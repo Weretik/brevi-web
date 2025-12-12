@@ -5,9 +5,5 @@ import { Component } from '@angular/core';
   imports: [],
   templateUrl: './reference.html',
   styleUrl: './reference.scss',
-
-
 })
-export class Reference {
-
-}
+export class Reference {}

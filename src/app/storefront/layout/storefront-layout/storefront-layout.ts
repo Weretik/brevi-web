@@ -9,5 +9,5 @@ import { Reference } from '../../../admin/features/reference';
   styleUrl: './storefront-layout.scss',
 })
 export class StorefrontLayout {
- public ref = new Reference();
+  public ref = new Reference();
 }

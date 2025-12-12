@@ -5,5 +5,5 @@ export const STOREFRONT_ROUTES: Routes = [
   {
     path: '',
     component: Home,
-  }
+  },
 ];

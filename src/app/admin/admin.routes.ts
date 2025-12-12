@@ -5,5 +5,5 @@ export const ADMIN_ROUTES: Routes = [
   {
     path: '',
     component: Reference,
-  }
+  },
 ];
