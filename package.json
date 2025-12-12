@@ -7,9 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:brevi-web": "node dist/brevi-web/server/server.mjs",
-    "lint": "ng lint",
-    "prepare": "husky"
+    "serve:ssr:brevi-web": "node dist/brevi-web/server/server.mjs"
   },
   "prettier": {
     "printWidth": 100,
@@ -46,13 +44,9 @@
     "@angular/compiler-cli": "^21.0.0",
     "@types/express": "^5.0.1",
     "@types/node": "^20.17.19",
-    "angular-eslint": "21.1.0",
-    "eslint": "^9.39.1",
-    "eslint-plugin-boundaries": "^5.3.1",
     "husky": "^9.1.7",
     "jsdom": "^27.1.0",
     "typescript": "~5.9.2",
-    "typescript-eslint": "8.47.0",
     "vitest": "^4.0.8"
   }
 }
