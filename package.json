@@ -7,7 +7,11 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:brevi-web": "node dist/brevi-web/server/server.mjs"
+    "serve:ssr:brevi-web": "node dist/brevi-web/server/server.mjs",
+    "lint": "ng lint",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "prepare": "husky"
   },
   "prettier": {
     "printWidth": 100,
@@ -46,6 +50,8 @@
     "@types/node": "^20.17.19",
     "husky": "^9.1.7",
     "jsdom": "^27.1.0",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.7.4",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8"
   }
