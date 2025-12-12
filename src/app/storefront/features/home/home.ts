@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import {Reference} from '../../../admin/features/reference';
 
 @Component({
   selector: 'app-home',
@@ -7,5 +8,5 @@ import { Component } from '@angular/core';
   styleUrl: './home.scss',
 })
 export class Home {
-
+  public ref= new Reference();
 }
