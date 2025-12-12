@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet, RouterLink } from '@angular/router';
+import { Reference } from '../../../admin/features/reference';
 
 @Component({
   selector: 'app-storefront-layout',
@@ -8,5 +9,5 @@ import { RouterOutlet, RouterLink } from '@angular/router';
   styleUrl: './storefront-layout.scss',
 })
 export class StorefrontLayout {
-
+ public ref = new Reference();
 }
