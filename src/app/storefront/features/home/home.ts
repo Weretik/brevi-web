@@ -1,7 +1,5 @@
 import { Component } from '@angular/core';
-
 import { Button } from 'primeng/button';
-import { Reference } from '../../../admin/features/reference';
 
 @Component({
   selector: 'app-home',
@@ -9,6 +7,4 @@ import { Reference } from '../../../admin/features/reference';
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
-export class Home {
-  public ref = new Reference();
-}
+export class Home {}
