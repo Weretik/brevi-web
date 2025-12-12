@@ -19,7 +19,9 @@
       "@app/*": ["src/app/*"],
       "@admin/*": ["src/app/admin/*"],
       "@storefront/*": ["src/app/storefront/*"],
-      "@shared/*": ["src/app/shared/*"]
+      "@shared/*": ["src/app/shared/*"],
+      "@core/*": ["src/app/core/*"],
+      "@environments/*": ["src/environments/*"]
     }
   },
   "angularCompilerOptions": {

@@ -7,7 +7,7 @@ import {
   withIncrementalHydration,
 } from '@angular/platform-browser';
 import { providePrimeNG } from 'primeng/config';
-import BreviStorePreset from './theme/brevi-store.preset';
+import BreviStorePreset from '@shared/theme/brevi-store.preset';
 
 export const appConfig: ApplicationConfig = {
   providers: [
