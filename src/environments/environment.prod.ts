@@ -1,5 +1,6 @@
 ﻿export const environment = {
   production: true,
+  enableHttpLogs: false,
 
   app: {
     name: 'Brevi Web',

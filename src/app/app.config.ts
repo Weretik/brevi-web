@@ -12,9 +12,14 @@ import {
 } from '@angular/platform-browser';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { TokenProvider, SessionTokenProvider } from '@app/core/auth/';
-import { baseUrlInterceptor, authInterceptor, errorInterceptor } from '@app/core/interceptors/';
+import {
+  baseUrlInterceptor,
+  authInterceptor,
+  errorInterceptor,
+  unauthorizedInterceptor,
+  loggingInterceptor,
+} from '@app/core/interceptors/';
 import { GlobalErrorHandler } from '@app/core/errors';
-import { unauthorizedInterceptor } from '@core/api/unauthorized.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -23,6 +28,7 @@ export const appConfig: ApplicationConfig = {
         baseUrlInterceptor,
         authInterceptor,
         unauthorizedInterceptor,
+        loggingInterceptor,
         errorInterceptor,
       ]),
     ),
