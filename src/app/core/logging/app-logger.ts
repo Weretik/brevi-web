@@ -14,7 +14,7 @@ export class AppLogger {
   logHttp(entry: HttpLogEntry): void {
     if (!environment.enableHttpLogs) return;
 
-    console.info('[HTTP]', entry);
+    console.warn('[HTTP]', entry);
   }
 
   logError(entry: HttpLogEntry): void {

@@ -1,36 +1,51 @@
 ﻿import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
-import { throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import type { ApiError } from '@app/core/errors/api-error';
 import { inject } from '@angular/core';
+import { catchError, throwError } from 'rxjs';
+import type { ApiError } from '@app/core/errors/api-error';
 import { AppLogger } from '@core/logging/app-logger';
 
-function mapHttpError(errorResponse: HttpErrorResponse): ApiError {
-  if (errorResponse.status === 0) {
+type ApiProblemDetails = {
+  message?: string;
+  title?: string;
+  traceId?: string;
+  errors?: Record<string, string[]>;
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function toProblemDetails(value: unknown): ApiProblemDetails | undefined {
+  if (!isRecord(value)) return undefined;
+
+  const errors = value['errors'];
+
+  return {
+    message: typeof value['message'] === 'string' ? value['message'] : undefined,
+    title: typeof value['title'] === 'string' ? value['title'] : undefined,
+    traceId: typeof value['traceId'] === 'string' ? value['traceId'] : undefined,
+    errors: isRecord(errors) ? (errors as Record<string, string[]>) : undefined,
+  };
+}
+
+function mapHttpError(err: HttpErrorResponse): ApiError {
+  if (err.status === 0) {
     return { code: 'Network', status: 0, message: 'Network error. Check connection.' };
   }
 
-  if (errorResponse.status === 401)
-    return { code: 'Unauthorized', status: 401, message: 'Unauthorized' };
+  if (err.status === 401) return { code: 'Unauthorized', status: 401, message: 'Unauthorized' };
+  if (err.status === 403) return { code: 'Forbidden', status: 403, message: 'Forbidden' };
+  if (err.status === 404) return { code: 'NotFound', status: 404, message: 'Not found' };
+  if (err.status >= 500) return { code: 'Server', status: err.status, message: 'Server error' };
 
-  if (errorResponse.status === 403) return { code: 'Forbidden', status: 403, message: 'Forbidden' };
+  const body = toProblemDetails(err.error);
+  const fieldErrors = body?.errors && typeof body.errors === 'object' ? body.errors : undefined;
 
-  if (errorResponse.status === 404) return { code: 'NotFound', status: 404, message: 'Not found' };
-
-  if (errorResponse.status >= 500)
-    return { code: 'Server', status: errorResponse.status, message: 'Server error' };
-
-  const body: any = errorResponse.error;
-  const fieldErrors =
-    body?.errors && typeof body.errors === 'object'
-      ? (body.errors as Record<string, string[]>)
-      : undefined;
-
-  const message = body?.message ?? body?.title ?? errorResponse.message ?? 'Request failed';
+  const message = body?.message ?? body?.title ?? err.message ?? 'Request failed';
 
   return {
     code: fieldErrors ? 'Validation' : 'Unknown',
-    status: errorResponse.status,
+    status: err.status,
     message,
     fieldErrors,
     traceId: body?.traceId,
@@ -41,15 +56,18 @@ export const errorInterceptor: HttpInterceptorFn = (request, next) => {
   const logger = inject(AppLogger);
 
   return next(request).pipe(
-    catchError((errorResponse: HttpErrorResponse) => {
+    catchError((e: unknown) => {
+      const err = e instanceof HttpErrorResponse ? e : new HttpErrorResponse({ error: e });
+
       logger.logError({
         method: request.method,
         url: request.url,
-        status: errorResponse.status,
+        status: err.status ?? 0,
         durationMs: 0,
-        error: errorResponse,
+        error: err,
       });
-      return throwError(() => mapHttpError(errorResponse));
+
+      return throwError(() => mapHttpError(err));
     }),
   );
 };

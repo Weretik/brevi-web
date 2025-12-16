@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
-import { RouterOutlet, RouterLink } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
+import { Footer } from '@storefront/shared/footer/footer';
+import { Header } from '@storefront/shared/header/header';
 
 @Component({
   selector: 'app-storefront-layout',
-  imports: [RouterOutlet, RouterLink],
+  imports: [RouterOutlet, Footer, Header],
   templateUrl: './storefront-layout.html',
   styleUrl: './storefront-layout.scss',
 })
