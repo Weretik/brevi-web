@@ -1,16 +1,23 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig, provideBrowserGlobalErrorListeners, ErrorHandler } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
+import { providePrimeNG } from 'primeng/config';
+import { MessageService } from 'primeng/api';
+import BreviStorePreset from '@shared/theme/brevi-store.preset';
+
 import {
   provideClientHydration,
   withEventReplay,
   withIncrementalHydration,
 } from '@angular/platform-browser';
-import { providePrimeNG } from 'primeng/config';
-import BreviStorePreset from '@shared/theme/brevi-store.preset';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { TokenProvider, NoopTokenProvider } from '@app/core/auth/';
+import { baseUrlInterceptor, authInterceptor, errorInterceptor } from '@app/core/interceptors/';
+import { GlobalErrorHandler } from '@app/core/errors';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideHttpClient(withInterceptors([baseUrlInterceptor, authInterceptor, errorInterceptor])),
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideClientHydration(withEventReplay(), withIncrementalHydration()),
@@ -32,5 +39,9 @@ export const appConfig: ApplicationConfig = {
         tooltip: 1100,
       },
     }),
+
+    { provide: TokenProvider, useClass: NoopTokenProvider },
+    MessageService,
+    { provide: ErrorHandler, useClass: GlobalErrorHandler },
   ],
 };
