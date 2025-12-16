@@ -11,13 +11,21 @@ import {
   withIncrementalHydration,
 } from '@angular/platform-browser';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { TokenProvider, NoopTokenProvider } from '@app/core/auth/';
+import { TokenProvider, SessionTokenProvider } from '@app/core/auth/';
 import { baseUrlInterceptor, authInterceptor, errorInterceptor } from '@app/core/interceptors/';
 import { GlobalErrorHandler } from '@app/core/errors';
+import { unauthorizedInterceptor } from '@core/api/unauthorized.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideHttpClient(withInterceptors([baseUrlInterceptor, authInterceptor, errorInterceptor])),
+    provideHttpClient(
+      withInterceptors([
+        baseUrlInterceptor,
+        authInterceptor,
+        unauthorizedInterceptor,
+        errorInterceptor,
+      ]),
+    ),
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideClientHydration(withEventReplay(), withIncrementalHydration()),
@@ -40,7 +48,7 @@ export const appConfig: ApplicationConfig = {
       },
     }),
 
-    { provide: TokenProvider, useClass: NoopTokenProvider },
+    { provide: TokenProvider, useClass: SessionTokenProvider },
     MessageService,
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
   ],
