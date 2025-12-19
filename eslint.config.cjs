@@ -93,12 +93,12 @@ module.exports = [
       'no-restricted-imports': ['error', {
           patterns: [
             {
-              group: ['@admin/features/*/*', '@admin/features/*/**'],
+              group: ['@admin/pages/*/*', '@admin/pages/*/**'],
               message:
-                'Do not deep-import from admin feature internals. Import only from @admin/features/<feature> (public API index.ts).',
+                'Do not deep-import from admin feature internals. Import only from @admin/pages/<feature> (public API index.ts).',
             },
             {
-              group: ['@storefront/features/*/*', '@storefront/features/*/**'],
+              group: ['@storefront/pages/*/*', '@storefront/pages/*/**'],
               message:
                 'Do not deep-import from storefront feature internals. Import only from @storefront/features/<feature> (public API index.ts).',
             },
@@ -107,14 +107,14 @@ module.exports = [
       ],
     },
   },
-  // 4) Core does not depend on features
+  // 4) Core does not depend on pages
   {
     files: ['src/app/admin/core/**/*.ts'],
     rules: {
       'no-restricted-imports': ['error', {
         patterns: [{
-          group: ['@admin/features/**'],
-          message: 'admin/core must not depend on admin/features.',
+          group: ['@admin/pages/**'],
+          message: 'admin/core must not depend on admin/pages.',
         }],
       }],
     },
@@ -124,8 +124,8 @@ module.exports = [
     rules: {
       'no-restricted-imports': ['error', {
         patterns: [{
-          group: ['@storefront/features/**'],
-          message: 'storefront/core must not depend on storefront/features.',
+          group: ['@storefront/pages/**'],
+          message: 'storefront/core must not depend on storefront/pages.',
         }],
       }],
     },
@@ -137,8 +137,8 @@ module.exports = [
     rules: {
       'no-restricted-imports': ['error', {
         patterns: [{
-          group: ['@admin/features/**'],
-          message: 'admin/shared must not depend on admin/features.',
+          group: ['@admin/pages/**'],
+          message: 'admin/shared must not depend on admin/pages.',
         }],
       }],
     },
@@ -148,8 +148,8 @@ module.exports = [
     rules: {
       'no-restricted-imports': ['error', {
         patterns: [{
-          group: ['@storefront/features/**'],
-          message: 'storefront/shared must not depend on storefront/features.',
+          group: ['@storefront/pages/**'],
+          message: 'storefront/shared must not depend on storefront/pages.',
         }],
       }],
     },
