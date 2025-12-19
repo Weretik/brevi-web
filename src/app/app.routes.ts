@@ -3,7 +3,7 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    loadChildren: () => import('@storefront/storefront.routes').then((m) => m.STOREFRONT_ROUTES),
+    loadChildren: () => import('@storefront/storefront.routes').then((m) => m.storefrontRoutes),
   },
   {
     path: 'admin',
