@@ -7,4 +7,10 @@ import { RouterLink } from '@angular/router';
   templateUrl: './header.html',
   styleUrl: './header.scss',
 })
-export class Header {}
+export class Header {
+  items = [
+    { label: 'Головна', routerLink: '/' },
+    { label: 'Каталог', routerLink: '/catalog' },
+    { label: 'Контакти', routerLink: '/contacts' },
+  ];
+}
