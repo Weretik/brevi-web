@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { Footer } from '@storefront/shared/footer/footer';
-import { Header } from '@storefront/shared/header/header';
+import { Header } from '../header/header';
+import { Footer } from '../footer/footer';
 
 @Component({
   selector: 'app-storefront-layout',
