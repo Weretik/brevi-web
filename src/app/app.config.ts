@@ -40,7 +40,7 @@ export const appConfig: ApplicationConfig = {
         preset: BreviStorePreset,
         options: {
           prefix: 'p',
-          darkModeSelector: '.dark-mode',
+          darkModeSelector: '.my-app-dark',
           cssLayer: false,
         },
       },
