@@ -8,6 +8,7 @@ module.exports = {
   trailingComma: 'all',
   arrowParens: 'always',
   endOfLine: 'lf',
+  htmlWhitespaceSensitivity: 'css',
 
   overrides: [
     {
