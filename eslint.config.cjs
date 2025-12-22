@@ -39,18 +39,21 @@ module.exports = [
   {
     files: ['src/**/*.ts'],
     rules: {
-      'no-restricted-imports': ['error', {
-        patterns: [
-          {
-            group: ['../**/admin/**', './**/admin/**'],
-            message: 'Use @admin/* imports. Relative imports into admin are forbidden.',
-          },
-          {
-            group: ['../**/storefront/**', './**/storefront/**'],
-            message: 'Use @storefront/* imports. Relative imports into storefront are forbidden.',
-          },
-        ],
-      }],
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['../**/admin/**', './**/admin/**'],
+              message: 'Use @admin/* imports. Relative imports into admin are forbidden.',
+            },
+            {
+              group: ['../**/storefront/**', './**/storefront/**'],
+              message: 'Use @storefront/* imports. Relative imports into storefront are forbidden.',
+            },
+          ],
+        },
+      ],
     },
   },
 
@@ -58,11 +61,14 @@ module.exports = [
   {
     files: ['src/app/admin/**/*.ts'],
     rules: {
-      'no-restricted-imports': ['error', {
+      'no-restricted-imports': [
+        'error',
+        {
           patterns: [
             {
               group: ['**/storefront/**'],
-              message: 'Admin cannot import from Storefront. Move shared code to src/app/shared (or core).',
+              message:
+                'Admin cannot import from Storefront. Move shared code to src/app/shared (or core).',
             },
           ],
         },
@@ -74,11 +80,14 @@ module.exports = [
   {
     files: ['src/app/storefront/**/*.ts'],
     rules: {
-      'no-restricted-imports': ['error', {
+      'no-restricted-imports': [
+        'error',
+        {
           patterns: [
             {
               group: ['**/admin/**'],
-              message: 'Storefront cannot import from Admin. Move shared code to src/app/shared (or core).',
+              message:
+                'Storefront cannot import from Admin. Move shared code to src/app/shared (or core).',
             },
           ],
         },
@@ -90,7 +99,9 @@ module.exports = [
   {
     files: ['src/**/*.ts'],
     rules: {
-      'no-restricted-imports': ['error', {
+      'no-restricted-imports': [
+        'error',
+        {
           patterns: [
             {
               group: ['@admin/pages/*/*', '@admin/pages/*/**'],
@@ -111,23 +122,33 @@ module.exports = [
   {
     files: ['src/app/admin/core/**/*.ts'],
     rules: {
-      'no-restricted-imports': ['error', {
-        patterns: [{
-          group: ['@admin/pages/**'],
-          message: 'admin/core must not depend on admin/pages.',
-        }],
-      }],
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@admin/pages/**'],
+              message: 'admin/core must not depend on admin/pages.',
+            },
+          ],
+        },
+      ],
     },
   },
   {
     files: ['src/app/storefront/core/**/*.ts'],
     rules: {
-      'no-restricted-imports': ['error', {
-        patterns: [{
-          group: ['@storefront/pages/**'],
-          message: 'storefront/core must not depend on storefront/pages.',
-        }],
-      }],
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@storefront/pages/**'],
+              message: 'storefront/core must not depend on storefront/pages.',
+            },
+          ],
+        },
+      ],
     },
   },
 
@@ -135,23 +156,33 @@ module.exports = [
   {
     files: ['src/app/admin/shared/**/*.ts'],
     rules: {
-      'no-restricted-imports': ['error', {
-        patterns: [{
-          group: ['@admin/pages/**'],
-          message: 'admin/shared must not depend on admin/pages.',
-        }],
-      }],
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@admin/pages/**'],
+              message: 'admin/shared must not depend on admin/pages.',
+            },
+          ],
+        },
+      ],
     },
   },
   {
     files: ['src/app/storefront/shared/**/*.ts'],
     rules: {
-      'no-restricted-imports': ['error', {
-        patterns: [{
-          group: ['@storefront/pages/**'],
-          message: 'storefront/shared must not depend on storefront/pages.',
-        }],
-      }],
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@storefront/pages/**'],
+              message: 'storefront/shared must not depend on storefront/pages.',
+            },
+          ],
+        },
+      ],
     },
   },
 
