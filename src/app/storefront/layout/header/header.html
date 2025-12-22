@@ -1,6 +1,73 @@
-<header>
-  <nav>
-    <a routerLink="/">Головна</a>
-    <a routerLink="/catalog">Каталог</a>
+<header class="resize-container-3 relative bg-brand-neutral dark:bg-surface-950">
+  <nav
+    class="relative flex items-center justify-between gap-8 px-8 lg:px-20 py-4 bg-brand-neutral dark:bg-surface-950"
+  >
+    <div class="flex items-center gap-4">
+      <img ngSrc="/assets/logo/brevi-logo-light.png" width="120" height="120" alt="Brevi Logo" />
+      <div class="text-white font-semibold text-lg">Trimzales</div>
+    </div>
+
+    <a
+      routerLink="/"
+      routerLinkActive="text-primary font-semibold"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="text-surface-600 hover:text-surface-900 transition"
+    >
+      Home
+    </a>
+
+    <a
+      routerLink="/customers"
+      routerLinkActive="text-primary font-semibold"
+      class="text-surface-600 hover:text-surface-900 transition"
+    >
+      Customers
+    </a>
+
+    <a
+      routerLink="/calendar"
+      routerLinkActive="text-primary font-semibold"
+      class="text-surface-600 hover:text-surface-900 transition"
+    >
+      Calendar
+    </a>
+
+    <a
+      routerLink="/stats"
+      routerLinkActive="text-primary font-semibold"
+      class="text-surface-600 hover:text-surface-900 transition"
+    >
+      Stats
+    </a>
+
+    <div
+      class="flex items-center gap-6 px-6 lg:px-0 py-4 lg:py-0 border-t lg:border-t-0 border-surface-800 flex-col lg:flex-row"
+    >
+      <div class="w-full lg:w-[216px]">
+        <p-iconfield iconPosition="left" class="w-full">
+          <p-inputicon class="pi pi-search text-surface-400"></p-inputicon>
+          <input
+            pInputText
+            type="text"
+            placeholder="Search"
+            class="bg-surface-800! text-surface-400! border-surface-700! w-full py-2! px-4! pl-10! rounded-md!"
+          />
+        </p-iconfield>
+      </div>
+
+      <div class="flex items-center w-full lg:w-auto">
+        <img
+          ngSrc="https://fqjltiegiezfetthbags.supabase.co/storage/v1/render/image/public/block.images/blocks/avatars/circle/avatar-m-1.png"
+          width="32"
+          height="32"
+          class="w-8 h-8 rounded-full shrink-0 cursor-pointer"
+          alt="Avatar"
+        />
+        <div class="lg:hidden flex flex-col gap-1 ml-3">
+          <div class="text-white font-medium">Robert Fox</div>
+          <div class="text-surface-400 text-sm">Developer</div>
+        </div>
+      </div>
+    </div>
   </nav>
 </header>
