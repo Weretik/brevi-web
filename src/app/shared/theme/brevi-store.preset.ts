@@ -20,34 +20,6 @@ const BreviStorePreset = definePreset(Lara, {
     success: palette('#22c55e'),
     warning: palette('#facc15'),
     danger: palette('#ef4444'),
-
-    colorScheme: {
-      light: {
-        primary: {
-          color: '#fd9600',
-          inverseColor: '#ffffff',
-          hoverColor: '#e58300',
-          activeColor: '#cc7500',
-        },
-        neutral: {
-          color: '#333333',
-          hoverColor: '#111111',
-        },
-      },
-
-      dark: {
-        primary: {
-          color: '#fd9600',
-          inverseColor: '#000000',
-          hoverColor: '#e58300',
-          activeColor: '#cc7500',
-        },
-        neutral: {
-          color: '#e5e5e5',
-          hoverColor: '#ffffff',
-        },
-      },
-    },
   },
 });
 
