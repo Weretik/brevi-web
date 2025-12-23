@@ -1,4 +1,4 @@
-import { Injectable, inject, PLATFORM_ID } from '@angular/core';
+import { Injectable, inject, PLATFORM_ID, signal } from '@angular/core';
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 
 @Injectable({
@@ -11,17 +11,36 @@ export class ThemeService {
 
   private readonly DARK_CLASS = 'my-app-dark';
 
-  getTheme(): boolean {
+  private readonly _isDark = signal(false);
+  readonly isDark = this._isDark.asReadonly();
+
+  public init(): void {
+    if (!this.isBrowser) return;
+
+    const isDark = localStorage.getItem('theme') === 'dark';
+    this.apply(isDark);
+    this._isDark.set(isDark);
+  }
+
+  public getTheme(): boolean {
     if (!this.isBrowser) return false;
 
     return localStorage.getItem('theme') === 'dark';
   }
 
-  setTheme(isDark: boolean): void {
+  public setTheme(isDark: boolean): void {
     if (!this.isBrowser) return;
 
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    this.apply(isDark);
+    this._isDark.set(isDark);
+  }
 
+  public toggleTheme(): void {
+    this.setTheme(!this.isDark());
+  }
+
+  private apply(isDark: boolean): void {
     this.document.documentElement.classList.toggle(this.DARK_CLASS, isDark);
   }
 }
