@@ -16,7 +16,7 @@
         [hideOnOutsideClick]="true"
         resizeSelector=".resize-container-2"
         [hideOnResize]="true"
-        class="cursor-pointer block lg:hidden text-surface-700 dark:text-surface-100 mt-1"
+        class="cursor-pointer block lg:hidden text-surface-100 dark:text-surface-100 mt-1"
       >
         <i class="pi pi-bars text-4xl!"></i>
       </a>
@@ -45,7 +45,7 @@
             >
               <li>
                 <a
-                  class="flex px-4 py-2 rounded items-center text-surface-900 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors duration-150 gap-2"
+                  class="flex items-center gap-2 px-4 py-2 rounded text-surface-900 hover:bg-surface-100 dark:text-surface-100 dark:hover:bg-surface-800 transition-colors duration-150"
                 >
                   <i class="pi pi-th-large"></i>
                   <span>Зимовий одяг</span>
@@ -53,7 +53,7 @@
               </li>
               <li>
                 <a
-                  class="flex px-4 py-2 rounded items-center text-surface-900 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors duration-150 gap-2"
+                  class="flex items-center gap-2 px-4 py-2 rounded text-surface-900 hover:bg-surface-100 dark:text-surface-100 dark:hover:bg-surface-800 transition-colors duration-150"
                 >
                   <i class="pi pi-microchip"></i>
                   <span>Літній одяг</span>
@@ -61,7 +61,7 @@
               </li>
               <li>
                 <a
-                  class="flex px-4 py-2 rounded items-center text-surface-900 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors duration-150 gap-2"
+                  class="flex items-center gap-2 px-4 py-2 rounded text-surface-900 hover:bg-surface-100 dark:text-surface-100 dark:hover:bg-surface-800 transition-colors duration-150"
                 >
                   <i class="pi pi-users"></i>
                   <span>Захист очей</span>
@@ -108,10 +108,16 @@
         </div>
 
         <div
-          class="flex items-center gap-7 px-6 ml-2 lg:px-0 py-4 lg:py-0 border-t lg:border-t-0 border-primary-400 flex-row"
+          class="flex w-full items-center justify-center gap-3 px-0 py-4 border-t border-primary-400 lg:w-auto lg:justify-end lg:px-0 lg:py-0 lg:border-t-0"
         >
-          <button pButton type="button" [rounded]="true" [text]="true" (click)="toggleTheme()">
-            <i class="pi" [ngClass]="checked ? 'pi-moon' : 'pi-sun'"></i>
+          <button
+            pButton
+            type="button"
+            [rounded]="true"
+            [text]="true"
+            (click)="themeService.toggleTheme()"
+          >
+            <i class="pi" [ngClass]="themeService.isDark() ? 'pi-moon' : 'pi-sun'"></i>
           </button>
         </div>
       </div>

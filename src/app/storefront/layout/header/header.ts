@@ -26,21 +26,13 @@ import { ThemeService } from '@core/services/theme.service';
   styleUrl: './header.scss',
 })
 export class Header {
-  private readonly themeService = inject(ThemeService);
-  public checked = false;
+  public readonly themeService = inject(ThemeService);
 
-  private ngOnInit(): void {
-    this.checked = this.themeService.getTheme();
-    this.themeService.setTheme(this.checked);
+  public ngOnInit(): void {
+    this.themeService.init();
   }
 
   public onThemeToggle(value: boolean): void {
-    this.checked = value;
     this.themeService.setTheme(value);
-  }
-
-  public toggleTheme(): void {
-    this.checked = !this.checked;
-    this.onThemeToggle(this.checked);
   }
 }
