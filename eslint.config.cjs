@@ -27,6 +27,7 @@ module.exports = [
     plugins: { prettier: prettierPlugin },
     rules: {
       'prettier/prettier': 'error',
+      '@angular-eslint/use-lifecycle-interface': 'off',
       '@typescript-eslint/no-unused-vars': 'error',
       '@typescript-eslint/no-explicit-any': 'warn',
       'no-console': ['warn', { allow: ['warn', 'error'] }],
