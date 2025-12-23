@@ -1,73 +1,120 @@
 <header class="resize-container-3 relative bg-brand-neutral dark:bg-surface-950">
-  <nav
-    class="relative flex items-center justify-between gap-8 px-8 lg:px-20 py-4 bg-brand-neutral dark:bg-surface-950"
-  >
-    <div class="flex items-center gap-4">
-      <img ngSrc="/assets/logo/brevi-logo-light.png" width="120" height="120" alt="Brevi Logo" />
-      <div class="text-white font-semibold text-lg">Trimzales</div>
-    </div>
-
-    <a
-      routerLink="/"
-      routerLinkActive="text-primary font-semibold"
-      [routerLinkActiveOptions]="{ exact: true }"
-      class="text-surface-600 hover:text-surface-900 transition"
+  <div class="resize-container-2 bg-surface-50 dark:bg-surface-950">
+    <nav
+      class="bg-brand-neutral dark:bg-surface-900 py-4 px-12 border-b border-surface-200 dark:border-surface-800 flex items-center justify-between relative lg:static"
     >
-      Home
-    </a>
-
-    <a
-      routerLink="/customers"
-      routerLinkActive="text-primary font-semibold"
-      class="text-surface-600 hover:text-surface-900 transition"
-    >
-      Customers
-    </a>
-
-    <a
-      routerLink="/calendar"
-      routerLinkActive="text-primary font-semibold"
-      class="text-surface-600 hover:text-surface-900 transition"
-    >
-      Calendar
-    </a>
-
-    <a
-      routerLink="/stats"
-      routerLinkActive="text-primary font-semibold"
-      class="text-surface-600 hover:text-surface-900 transition"
-    >
-      Stats
-    </a>
-
-    <div
-      class="flex items-center gap-6 px-6 lg:px-0 py-4 lg:py-0 border-t lg:border-t-0 border-surface-800 flex-col lg:flex-row"
-    >
-      <div class="w-full lg:w-[216px]">
-        <p-iconfield iconPosition="left" class="w-full">
-          <p-inputicon class="pi pi-search text-surface-400"></p-inputicon>
-          <input
-            pInputText
-            type="text"
-            placeholder="Search"
-            class="bg-surface-800! text-surface-400! border-surface-700! w-full py-2! px-4! pl-10! rounded-md!"
-          />
-        </p-iconfield>
+      <div class="flex items-center gap-4 py-2">
+        <img ngSrc="/assets/logo/brevi-logo-light.png" width="131" height="63" alt="Brevi Logo" />
       </div>
 
-      <div class="flex items-center w-full lg:w-auto">
-        <img
-          ngSrc="https://fqjltiegiezfetthbags.supabase.co/storage/v1/render/image/public/block.images/blocks/avatars/circle/avatar-m-1.png"
-          width="32"
-          height="32"
-          class="w-8 h-8 rounded-full shrink-0 cursor-pointer"
-          alt="Avatar"
-        />
-        <div class="lg:hidden flex flex-col gap-1 ml-3">
-          <div class="text-white font-medium">Robert Fox</div>
-          <div class="text-surface-400 text-sm">Developer</div>
+      <a
+        pStyleClass="@next"
+        enterFromClass="hidden"
+        enterActiveClass="animate-fadein"
+        leaveToClass="hidden"
+        leaveActiveClass="animate-fadeout"
+        [hideOnOutsideClick]="true"
+        resizeSelector=".resize-container-2"
+        [hideOnResize]="true"
+        class="cursor-pointer block lg:hidden text-surface-700 dark:text-surface-100 mt-1"
+      >
+        <i class="pi pi-bars text-4xl!"></i>
+      </a>
+      <div
+        class="items-center grow justify-between hidden lg:flex absolute lg:static w-full bg-brand-neutral dark:bg-surface-900 left-0 top-full px-12 lg:px-0 z-50 shadow lg:shadow-none"
+      >
+        <ul
+          class="list-none p-0 py-4 lg:py-0 m-0 flex grow lg:items-center lg:justify-center text-surface-0 dark:text-surface-0 select-none flex-col lg:flex-row cursor-pointer"
+        >
+          <li class="relative">
+            <a
+              pStyleClass="@next"
+              enterFromClass="hidden"
+              enterActiveClass="animate-scalein"
+              leaveToClass="hidden"
+              leaveActiveClass="animate-fadeout"
+              [hideOnOutsideClick]="true"
+              class="flex px-0 lg:px-8 py-2 items-center hover:text-primary font-medium transition-colors duration-150"
+            >
+              <span>Каталог</span>
+              <i class="pi pi-angle-down ml-auto lg:ml-3"></i>
+            </a>
+
+            <ul
+              class="list-none p-1 m-0 rounded-border shadow-0 lg:shadow lg:absolute top-18 bg-surface-50 dark:bg-surface-900 hidden origin-top w-full lg:w-60"
+            >
+              <li>
+                <a
+                  class="flex px-4 py-2 rounded items-center text-surface-900 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors duration-150 gap-2"
+                >
+                  <i class="pi pi-th-large"></i>
+                  <span>Зимовий одяг</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  class="flex px-4 py-2 rounded items-center text-surface-900 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors duration-150 gap-2"
+                >
+                  <i class="pi pi-microchip"></i>
+                  <span>Літній одяг</span>
+                </a>
+              </li>
+              <li>
+                <a
+                  class="flex px-4 py-2 rounded items-center text-surface-900 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors duration-150 gap-2"
+                >
+                  <i class="pi pi-users"></i>
+                  <span>Захист очей</span>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <li>
+            <a
+              class="flex px-0 lg:px-8 py-2 hover:text-primary font-medium transition-colors duration-150"
+            >
+              <span>Замовити оптом</span>
+            </a>
+          </li>
+
+          <li>
+            <a
+              class="flex px-0 lg:px-8 py-2 hover:text-primary font-medium transition-colors duration-150"
+            >
+              <span>Регіони</span>
+            </a>
+          </li>
+
+          <li>
+            <a
+              class="flex px-0 lg:px-8 py-2 hover:text-primary font-medium transition-colors duration-150"
+            >
+              <span>Про нас</span>
+            </a>
+          </li>
+        </ul>
+
+        <div class="w-full lg:w-54">
+          <p-iconfield iconPosition="left" class="w-full">
+            <p-inputicon class="pi pi-search text-surface-400"></p-inputicon>
+            <input
+              pInputText
+              type="text"
+              placeholder="Пошук"
+              class="bg-surface-50! text-surface-400! border-surface-700! w-full py-2! px-4! pl-10! rounded-md!"
+            />
+          </p-iconfield>
+        </div>
+
+        <div
+          class="flex items-center gap-7 px-6 ml-2 lg:px-0 py-4 lg:py-0 border-t lg:border-t-0 border-primary-400 flex-row"
+        >
+          <button pButton type="button" [rounded]="true" [text]="true" (click)="toggleTheme()">
+            <i class="pi" [ngClass]="checked ? 'pi-moon' : 'pi-sun'"></i>
+          </button>
         </div>
       </div>
-    </div>
-  </nav>
+    </nav>
+  </div>
 </header>
