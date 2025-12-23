@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NgClass, NgOptimizedImage } from '@angular/common';
+import { ThemeService } from '@core/services/theme.service';
 
 @Component({
   selector: 'app-footer',
@@ -7,4 +8,6 @@ import { NgClass, NgOptimizedImage } from '@angular/common';
   templateUrl: './footer.html',
   styleUrl: './footer.scss',
 })
-export class Footer {}
+export class Footer {
+  readonly theme = inject(ThemeService);
+}
