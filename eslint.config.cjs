@@ -105,12 +105,12 @@ module.exports = [
         {
           patterns: [
             {
-              group: ['@admin/pages/*/*', '@admin/pages/*/**'],
+              group: ['@admin/features/*/*', '@admin/features/*/**'],
               message:
                 'Do not deep-import from admin feature internals. Import only from @admin/pages/<feature> (public API index.ts).',
             },
             {
-              group: ['@storefront/pages/*/*', '@storefront/pages/*/**'],
+              group: ['@storefront/features/*/*', '@storefront/features/*/**'],
               message:
                 'Do not deep-import from storefront feature internals. Import only from @storefront/features/<feature> (public API index.ts).',
             },
@@ -128,8 +128,8 @@ module.exports = [
         {
           patterns: [
             {
-              group: ['@admin/pages/**'],
-              message: 'admin/core must not depend on admin/pages.',
+              group: ['@admin/features/**'],
+              message: 'admin/core must not depend on admin/features.',
             },
           ],
         },
@@ -144,8 +144,8 @@ module.exports = [
         {
           patterns: [
             {
-              group: ['@storefront/pages/**'],
-              message: 'storefront/core must not depend on storefront/pages.',
+              group: ['@storefront/features/**'],
+              message: 'storefront/core must not depend on storefront/features.',
             },
           ],
         },
@@ -162,8 +162,8 @@ module.exports = [
         {
           patterns: [
             {
-              group: ['@admin/pages/**'],
-              message: 'admin/shared must not depend on admin/pages.',
+              group: ['@admin/features/**'],
+              message: 'admin/shared must not depend on admin/features.',
             },
           ],
         },
@@ -178,8 +178,8 @@ module.exports = [
         {
           patterns: [
             {
-              group: ['@storefront/pages/**'],
-              message: 'storefront/shared must not depend on storefront/pages.',
+              group: ['@storefront/features/**'],
+              message: 'storefront/shared must not depend on storefront/features.',
             },
           ],
         },
