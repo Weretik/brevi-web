@@ -13,23 +13,16 @@
         </a>
       </ng-template>
       <ng-template #end>
-        <div class="flex items-center gap-2">
-          <p-iconfield iconPosition="left">
-            <p-inputicon class="pi pi-search text-surface-400"></p-inputicon>
-            <input type="text" pInputText placeholder="Пошук" class="w-42" />
-          </p-iconfield>
-
-          <div class="flex items-center">
-            <button
-              pButton
-              type="button"
-              [rounded]="true"
-              [text]="true"
-              (click)="themeService.toggleTheme()"
-            >
-              <i class="pi" [ngClass]="themeService.isDark() ? 'pi-moon' : 'pi-sun'"></i>
-            </button>
-          </div>
+        <div class="flex items-center">
+          <button
+            pButton
+            type="button"
+            [rounded]="true"
+            [text]="true"
+            (click)="themeService.toggleTheme()"
+          >
+            <i class="pi" [ngClass]="themeService.isDark() ? 'pi-moon' : 'pi-sun'"></i>
+          </button>
         </div>
       </ng-template>
     </p-menubar>

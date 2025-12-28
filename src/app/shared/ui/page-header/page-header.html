@@ -1,4 +1,4 @@
-<div class="bg-surface-0 dark:bg-surface-950 px-6 py-8 md:px-12 lg:px-20">
+<div class="bg-brand-bg dark:bg-surface-950 px-6 py-8 md:px-12 lg:px-20">
   <div class="flex flex-col gap-4">
     <!-- Breadcrumbs -->
     <ul class="list-none p-0 m-0 flex flex-wrap items-center font-medium">
@@ -7,7 +7,7 @@
           <span
             [class.text-surface-900]="last"
             [class.text-surface-500]="!last"
-            class="leading-normal truncate max-w-[120px]"
+            class="leading-normal truncate max-w-30"
           >
             {{ item }}
           </span>
@@ -30,7 +30,7 @@
       @if (config().showSearch) {
         <p-iconfield>
           <p-inputicon class="pi pi-search"></p-inputicon>
-          <input pInputText type="text" placeholder="Search" />
+          <input pInputText type="text" placeholder="Пошук" />
         </p-iconfield>
       }
     </div>

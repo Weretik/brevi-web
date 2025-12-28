@@ -2,9 +2,6 @@ import { Component, computed, inject } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { StyleClassModule } from 'primeng/styleclass';
-import { IconField } from 'primeng/iconfield';
-import { InputIcon } from 'primeng/inputicon';
-import { InputText } from 'primeng/inputtext';
 import { ToggleButtonModule } from 'primeng/togglebutton';
 import { FormsModule } from '@angular/forms';
 import { ThemeService } from '@core/services/theme.service';
@@ -19,10 +16,7 @@ import { tokens } from '@shared/theme/design-tokens';
     CommonModule,
     ButtonModule,
     StyleClassModule,
-    IconField,
-    InputIcon,
     NgOptimizedImage,
-    InputText,
     ToggleButtonModule,
     FormsModule,
     Menubar,
