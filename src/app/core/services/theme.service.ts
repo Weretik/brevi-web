@@ -13,7 +13,7 @@ export class ThemeService {
   private readonly THEME_KEY = 'theme';
 
   private readonly _isDark = signal(false);
-  readonly isDark = this._isDark.asReadonly();
+  public readonly isDark = this._isDark.asReadonly();
 
   public init(): void {
     const isDark = this.storage.getItem(this.THEME_KEY) === 'dark';
