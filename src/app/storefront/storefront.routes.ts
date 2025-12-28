@@ -2,7 +2,7 @@
 import { Home } from './features/home';
 import { StorefrontLayout } from '@storefront/layout/storefront-layout/storefront-layout';
 import { Catalog } from '@storefront/features/catalog';
-import { Contacts } from '@storefront/features/contacts';
+import { Contacts } from '@storefront/features/contacts/feature/pages/contacts';
 
 export const storefrontRoutes: Routes = [
   {
