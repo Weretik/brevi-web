@@ -1,5 +1,6 @@
 ﻿import { definePreset, palette } from '@primeuix/themes';
 import Lara from '@primeuix/themes/lara';
+import { tokens } from './design-tokens';
 
 const BreviStorePreset = definePreset(Lara, {
   global: {
@@ -8,18 +9,19 @@ const BreviStorePreset = definePreset(Lara, {
     focusRing: {
       width: '2px',
       style: 'solid',
-      color: '#fd9600',
+      color: tokens.colors.primary,
+      offset: '2px',
     },
   },
 
   semantic: {
-    primary: palette('#fd9600'),
-    neutral: palette('#333333'),
+    primary: palette(tokens.colors.primary),
+    neutral: palette(tokens.colors.neutral),
 
-    info: palette('#0ea5e9'),
-    success: palette('#22c55e'),
-    warning: palette('#facc15'),
-    danger: palette('#ef4444'),
+    info: palette(tokens.colors.info),
+    success: palette(tokens.colors.success),
+    warning: palette(tokens.colors.warning),
+    danger: palette(tokens.colors.danger),
   },
 });
 
