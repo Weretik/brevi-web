@@ -1,0 +1,32 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "preserve",
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@app/*": ["apps/brevi-web/src/app/*"],
+      "@layouts/*": ["apps/brevi-web/src/app/layouts/*"],
+      "@routing/*": ["apps/brevi-web/src/app/routing/*"],
+      "@environments/*": ["apps/brevi-web/src/environments/*"],
+      "@shared/ui": ["libs/shared/ui/src/index.ts"],
+      "@shared/util": ["libs/shared/util/src/index.ts"],
+      "@shared/data-access": ["libs/shared/data-access/src/index.ts"],
+      "@shared/auth": ["libs/shared/auth/src/index.ts"],
+      "@shared/config": ["libs/shared/config/src/index.ts"],
+      "@shared/forms": ["libs/shared/forms/src/index.ts"],
+      "@shared/http": ["libs/shared/http/src/index.ts"],
+      "@shared/logging": ["libs/shared/logging/src/index.ts"],
+      "@storefront/ui": ["libs/storefront/ui/src/index.ts"],
+      "@storefront/data-access": ["libs/storefront/data-access/src/index.ts"],
+      "@storefront/feature-home": ["libs/storefront/feature-home/src/index.ts"],
+      "@storefront/util": ["libs/storefront/util/src/index.ts"],
+      "@storefront/feature-contacts": ["libs/storefront/feature-contacts/src/index.ts"],
+      "@storefront/feature-catalog": ["libs/storefront/feature-catalog/src/index.ts"],
+      "@admin/feature-dashboard": ["libs/admin/feature-dashboard/src/index.ts"]
+    }
+  }
+}

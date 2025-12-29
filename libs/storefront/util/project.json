@@ -1,0 +1,13 @@
+{
+  "name": "storefront-util",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/storefront/util/src",
+  "prefix": "lib",
+  "projectType": "library",
+  "tags": ["scope:storefront", "type:util"],
+  "targets": {
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

@@ -6,6 +6,6 @@
     "outDir": "./out-tsc/app",
     "types": ["node"]
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["src/**/*.spec.ts"]
+  "include": ["apps/brevi-web/src/**/*.ts"],
+  "exclude": ["apps/brevi-web/src/**/*.d.ts"]
 }
