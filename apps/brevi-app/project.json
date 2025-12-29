@@ -67,12 +67,7 @@
     "lint": {
       "executor": "@nx/eslint:lint",
       "options": {
-        "lintFilePatterns": [
-          "apps/brevi-app/**/*.ts",
-          "apps/brevi-app/**/*.html",
-          "libs/**/*.ts",
-          "libs/**/*.html"
-        ]
+        "lintFilePatterns": ["apps/brevi-app/**/*.ts", "apps/brevi-app/**/*.html"]
       }
     },
     "test": {

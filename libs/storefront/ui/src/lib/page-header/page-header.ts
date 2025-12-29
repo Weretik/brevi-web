@@ -5,7 +5,7 @@ import { InputIcon } from 'primeng/inputicon';
 import { PageHeaderConfig } from './page-header.config';
 
 @Component({
-  selector: 'app-page-header',
+  selector: 'lib-page-header',
   imports: [IconField, InputIcon, InputText],
   templateUrl: './page-header.html',
   styleUrl: './page-header.scss',

@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, OnInit, computed, inject } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { StyleClassModule } from 'primeng/styleclass';
@@ -11,7 +11,7 @@ import { RouterLink } from '@angular/router';
 import { tokens } from '@shared/ui';
 
 @Component({
-  selector: 'app-header',
+  selector: 'lib-header',
   imports: [
     CommonModule,
     ButtonModule,
@@ -25,7 +25,7 @@ import { tokens } from '@shared/ui';
   templateUrl: './header.html',
   styleUrl: './header.scss',
 })
-export class Header {
+export class Header implements OnInit {
   public readonly themeService = inject(ThemeService);
 
   public ngOnInit(): void {

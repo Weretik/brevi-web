@@ -3,7 +3,7 @@ import { NgClass, NgOptimizedImage } from '@angular/common';
 import { ThemeService } from '@shared/ui';
 
 @Component({
-  selector: 'app-footer',
+  selector: 'lib-footer',
   imports: [NgClass, NgOptimizedImage],
   templateUrl: './footer.html',
   styleUrl: './footer.scss',
