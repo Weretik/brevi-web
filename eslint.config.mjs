@@ -30,7 +30,10 @@ export default defineConfig([
   },
 
   // 2) TypeScript recommended
-  ...tseslint.configs.recommended,
+  ...tseslint.configs.recommended.map((cfg) => ({
+    ...cfg,
+    files: ["**/*.ts", "**/*.tsx"],
+  })),
 
   // 3) Angular TS rules —  apps/libs
   ...angular.configs.tsRecommended.map((cfg) => ({
