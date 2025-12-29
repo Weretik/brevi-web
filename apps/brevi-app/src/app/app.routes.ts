@@ -1,6 +1,6 @@
-import { Routes } from '@angular/router';
+import { Route } from '@angular/router';
 
-export const routes: Routes = [
+export const appRoutes: Route[] = [
   {
     path: '',
     loadChildren: () => import('./routing/storefront.routes').then((m) => m.storefrontRoutes),

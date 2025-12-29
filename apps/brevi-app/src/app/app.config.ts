@@ -1,6 +1,6 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners, ErrorHandler } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { routes } from './app.routes';
+import { appRoutes } from './app.routes';
 import { providePrimeNG } from 'primeng/config';
 import { MessageService } from 'primeng/api';
 import { BreviStorePreset } from '@shared/ui';
@@ -27,7 +27,7 @@ export const appConfig: ApplicationConfig = {
       ]),
     ),
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes),
+    provideRouter(appRoutes),
     provideClientHydration(withEventReplay(), withIncrementalHydration()),
     providePrimeNG({
       theme: {
