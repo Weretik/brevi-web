@@ -2,6 +2,8 @@
 const globals = require("globals");
 const tseslint = require("typescript-eslint");
 const angular = require("angular-eslint");
+const nx = require("@nx/eslint-plugin");
+const importPlugin = require("eslint-plugin-import");
 
 const only = (configs, files) =>
   configs.map((c) => ({
