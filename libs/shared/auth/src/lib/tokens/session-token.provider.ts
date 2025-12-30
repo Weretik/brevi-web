@@ -1,7 +1,7 @@
 ﻿import { inject, Injectable } from '@angular/core';
 
-import { TokenProvider } from '../interceptors/auth.interceptor';
-import { SessionStore } from '../services/auth.service';
+import { TokenProvider } from './token.provider';
+import { SessionStore } from '../state/session.store';
 
 @Injectable({ providedIn: 'root' })
 export class SessionTokenProvider extends TokenProvider {

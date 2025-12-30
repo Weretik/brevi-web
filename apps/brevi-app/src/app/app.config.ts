@@ -18,7 +18,7 @@ import { MessageService } from 'primeng/api';
 import { providePrimeNG } from 'primeng/config';
 
 import { appRoutes } from './app.routes';
-import { environment } from '../environments/environment';
+import { environment } from './environments/environment';
 
 export const appConfig: ApplicationConfig = {
   providers: [
