@@ -71,4 +71,89 @@ module.exports = [
       "@angular-eslint/use-lifecycle-interface": "off",
     },
   },
+  {
+    files: ["**/*.{ts,tsx,mts,cts,js,mjs,cjs}"],
+    plugins: {
+      import: importPlugin,
+    },
+    rules: {
+      "import/no-duplicates": "error",
+      "import/newline-after-import": "error",
+      "import/order": [
+        "error",
+        {
+          groups: [
+            "builtin",
+            "external",
+            "internal",
+            ["parent", "sibling", "index"],
+            "object",
+            "type"
+          ],
+          "newlines-between": "always",
+          alphabetize: { order: "asc", caseInsensitive: true },
+        },
+      ],
+    },
+  },
+
+  {
+    files: ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"],
+    plugins: {
+      "@nx": nx,
+    },
+    rules: {
+      "@nx/enforce-module-boundaries": [
+        "error",
+        {
+          enforceBuildableLibDependency: true,
+          allow: [],
+
+          // Important: we prohibit “deep” imports into src/lib/*
+          // We only allow public entry points (index.ts) via importPath aliases.
+          banTransitiveDependencies: true,
+
+          depConstraints: [
+            // brevi-app can depend on everything
+            {
+              sourceTag: "scope:brevi-app",
+              onlyDependOnLibsWithTags: ["scope:shared", "scope:storefront", "scope:admin"],
+            },
+
+            // storefront can only depend on shared and storefront
+
+            // admin can only depend on shared and admin
+            {
+              sourceTag: "scope:admin",
+              onlyDependOnLibsWithTags: ["scope:admin", "scope:shared"],
+            },
+
+            // shared — from no one (except shared)
+            {
+              sourceTag: "scope:shared",
+              onlyDependOnLibsWithTags: ["scope:shared"],
+            },
+
+            // UI libraries should not pull data access
+            {
+              sourceTag: "type:ui",
+              onlyDependOnLibsWithTags: ["type:ui", "type:util", "type:feature", "scope:shared"],
+            },
+
+            // data-access can be used from feature, but data-access should not pull feature
+            {
+              sourceTag: "type:data-access",
+              onlyDependOnLibsWithTags: ["type:data-access", "type:util", "scope:shared"],
+            },
+
+            // feature can pull ui/util/data-access into its scope
+            {
+              sourceTag: "type:feature",
+              onlyDependOnLibsWithTags: ["type:feature", "type:ui", "type:util", "type:data-access", "scope:shared"],
+            },
+          ],
+        },
+      ],
+    },
+  },
 ];
