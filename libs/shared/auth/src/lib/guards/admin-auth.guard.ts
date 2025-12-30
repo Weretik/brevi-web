@@ -1,6 +1,7 @@
-﻿import { CanMatchFn, Router } from '@angular/router';
-import { inject } from '@angular/core';
-import { SessionStore } from '@shared/auth';
+﻿import { inject } from '@angular/core';
+import { CanMatchFn, Router } from '@angular/router';
+
+import { SessionStore } from '../services/auth.service';
 
 export const adminAuthGuard: CanMatchFn = () => {
   const session = inject(SessionStore);

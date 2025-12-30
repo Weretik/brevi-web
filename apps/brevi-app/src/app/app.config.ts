@@ -13,8 +13,7 @@ import {
   unauthorizedInterceptor,
 } from '@shared/auth';
 import { baseUrlInterceptor, errorInterceptor, loggingInterceptor, API_URL } from '@shared/http';
-import { BreviStorePreset } from '@shared/ui';
-import { GlobalErrorHandler } from '@shared/util';
+import { BreviStorePreset, GlobalErrorHandler } from '@shared/ui';
 import { MessageService } from 'primeng/api';
 import { providePrimeNG } from 'primeng/config';
 

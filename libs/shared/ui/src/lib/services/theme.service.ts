@@ -1,5 +1,5 @@
-import { Injectable, inject, signal } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
+import { Injectable, inject, signal } from '@angular/core';
 import { BrowserStorageService } from '@shared/util';
 
 type ThemeValue = 'dark' | 'light';

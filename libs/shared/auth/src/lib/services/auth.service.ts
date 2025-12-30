@@ -1,6 +1,8 @@
 ﻿import { inject, Injectable } from '@angular/core';
 import { tap } from 'rxjs/operators';
-import { AuthApi, LoginRequest, SessionStore } from '@shared/auth';
+
+import { SessionStore } from './auth.service';
+import { AuthApi, LoginRequest } from '../data-access/auth.api';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {

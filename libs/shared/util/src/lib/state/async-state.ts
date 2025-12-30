@@ -1,4 +1,4 @@
-﻿import type { ApiError } from '@shared/util';
+﻿import { ApiError } from '../errors/api-error';
 
 export type AsyncStatus = 'idle' | 'pending' | 'fulfilled' | 'rejected';
 

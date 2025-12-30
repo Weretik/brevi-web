@@ -1,9 +1,14 @@
-﻿import { environment } from '@environments/environment';
+﻿import { InjectionToken } from '@angular/core';
 
-export const AppConfig = {
-  production: environment.production,
-  appName: environment.app.name,
-  appVersion: environment.app.version,
-  apiBaseUrl: environment.api.baseUrl,
-  features: environment.features,
-} as const;
+export interface AppConfig {
+  production: boolean;
+  appName: string;
+  appVersion: string;
+  apiBaseUrl: string;
+  features: {
+    admin: boolean;
+    storefront: boolean;
+  };
+}
+
+export const APP_CONFIG = new InjectionToken<AppConfig>('APP_CONFIG');

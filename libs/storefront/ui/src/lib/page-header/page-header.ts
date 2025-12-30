@@ -1,7 +1,8 @@
 import { Component, input } from '@angular/core';
-import { InputText } from 'primeng/inputtext';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
+import { InputText } from 'primeng/inputtext';
+
 import { PageHeaderConfig } from './page-header.config';
 
 @Component({

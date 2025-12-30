@@ -1,14 +1,13 @@
-import { Component, OnInit, computed, inject } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { Component, OnInit, computed, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { ThemeService, tokens } from '@shared/ui';
+import { MenuItem } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { Menubar } from 'primeng/menubar';
 import { StyleClassModule } from 'primeng/styleclass';
 import { ToggleButtonModule } from 'primeng/togglebutton';
-import { FormsModule } from '@angular/forms';
-import { ThemeService } from '@shared/ui';
-import { MenuItem } from 'primeng/api';
-import { Menubar } from 'primeng/menubar';
-import { RouterLink } from '@angular/router';
-import { tokens } from '@shared/ui';
 
 @Component({
   selector: 'lib-header',

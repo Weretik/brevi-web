@@ -1,7 +1,7 @@
 ﻿import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { finalize, tap } from 'rxjs/operators';
 import { AppLogger } from '@shared/logging';
+import { finalize, tap } from 'rxjs/operators';
 
 export const loggingInterceptor: HttpInterceptorFn = (req, next) => {
   const logger = inject(AppLogger);

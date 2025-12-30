@@ -3,6 +3,6 @@
 export const FEATURE_CONTACTS_ROUTES: Routes = [
   {
     path: 'contacts',
-    loadComponent: () => import('@storefront/feature-contacts').then((p) => p.ContactsPage),
+    loadComponent: () => import('./contacts-page/contacts-page').then((p) => p.ContactsPage),
   },
 ];

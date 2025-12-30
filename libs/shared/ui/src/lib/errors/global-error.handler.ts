@@ -1,8 +1,8 @@
 ﻿import { ErrorHandler, Injectable, inject } from '@angular/core';
-import { ApiError } from './api-error';
-import { ToastService } from '@shared/ui';
-import { NotificationService } from '@shared/ui';
-import { mapToApiError } from '@shared/util';
+import { ApiError, mapToApiError } from '@shared/util';
+
+import { NotificationService } from '../services/notification.service';
+import { ToastService } from '../services/toast.service';
 
 @Injectable({ providedIn: 'root' })
 export class GlobalErrorHandler implements ErrorHandler {

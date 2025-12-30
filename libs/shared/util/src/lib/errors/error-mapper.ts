@@ -1,6 +1,8 @@
 ﻿import { HttpErrorResponse } from '@angular/common/http';
-import type { ApiError } from './api-error';
+
 import { AppErrorFactory } from './api-error.factory';
+
+import type { ApiError } from './api-error';
 
 function isChunkLoadError(e: unknown): boolean {
   const msg = e instanceof Error ? e.message : typeof e === 'string' ? e : '';
