@@ -1,22 +1,29 @@
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { ApplicationConfig, provideBrowserGlobalErrorListeners, ErrorHandler } from '@angular/core';
-import { provideRouter } from '@angular/router';
-import { appRoutes } from './app.routes';
-import { providePrimeNG } from 'primeng/config';
-import { MessageService } from 'primeng/api';
-import { BreviStorePreset } from '@shared/ui';
 import {
   provideClientHydration,
   withEventReplay,
   withIncrementalHydration,
 } from '@angular/platform-browser';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { TokenProvider, SessionTokenProvider } from '@shared/auth';
-import { baseUrlInterceptor, errorInterceptor, loggingInterceptor } from '@shared/http';
-import { authInterceptor, unauthorizedInterceptor } from '@shared/auth';
+import { provideRouter } from '@angular/router';
+import {
+  TokenProvider,
+  SessionTokenProvider,
+  authInterceptor,
+  unauthorizedInterceptor,
+} from '@shared/auth';
+import { baseUrlInterceptor, errorInterceptor, loggingInterceptor, API_URL } from '@shared/http';
+import { BreviStorePreset } from '@shared/ui';
 import { GlobalErrorHandler } from '@shared/util';
+import { MessageService } from 'primeng/api';
+import { providePrimeNG } from 'primeng/config';
+
+import { appRoutes } from './app.routes';
+import { environment } from '../environments/environment';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    { provide: API_URL, useValue: environment.api.baseUrl },
     provideHttpClient(
       withInterceptors([
         baseUrlInterceptor,

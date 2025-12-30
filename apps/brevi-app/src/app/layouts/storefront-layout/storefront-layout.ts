@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { Header } from '@storefront/ui';
-import { Footer } from '@storefront/ui';
+import { Header, Footer } from '@storefront/ui';
 
 @Component({
   selector: 'app-storefront-layout',
