@@ -1,7 +1,7 @@
 {
-  "name": "storefront-feature-catalog",
-  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/storefront/feature-catalog/src",
+  "name": "storefront-feature-contacts",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/storefront/feature/contacts/src",
   "prefix": "lib",
   "projectType": "library",
   "tags": ["scope:storefront", "type:feature"],

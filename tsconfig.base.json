@@ -8,11 +8,12 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@app/*": ["apps/brevi-app/src/app/*"],
-      "@brevi-app/*": ["apps/brevi-app/*"],
-      "@layouts/*": ["apps/brevi-app/src/app/layouts/*"],
-      "@routing/*": ["apps/brevi-app/src/app/routing/*"],
-      "@environments/*": ["apps/brevi-app/src/app/environments/*"],
+      // apps
+      "@admin/app/*": ["apps/admin/src/app/*"],
+      "@admin/environments/*": ["apps/admin/src/environments/*"],
+      "@storefront/app/*": ["apps/storefront/src/app/*"],
+      "@storefront/environments/*": ["apps/storefront/src/environments/*"],
+      // shared libs
       "@shared/ui": ["libs/shared/ui/src/index.ts"],
       "@shared/util": ["libs/shared/util/src/index.ts"],
       "@shared/data-access": ["libs/shared/data-access/src/index.ts"],
@@ -21,12 +22,14 @@
       "@shared/forms": ["libs/shared/forms/src/index.ts"],
       "@shared/http": ["libs/shared/http/src/index.ts"],
       "@shared/logging": ["libs/shared/logging/src/index.ts"],
+      // storefront libs
       "@storefront/ui": ["libs/storefront/ui/src/index.ts"],
       "@storefront/data-access": ["libs/storefront/data-access/src/index.ts"],
-      "@storefront/feature-home": ["libs/storefront/feature-home/src/index.ts"],
       "@storefront/util": ["libs/storefront/util/src/index.ts"],
-      "@storefront/feature-contacts": ["libs/storefront/feature-contacts/src/index.ts"],
-      "@storefront/feature-catalog": ["libs/storefront/feature-catalog/src/index.ts"],
+      "@storefront/feature/home": ["libs/storefront/feature/home/src/index.ts"],
+      "@storefront/feature/catalog": ["libs/storefront/feature/catalog/src/index.ts"],
+      "@storefront/feature/contacts": ["libs/storefront/feature/contacts/src/index.ts"],
+      // admin libs
       "@admin/feature-dashboard": ["libs/admin/feature-dashboard/src/index.ts"]
     }
   }

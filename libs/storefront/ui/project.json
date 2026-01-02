@@ -4,7 +4,7 @@
   "sourceRoot": "libs/storefront/ui/src",
   "prefix": "lib",
   "projectType": "library",
-  "tags": ["scope:storefront", "type:ui"],
+  "tags": ["scope:storefront", "type:ui", "domain:catalog"],
   "targets": {
     "lint": {
       "executor": "@nx/eslint:lint"

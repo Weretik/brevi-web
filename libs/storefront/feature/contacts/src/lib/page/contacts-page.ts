@@ -5,7 +5,7 @@ import { PageHeader, PageHeaderConfig } from '@storefront/ui';
   selector: 'lib-contacts-page',
   imports: [PageHeader],
   templateUrl: './contacts-page.html',
-  styleUrl: './contacts-page.css',
+  styleUrl: './contacts-page.scss',
 })
 export class ContactsPage {
   headerConfig: PageHeaderConfig = {
