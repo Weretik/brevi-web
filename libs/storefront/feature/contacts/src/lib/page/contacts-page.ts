@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
 import { PageHeader, PageHeaderConfig } from '@storefront/ui';
 
+import { OurTeam } from '../sections/our-team/our-team';
+
 @Component({
   selector: 'lib-contacts-page',
-  imports: [PageHeader],
+  imports: [PageHeader, OurTeam],
   templateUrl: './contacts-page.html',
   styleUrl: './contacts-page.scss',
 })

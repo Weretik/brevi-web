@@ -39,8 +39,8 @@ export class Header implements OnInit {
     {
       label: 'Каталог',
       items: [
-        { label: 'Зимовий одяг', routerLink: ['/catalog', 'winter'] },
-        { label: 'Літній одяг', routerLink: ['/catalog', 'handles'] },
+        { label: 'Зимовий одяг', routerLink: ['/catalog'] },
+        { label: 'Літній одяг', routerLink: ['/catalog'] },
         { separator: true },
         { label: 'Захист очей', routerLink: ['/catalog', 'winter'] },
       ],

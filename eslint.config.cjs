@@ -115,14 +115,11 @@ module.exports = [
           banTransitiveDependencies: true,
 
           depConstraints: [
-            // brevi-app can depend on everything
-            {
-              sourceTag: 'scope:brevi-app',
-              onlyDependOnLibsWithTags: ['scope:shared', 'scope:storefront', 'scope:admin'],
-            },
-
             // storefront can only depend on shared and storefront
-
+            {
+              sourceTag: 'scope:storefront',
+              onlyDependOnLibsWithTags: ['scope:storefront', 'scope:shared'],
+            },
             // admin can only depend on shared and admin
             {
               sourceTag: 'scope:admin',
