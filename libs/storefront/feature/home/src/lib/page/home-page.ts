@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
 
+import { MainHero } from '../sections/main-hero/main-hero';
+
 @Component({
   selector: 'lib-home-page',
-  imports: [],
+  imports: [MainHero],
   templateUrl: './home-page.html',
   styleUrl: './home-page.scss',
 })
