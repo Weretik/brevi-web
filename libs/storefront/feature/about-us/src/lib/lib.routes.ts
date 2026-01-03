@@ -14,4 +14,9 @@ export const aboutUsRoutes: Route[] = [
     path: 'articles',
     loadComponent: () => import('./pages/articles-page/articles-page').then((m) => m.ArticlesPage),
   },
+  {
+    path: 'agreement',
+    loadComponent: () =>
+      import('./pages/agreement-page/agreement-page').then((m) => m.AgreementPage),
+  },
 ];
