@@ -1,1 +1,149 @@
-<p>about-company works!</p>
+<lib-page-header [config]="aboutCompanyConfig" />
+
+<div
+  class="flex flex-col gap-16 bg-brand-bg px-6 py-20 md:px-12 lg:px-20 dark:bg-surface-950 overflow-hidden"
+>
+  <div class="flex xl:flex-row flex-col-reverse gap-20 items-center">
+    <div class="flex-1">
+      <h3 class="inline-flex flex-col text-surface-900 dark:text-surface-0 text-3xl font-bold mb-4">
+        Компанія "Бреві"
+      </h3>
+      <div class="text-surface-600 dark:text-surface-400 text-xl leading-7">
+        <p class="py-4">
+          <strong class="text-surface-900 dark:text-surface-0">Бреві</strong> — український бренд,
+          який спеціалізується на виробництві спецодягу, а також корпоративного одягу: костюмів,
+          курток, штанів, комбінезонів, напівкомбінезонів, жилетів, халатів та іншого одягу,
+          призначеного для використання як у теплу пору року, так і при знижених температурах.
+        </p>
+        <p>
+          Крім спецодягу, в асортименті ви знайдете робоче взуття: черевики зимові та демісезонні,
+          сандалії, чоботи гумові, утеплені та без утеплення. Також представлені засоби
+          індивідуального захисту (ЗІЗ): органів дихання, голови, зору, слуху, рук, протипожежне
+          обладнання та медичні аптечки.
+        </p>
+      </div>
+
+      <div class="h-px bg-surface-200 dark:bg-surface-800 w-full my-8"></div>
+    </div>
+    <div class="h-112 md:h-136 w-full xl:flex-1">
+      <img
+        class="w-full h-full object-cover rounded-xl"
+        src="/assets/images/about-us/our-mission.jpg"
+        alt="our-mission"
+      />
+    </div>
+  </div>
+  <div class="flex flex-col-reverse xl:flex-row-reverse gap-20 items-center">
+    <div class="flex-1">
+      <h3 class="inline-flex flex-col text-surface-900 dark:text-surface-0 text-3xl font-bold mb-4">
+        Наша місія
+      </h3>
+      <div class="h-px bg-surface-200 dark:bg-surface-800 w-full"></div>
+      <div class="flex flex-col gap-4">
+        <div class="flex items-baseline gap-3">
+          <span
+            class="bg-primary-50 dark:bg-primary-400/30 w-8 h-8 inline-flex items-center justify-center rounded-full shrink-0 border border-primary-100 dark:border-primary-400/40"
+          >
+            <i
+              class="pi pi-check text-xl! leading-normal! text-primary-800 dark:text-primary-300"
+            ></i>
+          </span>
+          <p class="text-surface-600 dark:text-surface-400 leading-6 text-lg">
+            Постачання споживачів функціональним, надійним та високоякісним спецодягом власного
+            швейного виробництва, а також засобами індивідуального захисту. Зовнішній вигляд
+            співробітників і, як наслідок, пізнаваність Вашої діяльності може стати суттєвою
+            перевагою у конкурентній боротьбі. Для цього, Ваші працівники повинні бути одягнені в
+            сучасний та стильний робочий одяг
+          </p>
+        </div>
+        <div class="flex items-baseline gap-3">
+          <span
+            class="bg-primary-50 dark:bg-primary-400/30 w-8 h-8 inline-flex items-center justify-center rounded-full shrink-0 border border-primary-100 dark:border-primary-400/40"
+          >
+            <i
+              class="pi pi-check text-xl! leading-normal! text-primary-800 dark:text-primary-300"
+            ></i>
+          </span>
+          <p class="text-surface-600 dark:text-surface-400 leading-6 text-lg">
+            Наш спецодяг та інші ЗІЗи призначені для працівників різних професій – робітники,
+            інженерно-технічний персонал та багато інших, і для виконання різних робіт у
+            промисловості, сільському господарстві, видобутку вуглеводнів та інших корисних копалин,
+            транспорті, логістиці, будівництві, комунальному господарстві, сфері обслуговування та
+            інших.
+          </p>
+        </div>
+        <div class="flex items-baseline gap-3">
+          <span
+            class="bg-primary-50 dark:bg-primary-400/30 w-8 h-8 inline-flex items-center justify-center rounded-full shrink-0 border border-primary-100 dark:border-primary-400/40"
+          >
+            <i
+              class="pi pi-check text-xl! leading-normal! text-primary-800 dark:text-primary-300"
+            ></i>
+          </span>
+          <p class="text-surface-600 dark:text-surface-400 leading-6 text-lg">
+            Вся наша продукція сертифікована, має декларацію про відповідність засобів
+            індивідуального захисту вимогам технічного регламенту, а також висновки
+            санітарно-епідеміологічної експертизи на спеціальний одяг для захисту від
+            загальновиробничих забруднень і механічних впливів і на спеціальний одяг для захисту від
+            знижених температур.
+          </p>
+        </div>
+        <div class="flex items-baseline gap-3">
+          <span
+            class="bg-primary-50 dark:bg-primary-400/30 w-8 h-8 inline-flex items-center justify-center rounded-full shrink-0 border border-primary-100 dark:border-primary-400/40"
+          >
+            <i
+              class="pi pi-check text-xl! leading-normal! text-primary-800 dark:text-primary-300"
+            ></i>
+          </span>
+          <p class="text-surface-600 dark:text-surface-400 leading-6 text-lg">
+            З усіма цими документами Ви можете ознайомитись у цьому розділі. Завірені копії всіх
+            документів ми надаємо нашим покупцям під час відвантаження товарів на запит.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="h-112 md:h-160 w-full xl:flex-1">
+      <img
+        class="w-full h-full object-contain rounded-xl"
+        src="/assets/images/about-us/our-mission.jpg"
+        alt="our-mission"
+      />
+    </div>
+  </div>
+  <div class="flex xl:flex-row flex-col-reverse gap-20 items-center">
+    <div class="flex-1">
+      <h3 class="inline-flex flex-col text-surface-900 dark:text-surface-0 text-3xl font-bold mb-4">
+        Повний цикл виробництва спецодягу
+      </h3>
+      <div class="text-surface-600 dark:text-surface-400 text-xl leading-7">
+        <p class="py-4">
+          При необхідності для визначення розмірів одягу здійснюємо виміри співробітників. При
+          необхідності можемо розробити унікальну модель спецодягу згідно з Вашими побажаннями. Наше
+          виробництво працює із замовленнями будь-якої складності.
+        </p>
+        <p class="py-4">
+          На спецодяг за допомогою спеціального обладнання наноситься символіка, логотипи та
+          необхідні написи у вигляді вишивки, термоперенесення або шовкографії. Весь спецодяг
+          власного виробництва виробляється підвищеною міцністю. На спецодяг власного виробництва
+          встановлюються гарантійні терміни експлуатації.
+        </p>
+        <p class="py-4">
+          Спецодяг та інші ЗІЗ можна замовити у нас з будь-якого міста України: Київ, Харків, Одеса,
+          Львів та інші. Ми доставляємо товар у всі області України. Наше виробництво знаходиться у
+          місті Полтава.
+        </p>
+      </div>
+
+      <div class="h-px bg-surface-200 dark:bg-surface-800 w-full my-8"></div>
+    </div>
+    <div class="h-112 md:h-160 xl:flex-1">
+      <img
+        class="w-full h-full object-cover rounded-xl"
+        src="/assets/images/about-us/production-cycle.jpg"
+        alt="our-mission"
+      />
+    </div>
+  </div>
+</div>
+<lib-product-categories />
