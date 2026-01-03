@@ -30,11 +30,6 @@ export class Header implements OnInit {
   public ngOnInit(): void {
     this.themeService.init();
   }
-
-  public onThemeToggle(value: boolean): void {
-    this.themeService.setTheme(value);
-  }
-
   menuItems: MenuItem[] = [
     {
       label: 'Каталог',
@@ -47,7 +42,18 @@ export class Header implements OnInit {
     },
     { label: 'Замовити оптом', routerLink: ['/contacts'] },
     { label: 'Регіони', routerLink: ['/contacts'] },
-    { label: 'Про нас', routerLink: ['/contacts'] },
+    {
+      label: 'Про нас',
+      items: [
+        { label: 'Про компанію', routerLink: ['/about-company'] },
+        { label: 'Доставка та оплата', routerLink: ['/delivery-and-payment'] },
+        { label: 'Повернення / обмін', routerLink: ['/returns-exchanges'] },
+        { label: 'Наші роботи', routerLink: ['/our-work'] },
+        { label: 'Сертифікати', routerLink: ['/certificates'] },
+        { label: 'Договір', routerLink: ['/agreement'] },
+        { label: 'Статті', routerLink: ['/articles'] },
+      ],
+    },
     { label: 'Контакти', routerLink: ['/contacts'] },
   ];
 

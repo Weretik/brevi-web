@@ -4,7 +4,7 @@
   "sourceRoot": "libs/storefront/feature/about-us/src",
   "prefix": "lib",
   "projectType": "library",
-  "tags": [],
+  "tags": ["scope:storefront, scope:shared"],
   "targets": {
     "build": {
       "executor": "@nx/angular:ng-packagr-lite",
