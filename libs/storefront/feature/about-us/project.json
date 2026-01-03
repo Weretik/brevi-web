@@ -4,23 +4,8 @@
   "sourceRoot": "libs/storefront/feature/about-us/src",
   "prefix": "lib",
   "projectType": "library",
-  "tags": ["scope:storefront, scope:shared"],
+  "tags": ["scope:storefront", "type:feature"],
   "targets": {
-    "build": {
-      "executor": "@nx/angular:ng-packagr-lite",
-      "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
-      "options": {
-        "project": "libs/storefront/feature/about-us/ng-package.json",
-        "tsConfig": "libs/storefront/feature/about-us/tsconfig.lib.json"
-      },
-      "configurations": {
-        "production": {
-          "tsConfig": "libs/storefront/feature/about-us/tsconfig.lib.prod.json"
-        },
-        "development": {}
-      },
-      "defaultConfiguration": "production"
-    },
     "lint": {
       "executor": "@nx/eslint:lint"
     }
