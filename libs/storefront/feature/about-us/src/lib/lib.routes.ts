@@ -10,4 +10,8 @@ export const aboutUsRoutes: Route[] = [
     loadComponent: () =>
       import('./pages/delivery-and-payment/delivery-and-payment').then((m) => m.DeliveryAndPayment),
   },
+  {
+    path: 'articles',
+    loadComponent: () => import('./pages/articles-page/articles-page').then((m) => m.ArticlesPage),
+  },
 ];
