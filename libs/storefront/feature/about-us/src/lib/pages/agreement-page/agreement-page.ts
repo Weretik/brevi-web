@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { PageHeader, PageHeaderConfig } from '@storefront/ui';
+import { PageHeader, PageHeaderConfig, ProductCategories } from '@storefront/ui';
 
 @Component({
   selector: 'lib-agreement-page',
-  imports: [PageHeader],
+  imports: [PageHeader, ProductCategories],
   templateUrl: './agreement-page.html',
   styleUrl: './agreement-page.scss',
 })
