@@ -40,8 +40,8 @@ export class Header implements OnInit {
         { label: 'Захист очей', routerLink: ['/catalog', 'winter'] },
       ],
     },
-    { label: 'Замовити оптом', routerLink: ['/contacts'] },
-    { label: 'Регіони', routerLink: ['/contacts'] },
+    { label: 'Замовити оптом', routerLink: ['/order-in-bulk'] },
+    { label: 'Регіони', routerLink: ['/regions'] },
     {
       label: 'Про нас',
       items: [

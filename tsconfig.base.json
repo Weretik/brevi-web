@@ -27,7 +27,11 @@
       "@storefront/feature/catalog": ["libs/storefront/feature/catalog/src/index.ts"],
       "@storefront/feature/contacts": ["libs/storefront/feature/contacts/src/index.ts"],
       "@admin/feature-dashboard": ["libs/admin/feature-dashboard/src/index.ts"],
-      "@storefront/feature/about-us": ["libs/storefront/feature/about-us/src/index.ts"]
+      "@storefront/feature/about-us": ["libs/storefront/feature/about-us/src/index.ts"],
+      "@storefront/feature/order-in-bulk": [
+        "libs/storefront/feature/order-in-bulk/order-in-bulk/src/index.ts"
+      ],
+      "@storefront/feature/regions": ["libs/storefront/feature/regions/regions/src/index.ts"]
     }
   }
 }
