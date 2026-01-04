@@ -1,0 +1,22 @@
+﻿{
+  "version": 2,
+  "functions": {
+    "api/ssr.mjs": {
+      "runtime": "nodejs20.x"
+    }
+  },
+  "routes": [
+    {
+      "src": "/(.*\\.(?:js|css|map|png|jpg|jpeg|gif|svg|webp|ico|txt|woff|woff2|ttf))$",
+      "dest": "/dist/apps/storefront/browser/$1"
+    },
+    {
+      "src": "^/assets/(.*)$",
+      "dest": "/dist/apps/storefront/browser/assets/$1"
+    },
+    {
+      "src": "^/(.*)$",
+      "dest": "/api/ssr.mjs"
+    }
+  ]
+}
