@@ -1,22 +1,18 @@
 ﻿{
   "version": 2,
   "functions": {
-    "api/ssr.mjs": {
+    "api/ssr.js": {
       "runtime": "nodejs20.x"
     }
   },
-  "routes": [
+  "rewrites": [
     {
-      "src": "/(.*\\.(?:js|css|map|png|jpg|jpeg|gif|svg|webp|ico|txt|woff|woff2|ttf))$",
-      "dest": "/dist/apps/storefront/browser/$1"
+      "source": "/assets/:path*",
+      "destination": "/dist/apps/storefront/browser/assets/:path*"
     },
     {
-      "src": "^/assets/(.*)$",
-      "dest": "/dist/apps/storefront/browser/assets/$1"
-    },
-    {
-      "src": "^/(.*)$",
-      "dest": "/api/ssr.mjs"
+      "source": "/:path*",
+      "destination": "/api/ssr.js"
     }
   ]
 }
