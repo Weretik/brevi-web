@@ -1,9 +1,10 @@
 {
   "version": 2,
   "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/api/ssr"
-    }
+    { "handle": "filesystem" },
+
+    { "src": "^/assets/(.*)$", "dest": "/dist/apps/storefront/browser/assets/$1" },
+
+    { "src": "^/(.*)$", "dest": "/api/ssr" }
   ]
 }
