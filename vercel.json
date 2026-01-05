@@ -1,10 +1,7 @@
 {
   "version": 2,
-  "routes": [
-    { "handle": "filesystem" },
-
-    { "src": "^/assets/(.*)$", "dest": "/dist/apps/storefront/browser/assets/$1" },
-
-    { "src": "^/(.*)$", "dest": "/api/ssr" }
-  ]
+  "functions": {
+    "api/ssr.mjs": { "runtime": "nodejs24.x" }
+  },
+  "routes": [{ "handle": "filesystem" }, { "src": "^/(.*)$", "dest": "/api/ssr" }]
 }
