@@ -1,7 +1,4 @@
 {
   "version": 2,
-  "functions": {
-    "api/ssr.mjs": { "runtime": "nodejs24.x" }
-  },
-  "routes": [{ "handle": "filesystem" }, { "src": "^/(.*)$", "dest": "/api/ssr" }]
+  "routes": [{ "handle": "filesystem" }, { "src": "^/(.*)$", "dest": "/index.html" }]
 }
