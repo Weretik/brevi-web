@@ -1,13 +1,9 @@
 {
   "version": 2,
-  "rewrites": [
+  "routes": [
     {
-      "source": "/assets/:path*",
-      "destination": "/dist/apps/storefront/browser/assets/:path*"
-    },
-    {
-      "source": "/:path*",
-      "destination": "/api/ssr.js"
+      "src": "/(.*)",
+      "dest": "/api/ssr"
     }
   ]
 }
