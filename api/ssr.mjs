@@ -1,13 +1,14 @@
-﻿module.exports = async (req, res) => {
-  const mod = await import('../dist/apps/storefront/server/server.mjs');
+﻿import { createRequestHandler } from '@angular/ssr';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-  const ssr = mod.reqHandler ?? mod.default ?? mod.app;
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
-  if (!ssr) {
-    res.statusCode = 500;
-    res.end('Angular SSR handler not found.');
-    return;
-  }
+const handler = createRequestHandler({
+  // путь к dist/apps/storefront
+  distPath: `${__dirname}/../dist/apps/storefront`
+});
 
-  return ssr(req, res);
-};
+export default async function (req, res) {
+  return handler(req, res);
+}
