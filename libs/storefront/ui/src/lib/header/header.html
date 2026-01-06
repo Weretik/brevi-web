@@ -1,30 +1,28 @@
-<header>
-  <nav>
-    <p-menubar [model]="menuItems" [pt]="menubarPt">
-      <ng-template #start>
-        <a routerLink="/" class="flex items-center gap-2">
-          <img
-            ngSrc="/assets/logo/brevi-logo-light.png"
-            width="131"
-            height="63"
-            alt="Brevi"
-            class="h-14 w-auto"
-          />
-        </a>
-      </ng-template>
-      <ng-template #end>
-        <div class="flex items-center">
-          <button
-            pButton
-            type="button"
-            [rounded]="true"
-            [text]="true"
-            (click)="themeService.toggleTheme()"
-          >
-            <i class="pi" [ngClass]="themeService.isDark() ? 'pi-moon' : 'pi-sun'"></i>
-          </button>
-        </div>
-      </ng-template>
-    </p-menubar>
-  </nav>
-</header>
+<nav>
+  <p-menubar [model]="menuItems" [pt]="menubarPt">
+    <ng-template #start>
+      <a routerLink="/" class="flex items-center gap-2">
+        <img
+          ngSrc="/assets/logo/brevi-logo-light.png"
+          width="131"
+          height="63"
+          alt="Brevi"
+          class="h-14 w-auto"
+        />
+      </a>
+    </ng-template>
+    <ng-template #end>
+      <div class="flex items-center">
+        <button
+          pButton
+          type="button"
+          [rounded]="true"
+          [text]="true"
+          (click)="themeService.toggleTheme()"
+        >
+          <i class="pi" [ngClass]="themeService.isDark() ? 'pi-moon' : 'pi-sun'"></i>
+        </button>
+      </div>
+    </ng-template>
+  </p-menubar>
+</nav>
