@@ -1,7 +1,7 @@
 ﻿import { definePreset, palette } from '@primeuix/themes';
 import Lara from '@primeuix/themes/lara';
 
-import { tokens } from './design-tokens';
+import { tokens } from './tokens';
 
 export const BreviStorePreset = definePreset(Lara, {
   global: {

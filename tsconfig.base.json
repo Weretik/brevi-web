@@ -8,10 +8,7 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@admin/app/*": ["apps/admin/src/app/*"],
-      "@admin/environments/*": ["apps/admin/src/environments/*"],
-      "@storefront/app/*": ["apps/storefront/src/app/*"],
-      "@storefront/environments/*": ["apps/storefront/src/environments/*"],
+      "@tokens/*": ["tools/tokens/*"],
       "@shared/ui": ["libs/shared/ui/src/index.ts"],
       "@shared/util": ["libs/shared/util/src/index.ts"],
       "@shared/data-access": ["libs/shared/data-access/src/index.ts"],
@@ -31,7 +28,8 @@
       "@storefront/feature/order-in-bulk": [
         "libs/storefront/feature/order-in-bulk/order-in-bulk/src/index.ts"
       ],
-      "@storefront/feature/regions": ["libs/storefront/feature/regions/regions/src/index.ts"]
+      "@storefront/feature/regions": ["libs/storefront/feature/regions/regions/src/index.ts"],
+      "@shared/theme": ["libs/shared/theme/src/index.ts"]
     }
   }
 }

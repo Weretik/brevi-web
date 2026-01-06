@@ -1,10 +1,10 @@
 ﻿const js = require('@eslint/js');
+const nx = require('@nx/eslint-plugin');
+const angular = require('angular-eslint');
+const prettierConfig = require('eslint-config-prettier');
+const importPlugin = require('eslint-plugin-import');
 const globals = require('globals');
 const tseslint = require('typescript-eslint');
-const angular = require('angular-eslint');
-const nx = require('@nx/eslint-plugin');
-const importPlugin = require('eslint-plugin-import');
-const prettierConfig = require('eslint-config-prettier');
 
 const only = (configs, files) =>
   configs.map((c) => ({

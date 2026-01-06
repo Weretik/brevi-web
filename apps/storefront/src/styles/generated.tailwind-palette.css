@@ -1,0 +1,73 @@
+@theme {
+  --color-primary-50: #fff7eb;
+  --color-primary-100: #ffeed6;
+  --color-primary-200: #fee2b8;
+  --color-primary-300: #fed599;
+  --color-primary-400: #fec87a;
+  --color-primary-500: #fd9600;
+  --color-primary-600: #df8400;
+  --color-primary-700: #c07200;
+  --color-primary-800: #a26000;
+  --color-primary-900: #844e00;
+  --color-primary-950: #653c00;
+
+  --color-neutral-50: #efefef;
+  --color-neutral-100: #dedede;
+  --color-neutral-200: #c6c6c6;
+  --color-neutral-300: #adadad;
+  --color-neutral-400: #959595;
+  --color-neutral-500: #333333;
+  --color-neutral-600: #2d2d2d;
+  --color-neutral-700: #272727;
+  --color-neutral-800: #212121;
+  --color-neutral-900: #1b1b1b;
+  --color-neutral-950: #141414;
+
+  --color-info-50: #ecf8fd;
+  --color-info-100: #d8f1fb;
+  --color-info-200: #bce6f9;
+  --color-info-300: #9fdbf6;
+  --color-info-400: #82d0f4;
+  --color-info-500: #0ea5e9;
+  --color-info-600: #0c91cd;
+  --color-info-700: #0b7db1;
+  --color-info-800: #096a95;
+  --color-info-900: #075679;
+  --color-info-950: #06425d;
+
+  --color-success-50: #edfaf2;
+  --color-success-100: #dcf6e5;
+  --color-success-200: #c1efd2;
+  --color-success-300: #a7e8bf;
+  --color-success-400: #8ce1ab;
+  --color-success-500: #22c55e;
+  --color-success-600: #1ead53;
+  --color-success-700: #1a9647;
+  --color-success-800: #167e3c;
+  --color-success-900: #126631;
+  --color-success-950: #0e4f26;
+
+  --color-warning-50: #fffbec;
+  --color-warning-100: #fef7da;
+  --color-warning-200: #fef1bd;
+  --color-warning-300: #fdeba1;
+  --color-warning-400: #fce485;
+  --color-warning-500: #facc15;
+  --color-warning-600: #dcb412;
+  --color-warning-700: #be9b10;
+  --color-warning-800: #a0830d;
+  --color-warning-900: #826a0b;
+  --color-warning-950: #645208;
+
+  --color-danger-50: #fef0f0;
+  --color-danger-100: #fce1e1;
+  --color-danger-200: #fbcbcb;
+  --color-danger-300: #f9b4b4;
+  --color-danger-400: #f79e9e;
+  --color-danger-500: #ef4444;
+  --color-danger-600: #d23c3c;
+  --color-danger-700: #b63434;
+  --color-danger-800: #992c2c;
+  --color-danger-900: #7c2323;
+  --color-danger-950: #601b1b;
+}

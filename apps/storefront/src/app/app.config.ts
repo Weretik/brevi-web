@@ -7,7 +7,8 @@ import {
 } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
 import { baseUrlInterceptor, errorInterceptor, loggingInterceptor, API_URL } from '@shared/http';
-import { BreviStorePreset, GlobalErrorHandler } from '@shared/ui';
+import { BreviStorePreset } from '@shared/theme';
+import { GlobalErrorHandler } from '@shared/ui';
 import { MessageService } from 'primeng/api';
 import { providePrimeNG } from 'primeng/config';
 
