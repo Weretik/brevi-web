@@ -1,5 +1,7 @@
-<nav>
-  <p-menubar [model]="menuItems" [pt]="menubarPt">
+<div
+  class="card fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-neutral-500 backdrop-blur border-b border-surface-400 dark:border-surface-600"
+>
+  <p-megaMenu [model]="items" [pt]="megaMenuPt">
     <ng-template #start>
       <a routerLink="/" class="flex items-center gap-2">
         <img
@@ -11,18 +13,77 @@
         />
       </a>
     </ng-template>
+
+    <ng-template #item let-item>
+      @if (item.root) {
+        <a
+          pRipple
+          [routerLink]="item.routerLink"
+          class="flex items-center cursor-pointer px-4 py-2 overflow-hidden relative font-semibold text-base uppercase"
+          style="border-radius: 2rem"
+        >
+          <i [ngClass]="item.icon"></i>
+          <span class="ml-2">{{ item.label }}</span>
+
+          @if (item.items?.length) {
+            <i class="pi pi-angle-down ml-2" aria-hidden="true"></i>
+          }
+        </a>
+      } @else if (!item.image) {
+        <a class="flex items-center px-4 cursor-pointer mb-2 gap-2" [routerLink]="item.routerLink">
+          <span class="inline-flex flex-col gap-1">
+            <span class="text-base text-surface-900 dark:text-surface-0">
+              {{ item.label }}
+            </span>
+          </span>
+        </a>
+      } @else {
+        <div class="flex flex-col items-start gap-4">
+          <img [src]="item.image" alt="wholesale-logo" class="w-full" />
+          <span>{{ item.subtext }}</span>
+          <p-button
+            [label]="item.label"
+            [outlined]="true"
+            [routerLink]="item.routerLink"
+          ></p-button>
+        </div>
+      }
+    </ng-template>
+
     <ng-template #end>
-      <div class="flex items-center">
+      <div class="flex justify-around items-center">
         <button
           pButton
-          type="button"
+          severity="secondary"
           [rounded]="true"
           [text]="true"
           (click)="themeService.toggleTheme()"
+          class="w-10 h-10 text-surface-500! dark:text-surface-400!"
+          aria-label="Змінити тему"
         >
           <i class="pi" [ngClass]="themeService.isDark() ? 'pi-moon' : 'pi-sun'"></i>
         </button>
+        <button
+          pButton
+          severity="secondary"
+          [text]="true"
+          [rounded]="true"
+          class="w-10 h-10 text-surface-500! dark:text-surface-400!"
+          aria-label="Аккаунт"
+        >
+          <i class="pi pi-user"></i>
+        </button>
+        <button
+          pButton
+          severity="secondary"
+          [text]="true"
+          [rounded]="true"
+          class="w-10 h-10 text-surface-500! dark:text-surface-400!"
+          aria-label="Корзина"
+        >
+          <i class="pi pi-shopping-cart"></i>
+        </button>
       </div>
     </ng-template>
-  </p-menubar>
-</nav>
+  </p-megaMenu>
+</div>
