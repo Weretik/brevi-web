@@ -29,7 +29,9 @@
         "libs/storefront/feature/order-in-bulk/order-in-bulk/src/index.ts"
       ],
       "@storefront/feature/regions": ["libs/storefront/feature/regions/regions/src/index.ts"],
-      "@shared/theme": ["libs/shared/theme/src/index.ts"]
+      "@shared/theme": ["libs/shared/theme/src/index.ts"],
+      "@admin/feature/dashboard": ["libs/admin/feature/dashboard/src/index.ts"],
+      "@admin/ui": ["libs/admin/ui/src/index.ts"]
     }
   }
 }

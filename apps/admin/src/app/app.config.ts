@@ -8,7 +8,8 @@ import {
   unauthorizedInterceptor,
 } from '@shared/auth';
 import { API_URL, baseUrlInterceptor, errorInterceptor, loggingInterceptor } from '@shared/http';
-import { BreviStorePreset, GlobalErrorHandler } from '@shared/ui';
+import { BreviStorePreset } from '@shared/theme';
+import { GlobalErrorHandler } from '@shared/ui';
 import { MessageService } from 'primeng/api';
 import { providePrimeNG } from 'primeng/config';
 
