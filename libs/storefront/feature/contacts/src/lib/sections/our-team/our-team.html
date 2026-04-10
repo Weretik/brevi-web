@@ -2,12 +2,10 @@
   <div class="grid grid-cols-12 gap-4">
     <div class="col-span-12 lg:col-span-4 pr-0 lg:pr-6">
       <div class="text-surface-900 dark:text-surface-0 text-5xl font-bold mb-4 leading-tight">
-        Наша команда
+        {{ 'contacts.team.title' | transloco }}
       </div>
       <p class="text-surface-700 dark:text-surface-100 text-lg leading-normal">
-        Enim diam vulputate ut pharetra sit amet aliquam id. Consequat nisl vel pretium lectus quam
-        id leo in. Nibh sit amet commodo nulla facilisi nullam vehicula. Nunc eget lorem dolor sed
-        viverra ipsum nunc aliquet.
+        {{ 'contacts.team.description' | transloco }}
       </p>
     </div>
     <div class="col-span-12 lg:col-span-8">
@@ -17,23 +15,20 @@
             <img
               src="https://fqjltiegiezfetthbags.supabase.co/storage/v1/render/image/public/block.images/blocks/team/team-1.png"
               class="w-full h-64 rounded-2xl object-cover"
+              [alt]="'contacts.team.person1.name' | transloco"
             />
             <div class="flex flex-col gap-6">
               <div class="flex flex-col gap-4">
                 <div class="flex flex-col gap-2">
-                  <div
-                    class="text-xl leading-tight font-medium text-surface-900 dark:text-surface-0"
-                  >
-                    Вадим Осауленко
+                  <div class="text-xl leading-tight font-medium text-surface-900 dark:text-surface-0">
+                    {{ 'contacts.team.person1.name' | transloco }}
                   </div>
-                  <span class="leading-normal font-medium text-surface-600 dark:text-surface-200"
-                    >Менекджер</span
-                  >
+                  <span class="leading-normal font-medium text-surface-600 dark:text-surface-200">
+                    {{ 'contacts.team.person1.role' | transloco }}
+                  </span>
                 </div>
                 <p class="leading-normal text-surface-700 dark:text-surface-300">
-                  Vulputate ut pharetra sit amet. Netus et malesuada fames ac turpis egestas. Elit
-                  eget gravida cum sociis natoque penatibus. Urna id volutpat lacus laoreet non
-                  curabitur. In ante metus dictum at.
+                  {{ 'contacts.team.person1.bio' | transloco }}
                 </p>
               </div>
               <div class="flex items-center gap-4">
@@ -55,22 +50,20 @@
             <img
               src="https://fqjltiegiezfetthbags.supabase.co/storage/v1/render/image/public/block.images/blocks/team/team-2.png"
               class="w-full h-64 rounded-2xl object-cover"
+              [alt]="'contacts.team.person2.name' | transloco"
             />
             <div class="flex flex-col gap-6">
               <div class="flex flex-col gap-4">
                 <div class="flex flex-col gap-2">
-                  <div
-                    class="text-xl leading-tight font-medium text-surface-900 dark:text-surface-0"
-                  >
-                    Анастасія Берегових
+                  <div class="text-xl leading-tight font-medium text-surface-900 dark:text-surface-0">
+                    {{ 'contacts.team.person2.name' | transloco }}
                   </div>
-                  <span class="leading-normal font-medium text-surface-600 dark:text-surface-200"
-                    >Менеджер</span
-                  >
+                  <span class="leading-normal font-medium text-surface-600 dark:text-surface-200">
+                    {{ 'contacts.team.person2.role' | transloco }}
+                  </span>
                 </div>
                 <p class="leading-normal text-surface-700 dark:text-surface-300">
-                  Risus feugiat in ante metus dictum. Et egestas quis ipsum suspendisse ultrices.
-                  Risus pretium quam vulputate dignissim suspendisse. Justo nec ultrices dui sapien.
+                  {{ 'contacts.team.person2.bio' | transloco }}
                 </p>
               </div>
               <div class="flex items-center gap-4">

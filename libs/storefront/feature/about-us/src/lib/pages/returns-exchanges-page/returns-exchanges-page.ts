@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { TranslocoService } from '@jsverse/transloco';
 import { PageHeader, PageHeaderConfig, ProductCategories } from '@storefront/ui';
 
 @Component({
@@ -8,9 +10,21 @@ import { PageHeader, PageHeaderConfig, ProductCategories } from '@storefront/ui'
   styleUrl: './returns-exchanges-page.scss',
 })
 export class ReturnsExchangesPage {
-  returnsExchangesConfig: PageHeaderConfig = {
-    title: 'Політика повернення та обміну товару',
-    breadcrumbs: ['Головна', 'Про нас', 'Повернення та обмін товару'],
-    showSearch: false,
-  };
+  private readonly transloco = inject(TranslocoService);
+  private readonly activeLang = toSignal(this.transloco.langChanges$, {
+    initialValue: this.transloco.getActiveLang(),
+  });
+
+  readonly returnsExchangesConfig = computed<PageHeaderConfig>(() => {
+    this.activeLang();
+    return {
+      title: this.transloco.translate('returns.page.title'),
+      breadcrumbs: [
+        this.transloco.translate('shared.home'),
+        this.transloco.translate('header.menu.about'),
+        this.transloco.translate('returns.page.title'),
+      ],
+      showSearch: false,
+    };
+  });
 }

@@ -8,24 +8,24 @@
           <h1
             class="text-4xl xl:text-5xl font-bold text-surface-0 lg:text-surface-900 dark:text-surface-0 mb-6 leading-tight!"
           >
-            <span class="block">Пошиття спецодягу на замовлення та оптовий продаж у Харкові</span>
-            <span class="block text-primary">від українського виробника Бреві</span>
+            <span class="block">{{ 'regions.hero.title' | transloco }}</span>
+            <span class="block text-primary">{{ 'regions.hero.subtitle' | transloco }}</span>
           </h1>
 
           <ul
             class="text-surface-0/90 lg:text-surface-700 dark:text-surface-200 text-xl leading-normal mb-8 space-y-2 max-w-xl lg:max-w-none"
           >
-            <li>✓ Виготовляємо на замовлення</li>
-            <li>✓ Оптом і в роздріб</li>
-            <li>✓ Працюємо з ПДВ</li>
+            <li>{{ 'home.hero.feature.custom' | transloco }}</li>
+            <li>{{ 'home.hero.feature.wholesaleRetail' | transloco }}</li>
+            <li>{{ 'home.hero.feature.vat' | transloco }}</li>
           </ul>
 
           <div class="flex items-center gap-4 justify-center lg:justify-start">
             <button pButton type="button">
-              <span pButtonLabel>Learn More</span>
+              <span pButtonLabel>{{ 'shared.learnMore' | transloco }}</span>
             </button>
             <button pButton type="button" outlined>
-              <span pButtonLabel>Live Demo</span>
+              <span pButtonLabel>{{ 'shared.liveDemo' | transloco }}</span>
             </button>
           </div>
         </div>
@@ -36,7 +36,7 @@
       <div class="absolute lg:hidden inset-0 bg-surface-900/60 dark:bg-surface-900/80 z-10"></div>
       <img
         src="https://fqjltiegiezfetthbags.supabase.co/storage/v1/render/image/public/block.images/blocks/hero/hero-1.png"
-        alt="hero-1"
+        [alt]="'regions.hero.imageAlt' | transloco"
         class="h-full w-full object-cover xl:[clip-path:polygon(12%_0,100%_0%,100%_100%,0_100%)]"
       />
     </div>

@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { TranslocoService } from '@jsverse/transloco';
 import { PageHeader, PageHeaderConfig, ProductCategories } from '@storefront/ui';
 
 interface Blog {
@@ -16,13 +18,25 @@ interface Blog {
   styleUrl: './articles-page.scss',
 })
 export class ArticlesPage {
-  articlesConfig: PageHeaderConfig = {
-    title: 'Статті',
-    breadcrumbs: ['Головна', 'Про нас', 'Статті'],
-    showSearch: false,
-  };
+  private readonly transloco = inject(TranslocoService);
+  private readonly activeLang = toSignal(this.transloco.langChanges$, {
+    initialValue: this.transloco.getActiveLang(),
+  });
 
-  blogs: Blog[] = [
+  readonly articlesConfig = computed<PageHeaderConfig>(() => {
+    this.activeLang();
+    return {
+      title: this.transloco.translate('articles.page.title'),
+      breadcrumbs: [
+        this.transloco.translate('shared.home'),
+        this.transloco.translate('header.menu.about'),
+        this.transloco.translate('articles.page.title'),
+      ],
+      showSearch: false,
+    };
+  });
+
+  readonly blogs: Blog[] = [
     {
       category: 'Good News',
       title: 'Our Four-Legged Warriors',

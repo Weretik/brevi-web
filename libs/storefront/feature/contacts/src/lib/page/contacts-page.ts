@@ -1,8 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { TranslocoService } from '@jsverse/transloco';
 import { PageHeader, PageHeaderConfig } from '@storefront/ui';
 
+import { ContactUs } from '../sections/contact-us/contact-us';
 import { OurTeam } from '../sections/our-team/our-team';
-import { ContactUs } from '../sections/сontact-us/contact-us';
 
 @Component({
   selector: 'lib-contacts-page',
@@ -11,9 +13,20 @@ import { ContactUs } from '../sections/сontact-us/contact-us';
   styleUrl: './contacts-page.scss',
 })
 export class ContactsPage {
-  headerConfig: PageHeaderConfig = {
-    title: 'Контакти',
-    breadcrumbs: ['Головна', 'Контакти'],
-    showSearch: true,
-  };
+  private readonly transloco = inject(TranslocoService);
+  private readonly activeLang = toSignal(this.transloco.langChanges$, {
+    initialValue: this.transloco.getActiveLang(),
+  });
+
+  readonly headerConfig = computed<PageHeaderConfig>(() => {
+    this.activeLang();
+    return {
+      title: this.transloco.translate('contacts.page.title'),
+      breadcrumbs: [
+        this.transloco.translate('shared.home'),
+        this.transloco.translate('contacts.page.title'),
+      ],
+      showSearch: true,
+    };
+  });
 }

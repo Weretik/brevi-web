@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
@@ -21,6 +22,7 @@ interface ContactForm {
     InputTextModule,
     ButtonModule,
     TextareaModule,
+    TranslocoPipe,
   ],
   templateUrl: './contact-us.html',
   styleUrl: './contact-us.scss',

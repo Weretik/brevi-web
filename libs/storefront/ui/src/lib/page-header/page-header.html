@@ -1,6 +1,5 @@
 <div class="bg-brand-bg dark:bg-surface-950 px-6 py-8 md:px-12 lg:px-20">
   <div class="flex flex-col gap-4">
-    <!-- Breadcrumbs -->
     <ul class="list-none p-0 m-0 flex flex-wrap items-center font-medium">
       @for (item of config().breadcrumbs; let last = $last; track item) {
         <li class="flex items-center">
@@ -21,7 +20,6 @@
       }
     </ul>
 
-    <!-- Title + actions -->
     <div class="flex flex-col md:flex-row md:justify-between gap-4">
       <h1 class="text-4xl font-bold text-surface-900 dark:text-surface-0">
         {{ config().title }}
@@ -30,7 +28,7 @@
       @if (config().showSearch) {
         <p-iconfield>
           <p-inputicon class="pi pi-search"></p-inputicon>
-          <input pInputText type="text" placeholder="Пошук" />
+          <input pInputText type="text" [placeholder]="'shared.search' | transloco" />
         </p-iconfield>
       }
     </div>
