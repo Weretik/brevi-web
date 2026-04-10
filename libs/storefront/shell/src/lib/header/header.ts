@@ -1,11 +1,11 @@
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { CommonModule, NgClass, NgOptimizedImage } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ThemeService } from '@shared/ui';
-import { LocaleNavigationService } from '@storefront/util';
+import { LocaleNavigationService, StorefrontLocale } from '@storefront/util';
 import { ButtonModule } from 'primeng/button';
 import { MegaMenu } from 'primeng/megamenu';
 import { StyleClassModule } from 'primeng/styleclass';
@@ -21,6 +21,7 @@ import { buildMenu } from './header.menu';
     ButtonModule,
     StyleClassModule,
     NgOptimizedImage,
+    NgClass,
     ToggleButtonModule,
     FormsModule,
     RouterLink,
@@ -32,6 +33,7 @@ import { buildMenu } from './header.menu';
 })
 export class Header {
   public readonly themeService = inject(ThemeService);
+  private readonly router = inject(Router);
   private readonly transloco = inject(TranslocoService);
   private readonly localeNavigation = inject(LocaleNavigationService);
 
@@ -45,6 +47,10 @@ export class Header {
     return buildMenu(currentLocale, (key) => this.transloco.translate(key));
   });
 
+  readonly currentLocale = computed<StorefrontLocale>(() =>
+    this.activeLang() === 'ru' ? 'ru' : 'uk',
+  );
+
   readonly homeLink = computed(() => {
     const currentLocale = this.localeNavigation.getCurrentLocale();
     return ['/', currentLocale];
@@ -52,6 +58,19 @@ export class Header {
 
   constructor() {
     this.themeService.init();
+  }
+
+  switchLocale(locale: StorefrontLocale): void {
+    if (locale === this.currentLocale()) return;
+
+    this.transloco.setActiveLang(locale);
+    this.localeNavigation.saveLocale(locale);
+    const localizedUrl = this.localeNavigation.localizedUrlForLocale(this.router.url, locale);
+    void this.router.navigateByUrl(localizedUrl);
+  }
+
+  localeHref(locale: StorefrontLocale): string {
+    return this.localeNavigation.localizedUrlForLocale(this.router.url, locale);
   }
 
   public readonly megaMenuPt = HEADER_MEGA_MENU_PT;

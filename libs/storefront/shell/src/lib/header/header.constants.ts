@@ -17,8 +17,7 @@ export type HeaderMenuPromo = {
   subtext: string;
 };
 
-const catalogLink = (slug: string): MenuLink =>
-  ['/catalog', slug, 'products'] as const;
+const catalogLink = (): MenuLink => ['/catalog'] as const;
 
 const infoLink = (path: string): MenuLink => [path] as const;
 
@@ -204,8 +203,7 @@ export const INFO_LEGAL_ITEMS: HeaderMenuSection = {
 };
 
 export const INFO_PROMO_ITEM: HeaderMenuPromo = {
-  image:
-    'https://primefaces.org/cdn/primeng/images/uikit/uikit-system.png',
+  image: 'https://primefaces.org/cdn/primeng/images/uikit/uikit-system.png',
   label: 'header.menu.wholesale',
   routerLink: '/order-in-bulk',
   subtext: 'header.menu.wholesaleSubtext',

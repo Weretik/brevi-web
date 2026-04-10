@@ -51,7 +51,35 @@
     </ng-template>
 
     <ng-template #end>
-      <div class="flex justify-around items-center">
+      <div class="flex justify-around items-center gap-2">
+        <div
+          class="flex items-center rounded-full border border-surface-300 dark:border-surface-600 overflow-hidden"
+        >
+          <a
+            [href]="localeHref('uk')"
+            class="px-2 py-1 text-xs font-semibold no-underline"
+            [ngClass]="
+              currentLocale() === 'uk'
+                ? 'bg-primary text-primary-contrast'
+                : 'text-surface-600 dark:text-surface-300'
+            "
+            (click)="$event.preventDefault(); switchLocale('uk')"
+          >
+            UK
+          </a>
+          <a
+            [href]="localeHref('ru')"
+            class="px-2 py-1 text-xs font-semibold no-underline"
+            [ngClass]="
+              currentLocale() === 'ru'
+                ? 'bg-primary text-primary-contrast'
+                : 'text-surface-600 dark:text-surface-300'
+            "
+            (click)="$event.preventDefault(); switchLocale('ru')"
+          >
+            RU
+          </a>
+        </div>
         <button
           pButton
           severity="secondary"

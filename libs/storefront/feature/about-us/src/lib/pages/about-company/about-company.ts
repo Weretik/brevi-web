@@ -1,11 +1,11 @@
 import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { TranslocoService } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { PageHeader, PageHeaderConfig, ProductCategories } from '@storefront/ui';
 
 @Component({
   selector: 'lib-about-company',
-  imports: [PageHeader, ProductCategories],
+  imports: [PageHeader, ProductCategories, TranslocoPipe],
   templateUrl: './about-company.html',
   styleUrl: './about-company.scss',
 })

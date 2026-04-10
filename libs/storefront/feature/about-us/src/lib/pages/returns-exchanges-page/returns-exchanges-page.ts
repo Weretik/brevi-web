@@ -1,11 +1,11 @@
 import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { TranslocoService } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { PageHeader, PageHeaderConfig, ProductCategories } from '@storefront/ui';
 
 @Component({
   selector: 'lib-returns-exchanges-page',
-  imports: [ProductCategories, PageHeader],
+  imports: [ProductCategories, PageHeader, TranslocoPipe],
   templateUrl: './returns-exchanges-page.html',
   styleUrl: './returns-exchanges-page.scss',
 })
