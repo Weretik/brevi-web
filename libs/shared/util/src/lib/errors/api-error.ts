@@ -1,4 +1,4 @@
-﻿export type ApiErrorCode =
+export type ApiErrorCode =
   | 'Unknown'
   | 'Network'
   | 'Timeout'
@@ -6,6 +6,7 @@
   | 'Forbidden'
   | 'NotFound'
   | 'Validation'
+  | 'ChunkLoad'
   | 'Server';
 
 export interface ApiError {

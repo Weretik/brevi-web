@@ -12,3 +12,4 @@ export * from './lib/interceptors/auth.interceptor';
 export * from './lib/tokens/noop-token.provider';
 export * from './lib/tokens/session-token.provider';
 export * from './lib/tokens/token.provider';
+export * from './lib/providers/auth.providers';

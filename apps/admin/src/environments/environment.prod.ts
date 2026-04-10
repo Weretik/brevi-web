@@ -18,6 +18,7 @@
   },
   logging: {
     enabled: true,
-    level: 'debug',
+    endpoint: null,
+    sampleRate: 1,
   },
 };

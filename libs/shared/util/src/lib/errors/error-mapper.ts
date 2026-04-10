@@ -1,4 +1,4 @@
-﻿import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 
 import { AppErrorFactory } from './api-error.factory';
 
@@ -14,12 +14,33 @@ function isChunkLoadError(e: unknown): boolean {
 function tryGetFieldErrors(err: HttpErrorResponse): Record<string, string[]> | null {
   const body: unknown = err.error;
 
-  if (!body || typeof body !== 'object') return null;
+  // 1) ProblemDetails.errors
+  if (body && typeof body === 'object' && !Array.isArray(body)) {
+    const errors = (body as { errors?: unknown }).errors;
+    if (errors && typeof errors === 'object') {
+      return errors as Record<string, string[]>;
+    }
+  }
 
-  const errors = (body as { errors?: unknown }).errors;
-  if (!errors || typeof errors !== 'object') return null;
+  // 2) Ardalis ValidationError[]
+  if (Array.isArray(body)) {
+    const mapped: Record<string, string[]> = {};
+    for (const item of body) {
+      if (!item || typeof item !== 'object') continue;
 
-  return errors as Record<string, string[]>;
+      const anyItem = item as Record<string, unknown>;
+      const id = anyItem['identifier'] ?? anyItem['Identifier'];
+      const msg = anyItem['errorMessage'] ?? anyItem['ErrorMessage'];
+
+      if (typeof id !== 'string' || typeof msg !== 'string') continue;
+
+      (mapped[id] ??= []).push(msg);
+    }
+
+    return Object.keys(mapped).length ? mapped : null;
+  }
+
+  return null;
 }
 
 function tryGetTraceId(err: HttpErrorResponse): string | undefined {
@@ -38,7 +59,10 @@ export function mapToApiError(error: unknown): ApiError {
     const traceId = tryGetTraceId(error);
 
     if (fieldErrors) {
-      return { ...AppErrorFactory.validation(fieldErrors, error.status), traceId };
+      return {
+        ...AppErrorFactory.validation(fieldErrors, error.status),
+        traceId,
+      };
     }
 
     return { ...AppErrorFactory.fromHttpStatus(error.status, error), traceId };
@@ -47,12 +71,12 @@ export function mapToApiError(error: unknown): ApiError {
   // Chunk load
   if (isChunkLoadError(error)) {
     return {
-      code: 'Unknown',
-      message: 'Оновлення застосунку. Перезавантажте сторінку.',
+      code: 'ChunkLoad',
+      message: 'Застосунок оновлено. Будь ласка, перезавантажте сторінку.',
     };
   }
 
-  // Timeout по RxJS (else throwError(() => new TimeoutError()))
+  // RxJS timeout
   if (error instanceof Error && error.name === 'TimeoutError') {
     return AppErrorFactory.timeout(error);
   }

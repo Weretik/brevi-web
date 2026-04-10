@@ -15,4 +15,9 @@
     dashboard: true,
     catalog: true,
   },
+  logging: {
+    enabled: false,
+    endpoint: null,
+    sampleRate: 1,
+  },
 };

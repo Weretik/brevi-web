@@ -1,4 +1,5 @@
-﻿import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, signal, inject } from '@angular/core';
+import { BrowserStorageService } from '@shared/util';
 
 export interface Session {
   accessToken: string | null;
@@ -8,7 +9,8 @@ const STORAGE_KEY = 'app.session.v1';
 
 @Injectable({ providedIn: 'root' })
 export class SessionStore {
-  private readonly _session = signal<Session>(loadSession());
+  private readonly storage = inject(BrowserStorageService);
+  private readonly _session = signal<Session>(this.loadSession());
 
   readonly session = computed(() => this._session());
   readonly isAuthenticated = computed(() => !!this._session().accessToken);
@@ -16,29 +18,29 @@ export class SessionStore {
   setAccessToken(token: string | null): void {
     const next: Session = { accessToken: token };
     this._session.set(next);
-    saveSession(next);
+    this.saveSession(next);
   }
 
   clear(): void {
     this.setAccessToken(null);
   }
-}
 
-function loadSession(): Session {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { accessToken: null };
-    const parsed = JSON.parse(raw) as Session;
-    return { accessToken: parsed?.accessToken ?? null };
-  } catch {
-    return { accessToken: null };
+  private loadSession(): Session {
+    try {
+      const raw = this.storage.getItem(STORAGE_KEY);
+      if (!raw) return { accessToken: null };
+      const parsed = JSON.parse(raw) as Session;
+      return { accessToken: parsed?.accessToken ?? null };
+    } catch {
+      return { accessToken: null };
+    }
   }
-}
 
-function saveSession(session: Session): void {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
-  } catch {
-    // ignore storage failures
+  private saveSession(session: Session): void {
+    try {
+      this.storage.setItem(STORAGE_KEY, JSON.stringify(session));
+    } catch {
+      // ignore storage failures
+    }
   }
 }

@@ -39,6 +39,16 @@ export class NotificationService {
     });
   }
 
+  info(summary: string, detail?: string, opts: NotifyOpts = {}) {
+    this.messages.add({
+      severity: 'info',
+      summary,
+      detail,
+      life: opts.lifeMs ?? 3000,
+      sticky: opts.sticky ?? false,
+    });
+  }
+
   clear(): void {
     this.messages.clear();
   }
