@@ -18,7 +18,7 @@
           <div class="flex flex-col gap-4">
             <div class="flex flex-col gap-1">
               <div class="text-surface-900 dark:text-surface-0 text-xl font-medium leading-tight">
-                Classic Denim Co-Ord
+                {{ 'catalog.productList.cards.1.title' | transloco }}
               </div>
             </div>
             <div class="flex gap-2">
@@ -35,7 +35,7 @@
             </div>
           </div>
           <p-button
-            routerLink="/product-page"
+            [routerLink]="productPageLink()"
             [label]="'catalog.productList.addToCart' | transloco"
             severity="secondary"
             styleClass="w-full px-3! py-2! text-base! font-medium! rounded-md!"
@@ -60,7 +60,7 @@
         <div class="flex flex-col gap-4">
           <div class="flex flex-col gap-1">
             <div class="text-surface-900 dark:text-surface-0 text-xl font-medium leading-tight">
-              Denim Lace-Up Onepiece
+              {{ 'catalog.productList.cards.2.title' | transloco }}
             </div>
           </div>
           <div class="flex gap-2">
@@ -75,7 +75,7 @@
           </div>
         </div>
         <p-button
-          routerLink="/product-page"
+          [routerLink]="productPageLink()"
           [label]="'catalog.productList.addToCart' | transloco"
           severity="secondary"
           styleClass="w-full px-3! py-2! text-base! font-medium! rounded-md!"
@@ -99,7 +99,7 @@
         <div class="flex flex-col gap-4">
           <div class="flex flex-col gap-1">
             <div class="text-surface-900 dark:text-surface-0 text-xl font-medium leading-tight">
-              Monochrome Pop Shirt
+              {{ 'catalog.productList.cards.3.title' | transloco }}
             </div>
           </div>
           <div class="flex gap-2">
@@ -114,7 +114,7 @@
           </div>
         </div>
         <p-button
-          routerLink="/product-page"
+          [routerLink]="productPageLink()"
           [label]="'catalog.productList.addToCart' | transloco"
           severity="secondary"
           styleClass="w-full px-3! py-2! text-base! font-medium! rounded-md!"
@@ -138,7 +138,7 @@
         <div class="flex flex-col gap-4">
           <div class="flex flex-col gap-1">
             <div class="text-surface-900 dark:text-surface-0 text-xl font-medium leading-tight">
-              Varsity Stripe Crew
+              {{ 'catalog.productList.cards.4.title' | transloco }}
             </div>
           </div>
           <div class="flex gap-2">
@@ -153,7 +153,7 @@
           </div>
         </div>
         <p-button
-          routerLink="/product-page"
+          [routerLink]="productPageLink()"
           [label]="'catalog.productList.addToCart' | transloco"
           severity="secondary"
           styleClass="w-full px-3! py-2! text-base! font-medium! rounded-md!"
