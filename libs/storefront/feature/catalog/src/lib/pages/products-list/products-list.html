@@ -1,1 +1,263 @@
-<p>products-list works!</p>
+<lib-page-header [config]="catalogConfig()" />
+
+<p-menu #sortMenu [popup]="true" [model]="sortOptions()" [appendTo]="'body'"></p-menu>
+<div
+  class="relative bg-brand-bg dark:bg-surface-950 p-6 md:p-12 lg:p-20 min-h-screen flex flex-col gap-6"
+>
+  <div class="flex justify-between items-end gap-8">
+    <div class="flex-1 flex flex-col gap-2">
+      <div class="text-surface-900 dark:text-surface-0 text-2xl font-semibold leading-tight">
+        {{ 'catalog.productsList.sectionTitle' | transloco }}
+      </div>
+      <div class="text-surface-500 dark:text-surface-200 text-xl font-normal leading-tight">
+        {{ 'catalog.productsList.wholesaleHint' | transloco }}
+        <a class="underline" [routerLink]="orderInBulkLink()">{{
+          'catalog.productsList.wholesaleLink' | transloco
+        }}</a>
+      </div>
+    </div>
+    <div class="flex items-center gap-4">
+      <button
+        pButton
+        [outlined]="true"
+        severity="secondary"
+        class="px-3 py-2 border-surface-300 dark:border-surface-600 text-surface-500 dark:text-surface-400"
+        (click)="toggleSortMenu($event)"
+      >
+        <span pButtonLabel>{{ selectedSort() | transloco }}</span>
+        <i pButtonIcon class="pi pi-sort-alt"></i>
+      </button>
+      <button
+        pButton
+        severity="secondary"
+        [outlined]="true"
+        pStyleClass="#slideover-cf-3"
+        enterFromClass="hidden"
+        enterActiveClass="animate-fadeinright"
+        leaveToClass="hidden"
+        leaveActiveClass="animate-fadeoutright"
+        [hideOnOutsideClick]="true"
+      >
+        <span pButtonLabel>{{ 'catalog.productsList.filters.open' | transloco }}</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-4 py-2 rounded-[6px]">
+    <span class="text-surface-500 dark:text-surface-200 text-base font-medium leading-tight">{{
+      'catalog.productsList.breadcrumb.clothing' | transloco
+    }}</span>
+    <span class="w-[3px] h-[3px] bg-surface-300 rounded-full"></span>
+    <span class="text-surface-500 dark:text-surface-200 text-base font-medium leading-tight">{{
+      'catalog.productsList.breadcrumb.outerwear' | transloco
+    }}</span>
+  </div>
+
+  <lib-product-list />
+
+  <div
+    id="slideover-cf-3"
+    class="hidden absolute z-50 flex top-0 right-0 w-[350px] h-full bg-surface-0 dark:bg-surface-900 flex-col overflow-hidden shadow-xl"
+  >
+    <div
+      class="flex items-center justify-between p-4 border-b border-surface-200 dark:border-surface-700 gap-2"
+    >
+      <span
+        class="flex-1 text-surface-900 dark:text-surface-0 text-2xl font-semibold leading-tight"
+        >{{ 'catalog.productsList.filters.title' | transloco }}</span
+      >
+      <button
+        pButton
+        pStyleClass="#slideover-cf-3"
+        leaveToClass="hidden"
+        leaveActiveClass="animate-fadeoutright"
+        [rounded]="true"
+        [text]="true"
+        severity="secondary"
+      >
+        <i pButtonIcon class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="flex-1 flex flex-col overflow-y-auto">
+      <div class="border-b border-surface-200 dark:border-surface-700 px-7 py-4">
+        <div class="flex items-center justify-between mb-4">
+          <span
+            class="text-surface-900 dark:text-surface-0 text-base font-semibold leading-tight"
+            >{{ 'catalog.productsList.filters.selected' | transloco }}</span
+          >
+          <button
+            pButton
+            [text]="true"
+            (click)="clearChips()"
+            class="text-surface-500 dark:text-surface-200 text-base font-normal leading-tight p-0 h-auto"
+          >
+            <span pButtonLabel>{{ 'catalog.productsList.filters.clear' | transloco }}</span>
+          </button>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          @for (chip of chips(); track chip) {
+            <p-chip
+              [label]="chip | transloco"
+              [removable]="true"
+              class="bg-surface-100 rounded-[16px] px-3 py-2 text-surface-800 text-base font-normal leading-normal"
+              (onRemove)="removeChip(chip)"
+            ></p-chip>
+          }
+        </div>
+      </div>
+
+      <p-accordion
+        [(value)]="accordionValue"
+        [multiple]="true"
+        class="w-full"
+        styleClass="border-0! shadow-none!"
+      >
+        <p-accordion-panel
+          value="brand"
+          class="border-0! border-b! border-surface-200! dark:border-surface-700! mx-7"
+        >
+          <p-accordion-header
+            class="bg-transparent! border-0! p-0! py-4! shadow-none! justify-between items-center w-full px-0"
+          >
+            <span
+              class="text-surface-900 dark:text-surface-0 text-base font-semibold leading-tight"
+              >{{ 'catalog.productsList.filters.brandTitle' | transloco }}</span
+            >
+          </p-accordion-header>
+          <p-accordion-content class="bg-transparent! border-0! p-0! pb-4!">
+            <div class="flex flex-col gap-4">
+              @for (brand of brands; track brand.key) {
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <p-checkbox
+                      [inputId]="brand.key"
+                      [(ngModel)]="selectedBrands"
+                      [value]="brand.key"
+                      (onChange)="toggleChip(brand.key)"
+                    ></p-checkbox>
+                    <label
+                      [for]="brand.key"
+                      class="text-surface-700 dark:text-surface-300 text-base font-normal leading-tight"
+                      >{{ brand.key | transloco }}</label
+                    >
+                  </div>
+                  <p-badge [value]="brand.count" class="rounded-xl!" severity="secondary"></p-badge>
+                </div>
+              }
+            </div>
+          </p-accordion-content>
+        </p-accordion-panel>
+
+        <p-accordion-panel
+          value="price"
+          class="border-0! border-b! border-surface-200! dark:border-surface-700! mx-7"
+        >
+          <p-accordion-header
+            class="bg-transparent! border-0! p-0! py-4! shadow-none! justify-between items-center w-full px-0"
+          >
+            <span
+              class="text-surface-900 dark:text-surface-0 text-base font-semibold leading-tight"
+              >{{ 'catalog.productsList.filters.priceRange' | transloco }}</span
+            >
+          </p-accordion-header>
+          <p-accordion-content class="bg-transparent! border-0! p-0! pb-4!">
+            <div class="flex flex-col gap-6 pt-2.5">
+              <p-slider [(ngModel)]="rangeValues" [range]="true" class="w-full"></p-slider>
+              <div class="flex gap-2">
+                <p-inputnumber
+                  [(ngModel)]="rangeValues[0]"
+                  placeholder="$20"
+                  mode="currency"
+                  currency="USD"
+                  [min]="10"
+                  inputStyleClass="w-full"
+                ></p-inputnumber>
+                <p-inputnumber
+                  [(ngModel)]="rangeValues[1]"
+                  placeholder="$80"
+                  mode="currency"
+                  currency="USD"
+                  [max]="10000"
+                  inputStyleClass="w-full"
+                ></p-inputnumber>
+              </div>
+            </div>
+          </p-accordion-content>
+        </p-accordion-panel>
+
+        <p-accordion-panel
+          value="size"
+          class="border-0! border-b! border-surface-200! dark:border-surface-700! mx-7"
+        >
+          <p-accordion-header
+            class="bg-transparent! border-0! p-0! py-4! shadow-none! justify-between items-center w-full px-0"
+          >
+            <span
+              class="text-surface-900 dark:text-surface-0 text-base font-semibold leading-tight"
+              >{{ 'catalog.productsList.filters.size' | transloco }}</span
+            >
+          </p-accordion-header>
+          <p-accordion-content class="bg-transparent! border-0! p-0! pb-4!">
+            <div class="flex flex-col gap-4">
+              @for (size of sizes; track size) {
+                <div class="flex items-center gap-2">
+                  <p-checkbox
+                    [inputId]="size"
+                    [(ngModel)]="selectedSizes"
+                    [value]="size"
+                    (onChange)="toggleChip(size)"
+                  ></p-checkbox>
+                  <label
+                    [for]="size"
+                    class="text-surface-700 dark:text-surface-300 text-base font-normal leading-tight"
+                    >{{ size }}</label
+                  >
+                </div>
+              }
+            </div>
+          </p-accordion-content>
+        </p-accordion-panel>
+
+        <p-accordion-panel value="color" class="border-0! mx-7">
+          <p-accordion-header
+            class="bg-transparent! border-0! p-0! py-4! shadow-none! justify-between items-center w-full px-0"
+          >
+            <span
+              class="text-surface-900 dark:text-surface-0 text-base font-semibold leading-tight"
+              >{{ 'catalog.productsList.filters.color' | transloco }}</span
+            >
+          </p-accordion-header>
+          <p-accordion-content class="bg-transparent! border-0! p-0! pb-4!">
+            <div class="flex flex-col gap-4">
+              @for (color of colors; track color.key) {
+                <div class="flex items-center gap-2">
+                  <p-checkbox
+                    [inputId]="color.key"
+                    [(ngModel)]="selectedColors"
+                    [value]="color.key"
+                    (onChange)="toggleChip(color.key)"
+                  ></p-checkbox>
+                  <div class="w-5 h-5 rounded-full" [ngClass]="color.class"></div>
+                  <span
+                    class="text-surface-900 dark:text-surface-0 text-base font-normal leading-tight"
+                    >{{ color.key | transloco }}</span
+                  >
+                </div>
+              }
+            </div>
+          </p-accordion-content>
+        </p-accordion-panel>
+      </p-accordion>
+    </div>
+
+    <div class="px-7 pb-7">
+      <button
+        pButton
+        class="w-full bg-primary-500 text-white font-medium px-3 py-2 rounded-[6px] outline-1 -outline-offset-1 outline-primary-500"
+      >
+        <span pButtonLabel>{{ 'catalog.productsList.filters.apply' | transloco }}</span>
+      </button>
+    </div>
+  </div>
+</div>
