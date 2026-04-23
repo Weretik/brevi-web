@@ -36,17 +36,125 @@ export const ukCatalogExtraTranslation: Translation = {
   'catalog.productsList.filters.color.sky': 'Небесний',
   'catalog.productsList.filters.color.dustyBlue': 'Димчасто-синій',
   'catalog.productsList.filters.color.orange': 'Помаранчевий',
-  'catalog.productPage.title': 'Товар 1',
+  'catalog.productPage.title': 'Костюм ІМПУЛЬС (напівкомбінезон)',
   'catalog.productPage.price': '$279',
   'catalog.productPage.reviews.label': 'відгуків',
   'catalog.productPage.color': 'Колір',
   'catalog.productPage.size': 'Розмір',
+  'catalog.productPage.fabric.label': 'Тканина',
+  'catalog.productPage.fabric.placeholder': 'Оберіть тканину',
+  'catalog.productPage.fabric.options.greta':
+    'Тканина "Грета" Черкаси 53% бав., 47% пе, щіл 220 г/м.кв. ВВ',
+  'catalog.productPage.fabric.options.profstyle':
+    'Тканина саржева "Профстайл" 100% бав, щіл. 240 г/м.кв.',
+  'catalog.productPage.price.fromBadge': 'від {{price}} грн',
+  'catalog.productPage.price.retail': 'Роздріб',
+  'catalog.productPage.price.wholesale': 'ОПТ',
+  'catalog.productPage.price.largeWholesale': 'Великий ОПТ',
+  'catalog.productPage.price.selectFabricHint': 'Оберіть тканину, щоб побачити ціни',
+  'catalog.productPage.info.model.label': 'Модель',
+  'catalog.productPage.info.model.value': '951-952',
+  'catalog.productPage.info.professions.label': 'Підходить для професій',
+  'catalog.productPage.info.professions.value':
+    'працівники виробничих підприємств, будівельники, монтажники, майстри дільниць, інженерно-технічний персонал, сервісні служби та інші спеціалісти технічного напрямку.',
+  'catalog.productPage.info.gender.label': 'Стать',
+  'catalog.productPage.info.gender.value': 'чоловіча / жіноча модель.',
+  'catalog.productPage.info.season.label': 'Сезон',
+  'catalog.productPage.info.season.value':
+    'весна, літо, осінь; температурний режим від +10°C до +40°C.',
+  'catalog.productPage.info.photoFabric.label': 'Тканина на фото',
+  'catalog.productPage.info.photoFabric.value':
+    '«Саржа» (Китай), склад: 35% бавовна, 65% поліестер, щільність 235 г/м².',
+  'catalog.productPage.info.features.label': 'Особливості',
+  'catalog.productPage.info.features.value':
+    'зносостійка тканина, світловідбивні елементи, контрастні вставки, функціональні кишені, посилені зони навантаження.',
+  'catalog.productPage.info.logo.label': 'Можливе нанесення логотипу',
+  'catalog.productPage.info.logo.value': 'машинна вишивка або шовкотрафаретний друк.',
+  'catalog.productPage.info.additional.label': 'Додатково',
+  'catalog.productPage.info.additional.value':
+    'можливе виготовлення в інших кольорових поєднаннях або з індивідуальними змінами під потреби замовника.',
   'catalog.productPage.tabs.details': 'Опис',
   'catalog.productPage.tabs.reviews': 'Відгуки',
   'catalog.productPage.tabs.shipping': 'Доставка',
-  'catalog.productPage.details.title': 'Створений для руху',
-  'catalog.productPage.details.description':
-    'Рюкзак RidgeTrail Modular Camera Backpack створений для подорожей і зйомок: надійно захищає техніку, зручно організовує простір і витримує активне щоденне використання.',
+  'catalog.productPage.tabs.characteristics': 'Характеристики',
+  'catalog.productPage.characteristics.title': 'Характеристики',
+  'catalog.productPage.characteristics.columns.parameter': 'Параметр',
+  'catalog.productPage.characteristics.columns.value': 'Значення',
+  'catalog.productPage.characteristics.jacket.title': 'Куртка',
+  'catalog.productPage.characteristics.jacket.rows.collar.parameter': 'Комір',
+  'catalog.productPage.characteristics.jacket.rows.collar.value': 'стійка;',
+  'catalog.productPage.characteristics.jacket.rows.cuff.parameter': 'Манжет',
+  'catalog.productPage.characteristics.jacket.rows.cuff.value':
+    'пришивний стягується еластичною стрічкою;',
+  'catalog.productPage.characteristics.jacket.rows.sleeve.parameter': 'Рукав',
+  'catalog.productPage.characteristics.jacket.rows.sleeve.value': 'прямий;',
+  'catalog.productPage.characteristics.jacket.rows.centralClosure.parameter': 'Центральна застібка',
+  'catalog.productPage.characteristics.jacket.rows.centralClosure.value':
+    'блискавка схована пластрон на контактній стрічці (липучці);',
+  'catalog.productPage.characteristics.jacket.rows.lowerPockets.parameter': 'Нижні кишені',
+  'catalog.productPage.characteristics.jacket.rows.lowerPockets.value':
+    'прорізні з листочкою під кутом;',
+  'catalog.productPage.characteristics.jacket.rows.upperPockets.parameter': 'Верхні кишені',
+  'catalog.productPage.characteristics.jacket.rows.upperPockets.value':
+    'зліва: накладна типу «книжка» з контрастним оздобленням, з клапаном на кнопці; зправа: вшивна кишеня, що застібається на блискавку, оформлена в «рамку» контрастного кольору та зверху накладна кишеня з відділеннями для олівців та дрібних деталей;',
+  'catalog.productPage.characteristics.jacket.rows.additionalPockets.parameter': 'Додаткові кишені',
+  'catalog.productPage.characteristics.jacket.rows.additionalPockets.value': 'відсутні;',
+  'catalog.productPage.characteristics.jacket.rows.yoke.parameter': 'Кокетка',
+  'catalog.productPage.characteristics.jacket.rows.yoke.value':
+    'відрізна контрастного кольору на плечах та по зовнішній стороні рукава;',
+  'catalog.productPage.characteristics.jacket.rows.reflectiveBand.parameter':
+    'Світловідбиваюча смуга',
+  'catalog.productPage.characteristics.jacket.rows.reflectiveBand.value':
+    'шириною 5 см на плечах по кокетці, на рівні грудей зпереду та позаду горизонтально та на рукавах горизонтально під контрастним оздобленням;',
+  'catalog.productPage.characteristics.jacket.rows.decorativePiping.parameter': 'Кант декоративний',
+  'catalog.productPage.characteristics.jacket.rows.decorativePiping.value':
+    'по краю клапана верхньої кишені;',
+  'catalog.productPage.characteristics.jacket.rows.bottomBelt.parameter': 'Пояс понизу куртки',
+  'catalog.productPage.characteristics.jacket.rows.bottomBelt.value': 'відсутній;',
+  'catalog.productPage.characteristics.jacket.rows.drawstring.parameter': 'Куліска',
+  'catalog.productPage.characteristics.jacket.rows.drawstring.value': 'відсутня;',
+  'catalog.productPage.characteristics.overalls.title': 'Напівкомбінезон',
+  'catalog.productPage.characteristics.overalls.rows.belt.parameter': 'Пояс',
+  'catalog.productPage.characteristics.overalls.rows.belt.value':
+    'пришивний позаду на стягуючій еластичній стрічці (резинці);',
+  'catalog.productPage.characteristics.overalls.rows.sidePockets.parameter': 'Кишені з боків',
+  'catalog.productPage.characteristics.overalls.rows.sidePockets.value': 'накладні;',
+  'catalog.productPage.characteristics.overalls.rows.additionalPockets.parameter':
+    'Додаткові кишені',
+  'catalog.productPage.characteristics.overalls.rows.additionalPockets.value':
+    'з лівого боку типу "книжка" з клапаном на кнопках;',
+  'catalog.productPage.characteristics.overalls.rows.bibPocket.parameter': 'Кишеня на нагруднику',
+  'catalog.productPage.characteristics.overalls.rows.bibPocket.value':
+    'велика накладна типу "книжка" з клапаном на кнопці;',
+  'catalog.productPage.characteristics.overalls.rows.kneePads.parameter': 'Наколінники',
+  'catalog.productPage.characteristics.overalls.rows.kneePads.value': 'посилені;',
+  'catalog.productPage.characteristics.overalls.rows.flyClosure.parameter': 'Застібка гульфіка',
+  'catalog.productPage.characteristics.overalls.rows.flyClosure.value': 'застібка-блискавка;',
+  'catalog.productPage.characteristics.overalls.rows.strapFasteners.parameter':
+    'Застібки лямок до нагрудника',
+  'catalog.productPage.characteristics.overalls.rows.strapFasteners.value': 'пластмасові фастекси;',
+  'catalog.productPage.characteristics.overalls.rows.decorativePiping.parameter':
+    'Кант декоративний',
+  'catalog.productPage.characteristics.overalls.rows.decorativePiping.value':
+    'на нагруднику над кишенєю, по краю клапана нагрудної кишені та бокової кишені зліва;',
+  'catalog.productPage.characteristics.overalls.rows.sideClosure.parameter': 'Бічна застібка',
+  'catalog.productPage.characteristics.overalls.rows.sideClosure.value':
+    'на гудзиках с лівого боку;',
+  'catalog.productPage.characteristics.overalls.rows.reflectiveBand.parameter':
+    'Світловідбиваюча смуга',
+  'catalog.productPage.characteristics.overalls.rows.reflectiveBand.value':
+    'шириною 5 см під наколінниками зпереду та позаду;',
+  'catalog.productPage.details.title': 'Опис',
+  'catalog.productPage.details.description.1':
+    'Сучасний робочий костюм у контрастному поєднанні графітового та помаранчевого кольорів розроблений для щоденної експлуатації в умовах виробництва, будівництва та сервісних робіт. Модель поєднує функціональність, зручну посадку та виразний зовнішній вигляд.',
+  'catalog.productPage.details.description.2':
+    'Куртка прямого силуету з центральною застібкою на блискавку та вітрозахисною планкою. Оснащена накладною нагрудною кишенею з клапаном і додатковою вертикальною кишенею на блискавці. Контрастні помаранчеві вставки та світловідбивні смуги по лінії грудей і на рукавах підвищують видимість працівника в умовах недостатнього освітлення. Манжети на резинці забезпечують комфортну фіксацію та захист від вітру.',
+  'catalog.productPage.details.description.3':
+    'Штани прямого крою з посиленими зонами в області колін. Передбачені місткі бокові та накладні кишені, зокрема функціональна кишеня на стегні з контрастною обробкою. Світловідбивні елементи в нижній частині штанин підвищують безпеку під час роботи у темний час доби.',
+  'catalog.productPage.details.description.4':
+    'Костюм виготовлений із зносостійкої тканини, стійкої до механічних навантажень і частого прання. Підходить для нанесення логотипу компанії.',
+  'catalog.productPage.details.description.5':
+    'Практичне рішення для підприємств, яким важливі надійність, комфорт і акуратний професійний зовнішній вигляд працівників.',
   'catalog.productPage.details.highlightsTitle': 'Основні переваги',
   'catalog.productPage.details.highlights.1': 'Налаштовувані внутрішні перегородки',
   'catalog.productPage.details.highlights.2': 'Боковий доступ для швидкої заміни об’єктива',
@@ -138,17 +246,128 @@ export const ruCatalogExtraTranslation: Translation = {
   'catalog.productsList.filters.color.sky': 'Небесный',
   'catalog.productsList.filters.color.dustyBlue': 'Пыльно-синий',
   'catalog.productsList.filters.color.orange': 'Оранжевый',
-  'catalog.productPage.title': 'Товар 1',
+  'catalog.productPage.title': 'Костюм ІМПУЛЬС (напівкомбінезон)',
   'catalog.productPage.price': '$279',
   'catalog.productPage.reviews.label': 'отзывов',
   'catalog.productPage.color': 'Цвет',
   'catalog.productPage.size': 'Размер',
+  'catalog.productPage.fabric.label': 'Ткань',
+  'catalog.productPage.fabric.placeholder': 'Выберите ткань',
+  'catalog.productPage.fabric.options.greta':
+    'Ткань "Грета" Черкассы 53% хб., 47% пэ, плотн. 220 г/м.кв. ВВ',
+  'catalog.productPage.fabric.options.profstyle':
+    'Ткань саржевая "Профстайл" 100% хб, плотн. 240 г/м.кв.',
+  'catalog.productPage.price.fromBadge': 'от {{price}} грн',
+  'catalog.productPage.price.retail': 'Розница',
+  'catalog.productPage.price.wholesale': 'ОПТ',
+  'catalog.productPage.price.largeWholesale': 'Крупный ОПТ',
+  'catalog.productPage.price.selectFabricHint': 'Выберите ткань, чтобы увидеть цены',
+  'catalog.productPage.info.model.label': 'Модель',
+  'catalog.productPage.info.model.value': '951-952',
+  'catalog.productPage.info.professions.label': 'Подходит для профессий',
+  'catalog.productPage.info.professions.value':
+    'работники производственных предприятий, строители, монтажники, мастера участков, инженерно-технический персонал, сервисные службы и другие специалисты технического направления.',
+  'catalog.productPage.info.gender.label': 'Пол',
+  'catalog.productPage.info.gender.value': 'мужская / женская модель.',
+  'catalog.productPage.info.season.label': 'Сезон',
+  'catalog.productPage.info.season.value':
+    'весна, лето, осень; температурный режим от +10°C до +40°C.',
+  'catalog.productPage.info.photoFabric.label': 'Ткань на фото',
+  'catalog.productPage.info.photoFabric.value':
+    '«Саржа» (Китай), состав: 35% хлопок, 65% полиэстер, плотность 235 г/м².',
+  'catalog.productPage.info.features.label': 'Особенности',
+  'catalog.productPage.info.features.value':
+    'износостойкая ткань, светоотражающие элементы, контрастные вставки, функциональные карманы, усиленные зоны нагрузки.',
+  'catalog.productPage.info.logo.label': 'Возможное нанесение логотипа',
+  'catalog.productPage.info.logo.value': 'машинная вышивка или шелкотрафаретная печать.',
+  'catalog.productPage.info.additional.label': 'Дополнительно',
+  'catalog.productPage.info.additional.value':
+    'возможно изготовление в других цветовых сочетаниях или с индивидуальными изменениями под потребности заказчика.',
   'catalog.productPage.tabs.details': 'Описание',
   'catalog.productPage.tabs.reviews': 'Отзывы',
   'catalog.productPage.tabs.shipping': 'Доставка',
-  'catalog.productPage.details.title': 'Создан для движения',
-  'catalog.productPage.details.description':
-    'Рюкзак RidgeTrail Modular Camera Backpack создан для путешествий и съемок: надежно защищает технику, удобно организует пространство и выдерживает активное ежедневное использование.',
+  'catalog.productPage.tabs.characteristics': 'Характеристики',
+  'catalog.productPage.characteristics.title': 'Характеристики',
+  'catalog.productPage.characteristics.columns.parameter': 'Параметр',
+  'catalog.productPage.characteristics.columns.value': 'Значение',
+  'catalog.productPage.characteristics.jacket.title': 'Куртка',
+  'catalog.productPage.characteristics.jacket.rows.collar.parameter': 'Воротник',
+  'catalog.productPage.characteristics.jacket.rows.collar.value': 'стойка;',
+  'catalog.productPage.characteristics.jacket.rows.cuff.parameter': 'Манжет',
+  'catalog.productPage.characteristics.jacket.rows.cuff.value':
+    'пришивной, стягивается эластичной лентой;',
+  'catalog.productPage.characteristics.jacket.rows.sleeve.parameter': 'Рукав',
+  'catalog.productPage.characteristics.jacket.rows.sleeve.value': 'прямой;',
+  'catalog.productPage.characteristics.jacket.rows.centralClosure.parameter':
+    'Центральная застежка',
+  'catalog.productPage.characteristics.jacket.rows.centralClosure.value':
+    'молния скрытая пластроном на контактной ленте (липучке);',
+  'catalog.productPage.characteristics.jacket.rows.lowerPockets.parameter': 'Нижние карманы',
+  'catalog.productPage.characteristics.jacket.rows.lowerPockets.value':
+    'прорезные с листочкой под углом;',
+  'catalog.productPage.characteristics.jacket.rows.upperPockets.parameter': 'Верхние карманы',
+  'catalog.productPage.characteristics.jacket.rows.upperPockets.value':
+    'слева: накладной типа «книжка» с контрастной отделкой, с клапаном на кнопке; справа: вшивной карман на молнии, оформленный в контрастную «рамку», и сверху накладной карман с отделениями для карандашей и мелких деталей;',
+  'catalog.productPage.characteristics.jacket.rows.additionalPockets.parameter':
+    'Дополнительные карманы',
+  'catalog.productPage.characteristics.jacket.rows.additionalPockets.value': 'отсутствуют;',
+  'catalog.productPage.characteristics.jacket.rows.yoke.parameter': 'Кокетка',
+  'catalog.productPage.characteristics.jacket.rows.yoke.value':
+    'отрезная контрастного цвета на плечах и по внешней стороне рукава;',
+  'catalog.productPage.characteristics.jacket.rows.reflectiveBand.parameter':
+    'Светоотражающая полоса',
+  'catalog.productPage.characteristics.jacket.rows.reflectiveBand.value':
+    'шириной 5 см на плечах по кокетке, на уровне груди спереди и сзади горизонтально, а также на рукавах горизонтально под контрастной отделкой;',
+  'catalog.productPage.characteristics.jacket.rows.decorativePiping.parameter': 'Кант декоративный',
+  'catalog.productPage.characteristics.jacket.rows.decorativePiping.value':
+    'по краю клапана верхнего кармана;',
+  'catalog.productPage.characteristics.jacket.rows.bottomBelt.parameter': 'Пояс по низу куртки',
+  'catalog.productPage.characteristics.jacket.rows.bottomBelt.value': 'отсутствует;',
+  'catalog.productPage.characteristics.jacket.rows.drawstring.parameter': 'Кулиска',
+  'catalog.productPage.characteristics.jacket.rows.drawstring.value': 'отсутствует;',
+  'catalog.productPage.characteristics.overalls.title': 'Полукомбинезон',
+  'catalog.productPage.characteristics.overalls.rows.belt.parameter': 'Пояс',
+  'catalog.productPage.characteristics.overalls.rows.belt.value':
+    'пришивной сзади на стягивающей эластичной ленте (резинке);',
+  'catalog.productPage.characteristics.overalls.rows.sidePockets.parameter': 'Карманы по бокам',
+  'catalog.productPage.characteristics.overalls.rows.sidePockets.value': 'накладные;',
+  'catalog.productPage.characteristics.overalls.rows.additionalPockets.parameter':
+    'Дополнительные карманы',
+  'catalog.productPage.characteristics.overalls.rows.additionalPockets.value':
+    'с левой стороны типа "книжка" с клапаном на кнопках;',
+  'catalog.productPage.characteristics.overalls.rows.bibPocket.parameter': 'Карман на нагруднике',
+  'catalog.productPage.characteristics.overalls.rows.bibPocket.value':
+    'большой накладной типа "книжка" с клапаном на кнопке;',
+  'catalog.productPage.characteristics.overalls.rows.kneePads.parameter': 'Наколенники',
+  'catalog.productPage.characteristics.overalls.rows.kneePads.value': 'усиленные;',
+  'catalog.productPage.characteristics.overalls.rows.flyClosure.parameter': 'Застежка гульфика',
+  'catalog.productPage.characteristics.overalls.rows.flyClosure.value': 'застежка-молния;',
+  'catalog.productPage.characteristics.overalls.rows.strapFasteners.parameter':
+    'Застежки лямок к нагруднику',
+  'catalog.productPage.characteristics.overalls.rows.strapFasteners.value':
+    'пластмассовые фастексы;',
+  'catalog.productPage.characteristics.overalls.rows.decorativePiping.parameter':
+    'Кант декоративный',
+  'catalog.productPage.characteristics.overalls.rows.decorativePiping.value':
+    'на нагруднике над карманом, по краю клапана нагрудного кармана и бокового кармана слева;',
+  'catalog.productPage.characteristics.overalls.rows.sideClosure.parameter': 'Боковая застежка',
+  'catalog.productPage.characteristics.overalls.rows.sideClosure.value':
+    'на пуговицах с левой стороны;',
+  'catalog.productPage.characteristics.overalls.rows.reflectiveBand.parameter':
+    'Светоотражающая полоса',
+  'catalog.productPage.characteristics.overalls.rows.reflectiveBand.value':
+    'шириной 5 см под наколенниками спереди и сзади;',
+  'catalog.productPage.details.title': 'Описание',
+  'catalog.productPage.details.description.1':
+    'Современный рабочий костюм в контрастном сочетании графитового и оранжевого цветов разработан для ежедневной эксплуатации в условиях производства, строительства и сервисных работ. Модель сочетает функциональность, удобную посадку и выразительный внешний вид.',
+  'catalog.productPage.details.description.2':
+    'Куртка прямого силуэта с центральной застежкой на молнию и ветрозащитной планкой. Оснащена накладным нагрудным карманом с клапаном и дополнительным вертикальным карманом на молнии. Контрастные оранжевые вставки и светоотражающие полосы по линии груди и на рукавах повышают видимость работника при недостаточном освещении. Манжеты на резинке обеспечивают комфортную фиксацию и защиту от ветра.',
+  'catalog.productPage.details.description.3':
+    'Брюки прямого кроя с усиленными зонами в области колен. Предусмотрены вместительные боковые и накладные карманы, в частности функциональный карман на бедре с контрастной отделкой. Светоотражающие элементы в нижней части штанин повышают безопасность во время работы в темное время суток.',
+  'catalog.productPage.details.description.4':
+    'Костюм изготовлен из износостойкой ткани, устойчивой к механическим нагрузкам и частым стиркам. Подходит для нанесения логотипа компании.',
+  'catalog.productPage.details.description.5':
+    'Практичное решение для предприятий, которым важны надежность, комфорт и аккуратный профессиональный внешний вид работников.',
   'catalog.productPage.details.highlightsTitle': 'Ключевые преимущества',
   'catalog.productPage.details.highlights.1': 'Настраиваемые внутренние перегородки',
   'catalog.productPage.details.highlights.2': 'Боковой доступ для быстрой замены объектива',
