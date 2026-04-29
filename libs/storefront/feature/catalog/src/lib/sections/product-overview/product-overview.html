@@ -1,9 +1,12 @@
 <div class="flex flex-col lg:flex-row gap-6 lg:gap-8 mb-16 lg:items-start">
+  <!-- Product gallery: desktop thumbnails + main image + mobile thumbnails -->
   <div class="flex gap-4 lg:flex-none">
     <div class="hidden sm:flex flex-col gap-4 lg:min-w-24">
       @for (image of images; track image; let i = $index) {
         <img
-          [src]="'/assets/images/products/' + image"
+          [ngSrc]="'/assets/images/products/' + image"
+          width="96"
+          height="112"
           class="w-24 h-28 rounded-lg cursor-pointer transition-all duration-150 object-cover"
           [class]="
             selectedImageIndex === i
@@ -19,7 +22,9 @@
     </div>
     <div class="flex-1">
       <img
-        [src]="'/assets/images/products/' + images[selectedImageIndex]"
+        [ngSrc]="'/assets/images/products/' + images[selectedImageIndex]"
+        width="528"
+        height="500"
         class="w-full h-auto lg:h-[31.28rem] lg:min-w-132 lg:max-w-132 object-contain rounded-lg"
         [alt]="'catalog.product.image.mainAlt' | transloco"
       />
@@ -27,7 +32,9 @@
       <div class="flex gap-2 sm:hidden h-32 mt-4">
         @for (image of images; track image; let i = $index) {
           <img
-            [src]="'/assets/images/products/' + image"
+            [ngSrc]="'/assets/images/products/' + image"
+            width="96"
+            height="112"
             class="flex-1 min-w-16 sm:min-w-20 md:min-w-24 h-auto max-h-28 object-cover rounded-md sm:rounded-lg cursor-pointer transition-all duration-150"
             [class]="
               selectedImageIndex === i
@@ -44,49 +51,56 @@
     </div>
   </div>
 
+  <!-- Product summary: title, pricing, fabric selector, details and actions -->
   <div class="flex-1 min-w-0 w-full px-3 py-5 lg:px-4 flex flex-col gap-8">
+    <!-- Title and pricing -->
     <div class="flex flex-col gap-4">
-      <div class="flex items-start gap-4 pt-2">
-        <h1
-          class="m-0 flex-1 text-surface-900 dark:text-surface-0 text-xl font-semibold leading-tight"
+      <div class="flex flex-wrap items-center gap-2">
+        <div
+          class="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-700 dark:bg-green-900/30 dark:text-green-300"
         >
-          {{ 'catalog.productPage.title' | transloco }}
-        </h1>
+          {{ 'catalog.productPage.availability.inStock' | transloco }}
+        </div>
+        <div
+          class="inline-flex items-center rounded-full bg-surface-100 px-3 py-1 text-sm font-medium text-surface-700 dark:bg-surface-800 dark:text-surface-200"
+        >
+          {{ 'catalog.productPage.availability.article' | transloco: { code: '2808' } }}
+        </div>
       </div>
       <div class="flex items-center justify-between gap-4">
         <div class="flex flex-col gap-3">
           <div
-            class="inline-flex w-fit items-center rounded-full bg-primary-100 px-4 py-1 text-sm font-semibold text-primary-700 dark:bg-primary-900/30 dark:text-primary-200"
+            class="inline-flex w-fit items-center rounded-full bg-primary-500 px-4 py-1 text-sm font-semibold text-white dark:bg-primary-500"
           >
             {{ 'catalog.productPage.price.fromBadge' | transloco: { price: minimumPrice } }}
           </div>
           @if (selectedPriceTiers; as prices) {
             <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
               <div
-                class="rounded-lg bg-surface-0 px-3 py-2 dark:bg-surface-900/50 outline outline-1 outline-surface-200 dark:outline-surface-700"
+                class="rounded-lg bg-surface-0 px-3 py-2 dark:bg-surface-900/50 outline outline-surface-200 dark:outline-surface-700"
               >
                 <div class="text-xs text-surface-500 dark:text-surface-400">
-                  {{ 'catalog.productPage.price.retail' | transloco }}
+                  {{ 'catalog.productPage.price.tiers.upTo10' | transloco }}
                 </div>
                 <div class="text-base font-semibold text-surface-900 dark:text-surface-0">
                   {{ prices.retail }} грн
                 </div>
               </div>
               <div
-                class="rounded-lg bg-surface-0 px-3 py-2 dark:bg-surface-900/50 outline outline-1 outline-surface-200 dark:outline-surface-700"
+                class="rounded-lg bg-surface-0 px-3 py-2 dark:bg-surface-900/50 outline outline-surface-200 dark:outline-surface-700"
               >
                 <div class="text-xs text-surface-500 dark:text-surface-400">
-                  {{ 'catalog.productPage.price.wholesale' | transloco }}
+                  {{ 'catalog.productPage.price.tiers.from11To39' | transloco }}
                 </div>
                 <div class="text-base font-semibold text-surface-900 dark:text-surface-0">
                   {{ prices.wholesale }} грн
                 </div>
               </div>
               <div
-                class="rounded-lg bg-surface-0 px-3 py-2 dark:bg-surface-900/50 outline outline-1 outline-surface-200 dark:outline-surface-700"
+                class="rounded-lg bg-surface-0 px-3 py-2 dark:bg-surface-900/50 outline outline-surface-200 dark:outline-surface-700"
               >
                 <div class="text-xs text-surface-500 dark:text-surface-400">
-                  {{ 'catalog.productPage.price.largeWholesale' | transloco }}
+                  {{ 'catalog.productPage.price.tiers.over40' | transloco }}
                 </div>
                 <div class="text-base font-semibold text-surface-900 dark:text-surface-0">
                   {{ prices.largeWholesale }} грн
@@ -94,7 +108,9 @@
               </div>
             </div>
           } @else {
-            <div class="text-sm text-surface-500 dark:text-surface-400">
+            <div
+              class="inline-flex w-fit items-center rounded-md bg-primary-50 px-3 py-2 text-sm font-semibold text-primary-700 dark:bg-primary-900/30 dark:text-primary-200"
+            >
               {{ 'catalog.productPage.price.selectFabricHint' | transloco }}
             </div>
           }
@@ -102,6 +118,7 @@
       </div>
     </div>
 
+    <!-- Fabric selection -->
     <div class="flex flex-col gap-4">
       <div class="text-surface-900 dark:text-surface-0 text-sm font-semibold leading-tight">
         {{ 'catalog.productPage.fabric.label' | transloco }}
@@ -112,46 +129,38 @@
         optionLabel="label"
         optionValue="value"
         [placeholder]="'catalog.productPage.fabric.placeholder' | transloco"
-        styleClass="w-full"
+        class="w-full"
       ></p-select>
     </div>
 
-    <div
-      class="rounded-xl bg-surface-0 p-4 dark:bg-surface-900/40 outline outline-1 outline-surface-200 dark:outline-surface-700"
-    >
-      <div class="grid gap-4">
-        @for (item of productInfoItems; track item.labelKey) {
-          <div class="grid gap-1">
-            <div class="text-xs uppercase tracking-wide text-surface-500 dark:text-surface-400">
-              {{ item.labelKey | transloco }}
-            </div>
-            <div class="text-sm text-surface-700 dark:text-surface-300">
-              {{ item.valueKey | transloco }}
-            </div>
-          </div>
-        }
-      </div>
-    </div>
-
+    <!-- Primary actions -->
     <div class="flex flex-col gap-8">
-      <div class="flex items-center gap-4">
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <button
           pButton
-          class="flex-1 py-2! px-4! bg-surface-900! dark:bg-surface-0! text-surface-0! dark:text-surface-900! border-surface-900! dark:border-surface-0! rounded-md! font-medium! text-sm!"
+          class="h-10! py-2! px-4! bg-surface-900! hover:bg-surface-800! active:bg-surface-700! dark:bg-surface-0! dark:hover:bg-surface-100! dark:active:bg-surface-200! text-surface-0! dark:text-surface-900! border-surface-900! dark:border-surface-0! rounded-md! font-medium! text-sm! transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-surface-950"
         >
-          <span pButtonLabel>{{ 'catalog.product.addToCart' | transloco }}</span>
+          <span pButtonLabel>{{ 'catalog.productPage.actions.order' | transloco }}</span>
         </button>
         <button
           pButton
-          class="w-9! h-9! p-2! bg-surface-100! dark:bg-surface-800! text-surface-600! dark:text-surface-300! border-surface-100! dark:border-surface-800! rounded-full! min-w-0"
-          (click)="liked = !liked"
+          (click)="openSizeGuideDialog()"
+          class="h-10! py-2! px-4! bg-surface-100! hover:bg-surface-200! active:bg-surface-300! dark:bg-surface-800! dark:hover:bg-surface-700! dark:active:bg-surface-600! text-surface-900! dark:text-surface-100! border-surface-300! dark:border-surface-600! rounded-md! font-medium! text-sm! transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-surface-950"
         >
-          <i
-            pButtonIcon
-            [ngClass]="['pi', 'pi-heart', liked ? 'text-pink-500! dark:text-pink-400!' : '']"
-          ></i>
+          <span pButtonLabel>{{ 'catalog.productPage.actions.pickSize' | transloco }}</span>
         </button>
       </div>
     </div>
   </div>
 </div>
+
+<p-dialog
+  [header]="'catalog.productPage.details.sizeAndFitTitle' | transloco"
+  [modal]="true"
+  [(visible)]="isSizeGuideDialogVisible"
+  [style]="{ width: '50rem' }"
+  [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+  [maximizable]="true"
+>
+  <lib-size-guide-dialog-section />
+</p-dialog>

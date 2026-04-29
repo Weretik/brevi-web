@@ -1,10 +1,13 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
+import { DialogModule } from 'primeng/dialog';
 import { SelectModule } from 'primeng/select';
+
+import { SizeGuideDialogSection } from '../size-guide-dialog/size-guide-dialog';
 
 type FabricOption = {
   label: string;
@@ -19,14 +22,18 @@ type PriceTiers = {
   largeWholesale: number;
 };
 
-type ProductInfoItem = {
-  labelKey: string;
-  valueKey: string;
-};
-
 @Component({
   selector: 'lib-product-overview',
-  imports: [CommonModule, FormsModule, ButtonModule, SelectModule, TranslocoPipe],
+  imports: [
+    CommonModule,
+    NgOptimizedImage,
+    FormsModule,
+    ButtonModule,
+    SelectModule,
+    DialogModule,
+    TranslocoPipe,
+    SizeGuideDialogSection,
+  ],
   templateUrl: './product-overview.html',
   styleUrl: './product-overview.scss',
 })
@@ -36,7 +43,6 @@ export class ProductOverview {
     initialValue: this.transloco.getActiveLang(),
   });
 
-  liked = false;
   images = [
     'impulse-suit-front.webp',
     'impulse-suit-side.webp',
@@ -45,6 +51,7 @@ export class ProductOverview {
   ];
   selectedImageIndex = 0;
   selectedFabric: FabricType | null = null;
+  isSizeGuideDialogVisible = false;
 
   private readonly fabricPricing: Record<FabricType, PriceTiers> = {
     greta: {
@@ -60,41 +67,6 @@ export class ProductOverview {
   };
 
   readonly minimumPrice = 2080;
-  readonly productInfoItems: ProductInfoItem[] = [
-    {
-      labelKey: 'catalog.productPage.info.model.label',
-      valueKey: 'catalog.productPage.info.model.value',
-    },
-    {
-      labelKey: 'catalog.productPage.info.professions.label',
-      valueKey: 'catalog.productPage.info.professions.value',
-    },
-    {
-      labelKey: 'catalog.productPage.info.gender.label',
-      valueKey: 'catalog.productPage.info.gender.value',
-    },
-    {
-      labelKey: 'catalog.productPage.info.season.label',
-      valueKey: 'catalog.productPage.info.season.value',
-    },
-    {
-      labelKey: 'catalog.productPage.info.photoFabric.label',
-      valueKey: 'catalog.productPage.info.photoFabric.value',
-    },
-    {
-      labelKey: 'catalog.productPage.info.features.label',
-      valueKey: 'catalog.productPage.info.features.value',
-    },
-    {
-      labelKey: 'catalog.productPage.info.logo.label',
-      valueKey: 'catalog.productPage.info.logo.value',
-    },
-    {
-      labelKey: 'catalog.productPage.info.additional.label',
-      valueKey: 'catalog.productPage.info.additional.value',
-    },
-  ];
-
   readonly fabricOptions = computed<FabricOption[]>(() => {
     this.activeLang();
     return [
@@ -111,5 +83,9 @@ export class ProductOverview {
 
   get selectedPriceTiers(): PriceTiers | null {
     return this.selectedFabric ? this.fabricPricing[this.selectedFabric] : null;
+  }
+
+  openSizeGuideDialog(): void {
+    this.isSizeGuideDialogVisible = true;
   }
 }
