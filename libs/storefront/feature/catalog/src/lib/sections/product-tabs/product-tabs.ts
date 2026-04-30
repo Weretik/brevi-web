@@ -22,10 +22,6 @@ export class ProductTabs {
   activeTab = 0;
   readonly productInfoItems: ProductInfoItem[] = [
     {
-      labelKey: 'catalog.productPage.info.model.label',
-      valueKey: 'catalog.productPage.info.model.value',
-    },
-    {
       labelKey: 'catalog.productPage.info.professions.label',
       valueKey: 'catalog.productPage.info.professions.value',
     },

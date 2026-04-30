@@ -1,117 +1,133 @@
 <div
-  class="card fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-neutral-500 backdrop-blur border-b border-surface-400 dark:border-surface-600"
+  class="card fixed top-0 left-0 right-0 z-50 bg-brand-neutral text-surface-0 border-b border-surface-700"
 >
-  <p-megaMenu [model]="items()" [pt]="megaMenuPt">
-    <ng-template #start>
-      <a [routerLink]="homeLink()" class="flex items-center gap-2">
-        <img
-          ngSrc="/assets/logo/brevi-logo-light.png"
-          width="131"
-          height="63"
-          [alt]="'header.logoAlt' | transloco"
-          class="h-14 w-auto"
-        />
-      </a>
-    </ng-template>
+  <div
+    class="flex items-center justify-between gap-4 px-6 py-2 md:px-12 lg:px-20 border-b border-surface-500"
+  >
+    <a [routerLink]="homeLink()" class="flex items-center gap-2">
+      <img
+        ngSrc="/assets/logo/brevi-logo-light.png"
+        width="131"
+        height="63"
+        [alt]="'header.logoAlt' | transloco"
+        class="h-11 w-auto"
+      />
+    </a>
 
-    <ng-template #item let-item>
-      @if (item.root) {
-        <a
-          pRipple
-          [routerLink]="item.routerLink"
-          class="flex items-center cursor-pointer px-4 py-2 overflow-hidden relative font-semibold text-base uppercase"
-          style="border-radius: 2rem"
-        >
-          <i [ngClass]="item.icon"></i>
-          <span class="ml-2">{{ item.label }}</span>
-
-          @if (item.items?.length) {
-            <i class="pi pi-angle-down ml-2" aria-hidden="true"></i>
-          }
-        </a>
-      } @else if (!item.image) {
-        <a class="flex items-center px-4 cursor-pointer mb-2 gap-2" [routerLink]="item.routerLink">
-          <span class="inline-flex flex-col gap-1">
-            <span class="text-base text-surface-900 dark:text-surface-0">
-              {{ item.label }}
-            </span>
-          </span>
-        </a>
-      } @else {
-        <div class="flex flex-col items-start gap-4">
-          <img [src]="item.image" [alt]="'header.wholesaleLogoAlt' | transloco" class="w-full" />
-          <span>{{ item.subtext }}</span>
-          <p-button
-            [label]="item.label"
-            [outlined]="true"
-            [routerLink]="item.routerLink"
-          ></p-button>
+    <div class="hidden md:flex flex-1 items-center justify-center">
+      <div class="flex flex-col items-center leading-tight">
+        <div class="mb-0.5 text-[11px] font-medium uppercase tracking-wide text-surface-300">
+          Відділ продажу
         </div>
-      }
-    </ng-template>
-
-    <ng-template #end>
-      <div class="flex justify-around items-center gap-2">
-        <div
-          class="flex items-center rounded-full border border-surface-300 dark:border-surface-600 overflow-hidden"
-        >
+        <div class="flex items-center gap-3 text-sm">
           <a
-            [href]="localeHref('uk')"
-            class="px-2 py-1 text-xs font-semibold no-underline"
-            [ngClass]="
-              currentLocale() === 'uk'
-                ? 'bg-primary text-primary-contrast'
-                : 'text-surface-600 dark:text-surface-300'
-            "
-            (click)="$event.preventDefault(); switchLocale('uk')"
+            href="tel:+380503075554"
+            class="font-semibold text-primary no-underline hover:text-primary-300 transition-colors"
           >
-            UK
+            050 307 55 54
           </a>
+          <span class="text-surface-500">•</span>
           <a
-            [href]="localeHref('ru')"
-            class="px-2 py-1 text-xs font-semibold no-underline"
-            [ngClass]="
-              currentLocale() === 'ru'
-                ? 'bg-primary text-primary-contrast'
-                : 'text-surface-600 dark:text-surface-300'
-            "
-            (click)="$event.preventDefault(); switchLocale('ru')"
+            href="tel:+380532671109"
+            class="font-semibold text-primary no-underline hover:text-primary-300 transition-colors"
           >
-            RU
+            053 267 11 09
           </a>
         </div>
-        <button
-          pButton
-          severity="secondary"
-          [rounded]="true"
-          [text]="true"
-          (click)="themeService.toggleTheme()"
-          class="w-10 h-10 text-surface-500! dark:text-surface-400!"
-          [attr.aria-label]="'header.toggleThemeAria' | transloco"
-        >
-          <i class="pi" [ngClass]="themeService.isDark() ? 'pi-moon' : 'pi-sun'"></i>
-        </button>
-        <button
-          pButton
-          severity="secondary"
-          [text]="true"
-          [rounded]="true"
-          class="w-10 h-10 text-surface-500! dark:text-surface-400!"
-          [attr.aria-label]="'header.accountAria' | transloco"
-        >
-          <i class="pi pi-user"></i>
-        </button>
-        <button
-          pButton
-          severity="secondary"
-          [text]="true"
-          [rounded]="true"
-          class="w-10 h-10 text-surface-500! dark:text-surface-400!"
-          [attr.aria-label]="'header.cartAria' | transloco"
-        >
-          <i class="pi pi-shopping-cart"></i>
-        </button>
       </div>
-    </ng-template>
-  </p-megaMenu>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <div class="flex items-center rounded-full border border-surface-600 overflow-hidden">
+        <a
+          [href]="localeHref('uk')"
+          class="px-2 py-1 text-xs font-semibold no-underline"
+          [ngClass]="
+            currentLocale() === 'uk' ? 'bg-primary text-primary-contrast' : 'text-surface-300'
+          "
+          (click)="$event.preventDefault(); switchLocale('uk')"
+        >
+          UK
+        </a>
+        <a
+          [href]="localeHref('ru')"
+          class="px-2 py-1 text-xs font-semibold no-underline"
+          [ngClass]="
+            currentLocale() === 'ru' ? 'bg-primary text-primary-contrast' : 'text-surface-300'
+          "
+          (click)="$event.preventDefault(); switchLocale('ru')"
+        >
+          RU
+        </a>
+      </div>
+      <button
+        pButton
+        severity="secondary"
+        [rounded]="true"
+        [text]="true"
+        (click)="themeService.toggleTheme()"
+        class="w-10 h-10 text-surface-200! hover:text-surface-0!"
+        [attr.aria-label]="'header.toggleThemeAria' | transloco"
+      >
+        <i class="pi" [ngClass]="themeService.isDark() ? 'pi-moon' : 'pi-sun'"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="px-6 md:px-12 lg:px-20">
+    <p-megaMenu [model]="items()" [pt]="megaMenuPt" class="py-1">
+      <ng-template #item let-item>
+        @if (item.root) {
+          <a
+            pRipple
+            [routerLink]="item.routerLink"
+            class="flex items-center cursor-pointer px-3 py-1.5 overflow-hidden relative font-semibold text-sm uppercase text-surface-100 hover:text-surface-0"
+            style="border-radius: 2rem"
+          >
+            <i [ngClass]="item.icon"></i>
+            <span class="ml-2">{{ item.label }}</span>
+
+            @if (item.items?.length) {
+              <i class="pi pi-angle-down ml-2" aria-hidden="true"></i>
+            }
+          </a>
+        } @else if (!item.image) {
+          <a
+            class="flex items-center px-4 cursor-pointer mb-2 gap-2"
+            [routerLink]="item.routerLink"
+          >
+            <span class="inline-flex flex-col gap-1">
+              <span class="text-base text-surface-100">
+                {{ item.label }}
+              </span>
+            </span>
+          </a>
+        } @else {
+          <div class="flex flex-col items-start gap-4">
+            <img [src]="item.image" [alt]="'header.wholesaleLogoAlt' | transloco" class="w-full" />
+            <span>{{ item.subtext }}</span>
+            <p-button
+              [label]="item.label"
+              [outlined]="true"
+              [routerLink]="item.routerLink"
+            ></p-button>
+          </div>
+        }
+      </ng-template>
+
+      <ng-template #end>
+        <div class="hidden lg:flex items-center relative py-1">
+          <i
+            class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-surface-400"
+            aria-hidden="true"
+          ></i>
+          <input
+            type="text"
+            class="h-9 w-80 rounded-md border border-zinc-500 bg-zinc-700 pl-9 pr-3 text-sm text-zinc-100 placeholder:text-zinc-400 outline-none transition-colors focus:border-zinc-300 focus:ring-1 focus:ring-zinc-300"
+            [placeholder]="'shared.search' | transloco"
+          />
+        </div>
+      </ng-template>
+    </p-megaMenu>
+  </div>
 </div>

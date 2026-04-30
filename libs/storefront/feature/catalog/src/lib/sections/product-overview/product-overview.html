@@ -55,63 +55,64 @@
   <div class="flex-1 min-w-0 w-full px-3 py-5 lg:px-4 flex flex-col gap-8">
     <!-- Title and pricing -->
     <div class="flex flex-col gap-4">
-      <div class="flex flex-wrap items-center gap-2">
-        <div
-          class="inline-flex items-center rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-700 dark:bg-green-900/30 dark:text-green-300"
-        >
-          {{ 'catalog.productPage.availability.inStock' | transloco }}
-        </div>
-        <div
-          class="inline-flex items-center rounded-full bg-surface-100 px-3 py-1 text-sm font-medium text-surface-700 dark:bg-surface-800 dark:text-surface-200"
-        >
-          {{ 'catalog.productPage.availability.article' | transloco: { code: '2808' } }}
-        </div>
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+        <div class="font-semibold text-surface-900 dark:text-surface-0">В наявності</div>
+        <div class="h-4 w-px bg-surface-300 dark:bg-surface-700"></div>
+        <div class="font-medium text-surface-600 dark:text-surface-300">Артикул: 2808</div>
       </div>
       <div class="flex items-center justify-between gap-4">
-        <div class="flex flex-col gap-3">
+        <div class="flex flex-col gap-3 w-full">
           <div
-            class="inline-flex w-fit items-center rounded-full bg-primary-500 px-4 py-1 text-sm font-semibold text-white dark:bg-primary-500"
+            class="inline-flex w-fit items-center rounded-full bg-primary-500 px-4 py-1.5 text-lg font-bold text-white dark:bg-primary-500"
           >
             {{ 'catalog.productPage.price.fromBadge' | transloco: { price: minimumPrice } }}
           </div>
           @if (selectedPriceTiers; as prices) {
-            <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
+            <div
+              class="grid w-full [grid-template-columns:repeat(auto-fit,minmax(11rem,1fr))] gap-2"
+            >
               <div
-                class="rounded-lg bg-surface-0 px-3 py-2 dark:bg-surface-900/50 outline outline-surface-200 dark:outline-surface-700"
+                class="min-w-44 rounded-lg bg-surface-0 px-3 py-2 dark:bg-surface-900/50 outline outline-surface-200 dark:outline-surface-700"
               >
                 <div class="text-xs text-surface-500 dark:text-surface-400">
                   {{ 'catalog.productPage.price.tiers.upTo10' | transloco }}
                 </div>
-                <div class="text-base font-semibold text-surface-900 dark:text-surface-0">
+                <div class="text-lg font-semibold text-surface-900 dark:text-surface-0">
                   {{ prices.retail }} грн
                 </div>
               </div>
               <div
-                class="rounded-lg bg-surface-0 px-3 py-2 dark:bg-surface-900/50 outline outline-surface-200 dark:outline-surface-700"
+                class="min-w-44 rounded-lg bg-surface-0 px-3 py-2 dark:bg-surface-900/50 outline outline-surface-200 dark:outline-surface-700"
               >
                 <div class="text-xs text-surface-500 dark:text-surface-400">
                   {{ 'catalog.productPage.price.tiers.from11To39' | transloco }}
                 </div>
-                <div class="text-base font-semibold text-surface-900 dark:text-surface-0">
+                <div class="text-lg font-semibold text-surface-900 dark:text-surface-0">
                   {{ prices.wholesale }} грн
                 </div>
               </div>
               <div
-                class="rounded-lg bg-surface-0 px-3 py-2 dark:bg-surface-900/50 outline outline-surface-200 dark:outline-surface-700"
+                class="min-w-44 rounded-lg bg-surface-0 px-3 py-2 dark:bg-surface-900/50 outline outline-surface-200 dark:outline-surface-700"
               >
                 <div class="text-xs text-surface-500 dark:text-surface-400">
                   {{ 'catalog.productPage.price.tiers.over40' | transloco }}
                 </div>
-                <div class="text-base font-semibold text-surface-900 dark:text-surface-0">
+                <div class="text-lg font-semibold text-surface-900 dark:text-surface-0">
                   {{ prices.largeWholesale }} грн
                 </div>
               </div>
             </div>
-          } @else {
-            <div
-              class="inline-flex w-fit items-center rounded-md bg-primary-50 px-3 py-2 text-sm font-semibold text-primary-700 dark:bg-primary-900/30 dark:text-primary-200"
-            >
-              {{ 'catalog.productPage.price.selectFabricHint' | transloco }}
+            <div class="flex flex-wrap items-center gap-2 text-xs">
+              <span
+                class="inline-flex items-center rounded-md border border-surface-300 bg-surface-0 px-2 py-1 font-semibold text-surface-700 dark:border-surface-600 dark:bg-surface-900 dark:text-surface-200"
+              >
+                Ціни вказані з ПДВ
+              </span>
+              <span
+                class="inline-flex items-center rounded-md border border-surface-300 bg-surface-0 px-2 py-1 font-semibold text-surface-700 dark:border-surface-600 dark:bg-surface-900 dark:text-surface-200"
+              >
+                Мінімальне замовлення: від 5 шт.
+              </span>
             </div>
           }
         </div>
@@ -120,9 +121,15 @@
 
     <!-- Fabric selection -->
     <div class="flex flex-col gap-4">
-      <div class="text-surface-900 dark:text-surface-0 text-sm font-semibold leading-tight">
-        {{ 'catalog.productPage.fabric.label' | transloco }}
-      </div>
+      @if (!selectedFabric) {
+        <div class="text-sm font-semibold text-primary-700 dark:text-primary-200">
+          {{ 'catalog.productPage.price.selectFabricHint' | transloco }}
+        </div>
+      } @else {
+        <div class="text-surface-900 dark:text-surface-0 text-sm font-semibold leading-tight">
+          {{ 'catalog.productPage.fabric.label' | transloco }}
+        </div>
+      }
       <p-select
         [(ngModel)]="selectedFabric"
         [options]="fabricOptions()"
