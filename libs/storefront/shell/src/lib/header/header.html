@@ -22,14 +22,14 @@
         <div class="flex items-center gap-3 text-sm">
           <a
             href="tel:+380503075554"
-            class="font-semibold text-primary no-underline hover:text-primary-300 transition-colors"
+            class="font-semibold text-primary no-underline hover:text-primary transition-colors"
           >
             050 307 55 54
           </a>
           <span class="text-surface-500">•</span>
           <a
             href="tel:+380532671109"
-            class="font-semibold text-primary no-underline hover:text-primary-300 transition-colors"
+            class="font-semibold text-primary no-underline hover:text-primary transition-colors"
           >
             053 267 11 09
           </a>
@@ -42,9 +42,7 @@
         <a
           [href]="localeHref('uk')"
           class="px-2 py-1 text-xs font-semibold no-underline"
-          [ngClass]="
-            currentLocale() === 'uk' ? 'bg-primary text-primary-contrast' : 'text-surface-300'
-          "
+          [ngClass]="currentLocale() === 'uk' ? 'bg-surface-800 text-primary' : 'text-surface-300'"
           (click)="$event.preventDefault(); switchLocale('uk')"
         >
           UK
@@ -52,9 +50,7 @@
         <a
           [href]="localeHref('ru')"
           class="px-2 py-1 text-xs font-semibold no-underline"
-          [ngClass]="
-            currentLocale() === 'ru' ? 'bg-primary text-primary-contrast' : 'text-surface-300'
-          "
+          [ngClass]="currentLocale() === 'ru' ? 'bg-surface-800 text-primary' : 'text-surface-300'"
           (click)="$event.preventDefault(); switchLocale('ru')"
         >
           RU

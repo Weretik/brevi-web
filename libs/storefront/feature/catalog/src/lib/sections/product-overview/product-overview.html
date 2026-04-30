@@ -7,12 +7,8 @@
           [ngSrc]="'/assets/images/products/' + image"
           width="96"
           height="112"
-          class="w-24 h-28 rounded-lg cursor-pointer transition-all duration-150 object-cover"
-          [class]="
-            selectedImageIndex === i
-              ? 'shadow-[0_0_0_2px] shadow-surface-900 dark:shadow-surface-0 ring-2 ring-surface-900 dark:ring-surface-0 ring-offset-2 ring-offset-surface-0 dark:ring-offset-surface-950'
-              : ''
-          "
+          [class]="desktopThumbClass"
+          [ngClass]="selectedImageIndex === i ? desktopThumbSelectedClass : ''"
           (click)="selectedImageIndex = i"
           (keyup.enter)="selectedImageIndex = i"
           tabindex="0"
@@ -35,12 +31,8 @@
             [ngSrc]="'/assets/images/products/' + image"
             width="96"
             height="112"
-            class="flex-1 min-w-16 sm:min-w-20 md:min-w-24 h-auto max-h-28 object-cover rounded-md sm:rounded-lg cursor-pointer transition-all duration-150"
-            [class]="
-              selectedImageIndex === i
-                ? 'shadow-[0_0_0_2px] shadow-surface-900 dark:shadow-surface-0 ring-2 ring-surface-900 dark:ring-surface-0 ring-offset-1 sm:ring-offset-2 ring-offset-surface-0 dark:ring-offset-surface-950'
-                : ''
-            "
+            [class]="mobileThumbClass"
+            [ngClass]="selectedImageIndex === i ? mobileThumbSelectedClass : ''"
             (click)="selectedImageIndex = i"
             (keyup.enter)="selectedImageIndex = i"
             tabindex="0"
@@ -68,12 +60,8 @@
             {{ 'catalog.productPage.price.fromBadge' | transloco: { price: minimumPrice } }}
           </div>
           @if (selectedPriceTiers; as prices) {
-            <div
-              class="grid w-full [grid-template-columns:repeat(auto-fit,minmax(11rem,1fr))] gap-2"
-            >
-              <div
-                class="min-w-44 rounded-lg bg-surface-0 px-3 py-2 dark:bg-surface-900/50 outline outline-surface-200 dark:outline-surface-700"
-              >
+            <div class="grid w-full grid-cols-[repeat(auto-fit,minmax(11rem,1fr))] gap-2">
+              <div [class]="priceCardClass">
                 <div class="text-xs text-surface-500 dark:text-surface-400">
                   {{ 'catalog.productPage.price.tiers.upTo10' | transloco }}
                 </div>
@@ -81,9 +69,7 @@
                   {{ prices.retail }} грн
                 </div>
               </div>
-              <div
-                class="min-w-44 rounded-lg bg-surface-0 px-3 py-2 dark:bg-surface-900/50 outline outline-surface-200 dark:outline-surface-700"
-              >
+              <div [class]="priceCardClass">
                 <div class="text-xs text-surface-500 dark:text-surface-400">
                   {{ 'catalog.productPage.price.tiers.from11To39' | transloco }}
                 </div>
@@ -91,9 +77,7 @@
                   {{ prices.wholesale }} грн
                 </div>
               </div>
-              <div
-                class="min-w-44 rounded-lg bg-surface-0 px-3 py-2 dark:bg-surface-900/50 outline outline-surface-200 dark:outline-surface-700"
-              >
+              <div [class]="priceCardClass">
                 <div class="text-xs text-surface-500 dark:text-surface-400">
                   {{ 'catalog.productPage.price.tiers.over40' | transloco }}
                 </div>
@@ -103,16 +87,8 @@
               </div>
             </div>
             <div class="flex flex-wrap items-center gap-2 text-xs">
-              <span
-                class="inline-flex items-center rounded-md border border-surface-300 bg-surface-0 px-2 py-1 font-semibold text-surface-700 dark:border-surface-600 dark:bg-surface-900 dark:text-surface-200"
-              >
-                Ціни вказані з ПДВ
-              </span>
-              <span
-                class="inline-flex items-center rounded-md border border-surface-300 bg-surface-0 px-2 py-1 font-semibold text-surface-700 dark:border-surface-600 dark:bg-surface-900 dark:text-surface-200"
-              >
-                Мінімальне замовлення: від 5 шт.
-              </span>
+              <span [class]="infoBadgeClass"> Ціни вказані з ПДВ </span>
+              <span [class]="infoBadgeClass"> Мінімальне замовлення: від 5 шт. </span>
             </div>
           }
         </div>
@@ -143,17 +119,10 @@
     <!-- Primary actions -->
     <div class="flex flex-col gap-8">
       <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <button
-          pButton
-          class="h-10! py-2! px-4! bg-surface-900! hover:bg-surface-800! active:bg-surface-700! dark:bg-surface-0! dark:hover:bg-surface-100! dark:active:bg-surface-200! text-surface-0! dark:text-surface-900! border-surface-900! dark:border-surface-0! rounded-md! font-medium! text-sm! transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-surface-950"
-        >
+        <button pButton [class]="primaryButtonClass">
           <span pButtonLabel>{{ 'catalog.productPage.actions.order' | transloco }}</span>
         </button>
-        <button
-          pButton
-          (click)="openSizeGuideDialog()"
-          class="h-10! py-2! px-4! bg-surface-100! hover:bg-surface-200! active:bg-surface-300! dark:bg-surface-800! dark:hover:bg-surface-700! dark:active:bg-surface-600! text-surface-900! dark:text-surface-100! border-surface-300! dark:border-surface-600! rounded-md! font-medium! text-sm! transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-surface-950"
-        >
+        <button pButton [class]="secondaryButtonClass" (click)="openSizeGuideDialog()">
           <span pButtonLabel>{{ 'catalog.productPage.actions.pickSize' | transloco }}</span>
         </button>
       </div>

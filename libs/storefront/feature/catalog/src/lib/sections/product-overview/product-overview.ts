@@ -53,6 +53,23 @@ export class ProductOverview {
   selectedFabric: FabricType | null = null;
   isSizeGuideDialogVisible = false;
 
+  readonly desktopThumbClass =
+    'w-24 h-28 rounded-lg cursor-pointer transition-all duration-150 object-cover';
+  readonly desktopThumbSelectedClass =
+    'shadow-[0_0_0_2px] shadow-surface-900 dark:shadow-surface-0 ring-2 ring-surface-900 dark:ring-surface-0 ring-offset-2 ring-offset-surface-0 dark:ring-offset-surface-950';
+  readonly mobileThumbClass =
+    'flex-1 min-w-16 sm:min-w-20 md:min-w-24 h-auto max-h-28 object-cover rounded-md sm:rounded-lg cursor-pointer transition-all duration-150';
+  readonly mobileThumbSelectedClass =
+    'shadow-[0_0_0_2px] shadow-surface-900 dark:shadow-surface-0 ring-2 ring-surface-900 dark:ring-surface-0 ring-offset-1 sm:ring-offset-2 ring-offset-surface-0 dark:ring-offset-surface-950';
+  readonly priceCardClass =
+    'min-w-44 rounded-lg bg-surface-0 px-3 py-2 dark:bg-surface-900/50 outline outline-surface-200 dark:outline-surface-700';
+  readonly infoBadgeClass =
+    'inline-flex items-center rounded-md border border-surface-300 bg-surface-0 px-2 py-1 font-semibold text-surface-700 dark:border-surface-600 dark:bg-surface-900 dark:text-surface-200';
+  readonly primaryButtonClass =
+    'w-full h-10! py-2! px-4! bg-surface-900! hover:bg-surface-800! active:bg-surface-700! dark:bg-surface-0! dark:hover:bg-surface-100! dark:active:bg-surface-200! text-surface-0! dark:text-surface-900! border-surface-900! dark:border-surface-0! rounded-md! font-medium! text-sm! transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-surface-950';
+  readonly secondaryButtonClass =
+    'w-full h-10! py-2! px-4! bg-surface-100! hover:bg-surface-200! active:bg-surface-300! dark:bg-surface-800! dark:hover:bg-surface-700! dark:active:bg-surface-600! text-surface-900! dark:text-surface-100! border-surface-300! dark:border-surface-600! rounded-md! font-medium! text-sm! transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-surface-950';
+
   private readonly fabricPricing: Record<FabricType, PriceTiers> = {
     greta: {
       retail: 2580,
