@@ -1,4 +1,4 @@
-<section class="flex flex-col p-6 md:p-8">
+﻿<section class="flex flex-col p-6 md:p-8">
   <p-toast />
   <p-confirmDialog />
   <p-contextMenu
@@ -42,7 +42,7 @@
                 pButton
                 type="button"
                 size="small"
-                (click)="store.openGarmentAccessoryCreateDialog()"
+                (click)="openGarmentAccessoryCreateDialog()"
               >
                 <i pButtonIcon class="pi pi-plus"></i>
                 <span pButtonLabel>Додати</span>
@@ -54,7 +54,7 @@
                 outlined
                 size="small"
                 [disabled]="!store.selectedGarmentAccessories.length"
-                (click)="store.confirmDeleteGarmentAccessories(store.selectedGarmentAccessories)"
+                (click)="confirmDeleteGarmentAccessories(store.selectedGarmentAccessories)"
               >
                 <i pButtonIcon class="pi pi-trash"></i>
                 <span pButtonLabel>Видалити вибране</span>
@@ -89,7 +89,7 @@
               stripedRows
               rowHover
             >
-              <ng-template #header>
+              <ng-template pTemplate="header">
                 <tr>
                   <th class="w-12 px-3 py-2">
                     <p-tableHeaderCheckbox />
@@ -101,21 +101,22 @@
                 </tr>
               </ng-template>
 
-              <ng-template #body let-accessory let-rowIndex="rowIndex">
-                <tr [pContextMenuRow]="accessory" [pContextMenuRowIndex]="rowIndex">
+              <ng-template pTemplate="body" let-accessory let-rowIndex="rowIndex">
+                @let accessoryRow = garmentAccessoryRow(accessory);
+                <tr [pContextMenuRow]="accessoryRow" [pContextMenuRowIndex]="rowIndex">
                   <td class="px-3 py-2">
-                    <p-tableCheckbox [value]="accessory" />
+                    <p-tableCheckbox [value]="accessoryRow" />
                   </td>
                   <td class="px-3 py-2 font-medium text-surface-900 dark:text-surface-0">
-                    {{ accessory.id }}
+                    {{ accessoryRow.id }}
                   </td>
-                  <td class="px-3 py-2">{{ accessory.name }}</td>
-                  <td class="px-3 py-2">{{ accessory.supplierName || '-' }}</td>
-                  <td class="px-3 py-2">{{ accessory.price | number: '1.2-2' }} грн</td>
+                  <td class="px-3 py-2">{{ accessoryRow.name }}</td>
+                  <td class="px-3 py-2">{{ accessoryRow.supplierName || '-' }}</td>
+                  <td class="px-3 py-2">{{ accessoryRow.price | number: '1.2-2' }} грн</td>
                 </tr>
               </ng-template>
 
-              <ng-template #emptymessage>
+              <ng-template pTemplate="emptymessage">
                 <tr>
                   <td colspan="5" class="px-6 py-10 text-center text-sm text-surface-500">
                     Дані не знайдено.
@@ -133,7 +134,7 @@
             class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-surface-200 bg-surface-50 px-4 py-3 dark:border-surface-200 dark:bg-surface-50"
           >
             <div class="flex flex-wrap items-center gap-2">
-              <button pButton type="button" size="small" (click)="store.openFabricCreateDialog()">
+              <button pButton type="button" size="small" (click)="openFabricCreateDialog()">
                 <i pButtonIcon class="pi pi-plus"></i>
                 <span pButtonLabel>Додати</span>
               </button>
@@ -144,7 +145,7 @@
                 outlined
                 size="small"
                 [disabled]="!store.selectedFabrics.length"
-                (click)="store.confirmDeleteFabrics(store.selectedFabrics)"
+                (click)="confirmDeleteFabrics(store.selectedFabrics)"
               >
                 <i pButtonIcon class="pi pi-trash"></i>
                 <span pButtonLabel>Видалити вибране</span>
@@ -177,7 +178,7 @@
               stripedRows
               rowHover
             >
-              <ng-template #header>
+              <ng-template pTemplate="header">
                 <tr>
                   <th class="w-12 px-3 py-2">
                     <p-tableHeaderCheckbox />
@@ -189,21 +190,22 @@
                 </tr>
               </ng-template>
 
-              <ng-template #body let-fabric let-rowIndex="rowIndex">
-                <tr [pContextMenuRow]="fabric" [pContextMenuRowIndex]="rowIndex">
+              <ng-template pTemplate="body" let-fabric let-rowIndex="rowIndex">
+                @let fabricTableRow = fabricRow(fabric);
+                <tr [pContextMenuRow]="fabricTableRow" [pContextMenuRowIndex]="rowIndex">
                   <td class="px-3 py-2">
-                    <p-tableCheckbox [value]="fabric" />
+                    <p-tableCheckbox [value]="fabricTableRow" />
                   </td>
                   <td class="px-3 py-2 font-medium text-surface-900 dark:text-surface-0">
-                    {{ fabric.id }}
+                    {{ fabricTableRow.id }}
                   </td>
-                  <td class="px-3 py-2">{{ fabric.name }}</td>
-                  <td class="px-3 py-2">{{ fabric.providerName }}</td>
-                  <td class="px-3 py-2">{{ fabric.price | number: '1.2-2' }} грн</td>
+                  <td class="px-3 py-2">{{ fabricTableRow.name }}</td>
+                  <td class="px-3 py-2">{{ fabricTableRow.providerName }}</td>
+                  <td class="px-3 py-2">{{ fabricTableRow.price | number: '1.2-2' }} грн</td>
                 </tr>
               </ng-template>
 
-              <ng-template #emptymessage>
+              <ng-template pTemplate="emptymessage">
                 <tr>
                   <td colspan="5" class="px-6 py-10 text-center text-sm text-surface-500">
                     Дані не знайдено.
@@ -222,7 +224,7 @@
     [(mode)]="store.garmentAccessoryDrawerMode"
     [draft]="store.garmentAccessoryDrawerDraft"
     [suppliers]="store.suppliers.value()"
-    (save)="store.saveGarmentAccessoryDraft($event)"
+    [saveDraft]="saveGarmentAccessoryDraft"
   />
 
   <lib-fabric-dialog
@@ -230,6 +232,6 @@
     [(mode)]="store.fabricDrawerMode"
     [draft]="store.fabricDrawerDraft"
     [suppliers]="store.suppliers.value()"
-    (save)="store.saveFabricDraft($event)"
+    [saveDraft]="saveFabricDraft"
   />
 </section>

@@ -4,6 +4,10 @@ import { AppErrorFactory } from './api-error.factory';
 
 import type { ApiError } from './api-error';
 
+export function isApiError(value: unknown): value is ApiError {
+  return typeof value === 'object' && value !== null && 'code' in value && 'message' in value;
+}
+
 function isChunkLoadError(e: unknown): boolean {
   const msg = e instanceof Error ? e.message : typeof e === 'string' ? e : '';
   return /ChunkLoadError|Loading chunk \d+ failed|Failed to fetch dynamically imported module/i.test(
@@ -53,6 +57,10 @@ function tryGetTraceId(err: HttpErrorResponse): string | undefined {
 }
 
 export function mapToApiError(error: unknown): ApiError {
+  if (isApiError(error)) {
+    return error;
+  }
+
   // Http
   if (error instanceof HttpErrorResponse) {
     const fieldErrors = tryGetFieldErrors(error);

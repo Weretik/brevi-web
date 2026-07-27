@@ -1,4 +1,4 @@
-import { DecimalPipe } from '@angular/common';
+﻿import { DecimalPipe } from '@angular/common';
 import { Component, ViewChild, inject } from '@angular/core';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -8,12 +8,10 @@ import { TableModule } from 'primeng/table';
 import { TabsModule } from 'primeng/tabs';
 import { ToastModule } from 'primeng/toast';
 
-import { GarmentPartOperationPageStore } from './garment-part-operation-page.store';
-import { GarmentPartDialogComponent } from '../../dialogs/garment-part-dialog/garment-part-dialog.component';
-import { GarmentPartOperationDialogComponent } from '../../dialogs/garment-part-operation-dialog/garment-part-operation-dialog.component';
+import { GarmentPartOperationPageFacade } from './garment-part-operation-page.facade';
+import { GarmentPartDialogComponent, GarmentPartOperationDialogComponent } from '../../components';
 
-import type { GarmentPartOperationRow } from '../../data-access/garment-part-operations/garment-part-operations.models';
-import type { GarmentPartRow } from '../../data-access/garment-parts/garment-parts.models';
+import type { GarmentPartOperationRow, GarmentPartRow } from '@admin/data-access';
 
 @Component({
   selector: 'lib-garment-part-operation',
@@ -31,7 +29,7 @@ import type { GarmentPartRow } from '../../data-access/garment-parts/garment-par
   ],
   templateUrl: './garment-part-operation.html',
   styleUrl: './garment-part-operation.css',
-  providers: [ConfirmationService, GarmentPartOperationPageStore, MessageService],
+  providers: [ConfirmationService, GarmentPartOperationPageFacade, MessageService],
 })
 export class GarmentPartOperation {
   @ViewChild('garmentPartOperationContextMenu')
@@ -40,7 +38,7 @@ export class GarmentPartOperation {
   @ViewChild('garmentPartContextMenu')
   private garmentPartContextMenu?: ContextMenu;
 
-  protected readonly store = inject(GarmentPartOperationPageStore);
+  protected readonly store = inject(GarmentPartOperationPageFacade);
   protected readonly garmentPartOperationMenuItems: MenuItem[] = [
     {
       label: 'Переглянути',

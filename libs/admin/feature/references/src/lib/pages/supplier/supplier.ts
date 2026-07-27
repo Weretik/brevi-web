@@ -6,10 +6,14 @@ import { ContextMenu, ContextMenuModule } from 'primeng/contextmenu';
 import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
 
-import { SupplierPageStore } from './supplier-page.store';
-import { SupplierDialogComponent } from '../../dialogs/supplier-dialog/supplier-dialog.component';
+import { SupplierPageFacade } from './supplier-page.facade';
+import { SupplierDialogComponent } from '../../components';
 
-import type { SupplierRow } from '../../data-access/suppliers/suppliers.models';
+import type {
+  SupplierDialogDraft,
+  SupplierDialogSaveResult,
+} from '../../components/dialogs/supplier-dialog/supplier-dialog.models';
+import type { SupplierRow } from '@admin/data-access';
 
 @Component({
   selector: 'lib-supplier',
@@ -24,13 +28,13 @@ import type { SupplierRow } from '../../data-access/suppliers/suppliers.models';
   ],
   templateUrl: './supplier.html',
   styleUrl: './supplier.css',
-  providers: [ConfirmationService, SupplierPageStore, MessageService],
+  providers: [ConfirmationService, SupplierPageFacade, MessageService],
 })
 export class Supplier {
   @ViewChild('supplierContextMenu')
   private supplierContextMenu?: ContextMenu;
 
-  protected readonly store = inject(SupplierPageStore);
+  protected readonly facade = inject(SupplierPageFacade);
   protected readonly supplierMenuItems: MenuItem[] = [
     {
       label: 'Переглянути',
@@ -40,7 +44,7 @@ export class Supplier {
           return;
         }
 
-        this.store.openSupplierViewDialog(this.activeSupplier);
+        this.facade.openSupplierViewDialog(this.activeSupplier);
       },
     },
     {
@@ -51,7 +55,7 @@ export class Supplier {
           return;
         }
 
-        void this.store.openSupplierEditDialog(this.activeSupplier);
+        void this.facade.openSupplierEditDialog(this.activeSupplier);
       },
     },
     {
@@ -62,10 +66,18 @@ export class Supplier {
           return;
         }
 
-        this.store.confirmDeleteSuppliers([this.activeSupplier]);
+        this.facade.confirmDeleteSuppliers([this.activeSupplier]);
       },
     },
   ];
 
   protected activeSupplier: SupplierRow | null = null;
+
+  protected openSupplierCreateDialog(): void {
+    this.facade.openSupplierCreateDialog();
+  }
+
+  protected readonly saveSupplierDraft = (
+    draft: SupplierDialogDraft,
+  ): Promise<SupplierDialogSaveResult> => this.facade.saveSupplierDraft(draft);
 }

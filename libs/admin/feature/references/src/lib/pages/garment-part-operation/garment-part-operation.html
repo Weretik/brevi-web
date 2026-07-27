@@ -223,7 +223,7 @@
     [(visible)]="store.garmentPartDrawerVisible"
     [(mode)]="store.garmentPartDrawerMode"
     [draft]="store.garmentPartDrawerDraft"
-    (save)="store.saveGarmentPartDraft($event)"
+    [saveDraft]="store.saveGarmentPartDraft"
   />
 
   <lib-garment-part-operation-dialog
@@ -231,6 +231,6 @@
     [(mode)]="store.garmentPartOperationDrawerMode"
     [draft]="store.garmentPartOperationDrawerDraft"
     [garmentParts]="store.garmentParts.value()"
-    (save)="store.saveGarmentPartOperationDraft($event)"
+    [saveDraft]="store.saveGarmentPartOperationDraft"
   />
 </section>

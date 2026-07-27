@@ -8,12 +8,18 @@ import { TableModule } from 'primeng/table';
 import { TabsModule } from 'primeng/tabs';
 import { ToastModule } from 'primeng/toast';
 
-import { GarmentAccessoryPageStore } from './garment-accessory-page.store';
-import { FabricDialogComponent } from '../../dialogs/fabric-dialog/fabric-dialog.component';
-import { GarmentAccessoryDialogComponent } from '../../dialogs/garment-accessory-dialog/garment-accessory-dialog.component';
+import { GarmentAccessoryPageFacade } from './garment-accessory-page.facade';
+import { FabricDialogComponent, GarmentAccessoryDialogComponent } from '../../components';
 
-import type { FabricRow } from '../../data-access/fabrics/fabrics.models';
-import type { GarmentAccessoryRow } from '../../data-access/garment-accessories/garment-accessories.models';
+import type {
+  FabricDialogDraft,
+  FabricDialogSaveResult,
+} from '../../components/dialogs/fabric-dialog/fabric-dialog.models';
+import type {
+  GarmentAccessoryDialogDraft,
+  GarmentAccessoryDialogSaveResult,
+} from '../../components/dialogs/garment-accessory-dialog/garment-accessory-dialog.models';
+import type { FabricRow, GarmentAccessoryRow } from '@admin/data-access';
 
 @Component({
   selector: 'lib-garment-accessory',
@@ -31,7 +37,7 @@ import type { GarmentAccessoryRow } from '../../data-access/garment-accessories/
   ],
   templateUrl: './garment-accessory.html',
   styleUrl: './garment-accessory.css',
-  providers: [ConfirmationService, GarmentAccessoryPageStore, MessageService],
+  providers: [ConfirmationService, GarmentAccessoryPageFacade, MessageService],
 })
 export class GarmentAccessory {
   @ViewChild('garmentAccessoryContextMenu')
@@ -40,7 +46,7 @@ export class GarmentAccessory {
   @ViewChild('fabricContextMenu')
   private fabricContextMenu?: ContextMenu;
 
-  protected readonly store = inject(GarmentAccessoryPageStore);
+  protected readonly store = inject(GarmentAccessoryPageFacade);
   protected readonly garmentAccessoryMenuItems: MenuItem[] = [
     {
       label: 'Переглянути',
@@ -50,7 +56,7 @@ export class GarmentAccessory {
           return;
         }
 
-        this.store.openGarmentAccessoryViewDialog(this.activeGarmentAccessory);
+        this.openGarmentAccessoryViewDialog(this.activeGarmentAccessory);
       },
     },
     {
@@ -61,7 +67,7 @@ export class GarmentAccessory {
           return;
         }
 
-        void this.store.openGarmentAccessoryEditDialog(this.activeGarmentAccessory);
+        this.openGarmentAccessoryEditDialog(this.activeGarmentAccessory);
       },
     },
     {
@@ -72,7 +78,7 @@ export class GarmentAccessory {
           return;
         }
 
-        this.store.confirmDeleteGarmentAccessories([this.activeGarmentAccessory]);
+        this.confirmDeleteGarmentAccessories([this.activeGarmentAccessory]);
       },
     },
   ];
@@ -86,7 +92,7 @@ export class GarmentAccessory {
           return;
         }
 
-        this.store.openFabricViewDialog(this.activeFabric);
+        this.openFabricViewDialog(this.activeFabric);
       },
     },
     {
@@ -97,7 +103,7 @@ export class GarmentAccessory {
           return;
         }
 
-        void this.store.openFabricEditDialog(this.activeFabric);
+        this.openFabricEditDialog(this.activeFabric);
       },
     },
     {
@@ -108,11 +114,59 @@ export class GarmentAccessory {
           return;
         }
 
-        this.store.confirmDeleteFabrics([this.activeFabric]);
+        this.confirmDeleteFabrics([this.activeFabric]);
       },
     },
   ];
 
   protected activeGarmentAccessory: GarmentAccessoryRow | null = null;
   protected activeFabric: FabricRow | null = null;
+
+  protected openGarmentAccessoryCreateDialog(): void {
+    this.store.openGarmentAccessoryCreateDialog();
+  }
+
+  protected openGarmentAccessoryEditDialog(accessory: GarmentAccessoryRow): void {
+    this.store.openGarmentAccessoryEditDialog(accessory);
+  }
+
+  protected openGarmentAccessoryViewDialog(accessory: GarmentAccessoryRow): void {
+    this.store.openGarmentAccessoryViewDialog(accessory);
+  }
+
+  protected confirmDeleteGarmentAccessories(accessories: GarmentAccessoryRow[]): void {
+    this.store.confirmDeleteGarmentAccessories(accessories);
+  }
+
+  protected openFabricCreateDialog(): void {
+    this.store.openFabricCreateDialog();
+  }
+
+  protected openFabricEditDialog(fabric: FabricRow): void {
+    this.store.openFabricEditDialog(fabric);
+  }
+
+  protected openFabricViewDialog(fabric: FabricRow): void {
+    this.store.openFabricViewDialog(fabric);
+  }
+
+  protected confirmDeleteFabrics(fabrics: FabricRow[]): void {
+    this.store.confirmDeleteFabrics(fabrics);
+  }
+
+  garmentAccessoryRow(row: unknown): GarmentAccessoryRow {
+    return row as GarmentAccessoryRow;
+  }
+
+  fabricRow(row: unknown): FabricRow {
+    return row as FabricRow;
+  }
+
+  protected readonly saveGarmentAccessoryDraft = (
+    draft: GarmentAccessoryDialogDraft,
+  ): Promise<GarmentAccessoryDialogSaveResult> => this.store.saveGarmentAccessoryDraft(draft);
+
+  protected readonly saveFabricDraft = (
+    draft: FabricDialogDraft,
+  ): Promise<FabricDialogSaveResult> => this.store.saveFabricDraft(draft);
 }

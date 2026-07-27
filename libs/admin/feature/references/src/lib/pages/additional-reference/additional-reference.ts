@@ -6,22 +6,22 @@ import { DynamicDialogModule, DialogService } from 'primeng/dynamicdialog';
 import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
 
-import { AdditionalReferencePageStore } from './additional-reference-page.store';
+import { AdditionalReferencePageFacade } from './additional-reference-page.facade';
 
-import type { AdditionalReferenceRow } from '../../data-access/additional-references/additional-references.models';
+import type { AdditionalReferenceRow } from '@admin/data-access';
 
 @Component({
   selector: 'lib-additional-reference',
   imports: [ButtonModule, ContextMenuModule, DynamicDialogModule, TableModule, ToastModule],
   templateUrl: './additional-reference.html',
   styleUrl: './additional-reference.css',
-  providers: [DialogService, AdditionalReferencePageStore, MessageService],
+  providers: [DialogService, AdditionalReferencePageFacade, MessageService],
 })
 export class AdditionalReference {
   @ViewChild('additionalReferenceContextMenu')
   private additionalReferenceContextMenu?: ContextMenu;
 
-  protected readonly store = inject(AdditionalReferencePageStore);
+  protected readonly store = inject(AdditionalReferencePageFacade);
   protected readonly additionalReferenceMenuItems: MenuItem[] = [
     {
       label: 'Редагувати',
