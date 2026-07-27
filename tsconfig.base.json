@@ -32,8 +32,11 @@
       "@storefront/feature/not-found": ["libs/storefront/feature/not-found/src/index.ts"],
       "@storefront/feature/regions": ["libs/storefront/feature/regions/regions/src/index.ts"],
       "@shared/theme": ["libs/shared/theme/src/index.ts"],
+      "@admin/contracts": ["libs/admin/contracts/src/index.ts"],
+      "@admin/data-access": ["libs/admin/data-access/src/index.ts"],
       "@admin/feature/dashboard": ["libs/admin/feature/dashboard/src/index.ts"],
       "@admin/ui": ["libs/admin/ui/src/index.ts"],
+      "@admin/util": ["libs/admin/util/src/index.ts"],
       "@admin/shell": ["libs/admin/shell/src/index.ts"],
       "@admin/feature/references": ["libs/admin/feature/references/src/index.ts"]
     }

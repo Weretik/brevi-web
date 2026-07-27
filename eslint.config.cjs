@@ -22,6 +22,7 @@ module.exports = [
       '**/.nx/**',
       '**/tmp/**',
       '**/.vite/**',
+      '**/vite.config.*.timestamp*',
     ],
   },
 

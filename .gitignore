@@ -51,3 +51,5 @@ Thumbs.db
 .vercel
 
 vitest.config.*.timestamp*
+
+vite.config.*.timestamp*
