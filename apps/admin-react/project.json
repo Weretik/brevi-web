@@ -1,0 +1,41 @@
+{
+  "name": "admin-react",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/admin-react/src",
+  "tags": ["scope:admin", "type:app"],
+  "targets": {
+    "build": {
+      "outputs": ["{projectRoot}/{options.outDir}", "{workspaceRoot}/dist/apps/admin-react"],
+      "defaultConfiguration": "production",
+      "options": {
+        "outDir": "../../dist/apps/admin-react"
+      },
+      "configurations": {
+        "development": {
+          "mode": "development"
+        },
+        "production": {
+          "mode": "production"
+        }
+      }
+    },
+    "serve": {
+      "defaultConfiguration": "development",
+      "configurations": {
+        "development": {},
+        "production": {}
+      }
+    },
+    "serve-static": {
+      "continuous": true,
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "admin-react:build",
+        "port": 4301,
+        "staticFilePath": "dist/apps/admin-react",
+        "spa": true
+      }
+    }
+  }
+}
