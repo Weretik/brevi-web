@@ -1,13 +1,16 @@
-# Стандарт інтерфейсу Admin
+# Admin UI rules
 
-**Область:** React-застосунок `apps/admin` і бібліотеки `libs/admin`  
-**Статус:** чинний
+## Language and components
 
-## Мова інтерфейсу та документації
+- Видимі рядки, accessible names, empty/error messages і feature specs пишіть українською.
+- Використовуйте наявні MUI patterns і theme; не створюйте локальні design tokens без потреби.
+- Для table, dialog, select, pagination та інших складних business controls використовуйте наявні MUI components.
+- Не змінюйте глобальні стилі, theme або routing заради локальної feature.
 
-Мовою інтерфейсу кабінету й документації є українська. Усі нові та змінені
-видимі користувачу рядки, accessible names, повідомлення про порожній стан і
-специфікації сценаріїв Admin пишуться українською мовою.
+## States and accessibility
 
-Виняток становлять назви брендів, технічні значення, дані зовнішніх контрактів і
-кодові ідентифікатори, які не перекладаються без окремого рішення.
+- Кожен екран із server data визначає застосовні `loading`, `success`, `empty`, `error` та `forbidden` states.
+- Error state показує зрозуміле повідомлення без transport details і доступну retry-дію, якщо вона можлива.
+- Інтерактивні елементи мають semantic HTML, keyboard navigation, visible focus і доступне ім'я.
+- Icon-only control має `aria-label` або наявний еквівалент.
+- Перевіряйте layout на погоджених вузьких і широких breakpoints.
