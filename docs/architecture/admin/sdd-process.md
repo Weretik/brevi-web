@@ -57,6 +57,14 @@
 - Integration / e2e:
 - Ручна перевірка:
 
+## Security і доступ
+
+- Рівень review: `n/a`, `basic` або `elevated` із причиною:
+- Ролі, route access і доступ до кожної mutation:
+- Сценарії 401 / 403 / завершення сесії:
+- Чутливі дані, PII, файли, export або `none`:
+- Threat model для `elevated`:
+
 ## Відкриті питання
 
 - [ ]
@@ -71,6 +79,9 @@
   накопичується в корені `src` або одному файлі-«комбайні»;
 - код розміщений у коректних межах і проходить Nx module boundaries;
 - додано або оновлено релевантні тести;
+- Test strategy і security/access review виконані або `n/a` обґрунтовано;
+- Для першої функціональної React Admin feature закрито `TST-ADMIN-001` із
+  [Testing rules](../../standards/testing-rules.md#react-admin-readiness-gate).
 - запущено відповідні lint, test і build цілі;
 - у специфікації зазначено ручні перевірки та ризики, що залишилися.
 

@@ -10,7 +10,8 @@
 ## Technical context
 
 - **Stack:** React, TypeScript, RTK Query, MUI, Nx.
-- **Testing:** <точні Jest / RTL / e2e targets або n/a з причиною>.
+- **Testing:** Vitest, RTL, Playwright; <точні test files, Nx targets та e2e рішення з spec.md>.
+- **Security:** <review level, route/action access, sensitive data, 401/403 handling, або n/a з причиною>.
 - **Performance / constraints:** <pagination, rendering, permissions або n/a>.
 
 ## Architecture and source paths
@@ -30,6 +31,8 @@ libs/admin/<domain>/
 ## Constitution check
 
 - [ ] Nx boundaries, public `src/index.ts` і чинні Admin standards дотримано.
+- [ ] Test strategy відповідає `docs/standards/testing-rules.md`; потрібні Nx test targets існують.
+- [ ] Security/access рішення відповідає `docs/standards/security-rules.md`.
 - [ ] Усі нові залежності та відхилення від архітектури обґрунтовано нижче.
 
 ## Complexity tracking

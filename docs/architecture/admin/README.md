@@ -23,4 +23,6 @@
 
 - [Організація коду Admin](../../standards/admin-code-organization.md)
 - [Інтерфейс Admin](../../standards/admin-ui.md)
+- [Testing strategy](../../standards/testing-rules.md)
+- [Security rules](../../standards/security-rules.md)
 - [ADR Admin](adr/)

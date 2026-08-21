@@ -30,7 +30,7 @@ router; `feature` збирає page і локальний UI-state. Усі мі�
 ## Порядок створення документів
 
 1. Створіть [spec.md](spec.md): **що** отримує користувач — user stories,
-   requirements, acceptance scenarios, edge cases і success criteria.
+   requirements, acceptance scenarios, edge cases, Security/access і Test strategy.
 2. За наявності невизначеності створіть [research.md](research.md): питання,
    рішення, докази та відхилені альтернативи.
 3. Створіть [plan.md](plan.md): **як** feature лягає в поточний Admin-код —
@@ -39,7 +39,8 @@ router; `feature` збирає page і локальний UI-state. Усі мі�
    за потреби, [API contract](contracts/api-contract.md).
 5. Заповніть [requirements checklist](checklists/requirements.md) до коду.
 6. Створіть фази в [tasks/](tasks/): спочатку plan gate і foundation, потім
-   кожна user story окремою independently testable поставкою.
+   кожна user story окремою independently testable поставкою. Для кожної story
+   задачі на tests і security scenarios є обов'язковими або мають `n/a` з причиною.
 7. Після реалізації заповніть [quickstart.md](quickstart.md), результати фаз
    і [delivery checklist](checklists/delivery.md).
 
