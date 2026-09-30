@@ -5,6 +5,13 @@
   "sourceRoot": "apps/admin-react/src",
   "tags": ["scope:admin", "type:app"],
   "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "eslint .",
+        "cwd": "apps/admin-react"
+      }
+    },
     "build": {
       "outputs": ["{projectRoot}/{options.outDir}", "{workspaceRoot}/dist/apps/admin-react"],
       "defaultConfiguration": "production",
@@ -35,6 +42,13 @@
         "port": 4301,
         "staticFilePath": "dist/apps/admin-react",
         "spa": true
+      }
+    },
+    "typecheck-tests": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit -p tsconfig.spec.json",
+        "cwd": "apps/admin-react"
       }
     }
   }
