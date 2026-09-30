@@ -1,0 +1,45 @@
+openapi: 3.1.0
+info:
+  title: BreviERP API
+  version: 0.1.0
+  description: >-
+    Агрегована точка входу OpenAPI. Контракти функціональностей додаються до
+    цього документа через $ref після погодження їхнього API-контракту.
+servers:
+  - url: /
+    description: Origin розгорнутого BreviERP API
+paths:
+  /api/reference/product-categories/admin:
+    $ref: ./catalog/product-dependencies.openapi.yaml#/paths/~1api~1reference~1product-categories~1admin
+  /api/catalog/media:
+    $ref: ./catalog/product-dependencies.openapi.yaml#/paths/~1api~1catalog~1media
+  /api/catalog/media/{id}:
+    $ref: ./catalog/product-dependencies.openapi.yaml#/paths/~1api~1catalog~1media~1{id}
+  /api/reference/additional-references:
+    $ref: ./reference/additional-references.openapi.yaml#/paths/~1api~1reference~1additional-references
+  /api/reference/additional-references/{id}:
+    $ref: ./reference/additional-references.openapi.yaml#/paths/~1api~1reference~1additional-references~1{id}
+  /api/reference/garment-part-operations:
+    $ref: ./reference/garment-part-operations.openapi.yaml#/paths/~1api~1reference~1garment-part-operations
+  /api/reference/garment-part-operations/{id}:
+    $ref: ./reference/garment-part-operations.openapi.yaml#/paths/~1api~1reference~1garment-part-operations~1{id}
+  /api/reference/garment-parts:
+    $ref: ./reference/garment-parts.openapi.yaml#/paths/~1api~1reference~1garment-parts
+  /api/reference/garment-parts/{id}:
+    $ref: ./reference/garment-parts.openapi.yaml#/paths/~1api~1reference~1garment-parts~1{id}
+  /api/reference/fabrics:
+    $ref: ./reference/fabrics.openapi.yaml#/paths/~1api~1reference~1fabrics
+  /api/reference/fabrics/{id}:
+    $ref: ./reference/fabrics.openapi.yaml#/paths/~1api~1reference~1fabrics~1{id}
+  /api/reference/garment-accessories:
+    $ref: ./reference/garment-accessories.openapi.yaml#/paths/~1api~1reference~1garment-accessories
+  /api/reference/garment-accessories/{id}:
+    $ref: ./reference/garment-accessories.openapi.yaml#/paths/~1api~1reference~1garment-accessories~1{id}
+  /api/reference/suppliers:
+    $ref: ./reference/suppliers.openapi.yaml#/paths/~1api~1reference~1suppliers
+  /api/reference/suppliers/{id}:
+    $ref: ./reference/suppliers.openapi.yaml#/paths/~1api~1reference~1suppliers~1{id}
+  /api/v1/products:
+    $ref: ./catalog/product-catalog.openapi.yaml#/paths/~1api~1v1~1products
+  /api/v1/products/{id}:
+    $ref: ./catalog/product-catalog.openapi.yaml#/paths/~1api~1v1~1products~1{id}

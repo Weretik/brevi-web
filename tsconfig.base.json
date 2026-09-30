@@ -33,11 +33,18 @@
       "@storefront/feature/regions": ["libs/storefront/feature/regions/regions/src/index.ts"],
       "@shared/theme": ["libs/shared/theme/src/index.ts"],
       "@admin/contracts": ["libs/admin/contracts/src/index.ts"],
+      "@admin/api-contract": ["libs/admin/api-contract/src/index.ts"],
+      "@admin/references/data-access": ["libs/admin/references/data-access/src/index.ts"],
+      "@admin/references/feature": ["libs/admin/references/feature/src/index.ts"],
+      "@admin/products/data-access": ["libs/admin/products/data-access/src/index.ts"],
+      "@admin/products/feature": ["libs/admin/products/feature/src/index.ts"],
       "@admin/data-access": ["libs/admin/data-access/src/index.ts"],
       "@admin/feature/dashboard": ["libs/admin/feature/dashboard/src/index.ts"],
       "@admin/ui": ["libs/admin/ui/src/index.ts"],
       "@admin/util": ["libs/admin/util/src/index.ts"],
+      "@admin/util/api-url": ["libs/admin/util/src/api-url.ts"],
       "@admin/shell": ["libs/admin/shell/src/index.ts"],
+      "@admin/core/shell": ["libs/admin/core/shell/src/index.ts"],
       "@admin/feature/references": ["libs/admin/feature/references/src/index.ts"]
     }
   }
