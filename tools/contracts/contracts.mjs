@@ -55,6 +55,17 @@ function generate(output) {
     ],
     { cwd: root, stdio: 'inherit' },
   );
+  execFileSync(
+    process.execPath,
+    [
+      join(root, 'node_modules/prettier/bin/prettier.cjs'),
+      '--config',
+      join(root, 'prettier.config.cjs'),
+      '--write',
+      output,
+    ],
+    { cwd: root, stdio: 'inherit' },
+  );
 }
 
 const [command, checkoutArg, commit] = process.argv.slice(2);
