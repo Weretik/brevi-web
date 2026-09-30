@@ -1,0 +1,24 @@
+{
+  "name": "admin-react-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/admin-react-e2e/src",
+  "tags": ["scope:admin", "type:e2e"],
+  "implicitDependencies": ["admin-react"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "eslint .",
+        "cwd": "apps/admin-react-e2e"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit -p tsconfig.json",
+        "cwd": "apps/admin-react-e2e"
+      }
+    }
+  }
+}
