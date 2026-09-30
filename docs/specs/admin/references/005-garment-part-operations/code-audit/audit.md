@@ -1,0 +1,52 @@
+# Аудит відповідальностей коду — Операції (роботи)
+
+- **Feature:** `docs/specs/admin/references/005-garment-part-operations`
+- **Scope:** уся погоджена feature
+- **Дата:** 2026-09-28
+
+## Перед реалізацією
+
+- [x] Переглянуто backend controller, request/row DTO, validators, OpenAPI entry point; frontend route, сторінку елементів, data-access, hooks, компоненти й Nx targets.
+- [x] API-контракт належить backend OpenAPI; HTTP і runtime mapping — `references/data-access`; стан запитів і дій — hooks; представлення — компоненти; вкладки — спільна сторінка; route — app router.
+- [x] До реалізації `GarmentPartsPage` містила тільки вкладку «Елементи»; backend OpenAPI не мав операцій робіт. Заплановано спільну оболонку вкладок, окремий вміст робіт та окремий contract YAML.
+
+## Після реалізації, до delivery checkpoint
+
+- [x] Переглянуто всі нові файли `garment-part-operations/`, hooks, model, components, сторінку вкладок, route, тести й generated type export.
+- [x] Contract, HTTP/mapping, стан, validation, grid, dialog, selection і page composition мають окремі власники. Після повторного аудиту вміст «Елементів» винесено з файла вкладок; однакове правило вибору й утримання невдалих ID об'єднано в один hook. Публічний export не змінено.
+- [x] Імпорти й Nx boundaries перевірено lint/typecheck; feature і app tests та E2E повторено після розділення.
+
+## Результат аудиту
+
+| Шлях або область                                                                                                                     | Наявна й впроваджена відповідальність                | Рішення та причина                                                                                                                                                                                                                                                                   | Нові шляхи й межі імпортів                       | Перевірка                       |
+| ------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------ | ------------------------------- |
+| Backend `docs/sdd/contracts/openapi.yaml`, `reference/garment-part-operations.openapi.yaml`                                          | Канонічний API з окремою feature схемою та refs      | Окремий контракт відповідає наявним controller/validators; код backend не змінювався                                                                                                                                                                                                 | `openapi.yaml` → feature YAML                    | `contracts:check`               |
+| `libs/admin/references/data-access/src/garment-part-operations/`                                                                     | API, runtime mapper, model, error                    | Ролі залишено у чотирьох малих файлах за наявним шаблоном; generated DTO лише тут                                                                                                                                                                                                    | Public export тільки моделі та операцій          | 4 focused tests, lint/typecheck |
+| `libs/admin/references/feature/src/hooks/`, `model/`                                                                                 | Read/retry/abort, editor, deletion, чиста validation | Незалежні стани лишено окремо. Однакове правило selection у двох вкладках перенесено в `use-reference-row-selection.ts`, щоб не дублювати утримання невдалих ID. Domain-specific editor/deletion hooks залишено окремими, бо вони викликають різні API й формують різні повідомлення | Hooks → public data-access; model без React/HTTP | component suite, lint/typecheck |
+| `libs/admin/references/feature/src/components/garment-part-operations/`                                                              | Grid, form, confirmation                             | Окремі presentational components, HTTP не викликають                                                                                                                                                                                                                                 | Components → hooks/types                         | component suite, E2E            |
+| `libs/admin/references/feature/vitest.config.mts`                                                                                    | Discovery feature tests                              | Додано `*.test.ts` поруч із наявним `*.test.tsx`, щоб чиста validation мала виконуваний unit test                                                                                                                                                                                    | Без нової test infrastructure                    | validation unit 2/2             |
+| `libs/admin/references/feature/src/pages/garment-parts-page.tsx`, `garment-parts-content.tsx`, `garment-part-operations-content.tsx` | Спільні вкладки та два незалежні вмісти              | `garment-parts-page.tsx` тепер тільки компонує вкладки; стан і дії «Елементів» винесено в `garment-parts-content.tsx`, дії «Робіт» залишено в окремому content. Це прибирає змішані ролі зі спільної сторінки без зміни URL чи public export                                         | Page → два content → hooks/components            | feature tests, app route, E2E   |
+| `apps/admin-react/src/app/router/`                                                                                                   | Наявний route і пункт меню                           | Збережено URL і public export; новий route не потрібен                                                                                                                                                                                                                               | App → `@admin/references/feature`                | app route, Playwright           |
+
+## Повторний аудит після delivery
+
+- `garment-parts-page.tsx` раніше містив і перемикання вкладок, і повну поведінку таблиці «Елементи». Поведінку без зміни перенесено в `garment-parts-content.tsx`. Тепер обидві вкладки мають симетричні content-файли, а сторінка відповідає тільки за їхню композицію.
+- `use-garment-part-selection.ts` і `use-garment-part-operation-selection.ts` дублювали той самий стан вибору та правило збереження ID після часткового видалення. Їх замінено на `use-reference-row-selection.ts` у наявному каталозі hooks. Кожна вкладка викликає hook окремо, тому стан вибору між вкладками не змішується.
+- `garment-part-operations.api.ts` залишено одним transport-файлом: `send` і чотири endpoint-функції використовують одну схему credentials/error handling. Runtime mapper та error parser мають окремі файли, бо це незалежні правила. Generated operation types імпортуються тільки в data-access; `feature` бачить лише модель застосунку через публічний export.
+- `garment-part-operation-dialog.tsx` залишено одним компонентом: поля створення, перегляду й редагування є однією формою з режимами; стан і правила збереження належать editor hook, чиста validation — `model/`. Grid і confirmation залишаються окремими компонентами.
+- `garment-part-operations-content.tsx` залишено власником оркестрації read, lookup, edit і delete для вкладки. Він не виконує HTTP і не містить правил валідації. `app-router.tsx` лише використовує наявний публічний `GarmentPartsPage`; циклів імпортів та другого route немає.
+
+## Повторна перевірка після розділення
+
+| Команда                                                                                                                                             | Результат                                            |
+| --------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| `npx nx test admin-references-feature`                                                                                                              | 29/29, 6 файлів                                      |
+| `npx nx test admin-references-data-access`                                                                                                          | 23/23, 10 файлів                                     |
+| `npx nx test admin-react -- app-router.integration.test.tsx`                                                                                        | 7/7                                                  |
+| `npx nx e2e admin-react-e2e -- garment-part-operations.spec.ts garment-parts.spec.ts`                                                               | 6/6                                                  |
+| `npx nx lint admin-references-feature`, `npx nx lint admin-references-data-access`                                                                  | Успішно                                              |
+| `npx nx typecheck admin-references-feature`, `npx nx run admin-references-feature:typecheck-tests`, `npx nx typecheck admin-references-data-access` | Успішно                                              |
+| `npx nx build admin-react`                                                                                                                          | Успішно; наявне попередження про bundle понад 500 kB |
+| `npm run contracts:check`, `npm run docs:check`                                                                                                     | Успішно                                              |
+
+Поведінкові тести й збірка після структурних змін зелені. Робоче дерево frontend містить численні сторонні зміни, які цей аудит не змінював.
