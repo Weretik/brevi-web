@@ -16,6 +16,7 @@ module.exports = [
   {
     ignores: [
       '**/dist/**',
+      '**/build/**',
       '**/coverage/**',
       '**/.angular/**',
       '**/node_modules/**',
@@ -23,6 +24,9 @@ module.exports = [
       '**/tmp/**',
       '**/.vite/**',
       '**/vite.config.*.timestamp*',
+      '**/vitest.config.*.timestamp*',
+      '**/playwright-report/**',
+      '**/test-results/**',
     ],
   },
 
@@ -48,7 +52,13 @@ module.exports = [
     },
   },
   {
-    files: ['**/*.spec.ts', '**/*.test.ts', '**/vitest.setup.ts', '**/test/**/*.ts'],
+    files: [
+      '**/*.spec.{ts,tsx}',
+      '**/*.test.{ts,tsx}',
+      '**/test-setup.{ts,tsx}',
+      '**/vitest.setup.{ts,tsx}',
+      '**/test/**/*.{ts,tsx}',
+    ],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-expressions': 'off',

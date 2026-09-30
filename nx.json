@@ -90,7 +90,6 @@
       "plugin": "@nx/vite/plugin",
       "options": {
         "buildTargetName": "build",
-        "testTargetName": "test",
         "serveTargetName": "serve",
         "devTargetName": "dev",
         "previewTargetName": "preview",
@@ -99,6 +98,60 @@
         "buildDepsTargetName": "build-deps",
         "watchDepsTargetName": "watch-deps"
       }
+    },
+    {
+      "plugin": "@nx/vitest",
+      "options": {
+        "testTargetName": "test",
+        "ciTargetName": "test-ci",
+        "testMode": "run"
+      }
+    },
+    {
+      "plugin": "@nx/playwright/plugin",
+      "options": {
+        "targetName": "e2e",
+        "ciTargetName": "e2e-ci"
+      }
+    },
+    {
+      "plugin": "@nx/eslint/plugin",
+      "options": {
+        "targetName": "lint"
+      },
+      "include": [
+        "apps/admin/**/*",
+        "apps/admin-react/**/*",
+        "apps/admin-react-e2e/**/*",
+        "apps/storefront/**/*",
+        "libs/admin/contracts/**/*",
+        "libs/admin/data-access/**/*",
+        "libs/admin/feature/dashboard/**/*",
+        "libs/admin/feature/references/**/*",
+        "libs/admin/shell/**/*",
+        "libs/admin/ui/**/*",
+        "libs/admin/util/**/*",
+        "libs/shared/auth/**/*",
+        "libs/shared/config/**/*",
+        "libs/shared/data-access/**/*",
+        "libs/shared/forms/**/*",
+        "libs/shared/http/**/*",
+        "libs/shared/logging/**/*",
+        "libs/shared/theme/**/*",
+        "libs/shared/ui/**/*",
+        "libs/shared/util/**/*",
+        "libs/storefront/data-access/**/*",
+        "libs/storefront/feature/about-us/**/*",
+        "libs/storefront/feature/catalog/**/*",
+        "libs/storefront/feature/contacts/**/*",
+        "libs/storefront/feature/home/**/*",
+        "libs/storefront/feature/not-found/**/*",
+        "libs/storefront/feature/order-in-bulk/order-in-bulk/**/*",
+        "libs/storefront/feature/regions/regions/**/*",
+        "libs/storefront/shell/**/*",
+        "libs/storefront/ui/**/*",
+        "libs/storefront/util/**/*"
+      ]
     }
   ]
 }

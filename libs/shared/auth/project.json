@@ -5,9 +5,6 @@
   "prefix": "lib",
   "projectType": "library",
   "tags": ["scope:shared", "type:auth"],
-  "targets": {
-    "lint": {
-      "executor": "@nx/eslint:lint"
-    }
-  }
+  "// targets": "to see all targets run: nx show project auth --web",
+  "targets": {}
 }
