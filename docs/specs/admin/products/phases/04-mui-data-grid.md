@@ -21,7 +21,7 @@
 - Колонки: фото, ID, товар, ціна, наявність, ознаки «Акція»/«Новинка».
 - `paginationMode="server"`, `sortingMode="server"`; client filtering не
   використовується.
-- Page sizes: `10`, `20`, `30`, `50`.
+- Розміри сторінки: `10`, `20`, `30`, `50`.
 - Зміна page або page size оновлює reducer; зміна sort також скидає page на 1.
 - Один sort model: за спроби multi-sort використовується перше поле, бо API
   має один `Sort`.

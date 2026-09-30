@@ -64,7 +64,7 @@ GET /api/admin/products?SearchTerm={string}&InStock={boolean}&IsSale={boolean}&I
 
 Перевірено 2026-07-24 у backend-репозиторії:
 `Catalog.Api/Controllers/AdminProductsController.cs` та пов’язані
-`GetAdminList` contracts/handler.
+контракти й обробник `GetAdminList`.
 
 ### Відповідає фазі
 
