@@ -1,0 +1,8 @@
+# Меню Admin — трасування
+
+| Сценарій | Правила      | Задачі         | Рівень                       | Тести                                                                                            | Свідчення                                                                                | Статус               |
+| -------- | ------------ | -------------- | ---------------------------- | ------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------- | -------------------- |
+| SC-001   | R-001, R-002 | TS-001, TS-002 | unit + інтеграційний         | `navigation-config.unit.test.ts`, `app-router.integration.test.tsx`                              | [TS-001](tasks/TS-001-menu-map.md), [TS-002](tasks/TS-002-grouped-navigation.md)         | verified             |
+| SC-002   | R-002, R-006 | TS-001, TS-003 | unit + інтеграційний + E2E   | `navigation-config.unit.test.ts`, `app-router.integration.test.tsx`, `admin-react.shell.spec.ts` | [TS-001](tasks/TS-001-menu-map.md), [TS-003](tasks/TS-003-route-activation.md)           | deferred: live route |
+| SC-003   | R-003, R-004 | TS-002, TS-003 | компонентний + E2E           | `admin-layout.component.test.tsx`, `admin-react.shell.spec.ts`                                   | [TS-002](tasks/TS-002-grouped-navigation.md), [TS-003](tasks/TS-003-route-activation.md) | deferred: live route |
+| SC-004   | R-005        | TS-004         | компонентний + ручний вигляд | `admin-layout.component.test.tsx`, `admin-react.shell.spec.ts`                                   | [TS-004](tasks/TS-004-header-review.md)                                                  | verified             |

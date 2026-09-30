@@ -8,7 +8,7 @@
 
 - `admin-theme.ts` — композиція теми.
 - `palette.ts`, `typography.ts`, `shadows.ts` — токени.
-- `components.ts` — component overrides.
+- `components.ts` — перевизначення компонентів.
 
 ## Критерії приймання
 
