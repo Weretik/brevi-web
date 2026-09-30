@@ -1,82 +1,133 @@
-# Testing rules
+# Правила тестування
 
-## Scope and tools
+## Джерело tooling
 
-Для React Admin стандартний стек — Vitest, React Testing Library (RTL) і
-Playwright. Не додавайте інший test runner, assertion library або mock framework
-без окремого рішення.
+Перед плануванням тестів перевірте `package.json`, lockfile, Nx project targets,
+test configs і наявні test files. [Frontend inventory](../architecture/frontend-inventory.md)
+є знімком, але фактичний repository state має пріоритет.
 
-- **Vitest**: швидкі unit та integration tests.
-- **RTL**: component і feature tests через поведінку користувача, ролі та
-  accessible names, а не через внутрішній state чи CSS-класи.
-- **Playwright**: критичні наскрізні сценарії у справжньому браузері.
-- **Mock transport**: для integration tests використовуйте чинний mock на межі
-  `baseApi` / transport; не викликайте реальний backend.
+Не вважайте Jest, Vitest, React Testing Library, Playwright чи інший інструмент
+доступним лише через звичність або згадку в документації.
+Dependency без config, target і виконуваного test file означає prerequisite,
+який оформлюється окремим `EN-*`. Новий package лише рекомендуйте, доки його
+встановлення не входить до погодженого scope.
 
-## Test pyramid and selection
+## Вибір найвужчого рівня за ризиком
 
-Починайте з найменшого рівня, який дає достатню впевненість. Не дублюйте один
-і той самий сценарій на всіх рівнях без причини.
+| Ризик                                                           | Основний рівень тестування             |
+| --------------------------------------------------------------- | -------------------------------------- |
+| Чисті функції, мапінг, форматування, валідація                  | Модульний                              |
+| Хук, сховище, кеш, переходи стану, отримання даних              | Фокусний інтеграційний                 |
+| Компонент, форма, стан завантаження/порожній/помилка, взаємодія | Компонентний                           |
+| Навігація, глибоке посилання, дозвіл, сховище або адаптер       | Інтеграційний                          |
+| Мапінг запиту/відповіді API та помилки транспорту               | Фокусний інтеграційний або контрактний |
+| Критичний сценарій користувача між екранами/сервісами           | E2E                                    |
 
-| Зміна або ризик                                                      | Обов'язкова перевірка                   |
-| -------------------------------------------------------------------- | --------------------------------------- |
-| Pure model, mapper, formatter, validation, permission policy         | Unit test                               |
-| RTK Query endpoint, DTO mapping, error mapping, cache / invalidation | Integration test з mock transport       |
-| UI interaction, form, loading / empty / error / forbidden state      | RTL component або feature test          |
-| Route, provider, guard або library interaction                       | Integration / architecture verification |
-| Критичний користувацький journey, session або доступ за роллю        | Playwright e2e або `n/a` з причиною     |
+Один `SC-*` може мати кілька вузьких тестів для різних ризиків. Не повторюйте
+повний сценарій на unit, component, integration та E2E рівнях. E2E потрібен для
+критичного journey, а не автоматично для кожного acceptance scenario.
 
-Для кожної user story у spec має бути **Test strategy**: точні test files або
-команди, сценарії, що покриваються, і рішення щодо e2e. `n/a` дозволене лише з
-короткою перевірюваною причиною, наприклад «pure layout change, critical journey
-не змінюється».
+## Проєктування тестів від сценаріїв
 
-## Test design
+`SC-*` не є виконуваним тестом. Це стабільний acceptance contract, з якого
+виводяться конкретні automated tests. Сценарій відповідає на питання «що бачить
+або може зробити користувач», а тест — «на якому технічному рівні найдешевше й
+надійно довести цей ризик».
 
-- Тестуйте видимий результат і public contract, а не private implementation.
-- Один тест перевіряє один зрозумілий outcome; назва описує умову й результат.
-- Для API перевіряйте domain model, нормалізацію помилок, cancellation та
-  permission states, коли вони змінюються.
-- Для UI перевіряйте accessible name, keyboard/focus та user-visible states,
-  якщо feature ними керує.
-- Дані тестів мають бути локальними, детермінованими й без secrets або реальних PII.
-- Уникайте `wait`/timeout як синхронізації та нестабільних snapshot-тестів.
+Наприклад, один сценарій фільтрації може мати unit test нормалізації параметрів
+і component test підтвердження форми. Повторювати весь сценарій в обох тестах або
+додавати E2E без окремого journey-ризику не потрібно.
 
-## E2E policy
+- Кожен новий або змінений observable behavior посилається на `SC-*` і
+  відповідні `R-*`.
+- Сценарій описує поведінку користувача у Given / When / Then без назв
+  components, hooks, stores, libraries або files.
+- Тест перевіряє public contract чи видимий результат. Один тест має один
+  зрозумілий outcome.
+- Component tests використовують semantic roles, accessible names і реальні
+  interaction events, які підтримує наявний setup.
+- Test data детерміновані й не містять secrets або реальних персональних даних.
+- Manual evidence допустиме лише для ризику, який наявне tooling об'єктивно не
+  може автоматизувати; причина записується в task і traceability.
 
-E2E не замінює unit та integration tests. Додавайте або оновлюйте Playwright
-сценарій, коли змінюється хоча б один критичний flow: вхід/відновлення сесії,
-route access, permission-sensitive mutation, створення/редагування ключової
-сутності, платіж, експорт або завантаження файлу. Для іншої feature зафіксуйте
-`e2e: n/a` у її Test strategy.
+## Архітектура тестів у цьому repository
 
-## React Admin readiness gate
+- Тести належать Nx project, поведінку якого перевіряють, і розміщуються поруч
+  із source як `*.test.ts`/`*.test.tsx` або в наявному project test directory.
+- Pure TypeScript rules перевіряються без DOM і framework providers.
+- State/data-fetching tests збирають мінімальний реальний store/provider graph і
+  підміняють лише зовнішню transport boundary. Не створюйте глобальний mock
+  backend або нову mocking library без окремого `EN-*`.
+- React component tests використовують Vitest і React Testing Library після
+  створення project target та одного `test-setup`. Глобальний setup містить лише
+  DOM matchers/polyfills; feature fixtures і mocks лишаються локальними.
+- App-level integration tests перевіряють composition providers, routing і
+  browser adapters лише коли ризик перетинає межі однієї library.
+- Browser E2E використовує окремий `admin-react-e2e` Nx project і покриває
+  кілька критичних journeys. Новий E2E додається лише для окремого journey-ризику.
+- Coverage збирається на CI після появи стабільного набору tests. Порогові
+  значення вводяться окремим рішенням на основі baseline, а не довільним числом.
 
-`apps/admin-react` поки є лише bootstrap-застосунком. До завершення **першої
-функціональної React Admin feature** обов'язково виконайте окрему технічну
-задачу `TST-ADMIN-001`:
+Базовий React harness уже налаштований в `apps/admin-react`. Для нової library
+перевірте її Nx target/config і додайте перший behavioral test у відповідному
+`TS-*`. Наявний harness smoke перевіряє лише працездатність test infrastructure
+і не є evidence бізнес-сценарію.
 
-1. Налаштувати Vitest target для `admin-react` і для кожної React Admin library,
-   створеної цією feature.
-2. Додати RTL test setup і щонайменше один component/feature test, що перевіряє
-   користувацький результат першої feature.
-3. Створити Playwright e2e project та його Nx target.
-4. Коли з'являться route, authentication/authorization і перша захищена
-   mutation, додати e2e сценарії: відмова в доступі до route та успішне виконання
-   ключової Admin-операції.
+## Імена тестів і команди
 
-Поки цих React flows не існує, допустимий лише Playwright smoke test запуску
-застосунку. Після їх появи `e2e: n/a` для access або ключової mutation не
-допускається. Feature не вважається delivery-ready, доки `TST-ADMIN-001` не
-закрито або його невиконання не оформлене як погоджений blocker з owner і датою.
+- `*.unit.test.ts` або `*.unit.test.tsx` — pure functions і validation.
+- `*.component.test.tsx` — React UI та user interactions.
+- `*.integration.test.ts` або `*.integration.test.tsx` — state, data fetching,
+  routing і browser boundaries.
+- `*.spec.ts` у `apps/admin-react-e2e` — browser E2E journeys.
 
-## Required evidence
+Команди верхнього рівня: `npm run test:web`, `npm run test:web:coverage`,
+`npm run test:web:e2e` та `npm run typecheck:tests`. Окремі порожні test levels
+можуть завершуватися успішно через `--passWithNoTests`, але readiness потребує
+щонайменше одного реально виконаного behavioral або infrastructure test.
 
-- Запускайте релевантні команди лише для змінених apps і libraries.
-- Для Admin запускайте цільові `npx nx lint <project>` і `npx nx test <project>`;
-  після feature-зміни також `npx nx build admin`.
-- Запускайте відповідний Playwright target, коли e2e входить у Test strategy.
-- Якщо test target ще не створено, це blocker для вимоги «automated test»:
-  зафіксуйте точну відсутню ціль і створіть окрему технічну задачу.
-- Якщо перевірка не виконана або впала, зафіксуйте точну команду, failure point і
-  чи є причина pre-existing. Не приховуйте не пов'язані з feature failures.
+## Red → Green → Refactor → Regression
+
+Для кожного нового testable behavior у `TS-*`:
+
+1. **Red** — додайте найменший behavioral test, запустіть його й зафіксуйте
+   очікувану невідповідність `R-*`/`SC-*`.
+2. **Green** — реалізуйте найменшу повну зміну, яка робить focused test зеленим.
+3. **Refactor** — поліпшіть структуру в межах тієї самої відповідальності та
+   повторіть focused test.
+4. **Regression** — запустіть affected suite/targets і запишіть команду та
+   результат.
+
+Compilation error, broken fixture, missing dependency, invalid test setup або
+unrelated failure не є валідним Red. Спочатку виправте prerequisite через
+`EN-*`, а потім отримайте behavioral Red.
+
+## Винятки
+
+Red-first може не мати сенсу для documentation-only work, generator/setup,
+нового test harness або platform prerequisite. Таку роботу оформлюйте `EN-*` з
+`Enables`, причиною винятку та replacement verification. Виняток не скасовує
+фінальну перевірку enabled scenario.
+
+## Свідчення
+
+Task-файл зберігає test name/path, Red failure, Green result, refactor note і
+regression result. `traceability.md` містить лише посилання `SC → TS/EN → test →
+evidence` та статус. Для невиконаної команди вкажіть точну команду, failure
+point і чи причина pre-existing.
+
+Для поточного репозиторію типові доступні перевірки:
+
+```powershell
+npx nx lint <project>
+npx nx test <project>
+npx nx typecheck <project>
+npx nx build <project>
+npm run format:check -- <paths>
+```
+
+Виконуйте лише targets, які показує `npx nx show project <project> --json`.
+Для API feature додатково перевіряйте sync/generate/check за
+[contract workflow](../architecture/api/contract-workflow.md), runtime mapping
+і помилки. Contract scripts поки не існують; до їх реалізації записуйте
+конкретний `EN-*`, не позначаючи перевірку виконаною.

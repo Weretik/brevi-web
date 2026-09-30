@@ -1,6 +1,6 @@
-# Admin code rules
+# Правила коду Admin
 
-## Libraries and dependencies
+## Бібліотеки та залежності
 
 - Розміщуйте domain-код у `libs/admin/<domain>/{model,data-access,ui,feature}`.
 - `model` містить pure TypeScript types, query, defaults та інваріанти; він не залежить від React, HTTP або browser API.
@@ -9,7 +9,7 @@
 - `feature` оркеструє page, hooks і локальний UI-state; він передає domain data та callbacks у `ui`.
 - Між libraries імпортуйте тільки через alias і public `src/index.ts`; deep imports заборонені.
 
-## Structure and state
+## Структура та стан
 
 - Один файл, компонент і каталог має одну цілісну відповідальність.
 - Групуйте внутрішній код за роллю: `components`, `pages`, `hooks`, `state`, `forms`, `tables`, `mappers`, `contracts`.
@@ -18,7 +18,7 @@
 - Простий feature-local state зберігайте в component state; reducer створюйте лише для пов'язаних переходів або shared feature state.
 - Не виконуйте HTTP і не ховайте business rules у JSX.
 
-## Pages and routes
+## Сторінки та маршрути
 
 - Page є оркестратором; toolbar, table, complex cell і feature-only dialog розділяйте за незалежною відповідальністю.
 - Reusable dialog/form належить `ui` і отримує values, errors та callbacks через props.

@@ -1,6 +1,6 @@
-# Security rules
+# Правила безпеки
 
-## Scope and responsibility
+## Межі та відповідальність
 
 Ці правила застосовні до React Admin. Frontend покращує безпечну поведінку UI,
 але не є security boundary: backend зобов'язаний перевіряти authentication,
@@ -9,7 +9,7 @@ authorization, ownership і валідацію кожного request.
 Кожна Admin feature фіксує у spec ролі, route access, доступ до кожної mutation,
 чутливі дані та рішення `basic`, `elevated` або `n/a` для security review.
 
-## Access and session
+## Доступ і сесія
 
 - Route guard і UI можуть приховати недоступну дію, але endpoint все одно має
   бути захищений backend permission check.
@@ -19,7 +19,7 @@ authorization, ownership і валідацію кожного request.
   Не створюйте власні token storage, Axios client або refresh flow у feature.
 - Не передавайте access token у URL, analytics, логи або помилки.
 
-## Data, input and output
+## Дані, введення та виведення
 
 - DTO валідуються та мапляться на межі `data-access`; UI не показує raw API
   error, stack trace або внутрішні ідентифікатори.
@@ -30,7 +30,7 @@ authorization, ownership і валідацію кожного request.
 - Для файлів, CSV/export, зовнішніх URL, масових операцій і PII зазначайте
   окремі правила доступу, валідації та audit/confirmation requirements.
 
-## Transport and observability
+## Транспорт і спостережуваність
 
 - Використовуйте чинні bearer, refresh, CSRF та credentials механізми transport
   без їх дублювання у domain feature.
@@ -39,7 +39,7 @@ authorization, ownership і валідацію кожного request.
 - Не додавайте security headers, cookie attributes або CSP лише у frontend spec:
   це deployment/backend responsibility і потребує узгодженого contract.
 
-## Proportional review and verification
+## Пропорційний огляд і перевірка
 
 | Рівень     | Коли                                                           | Мінімальна перевірка                                                       |
 | ---------- | -------------------------------------------------------------- | -------------------------------------------------------------------------- |
@@ -48,6 +48,6 @@ authorization, ownership і валідацію кожного request.
 | `elevated` | Auth, permissions, PII, файли, export, bulk/destructive action | Короткий threat model, негативні automated tests і review backend contract |
 
 Threat model для `elevated` містить: asset, actor, entry point, загрозу,
-server-side mitigation, frontend behavior і спосіб перевірки. Security tests
-перевіряють відмову в UI та коректний handling 401/403; вони не замінюють backend
-authorization tests.
+серверне пом'якшення ризику, поведінку frontend і спосіб перевірки. Тести
+безпеки перевіряють відмову в UI та коректну обробку 401/403; вони не замінюють
+серверні тести авторизації.

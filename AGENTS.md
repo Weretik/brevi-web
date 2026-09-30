@@ -1,8 +1,8 @@
-﻿\*\*# AGENTS.md
+﻿# AGENTS.md
 
 ## Project Context
 
-- Stack: `Angular`
+- Stack: Nx frontend monorepo with Angular apps and a React Web bootstrap.
 - Package manager: use the one already configured in the repo (`npm` / `pnpm` / `yarn`)
 - This repository contains only the frontend application.
 - Follow the existing project structure and naming conventions.
@@ -24,9 +24,10 @@
 - Respect existing boundaries such as `core`, `shared`, `features`, `ui`, `data-access`, `util` if they already exist in the project.
 - Do not move files or reorganize folders unless required for the task.
 
-## Angular Conventions
+## Framework Conventions
 
-- Prefer the existing project style first. Do not mix paradigms unnecessarily.
+- Prefer the existing project style for the app being changed. Do not mix
+  Angular and React paradigms or move behavior between apps without explicit scope.
 - If the project already uses standalone components, continue using standalone components.
 - If the project already uses Signals, continue with Signals; if it uses RxJS/store/facades, follow that approach.
 - Do not introduce a new state management library without explicit request.
@@ -72,12 +73,14 @@ Before завершением задачи, Codex should run what is available a
 
 2. Static checks:
 
-- `npx nx lint storefron` or `npx nx lint admin`
+- `npx nx lint storefront`, `npx nx lint admin`, or the relevant project target
 - Always run relevant lint targets for changed projects after edits and before running build.
 
-3. Unit tests:
+3. Unit/component/integration tests:
 
--
+- Run `npx nx test <project>` only when that target exists.
+- Derive the test runner and setup from the repository; do not assume a tool
+  from an installed package alone.
 
 4. Build:
 
@@ -103,7 +106,7 @@ For each task, report in this order:
 1. What was changed
 2. Which files were modified
 3. What was verified
-4. What could not be verified~~~~~~~~
+4. What could not be verified
 5. Risks / what should be checked manually
 
 ## Definition of Done

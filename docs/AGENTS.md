@@ -1,22 +1,15 @@
-# Робочий контекст AI: Admin
+# Маршрутизація для AI
 
-Прочитай цей файл перед нетривіальною зміною в `apps/admin` або `libs/admin`. Пов'язані документи є джерелом істини.
+1. Звір фактичні apps, targets і test tooling з
+   [frontend inventory](architecture/frontend-inventory.md).
+2. Для feature-роботи відкрий [індекс специфікацій](specs/README.md), README
+   потрібної feature та [AI workflow](specs/_templates/ai-feature-workflow/README.md).
+3. Застосуй [testing rules](standards/testing-rules.md),
+   [delivery rules](standards/delivery-rules.md) і лише релевантні architecture,
+   UI, API та security standards.
+4. Для нової специфікації використай
+   [feature template](specs/_templates/README.md); код до погодження не реалізуй.
 
-1. Почни з [архітектури Admin](architecture/admin/README.md): домени, залежності, Nx-контракт, стан і API.
-2. Для змін API прочитай [API-архітектуру Admin](architecture/api/README.md): transport contract, нормалізацію помилок, безпеку й інтеграційні межі.
-3. Обов'язково прочитай [стандарт організації коду Admin](standards/admin-code-organization.md). Зверни особливу увагу на декомпозицію, одну відповідальність модуля та структуру внутрішнього коду; це правило діє для будь-якої library, feature і компонента.
-4. Для UI-змін прочитай [стандарт інтерфейсу Admin](standards/admin-ui.md).
-5. Перед нетривіальною можливістю або архітектурною зміною прочитай [SDD-процес Admin](architecture/admin/sdd-process.md), створи чи онови специфікацію в `docs/specs/admin/<domain>/` і, за потреби, використай [шаблон Admin feature](specs/_templates/admin-feature/README.md).
-
-Зберігай межі `feature`, `ui`, `data-access` і `model`, DTO залишай у `data-access`, а публічний API бібліотек — у `src/index.ts`. Запускай релевантні lint, tests і build та фіксуй точні результати.
-
-## Створення стандартної структури
-
-Для застосунків, бібліотек, компонентів, route-файлів та інших артефактів із
-підтримуваним generator використовуйте відповідну консольну команду (Nx, Expo
-тощо). Не створюйте такий scaffold вручну; після генерації вносіть лише
-необхідні предметні зміни.
-
-```
-
-```
+Дотримуйся всіх `AGENTS.md` на шляху до файлів, які змінюєш. Не вважай
+залежність у `package.json` доступним test level без config, target і
+виконуваного test file.
