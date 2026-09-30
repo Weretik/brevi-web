@@ -3,7 +3,8 @@
 ## Серверний стан і API
 
 - Серверний стан реалізується RTK Query і належить `data-access`.
-- Кореневий Redux store розміщений у `apps/admin/src/app/store.ts`.
+- Запланований кореневий Redux store розміщується в
+  `apps/admin-react/src/app/store.ts`; у поточному bootstrap цього файла немає.
 - Спільний API розміщений у `@admin/shared/api-client`; transport-деталі задані в
   [ADR-0001](adr/0001-admin-axios-transport.md).
 - `admin/core/auth` передає API-клієнту `AuthSessionAdapter`; API-клієнт не
@@ -13,8 +14,11 @@
 - Feature використовує лише експортовані типізовані hooks і не звертається до
   `baseApi` напряму.
 - Усі зовнішні дані валідуються та перетворюються на межі `data-access`.
+- API feature фіксує `operationId` і версію backend OpenAPI до endpoint-коду;
+  generated DTO залишаються у transport/data-access. Порядок і стан
+  автоматизації описані у [contract workflow](../api/contract-workflow.md).
 
-## Структура `@admin/shared/api-client`
+## Цільова структура `@admin/shared/api-client`
 
 `@admin/shared/api-client` — спільна transport infrastructure. Його кореневий
 `src/index.ts` містить лише стабільні публічні exports; усі внутрішні реалізації
@@ -40,9 +44,9 @@ libs/admin/shared/api-client/src/
   імпортують внутрішні модулі `api-client`.
 - Публічні exports transport layer змінюються лише окремим сумісним рішенням.
 - Зміна transport behavior супроводжується релевантними тестами error mapping
-  або interceptor behavior та перевіркою `npx nx build admin`.
+  або interceptor behavior та перевіркою `npx nx build admin-react`.
 
-## Структура `@admin/shared/config`
+## Цільова структура `@admin/shared/config`
 
 `@admin/shared/config` ізолює Vite environment від решти Admin. Публічний
 `src/index.ts` експортує готовий `appConfig` і тип `AppConfig`; читання
@@ -60,7 +64,7 @@ libs/admin/shared/config/src/
 ```
 
 - Лише `env/environment-reader.ts` звертається до `import.meta.env` і містить
-  Vite type reference.
+  посилання на типи Vite.
 - `config/app-config.ts` є чистою функцією з явним environment input; усі
   fallback і parsing правила зосереджені в `env`.
 - Споживачі імпортують тільки `appConfig` з `@admin/shared/config`, а не Vite

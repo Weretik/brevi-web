@@ -1,93 +1,38 @@
-# SDD-процес Admin
+# SDD-процес frontend-функціональності
 
-## Процес
+Frontend feature планується від observable scenarios до найменших технічних
+responsibilities. Джерелом шаблонів є
+[template catalog](../../specs/_templates/README.md), правила готовності —
+[delivery rules](../../standards/delivery-rules.md), а test strategy —
+[testing rules](../../standards/testing-rules.md).
 
-Для кожної задачі створюється Markdown-специфікація в `docs/specs/admin/...`.
-Реалізація починається після погодження розділів «Мета», «Межі» та «Критерії
-приймання». Зміну специфікації після початку розробки фіксують унизу документа з
-датою та причиною.
+## Послідовність
 
-Для великої feature з кількома залежними implementation-фазами використовується
-[шаблон поетапної реалізації](../../specs/_templates/admin-feature-phased-implementation.md).
-Головна специфікація описує користувацький результат і план фаз, а кожна фаза
-має окремий файл у `docs/specs/admin/<domain>/phases/`.
+1. Зафіксувати actor, goal, scope, exclusions і стабільні бізнес-правила `R-*`.
+2. Описати acceptance scenarios `SC-*` у Given / When / Then лише через
+   спостережувану поведінку.
+3. Визначити потрібні області: спільна поведінка; стан/отримання даних;
+   UI React Web; браузерна навігація/глибокі посилання; браузерні
+   адаптери/дозволи; інтеграція з API; компонентна, інтеграційна та
+   E2E-перевірка.
+   Для API feature до реалізації заповнити `contracts/api-contract.md` з
+   `operationId`, backend OpenAPI source і commit/tag. Якщо синхронізація та
+   генерація відсутні, додати `EN-*` за
+   [contract workflow](../api/contract-workflow.md).
+4. Обрати найвужчий test level за ризиком і перевірити фактичний tooling.
+5. Розкласти реалізацію на `TS-*` та shared prerequisites на `EN-*`, додати
+   dependencies, exact paths, evidence targets і checkpoints.
+6. Заповнити `traceability.md` до початку реалізації.
+7. Після погодження виконувати ready tasks за
+   [AI feature workflow](../../specs/_templates/ai-feature-workflow/README.md).
 
-```md
-# <Назва можливості>
+Не створюйте порожні optional files. Якщо великій feature потрібні phases,
+phase-файли залишаються orchestration index, а реалізація живе в малих task-файлах.
 
-## Мета
+## Поточні архітектурні обмеження
 
-Як <роль>, я хочу <дію>, щоб <результат>.
-
-## Межі
-
-- У межах задачі:
-- Поза межами задачі:
-- Задіяні бібліотеки:
-
-## Сценарії
-
-1. Given ... When ... Then ...
-
-## Контракти й дані
-
-- Endpoint / вхідні та вихідні моделі:
-- Права доступу:
-- Стани: loading, empty, error, success:
-
-## Структура реалізації
-
-- Задіяні libraries і їхні відповідальності:
-- Нові/змінені папки та файли, згруповані за роллю:
-- Public API / `src/index.ts` exports:
-- Чому файл або компонент лишається цілісним чи розділяється:
-
-## UI та маршрутизація
-
-- Route:
-- Компоненти:
-
-## Критерії приймання
-
-- [ ]
-
-## Перевірка
-
-- Unit:
-- Integration / e2e:
-- Ручна перевірка:
-
-## Security і доступ
-
-- Рівень review: `n/a`, `basic` або `elevated` із причиною:
-- Ролі, route access і доступ до кожної mutation:
-- Сценарії 401 / 403 / завершення сесії:
-- Чутливі дані, PII, файли, export або `none`:
-- Threat model для `elevated`:
-
-## Відкриті питання
-
-- [ ]
-```
-
-## Критерії готовності
-
-Задача завершена, коли:
-
-- специфікація містить перевірювані критерії приймання;
-- структура реалізації описує межі відповідальностей; внутрішній код не
-  накопичується в корені `src` або одному файлі-«комбайні»;
-- код розміщений у коректних межах і проходить Nx module boundaries;
-- додано або оновлено релевантні тести;
-- Test strategy і security/access review виконані або `n/a` обґрунтовано;
-- Для першої функціональної React Admin feature закрито `TST-ADMIN-001` із
-  [Testing rules](../../standards/testing-rules.md#react-admin-readiness-gate).
-- запущено відповідні lint, test і build цілі;
-- у специфікації зазначено ручні перевірки та ризики, що залишилися.
-
-## Відкриті архітектурні рішення
-
-1. Бібліотека форм і схема валідації.
-2. Єдиний формат помилок API та сповіщень.
-3. Стратегія прав доступу на рівні маршрутів і дій.
-4. Правила i18n для Admin.
+Фактичний стан apps і tooling описаний у
+[frontend inventory](../frontend-inventory.md). Mobile application не входить
+до scope. React Admin має app, shell і browser test targets; для нової
+бібліотеки перевіряйте її власні target/setup перед плануванням automated
+evidence.

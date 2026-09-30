@@ -1,8 +1,12 @@
 # API-архітектура Admin
 
-**Область:** `apps/admin`  
-**Статус:** чинний  
-**Пов'язані документи:** [ADR Admin Axios transport](../admin/adr/0001-admin-axios-transport.md), [стан і API Admin](../admin/state-and-api.md)
+- **Область:** цільовий transport для `apps/admin-react`
+- **Статус:** planned; не підтверджує наявність описаних libraries
+- **Пов'язані документи:** [ADR Admin Axios transport](../admin/adr/0001-admin-axios-transport.md), [стан і API Admin](../admin/state-and-api.md)
+
+[Життєвий цикл OpenAPI-контракту](contract-workflow.md) застосовується також до
+поточного Angular Admin і Storefront. Ця сторінка описує цільовий React Admin
+transport; його наявність потрібно перевіряти в коді.
 
 ## Призначення
 
@@ -31,18 +35,18 @@ feature error state              runtime notifier (network/timeout/5xx)
 
 ## Межі відповідальності
 
-| Шар                  | Відповідальність                                                                                                |
-| -------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `shared/api-client`  | Axios instance, interceptors, `axiosBaseQuery`, `baseApi`, API contracts, error normalization, runtime notifier |
-| Domain `data-access` | DTO, runtime validation, mapper і endpoints через `baseApi.injectEndpoints`                                     |
-| `feature`            | Generated RTK Query hooks, loading/error states і ручний `refetch`                                              |
-| `ui` / route         | Не викликають HTTP і не імпортують transport                                                                    |
+| Шар                    | Відповідальність                                                                                                     |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `shared/api-client`    | Екземпляр Axios, перехоплювачі, `axiosBaseQuery`, `baseApi`, контракти API, нормалізація помилок, runtime-сповіщувач |
+| Доменний `data-access` | Generated DTO на межі, runtime-валідація, мапер і кінцеві точки через `baseApi.injectEndpoints`                      |
+| `feature`              | Згенеровані хуки RTK Query, стани завантаження/помилки і ручний `refetch`                                            |
+| `ui` / маршрут         | Не викликають HTTP і не імпортують транспорт                                                                         |
 
 Кожен domain endpoint оголошується виключно через public `baseApi.injectEndpoints`.
 Не можна створювати окремий Axios instance, робити deep import у `api-client` або
 дублювати RTK Query response/error у slice.
 
-## Публічний transport contract
+## Публічний транспортний контракт
 
 ```ts
 interface ApiRequest {
@@ -75,24 +79,24 @@ interface ApiError {
 `axiosBaseQuery` передає RTK Query `AbortSignal` до Axios і повертає тільки
 `{ data }` або `{ error: ApiError }`. Axios exception не виходить у feature.
 
-## Backend errors
+## Помилки backend
 
-| Backend response              | `ApiError`                                |
-| ----------------------------- | ----------------------------------------- |
-| Немає response                | `Network`, `status: 0`                    |
-| `ECONNABORTED` / `ETIMEDOUT`  | `Timeout`                                 |
-| HTTP 401 / 403 / 404          | `Unauthorized` / `Forbidden` / `NotFound` |
-| HTTP 4xx з validation fields  | `Validation` і `fieldErrors`              |
-| HTTP 5xx                      | `Server`                                  |
-| Інша transport/client помилка | `Unknown`                                 |
+| Відповідь backend               | `ApiError`                                |
+| ------------------------------- | ----------------------------------------- |
+| Немає відповіді                 | `Network`, `status: 0`                    |
+| `ECONNABORTED` / `ETIMEDOUT`    | `Timeout`                                 |
+| HTTP 401 / 403 / 404            | `Unauthorized` / `Forbidden` / `NotFound` |
+| HTTP 4xx з validation fields    | `Validation` і `fieldErrors`              |
+| HTTP 5xx                        | `Server`                                  |
+| Інша помилка транспорту/клієнта | `Unknown`                                 |
 
-### ASP.NET Problem Details
+### Problem Details ASP.NET
 
 Backend може повертати `{ detail, title, errors, traceId }`. `detail` має
 пріоритет над `title`; `errors` перетворюється на `fieldErrors`; `traceId`
 зберігається для діагностики. Response body не логується.
 
-### Ardalis validation result
+### Результат валідації Ardalis
 
 Backend може повертати масив з `Identifier` / `ErrorMessage` або
 `identifier` / `errorMessage`. Клієнт групує повідомлення за полем у
@@ -108,7 +112,7 @@ Backend може повертати масив з `Identifier` / `ErrorMessage` 
 4. `traceId` передається в support лише через нормалізований `ApiError`; feature
    не парсить backend response самостійно.
 
-## Observability і безпека
+## Спостережуваність і безпека
 
 - Request interceptor може додавати correlation ID і вимірює тривалість.
 - Логи містять тільки method, sanitized URL без query/fragment, status і duration.
@@ -117,17 +121,17 @@ Backend може повертати масив з `Identifier` / `ErrorMessage` 
 
 ## Параметри Admin
 
-| Аспект           | Admin                                                               |
-| ---------------- | ------------------------------------------------------------------- |
-| Base URL         | `@admin/shared/config`                                              |
-| Authentication   | bearer token, refresh, CSRF, credentials через `AuthSessionAdapter` |
-| Runtime notifier | Налаштовується під час Admin bootstrap                              |
-| Connectivity     | browser/HTTP failure handling                                       |
+| Аспект             | Admin                                                               |
+| ------------------ | ------------------------------------------------------------------- |
+| Базова URL-адреса  | `@admin/shared/config`                                              |
+| Автентифікація     | bearer-токен, refresh, CSRF, credentials через `AuthSessionAdapter` |
+| Runtime-сповіщувач | Налаштовується під час bootstrap Admin                              |
+| З'єднання          | Обробка помилок браузера/HTTP                                       |
 
 ## Перевірка
 
-- Unit: Problem Details, Ardalis, network, timeout і 5xx mapping; `AbortSignal`
-  forwarding; logger sanitization.
-- Integration: endpoint через `baseApi.injectEndpoints` повертає доменну модель,
+- Модульна: мапінг Problem Details, Ardalis, мережевих помилок, timeout і 5xx;
+  передавання `AbortSignal`; очищення даних логера.
+- Інтеграційна: кінцева точка через `baseApi.injectEndpoints` повертає доменну модель,
   а не DTO.
-- Ручна: скасувати запит при unmount або навігації.
+- Ручна: скасувати запит під час розмонтування або навігації.

@@ -1,45 +1,51 @@
 # Застосунок і маршрутизація Admin
 
-## Застосунок `apps/admin`
+## Застосунок `apps/admin-react`
 
-Застосунок є точкою композиції. Тут розміщені запуск React, кореневі провайдери,
+Застосунок має бути точкою композиції. Тут розміщуються запуск React, кореневі провайдери,
 маршрутизація, глобальні стилі та підключення feature-бібліотек. Бізнес-правила,
 API-виклики й доменні компоненти тут не розміщуються.
 
-`AppRouter` залишається коренем композиції: він підключає layout, об’єднує
-доменні маршрути, задає глобальний fallback і не імпортує реалізації сторінок.
+Поточний `AppRouter` підключає спільний layout, кореневу нейтральну сторінку
+та fallback невідомої адреси. Після появи доменних сторінок він об'єднуватиме
+їхні маршрути, не імпортуючи реалізації сторінок.
 Кожен домен експортує іменовану конфігурацію маршрутів із публічної точки входу.
 
 ```text
-productsRoutes ─┐
-ordersRoutes   ─┼→ AppRouter
-clientsRoutes  ─┘
+productsRoutes   ─┐
+referencesRoutes ─┼→ AppRouter
+ordersRoutes     ─┤
+clientsRoutes    ─┘
 ```
 
 Приклад допустимого підключення:
 
 ```ts
 import { productsRoutes } from '@admin/products/feature';
+import { referencesRoutes } from '@admin/references/feature';
 import { ordersRoutes } from '@admin/orders/feature';
 ```
 
 `AdminLayout` залишається елементом маршруту з `Outlet`. Розташування файла
 router може змінюватися без зміни цього правила.
 
-## Lazy loading route features
+## Ліниве завантаження маршрутних функціональностей
 
-- Feature pages that are route entries export a default page component and load
-  through the short form `lazy(() => import('./pages/<page>'))` from their
-  `<domain>.routes.tsx` module. Named-export adapters with `.then(...)` are not
-  used for route pages.
-- `AdminLayout` owns the single `Suspense` fallback around `Outlet`; pages and
-  features do not duplicate route-loading spinners. Fallback показує лише стан
+- Сторінки функціональностей, які є входами маршрутів, експортують компонент
+  сторінки за замовчуванням і завантажуються короткою формою
+  `lazy(() => import('./pages/<page>'))` зі свого модуля `<domain>.routes.tsx`.
+  Адаптери іменованого експорту з `.then(...)` для маршрутних сторінок не
+  використовуються.
+- `AdminLayout` володіє єдиним резервним вмістом `Suspense` навколо `Outlet`;
+  сторінки та функціональності не дублюють індикатори завантаження маршруту.
+  Резервний вміст показує лише стан
   завантаження route chunk; він не виконує server request і не дублює loading
   state конкретної сторінки.
-- Shell, route configuration and minimal route metadata may remain in the
-  initial chunk. Page implementation, heavy domain UI and optional MUI X
-  packages must remain behind the relevant route boundary.
-- Manual chunk configuration is introduced only after bundle analysis shows a
-  cross-route dependency that route-level lazy loading cannot split.
+- Каркас, конфігурація маршрутів і мінімальні метадані маршрутів можуть
+  залишатися в початковому чанку. Реалізація сторінок, важкий доменний UI та
+  необов'язкові пакети MUI X мають залишатися за відповідною межею маршруту.
+- Ручну конфігурацію чанків додають лише тоді, коли аналіз збірки виявляє
+  міжмаршрутну залежність, яку не може розділити ліниве завантаження на рівні
+  маршрутів.
 - Зміна route boundaries перевіряється lint для shell і змінених feature, а
-  також `npx nx build admin`; build output має містити окремі page chunks.
+  також `npx nx build admin-react`; build output має містити окремі page chunks.

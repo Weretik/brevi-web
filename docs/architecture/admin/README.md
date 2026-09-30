@@ -1,13 +1,19 @@
 # Архітектура Admin
 
-**Область:** React-застосунок `apps/admin` у Nx-монорепозиторії  
-**Підхід:** гібридний domain-first
+- **Область:** цільова архітектура React Web застосунку `apps/admin-react`
+- **Статус:** частково реалізована; фактичний стан описаний у
+  [frontend inventory](../frontend-inventory.md)
+- **Підхід:** domain-first
 
 ## Призначення
 
-Документи задають архітектурний контракт розробки Admin: межі доменів,
+Документи задають цільовий архітектурний контракт React Admin: межі доменів,
 допустимі залежності, організацію стану й API, правила Nx та SDD-процес. Нову
 можливість спочатку описують специфікацією, а потім реалізують у цих межах.
+Спільний shell і тема React Admin реалізовані за
+[SDD оболонки](../../specs/admin/shell/001-react-admin-shell-theme/README.md).
+Решта наведених libraries, routes і providers — цільовий design; їхню
+наявність потрібно перевіряти в коді.
 
 ## Карта документів
 
@@ -23,6 +29,6 @@
 
 - [Організація коду Admin](../../standards/admin-code-organization.md)
 - [Інтерфейс Admin](../../standards/admin-ui.md)
-- [Testing strategy](../../standards/testing-rules.md)
-- [Security rules](../../standards/security-rules.md)
+- [Стратегія тестування](../../standards/testing-rules.md)
+- [Правила безпеки](../../standards/security-rules.md)
 - [ADR Admin](adr/)

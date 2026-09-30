@@ -12,14 +12,14 @@ model -> admin/shared/contracts | admin/shared/util
 admin/shared/* -> admin/shared/* без циклов
 ```
 
-| Джерело        | Може залежати від                                   |
-| -------------- | --------------------------------------------------- |
-| `app`          | `core`, `feature`, `admin/shared`                   |
-| `feature`      | `data-access`, `model`, domain `ui`, `admin/shared` |
-| `data-access`  | `model`, API client, contracts, util                |
-| domain `ui`    | `model`, shared UI, util                            |
-| `model`        | contracts, util                                     |
-| `admin/shared` | только `admin/shared`                               |
+| Джерело        | Може залежати від                                     |
+| -------------- | ----------------------------------------------------- |
+| `app`          | `core`, `feature`, `admin/shared`                     |
+| `feature`      | `data-access`, `model`, доменний `ui`, `admin/shared` |
+| `data-access`  | `model`, клієнт API, контракти, утиліти               |
+| Доменний `ui`  | `model`, спільний UI, утиліти                         |
+| `model`        | контракти, утиліти                                    |
+| `admin/shared` | лише `admin/shared`                                   |
 
 ## Обмеження
 
@@ -31,8 +31,8 @@ admin/shared/* -> admin/shared/* без циклов
 - `model` залишається чистим TypeScript без React.
 - API DTO не виходять із `data-access`; feature і UI використовують доменні моделі.
 - Циклічні залежності заборонені.
-- Між бібліотеками використовуються path aliases і публічні точки входу, а не
-  relative/deep imports.
+- Між бібліотеками використовуються псевдоніми шляхів і публічні точки входу,
+  а не відносні чи глибокі імпорти.
 
 Feature одного домену не імпортує feature іншого. Сценарій кількох доменів
 отримує окрему orchestration feature з явним архітектурним рішенням.

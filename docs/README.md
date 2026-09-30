@@ -1,20 +1,14 @@
 # Документація Brevi Web
 
-Цей каталог містить versioned engineering documentation для frontend-застосунку Brevi Web. Документація ведеться як docs-as-code разом зі змінами коду.
+Це індекс versioned frontend-документації.
 
-## Frontend SDD
+- [Фактичний склад frontend](architecture/frontend-inventory.md)
+- [Архітектура Admin](architecture/admin/README.md)
+- [API-інтеграція Admin](architecture/api/README.md)
+- [Життєвий цикл API-контракту](architecture/api/contract-workflow.md)
+- [Сталі інженерні правила](standards/README.md)
+- [Feature-специфікації](specs/README.md)
+- [Коротка маршрутизація для AI](AGENTS.md)
 
-- [Архітектура Admin](architecture/admin/README.md) — фактична топологія frontend-застосунку, модулі та межі шарів.
-- [Інженерні правила](standards/README.md) — індекс rules для Admin, UI, API, testing і delivery.
-- [Специфікації](specs/README.md) — структура feature-специфікацій та SDD-шаблони.
-
-## Застосунок
-
-- [Admin](architecture/admin/README.md) — архітектура адміністративного застосунку.
-- [API](architecture/api/README.md) — API-контракти та інтеграційні домовленості.
-
-## Принцип розміщення
-
-Сталі правила належать у `architecture/` або `standards/`. Рішення, вимоги, контракти, задачі та докази перевірки конкретної feature належать у її папку в `specs/`.
-
-Перед змінами в Admin прочитай [інструкції для AI](AGENTS.md).
+Сталі правила належать до `architecture/` або `standards/`. Вимоги, рішення,
+задачі та evidence конкретної feature належать до її каталогу в `specs/`.

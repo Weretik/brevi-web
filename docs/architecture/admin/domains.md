@@ -1,4 +1,4 @@
-# Домени та структура feature Admin
+# Домени та структура функціональності Admin
 
 ## Цільова структура
 
@@ -6,6 +6,7 @@
 libs/admin/
 ├── core/{shell,auth,permissions}/
 ├── shared/{ui,api-client,contracts,config,util,testing}/
+├── references/{feature,data-access,model,ui}/
 ├── products/{feature,data-access,model,ui}/
 ├── orders/{feature,data-access,model,ui}/
 ├── clients/{feature,data-access,model,ui}/
@@ -15,9 +16,15 @@ libs/admin/
 Новий код розміщується за цією структурою. Перенесення наявного коду виконується
 лише окремою задачею.
 
+`references` об'єднує шість таблиць чотирьох сторінок старого Admin у React.
+Кожна таблиця має окрему feature-SDD, але парні вкладки компонуються однією
+сторінкою та одним маршрутом. Бібліотеки `model` і `ui` створюються лише за
+появи спільної відповідальності; Angular-код `libs/admin/feature/references`
+не переноситься масово.
+
 ## `admin/core`
 
-`shell` містить каркас, навігацію, layout та область маршрутів; `auth` — сесію й
+`shell` містить каркас, навігацію, компонування та область маршрутів; `auth` — сесію й
 автентифікацію; `permissions` — перевірку прав. `core` не містить правил
 конкретних доменів.
 
@@ -28,20 +35,20 @@ libs/admin/
 libs/admin/core/
 ├── shell/src/
 │   ├── index.ts
-│   ├── layout/             # layout composition і content area
-│   ├── navigation/         # nav config, sidebar, mobile drawer
-│   ├── components/         # top bar, breadcrumbs, menus
-│   └── hooks/              # shell-specific React hooks
+│   ├── layout/             # композиція компонування й область вмісту
+│   ├── navigation/         # конфігурація навігації, бічна панель, мобільна панель
+│   ├── components/         # верхня панель, навігаційний ланцюжок, меню
+│   └── hooks/              # специфічні для shell хуки React
 ├── auth/src/
 │   ├── index.ts
-│   ├── api/                # auth transport / RTK Query, якщо він з'явиться
-│   ├── session/            # session model, provider, lifecycle
-│   └── hooks/              # useAuth / useSession та інші public hooks
+│   ├── api/                # транспорт автентифікації / RTK Query, якщо він з'явиться
+│   ├── session/            # модель сесії, провайдер, життєвий цикл
+│   └── hooks/              # useAuth / useSession та інші публічні хуки
 └── permissions/src/
     ├── index.ts
-    ├── policies/           # permission rules і pure predicates
-    ├── guards/             # route/action guards
-    └── hooks/              # usePermission та похідні hooks
+    ├── policies/           # правила дозволів і чисті предикати
+    ├── guards/             # захисники маршрутів і дій
+    └── hooks/              # usePermission та похідні хуки
 ```
 
 Папка створюється лише за наявності її відповідальності. Наявний плоский код не
@@ -51,22 +58,22 @@ libs/admin/core/
 ## Бізнес-домени
 
 Домен ізольований і розкриває публічний API лише через кореневий `src/index.ts`.
-Deep imports до внутрішніх модулів іншого домену заборонені.
+Глибокі імпорти до внутрішніх модулів іншого домену заборонені.
 
-| Шар           | Відповідальність                                          | Не повинен містити          |
-| ------------- | --------------------------------------------------------- | --------------------------- |
-| `feature`     | Екран, сценарій користувача, route entry, orchestration   | HTTP і спільні UI-примітиви |
-| `data-access` | API, query/mutation hooks, DTO mapping, cache             | JSX і маршрути              |
-| `model`       | Типи, інваріанти, чисті перетворення                      | React, HTTP, browser API    |
-| `ui`          | Повторно використовувані domain presentational-компоненти | API, router, server state   |
+| Шар           | Відповідальність                                             | Не повинен містити                 |
+| ------------- | ------------------------------------------------------------ | ---------------------------------- |
+| `feature`     | Екран, сценарій користувача, вхід маршруту, оркестрація      | HTTP і спільні UI-примітиви        |
+| `data-access` | API, generated DTO на межі, перевірка відповіді, мапінг, кеш | JSX і маршрути                     |
+| `model`       | Типи, інваріанти, чисті перетворення                         | React, HTTP, API браузера          |
+| `ui`          | Повторно використовувані презентаційні компоненти домену     | API, маршрутизатор, серверний стан |
 
 `model` створюється лише за наявності спільної логіки або типів. Невеликий домен
 може почати з `feature`; додаткові шари виділяються за появи нової
 відповідальності чи повторного використання.
 
-## Внутрішня структура domain library
+## Внутрішня структура доменної бібліотеки
 
-`src/index.ts` у кожній library — лише публічний API. Внутрішній код не
+`src/index.ts` у кожній бібліотеці — лише публічний API. Внутрішній код не
 розміщується поруч з ним «тимчасово» і не накопичується у великому файлі.
 Застосовуються такі папки, якщо відповідна роль існує:
 
@@ -74,41 +81,45 @@ Deep imports до внутрішніх модулів іншого домену 
 libs/admin/<domain>/
 ├── data-access/src/
 │   ├── index.ts
-│   ├── api/                # injectEndpoints, hooks, endpoint definitions
-│   ├── contracts/          # private transport DTO/request-response shapes
-│   ├── mappers/            # DTO <-> domain/query transformations
-│   ├── models/             # data-access-owned technical query/cache types
-│   └── validators/         # response/query validation at the API boundary
+│   ├── api/                # injectEndpoints, хуки, визначення кінцевих точок
+│   ├── contracts/          # приватні адаптери; DTO з OpenAPI не дублюються вручну
+│   ├── mappers/            # перетворення DTO <-> домен/запит
+│   ├── models/             # технічні типи запитів/кешу, якими володіє data-access
+│   └── validators/         # валідація відповідей/запитів на межі API
 ├── model/src/
 │   ├── index.ts
-│   ├── entities/           # domain entities and value types
-│   ├── queries/            # domain query types/defaults/invariants
-│   ├── mappers/            # pure domain transformations
-│   └── validators/         # pure domain validation where needed
+│   ├── entities/           # сутності домену й типи значень
+│   ├── queries/            # типи, початкові значення та інваріанти доменних запитів
+│   ├── mappers/            # чисті доменні перетворення
+│   └── validators/         # чиста доменна валідація, де вона потрібна
 ├── ui/src/
 │   ├── index.ts
-│   ├── components/         # reusable presentational components
-│   ├── tables/             # table shells, columns and cells
-│   ├── forms/              # presentational forms and fields
-│   └── states/             # loading/empty/error presentational states
+│   ├── components/         # повторно використовувані презентаційні компоненти
+│   ├── tables/             # оболонки таблиць, стовпці та комірки
+│   ├── forms/              # презентаційні форми та поля
+│   └── states/             # презентаційні стани завантаження/порожнього стану/помилки
 └── feature/src/
     ├── index.ts
     ├── <domain>.routes.tsx
-    ├── pages/              # route/page composition
-    ├── components/         # feature-only composition controls
-    ├── hooks/              # feature orchestration hooks
-    └── state/              # local reducer/actions or durable client state
+    ├── pages/              # композиція маршрутів і сторінок
+    ├── components/         # елементи композиції лише для функціональності
+    ├── hooks/              # хуки оркестрації функціональності
+    └── state/              # локальні reducer/actions або тривалий клієнтський стан
 ```
 
-Це не вимога створити всі папки наперед. Це вимога не змішувати ролі: endpoint
-не містить DTO parser, mapper не містить React-компонент, а таблиця не містить
-server-state або маршрутизацію. Коли Nx boundary забороняє залежність
-`data-access -> model`, data-access-owned типи залишаються в `data-access/models`;
+Це не вимога створити всі папки наперед. Це вимога не змішувати ролі: кінцева
+точка не містить парсер DTO, мапер не містить React-компонент, а таблиця не
+містить серверний стан або маршрутизацію. Коли межа Nx забороняє залежність
+`data-access -> model`, типи, якими володіє data-access, залишаються в `data-access/models`;
 глобальні module-boundary правила не послаблюються для локальної задачі.
 
-### Приклад: products
+### Приклад: товари
 
-`Домен products` зберігає модель товару, типи, інваріанти query та paginated result списку в `products/model`; `products/data-access` володіє endpoint, API DTO та mapper'ами.
+Домен `products` зберігає модель товару, типи, інваріанти запиту та сторінковий
+результат списку в `products/model`; `products/data-access` володіє кінцевою
+точкою, імпортує generated DTO для [OpenAPI-контракту](../api/contract-workflow.md)
+та виконує перевірку й мапінг. Показані нижче файли — приклад цільової
+структури, а не свідчення наявності генерації.
 
 ```text
 libs/admin/products/
@@ -119,11 +130,11 @@ libs/admin/products/
 │       └── products-list-query.ts
 └── data-access/src/
     ├── api/admin-products.api.ts
-    ├── contracts/admin-products-list.contract.ts
+    ├── contracts/admin-products-list.adapter.ts
     └── mappers/
 ```
 
-## Внутрішня структура feature
+## Внутрішня структура функціональності
 
 Внутрішні модулі групуються за призначенням сценарію:
 
@@ -144,5 +155,6 @@ libs/admin/products/feature/src/
 ## `admin/shared`
 
 `admin/shared` містить лише код, спільний для кількох доменів: UI-примітиви,
-API-клієнт, transport-контракти, config, util і testing. Він не залежить від
-доменів. Код, потрібний одному домену, не переноситься до shared заздалегідь.
+API-клієнт, транспортні контракти, конфігурацію, утиліти й тестування. Він не
+залежить від доменів. Код, потрібний одному домену, не переноситься до `shared`
+заздалегідь.
