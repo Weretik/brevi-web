@@ -27,6 +27,12 @@
         }
       }
     },
+    "build-cloudflare": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx nx build admin-react"
+      }
+    },
     "serve": {
       "defaultConfiguration": "development",
       "configurations": {
