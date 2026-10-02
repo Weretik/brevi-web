@@ -8,7 +8,7 @@
 - Канонічний entry point: `docs/sdd/contracts/openapi.yaml`.
 - Зафіксована версія backend: `f74c01f7784b1bccaae3234dfee63d8adac5da76` (2026-09-27; OpenAPI введено в попередньому commit `403280e519161116ff743f337fb5668f9e948e40`).
 - Versioned contract: `docs/sdd/contracts/reference/suppliers.openapi.yaml`; агрегований entry point посилається на нього.
-- Frontend snapshot: `docs/contracts/openapi/backend/`; provenance: `docs/contracts/openapi/SOURCE.json`; generated types: `libs/admin/api-contract/src/generated/openapi.ts`.
+- Frontend snapshot: `docs/contracts/openapi/backend/`; provenance: `docs/contracts/openapi/SOURCE.json`; generated types: `libs/admin/shared/contracts/src/generated/openapi.ts`.
 - Статус: **контракт синхронізовано**; HTTP-код має використовувати цю версію.
 
 | `operationId`    | Метод і шлях, перевірені за backend controller | Сценарії       | Статус у канонічному OpenAPI |

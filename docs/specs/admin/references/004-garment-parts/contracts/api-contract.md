@@ -8,7 +8,7 @@
 - Канонічний entry point: `docs/sdd/contracts/openapi.yaml`.
 - Зафіксована версія backend для feature: commit `2757080afbaf994884de5745b53d7bc7c8d83b1b` (2026-09-28).
 - Feature contract: `docs/sdd/contracts/reference/garment-parts.openapi.yaml`; агрегований entry point посилається на нього.
-- Frontend snapshot/provenance: `docs/contracts/openapi/`; generated types: `libs/admin/api-contract/src/generated/openapi.ts`.
+- Frontend snapshot/provenance: `docs/contracts/openapi/`; generated types: `libs/admin/shared/contracts/src/generated/openapi.ts`.
 - Статус: **implemented** — snapshot і типи відтворені та перевірені на зазначеному commit.
 
 | `operationId`       | Метод і шлях, перевірені за backend controller | Сценарії       | Статус у канонічному OpenAPI |

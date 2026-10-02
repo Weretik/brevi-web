@@ -17,12 +17,12 @@
 
 ## Відповідальності
 
-| Область       | Власник                                                                                                                                                          |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Page/route    | `libs/admin/references/feature/src/pages/` компонує вкладки й локальні взаємодії; `apps/admin-react/src/app/router/` підключає route через публічний export.     |
-| Таблиця/форма | `libs/admin/references/feature/src/components/garment-parts/` або `ui/src/` лише за реального повторного використання; Data Grid та MUI form не викликають HTTP. |
-| Data-access   | `libs/admin/references/data-access/src/garment-parts/`: generated operation types на межі, runtime-перевірка, mapping, транспорт і помилки.                      |
-| Модель        | Типи застосунку та чисті правила без React/HTTP; стан списку, вибір і повторне читання належать hooks у `feature/src/hooks/`.                                    |
-| Меню          | Активувати пункт тільки разом із route згідно з SDD меню; не додавати другий пункт для вкладки.                                                                  |
+| Область       | Власник                                                                                                                                                                    |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Page/route    | `libs/admin/references/feature/src/pages/garment-parts/` компонує вкладки й локальні взаємодії; `apps/admin-react/src/app/router/` підключає route через публічний export. |
+| Таблиця/форма | `libs/admin/references/feature/src/components/garment-parts/` або `ui/src/` лише за реального повторного використання; Data Grid та MUI form не викликають HTTP.           |
+| Data-access   | `libs/admin/references/data-access/src/garment-parts/`: generated operation types на межі, runtime-перевірка, mapping, транспорт і помилки.                                |
+| Модель        | Типи застосунку та чисті правила без React/HTTP; стан списку, вибір і повторне читання належать hooks у `feature/src/hooks/`.                                              |
+| Меню          | Активувати пункт тільки разом із route згідно з SDD меню; не додавати другий пункт для вкладки.                                                                            |
 
 Тестувати loading/empty/error, клавіатуру й фокус, успіх/помилку запису, підтвердження видалення та прямий URL. Перевірити 320/768/1280 px, темну/світлу тему. Наявні Nx targets `admin-references-feature` і `admin-references-data-access` звірено через `npx nx show project <project> --json`.

@@ -3,9 +3,9 @@
 - **ID задачі:** TS-002
 - **Охоплює:** SC-001–SC-003
 - **Залежить від:** TS-001
-- **Точні шляхи:** `libs/admin/products/feature/src/pages/media-page.tsx`,
-  `src/components/media/media-gallery.tsx`, `src/hooks/use-media-library.ts`,
-  `src/pages/media-page.component.test.tsx`
+- **Точні шляхи:** `libs/admin/products/feature/src/pages/media-library/media-page.tsx`,
+  `src/components/media/media-gallery.tsx`, `src/hooks/media-library/use-media-library.ts`,
+  `src/pages/media-library/media-page.component.test.tsx`
 - **Рівень тестування:** компонентний
 
 ## Робота

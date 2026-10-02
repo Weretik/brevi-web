@@ -28,6 +28,6 @@
 ## Виконання 2026-09-28
 
 - Фокус: `fabrics-page.component.test.tsx` — input і помилка 400 лишаються у формі, view → edit → успішний PUT перезавантажує список.
-- Додатковий валідний Red: `npx vitest run src/pages/fabrics-page.component.test.tsx -t 'waits for a verified list'` — кнопка створення була доступною до читання списку, з якого обчислюється client supplied ID.
+- Додатковий валідний Red: `npx vitest run src/pages/fabrics/fabrics-page.component.test.tsx -t 'waits for a verified list'` — кнопка створення була доступною до читання списку, з якого обчислюється client supplied ID.
 - Green: та сама команда після guard `disabled={loading || Boolean(error)}` — 1 passed. До цього інші сценарії форми не мали окремого Red; це прогалина TDD evidence.
 - Refactor: валідація залишена у `model/fabric-validation.ts`, orchestration у `use-fabric-editor.ts`, поля у `fabric-dialog.tsx`. Regression: `npx nx test admin-references-feature` — фінально 17/17; `npx nx typecheck-tests admin-references-feature` — успішно.

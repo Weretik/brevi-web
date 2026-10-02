@@ -3,8 +3,8 @@
 - **ID задачі:** TS-003
 - **Охоплює:** SC-004, SC-005
 - **Залежить від:** TS-001, TS-002
-- **Точні шляхи:** `libs/admin/products/feature/src/components/media/media-upload.tsx`,
-  за потреби `src/hooks/use-media-upload.ts` і
+- **Точні шляхи:** `libs/admin/products/ui/src/media/media-upload.tsx`,
+  за потреби `src/hooks/media-library/use-media-upload.ts` і
   `src/model/media-file-validation.ts`, focused component/unit tests
 - **Рівень тестування:** компонентний і модульний
 

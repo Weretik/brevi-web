@@ -8,7 +8,7 @@
 - Канонічний entry point: `docs/sdd/contracts/openapi.yaml`.
 - Зафіксована версія backend: commit `9f75e832525ea96a327be227f6ec756e01ddfa67` (2026-09-28).
 - Операції визначені в `docs/sdd/contracts/reference/garment-part-operations.openapi.yaml`; lookup має `getGarmentParts` у `reference/garment-parts.openapi.yaml` того самого commit.
-- Frontend snapshot: `docs/contracts/openapi/backend/`, provenance: `docs/contracts/openapi/SOURCE.json`; generated types: `libs/admin/api-contract/src/generated/openapi.ts`. `contracts:sync`, `contracts:generate`, `contracts:check` виконані.
+- Frontend snapshot: `docs/contracts/openapi/backend/`, provenance: `docs/contracts/openapi/SOURCE.json`; generated types: `libs/admin/shared/contracts/src/generated/openapi.ts`. `contracts:sync`, `contracts:generate`, `contracts:check` виконані.
 - Статус: **реалізовано й перевірено** за вказаним commit.
 
 | `operationId`                | Метод і шлях, перевірені за backend controller       | Сценарії       | Статус у канонічному OpenAPI |

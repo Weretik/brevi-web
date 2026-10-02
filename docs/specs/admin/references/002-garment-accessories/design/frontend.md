@@ -17,13 +17,13 @@
 
 ## Відповідальності
 
-| Область       | Власник                                                                                                                                                                |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Page/route    | `libs/admin/references/feature/src/pages/` компонує вкладки й локальні взаємодії; `apps/admin-react/src/app/router/` підключає route через публічний export.           |
-| Таблиця/форма | `libs/admin/references/feature/src/components/garment-accessories/` або `ui/src/` лише за реального повторного використання; Data Grid та MUI form не викликають HTTP. |
-| Data-access   | `libs/admin/references/data-access/src/garment-accessories/`: generated operation types на межі, runtime-перевірка, mapping, кеш і invalidation.                       |
-| Модель        | Типи застосунку та чисті правила без React/HTTP; окремий `model` лише коли потрібен спільний власник.                                                                  |
-| Меню          | Активувати пункт тільки разом із route згідно з SDD меню; не додавати другий пункт для вкладки.                                                                        |
+| Область       | Власник                                                                                                                                                                          |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Page/route    | `libs/admin/references/feature/src/pages/garment-accessories/` компонує вкладки й локальні взаємодії; `apps/admin-react/src/app/router/` підключає route через публічний export. |
+| Таблиця/форма | `libs/admin/references/feature/src/components/garment-accessories/` або `ui/src/` лише за реального повторного використання; Data Grid та MUI form не викликають HTTP.           |
+| Data-access   | `libs/admin/references/data-access/src/garment-accessories/`: generated operation types на межі, runtime-перевірка, mapping, кеш і invalidation.                                 |
+| Модель        | Типи застосунку та чисті правила без React/HTTP; окремий `model` лише коли потрібен спільний власник.                                                                            |
+| Меню          | Активувати пункт тільки разом із route згідно з SDD меню; не додавати другий пункт для вкладки.                                                                                  |
 
 Залежність селектора: постачальники для вибору у формі. Вона має власну contract operation і перевірку відповіді; не покладатися на ручні Angular DTO.
 Тестувати loading/empty/error, клавіатуру й фокус, успіх/помилку запису, підтвердження видалення там, де воно існує, а також прямий URL. Перевірити 320/768/1280 px, темну/світлу тему. Під час TS-001/TS-002 додати потрібні Nx targets для нових бібліотек і звірити їх через `npx nx show project <project> --json`; не вважати їх наявними.

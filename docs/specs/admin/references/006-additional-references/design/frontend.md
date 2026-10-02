@@ -19,7 +19,7 @@
 
 | Область       | Власник                                                                                                                                                                                                                              |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Page/route    | `libs/admin/references/feature/src/pages/additional-references-page.tsx` компонує одну таблицю й локальні взаємодії; `apps/admin-react/src/app/router/` підключає route через публічний export.                                      |
+| Page/route    | `libs/admin/references/feature/src/pages/additional-references/additional-references-page.tsx` компонує одну таблицю й локальні взаємодії; `apps/admin-react/src/app/router/` підключає route через публічний export.                |
 | Таблиця/форма | `libs/admin/references/feature/src/components/additional-references/` або `ui/src/` лише за реального повторного використання; Data Grid та MUI form не викликають HTTP.                                                             |
 | Data-access   | `libs/admin/references/data-access/src/additional-references/`: generated operation types на межі, runtime-перевірка й mapping. Локальний стан списку та повторне завантаження після запису належать `use-additional-references.ts`. |
 | Модель        | Типи застосунку та чисті правила без React/HTTP; окремий `model` лише коли потрібен спільний власник.                                                                                                                                |

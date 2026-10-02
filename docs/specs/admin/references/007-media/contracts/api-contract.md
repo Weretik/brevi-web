@@ -8,7 +8,7 @@
   у локальній гілці `codex/media-contract`.
 - Snapshot/provenance: `docs/contracts/openapi/backend/` і
   `docs/contracts/openapi/SOURCE.json`.
-- Generated types: `libs/admin/api-contract/src/generated/openapi.ts` через
+- Generated types: `libs/admin/shared/contracts/src/generated/openapi.ts` через
   `openapi-typescript` і `tools/contracts/contracts.mjs`.
 - Статус: синхронізовано і перевірено; authorization лишається platform gap.
 

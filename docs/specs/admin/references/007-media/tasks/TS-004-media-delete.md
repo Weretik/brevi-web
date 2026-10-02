@@ -3,8 +3,8 @@
 - **ID задачі:** TS-004
 - **Охоплює:** SC-006, SC-007
 - **Залежить від:** TS-001, TS-002
-- **Точні шляхи:** `libs/admin/products/feature/src/components/media/media-delete-dialog.tsx`,
-  за потреби `src/hooks/use-media-deletion.ts`, focused component test
+- **Точні шляхи:** `libs/admin/products/ui/src/media/media-delete-dialog.tsx`,
+  за потреби `src/hooks/media-library/use-media-deletion.ts`, focused component test
 - **Рівень тестування:** компонентний
 
 ## Робота

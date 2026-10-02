@@ -6,7 +6,7 @@
 
 - Backend: `C:/Users/Віталій/RiderProjects/BreviERP`, commit `2ec6376d986eb18ace4c1b7d360c329d38405b57`.
 - Канонічний entry point: `docs/sdd/contracts/openapi.yaml`; контракт тканин: `docs/sdd/contracts/reference/fabrics.openapi.yaml`; lookup: `docs/sdd/contracts/reference/suppliers.openapi.yaml`.
-- Frontend snapshot: `docs/contracts/openapi/backend/`; provenance: `docs/contracts/openapi/SOURCE.json`; generated types: `libs/admin/api-contract/src/generated/openapi.ts`.
+- Frontend snapshot: `docs/contracts/openapi/backend/`; provenance: `docs/contracts/openapi/SOURCE.json`; generated types: `libs/admin/shared/contracts/src/generated/openapi.ts`.
 
 | `operationId`  | Метод і шлях                         | Сценарії       |
 | -------------- | ------------------------------------ | -------------- |

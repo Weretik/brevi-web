@@ -6,7 +6,7 @@
 - **Точні шляхи:** backend `docs/sdd/contracts/openapi.yaml` і media contract;
   frontend `docs/contracts/openapi/backend/catalog/product-dependencies.openapi.yaml`,
   `docs/contracts/openapi/SOURCE.json`,
-  `libs/admin/api-contract/src/generated/openapi.ts`
+  `libs/admin/shared/contracts/src/generated/openapi.ts`
 - **Рівень тестування:** contract/tooling verification
 
 ## Робота

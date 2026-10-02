@@ -13,3 +13,11 @@
 | 7       | `/references/media`                  | [Медіа/Фото](007-media/README.md)                          |
 
 «Товари» мають окрему [SDD](../products/001-products-table/README.md), бо в Angular Admin це пункт без сторінки. Візуальні правила — [тут](../table-visual-guidance.md).
+
+Наступний узгоджений етап оформлено п'ятьма окремими SDD змін:
+
+- [Тканина та фурнітура](008-garment-materials-pages/README.md);
+- [Операції: елементи та роботи](009-operations-pages/README.md);
+- [Постачальники](010-suppliers-pages/README.md);
+- [Додаткові довідники](011-additional-references-pages/README.md);
+- [Товари](../products/003-products-table-pages/README.md) залишаються в домені products.

@@ -17,17 +17,17 @@
 
 ## Відповідальності
 
-| Область       | Власник                                                                                                                                                                                         |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Page/route    | `libs/admin/references/feature/src/pages/suppliers-page.tsx` компонує одну таблицю й локальні діалоги; `apps/admin-react/src/app/router/app-router.tsx` підключає route через публічний export. |
-| Таблиця/форма | `libs/admin/references/feature/src/components/suppliers/` малює Data Grid, форму та підтвердження; компоненти не викликають data-access.                                                        |
-| Стан і дії    | `libs/admin/references/feature/src/hooks/` містить read lifecycle, збереження форми та підтверджене видалення з відновленням selection.                                                         |
-| Data-access   | `libs/admin/references/data-access/src/suppliers/` містить HTTP, generated operation types на межі, runtime-перевірку й mapping; повтор read після write виконує feature hook.                  |
-| Модель        | Типи застосунку та чисті правила без React/HTTP; окремий `model` лише коли потрібен спільний власник.                                                                                           |
-| Меню          | Активувати пункт тільки разом із route згідно з SDD меню; не додавати другий пункт для вкладки.                                                                                                 |
+| Область       | Власник                                                                                                                                                                                                   |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Page/route    | `libs/admin/references/feature/src/pages/suppliers/suppliers-page.tsx` компонує одну таблицю й локальні діалоги; `apps/admin-react/src/app/router/app-router.tsx` підключає route через публічний export. |
+| Таблиця/форма | `libs/admin/references/feature/src/components/suppliers/` малює Data Grid, форму та підтвердження; компоненти не викликають data-access.                                                                  |
+| Стан і дії    | `libs/admin/references/feature/src/hooks/suppliers/` містить read lifecycle, збереження форми та підтверджене видалення з відновленням selection.                                                         |
+| Data-access   | `libs/admin/references/data-access/src/suppliers/` містить HTTP, generated operation types на межі, runtime-перевірку й mapping; повтор read після write виконує feature hook.                            |
+| Модель        | Типи застосунку та чисті правила без React/HTTP; окремий `model` лише коли потрібен спільний власник.                                                                                                     |
+| Меню          | Активувати пункт тільки разом із route згідно з SDD меню; не додавати другий пункт для вкладки.                                                                                                           |
 
 Тестувати loading/empty/error, клавіатуру й фокус, успіх/помилку запису, підтвердження видалення там, де воно існує, а також прямий URL. Перевірити 320/768/1280 px, темну/світлу тему. Під час TS-001/TS-002 додати потрібні Nx targets для нових бібліотек і звірити їх через `npx nx show project <project> --json`; не вважати їх наявними.
 
 ## Межі code-audit
 
-Перед аудитом `supplier-dialog.tsx` змішував MUI-поля зі збереженням через data-access, а `suppliers-page.tsx` — grid presentation із batch delete й reconciliation вибору. Аудит розділяє ці незалежні ролі в межах уже наявної feature library: `hooks/use-supplier-editor.ts`, `hooks/use-supplier-deletion.ts`, `components/suppliers/suppliers-grid.tsx` і `components/suppliers/supplier-delete-dialog.tsx`. Validation лишається чистою функцією у `model/supplier-validation.ts`, доступною hook і формі без залежності hook від UI-каталогу. Transport і runtime mapper залишаються в data-access. Спільний contract tooling, generated type-only library, router і Angular-джерело не змінюють відповідальності.
+Перед аудитом `supplier-dialog.tsx` змішував MUI-поля зі збереженням через data-access, а `suppliers-page.tsx` — grid presentation із batch delete й reconciliation вибору. Аудит розділяє ці незалежні ролі в межах уже наявної feature library: `hooks/suppliers/use-supplier-editor.ts`, `hooks/suppliers/use-supplier-deletion.ts`, `components/suppliers/suppliers-grid.tsx` і `components/suppliers/supplier-delete-dialog.tsx`. Validation лишається чистою функцією у `model/supplier-validation.ts`, доступною hook і формі без залежності hook від UI-каталогу. Transport і runtime mapper залишаються в data-access. Спільний contract tooling, generated type-only library, router і Angular-джерело не змінюють відповідальності.

@@ -3,7 +3,7 @@
 - **ID задачі:** TS-002
 - **Охоплює:** SC-001, SC-002, SC-004
 - **Залежить від:** TS-001
-- **Точні шляхи:** `libs/admin/references/feature/src/components/fabrics/`, `libs/admin/references/feature/src/pages/`
+- **Точні шляхи:** `libs/admin/references/feature/src/components/fabrics/`, `libs/admin/references/feature/src/pages/fabrics/`
 - **Рівень тестування:** компонентний
 
 ## Робота

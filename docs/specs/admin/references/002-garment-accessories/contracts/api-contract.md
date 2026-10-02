@@ -7,7 +7,7 @@
 - Backend repository: `C:/Users/Віталій/RiderProjects/BreviERP` (локальний checkout, наданий користувачем).
 - Канонічний entry point: `docs/sdd/contracts/openapi.yaml`.
 - Зафіксована версія backend: `d2b011647ed14ec32eb42b76aac2e908fb3d95e6`; garment contract: `docs/sdd/contracts/reference/garment-accessories.openapi.yaml`.
-- Frontend snapshot/provenance: `docs/contracts/openapi/`; generated types: `libs/admin/api-contract/src/generated/openapi.ts`.
+- Frontend snapshot/provenance: `docs/contracts/openapi/`; generated types: `libs/admin/shared/contracts/src/generated/openapi.ts`.
 - Статус: чотири garment operations і `getSuppliers` наявні у зафіксованому OpenAPI.
 
 | `operationId`            | Метод і шлях, перевірені за backend controller   | Сценарії       | Статус у канонічному OpenAPI |

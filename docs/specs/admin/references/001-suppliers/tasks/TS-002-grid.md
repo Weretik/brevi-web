@@ -3,7 +3,7 @@
 - **ID задачі:** TS-002
 - **Охоплює:** SC-001, SC-002, SC-004
 - **Залежить від:** TS-001
-- **Точні шляхи:** `libs/admin/references/feature/src/components/suppliers/`, `libs/admin/references/feature/src/pages/`
+- **Точні шляхи:** `libs/admin/references/feature/src/components/suppliers/`, `libs/admin/references/feature/src/pages/suppliers/`
 - **Рівень тестування:** компонентний
 
 ## Робота
@@ -15,10 +15,10 @@
 
 ## Свідчення
 
-- Фокусний тест: `libs/admin/references/feature/src/pages/suppliers-page.component.test.tsx`.
+- Фокусний тест: `libs/admin/references/feature/src/pages/suppliers/suppliers-page.component.test.tsx`.
 - Red: `npx nx test admin-references-feature` — не знайдено завантажений рядок «Атлас» (1 failed).
 - Green: `npx nx test admin-references-feature` — таблиця й дії доступні.
-- Refactor: HTTP state винесено в `hooks/use-suppliers.ts`; повторний suite пройшов.
+- Refactor: HTTP state винесено в `hooks/suppliers/use-suppliers.ts`; повторний suite пройшов.
 - Regression: `npx nx lint admin-references-feature`, `npx nx typecheck admin-references-feature`, `npx nx e2e admin-react-e2e` — успішно.
 
 ## Контрольна точка

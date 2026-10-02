@@ -4,7 +4,7 @@
 - Канонічний entry point: `docs/sdd/contracts/openapi.yaml`.
 - Feature contract: `docs/sdd/contracts/reference/additional-references.openapi.yaml`.
 - Зафіксована версія: `03ed99f2d40f0bb239adb6d3bd9e237eac300344`.
-- Frontend snapshot: `docs/contracts/openapi/backend/`; provenance: `docs/contracts/openapi/SOURCE.json`; generated types: `libs/admin/api-contract/src/generated/openapi.ts`.
+- Frontend snapshot: `docs/contracts/openapi/backend/`; provenance: `docs/contracts/openapi/SOURCE.json`; generated types: `libs/admin/shared/contracts/src/generated/openapi.ts`.
 
 | `operationId`               | Метод і шлях                                    | Сценарії       |
 | --------------------------- | ----------------------------------------------- | -------------- |
