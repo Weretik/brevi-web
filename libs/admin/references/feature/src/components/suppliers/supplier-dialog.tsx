@@ -11,11 +11,10 @@ import {
   TextField,
 } from '@mui/material';
 
-import { useSupplierEditor } from '../../hooks/use-supplier-editor';
+import { useSupplierEditor } from '../../hooks/suppliers/use-supplier-editor';
 
-import type { SupplierDialogMode } from '../../hooks/use-supplier-editor';
-import type { SupplierField } from '../../model/supplier-validation';
-import type { Supplier } from '@admin/references/data-access';
+import type { SupplierDialogMode } from '../../hooks/suppliers/use-supplier-editor';
+import type { SupplierField, Supplier } from '@admin/references/model';
 import type { KeyboardEvent } from 'react';
 
 interface Props {

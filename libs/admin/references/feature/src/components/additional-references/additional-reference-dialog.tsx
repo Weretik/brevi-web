@@ -1,3 +1,4 @@
+import { ADDITIONAL_REFERENCE_UNITS } from '@admin/references/model';
 import {
   Alert,
   Box,
@@ -11,10 +12,9 @@ import {
   TextField,
 } from '@mui/material';
 
-import { useAdditionalReferenceEditor } from '../../hooks/use-additional-reference-editor';
-import { ADDITIONAL_REFERENCE_UNITS } from '../../model/additional-reference-validation';
+import { useAdditionalReferenceEditor } from '../../hooks/additional-references/use-additional-reference-editor';
 
-import type { AdditionalReference } from '@admin/references/data-access';
+import type { AdditionalReference } from '@admin/references/model';
 
 interface Props {
   reference: AdditionalReference;

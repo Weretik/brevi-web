@@ -1,42 +1,34 @@
 export {
-  listSuppliers,
-  createSupplier,
-  updateSupplier,
-  deleteSupplier,
-  SupplierApiError,
-} from './suppliers/suppliers.api';
-export { mapSuppliers } from './suppliers/suppliers.mapper';
-export type { Supplier, SupplierDraft } from './suppliers/suppliers.model';
+  useListAdditionalReferencesQuery,
+  useUpdateAdditionalReferenceMutation,
+} from './api/additional-references/additional-references.api';
 export {
-  listGarmentAccessories,
-  createGarmentAccessory,
-  updateGarmentAccessory,
-  deleteGarmentAccessory,
-} from './garment-accessories/garment-accessories.api';
-export { GarmentAccessoryApiError } from './garment-accessories/garment-accessories.error';
-export type { GarmentAccessory } from './garment-accessories/garment-accessories.model';
-export { listFabrics, createFabric, updateFabric, deleteFabric } from './fabrics/fabrics.api';
-export { FabricApiError } from './fabrics/fabrics.error';
-export type { Fabric } from './fabrics/fabrics.model';
+  useCreateFabricMutation,
+  useDeleteFabricMutation,
+  useListFabricsQuery,
+  useUpdateFabricMutation,
+} from './api/fabrics/fabrics.api';
 export {
-  listGarmentParts,
-  createGarmentPart,
-  updateGarmentPart,
-  deleteGarmentPart,
-} from './garment-parts/garment-parts.api';
-export { GarmentPartApiError } from './garment-parts/garment-parts.error';
-export type { GarmentPart } from './garment-parts/garment-parts.model';
+  useCreateGarmentAccessoryMutation,
+  useDeleteGarmentAccessoryMutation,
+  useListGarmentAccessoriesQuery,
+  useUpdateGarmentAccessoryMutation,
+} from './api/garment-accessories/garment-accessories.api';
 export {
-  listGarmentPartOperations,
-  createGarmentPartOperation,
-  updateGarmentPartOperation,
-  deleteGarmentPartOperation,
-} from './garment-part-operations/garment-part-operations.api';
-export { GarmentPartOperationApiError } from './garment-part-operations/garment-part-operations.error';
-export type { GarmentPartOperation } from './garment-part-operations/garment-part-operations.model';
+  useCreateGarmentPartMutation,
+  useDeleteGarmentPartMutation,
+  useListGarmentPartsQuery,
+  useUpdateGarmentPartMutation,
+} from './api/garment-parts/garment-parts.api';
 export {
-  listAdditionalReferences,
-  updateAdditionalReference,
-} from './additional-references/additional-references.api';
-export { AdditionalReferenceApiError } from './additional-references/additional-references.error';
-export type { AdditionalReference } from './additional-references/additional-references.model';
+  useCreateGarmentPartOperationMutation,
+  useDeleteGarmentPartOperationMutation,
+  useListGarmentPartOperationsQuery,
+  useUpdateGarmentPartOperationMutation,
+} from './api/garment-part-operations/garment-part-operations.api';
+export {
+  useCreateSupplierMutation,
+  useDeleteSupplierMutation,
+  useListSuppliersQuery,
+  useUpdateSupplierMutation,
+} from './api/suppliers/suppliers.api';
