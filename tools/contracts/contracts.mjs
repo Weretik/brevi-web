@@ -17,7 +17,7 @@ import { fileURLToPath } from 'node:url';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const snapshot = join(root, 'docs/contracts/openapi/backend');
 const provenancePath = join(root, 'docs/contracts/openapi/SOURCE.json');
-const generatedPath = join(root, 'libs/admin/api-contract/src/generated/openapi.ts');
+const generatedPath = join(root, 'libs/admin/shared/contracts/src/generated/openapi.ts');
 const entry = 'docs/sdd/contracts/openapi.yaml';
 
 function git(checkout, ...args) {

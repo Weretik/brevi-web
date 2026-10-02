@@ -1,0 +1,20 @@
+{
+  "name": "admin-shared-contracts",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/admin/shared/contracts/src",
+  "projectType": "library",
+  "tags": ["scope:admin", "domain:shared", "type:contract"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": { "command": "eslint .", "cwd": "libs/admin/shared/contracts" }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit -p tsconfig.lib.json",
+        "cwd": "libs/admin/shared/contracts"
+      }
+    }
+  }
+}

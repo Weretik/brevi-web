@@ -143,26 +143,90 @@ module.exports = [
               onlyDependOnLibsWithTags: ['scope:shared'],
             },
 
-            // UI libraries should not pull data access
+            // Pure domain model stays framework and transport independent.
+            {
+              sourceTag: 'type:model',
+              onlyDependOnLibsWithTags: ['type:model', 'type:util', 'scope:shared'],
+            },
+
+            // Generated contracts do not depend on runtime application layers.
+            {
+              sourceTag: 'type:contract',
+              onlyDependOnLibsWithTags: ['type:contract', 'type:util', 'scope:shared'],
+            },
+
+            // Shared API client owns the transport base used by domain endpoints.
+            {
+              sourceTag: 'type:api-client',
+              onlyDependOnLibsWithTags: [
+                'type:api-client',
+                'type:contract',
+                'type:util',
+                'scope:shared',
+              ],
+            },
+
+            // Presentation can use domain models, but never feature or data-access.
             {
               sourceTag: 'type:ui',
-              onlyDependOnLibsWithTags: ['type:ui', 'type:util', 'type:feature', 'scope:shared'],
+              onlyDependOnLibsWithTags: ['type:ui', 'type:model', 'type:util', 'scope:shared'],
             },
 
-            // data-access can be used from feature, but data-access should not pull feature
+            // Domain endpoints map transport contracts into domain models.
             {
               sourceTag: 'type:data-access',
-              onlyDependOnLibsWithTags: ['type:data-access', 'type:util', 'scope:shared'],
+              onlyDependOnLibsWithTags: [
+                'type:data-access',
+                'type:api-client',
+                'type:contract',
+                'type:model',
+                'type:util',
+                'scope:shared',
+              ],
             },
 
-            // feature can pull ui/util/data-access into its scope
+            // Feature orchestrates domain UI, models and data access.
             {
               sourceTag: 'type:feature',
               onlyDependOnLibsWithTags: [
                 'type:feature',
                 'type:ui',
+                'type:model',
                 'type:util',
                 'type:data-access',
+                'type:api-client',
+                'scope:shared',
+              ],
+            },
+
+            // Core composes application capabilities without becoming a domain owner.
+            {
+              sourceTag: 'type:core',
+              onlyDependOnLibsWithTags: [
+                'type:core',
+                'type:feature',
+                'type:ui',
+                'type:model',
+                'type:data-access',
+                'type:api-client',
+                'type:contract',
+                'type:util',
+                'scope:shared',
+              ],
+            },
+
+            // Application is the composition root.
+            {
+              sourceTag: 'type:app',
+              onlyDependOnLibsWithTags: [
+                'type:core',
+                'type:feature',
+                'type:ui',
+                'type:model',
+                'type:data-access',
+                'type:api-client',
+                'type:contract',
+                'type:util',
                 'scope:shared',
               ],
             },

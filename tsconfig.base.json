@@ -12,9 +12,7 @@
       "@shared/ui": ["libs/shared/ui/src/index.ts"],
       "@shared/util": ["libs/shared/util/src/index.ts"],
       "@shared/data-access": ["libs/shared/data-access/src/index.ts"],
-      "@shared/auth": ["libs/shared/auth/src/index.ts"],
       "@shared/config": ["libs/shared/config/src/index.ts"],
-      "@shared/forms": ["libs/shared/forms/src/index.ts"],
       "@shared/http": ["libs/shared/http/src/index.ts"],
       "@shared/logging": ["libs/shared/logging/src/index.ts"],
       "@storefront/ui": ["libs/storefront/ui/src/index.ts"],
@@ -24,7 +22,6 @@
       "@storefront/feature/home": ["libs/storefront/feature/home/src/index.ts"],
       "@storefront/feature/catalog": ["libs/storefront/feature/catalog/src/index.ts"],
       "@storefront/feature/contacts": ["libs/storefront/feature/contacts/src/index.ts"],
-      "@admin/feature-dashboard": ["libs/admin/feature-dashboard/src/index.ts"],
       "@storefront/feature/about-us": ["libs/storefront/feature/about-us/src/index.ts"],
       "@storefront/feature/order-in-bulk": [
         "libs/storefront/feature/order-in-bulk/order-in-bulk/src/index.ts"
@@ -32,20 +29,18 @@
       "@storefront/feature/not-found": ["libs/storefront/feature/not-found/src/index.ts"],
       "@storefront/feature/regions": ["libs/storefront/feature/regions/regions/src/index.ts"],
       "@shared/theme": ["libs/shared/theme/src/index.ts"],
-      "@admin/contracts": ["libs/admin/contracts/src/index.ts"],
-      "@admin/api-contract": ["libs/admin/api-contract/src/index.ts"],
+      "@admin/shared/contracts": ["libs/admin/shared/contracts/src/index.ts"],
+      "@admin/shared/config": ["libs/admin/shared/config/src/index.ts"],
+      "@admin/shared/api-client": ["libs/admin/shared/api-client/src/index.ts"],
       "@admin/references/data-access": ["libs/admin/references/data-access/src/index.ts"],
+      "@admin/references/model": ["libs/admin/references/model/src/index.ts"],
       "@admin/references/feature": ["libs/admin/references/feature/src/index.ts"],
       "@admin/products/data-access": ["libs/admin/products/data-access/src/index.ts"],
+      "@admin/products/model": ["libs/admin/products/model/src/index.ts"],
+      "@admin/products/ui": ["libs/admin/products/ui/src/index.ts"],
       "@admin/products/feature": ["libs/admin/products/feature/src/index.ts"],
-      "@admin/data-access": ["libs/admin/data-access/src/index.ts"],
-      "@admin/feature/dashboard": ["libs/admin/feature/dashboard/src/index.ts"],
-      "@admin/ui": ["libs/admin/ui/src/index.ts"],
-      "@admin/util": ["libs/admin/util/src/index.ts"],
-      "@admin/util/api-url": ["libs/admin/util/src/api-url.ts"],
-      "@admin/shell": ["libs/admin/shell/src/index.ts"],
-      "@admin/core/shell": ["libs/admin/core/shell/src/index.ts"],
-      "@admin/feature/references": ["libs/admin/feature/references/src/index.ts"]
+      "@admin/references/ui": ["libs/admin/references/ui/src/index.ts"],
+      "@admin/core/shell": ["libs/admin/core/shell/src/index.ts"]
     }
   }
 }
