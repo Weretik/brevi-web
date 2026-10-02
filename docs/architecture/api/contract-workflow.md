@@ -36,31 +36,12 @@
 
 ## Стан інструментів у цьому репозиторії
 
-Станом на 2026-09-26 у `package.json` немає `contracts:sync`,
-`contracts:generate` чи `contracts:check`. У репозиторії немає OpenAPI snapshot,
-generated API types, manifest походження або генератора. Наявні
-`libs/admin/contracts` містять ручні request types, а Angular Admin `data-access`
-викликає `HttpClient` з ручною типізацією. Не вважайте описаний вище цикл
-автоматизованим і не позначайте API feature готовою за цим критерієм, поки
-передумова не реалізована. Наявний код змінюйте окремими задачами без масового
-перенесення.
+Станом на 2026-10-01 репозиторій має versioned OpenAPI snapshot, manifest
+походження, generated типи в `libs/admin/shared/contracts` і команди
+`contracts:sync`, `contracts:generate`, `contracts:check`. React data-access
+імпортує generated operation types через публічний alias `@admin/shared/contracts`.
 
-Для першої API feature додайте `EN-*` із такими конкретними змінами:
-
-- Виберіть backend checkout і канонічний OpenAPI entry point. Додайте
-  versioned snapshot під `docs/contracts/openapi/` та `SOURCE.md` з backend
-  repository, commit SHA, source path і способом відтворення.
-- Додайте скрипт `contracts:sync`, який приймає backend checkout і commit,
-  перевіряє чистоту checkout та відповідність `HEAD`, копіює OpenAPI й записує
-  provenance. Не беріть «latest» без зафіксованої версії.
-- Додайте зафіксований у lockfile генератор і `contracts:generate` для
-  TypeScript output у спільній Nx library з type-only public export. Сумісність
-  її alias і Nx boundaries перевірте перед вибором конкретного шляху.
-- Додайте `contracts:check`, який валідовує OpenAPI, запускає генерацію у
-  тимчасовому каталозі та порівнює результат з committed output без зміни
-  робочого дерева. Окремо перевіряйте наявність `operationId` у snapshot.
-
-Після появи скриптів перевірочна послідовність для API feature:
+Перевірочна послідовність для API feature:
 
 ```powershell
 npm run contracts:sync -- <backend-checkout> <backend-commit>
@@ -72,8 +53,8 @@ npx nx test <changed-project>
 npx nx build <app>
 ```
 
-Перші три рядки є **цільовими командами**, а не поточними npm scripts.
-`typecheck` і `test` запускайте лише для наявних Nx targets, перевірених через
+Перші три рядки є поточними npm scripts; `contracts:sync` потребує backend
+checkout і immutable revision. `typecheck` і `test` запускайте лише для наявних Nx targets, перевірених через
 `npx nx show project <project> --json`; для React test types доступні
 `npm run typecheck:tests`. За відсутності target оформіть `EN-*` або точно
 запишіть прогалину та доступний `tsc --noEmit --project <tsconfig>`.

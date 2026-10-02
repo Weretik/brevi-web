@@ -4,9 +4,9 @@
 - **Статус:** planned; не підтверджує наявність описаних libraries
 - **Пов'язані документи:** [ADR Admin Axios transport](../admin/adr/0001-admin-axios-transport.md), [стан і API Admin](../admin/state-and-api.md)
 
-[Життєвий цикл OpenAPI-контракту](contract-workflow.md) застосовується також до
-поточного Angular Admin і Storefront. Ця сторінка описує цільовий React Admin
-transport; його наявність потрібно перевіряти в коді.
+[Життєвий цикл OpenAPI-контракту](contract-workflow.md) застосовується до
+React Admin. Ця сторінка описує цільовий transport; його наявність потрібно
+перевіряти в коді.
 
 ## Призначення
 
