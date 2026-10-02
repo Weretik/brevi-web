@@ -1,5 +1,5 @@
-import { Box, Container } from '@mui/material';
-import { useEffect, useRef, useState } from 'react';
+import { Box, CircularProgress, Container } from '@mui/material';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 
 import { AdminTopBar } from '../components/admin-top-bar';
@@ -46,7 +46,9 @@ export function AdminLayout({ navigation, colorMode, onColorModeChange }: AdminL
         />
         <Box component="main" sx={{ minWidth: 0 }}>
           <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3 }, py: { xs: 3, lg: 5 } }}>
-            <Outlet />
+            <Suspense fallback={<CircularProgress aria-label="Завантаження сторінки" />}>
+              <Outlet />
+            </Suspense>
           </Container>
         </Box>
       </Box>

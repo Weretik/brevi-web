@@ -1,4 +1,4 @@
-import { configureApiEnvironment } from '@admin/util/api-url';
+import { configureApiEnvironment } from '@admin/shared/config';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 

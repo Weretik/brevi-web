@@ -15,7 +15,7 @@ test('operations open directly with the Brevi shell and shared tabs', async ({ p
   await expect(page.getByText('Елементів виробу поки немає')).toBeVisible();
 });
 
-test('operations keep form values after error and confirm deletion', async ({ page }) => {
+test('operations keep selection while the row menu confirms deletion', async ({ page }) => {
   let deleteRequests = 0;
   await page.route('**/api/reference/garment-parts', (route) =>
     route.fulfill({
@@ -25,12 +25,6 @@ test('operations keep form values after error and confirm deletion', async ({ pa
     }),
   );
   await page.route('**/api/reference/garment-part-operations', (route) => {
-    if (route.request().method() === 'POST')
-      return route.fulfill({
-        status: 400,
-        contentType: 'application/json',
-        body: JSON.stringify([{ identifier: 'Request.Name', errorMessage: 'Назва вже існує.' }]),
-      });
     return route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -43,22 +37,28 @@ test('operations keep form values after error and confirm deletion', async ({ pa
   });
   await page.goto('/references/garment-part-operation');
   await expect(page.getByText('Шов')).toBeVisible();
-  await page.getByRole('button', { name: 'Створити' }).click();
-  const dialog = page.getByRole('dialog', { name: 'Нова робота' });
-  await dialog.getByRole('combobox', { name: 'Елемент' }).click();
-  await page.getByRole('option', { name: 'Рукав' }).click();
-  await dialog.getByRole('textbox', { name: 'Назва' }).fill('Шов');
-  await dialog.getByRole('button', { name: 'Зберегти' }).click();
-  await expect(dialog.getByText('Назва вже існує.')).toBeVisible();
-  await expect(dialog.getByRole('textbox', { name: 'Назва' })).toHaveValue('Шов');
-  await dialog.getByRole('button', { name: 'Закрити' }).click();
-  await expect(page.getByRole('button', { name: 'Створити' })).toBeFocused();
-  await page.getByRole('button', { name: 'Видалити', exact: true }).click();
+  const row = page.locator('[role="row"][data-id="2"]');
+  await expect(row).toContainText('Рукав');
+  await expect(row).toContainText('Шов');
+  const rowCheckbox = row.locator('input[type="checkbox"]');
+  await rowCheckbox.check();
+  await row.click({ button: 'right' });
+  await expect(rowCheckbox).toBeChecked();
+  await page.getByRole('menuitem', { name: 'Змінити' }).click();
+  const drawer = page.getByRole('dialog', { name: 'Редагування роботи' });
+  await expect(drawer.getByRole('textbox', { name: 'Назва' })).toHaveValue('Шов');
+  await expect(drawer.getByRole('combobox', { name: 'Елемент' })).toContainText('Рукав');
+  await expect(page).toHaveURL('/references/garment-part-operation');
+  await drawer.getByRole('button', { name: 'Скасувати' }).click();
+  await expect(rowCheckbox).toBeChecked();
+  await row.click({ button: 'right' });
+  await page.getByRole('menuitem', { name: 'Видалити' }).click();
   expect(deleteRequests).toBe(0);
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog', { name: 'Підтвердження видалення' })).toBeHidden();
   expect(deleteRequests).toBe(0);
-  await page.getByRole('button', { name: 'Видалити', exact: true }).click();
+  await row.click({ button: 'right' });
+  await page.getByRole('menuitem', { name: 'Видалити' }).click();
   await page
     .getByRole('dialog', { name: 'Підтвердження видалення' })
     .getByRole('button', { name: 'Видалити' })

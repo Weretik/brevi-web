@@ -16,6 +16,19 @@ describe('Brevi theme', () => {
     expect(darkTheme.palette.background.default).toBe('#09090b');
   });
 
+  it('provides Ukrainian labels for Material UI and the data grid in both schemes', () => {
+    for (const theme of [lightTheme, darkTheme]) {
+      const dataGridLocale = theme.components?.MuiDataGrid?.defaultProps?.localeText;
+      const paginationLocale = theme.components?.MuiTablePagination?.defaultProps;
+
+      expect(dataGridLocale?.columnMenuSortAsc).toBe('Сортувати за зростанням');
+      expect(dataGridLocale?.columnMenuFilter).toBe('Фільтр');
+      expect(dataGridLocale?.columnMenuAriaLabel?.('Назва')).toBe('Меню стовпця Назва');
+      expect(dataGridLocale?.footerTotalVisibleRows?.(2, 5)).toBe('2 з 5');
+      expect(paginationLocale?.labelRowsPerPage).toBe('Рядків на сторінці:');
+    }
+  });
+
   it('reads the existing Angular preference and falls back to system', () => {
     window.localStorage.setItem('theme', 'dark');
     expect(readColorMode()).toBe('dark');

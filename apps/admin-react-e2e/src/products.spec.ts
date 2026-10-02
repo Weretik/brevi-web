@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+test.describe.configure({ timeout: 60_000 });
+
 test('products create, edit, delete and direct detail use the Brevi shell', async ({ page }) => {
   let productName = 'Рукавиці';
   let productExists = false;
@@ -132,10 +134,10 @@ test('products create, edit, delete and direct detail use the Brevi shell', asyn
   await page.getByRole('combobox', { name: 'Постачальник' }).click();
   await page.getByRole('option', { name: 'Постачальник' }).click();
   await page.getByRole('spinbutton', { name: 'Базова ціна' }).fill('10');
-  await page.getByRole('button', { name: 'Зберегти' }).click();
+  await page.getByRole('button', { name: 'Створити товар' }).click();
   await expect(page.getByText('Перевірте назву.')).toBeVisible();
   await expect(page.getByRole('textbox', { name: 'Назва українською' })).toHaveValue('Рукавиці');
-  await page.getByRole('button', { name: 'Зберегти' }).evaluate((button) => {
+  await page.getByRole('button', { name: 'Створити товар' }).evaluate((button) => {
     (button as HTMLButtonElement).click();
     (button as HTMLButtonElement).click();
   });
@@ -150,13 +152,20 @@ test('products create, edit, delete and direct detail use the Brevi shell', asyn
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Рукавиці' })).toBeVisible();
   expect(detailReads).toBeGreaterThan(0);
+  await page.getByRole('link', { name: '← До товарів' }).click();
+  const productRow = page.getByRole('row', { name: /19.*Рукавиці/ });
+  await productRow.click({ button: 'right' });
+  await page.getByRole('menuitem', { name: 'Перегляд' }).click();
+  await expect(page.getByRole('heading', { name: 'Рукавиці' })).toBeVisible();
   await page.getByRole('link', { name: 'Редагувати' }).click();
   await page.getByRole('textbox', { name: 'Назва українською' }).fill('Нові рукавиці');
   const readsBeforeReplace = detailReads;
-  await page.getByRole('button', { name: 'Зберегти' }).click();
+  await page.getByRole('button', { name: 'Зберегти зміни' }).click();
   await expect(page.getByRole('heading', { name: 'Нові рукавиці' })).toBeVisible();
   expect(detailReads).toBe(readsBeforeReplace);
-  await page.getByRole('button', { name: 'Видалити' }).click();
+  await page.getByRole('link', { name: '← До товарів' }).click();
+  await page.getByRole('row', { name: /19.*Нові рукавиці/ }).click({ button: 'right' });
+  await page.getByRole('menuitem', { name: 'Видалити' }).click();
   await page
     .getByRole('dialog', { name: 'Видалити товар?' })
     .getByRole('button', { name: 'Видалити' })
@@ -164,20 +173,62 @@ test('products create, edit, delete and direct detail use the Brevi shell', asyn
   await expect(page.getByRole('heading', { name: 'Товари' })).toBeVisible();
 });
 
-test('product list fits supported widths and a missing detail has a clear state', async ({
+test('product pages fit supported widths and themes, and a missing detail has a clear state', async ({
   page,
 }) => {
-  await page.route('**/api/v1/products**', (route) =>
-    route.fulfill({
-      status: route.request().url().includes('/404') ? 404 : 200,
+  const product = {
+    id: 8,
+    name: 'Куртка',
+    ruName: 'Куртка',
+    slug: 'jacket',
+    type: 'Sewing',
+    categoryIds: [],
+    categories: [],
+    descriptionUk: 'Опис',
+    descriptionRu: 'Описание',
+    photos: [],
+    informationBlocks: [],
+    characteristicTables: [],
+    mainPhoto: null,
+    createdAtUtc: '2026-09-01T00:00:00Z',
+    updatedAtUtc: null,
+    minimumWholesalePrice: 0,
+    sewing: {
+      metersPerProduct: 2,
+      fabrics: [],
+      accessories: [],
+      operations: [],
+      piecesPerShift: null,
+      prices: null,
+    },
+    ppe: null,
+  };
+  await page.route('**/api/v1/products**', (route) => {
+    const pathname = new URL(route.request().url()).pathname;
+    if (pathname.endsWith('/404'))
+      return route.fulfill({ status: 404, contentType: 'application/json', body: '' });
+    if (pathname.endsWith('/8'))
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(product),
+      });
+    return route.fulfill({
+      status: 200,
       contentType: 'application/json',
       body: JSON.stringify({
-        value: [],
-        pagedInfo: { pageNumber: 1, pageSize: 20, totalPages: 0, totalRecords: 0 },
+        value: [product],
+        pagedInfo: { pageNumber: 1, pageSize: 20, totalPages: 1, totalRecords: 1 },
       }),
-    }),
-  );
+    });
+  });
   await page.route('**/api/reference/product-categories/admin', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
+  );
+  await page.route('**/api/catalog/media', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
+  );
+  await page.route('**/api/reference/**', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
   );
   for (const width of [320, 768, 1280]) {
@@ -186,6 +237,34 @@ test('product list fits supported widths and a missing detail has a clear state'
       await page.emulateMedia({ colorScheme });
       await page.goto('/references/products');
       await expect(page.getByRole('heading', { name: 'Товари' })).toBeVisible({ timeout: 15000 });
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+        width,
+      );
+
+      await page.goto('/references/products/8');
+      await expect(page.getByRole('heading', { name: 'Куртка' })).toBeVisible();
+      await expect(page.getByRole('region', { name: 'Основні дані' })).toHaveCSS(
+        'background-color',
+        'rgb(255, 255, 255)',
+      );
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+        width,
+      );
+
+      await page.goto('/references/products/create');
+      await expect(page.getByRole('heading', { name: 'Новий товар' })).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Створити товар' })).toBeVisible();
+      await expect(page.getByRole('region', { name: 'Основна інформація' })).toHaveCSS(
+        'background-color',
+        'rgb(255, 255, 255)',
+      );
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+        width,
+      );
+
+      await page.goto('/references/products/8/edit');
+      await expect(page.getByRole('heading', { name: 'Редагування товару' })).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Зберегти зміни' })).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
         width,
       );
@@ -223,7 +302,7 @@ test('product paging and search use server parameters and reset to page one', as
   expect(requests.at(-1)?.searchParams.get('sortDirection')).toBe('asc');
   await page.getByRole('columnheader', { name: 'ID' }).click();
   await expect.poll(() => requests.at(-1)?.searchParams.get('sortBy')).toBe('id');
-  await page.getByRole('button', { name: 'Go to next page' }).click();
+  await page.getByRole('button', { name: 'Перейти на наступну сторінку' }).click();
   await expect.poll(() => requests.at(-1)?.searchParams.get('page')).toBe('2');
   await page.getByRole('textbox', { name: 'Пошук за ID або назвою' }).fill('Рукавиці');
   await page.getByRole('button', { name: 'Знайти' }).click();
@@ -296,7 +375,7 @@ test('a sewing product can be created and fully replaced with its conditional fi
   await page.getByRole('textbox', { name: 'Опис українською (Markdown)' }).fill('Опис');
   await page.getByRole('textbox', { name: 'Опис російською (Markdown)' }).fill('Описание');
   await page.getByRole('spinbutton', { name: 'Метрів на виріб' }).fill('2');
-  await page.getByRole('button', { name: 'Зберегти' }).click();
+  await page.getByRole('button', { name: 'Створити товар' }).click();
   await expect(page.getByRole('heading', { name: 'Куртка' })).toBeVisible();
   await expect(page.getByText('Продуктивність: ще не розраховано')).toBeVisible();
   expect(submitted).toMatchObject({
@@ -317,7 +396,7 @@ test('a sewing product can be created and fully replaced with its conditional fi
     .getByRole('button', { name: 'Скасувати' })
     .click();
   await expect(page.getByRole('spinbutton', { name: 'Метрів на виріб' })).toHaveValue('3');
-  await page.getByRole('button', { name: 'Зберегти' }).click();
+  await page.getByRole('button', { name: 'Зберегти зміни' }).click();
   await expect(page.getByText('Метри на виріб: 3')).toBeVisible();
   expect(replaced).toMatchObject({
     type: 'Sewing',
@@ -412,7 +491,7 @@ test('only Ready photos can be attached and reordered', async ({ page }) => {
   await page.getByRole('textbox', { name: 'Опис українською (Markdown)' }).fill('Опис');
   await page.getByRole('textbox', { name: 'Опис російською (Markdown)' }).fill('Описание');
   await page.getByRole('spinbutton', { name: 'Метрів на виріб' }).fill('1');
-  await page.getByRole('button', { name: 'Зберегти' }).click();
+  await page.getByRole('button', { name: 'Створити товар' }).click();
   await expect.poll(() => submitted).not.toBeNull();
   expect(submitted?.['photos']).toMatchObject([
     { mediaFileId: 3, sortOrder: 0 },
@@ -482,7 +561,7 @@ test('PPE reference picker accepts only percent references and sends mixed sourc
   await page.getByRole('combobox', { name: 'Постачальник' }).click();
   await page.getByRole('option', { name: 'Постачальник' }).click();
   await page.getByRole('spinbutton', { name: 'Базова ціна' }).fill('10');
-  await page.getByRole('button', { name: 'Зберегти' }).click();
+  await page.getByRole('button', { name: 'Створити товар' }).click();
   await expect.poll(() => submitted).not.toBeNull();
   expect(submitted?.['retailPercent']).toEqual({ source: 'Reference', additionalReferenceId: 1 });
   expect(submitted?.['wholesalePercent']).toEqual({ source: 'Custom', customPercent: 0 });

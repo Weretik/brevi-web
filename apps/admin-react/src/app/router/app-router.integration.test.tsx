@@ -1,3 +1,4 @@
+import { resetAdminApiState } from '@admin/shared/api-client';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -5,6 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { App } from '../app';
 
 afterEach(() => {
+  resetAdminApiState();
   window.history.replaceState({}, '', '/');
   window.localStorage.clear();
   vi.unstubAllGlobals();
@@ -99,7 +101,8 @@ describe('React Admin routing', () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => [] }));
     window.history.replaceState({}, '', '/references/supplier');
     render(<App />);
-    expect(screen.getByRole('main')).toHaveTextContent('Постачальники');
+    await vi.dynamicImportSettled();
+    expect(await screen.findByRole('heading', { name: 'Постачальники' })).toBeVisible();
     expect(
       within(screen.getByRole('navigation', { name: 'Основна навігація' })).getByRole('link', {
         name: 'Постачальники',
@@ -112,7 +115,8 @@ describe('React Admin routing', () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => [] }));
     window.history.replaceState({}, '', '/references/additional-reference');
     render(<App />);
-    expect(screen.getByRole('main')).toHaveTextContent('Додаткові довідники');
+    await vi.dynamicImportSettled();
+    expect(await screen.findByRole('heading', { name: 'Додаткові довідники' })).toBeVisible();
     expect(
       within(screen.getByRole('navigation', { name: 'Основна навігація' })).getByRole('link', {
         name: 'Додаткові довідники',
@@ -123,24 +127,37 @@ describe('React Admin routing', () => {
 
   it('opens garment accessories directly inside the Brevi shell', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => [] }));
-    window.history.replaceState({}, '', '/references/garment-accessory');
+    window.history.replaceState({}, '', '/references/garment-accessory?tab=fabrics');
     render(<App />);
-    expect(screen.getByRole('main')).toHaveTextContent('Фурнітура виробу');
+    await vi.dynamicImportSettled();
+    expect(await screen.findByRole('heading', { name: 'Фурнітура' })).toBeVisible();
+    expect(screen.getByRole('main')).toHaveTextContent('Тканини');
     expect(
       within(screen.getByRole('navigation', { name: 'Основна навігація' })).getByRole('link', {
         name: 'Тканина та фурнітура',
       }),
     ).toHaveAttribute('href', '/references/garment-accessory');
-    expect(await screen.findByText('Фурнітури поки немає')).toBeVisible();
-    await userEvent.setup().click(screen.getByRole('tab', { name: 'Тканини' }));
+    expect(screen.getByRole('tab', { name: 'Тканини' })).toHaveAttribute('aria-selected', 'true');
     expect(await screen.findByText('Тканин поки немає')).toBeVisible();
+    expect(screen.getByRole('combobox', { name: 'Рядків на сторінці:' })).toBeVisible();
+    expect(screen.queryByRole('columnheader', { name: 'Дії' })).not.toBeInTheDocument();
+
+    await userEvent.setup().click(screen.getByRole('tab', { name: 'Фурнітура виробу' }));
+
+    expect(window.location.search).toBe('?tab=accessories');
+    expect(await screen.findByText('Фурнітури поки немає')).toBeVisible();
+    expect(screen.getByRole('combobox', { name: 'Рядків на сторінці:' })).toBeVisible();
+    expect(screen.queryByRole('columnheader', { name: 'Дії' })).not.toBeInTheDocument();
   });
 
   it('opens operations directly and activates the shared legacy menu entry', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => [] }));
     window.history.replaceState({}, '', '/references/garment-part-operation');
     render(<App />);
-    expect(screen.getByRole('main')).toHaveTextContent('Елементи виробу');
+    await vi.dynamicImportSettled();
+    expect(
+      await screen.findByRole('heading', { name: 'Елементи виробу та роботи' }),
+    ).toBeVisible();
     expect(
       within(screen.getByRole('navigation', { name: 'Основна навігація' })).getByRole('link', {
         name: 'Операції',
@@ -148,15 +165,20 @@ describe('React Admin routing', () => {
     ).toHaveAttribute('href', '/references/garment-part-operation');
     expect(screen.getByRole('tab', { name: 'Роботи' })).toHaveAttribute('aria-selected', 'true');
     expect(await screen.findByText('Робіт поки немає')).toBeVisible();
+    expect(screen.getByRole('combobox', { name: 'Рядків на сторінці:' })).toBeVisible();
+    expect(screen.queryByRole('columnheader', { name: 'Дії' })).not.toBeInTheDocument();
     await userEvent.setup().click(screen.getByRole('tab', { name: 'Елементи' }));
     expect(await screen.findByText('Елементів виробу поки немає')).toBeVisible();
+    expect(window.location.search).toBe('?tab=parts');
   });
 
   it('opens the product list directly with server total and an active menu link', async () => {
+    const user = userEvent.setup();
     vi.stubGlobal(
       'fetch',
-      vi.fn((url: string) =>
-        Promise.resolve(
+      vi.fn((input: RequestInfo | URL) => {
+        const url = input instanceof Request ? input.url : String(input);
+        return Promise.resolve(
           new Response(
             JSON.stringify(
               url.includes('/api/v1/products')
@@ -168,11 +190,12 @@ describe('React Admin routing', () => {
             ),
             { status: 200 },
           ),
-        ),
-      ),
+        );
+      }),
     );
     window.history.replaceState({}, '', '/references/products');
     render(<App />);
+    await vi.dynamicImportSettled();
     expect(await screen.findByRole('heading', { name: 'Товари' })).toBeVisible();
     expect(
       within(screen.getByRole('navigation', { name: 'Основна навігація' })).getByRole('link', {
@@ -180,7 +203,16 @@ describe('React Admin routing', () => {
       }),
     ).toHaveAttribute('href', '/references/products');
     expect(await screen.findByText('Товарів не знайдено')).toBeVisible();
-  });
+    expect(screen.getByRole('combobox', { name: 'Рядків на сторінці:' })).toBeVisible();
+    const idHeader = screen.getByRole('columnheader', { name: 'ID' });
+    await user.hover(idHeader);
+    const columnMenuButton = idHeader.querySelector<HTMLButtonElement>(
+      'button[aria-haspopup="menu"]',
+    );
+    expect(columnMenuButton).toHaveAttribute('aria-label', 'Меню стовпця ID');
+    await user.click(columnMenuButton!);
+    expect(screen.getByRole('menuitem', { name: 'Сортувати за зростанням' })).toBeVisible();
+  }, 15_000);
 
   it('opens media directly inside the Brevi shell', async () => {
     vi.stubGlobal(

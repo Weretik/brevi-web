@@ -32,7 +32,6 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         './environments/environment': environmentModule,
-        '@admin/util/api-url': join(import.meta.dirname, '../../libs/admin/util/src/api-url.ts'),
       },
       tsconfigPaths: true,
     },

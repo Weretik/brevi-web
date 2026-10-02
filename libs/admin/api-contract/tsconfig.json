@@ -1,5 +1,0 @@
-{
-  "extends": "../../../tsconfig.base.json",
-  "compilerOptions": { "moduleResolution": "bundler", "strict": true },
-  "references": [{ "path": "./tsconfig.lib.json" }]
-}

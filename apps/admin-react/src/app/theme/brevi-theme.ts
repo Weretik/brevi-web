@@ -1,4 +1,7 @@
+import { ukUA as materialUkUA } from '@mui/material/locale';
 import { createTheme } from '@mui/material/styles';
+import { ukUA as dataGridUkUA } from '@mui/x-data-grid/locales';
+import type {} from '@mui/x-data-grid/themeAugmentation';
 
 import { breviBrand, darkPalette, lightPalette } from './brevi-palette';
 
@@ -20,5 +23,26 @@ const sharedThemeOptions: ThemeOptions = {
   },
 };
 
-export const lightTheme = createTheme({ ...sharedThemeOptions, palette: lightPalette });
-export const darkTheme = createTheme({ ...sharedThemeOptions, palette: darkPalette });
+const missingDataGridUkUA: ThemeOptions = {
+  components: {
+    MuiDataGrid: {
+      defaultProps: {
+        localeText: {
+          columnMenuAriaLabel: (columnName: string) => `Меню стовпця ${columnName}`,
+        },
+      },
+    },
+  },
+};
+
+function createBreviTheme(palette: ThemeOptions['palette']) {
+  return createTheme(
+    { ...sharedThemeOptions, palette },
+    materialUkUA,
+    dataGridUkUA,
+    missingDataGridUkUA,
+  );
+}
+
+export const lightTheme = createBreviTheme(lightPalette);
+export const darkTheme = createBreviTheme(darkPalette);

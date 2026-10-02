@@ -88,7 +88,8 @@ test('supplier actions keep form errors and require delete confirmation', async 
   await expect(dialog.getByText('Назва вже існує.')).toBeVisible();
   await expect(dialog.getByRole('textbox', { name: 'Назва' })).toHaveValue('Атлас');
   await dialog.getByRole('button', { name: 'Закрити' }).click();
-  await page.getByRole('button', { name: 'Видалити', exact: true }).click();
+  await page.getByRole('row', { name: /1.*Атлас/ }).click({ button: 'right' });
+  await page.getByRole('menuitem', { name: 'Видалити' }).click();
   expect(deletes).toBe(0);
   await page
     .getByRole('dialog', { name: 'Підтвердження видалення' })
@@ -133,7 +134,7 @@ test('fabrics tab keeps the shared URL and Brevi shell at three widths in both t
     await page.goto('/references/garment-accessory');
     await page.getByRole('tab', { name: 'Тканини' }).click();
     await expect(page.getByRole('grid', { name: 'Тканини' }).getByText('Льон')).toBeVisible();
-    await expect(page).toHaveURL(/\/references\/garment-accessory$/);
+    await expect(page).toHaveURL(/\/references\/garment-accessory\?tab=fabrics$/);
     for (const colorScheme of ['light', 'dark'] as const) {
       await page.emulateMedia({ colorScheme });
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
