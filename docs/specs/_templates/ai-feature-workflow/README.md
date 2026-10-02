@@ -6,7 +6,9 @@
    design/contracts, tasks і traceability.
 2. Визнач дозволений scope: feature, phase, `SC-*` або `TS-*`/`EN-*`.
 3. Перевір ready tasks і фактичний test tooling.
-4. Виконай [context and scope](01-context-and-scope.md),
+4. Виконай architecture baseline і code audit; для наявних системних порушень
+   підключи [remediation SDD](../remediation/README.md).
+5. Виконай [context and scope](01-context-and-scope.md),
    [tasks and evidence](02-execution-and-evidence.md), потім
    [verification and handoff](03-verification-and-handoff.md).
 

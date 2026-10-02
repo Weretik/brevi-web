@@ -26,6 +26,10 @@ Feature готова до реалізації, коли:
   feature та перелік потрібних files.
 - `ai-feature-workflow/README.md` є точкою входу для виконання AI.
 - `ai-feature-workflow/USAGE.md` містить готові українські prompts.
+- `remediation/README.md` визначає SDD для вже наявних системних architecture
+  violations із `AF-*`, `AR-*`, `RM-*` та `EN-*`.
+- `code-audit/README.md` є обов'язковим architecture quality gate, а не лише
+  рекомендацією щодо component split.
 - `testing-rules.md` зберігає стабільні правила тестів і TDD.
 - `delivery-rules.md` зберігає readiness, traceability policy і definition of done.
 - `traceability.md` містить тільки зв'язки між scenario, task, test та evidence.
@@ -43,6 +47,9 @@ checklist.
   задачі.
 - `TS-*` містить `Covers`; `EN-*` містить `Enables`. Обидва містять `Depends
 on`, exact paths, test level, Work, Evidence і Checkpoint.
+- Remediation SDD використовує `AF-*` findings, `AR-*` requirements і `RM-*`
+  executable tasks. Кожен `AF-*` трасується до `RM-*`/`EN-*` і verification;
+  delivery потребує статусу `verified` для всіх in-scope findings.
 - Scenario стає `verified`, лише коли всі потрібні tasks завершені й acceptance
   evidence пройшло.
 - Під час зміни меж оновіть вимоги, граф задач і трасування в одній зміні
@@ -63,4 +70,7 @@ scope або через конкретний blocker, що потребує рі
 завершені; contracts, docs і implementation узгоджені; focused і regression
 evidence записане; релевантні lint/typecheck/test/build пройшли або причина
 задокументована. Delivery report перелічує scope, changed files, evidence,
-невиконані перевірки та реальні залишкові ризики.
+невиконані перевірки та реальні залишкові ризики. Architecture findings у
+поточному scope мають бути `verified`; `open`, `blocked` або `planned` finding
+блокує delivery, а `deferred-approved` потребує окремої SDD/task, owner і явного
+погодження, що finding не є prerequisite поточного результату.

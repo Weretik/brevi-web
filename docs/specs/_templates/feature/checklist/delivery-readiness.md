@@ -6,6 +6,8 @@
 - [ ] Контракти, реалізація та документація узгоджені.
 - [ ] Для API feature: snapshot і generated types відтворюються з записаної backend-версії; `contracts:check`, relevant typecheck і focused mapping/error tests пройшли або блокер та `EN-*` зафіксовані.
 - [ ] `code-audit/audit.md` цієї feature заповнено за окремим модулем `docs/specs/_templates/code-audit/`: наявний і новий код переглянуто, незалежні ролі розділено на файли/компоненти/каталоги/модулі за наявними межами, рішення залишити цілісний код разом обґрунтовано, тести після розділення повторено.
+- [ ] Усі architecture findings у scope мають статус `fixed` і evidence; `planned` або неузгоджене `deferred` не проходить delivery checkpoint.
+- [ ] Module graph, aliases/public barrels, approved state/data stack, generated DTO boundary, test typecheck і відсутність порожніх/мертвих модулів перевірені після змін.
 - [ ] Релевантні цілі lint, typecheck, test і build пройшли або помилки зафіксовані.
 - [ ] Ручні свідчення обмежені задокументованими прогалинами автоматизації.
 - [ ] Змінені файли, неперевірені елементи та залишкові ризики наведені у звіті.

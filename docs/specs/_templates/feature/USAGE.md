@@ -15,9 +15,12 @@ Scope: <включена поведінка>.
 API: <немає | backend repository, OpenAPI path, commit/tag, operationId для кожної операції>.
 
 Сформулюй R-* і Given/When/Then SC-*, визнач test levels з фактичного tooling,
-проведи початковий аудит відповідальностей наявного коду feature в
-`design/frontend.md`, підключи окремий модуль `docs/specs/_templates/code-audit/`,
-підготуй малі TS-*/EN-* та traceability. Код не реалізовуй.
+проведи architecture baseline і початковий аудит наявного коду feature в
+`design/frontend.md`, підключи `docs/specs/_templates/code-audit/`. Перевір Nx
+tags/constraints, layers/nesting, public entry points, approved state/API stack,
+DTO boundary і source/test targets. Для системних розбіжностей створи dependency
+на SDD за `docs/specs/_templates/remediation/`. Підготуй малі TS-*/EN-* та
+traceability. Код не реалізовуй.
 ```
 
 Обов'язково вкажіть `docs/specs/_templates/feature/` і destination path. За

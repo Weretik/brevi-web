@@ -19,3 +19,10 @@
 Не створюйте новий шар лише через розмір файла й не рефакторте сторонній код.
 Після досягнення контрольної точки оновіть трасування й перейдіть до наступної
 готової задачі в дозволених межах.
+
+Для кожної задачі повторно перевірте, що вона використовує approved stack, а
+не просто копіює сусідній implementation. Direct `fetch`, ручне server
+loading/error/cache state, deep imports, generated DTO у feature/UI, API calls
+із presentation component або обхід public `src/index.ts` вважаються findings,
+якщо застосовні standards прямо не дозволяють їх. Finding у scope виправляється
+цією задачею або її prerequisite; записати його лише як ризик недостатньо.

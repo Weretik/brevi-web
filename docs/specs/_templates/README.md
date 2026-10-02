@@ -1,7 +1,8 @@
 # Шаблони SDD
 
 Цей каталог містить окремі модулі: структуру нової feature,
-[аудит відповідальностей коду](code-audit/README.md) та AI workflow. Сталі
+[SDD для виправлення наявної архітектури](remediation/README.md),
+[повний аудит архітектури коду](code-audit/README.md) та AI workflow. Сталі
 правила залишаються в [`docs/standards`](../../standards/README.md).
 
 ## Створення специфікації
@@ -39,6 +40,11 @@ traceability. Скористайтеся [feature/USAGE.md](feature/USAGE.md) д
 в [API contract template](feature/contracts/api-contract.md). Відсутню
 синхронізацію/генерацію плануйте як `EN-*` за
 [contract workflow](../../architecture/api/contract-workflow.md).
+
+Якщо audit знаходить системні порушення в кількох libraries/features, не
+маскуйте їх локальним refactor або списком ризиків. Створіть SDD за
+`remediation/`, зв'яжіть її `RM-*` checkpoints із feature dependencies і лише
+після цього продовжуйте залежну реалізацію.
 
 Існуючі специфікації мігруйте за [MIGRATION.md](MIGRATION.md), не змінюючи
 історичні ID та evidence без потреби.

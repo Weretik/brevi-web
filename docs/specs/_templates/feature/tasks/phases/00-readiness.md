@@ -3,6 +3,12 @@
 - Підтвердити мету, актора, межі та виключення.
 - Призначити стабільні `R-*` і спостережувані `SC-*` у форматі «За умови / Коли / Тоді».
 - Перевірити фактичні застосунки, шляхи, цілі, конфігурації та тести.
+- Порівняти фактичні Nx projects/tags, dependency constraints, domain layers,
+  public entry points, approved state/data stack і test targets з architecture
+  та standards documents.
+- Кожну розбіжність у dependency chain оформити prerequisite `EN-*` або
+  посиланням на погоджену remediation SDD; не оголошувати feature ready поверх
+  відомого порушення.
 - Вибрати рівні тестування за ризиком та ініціалізувати трасування.
 - Створити лише потрібні файли `EN-*` для готовності.
 

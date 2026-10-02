@@ -9,6 +9,8 @@ Scope: уся погоджена feature.
 Виконуй усі ready TS-*/EN-* за Depends on до delivery checkpoint.
 Підключи окремий модуль `docs/specs/_templates/code-audit/` і заповни
 `<feature>/code-audit/audit.md` перед реалізацією та delivery checkpoint.
+Якщо audit знаходить системні порушення в dependency chain, підключи погоджену
+SDD за `docs/specs/_templates/remediation/` і виконай її prerequisite checkpoints.
 ```
 
 ## Продовження

@@ -17,6 +17,13 @@ feature змінює або повторно використовує. Зіст�
 [окремого модуля аудиту коду](../code-audit/README.md); заповнюйте
 `<feature>/code-audit/audit.md`.
 
+Окремо звірте фактичні Nx projects/tags і `depConstraints`, public aliases та
+barrels, domain layers і вкладеність, approved libraries для state/data/API,
+generated DTO boundary, test configs/targets і executable tests. Поточний код
+не є доказом дозволеного pattern. Якщо залежність поточної задачі порушує
+architecture/standards, додайте ready prerequisite task або dependency на
+[remediation SDD](../remediation/README.md); до її checkpoint задача blocked.
+
 Зупиняйтеся лише після завершення визначених меж або через конкретне невирішене
 продуктове рішення, залежність, потребу в доступі чи руйнівну дію поза межами
 дозволу.

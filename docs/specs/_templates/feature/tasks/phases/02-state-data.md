@@ -5,5 +5,12 @@
 тести з наявними в репозиторії межами стану й транспорту. Створюйте `EN-*` для
 відсутнього тестового налаштування.
 
+До задач зафіксуйте approved repository stack. Для Admin server state це
+чинний RTK Query `baseApi` та injected endpoints. Наявний direct `fetch`,
+`useEffect + useState` для server loading/error/cache або власний transport не
+стає дозволеним pattern лише тому, що він уже є: створіть prerequisite
+remediation/enabler task або позначте scope blocked. Component і page не
+викликають endpoint functions безпосередньо.
+
 **Контрольна точка:** власника стану та поведінку завантаження, успіху,
 порожнього стану, помилки й повтору визначено без дублювання серверного стану.

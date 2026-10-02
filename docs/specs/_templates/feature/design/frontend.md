@@ -6,6 +6,23 @@
 - Наявний шлях стану або даних: <шлях або немає>
 - Наявні тести та інструменти: <цілі, конфігурації та файли>
 
+## Архітектурний baseline
+
+До планування реалізації порівняйте фактичний код із застосовними architecture
+та standards documents. Не вважайте поточне розміщення автоматично правильним.
+
+| Перевірка                                | Фактичний стан            | Вимога й джерело     | Розбіжність | Задача             |
+| ---------------------------------------- | ------------------------- | -------------------- | ----------- | ------------------ |
+| Nx projects, tags і dependency direction | `<projects/tags>`         | `<doc path#section>` | `<так/ні>`  | `<EN/TS/RM або —>` |
+| Domain layers і вкладеність              | `<точні paths>`           | `<doc path#section>` | `<так/ні>`  | `<task або —>`     |
+| Public entry points та imports           | `<aliases/barrels>`       | `<doc path#section>` | `<так/ні>`  | `<task або —>`     |
+| State/data stack                         | `<RTK Query/fetch/hooks>` | `<doc path#section>` | `<так/ні>`  | `<task або —>`     |
+| Test tooling і targets                   | `<config/targets/files>`  | `<doc path#section>` | `<так/ні>`  | `<task або —>`     |
+
+Якщо feature залежить від порушеної межі, додайте prerequisite `EN-*` або
+посилання на погоджену remediation SDD. Не плануйте новий код поверх відомого
+порушення без явного dependency та checkpoint.
+
 ## Відповідальності в межах роботи
 
 Використовуйте лише області, потрібні для сценаріїв:
@@ -19,6 +36,14 @@
 | Браузерні адаптери та дозволи  | <сховище, файли, буфер обміну, дозволи або —>          |
 | Інтеграція з API               | <контракт, DTO, мапінг, скасування або —>              |
 | Перевірка                      | <межі компонентних, інтеграційних та E2E-перевірок>    |
+
+## Дозволені інструменти та заборонені обходи
+
+- Server state/data access: `<точний approved stack і owner>`
+- Transport boundary: `<base API/client, cancellation, error normalization>`
+- Заборонені в цій feature обходи: `<direct fetch у component, ручний cache,
+deep import, generated DTO в UI тощо>`
+- Evidence пошуку повторного використання: `<команди та перевірені paths>`
 
 ## Початковий аудит відповідальностей
 
