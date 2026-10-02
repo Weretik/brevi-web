@@ -100,6 +100,16 @@ if (command === 'sync') {
 } else if (command === 'check') {
   const provenance = JSON.parse(readFileSync(provenancePath, 'utf8'));
   if (digest(snapshot) !== provenance.sha256) throw Error('Snapshot differs from provenance.');
+  const sessionContract = readFileSync(join(snapshot, 'identity/session.openapi.yaml'), 'utf8');
+  for (const operationId of [
+    'loginSession',
+    'refreshSession',
+    'logoutSession',
+    'getCurrentSession',
+  ]) {
+    if (!sessionContract.includes('operationId: ' + operationId))
+      throw Error('Missing operationId: ' + operationId);
+  }
   const supplierContract = readFileSync(join(snapshot, 'reference/suppliers.openapi.yaml'), 'utf8');
   for (const operationId of [
     'getSuppliers',

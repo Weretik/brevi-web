@@ -46,11 +46,7 @@ paths:
               type: object
               required: [file]
               properties:
-                file:
-                  type: string
-                  format: binary
-                  maxLength: 52428800
-                  description: JPEG, PNG or WebP image up to 50 MiB.
+                file: { type: string, format: binary }
       responses:
         '200':
           description: Uploaded media file.
@@ -98,9 +94,7 @@ components:
         publicUrl: { type: string }
         contentType: { type: string }
         storageKey: { type: string }
-        status:
-          type: string
-          enum: [PendingUpload, Ready]
+        status: { type: string }
     UploadMediaResponse:
       type: object
       required: [mediaFileId, storageKey, publicUrl, contentType, originalFileName]

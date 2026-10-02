@@ -4,6 +4,86 @@
  */
 
 export interface paths {
+  '/api/auth/session/login': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Create an authenticated session
+     * @description Authenticates with email and password. The AuthLogin policy permits 10 requests per minute per client IP and rejects excess requests with 429. On success, the response sets the HTTP-only `kedr.rt` refresh cookie and the script-readable `kedr.csrf` cookie. Cross-origin browser clients must use credentials mode `include` so the browser stores both cookies.
+     */
+    post: operations['loginSession'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/auth/session/refresh': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Rotate and refresh an authenticated session
+     * @description Requires the HTTP-only `kedr.rt` cookie and a double-submit CSRF value: header `X-CSRF-Token` must exactly equal cookie `kedr.csrf`. Browser clients must use credentials mode `include`. The AuthRefresh policy permits 30 requests per minute per client IP. A successful refresh revokes the old refresh session, creates a replacement, and rotates both cookies.
+     */
+    post: operations['refreshSession'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/auth/session/logout': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * End the current session
+     * @description Requires an access token. Revokes every active refresh session for the authenticated user, updates the user's security stamp, and expires both `kedr.rt` and `kedr.csrf`. Cross-origin browser clients must use credentials mode `include` so the browser applies the Set-Cookie deletion headers.
+     */
+    post: operations['logoutSession'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/auth/session/me': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get the current authenticated user
+     * @description Returns the authenticated user's identifier, email, and roles. Permissions are not included in this response.
+     */
+    get: operations['getCurrentSession'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/reference/product-categories/admin': {
     parameters: {
       query?: never;
@@ -325,6 +405,54 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    SessionLoginRequest: {
+      /** @example user@example.com */
+      email: string;
+      /** Format: password */
+      password: string;
+    };
+    SessionTokenResponse: {
+      /** @example Bearer */
+      tokenType: string;
+      /**
+       * @description Opaque Bearer access token. This is not the refresh token.
+       * @example opaque-access-token
+       */
+      accessToken: string;
+      /**
+       * Format: int32
+       * @description Access-token lifetime in seconds.
+       * @example 900
+       */
+      expiresIn: number;
+    };
+    /** @description ASP.NET Core automatic model-validation response. */
+    ValidationProblemDetails: {
+      type?: string | null;
+      title?: string | null;
+      /** Format: int32 */
+      status?: number | null;
+      traceId?: string | null;
+      errors: {
+        [key: string]: string[];
+      };
+    };
+    SessionMeResponse: {
+      /**
+       * @description String representation of the backend user identifier.
+       * @example 42
+       */
+      userId: string;
+      /** @example user@example.com */
+      email: string;
+      /**
+       * @description Current ASP.NET Core Identity role names; permissions are not returned.
+       * @example [
+       *       "User"
+       *     ]
+       */
+      roles: string[];
+    };
     AdminProductCategoryRow: {
       id: number;
       name: string;
@@ -343,8 +471,7 @@ export interface components {
       publicUrl: string;
       contentType: string;
       storageKey: string;
-      /** @enum {string} */
-      status: 'PendingUpload' | 'Ready';
+      status: string;
     };
     UploadMediaResponse: {
       mediaFileId: number;
@@ -731,6 +858,12 @@ export interface components {
     };
   };
   parameters: {
+    /** @description Must exactly match the `kedr.csrf` cookie value. */
+    CsrfHeader: string;
+    /** @description HTTP-only refresh token cookie. Browser requests must include credentials; frontend code cannot read this value. */
+    RefreshCookie: string;
+    /** @description Script-readable double-submit CSRF cookie. */
+    CsrfCookie: string;
     Page: number;
     PageSize: 10 | 20 | 50;
     /** @description One numeric token searches Product ID exactly. Otherwise, space-separated tokens perform case-insensitive partial search in Ukrainian and Russian names; every token must match at least one localized name. Slug is not searched. */
@@ -748,6 +881,170 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+  loginSession: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SessionLoginRequest'];
+      };
+    };
+    responses: {
+      /** @description Authenticated session created and refresh/CSRF cookies issued. */
+      200: {
+        headers: {
+          /** @description Sets `kedr.rt` with HttpOnly, Secure, SameSite=None, Path=/api/auth/session/refresh and `kedr.csrf` with Secure, SameSite=None, Path=/. Both cookies have a default Max-Age of 14 days. */
+          'Set-Cookie'?: string;
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SessionTokenResponse'];
+        };
+      };
+      /** @description Request JSON is malformed or required request fields are null or missing. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ValidationProblemDetails'];
+        };
+      };
+      /** @description Email or password is empty, invalid, or cannot be used to sign in. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Request content type is not supported; send JSON. */
+      415: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description AuthLogin rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  refreshSession: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Must exactly match the `kedr.csrf` cookie value. */
+        'X-CSRF-Token': components['parameters']['CsrfHeader'];
+      };
+      path?: never;
+      cookie: {
+        /** @description HTTP-only refresh token cookie. Browser requests must include credentials; frontend code cannot read this value. */
+        'kedr.rt': components['parameters']['RefreshCookie'];
+        /** @description Script-readable double-submit CSRF cookie. */
+        'kedr.csrf': components['parameters']['CsrfCookie'];
+      };
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Session refreshed and replacement refresh/CSRF cookies issued. */
+      200: {
+        headers: {
+          /** @description Rotates `kedr.rt` and `kedr.csrf` with the attributes documented by the login response. */
+          'Set-Cookie'?: string;
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SessionTokenResponse'];
+        };
+      };
+      /** @description CSRF cookie/header is missing, blank, or does not match. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          /** @example Invalid CSRF token. */
+          'text/plain': string;
+        };
+      };
+      /** @description Refresh cookie is missing, expired, revoked, reused, or otherwise invalid. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description AuthRefresh rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  logoutSession: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Session ended and refresh/CSRF cookies cleared. */
+      204: {
+        headers: {
+          /** @description Expires `kedr.rt` at its refresh path and `kedr.csrf` at `/`. */
+          'Set-Cookie'?: string;
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Access token is missing or invalid, or its user can no longer sign in. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCurrentSession: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Current authenticated user. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SessionMeResponse'];
+        };
+      };
+      /** @description Access token is missing or invalid, or its user can no longer sign in. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   getAdminProductCategories: {
     parameters: {
       query?: never;
@@ -812,10 +1109,7 @@ export interface operations {
     requestBody: {
       content: {
         'multipart/form-data': {
-          /**
-           * Format: binary
-           * @description JPEG, PNG or WebP image up to 50 MiB.
-           */
+          /** Format: binary */
           file: string;
         };
       };
