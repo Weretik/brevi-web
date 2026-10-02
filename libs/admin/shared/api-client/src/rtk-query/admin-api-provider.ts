@@ -2,7 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { createElement } from 'react';
 import { Provider } from 'react-redux';
 
-import { adminApi } from './admin-api';
+import { adminApi } from './base-api';
 
 import type { PropsWithChildren } from 'react';
 

@@ -1,5 +1,5 @@
 import { adminApi, createAdminApiStore } from '@admin/shared/api-client';
-import { configureApiEnvironment } from '@admin/shared/config';
+import { configureAppConfig } from '@admin/shared/config';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { productMediaApi } from './api/product-media.api';
@@ -14,7 +14,7 @@ afterEach(() => {
 
 describe('productsApi', () => {
   it('serializes filters and maps the list response through the shared base query', async () => {
-    configureApiEnvironment({ production: true, api: { baseUrl: 'http://localhost' } });
+    configureAppConfig({ production: true, api: { baseUrl: 'http://localhost' } });
     const fetcher = vi.fn().mockResolvedValue(
       new Response(
         JSON.stringify({
@@ -57,7 +57,7 @@ describe('productsApi', () => {
   });
 
   it('uses FormData for media upload and invalidates the media cache', async () => {
-    configureApiEnvironment({ production: true, api: { baseUrl: 'http://localhost' } });
+    configureAppConfig({ production: true, api: { baseUrl: 'http://localhost' } });
     const fetcher = vi.fn().mockResolvedValue(
       new Response(
         JSON.stringify({

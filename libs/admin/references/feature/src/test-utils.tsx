@@ -1,5 +1,5 @@
 import { AdminApiProvider, resetAdminApiState } from '@admin/shared/api-client';
-import { configureApiEnvironment } from '@admin/shared/config';
+import { configureAppConfig } from '@admin/shared/config';
 import { render as testingLibraryRender } from '@testing-library/react';
 
 import type { RenderOptions } from '@testing-library/react';
@@ -40,7 +40,7 @@ function adaptStubbedFetch(): void {
 }
 
 export function render(ui: ReactNode, options?: Omit<RenderOptions, 'wrapper'>) {
-  configureApiEnvironment({ production: true, api: { baseUrl: 'http://localhost' } });
+  configureAppConfig({ production: true, api: { baseUrl: 'http://localhost' } });
   resetAdminApi();
   adaptStubbedFetch();
   return testingLibraryRender(ui, { wrapper: AdminApiProvider, ...options });

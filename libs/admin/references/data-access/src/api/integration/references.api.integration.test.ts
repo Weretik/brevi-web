@@ -1,5 +1,5 @@
 import { adminApi, createAdminApiStore } from '@admin/shared/api-client';
-import { configureApiEnvironment } from '@admin/shared/config';
+import { configureAppConfig } from '@admin/shared/config';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { fabricsApi } from '../fabrics/fabrics.api';
@@ -14,7 +14,7 @@ afterEach(() => {
 
 describe('referencesApi', () => {
   it('maps supplier DTOs through the canonical base query', async () => {
-    configureApiEnvironment({ production: true, api: { baseUrl: 'http://localhost' } });
+    configureAppConfig({ production: true, api: { baseUrl: 'http://localhost' } });
     const fetcher = vi.fn().mockResolvedValue(
       new Response(
         JSON.stringify([
@@ -50,7 +50,7 @@ describe('referencesApi', () => {
   });
 
   it('normalizes backend validation errors for editor field errors', async () => {
-    configureApiEnvironment({ production: true, api: { baseUrl: 'http://localhost' } });
+    configureAppConfig({ production: true, api: { baseUrl: 'http://localhost' } });
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue(
