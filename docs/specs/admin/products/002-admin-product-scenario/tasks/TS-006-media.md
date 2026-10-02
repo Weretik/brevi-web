@@ -3,7 +3,7 @@
 - **ID задачі:** TS-006
 - **Охоплює:** SC-006
 - **Залежить від:** немає
-- **Точні шляхи:** `libs/admin/products/feature/src/components/product-photo-fields.tsx`, `libs/admin/products/feature/src/components/product-photo-upload.tsx` (цільовий), `libs/admin/products/feature/src/components/product-photo-fields.component.test.tsx` (цільовий), `libs/admin/products/data-access/src/product-lookups.api.ts`, `libs/admin/products/data-access/src/products.api.integration.test.ts`
+- **Точні шляхи:** `libs/admin/products/ui/src/product-editor/media/product-photo-fields.tsx`, `libs/admin/products/feature/src/components/product-editor/product-photo-upload.tsx` (цільовий), `libs/admin/products/feature/src/components/product-editor/product-editor.component.test.tsx` (цільовий), `libs/admin/products/data-access/src/product-lookups.api.ts`, `libs/admin/products/data-access/src/products.api.integration.test.ts`
 - **Рівень тестування:** компонентний + фокусний інтеграційний
 
 ## Робота

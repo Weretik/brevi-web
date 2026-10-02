@@ -3,7 +3,7 @@
 - **ID задачі:** TS-010
 - **Охоплює:** SC-008
 - **Залежить від:** немає
-- **Точні шляхи:** `libs/admin/products/feature/src/components/product-base-fields.tsx`, `libs/admin/products/feature/src/components/product-editor.tsx`, `libs/admin/products/feature/src/components/product-type-change-dialog.tsx` (цільовий), `libs/admin/products/feature/src/model/product-draft.ts`, `libs/admin/products/feature/src/components/product-editor.component.test.tsx` (цільовий)
+- **Точні шляхи:** `libs/admin/products/ui/src/product-editor/core/product-base-fields.tsx`, `libs/admin/products/feature/src/components/product-editor/product-editor.tsx`, `libs/admin/products/ui/src/product-editor/core/product-type-change-dialog.tsx` (цільовий), `libs/admin/products/model/src/product-editor/product-draft.ts`, `libs/admin/products/feature/src/components/product-editor/product-editor.component.test.tsx` (цільовий)
 - **Рівень тестування:** компонентний + модульний
 
 ## Робота

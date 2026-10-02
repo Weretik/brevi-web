@@ -3,7 +3,7 @@
 - **ID задачі:** EN-001
 - **Уможливлює:** SC-003
 - **Залежить від:** немає
-- **Точні шляхи:** `package.json`, `package-lock.json`, `libs/admin/products/feature/src/components/product-description-fields.tsx` (цільовий), `libs/admin/products/feature/src/components/product-detail-content.tsx` (цільовий), `libs/admin/products/feature/src/components/product-detail-content.component.test.tsx` (цільовий)
+- **Точні шляхи:** `package.json`, `package-lock.json`, `libs/admin/products/ui/src/product-editor/content/product-description-fields.tsx` (цільовий), `libs/admin/products/ui/src/product-detail/product-detail-content.tsx` (цільовий), `libs/admin/products/ui/src/product-detail/product-localized-detail.component.test.tsx` (цільовий)
 - **Рівень тестування:** перевірка налаштування
 
 ## Робота

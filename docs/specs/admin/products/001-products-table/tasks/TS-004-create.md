@@ -3,7 +3,7 @@
 - **ID задачі:** TS-004
 - **Охоплює:** SC-003
 - **Залежить від:** TS-003, EN-001
-- **Точні шляхи:** `libs/admin/products/feature/src/pages/`, `libs/admin/products/data-access/src/`
+- **Точні шляхи:** `libs/admin/products/feature/src/pages/product-editor/`, `libs/admin/products/feature/src/components/product-editor/`, `libs/admin/products/feature/src/hooks/product-editor/`, `libs/admin/products/ui/src/product-editor/`, `libs/admin/products/data-access/src/`
 - **Рівень тестування:** модульний + компонентний + інтеграційний (E2E для критичного маршруту)
 
 ## Робота

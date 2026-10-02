@@ -5,7 +5,7 @@
 - Backend repository: `https://github.com/Weretik/BreviERP.git` (локальний checkout `C:/Users/Віталій/RiderProjects/BreviERP`).
 - Канонічний OpenAPI entry point: `docs/sdd/contracts/openapi.yaml`; модулі: `docs/sdd/contracts/catalog/product-catalog.openapi.yaml`, `product-dependencies.openapi.yaml` та відповідні `docs/sdd/contracts/reference/*.openapi.yaml`.
 - Зафіксована версія backend і frontend snapshot: `7178113572c5c0da21ba9f28db5d94f96dc8e1b6`.
-- Snapshot і provenance: `docs/contracts/openapi/backend/openapi.yaml`, `docs/contracts/openapi/SOURCE.json`; generator: `tools/contracts/contracts.mjs` + `openapi-typescript`; generated types: `libs/admin/api-contract/src/generated/openapi.ts`.
+- Snapshot і provenance: `docs/contracts/openapi/backend/openapi.yaml`, `docs/contracts/openapi/SOURCE.json`; generator: `tools/contracts/contracts.mjs` + `openapi-typescript`; generated types: `libs/admin/shared/contracts/src/generated/openapi.ts`.
 - Статус: операції й tooling існують; перед реалізацією повторити `npm run contracts:check`. Нових backend операцій не планується.
 
 | `operationId`               | Метод і шлях                                  | Сценарії                     | Snapshot |

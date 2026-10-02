@@ -3,7 +3,7 @@
 - **ID задачі:** TS-001
 - **Охоплює:** SC-001
 - **Залежить від:** немає
-- **Точні шляхи:** `libs/admin/products/feature/src/pages/products-page.tsx`, `libs/admin/products/feature/src/hooks/use-product-categories.ts`, `libs/admin/products/feature/src/pages/products-page.component.test.tsx` (цільовий), `apps/admin-react-e2e/src/products.spec.ts`
+- **Точні шляхи:** `libs/admin/products/feature/src/pages/product-list/products-page.tsx`, `libs/admin/products/feature/src/hooks/product-list/use-product-categories.ts`, `libs/admin/products/feature/src/pages/product-list/products-page.component.test.tsx` (цільовий), `apps/admin-react-e2e/src/products.spec.ts`
 - **Рівень тестування:** компонентний + фокусний E2E
 
 ## Робота

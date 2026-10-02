@@ -3,7 +3,7 @@
 - **ID задачі:** TS-003
 - **Охоплює:** SC-003
 - **Залежить від:** EN-001, TS-002
-- **Точні шляхи:** `libs/admin/products/feature/src/components/product-detail-content.tsx`, `libs/admin/products/feature/src/components/product-description-fields.tsx` (цільові), `libs/admin/products/feature/src/components/product-base-fields.tsx`, `libs/admin/products/feature/src/components/product-detail-content.component.test.tsx` (цільовий)
+- **Точні шляхи:** `libs/admin/products/ui/src/product-detail/product-detail-content.tsx`, `libs/admin/products/ui/src/product-editor/content/product-description-fields.tsx` (цільові), `libs/admin/products/ui/src/product-editor/core/product-base-fields.tsx`, `libs/admin/products/ui/src/product-detail/product-localized-detail.component.test.tsx` (цільовий)
 - **Рівень тестування:** компонентний
 
 ## Робота

@@ -3,7 +3,7 @@
 - **ID задачі:** TS-009
 - **Охоплює:** SC-005
 - **Залежить від:** немає
-- **Точні шляхи:** `libs/admin/products/feature/src/components/ppe-product-fields.tsx`, `libs/admin/products/feature/src/hooks/use-product-lookups.ts`, `libs/admin/products/feature/src/components/ppe-product-fields.component.test.tsx` (цільовий)
+- **Точні шляхи:** `libs/admin/products/ui/src/product-editor/ppe/ppe-product-fields.tsx`, `libs/admin/products/feature/src/hooks/product-editor/use-product-lookups.ts`, `libs/admin/products/feature/src/components/product-editor/product-editor.component.test.tsx` (цільовий)
 - **Рівень тестування:** компонентний
 
 ## Робота

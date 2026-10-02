@@ -3,7 +3,7 @@
 - **ID задачі:** TS-012
 - **Охоплює:** SC-009
 - **Залежить від:** TS-006, TS-011
-- **Точні шляхи:** `libs/admin/products/data-access/src/products.http.ts`, `libs/admin/products/data-access/src/products.api.integration.test.ts`, `libs/admin/products/feature/src/hooks/use-product-lookups.ts`, `libs/admin/products/feature/src/components/product-editor.tsx`, `libs/admin/products/feature/src/components/product-delete-dialog.tsx`, `libs/admin/products/feature/src/pages/product-detail-page.tsx`, `libs/admin/products/feature/src/components/product-editor.component.test.tsx` (цільовий)
+- **Точні шляхи:** `libs/admin/products/data-access/src/products.http.ts`, `libs/admin/products/data-access/src/products.api.integration.test.ts`, `libs/admin/products/feature/src/hooks/product-editor/use-product-lookups.ts`, `libs/admin/products/feature/src/components/product-editor/product-editor.tsx`, `libs/admin/products/feature/src/components/product-deletion/product-delete-dialog.tsx`, `libs/admin/products/feature/src/pages/product-detail/product-detail-page.tsx`, `libs/admin/products/feature/src/components/product-editor/product-editor.component.test.tsx` (цільовий)
 - **Рівень тестування:** фокусний інтеграційний + компонентний
 
 ## Робота

@@ -3,7 +3,7 @@
 - **ID задачі:** TS-002
 - **Охоплює:** SC-002
 - **Залежить від:** немає
-- **Точні шляхи:** `libs/admin/products/feature/src/pages/product-detail-page.tsx`, `libs/admin/products/feature/src/components/product-detail-header.tsx`, `libs/admin/products/feature/src/components/product-detail-gallery.tsx`, `libs/admin/products/feature/src/components/product-detail-gallery.component.test.tsx` (цільові)
+- **Точні шляхи:** `libs/admin/products/feature/src/pages/product-detail/product-detail-page.tsx`, `libs/admin/products/ui/src/product-detail/product-detail-header.tsx`, `libs/admin/products/ui/src/product-detail/product-detail-gallery.tsx`, `libs/admin/products/feature/src/pages/product-detail/product-detail-page.component.test.tsx` (цільові)
 - **Рівень тестування:** компонентний
 
 ## Робота

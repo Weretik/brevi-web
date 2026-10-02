@@ -3,7 +3,7 @@
 - **ID задачі:** TS-003
 - **Охоплює:** SC-002
 - **Залежить від:** TS-001
-- **Точні шляхи:** `libs/admin/products/feature/src/pages/`, `libs/admin/products/feature/src/components/`
+- **Точні шляхи:** `libs/admin/products/feature/src/pages/product-detail/`, `libs/admin/products/feature/src/hooks/product-detail/`, `libs/admin/products/ui/src/product-detail/`
 - **Рівень тестування:** модульний + компонентний + інтеграційний (E2E для критичного маршруту)
 
 ## Робота

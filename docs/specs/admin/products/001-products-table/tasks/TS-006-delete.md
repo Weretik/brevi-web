@@ -3,7 +3,7 @@
 - **ID задачі:** TS-006
 - **Охоплює:** SC-005
 - **Залежить від:** TS-002, TS-003
-- **Точні шляхи:** `libs/admin/products/feature/src/components/`, `libs/admin/products/data-access/src/`
+- **Точні шляхи:** `libs/admin/products/feature/src/components/product-deletion/`, `libs/admin/products/data-access/src/`
 - **Рівень тестування:** модульний + компонентний + інтеграційний (E2E для критичного маршруту)
 
 ## Робота

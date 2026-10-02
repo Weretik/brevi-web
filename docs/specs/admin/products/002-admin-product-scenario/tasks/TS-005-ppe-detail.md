@@ -3,7 +3,7 @@
 - **ID задачі:** TS-005
 - **Охоплює:** SC-005
 - **Залежить від:** TS-002
-- **Точні шляхи:** `libs/admin/products/feature/src/components/ppe-product-detail.tsx` (цільовий), `libs/admin/products/feature/src/pages/product-detail-page.tsx`, `libs/admin/products/feature/src/components/ppe-product-detail.component.test.tsx` (цільовий)
+- **Точні шляхи:** `libs/admin/products/ui/src/product-detail/ppe-product-detail.tsx` (цільовий), `libs/admin/products/feature/src/pages/product-detail/product-detail-page.tsx`, `libs/admin/products/ui/src/product-detail/product-calculations.component.test.tsx` (цільовий)
 - **Рівень тестування:** компонентний
 
 ## Робота

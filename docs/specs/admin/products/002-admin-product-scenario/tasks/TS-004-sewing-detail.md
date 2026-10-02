@@ -3,7 +3,7 @@
 - **ID задачі:** TS-004
 - **Охоплює:** SC-004
 - **Залежить від:** TS-002
-- **Точні шляхи:** `libs/admin/products/feature/src/components/sewing-product-detail.tsx` (цільовий), `libs/admin/products/feature/src/pages/product-detail-page.tsx`, `libs/admin/products/feature/src/components/sewing-product-detail.component.test.tsx` (цільовий)
+- **Точні шляхи:** `libs/admin/products/ui/src/product-detail/sewing-product-detail.tsx` (цільовий), `libs/admin/products/feature/src/pages/product-detail/product-detail-page.tsx`, `libs/admin/products/ui/src/product-detail/product-calculations.component.test.tsx` (цільовий)
 - **Рівень тестування:** компонентний
 
 ## Робота

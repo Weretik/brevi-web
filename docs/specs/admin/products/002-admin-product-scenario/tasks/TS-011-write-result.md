@@ -3,7 +3,7 @@
 - **ID задачі:** TS-011
 - **Охоплює:** SC-008
 - **Залежить від:** TS-002, TS-010
-- **Точні шляхи:** `libs/admin/products/feature/src/components/product-editor.tsx`, `libs/admin/products/feature/src/pages/product-detail-page.tsx`, `libs/admin/products/feature/src/pages/product-edit-page.tsx`, `libs/admin/products/data-access/src/products.api.ts`, `apps/admin-react-e2e/src/products.spec.ts`
+- **Точні шляхи:** `libs/admin/products/feature/src/components/product-editor/product-editor.tsx`, `libs/admin/products/feature/src/pages/product-detail/product-detail-page.tsx`, `libs/admin/products/feature/src/pages/product-editor/product-edit-page.tsx`, `libs/admin/products/data-access/src/products.api.ts`, `apps/admin-react-e2e/src/products.spec.ts`
 - **Рівень тестування:** фокусний інтеграційний + E2E
 
 ## Робота

@@ -5,7 +5,7 @@
 - Backend repository: `C:/Users/Віталій/RiderProjects/BreviERP`.
 - Канонічний entry point: `docs/sdd/contracts/openapi.yaml`; локальний модуль: `docs/sdd/contracts/catalog/product-catalog.openapi.yaml`.
 - Зафіксована backend-версія: `7178113572c5c0da21ba9f28db5d94f96dc8e1b6`. Product CRUD уже містився в `03ed99f2d40f0bb239adb6d3bd9e237eac300344`; цей commit додає category/media залежності.
-- Frontend snapshot/provenance: `docs/contracts/openapi/backend/`, `docs/contracts/openapi/SOURCE.json`; generated types: `libs/admin/api-contract/src/generated/openapi.ts`.
+- Frontend snapshot/provenance: `docs/contracts/openapi/backend/`, `docs/contracts/openapi/SOURCE.json`; generated types: `libs/admin/shared/contracts/src/generated/openapi.ts`.
 - Статус: **готовий до frontend реалізації**; category lookup/media upload зафіксовані нижче.
 
 | `operationId`               | Метод і шлях                                  | Сценарії       | Статус у зафіксованій версії |

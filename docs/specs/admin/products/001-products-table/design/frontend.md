@@ -19,12 +19,12 @@
 
 ## Межі відповідальності
 
-| Область     | Власник                                                                                                                                                                 |
-| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Route/pages | `libs/admin/products/feature/src/pages/` і `products.routes.tsx` через public export; app лише компонує маршрути.                                                       |
-| UI          | `libs/admin/products/feature/src/components/` або `ui/src/` за реального повторного використання: grid, toolbar, секції форми, стани.                                   |
-| Data-access | `libs/admin/products/data-access/src/`: generated types на transport boundary, runtime validation, mapping і HTTP; cancellation у read hooks, довгоживучого кешу немає. |
-| Model       | Типи товару/запиту без React та HTTP; окремий `model` тільки за потреби спільної логіки.                                                                                |
-| Меню        | Специфікація навігації; активувати пункт після доступності списку.                                                                                                      |
+| Область     | Власник                                                                                                                                                                      |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Route/pages | `libs/admin/products/feature/src/pages/<capability>/` (`product-list`, `product-detail`, `product-editor`, `media-library`) через public export; app лише компонує маршрути. |
+| UI          | Capability modules у `libs/admin/products/ui/src/` для list, editor, detail і media: grid, toolbar, секції форми, стани.                                                     |
+| Data-access | `libs/admin/products/data-access/src/`: generated types на transport boundary, runtime validation, mapping і HTTP; cancellation у read hooks, довгоживучого кешу немає.      |
+| Model       | Типи товару/запиту без React та HTTP; окремий `model` тільки за потреби спільної логіки.                                                                                     |
+| Меню        | Специфікація навігації; активувати пункт після доступності списку.                                                                                                           |
 
 Тести: mapper/error unit, component list/form, integration route, один browser journey create/edit/delete на контрольованому середовищі після появи backend/fixtures. Перевірити 320/768/1280 px, обидві теми, keyboard/focus. Build має дати окремий lazy page chunk згідно з `docs/architecture/admin/application.md`.

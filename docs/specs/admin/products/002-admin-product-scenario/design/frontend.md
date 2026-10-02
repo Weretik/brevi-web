@@ -3,23 +3,27 @@
 ## Наявний контекст
 
 - React shell і маршрути: `apps/admin-react/src/app/router/app-router.tsx`, `libs/admin/core/shell/`.
-- Список, detail і форми: `libs/admin/products/feature/src/pages/`, `components/`, `hooks/`, `model/`; transport: `libs/admin/products/data-access/src/`. Довідники читаються через `@admin/references/data-access`.
-- Pinned types і перевірка походження: `docs/contracts/openapi/backend/openapi.yaml`, `docs/contracts/openapi/SOURCE.json`, `libs/admin/api-contract/src/generated/openapi.ts`, `tools/contracts/`.
+- Список, detail, editor і media orchestration: role-first каталоги з
+  capability modules у `libs/admin/products/feature/src/`; presentation — відповідні modules у
+  `libs/admin/products/ui/src/`; pure rules — `libs/admin/products/model/src/`;
+  transport — `libs/admin/products/data-access/src/`. Довідники читаються через
+  `@admin/references/data-access`.
+- Pinned types і перевірка походження: `docs/contracts/openapi/backend/openapi.yaml`, `docs/contracts/openapi/SOURCE.json`, `libs/admin/shared/contracts/src/generated/openapi.ts`, `tools/contracts/`.
 - Виконувані перевірки: `admin-products-feature` (`lint`, `typecheck`, `typecheck-tests`, `test` із Vitest), `admin-products-data-access` (`lint`, `typecheck`, `test`), `admin-react` (`lint`, `typecheck-tests`, `test`, `build`), `admin-react-e2e` (`lint`, `typecheck`, Playwright `e2e`). Тести: `libs/admin/products/feature/src/**/*.test.ts(x)`, `libs/admin/products/data-access/src/products.api.integration.test.ts`, `apps/admin-react-e2e/src/products.spec.ts`.
 - Немає загального перемикача мови Admin та встановленого Markdown renderer. Контент detail показує обидві мови одночасно за уточненням власника; глобальну локалізацію не вводити. Безпечний renderer — EN-001.
 - Маршрути і shell лишаються. Візуальні приклади з `docs/specs/admin/assets/visual-references/` дають композиційні орієнтири, але backend-сценарій визначає склад даних, не піксельний макет.
 
 ## Відповідальності в межах роботи
 
-| Область                 | Власник і точні шляхи                                                                                                                                                                                                                                        |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Спільні правила подання | `libs/admin/products/feature/src/model/`: порядок, доступність Ready media, відображення `null`, дозволений Markdown; без API й React, де можливо.                                                                                                           |
-| Стан і отримання даних  | `libs/admin/products/feature/src/hooks/use-products.ts`, `use-product.ts`, `use-product-lookups.ts`, `use-product-categories.ts`; поточні abort/retry зберегти. Тимчасовий повний detail після write передати до картки без довгоживучого дубльованого кешу. |
-| React Web               | `pages/products-page.tsx`, `pages/product-detail-page.tsx`, `components/product-editor.tsx` та спеціалізовані компоненти в `components/`; поля за типом, обидві локалізації, доступні кнопки перестановки.                                                   |
-| Навігація               | Поточні чотири маршрути в `apps/admin-react/src/app/router/app-router.tsx`; direct URL завжди робить GET, create/replace можуть відкрити detail з повної відповіді.                                                                                          |
-| Браузерний адаптер      | `<input type=file>` у продуктовій photo-секції; upload через `product-lookups.api.ts`, перевірка `Ready` через media list, прев'ю тільки за готовим URL.                                                                                                     |
-| API                     | `libs/admin/products/data-access/src/products.api.ts`, `products.http.ts`, `product-lookups.api.ts`, `products.mapper.ts`; generated DTO лишаються тут, 409 body парситься без показу технічних даних.                                                       |
-| Тести                   | Чисті правила/model — unit; фото, порядок, попередження, стани — component; mapping/errors — data-access integration; create/edit/detail/delete — вибрані Playwright journeys.                                                                               |
+| Область                 | Власник і точні шляхи                                                                                                                                                                                  |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Спільні правила подання | `libs/admin/products/model/src/ordering/`, `product-media/`, `product-editor/`; Markdown renderer — `libs/admin/products/ui/src/product-content/`.                                                     |
+| Стан і отримання даних  | Hooks згруповані за flow у `feature/src/hooks/product-list/`, `product-detail/`, `product-editor/` і `media-library/`; RTK Query володіє server state.                                                 |
+| React Web               | Pages і feature-only components розділені за роллю та capability; presentation у `ui/src/product-list/`, `product-detail/`, `product-editor/` і `media/`.                                              |
+| Навігація               | Поточні чотири маршрути в `apps/admin-react/src/app/router/app-router.tsx`; direct URL завжди робить GET, create/replace можуть відкрити detail з повної відповіді.                                    |
+| Браузерний адаптер      | `<input type=file>` у продуктовій photo-секції; upload через `product-lookups.api.ts`, перевірка `Ready` через media list, прев'ю тільки за готовим URL.                                               |
+| API                     | `libs/admin/products/data-access/src/products.api.ts`, `products.http.ts`, `product-lookups.api.ts`, `products.mapper.ts`; generated DTO лишаються тут, 409 body парситься без показу технічних даних. |
+| Тести                   | Чисті правила/model — unit; фото, порядок, попередження, стани — component; mapping/errors — data-access integration; create/edit/detail/delete — вибрані Playwright journeys.                         |
 
 ## Початковий аудит відповідальностей
 

@@ -3,7 +3,7 @@
 - **ID задачі:** TS-008
 - **Охоплює:** SC-004, SC-007
 - **Залежить від:** немає
-- **Точні шляхи:** `libs/admin/products/feature/src/components/sewing-fabric-fields.tsx`, `libs/admin/products/feature/src/components/sewing-accessory-fields.tsx`, `libs/admin/products/feature/src/components/sewing-operation-fields.tsx`, `libs/admin/products/feature/src/model/product-validation.ts`, `libs/admin/products/feature/src/components/sewing-fabric-fields.component.test.tsx` (цільовий)
+- **Точні шляхи:** `libs/admin/products/ui/src/product-editor/sewing/sewing-fabric-fields.tsx`, `libs/admin/products/ui/src/product-editor/sewing/sewing-accessory-fields.tsx`, `libs/admin/products/ui/src/product-editor/sewing/sewing-operation-fields.tsx`, `libs/admin/products/model/src/product-editor/product-validation.ts`, `libs/admin/products/feature/src/components/product-editor/product-editor.component.test.tsx` (цільовий)
 - **Рівень тестування:** модульний + компонентний
 
 ## Робота
