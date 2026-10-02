@@ -1,3 +1,4 @@
+import { initializeAdminAuth } from '@admin/core/auth';
 import { configureAppConfig } from '@admin/shared/config';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -8,8 +9,14 @@ import './styles.css';
 
 configureAppConfig(environment);
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-);
+async function bootstrap(): Promise<void> {
+  await initializeAdminAuth();
+
+  createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+      <App />
+    </StrictMode>,
+  );
+}
+
+void bootstrap();

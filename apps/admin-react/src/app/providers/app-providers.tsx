@@ -1,3 +1,5 @@
+import { logout } from '@admin/core/auth';
+import { AdminShellSessionProvider } from '@admin/core/shell';
 import { AdminApiProvider } from '@admin/shared/api-client';
 import { BrowserRouter } from 'react-router-dom';
 
@@ -8,9 +10,11 @@ import type { PropsWithChildren } from 'react';
 export function AppProviders({ children }: PropsWithChildren) {
   return (
     <AdminApiProvider>
-      <ColorModeProvider>
-        <BrowserRouter>{children}</BrowserRouter>
-      </ColorModeProvider>
+      <AdminShellSessionProvider onLogout={logout}>
+        <ColorModeProvider>
+          <BrowserRouter>{children}</BrowserRouter>
+        </ColorModeProvider>
+      </AdminShellSessionProvider>
     </AdminApiProvider>
   );
 }

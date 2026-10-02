@@ -32,6 +32,7 @@
       "@admin/shared/contracts": ["libs/admin/shared/contracts/src/index.ts"],
       "@admin/shared/config": ["libs/admin/shared/config/src/index.ts"],
       "@admin/shared/api-client": ["libs/admin/shared/api-client/src/index.ts"],
+      "@admin/core/auth": ["libs/admin/core/auth/src/index.ts"],
       "@admin/references/data-access": ["libs/admin/references/data-access/src/index.ts"],
       "@admin/references/model": ["libs/admin/references/model/src/index.ts"],
       "@admin/references/feature": ["libs/admin/references/feature/src/index.ts"],
