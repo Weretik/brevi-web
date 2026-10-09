@@ -1,0 +1,6 @@
+interface:
+  display_name: 'Brevi Feature Delivery'
+  short_description: 'Implement accepted Brevi feature specifications'
+  default_prompt: 'Use $brevi-feature-delivery to implement the authorized scope of the accepted Brevi Web feature specification.'
+policy:
+  allow_implicit_invocation: true

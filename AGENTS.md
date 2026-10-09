@@ -3,7 +3,7 @@
 ## Project Context
 
 - Stack: Nx frontend monorepo with Angular apps and a React Web bootstrap.
-- Package manager: use the one already configured in the repo (`npm` / `pnpm` / `yarn`)
+- Package manager: `npm@11.6.2`; preserve `package-lock.json`.
 - This repository contains only the frontend application.
 - Follow the existing project structure and naming conventions.
 - Do not introduce new architectural patterns unless explicitly requested.
@@ -73,7 +73,7 @@ Before завершением задачи, Codex should run what is available a
 
 2. Static checks:
 
-- `npx nx lint storefront`, `npx nx lint admin`, or the relevant project target
+- `npx nx lint storefront`, `npx nx lint admin-react`, or the relevant project target
 - Always run relevant lint targets for changed projects after edits and before running build.
 
 3. Unit/component/integration tests:
@@ -84,7 +84,7 @@ Before завершением задачи, Codex should run what is available a
 
 4. Build:
 
-- `npx nx build <app>` (`npx nx build storefron` or `npx nx build admin`)
+- `npx nx build <app>` (`npx nx build storefront` or `npx nx build admin-react`)
 
 If a command does not exist or fails, explicitly report:
 
@@ -118,3 +118,32 @@ The task is done when:
 - Existing architecture and project patterns are respected.
 - Lint/tests/build were run when available, or the reason they were not run is clearly stated.
 - No obvious unrelated regressions were introduced.
+
+## AI Routing
+
+Before changing frontend code or a feature specification:
+
+1. Reconcile actual apps, targets and test tooling with
+   [frontend inventory](docs/architecture/frontend-inventory.md), then choose
+   Admin React, Storefront Angular or shared scope.
+2. Read the relevant rules from [standards](docs/standards/README.md) and the
+   applicable architecture documentation.
+3. For a new or changed specification use `$brevi-feature-spec` and
+   [feature templates](docs/specs/_templates/README.md). Do not implement code
+   before the specification passes readiness and is accepted.
+4. For single-agent delivery use `$brevi-feature-delivery`. For an accepted
+   specification explicitly requested for multi-agent delivery use
+   `$brevi-feature-orchestrator`.
+5. For architecture review use `$brevi-code-audit`; route systemic findings
+   through `$brevi-remediation-plan`.
+6. For API work use `$brevi-api-contract-sync` and follow the
+   [contract workflow](docs/architecture/api/contract-workflow.md). Never edit
+   the OpenAPI snapshot or generated TypeScript manually.
+7. After runtime, test, contract or build changes use
+   `$brevi-change-verification`. Before review handoff use
+   `$brevi-pr-handoff`; for code/docs drift use `$brevi-docs-sync`.
+
+Derive Nx targets from `project.json` or `npx nx show project <name> --json`.
+Do not treat an installed package as executable test tooling without a target,
+configuration and runnable test. Preserve unrelated worktree changes and
+historical evidence.

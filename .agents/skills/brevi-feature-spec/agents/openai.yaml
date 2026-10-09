@@ -1,0 +1,6 @@
+interface:
+  display_name: 'Brevi Feature Specification'
+  short_description: 'Create scenario-first Brevi feature specs'
+  default_prompt: 'Use $brevi-feature-spec to create or update the requested Brevi Web feature specification.'
+policy:
+  allow_implicit_invocation: true

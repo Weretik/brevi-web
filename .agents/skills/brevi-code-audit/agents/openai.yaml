@@ -1,0 +1,6 @@
+interface:
+  display_name: 'Brevi Code Audit'
+  short_description: 'Audit Brevi architecture and code with evidence'
+  default_prompt: 'Use $brevi-code-audit to perform the requested Brevi Web architecture and code audit with actionable evidence.'
+policy:
+  allow_implicit_invocation: true
