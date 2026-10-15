@@ -1,8 +1,8 @@
 # Запуск remediation
 
 ```text
-Працюй за `docs/specs/_templates/remediation/` і
-`docs/specs/_templates/code-audit/`.
+Працюй за `$frontend-remediation-plan` і
+`$frontend-code-audit`.
 SDD: `docs/specs/admin/architecture/001-admin-layers-and-boundaries/`.
 Scope: уся погоджена remediation.
 

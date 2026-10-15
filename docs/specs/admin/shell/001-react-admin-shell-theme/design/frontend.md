@@ -15,13 +15,13 @@
   `apps/admin/public/assets/logo/brevi-logo-{light,dark}.png`. Це джерела
   Brevi кольорів, логотипа й потрібних елементів shell; Angular/PrimeNG код не
   переноситься буквально.
-- `D:/RiderProjects/kedr-web/apps/admin/src/app/{providers,router,theme}/` та
-  `D:/RiderProjects/kedr-web/libs/admin/core/shell/src/` — локальний референс
+- `E:/RiderProjects/kedr-web/apps/admin/src/app/{providers,router,theme}/` та
+  `E:/RiderProjects/kedr-web/libs/admin/core/shell/src/` — локальний референс
   композиції MUI theme, роутера, layout, верхньої панелі, drawer і області
   сторінки. Палітра, текст, логотип, назви розділів і профіль Kedr не є
   вимогами Brevi. Референс поза цим репозиторієм; для реалізації достатньо
   рішень, записаних тут.
-- Цільові межі описані в `docs/architecture/admin/application.md`,
+- Цільові межі описані в `docs/architecture/admin/runtime/application.md`,
   `domains.md` і `dependencies.md`; `libs/admin/core/shell` створено в цій
   feature.
 

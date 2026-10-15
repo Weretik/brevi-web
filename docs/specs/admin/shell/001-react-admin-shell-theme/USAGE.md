@@ -5,7 +5,7 @@
 Реалізуй SC-001–SC-006 за `tasks/README.md` і залежностями EN-*/TS-*.
 Почни з перевірки фактичного дерева, Nx targets і референсних файлів,
 перелічених у `design/frontend.md`. Не переносити бізнес-сторінки чи API.
-Візуальна система — Brevi; `D:/RiderProjects/kedr-web/apps/admin` лише
+Візуальна система — Brevi; `E:/RiderProjects/kedr-web/apps/admin` лише
 референс композиції React. Збережи історичні migration records без
 переписування evidence. Для кожної задачі запиши focused test і результати
 перевірок у її файл, онови `traceability.md`.

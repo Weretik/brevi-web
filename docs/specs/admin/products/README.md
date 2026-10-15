@@ -20,7 +20,7 @@
 
 Історичні phase records залишаються свідченням попередніх delivery-кроків.
 Поточні архітектурні шари та межі визначені в
-[`docs/architecture/admin/domains.md`](../../../architecture/admin/domains.md).
+[`docs/architecture/admin/structure/domains.md`](../../../architecture/admin/structure/domains.md).
 
 Нова окрема SDD [«Таблиця та дії з товарами»](001-products-table/README.md)
 враховує поточний backend OpenAPI та запит на CRUD. Вона не змінює історичні

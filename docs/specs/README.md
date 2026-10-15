@@ -16,4 +16,4 @@
 - [Порядок перенесення React Admin](admin/react-migration-roadmap.md)
 - [Admin: відновлення шарів і module boundaries](admin/architecture/001-admin-layers-and-boundaries/README.md)
 - [Admin React: auth, permissions і API foundation](admin/auth/001-auth-permissions-api-foundation/README.md)
-- [Шаблони та workflow](./_templates/README.md)
+- [Правила створення й виконання специфікацій](../standards/shared/delivery-rules.md)

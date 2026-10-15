@@ -1,6 +1,0 @@
-interface:
-  display_name: 'Brevi PR Handoff'
-  short_description: 'Prepare review-ready Brevi pull request handoffs'
-  default_prompt: 'Use $brevi-pr-handoff to prepare an accurate review-ready handoff for the current Brevi Web changes.'
-policy:
-  allow_implicit_invocation: true

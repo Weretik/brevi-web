@@ -6,7 +6,7 @@
 - **Оновлено:** 2026-10-02
 
 SDD описує адаптацію auth/session, permissions, shell session provider,
-Axios/RTK Query transport і runtime config із `D:\RiderProjects\kedr-web` до
+Axios/RTK Query transport і runtime config із `E:\RiderProjects\kedr-web` до
 наявної архітектури `brevi-web`. Реалізація має зберегти чинні Admin routes,
 RTK Query endpoints, error UX і публічні aliases; це не механічне копіювання.
 

@@ -1,6 +1,6 @@
 # Як виконувати «Медіа/Фото»
 
-Використай `docs/specs/_templates/feature/` і специфікацію
+Використай `$frontend-feature-spec` і специфікацію
 `docs/specs/admin/references/007-media/`. EN-001 виконано на backend commit
 `e4c1588659684f3d5174fc6dfbfd5bfbd420a6ea`; authorization deferred до
 спільної React Admin auth feature.
@@ -12,4 +12,4 @@
 редагування файлів або папки.
 
 Перед delivery checkpoint заверши `code-audit/audit.md` за окремим модулем
-`docs/specs/_templates/code-audit/`.
+`$frontend-code-audit`.

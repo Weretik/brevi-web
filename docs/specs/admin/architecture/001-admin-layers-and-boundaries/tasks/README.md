@@ -14,6 +14,6 @@
 | RM-009 | Public API, nesting і dead-tree cleanup    | AF-006, AF-007, AF-008, AF-010 | RM-002–RM-008  | complete |
 | RM-010 | Full architecture verification і docs sync | AF-001–AF-010                  | RM-009         | complete |
 
-Фази відповідають `docs/specs/_templates/remediation/tasks/phases/`. Не
+Цей граф охоплює фази `фазам remediation SDD`. Не
 об'єднуйте domain migrations в одну зміну: products і references мають окремі
 regression suites та checkpoints.

@@ -1,6 +1,0 @@
-interface:
-  display_name: 'Brevi Change Verification'
-  short_description: 'Verify Brevi changes with fresh test evidence'
-  default_prompt: 'Use $brevi-change-verification to run risk-appropriate checks for the current Brevi Web changes and report exact evidence.'
-policy:
-  allow_implicit_invocation: true

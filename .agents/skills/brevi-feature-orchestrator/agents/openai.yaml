@@ -1,6 +1,0 @@
-interface:
-  display_name: 'Brevi Feature Orchestrator'
-  short_description: 'Coordinate multi-agent Brevi feature delivery'
-  default_prompt: 'Use $brevi-feature-orchestrator to coordinate dependency-aware multi-agent delivery of the accepted Brevi Web feature specification.'
-policy:
-  allow_implicit_invocation: true

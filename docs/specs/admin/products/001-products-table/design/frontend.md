@@ -27,4 +27,4 @@
 | Model       | Типи товару/запиту без React та HTTP; окремий `model` тільки за потреби спільної логіки.                                                                                     |
 | Меню        | Специфікація навігації; активувати пункт після доступності списку.                                                                                                           |
 
-Тести: mapper/error unit, component list/form, integration route, один browser journey create/edit/delete на контрольованому середовищі після появи backend/fixtures. Перевірити 320/768/1280 px, обидві теми, keyboard/focus. Build має дати окремий lazy page chunk згідно з `docs/architecture/admin/application.md`.
+Тести: mapper/error unit, component list/form, integration route, один browser journey create/edit/delete на контрольованому середовищі після появи backend/fixtures. Перевірити 320/768/1280 px, обидві теми, keyboard/focus. Build має дати окремий lazy page chunk згідно з `docs/architecture/admin/runtime/application.md`.

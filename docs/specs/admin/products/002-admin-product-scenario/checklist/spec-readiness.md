@@ -8,6 +8,6 @@
 - [x] Кожен сценарій має test level, задачу та evidence target у traceability.
 - [x] Кожна задача має одну відповідальність, `Depends on`, точні шляхи, Work, Evidence, Checkpoint і перевірку цілісності відповідальності.
 - [x] `contracts/api-contract.md` містить operationId, pinned backend commit, snapshot, рішення клієнта; EN-001 покриває відсутній renderer, а contract tooling уже існує.
-- [x] Для повторного аудиту підключено окремий модуль `docs/specs/_templates/code-audit/`.
+- [x] Для повторного аудиту підключено окремий модуль `$frontend-code-audit`.
 
 **Підсумок:** специфікація готова до виконання за графом; ця перевірка не означає готовність реалізації.

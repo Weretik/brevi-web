@@ -1,6 +1,0 @@
-interface:
-  display_name: 'Brevi Remediation Plan'
-  short_description: 'Plan systemic Brevi architecture remediation'
-  default_prompt: 'Use $brevi-remediation-plan to create a traceable remediation specification for the supplied Brevi architecture findings.'
-policy:
-  allow_implicit_invocation: true

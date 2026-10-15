@@ -15,10 +15,10 @@
 
 - **AR-001:** Nx tags/constraints реалізують `feature → ui/model/data-access`,
   `ui → model`, `data-access → model/api-client/contracts`; reverse dependencies
-  заборонені — `docs/architecture/admin/domains.md`.
+  заборонені — `docs/architecture/admin/structure/domains.md`.
 - **AR-002:** domain types/invariants/pure transformations мають owner у
   `<domain>/model`; generated DTO не виходять із data-access —
-  `docs/standards/admin-code-organization.md`, `api-data-rules.md`.
+  `docs/standards/admin/admin-code-organization.md`, `api-data-rules.md`.
 - **AR-003:** reusable domain presentation належить `<domain>/ui`, а feature
   оркеструє routes/pages/hooks/local UI state через props/callbacks.
 - **AR-004:** Admin server data, loading, errors, cache та invalidation належать

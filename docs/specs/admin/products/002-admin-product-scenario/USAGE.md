@@ -1,7 +1,7 @@
 # Як виконати доповнення Admin-товару
 
 ```text
-Працюй за docs/specs/_templates/ai-feature-workflow/.
+Працюй за $frontend-feature-delivery.
 Feature: docs/specs/admin/products/002-admin-product-scenario/.
 Scope: уся feature.
 Виконуй ready EN-/TS- за Depends on до delivery checkpoint.
@@ -10,4 +10,4 @@ Scope: уся feature.
 Не змінюй backend і не переписуй історичне evidence 001-products-table.
 ```
 
-Можна звузити scope до конкретного `SC-*` або `TS-*`; перед початком перевірити його залежності в [графі](tasks/README.md). Аудит зміненого коду вести за `docs/specs/_templates/code-audit/` у [записі](code-audit/audit.md).
+Можна звузити scope до конкретного `SC-*` або `TS-*`; перед початком перевірити його залежності в [графі](tasks/README.md). Аудит зміненого коду вести за `$frontend-code-audit` у [записі](code-audit/audit.md).

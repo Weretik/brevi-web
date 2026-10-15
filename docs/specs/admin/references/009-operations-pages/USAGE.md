@@ -1,7 +1,7 @@
 # Як виконувати SDD операцій
 
 ```text
-Працюй за docs/specs/_templates/ai-feature-workflow/.
+Працюй за $frontend-feature-delivery.
 Feature: docs/specs/admin/references/009-operations-pages/.
 Виконуй ready TS-* за залежностями. Create/view/edit реалізуй правими MUI
 Drawer поверх списків без child routes. Збережи поля, validation, tab pair,

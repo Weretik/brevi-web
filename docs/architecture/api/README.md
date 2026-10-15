@@ -1,8 +1,10 @@
 # API-архітектура Admin
 
+Поточний Angular Storefront описаний окремо: [API-межа Storefront](storefront.md).
+
 - **Область:** цільовий transport для `apps/admin-react`
 - **Статус:** planned; не підтверджує наявність описаних libraries
-- **Пов'язані документи:** [ADR Admin Axios transport](../admin/adr/0001-admin-axios-transport.md), [стан і API Admin](../admin/state-and-api.md)
+- **Пов'язані документи:** [ADR Admin Axios transport](../admin/adr/0001-admin-axios-transport.md), [стан і API Admin](../admin/runtime/state-and-api.md)
 
 [Життєвий цикл OpenAPI-контракту](contract-workflow.md) застосовується до
 React Admin. Ця сторінка описує цільовий transport; його наявність потрібно

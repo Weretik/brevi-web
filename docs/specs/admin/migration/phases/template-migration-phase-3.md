@@ -22,7 +22,7 @@
 - `StatisticCard` розміщується поруч із dashboard як presentation-компонент і
   показує informative empty state з значенням `—` до появи реальних метрик.
 - Візуальний референс: структура верхньої частини customer page, table-card і
-  overview cards у [локальному шаблоні](file:///D:/RiderProjects/template).
+  overview cards у [локальному шаблоні](file:///E:/RiderProjects/template).
 
 ## Поза межами
 

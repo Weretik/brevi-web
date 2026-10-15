@@ -1,10 +1,9 @@
 # SDD-процес frontend-функціональності
 
 Frontend feature планується від observable scenarios до найменших технічних
-responsibilities. Джерелом шаблонів є
-[template catalog](../../specs/_templates/README.md), правила готовності —
-[delivery rules](../../standards/delivery-rules.md), а test strategy —
-[testing rules](../../standards/testing-rules.md).
+responsibilities. Правила готовності визначають
+[delivery rules](../../standards/shared/delivery-rules.md), а test strategy —
+[testing rules](../../standards/shared/testing-rules.md).
 
 ## Послідовність
 
@@ -23,8 +22,8 @@ responsibilities. Джерелом шаблонів є
 5. Розкласти реалізацію на `TS-*` та shared prerequisites на `EN-*`, додати
    dependencies, exact paths, evidence targets і checkpoints.
 6. Заповнити `traceability.md` до початку реалізації.
-7. Після погодження виконувати ready tasks за
-   [AI feature workflow](../../specs/_templates/ai-feature-workflow/README.md).
+7. Після погодження виконувати ready tasks за їхніми залежностями,
+   checkpoints і evidence у feature SDD.
 
 Не створюйте порожні optional files. Якщо великій feature потрібні phases,
 phase-файли залишаються orchestration index, а реалізація живе в малих task-файлах.

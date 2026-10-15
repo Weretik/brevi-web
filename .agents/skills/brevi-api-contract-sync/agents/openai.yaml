@@ -1,6 +1,0 @@
-interface:
-  display_name: 'Brevi API Contract Sync'
-  short_description: 'Synchronize Brevi OpenAPI contracts and consumers'
-  default_prompt: 'Use $brevi-api-contract-sync to synchronize and verify the requested Brevi Web API contract change.'
-policy:
-  allow_implicit_invocation: true

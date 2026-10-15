@@ -5,7 +5,7 @@
 - Перевірені застосунки та бібліотеки: `apps/admin-react`,
   `libs/admin/core/shell`, `libs/admin/shared/{api-client,config,contracts}`,
   `libs/admin/{products,references}/{data-access,feature}`.
-- Source reference: п'ять paths у `D:\RiderProjects\kedr-web`, перелічених у
+- Source reference: п'ять paths у `E:\RiderProjects\kedr-web`, перелічених у
   `USAGE.md`; `core/permissions` містить лише `.babelrc`.
 - Наявний шлях даних: app `AdminApiProvider` → один `adminApi` → domain
   `injectEndpoints` → `fetchBaseQuery` → `apiUrl`.
@@ -17,14 +17,14 @@
 
 ## Архітектурний baseline
 
-| Перевірка                                | Фактичний стан                                                                                                               | Вимога й джерело                                              | Розбіжність  | Задача                 |
-| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | ------------ | ---------------------- |
-| Nx projects, tags і dependency direction | shell/config/api-client мають projects/targets; auth/permissions відсутні                                                    | `docs/architecture/admin/nx-contract.md`, `eslint.config.cjs` | так          | TS-003, TS-004         |
-| Domain layers і вкладеність              | target shared projects існують; api-client/config плоскі у `src/lib`; shell provider відсутній                               | `docs/architecture/admin/domains.md`, `state-and-api.md`      | так          | TS-001, TS-002, TS-004 |
-| Public entry points та imports           | aliases для config/api-client/shell є; auth/permissions aliases відсутні; багато consumers залежать від current public names | `docs/architecture/admin/nx-contract.md`                      | так          | TS-002–TS-005          |
-| State/data stack                         | один RTK Query API + `fetchBaseQuery`; accepted ADR вимагає Axios base query/auth adapter                                    | `docs/architecture/admin/state-and-api.md`, ADR-0001          | так          | TS-002, TS-003         |
-| DTO boundary                             | generated shared contracts є, але auth operations відсутні                                                                   | `docs/architecture/api/contract-workflow.md`                  | так, blocker | EN-001                 |
-| Test tooling і targets                   | current projects мають lint/typecheck/typecheck-tests/test; new auth/permissions projects не існують                         | `docs/standards/testing-rules.md`                             | так          | TS-003, TS-005         |
+| Перевірка                                | Фактичний стан                                                                                                               | Вимога й джерело                                                        | Розбіжність  | Задача                 |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- | ------------ | ---------------------- |
+| Nx projects, tags і dependency direction | shell/config/api-client мають projects/targets; auth/permissions відсутні                                                    | `docs/architecture/admin/structure/nx-contract.md`, `eslint.config.cjs` | так          | TS-003, TS-004         |
+| Domain layers і вкладеність              | target shared projects існують; api-client/config плоскі у `src/lib`; shell provider відсутній                               | `docs/architecture/admin/structure/domains.md`, `state-and-api.md`      | так          | TS-001, TS-002, TS-004 |
+| Public entry points та imports           | aliases для config/api-client/shell є; auth/permissions aliases відсутні; багато consumers залежать від current public names | `docs/architecture/admin/structure/nx-contract.md`                      | так          | TS-002–TS-005          |
+| State/data stack                         | один RTK Query API + `fetchBaseQuery`; accepted ADR вимагає Axios base query/auth adapter                                    | `docs/architecture/admin/runtime/state-and-api.md`, ADR-0001            | так          | TS-002, TS-003         |
+| DTO boundary                             | generated shared contracts є, але auth operations відсутні                                                                   | `docs/architecture/api/contract-workflow.md`                            | так, blocker | EN-001                 |
+| Test tooling і targets                   | current projects мають lint/typecheck/typecheck-tests/test; new auth/permissions projects не існують                         | `docs/standards/shared/testing-rules.md`                                | так          | TS-003, TS-005         |
 
 Попередня remediation SDD
 `docs/specs/admin/architecture/001-admin-layers-and-boundaries/` завершена, але

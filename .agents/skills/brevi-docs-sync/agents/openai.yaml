@@ -1,6 +1,0 @@
-interface:
-  display_name: 'Brevi Documentation Sync'
-  short_description: 'Detect and repair Brevi documentation drift'
-  default_prompt: 'Use $brevi-docs-sync to audit and repair confirmed drift in the requested Brevi Web documentation scope.'
-policy:
-  allow_implicit_invocation: true

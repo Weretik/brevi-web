@@ -1,7 +1,7 @@
 # Як виконувати SDD постачальників
 
 ```text
-Працюй за docs/specs/_templates/ai-feature-workflow/.
+Працюй за $frontend-feature-delivery.
 Feature: docs/specs/admin/references/010-suppliers-pages/.
 Спочатку виконай EN-001 і shared locale TS-001 з
 docs/specs/admin/products/003-products-table-pages/.
