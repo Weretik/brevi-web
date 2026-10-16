@@ -1,3 +1,3 @@
-# storefront-feature-contacts
+# Storefront: контакти
 
-This library was generated with [Nx](https://nx.dev).
+Архітектура сторінки та секцій описана в [карті функціональності](../../../../docs/features/storefront/information/contacts.md). Вимоги та стан окремого сценарію звіряй за кодом і відповідною SDD, якщо вона з'явиться.

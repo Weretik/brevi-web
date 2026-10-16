@@ -1,3 +1,3 @@
-# storefront-feature-catalog
+# Storefront: каталог
 
-This library was generated with [Nx](https://nx.dev).
+Архітектура списку та сторінки товару описана в [карті функціональності](../../../../docs/features/storefront/catalog.md). Вимоги та стан окремого сценарію звіряй за кодом і відповідною SDD, якщо вона з'явиться.

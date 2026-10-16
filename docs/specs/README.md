@@ -1,5 +1,9 @@
 # Специфікації функціональностей
 
+Цей індекс містить SDD-вимоги й задачі. [Карта фактичних функціональностей](../features/README.md) описує наявну реалізацію окремо від планів.
+
+Для Storefront зараз є README його Nx feature-бібліотек, але вони не є SDD: [home](../../libs/storefront/feature/home/README.md), [catalog](../../libs/storefront/feature/catalog/README.md), [contacts](../../libs/storefront/feature/contacts/README.md), [about-us](../../libs/storefront/feature/about-us/README.md), [order-in-bulk](../../libs/storefront/feature/order-in-bulk/order-in-bulk/README.md), [regions](../../libs/storefront/feature/regions/regions/README.md). Їхню перевірену архітектурну карту дивись у [Storefront](../features/README.md#storefront-angular-appsstorefront).
+
 - [Admin: список товарів](admin/products/README.md)
 - [Admin: міграція шаблону](admin/migration/README.md)
 - [Admin React: оболонка та корпоративна тема](admin/shell/001-react-admin-shell-theme/README.md)

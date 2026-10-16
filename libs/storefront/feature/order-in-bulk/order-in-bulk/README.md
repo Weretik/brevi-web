@@ -1,3 +1,3 @@
-# order-in-bulk
+# Storefront: оптове замовлення
 
-This library was generated with [Nx](https://nx.dev).
+Поточну межу сторінки та її склад описано в [карті функціональності](../../../../../docs/features/storefront/order-in-bulk.md). Назва бібліотеки не підтверджує наявність сценарію оформлення замовлення через API.

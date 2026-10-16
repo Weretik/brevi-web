@@ -1,3 +1,3 @@
-# regions
+# Storefront: регіони
 
-This library was generated with [Nx](https://nx.dev).
+Архітектура маршруту й сторінки описана в [карті функціональності](../../../../../docs/features/storefront/information/regions.md). Вимоги та стан окремого сценарію звіряй за кодом і відповідною SDD, якщо вона з'явиться.

@@ -6,16 +6,15 @@
 маршрутизація, глобальні стилі та підключення feature-бібліотек. Бізнес-правила,
 API-виклики й доменні компоненти тут не розміщуються.
 
-Поточний `AppRouter` підключає спільний layout, кореневу нейтральну сторінку
-та fallback невідомої адреси. Після появи доменних сторінок він об'єднуватиме
-їхні маршрути, не імпортуючи реалізації сторінок.
+Станом на 2026-10-16 `AppRouter` підключає спільний layout, кореневу сторінку,
+`productsRoutes`, `referencesRoutes` і fallback невідомої адреси. Реалізації
+сторінок завантажуються в доменних route-файлах, а застосунок імпортує
+лише публічні конфігурації маршрутів.
 Кожен домен експортує іменовану конфігурацію маршрутів із публічної точки входу.
 
 ```text
 productsRoutes   ─┐
-referencesRoutes ─┼→ AppRouter
-ordersRoutes     ─┤
-clientsRoutes    ─┘
+referencesRoutes ─┴→ AppRouter
 ```
 
 Приклад допустимого підключення:
@@ -23,7 +22,6 @@ clientsRoutes    ─┘
 ```ts
 import { productsRoutes } from '@admin/products/feature';
 import { referencesRoutes } from '@admin/references/feature';
-import { ordersRoutes } from '@admin/orders/feature';
 ```
 
 `AdminLayout` залишається елементом маршруту з `Outlet`. Розташування файла

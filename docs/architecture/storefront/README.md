@@ -5,6 +5,7 @@
 ## Де шукати код
 
 - [Карта наявних модулів](modules.md) — Nx projects Storefront і їхні ролі.
+- [Фактичні функціональності Storefront](../../features/README.md#storefront-angular-appsstorefront) — окремі описи сторінок і зв'язків.
 - [Виконання Storefront](runtime.md) — SSR, hydration, маршрути, локалізація, стан і перевірки.
 - [Поточна API-межа](../api/storefront.md) — налаштований HTTP pipeline і фактичні споживачі.
 - `apps/storefront/src/app/app.config.ts` — глобальні providers: router, HTTP/interceptors, hydration, Transloco і PrimeNG.

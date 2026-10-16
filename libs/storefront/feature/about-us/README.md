@@ -1,3 +1,3 @@
-# about-us
+# Storefront: інформаційні сторінки
 
-This library was generated with [Nx](https://nx.dev).
+Архітектура маршрутів компанії та інформаційних сторінок описана в [карті функціональності](../../../../docs/features/storefront/information/about-us.md). Вимоги та стан окремого сценарію звіряй за кодом і відповідною SDD, якщо вона з'явиться.

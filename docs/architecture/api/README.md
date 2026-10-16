@@ -2,13 +2,14 @@
 
 Поточний Angular Storefront описаний окремо: [API-межа Storefront](storefront.md).
 
-- **Область:** цільовий transport для `apps/admin-react`
-- **Статус:** planned; не підтверджує наявність описаних libraries
+- **Область:** transport для `apps/admin-react`
+- **Статус (звірено 2026-10-16):** спільний Axios transport, `baseApi` і domain endpoints реалізовані; окремі сценарії та цільові правила нижче перевіряй за кодом
 - **Пов'язані документи:** [ADR Admin Axios transport](../admin/adr/0001-admin-axios-transport.md), [стан і API Admin](../admin/runtime/state-and-api.md)
 
 [Життєвий цикл OpenAPI-контракту](contract-workflow.md) застосовується до
-React Admin. Ця сторінка описує цільовий transport; його наявність потрібно
-перевіряти в коді.
+React Admin. Поточні точки входу: `libs/admin/shared/api-client/src/index.ts`,
+`libs/admin/products/data-access/src/index.ts` і
+`libs/admin/references/data-access/src/index.ts`.
 
 ## Призначення
 

@@ -19,6 +19,7 @@
 ## Карта документів
 
 - [Наявні модулі та маршрути](structure/modules.md)
+- [Фактичні функціональності Admin](../../features/README.md#admin-react-appsadmin-react)
 - [Застосунок і маршрутизація](runtime/application.md)
 - [Домени та внутрішня структура feature](structure/domains.md)
 - [Правила залежностей](structure/dependencies.md)
