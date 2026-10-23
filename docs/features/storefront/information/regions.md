@@ -1,37 +1,40 @@
-# Storefront: регіони
+# Storefront: Regions
 
-**Стан:** наявний маршрут і сторінка, звірено 2026-10-16.
+**Status:** route and page exist, checked 2026-10-16.
 
-`/uk|ru/regions` відкриває `RegionPage`. Вона складає локальну hero-секцію й повторно використовувані `InStockWorkwear` та `ProductCategories` зі `storefront/ui`. Бібліотека має додатковий рівень каталогу `regions/regions`; це фактичний шлях, а не новий модуль.
+`/uk|ru/regions` opens `RegionPage`. It composes a local hero section and the
+reusable `InStockWorkwear` and `ProductCategories` from `storefront/ui`. The
+library has an additional nested `regions/regions` directory; this is the
+actual path, not a new module.
 
-## Схема будови
+## Structure diagram
 
 ```mermaid
 flowchart LR
-  Route["/uk або /ru /regions"] --> Page["RegionPage"]
-  Page --> Hero["локальна hero-секція"]
-  Page --> UI["storefront/ui: товари й категорії"]
+  Route["/uk or /ru /regions"] --> Page["RegionPage"]
+  Page --> Hero["local hero section"]
+  Page --> UI["storefront/ui: products and categories"]
 ```
 
-## Структура в коді
+## Code structure
 
 ```text
 libs/storefront/feature/regions/
 └── regions/src/lib/
     ├── pages/regions-page/
-    │   └── region.page.ts # сторінка
+    │   └── region.page.ts # page
     ├── sections/hero/
-    │   └── hero.ts # локальний hero
-    └── lib.routes.ts # маршрут
+    │   └── hero.ts # local hero
+    └── lib.routes.ts # route
 ```
 
 ```text
 libs/storefront/ui/
 └── src/lib/sections/
     ├── in-stock-workwear/
-    │   └── in-stock-workwear.ts # спільні товари
+    │   └── in-stock-workwear.ts # shared products
     └── product-categories/
-        └── product-categories.ts # спільні категорії
+        └── product-categories.ts # shared categories
 ```
 
-**Де шукати:** [маршрут](../../../../libs/storefront/feature/regions/regions/src/lib/lib.routes.ts), [сторінка](../../../../libs/storefront/feature/regions/regions/src/lib/pages/regions-page/region.page.ts), [карта модулів](../../../architecture/storefront/modules.md).
+**Where to look:** [route](../../../../libs/storefront/feature/regions/regions/src/lib/lib.routes.ts), [page](../../../../libs/storefront/feature/regions/regions/src/lib/pages/regions-page/region.page.ts), [module map](../../../architecture/storefront/modules.md).

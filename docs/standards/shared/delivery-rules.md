@@ -1,73 +1,56 @@
-# Правила постачання
+# Delivery rules
 
-## Готовність
+Prepare an SDD before implementing a new feature or changing the scenarios, UI behavior, or contracts of an existing feature. For an existing feature, update its current specification or add a revision in its directory; do not duplicate the entire SDD. Maintain IDs and traceability for the changed scope.
 
-Feature готова до реалізації, коли:
+For a local internal fix that restores already documented behavior without changing a scenario, contract, or module boundary, a short description of the problem, fix, and focused verification result in the task or report is enough. Open historical revisions only for a specific need.
 
-- мета, actor, scope та exclusions однозначні;
-- бізнес-правила мають стабільні `R-*`, а observable Given / When / Then
-  сценарії — стабільні `SC-*`;
-- невідомі product decisions вирішені або позначені `[NEEDS CLARIFICATION]` і
-  винесені за межі ready scope;
-- design і contracts містять лише потрібні рішення з точними source paths;
-- API feature має `operationId`, backend OpenAPI source і зафіксовану версію в
-  `contracts/api-contract.md`; відсутній contract tooling оформлено як `EN-*`;
-- кожен сценарій має ризик-орієнтований test level та evidence target;
-- `traceability.md` пов'язує кожен `SC-*` із малими `TS-*` і потрібними `EN-*`;
-- кожна task dependency існує, а перші задачі графа готові.
+## Readiness
 
-## Деталізація та відповідальність за документи
+Keep a feature's current scope and navigation in its `README.md`, requirements in the current specification, evidence in task files, and `traceability.md` as brief links and statuses. Earlier revisions are history; do not duplicate current status in them or open them without a specific need.
 
-- Кореневий `AGENTS.md` є короткою точкою входу до проєктної архітектури, standards і навичок AI.
-- `docs/specs/README.md` є лише індексом feature-специфікацій.
-- Цей документ визначає готовність специфікації та постачання.
-- Feature `README.md` містить статус і навігацію конкретної feature.
-- Feature `USAGE.md` дає українську інструкцію користувачу для створення цієї
-  feature та перелік потрібних files.
-- Прийнята feature, її граф задач і traceability визначають scope та evidence виконання.
-- Системні порушення оформлюються окремою remediation SDD з AF-_, AR-_, RM-* та EN-*.
-- Аудит коду є необхідним architecture quality gate.
-- `testing-rules.md` зберігає стабільні правила тестів і TDD.
-- `delivery-rules.md` зберігає readiness, traceability policy і definition of done.
-- `traceability.md` містить тільки зв'язки між scenario, task, test та evidence.
-- Кожен файл задачі `TS-*` або `EN-*` має одну відповідальність за реалізацію
-  чи перевірку.
+A feature is ready for implementation when:
 
-Requirements описують бізнес-поведінку, design — frontend boundaries і
-рішення, contracts — зовнішні interfaces. Великі phase-файли лише оркеструють
-планування; вони посилаються на малі task-файли й не стають implementation
-checklist.
+- its goal, actor, scope, and exclusions are unambiguous;
+- business rules have stable `R-*` IDs, and observable Given/When/Then scenarios have stable `SC-*` IDs;
+- unknown product decisions are resolved or marked `[NEEDS CLARIFICATION]` and excluded from the ready scope;
+- design and contracts contain only necessary decisions with exact source paths;
+- an API feature records `operationId`, the backend OpenAPI source, and its version in `contracts/api-contract.md`; missing contract tooling is represented by an `EN-*` task;
+- each scenario has a risk-based test level and evidence target;
+- `traceability.md` links each `SC-*` to small `TS-*` tasks and required `EN-*` tasks;
+- every task dependency exists, and the first tasks in the graph are ready.
 
-## Політика трасування
+## Documentation detail and ownership
 
-- Не перевикористовуйте ID для іншого змісту й не перенумеровуйте завершені
-  задачі.
-- `TS-*` містить `Covers`; `EN-*` містить `Enables`. Обидва містять `Depends
-on`, exact paths, test level, Work, Evidence і Checkpoint.
-- Remediation SDD використовує `AF-*` findings, `AR-*` requirements і `RM-*`
-  executable tasks. Кожен `AF-*` трасується до `RM-*`/`EN-*` і verification;
-  delivery потребує статусу `verified` для всіх in-scope findings.
-- Scenario стає `verified`, лише коли всі потрібні tasks завершені й acceptance
-  evidence пройшло.
-- Під час зміни меж оновіть вимоги, граф задач і трасування в одній зміні
-  документації.
-- Старе evidence не переписуйте. Під час міграції посилайтеся на legacy phase
-  як historical evidence, а нову роботу описуйте новими `TS-*`/`EN-*`.
+Describe a new feature with a short card in `docs/features/admin/` or `docs/features/storefront/` and add it to the index. The card includes behavior, route, components, state and data where applicable, a compact Mermaid diagram of verified relationships, and a tree of actual key files and their roles. Use separate trees for distinct `apps/` and `libs/` roots; do not present invented state, APIs, or planned files as existing. Review the card after a substantial change, while the SDD remains the source for requirements and plans. Do not create a subdirectory for a single card.
 
-## Межі автономного виконання
+- Root `AGENTS.md` is a brief entry point for project architecture, standards, and AI skills.
+- `docs/specs/README.md` is only an index of feature specifications.
+- This document defines specification and delivery readiness.
+- A feature `README.md` contains the status and navigation for that feature.
+- A feature `USAGE.md` gives English instructions for creating that feature and lists the required files.
+- The accepted feature, its task graph, and traceability define execution scope and evidence.
+- Systemic violations receive a separate remediation SDD with `AF-*`, `AR-*`, `RM-*`, and `EN-*`.
+- A code audit is a required architecture quality gate.
+- `testing-rules.md` holds stable testing and TDD rules.
+- `delivery-rules.md` holds readiness, traceability policy, and definition of done.
+- `traceability.md` contains only links between scenario, task, test, and evidence.
+- Each `TS-*` or `EN-*` task file has one implementation or verification responsibility.
 
-Якщо користувач дозволив усю feature, phase або набір `SC-*`, AI самостійно
-переходить між усіма ready task-файлами в цьому scope за `Depends on`. Окрема
-команда для кожної підфази не потрібна. Виконання зупиняється після завершення
-scope або через конкретний blocker, що потребує рішення чи нового дозволу.
+Requirements describe business behavior, design describes frontend boundaries and decisions, and contracts describe external interfaces. Large phase files only orchestrate planning; they link to small task files and do not become implementation checklists.
 
-## Критерії завершення
+## Traceability policy
 
-Усі in-scope `SC-*` реалізовані або явно deferred; tasks і checkpoints
-завершені; contracts, docs і implementation узгоджені; focused і regression
-evidence записане; релевантні lint/typecheck/test/build пройшли або причина
-задокументована. Delivery report перелічує scope, changed files, evidence,
-невиконані перевірки та реальні залишкові ризики. Architecture findings у
-поточному scope мають бути `verified`; `open`, `blocked` або `planned` finding
-блокує delivery, а `deferred-approved` потребує окремої SDD/task, owner і явного
-погодження, що finding не є prerequisite поточного результату.
+- Do not reuse IDs for different content or renumber completed tasks.
+- `TS-*` contains `Covers`; `EN-*` contains `Enables`. Both contain `Depends on`, exact paths, test level, `Work`, `Evidence`, and `Checkpoint`.
+- A remediation SDD uses `AF-*` findings, `AR-*` requirements, and `RM-*` executable tasks. Each `AF-*` traces to `RM-*`/`EN-*` and verification; delivery requires all in-scope findings to be `verified`.
+- A scenario becomes `verified` only when all required tasks are complete and acceptance evidence passes.
+- When boundaries change, update requirements, the task graph, and traceability in the same documentation change.
+- Do not rewrite old evidence. During migration, link to a legacy phase as historical evidence and describe new work in new `TS-*`/`EN-*` tasks.
+
+## Autonomous execution boundaries
+
+If the user authorizes an entire feature, phase, or set of `SC-*` scenarios, the AI proceeds independently through all ready task files in that scope according to `Depends on`. A separate command for each subphase is unnecessary. Execution stops when the scope is complete or a specific blocker requires a decision or new authorization.
+
+## Completion criteria
+
+All in-scope `SC-*` scenarios are implemented or explicitly deferred; tasks and checkpoints are complete; contracts, documentation, and implementation agree; and evidence of focused tests and regression for the affected feature is recorded. Checks needed for its risks pass or their absence is documented. General tests and a full suite run only at the user's explicit request. The delivery report lists scope, changed files, evidence, unrun checks, and real residual risks. Architecture findings in the current scope must be `verified`; an `open`, `blocked`, or `planned` finding blocks delivery, while `deferred-approved` requires a separate SDD/task, an owner, and explicit approval that the finding is not a prerequisite of the current result.

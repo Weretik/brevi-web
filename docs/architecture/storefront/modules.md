@@ -1,12 +1,17 @@
-# Наявні модулі Storefront
+# Existing Storefront Modules
 
-Це карта поточних Nx projects за їхніми `project.json`. Фактичні targets і версії перевіряй у [frontend inventory](../frontend-inventory.md) та конфігурації проєктів.
+This is a map of current Nx projects from their `project.json` files. Check
+actual targets and versions in the [frontend inventory](../frontend-inventory.md)
+and project configuration.
 
-| Область           | Наявні Nx projects                                                                               | Відповідальність                                                    |
-| ----------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
-| Застосунок        | `apps/storefront`                                                                                | Angular SSR, маршрути й глобальні providers                         |
-| Основа Storefront | `libs/storefront/{data-access,shell,ui,util}`                                                    | Дані, оболонка, презентація й утиліти                               |
-| Feature           | `libs/storefront/feature/{home,catalog,contacts,about-us,not-found}`                             | Основні та інформаційні сторінки                                    |
-| Feature           | `libs/storefront/feature/order-in-bulk/order-in-bulk`, `libs/storefront/feature/regions/regions` | Оптове замовлення й регіони; у коді є вкладений однойменний каталог |
+| Area            | Existing Nx projects                                                                             | Responsibility                                                              |
+| --------------- | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------- |
+| Application     | `apps/storefront`                                                                                | Angular SSR, routes, and global providers                                   |
+| Storefront base | `libs/storefront/{data-access,shell,ui,util}`                                                    | Data, shell, presentation, and utilities                                    |
+| Feature         | `libs/storefront/feature/{home,catalog,contacts,about-us,not-found}`                             | Main and informational pages                                                |
+| Feature         | `libs/storefront/feature/order-in-bulk/order-in-bulk`, `libs/storefront/feature/regions/regions` | Bulk orders and regions; code has an additional same-named nested directory |
 
-`apps/storefront/src/app/app.routes.ts` підключає feature routes під префіксами `/uk` та `/ru`; кореневий шлях веде на `/uk`. Наявність бібліотеки не доводить готовність кожного сценарію. Спільні `libs/shared/*` перевіряй за кодом і [frontend inventory](../frontend-inventory.md).
+`apps/storefront/src/app/app.routes.ts` wires feature routes under `/uk` and
+`/ru`; the root path redirects to `/uk`. The presence of a library does not
+prove that every scenario is complete. Check shared `libs/shared/*` against
+the code and [frontend inventory](../frontend-inventory.md).

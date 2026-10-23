@@ -1,53 +1,57 @@
-# Admin: елементи виробу і роботи
+# Admin: Garment Parts and Operations
 
-**Стан:** обидві вкладки наявні, звірено 2026-10-16.
+**Status:** both tabs exist, checked 2026-10-16.
 
-`/references/garment-part-operation` відкриває вкладки елементів і робіт; query `tab=parts|operations` зберігає вибір. Для кожної вкладки `references/feature` має власні content, hooks і діалоги дій, `references/ui` — таблиці, `references/data-access` — окремі endpoints та мапери. Спільний маршрут не означає спільної моделі даних.
+`/references/garment-part-operation` opens parts and operations tabs; the
+`tab=parts|operations` query preserves the selection. Each tab has its own
+content, hooks, and action dialogs in `references/feature`, tables in
+`references/ui`, and separate endpoints and mappers in
+`references/data-access`. A shared route does not imply a shared data model.
 
-## Схема будови
+## Structure diagram
 
 ```mermaid
 flowchart LR
-  Route["/references/garment-part-operation"] --> Tabs["tab=parts або operations"]
-  Tabs --> Parts["feature: елементи виробу"]
-  Tabs --> Operations["feature: роботи"]
-  Parts --> PartsUI["references/ui: таблиця"]
-  Operations --> OperationsUI["references/ui: таблиця"]
+  Route["/references/garment-part-operation"] --> Tabs["tab=parts or operations"]
+  Tabs --> Parts["feature: garment parts"]
+  Tabs --> Operations["feature: operations"]
+  Parts --> PartsUI["references/ui: table"]
+  Operations --> OperationsUI["references/ui: table"]
   Parts --> PartsAPI["data-access: parts API"]
   Operations --> OperationsAPI["data-access: operations API"]
 ```
 
-## Структура в коді
+## Code structure
 
 ```text
 libs/admin/references/
 ├── data-access/src/api/
 │   ├── garment-part-operations/
-│   │   └── garment-part-operations.api.ts # API робіт
+│   │   └── garment-part-operations.api.ts # operations API
 │   └── garment-parts/
-│       └── garment-parts.api.ts # API елементів
+│       └── garment-parts.api.ts # parts API
 ├── feature/src/
 │   ├── hooks/
 │   │   ├── garment-part-operations/
-│   │   │   └── use-garment-part-operations.ts # стан робіт
+│   │   │   └── use-garment-part-operations.ts # operations state
 │   │   └── garment-parts/
-│   │       └── use-garment-parts.ts # стан елементів
+│   │       └── use-garment-parts.ts # parts state
 │   ├── pages/
 │   │   ├── garment-part-operations/
-│   │   │   └── garment-part-operations-content.tsx # вкладка робіт
+│   │   │   └── garment-part-operations-content.tsx # operations tab
 │   │   └── garment-parts/
-│   │       └── garment-parts-page.tsx # вкладки
-│   └── references.routes.tsx # маршрут
+│   │       └── garment-parts-page.tsx # tabs
+│   └── references.routes.tsx # route
 ├── model/src/entities/
 │   ├── garment-part-operations/
-│   │   └── garment-part-operation.ts # модель робіт
+│   │   └── garment-part-operation.ts # operations model
 │   └── garment-parts/
-│       └── garment-part.ts # модель елементів
+│       └── garment-part.ts # parts model
 └── ui/src/components/
     ├── garment-part-operations/
-    │   └── garment-part-operations-grid.tsx # таблиця робіт
+    │   └── garment-part-operations-grid.tsx # operations table
     └── garment-parts/
-        └── garment-parts-grid.tsx # таблиця елементів
+        └── garment-parts-grid.tsx # parts table
 ```
 
-**Де шукати:** [маршрут](../../../../libs/admin/references/feature/src/references.routes.tsx), [вкладки](../../../../libs/admin/references/feature/src/pages/garment-parts/garment-parts-page.tsx), [API елементів](../../../../libs/admin/references/data-access/src/api/garment-parts/garment-parts.api.ts), [API робіт](../../../../libs/admin/references/data-access/src/api/garment-part-operations/garment-part-operations.api.ts), [SDD](../../../specs/admin/references/009-operations-pages/README.md).
+**Where to look:** [route](../../../../libs/admin/references/feature/src/references.routes.tsx), [tabs](../../../../libs/admin/references/feature/src/pages/garment-parts/garment-parts-page.tsx), [parts API](../../../../libs/admin/references/data-access/src/api/garment-parts/garment-parts.api.ts), [operations API](../../../../libs/admin/references/data-access/src/api/garment-part-operations/garment-part-operations.api.ts), [SDD](../../../specs/admin/references/009-operations-pages/README.md).

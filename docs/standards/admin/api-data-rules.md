@@ -1,23 +1,23 @@
-# Правила API та даних
+# API and Data Rules
 
-## Контракти та DTO
+## Contracts and DTOs
 
-- Public API route, query parameters і response fields стабільні за замовчуванням; breaking change потребує contract, migration path і rollout у feature spec.
-- До реалізації вкажіть точний `operationId`, backend OpenAPI source і commit/tag у feature-контракті. Дотримуйтеся [життєвого циклу контракту](../../architecture/api/contract-workflow.md).
-- Синхронізований YAML і згенеровані типи не редагуйте вручну. Не створюйте ручну копію тих самих DTO.
-- Generated request/response types використовуйте лише на межі transport/data-access; runtime-перевірка відповіді та mapper залишаються в `data-access`.
-- Mapper перетворює DTO на domain/view model на API boundary; `ui` і `feature` не працюють із DTO.
-- Не показуйте користувачу raw transport errors, stack traces або internal details.
-- У Markdown записуйте рішення клієнта, а не дублюйте OpenAPI schemas.
+- Public API routes, query parameters, and response fields are stable by default; a breaking change requires a contract, migration path, and rollout plan in the feature spec.
+- Before implementation, record the exact `operationId`, backend OpenAPI source, and commit/tag in the feature contract. Follow the [API contract lifecycle](../../architecture/api/contract-workflow.md).
+- Do not edit synchronized YAML or generated types manually. Do not create a manual copy of the same DTOs.
+- Use generated request/response types only at the transport/data-access boundary; runtime response validation and mapping remain in `data-access`.
+- A mapper converts DTOs into a domain/view model at the API boundary; `ui` and `feature` do not work with DTOs.
+- Do not show raw transport errors, stack traces, or internal details to users.
+- Record client decisions in Markdown; do not duplicate OpenAPI schemas.
 
-## Запити та стан
+## Requests and state
 
-- Використовуйте чинний RTK Query `baseApi` і typed hooks; не викликайте Axios/HTTP безпосередньо з components.
-- Передавайте cancellation signal у transport та зберігайте чинну нормалізацію errors.
-- Визначайте pagination, filtering, sorting, cache/refetch semantics у contract до коду.
-- Не дублюйте RTK Query cache, loading або error state у feature reducer.
+- Use the existing RTK Query `baseApi` and typed hooks; do not call Axios/HTTP directly from components.
+- Pass the cancellation signal to the transport and preserve current error normalization.
+- Define pagination, filtering, sorting, and cache/refetch semantics in the contract before coding.
+- Do not duplicate RTK Query cache, loading, or error state in a feature reducer.
 
-## Публічна конфігурація
+## Public configuration
 
-- Перевіряйте public runtime config на межі застосунку.
-- Не додавайте secrets, tokens, PII або request/response bodies у source, logs чи docs.
+- Validate public runtime configuration at the application boundary.
+- Do not add secrets, tokens, PII, or request/response bodies to source, logs, or docs.

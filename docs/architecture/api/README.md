@@ -1,20 +1,21 @@
-# API-архітектура Admin
+# Admin API Architecture
 
-Поточний Angular Storefront описаний окремо: [API-межа Storefront](storefront.md).
+The current Angular Storefront is described separately in the
+[Storefront API boundary](storefront.md).
 
-- **Область:** transport для `apps/admin-react`
-- **Статус (звірено 2026-10-16):** спільний Axios transport, `baseApi` і domain endpoints реалізовані; окремі сценарії та цільові правила нижче перевіряй за кодом
-- **Пов'язані документи:** [ADR Admin Axios transport](../admin/adr/0001-admin-axios-transport.md), [стан і API Admin](../admin/runtime/state-and-api.md)
+- **Scope:** transport for `apps/admin-react`
+- **Status (checked 2026-10-16):** shared Axios transport, `baseApi`, and domain endpoints are implemented; check individual scenarios and target rules below against the code
+- **Related documents:** [Admin Axios transport ADR](../admin/adr/0001-admin-axios-transport.md), [Admin state and API](../admin/runtime/state-and-api.md)
 
-[Життєвий цикл OpenAPI-контракту](contract-workflow.md) застосовується до
-React Admin. Поточні точки входу: `libs/admin/shared/api-client/src/index.ts`,
-`libs/admin/products/data-access/src/index.ts` і
+The [OpenAPI contract lifecycle](contract-workflow.md) applies to React Admin.
+Current entry points are `libs/admin/shared/api-client/src/index.ts`,
+`libs/admin/products/data-access/src/index.ts`, and
 `libs/admin/references/data-access/src/index.ts`.
 
-## Призначення
+## Purpose
 
-Admin передає API-запити через спільний transport, нормалізує backend errors і
-підтримує cancellation.
+Admin sends API requests through a shared transport, normalizes backend errors,
+and supports cancellation.
 
 ```text
 Admin feature
@@ -33,23 +34,23 @@ shared/api-client
 feature error state              runtime notifier (network/timeout/5xx)
 ```
 
-`feature` показує власні loading/error/empty states. Глобальний notifier не
-замінює error state та не повідомляє про validation errors.
+`feature` displays its own loading/error/empty states. The global notifier does
+not replace error state or report validation errors.
 
-## Межі відповідальності
+## Responsibilities
 
-| Шар                    | Відповідальність                                                                                                     |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `shared/api-client`    | Екземпляр Axios, перехоплювачі, `axiosBaseQuery`, `baseApi`, контракти API, нормалізація помилок, runtime-сповіщувач |
-| Доменний `data-access` | Generated DTO на межі, runtime-валідація, мапер і кінцеві точки через `baseApi.injectEndpoints`                      |
-| `feature`              | Згенеровані хуки RTK Query, стани завантаження/помилки і ручний `refetch`                                            |
-| `ui` / маршрут         | Не викликають HTTP і не імпортують транспорт                                                                         |
+| Layer                | Responsibility                                                                                                  |
+| -------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `shared/api-client`  | Axios instance, interceptors, `axiosBaseQuery`, `baseApi`, API contracts, error normalization, runtime notifier |
+| Domain `data-access` | Generated DTOs at the boundary, runtime validation, mapper, and endpoints through `baseApi.injectEndpoints`     |
+| `feature`            | Generated RTK Query hooks, loading/error states, and manual `refetch`                                           |
+| `ui` / route         | Do not call HTTP or import transport                                                                            |
 
-Кожен domain endpoint оголошується виключно через public `baseApi.injectEndpoints`.
-Не можна створювати окремий Axios instance, робити deep import у `api-client` або
-дублювати RTK Query response/error у slice.
+Declare each domain endpoint exclusively through public
+`baseApi.injectEndpoints`. Do not create a separate Axios instance, deep-import
+from `api-client`, or duplicate RTK Query response/error state in a slice.
 
-## Публічний транспортний контракт
+## Public transport contract
 
 ```ts
 interface ApiRequest {
@@ -79,62 +80,58 @@ interface ApiError {
 }
 ```
 
-`axiosBaseQuery` передає RTK Query `AbortSignal` до Axios і повертає тільки
-`{ data }` або `{ error: ApiError }`. Axios exception не виходить у feature.
+`axiosBaseQuery` forwards RTK Query's `AbortSignal` to Axios and returns only
+`{ data }` or `{ error: ApiError }`. Axios exceptions do not escape to the
+feature.
 
-## Помилки backend
+## Backend errors
 
-| Відповідь backend               | `ApiError`                                |
+| Backend response                | `ApiError`                                |
 | ------------------------------- | ----------------------------------------- |
-| Немає відповіді                 | `Network`, `status: 0`                    |
+| No response                     | `Network`, `status: 0`                    |
 | `ECONNABORTED` / `ETIMEDOUT`    | `Timeout`                                 |
 | HTTP 401 / 403 / 404            | `Unauthorized` / `Forbidden` / `NotFound` |
-| HTTP 4xx з validation fields    | `Validation` і `fieldErrors`              |
+| HTTP 4xx with validation fields | `Validation` and `fieldErrors`            |
 | HTTP 5xx                        | `Server`                                  |
-| Інша помилка транспорту/клієнта | `Unknown`                                 |
+| Other transport/client error    | `Unknown`                                 |
 
-### Problem Details ASP.NET
+### ASP.NET Problem Details
 
-Backend може повертати `{ detail, title, errors, traceId }`. `detail` має
-пріоритет над `title`; `errors` перетворюється на `fieldErrors`; `traceId`
-зберігається для діагностики. Response body не логується.
+The backend may return `{ detail, title, errors, traceId }`. `detail` takes
+priority over `title`; `errors` is converted to `fieldErrors`; `traceId` is
+retained for diagnostics. The response body is not logged.
 
-### Результат валідації Ardalis
+### Ardalis validation result
 
-Backend може повертати масив з `Identifier` / `ErrorMessage` або
-`identifier` / `errorMessage`. Клієнт групує повідомлення за полем у
-`fieldErrors` і повертає `Validation`.
+The backend may return an array with `Identifier` / `ErrorMessage` or
+`identifier` / `errorMessage`. The client groups messages by field into
+`fieldErrors` and returns `Validation`.
 
-## Робота з помилками
+## Error handling
 
-1. Для `Validation` feature показує field errors.
-2. Для `Network`, `Timeout` і `Server` feature пропонує доступний ручний retry
-   через `refetch`.
-3. Runtime notifier повідомляє про network, timeout, server та unknown errors;
-   4xx лишаються відповідальністю конкретного feature.
-4. `traceId` передається в support лише через нормалізований `ApiError`; feature
-   не парсить backend response самостійно.
+1. For `Validation`, the feature displays field errors.
+2. For `Network`, `Timeout`, and `Server`, the feature offers an available manual retry through `refetch`.
+3. The runtime notifier reports network, timeout, server, and unknown errors; each feature remains responsible for 4xx errors.
+4. `traceId` is passed to support only through normalized `ApiError`; the feature does not parse backend responses itself.
 
-## Спостережуваність і безпека
+## Observability and security
 
-- Request interceptor може додавати correlation ID і вимірює тривалість.
-- Логи містять тільки method, sanitized URL без query/fragment, status і duration.
-- Headers, request/response body, tokens і персональні дані не логуються.
-- Logging увімкнений лише за development opt-in flag: `VITE_ENABLE_HTTP_LOGS`.
+- A request interceptor may add a correlation ID and measure duration.
+- Logs contain only method, sanitized URL without query/fragment, status, and duration.
+- Headers, request/response bodies, tokens, and personal data are not logged.
+- Logging is enabled only by the development opt-in flag `VITE_ENABLE_HTTP_LOGS`.
 
-## Параметри Admin
+## Admin configuration
 
-| Аспект             | Admin                                                               |
-| ------------------ | ------------------------------------------------------------------- |
-| Базова URL-адреса  | `@admin/shared/config`                                              |
-| Автентифікація     | bearer-токен, refresh, CSRF, credentials через `AuthSessionAdapter` |
-| Runtime-сповіщувач | Налаштовується під час bootstrap Admin                              |
-| З'єднання          | Обробка помилок браузера/HTTP                                       |
+| Aspect           | Admin                                                                     |
+| ---------------- | ------------------------------------------------------------------------- |
+| Base URL         | `@admin/shared/config`                                                    |
+| Authentication   | Bearer token, refresh, CSRF, and credentials through `AuthSessionAdapter` |
+| Runtime notifier | Configured during Admin bootstrap                                         |
+| Connectivity     | Browser/HTTP error handling                                               |
 
-## Перевірка
+## Verification
 
-- Модульна: мапінг Problem Details, Ardalis, мережевих помилок, timeout і 5xx;
-  передавання `AbortSignal`; очищення даних логера.
-- Інтеграційна: кінцева точка через `baseApi.injectEndpoints` повертає доменну модель,
-  а не DTO.
-- Ручна: скасувати запит під час розмонтування або навігації.
+- Unit: map Problem Details, Ardalis, network errors, timeout, and 5xx; forward `AbortSignal`; sanitize logger data.
+- Integration: an endpoint through `baseApi.injectEndpoints` returns a domain model, not a DTO.
+- Manual: cancel a request during unmount or navigation.

@@ -1,53 +1,42 @@
-# Інвентаризація frontend
+# Frontend Inventory
 
-**Перевірено:** 2026-10-01
+**Checked:** 2026-10-01
 
-Цей файл фіксує лише наявну архітектуру й команди. Його потрібно оновлювати,
-коли змінюються застосунки, менеджер пакетів або тестові цілі.
+This file records the existing architecture and commands only. Update it when
+applications, package managers, or test targets change.
 
-## Застосунки
+## Applications
 
-| Застосунок             | Технологія               | Фактичний стан                                                  | Цілі перевірки                                          |
-| ---------------------- | ------------------------ | --------------------------------------------------------------- | ------------------------------------------------------- |
-| `apps/storefront`      | Angular 21, SSR, PrimeNG | Робочий storefront; feature-код переважно в `libs/storefront/*` | `lint`, `build`; test target відсутній                  |
-| `apps/admin-react`     | React 19, Vite, MUI      | Робочий Admin із shell, довідниками та керуванням товарами      | `lint`, `typecheck`, `typecheck-tests`, `test`, `build` |
-| `apps/admin-react-e2e` | Playwright, Chromium     | Browser journeys для критичних сценаріїв Admin                  | `lint`, `typecheck`, `e2e`, atomized `e2e-ci`           |
+| Application            | Technology               | Actual state                                                      | Check targets                                           |
+| ---------------------- | ------------------------ | ----------------------------------------------------------------- | ------------------------------------------------------- |
+| `apps/storefront`      | Angular 21, SSR, PrimeNG | Working storefront; feature code is mainly in `libs/storefront/*` | `lint`, `build`; no test target                         |
+| `apps/admin-react`     | React 19, Vite, MUI      | Working Admin with shell, reference data, and product management  | `lint`, `typecheck`, `typecheck-tests`, `test`, `build` |
+| `apps/admin-react-e2e` | Playwright, Chromium     | Browser journeys for critical Admin scenarios                     | `lint`, `typecheck`, `e2e`, atomized `e2e-ci`           |
 
-## Межі коду
+## Code boundaries
 
-- Angular storefront використовує Nx libraries `shared` і `storefront`.
-- React Admin має композицію у `apps/admin-react/src/app/`, shell у
-  `libs/admin/core/shell` та доменні бібліотеки `products` і `references`.
-- Mobile application не входить до scope цього repository.
+- Angular Storefront uses Nx `shared` and `storefront` libraries.
+- React Admin composes the application in `apps/admin-react/src/app/`, has its shell in `libs/admin/core/shell`, and domain libraries for `products` and `references`.
+- The mobile application is outside this repository's scope.
 
-## Менеджер пакетів і скрипти
+## Package manager and scripts
 
-Детальний перелік оголошених і розв’язаних прямих пакетів: [технології та npm-залежності](technology-and-packages.md).
+See [technology and npm dependencies](technology-and-packages.md) for the
+detailed list of declared and resolved direct packages.
 
-- Node.js: `24.18.0`, зафіксований у `.nvmrc` і `.node-version`; підтримуваний
-  діапазон — `>=24.15.0 <25`.
-- Менеджер пакетів: `npm@11.6.2`, lock-файл `package-lock.json`.
-- Кореневі скрипти містять `test:web`, його варіанти для модульних,
-  компонентних, інтеграційних, coverage та E2E-тестів, а також
-  `typecheck:tests`, `docs:check`, `docs:format:check` і `storefront:start`
-  разом із наявними командами збірки, lint і форматування.
-- Nx визначає цілі для кожного проєкту; перед плануванням задачі перевіряйте
-  `npx nx show project <project> --json`.
-- `contracts:sync`, `contracts:generate` і `contracts:check` підтримують
-  OpenAPI snapshot та generated API types для React Admin.
+- Node.js: `24.18.0`, pinned in `.nvmrc` and `.node-version`; supported range is `>=24.15.0 <25`.
+- Package manager: `npm@11.6.2`, lock file `package-lock.json`.
+- Root scripts include `test:web` and its unit, component, integration, coverage, and E2E variants, plus `typecheck:tests`, `docs:check`, `docs:format:check`, and `storefront:start`, alongside existing build, lint, and formatting commands.
+- Nx defines targets per project; inspect `npx nx show project <project> --json` before planning a task.
+- `contracts:sync`, `contracts:generate`, and `contracts:check` support the OpenAPI snapshot and generated API types for React Admin.
 
-## Тестові інструменти й наявні тести
+## Test tooling and existing tests
 
-- Встановлено Vitest, Angular Vitest adapter, React Testing Library,
-  `jest-dom`, `user-event` і `@playwright/test`/`@nx/playwright`.
-- React Admin має окремий `vitest.config.mts`, налаштування jsdom і виконуваний
-  набір unit, component та integration тестів.
-- `admin-core-shell` має окремі lint, typecheck, typecheck-tests і Vitest test
-  targets та компонентні тести.
-- `apps/admin-react-e2e` має Playwright config, Chromium smoke і Nx inferred
-  targets. Chromium binary встановлюється локально/в CI командою
-  `npx playwright install chromium`.
+- Installed tools include Vitest, the Angular Vitest adapter, React Testing Library, `jest-dom`, `user-event`, and `@playwright/test`/`@nx/playwright`.
+- React Admin has a separate `vitest.config.mts`, jsdom configuration, and an executable unit, component, and integration test suite.
+- `admin-core-shell` has separate lint, typecheck, typecheck-tests, and Vitest test targets, as well as component tests.
+- `apps/admin-react-e2e` has a Playwright config, Chromium smoke tests, and Nx inferred targets. Install the Chromium binary locally or in CI with `npx playwright install chromium`.
 
-Встановлена dependency сама по собі не робить test level доступним. Нова React
-library повинна мати executable Nx test target/config і focused test. Новий
-інструмент оформлюється окремим `EN-*` до його додавання.
+An installed dependency does not by itself make a test level available. A new
+React library must have an executable Nx test target/configuration and focused
+tests. Add a new tool through a separate `EN-*` task before including it.

@@ -1,18 +1,17 @@
-# Документація Brevi Web
+# Brevi Web documentation
 
-Це індекс versioned frontend-документації.
+This is the index of versioned frontend documentation.
 
-- [Фактичний склад frontend](architecture/frontend-inventory.md)
-- [Технології та всі прямі npm-залежності](architecture/technology-and-packages.md)
-- [Архітектура Admin](architecture/admin/README.md)
-- [Архітектура Storefront](architecture/storefront/README.md)
-- [Карта функціональностей Admin і Storefront](features/README.md)
-- [Локальний запуск і діагностика](operations/README.md)
-- [API-інтеграція Admin](architecture/api/README.md)
-- [Життєвий цикл API-контракту](architecture/api/contract-workflow.md)
-- [Сталі інженерні правила](standards/README.md)
-- [Feature-специфікації](specs/README.md)
-- [Маршрутизація для AI](../AGENTS.md)
+- [Current frontend inventory](architecture/frontend-inventory.md)
+- [Technology and all direct npm dependencies](architecture/technology-and-packages.md)
+- [Admin architecture](architecture/admin/README.md)
+- [Storefront architecture](architecture/storefront/README.md)
+- [Admin and Storefront feature map](features/README.md)
+- [Local startup and diagnostics](operations/README.md)
+- [Admin API integration](architecture/api/README.md)
+- [API contract lifecycle](architecture/api/contract-workflow.md)
+- [Stable engineering rules](standards/README.md)
+- [Feature specifications](specs/README.md)
+- [AI task routing](../AGENTS.md)
 
-Сталі правила належать до `architecture/` або `standards/`. Вимоги, рішення,
-задачі та evidence конкретної feature належать до її каталогу в `specs/`.
+Stable rules belong in `architecture/` or `standards/`. Requirements, decisions, tasks, and evidence for a specific feature belong in its `specs/` directory.

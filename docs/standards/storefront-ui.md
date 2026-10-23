@@ -1,11 +1,14 @@
-# Правила UI Storefront
+# Storefront UI Rules
 
-Ці правила стосуються Angular Storefront із PrimeNG; React Admin використовує [власні UI-правила](admin/admin-ui.md).
+These rules apply to the Angular Storefront with PrimeNG; React Admin uses its
+[own UI rules](admin/admin-ui.md).
 
-## Стилізація PrimeNG
+## PrimeNG styling
 
-- Для змін PrimeNG UI використовуй наявні Tailwind-класи в шаблонах або PrimeNG `pt` configurations.
-- Не змінюй component чи global CSS для локальної PrimeNG-задачі, якщо її scope цього прямо не потребує.
-- Не змінюй глобальні theme tokens і не замінюй поточну стратегію стилізації заради локальної feature.
+- For PrimeNG UI changes, use existing Tailwind classes in templates or PrimeNG `pt` configurations.
+- Do not change component or global CSS for a local PrimeNG task unless its scope directly requires it.
+- Do not change global theme tokens or replace the current styling strategy for a local feature.
 
-Перевір актуальні компоненти, тему та класи в коді відповідного застосунку перед зміною. Правила, що стосуються інших аспектів UI, визначай із відповідної архітектури та поточних компонентів.
+Before making a change, check the current components, theme, and classes in the
+relevant application code. Determine rules for other UI aspects from the
+relevant architecture and current components.

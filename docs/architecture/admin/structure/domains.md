@@ -1,6 +1,6 @@
-# Домени та структура функціональності Admin
+# Admin Domains and Feature Structure
 
-## Цільова структура
+## Target structure
 
 ```text
 libs/admin/
@@ -13,118 +13,121 @@ libs/admin/
 └── dashboard/{feature,data-access,ui}/
 ```
 
-Новий код розміщується за цією структурою. Перенесення наявного коду виконується
-лише окремою задачею.
+Place new code according to this structure. Move existing code only as part of
+a separate task.
 
-`references` об'єднує шість таблиць чотирьох сторінок Admin у React.
-Кожна таблиця має окрему feature-SDD, але парні вкладки компонуються однією
-сторінкою та одним маршрутом. Порожні бібліотеки `model` і `ui` не створюються
-наперед. Якщо domain types/invariants або повторно використовуване domain
-presentation уже існують, відповідний шар є обов'язковим, навіть коли код
-історично розміщено у `data-access` чи `feature`.
+`references` groups six tables across four React Admin pages. Each table has a
+separate feature SDD, but paired tabs are composed by one page and one route.
+Do not create empty `model` and `ui` libraries in advance. If domain types or
+invariants, or reusable domain presentation, already exist, the corresponding
+layer is required even when code has historically lived in `data-access` or
+`feature`.
 
 ## `admin/core`
 
-`shell` містить каркас, навігацію, компонування та область маршрутів; `auth` — сесію й
-автентифікацію; `permissions` — перевірку прав. `core` не містить правил
-конкретних доменів.
+`shell` contains the application shell, navigation, layout, and route outlet;
+`auth` contains session and authentication; `permissions` contains permission
+checks. `core` does not contain rules for specific domains.
 
-Новий код `core` групується за відповідальністю; корінь `src` не є місцем для
-внутрішніх реалізацій. Цільові структури для нового або суттєво зміненого коду:
+Group new `core` code by responsibility; the `src` root is not a place for
+internal implementations. Target structures for new or substantially changed
+code:
 
 ```text
 libs/admin/core/
 ├── shell/src/
 │   ├── index.ts
-│   ├── layout/             # композиція компонування й область вмісту
-│   ├── navigation/         # конфігурація навігації, бічна панель, мобільна панель
-│   ├── components/         # верхня панель, навігаційний ланцюжок, меню
-│   └── hooks/              # специфічні для shell хуки React
+│   ├── layout/             # layout composition and content outlet
+│   ├── navigation/         # navigation config, sidebar, mobile panel
+│   ├── components/         # top bar, breadcrumbs, menus
+│   └── hooks/              # shell-specific React hooks
 ├── auth/src/
 │   ├── index.ts
-│   ├── api/                # транспорт автентифікації / RTK Query, якщо він з'явиться
-│   ├── session/            # модель сесії, провайдер, життєвий цикл
-│   └── hooks/              # useAuth / useSession та інші публічні хуки
+│   ├── api/                # auth transport / RTK Query, if introduced
+│   ├── session/            # session model, provider, lifecycle
+│   └── hooks/              # useAuth / useSession and other public hooks
 └── permissions/src/
     ├── index.ts
-    ├── policies/           # правила дозволів і чисті предикати
-    ├── guards/             # захисники маршрутів і дій
-    └── hooks/              # usePermission та похідні хуки
+    ├── policies/           # permission rules and pure predicates
+    ├── guards/             # route and action guards
+    └── hooks/              # usePermission and derived hooks
 ```
 
-Папка створюється лише за наявності її відповідальності. Наявний плоский код не
-переміщується масово: його розділення виконується разом зі зміною відповідної
-функціональності або окремою задачею.
+Create a directory only when its responsibility exists. Do not mass-move
+existing flat code; split it alongside a change to the relevant feature or in
+a separate task.
 
-## Бізнес-домени
+## Business domains
 
-Домен ізольований і розкриває публічний API лише через кореневий `src/index.ts`.
-Глибокі імпорти до внутрішніх модулів іншого домену заборонені.
+A domain is isolated and exposes its public API only through its root
+`src/index.ts`. Deep imports into another domain's internal modules are
+prohibited.
 
-| Шар           | Відповідальність                                             | Не повинен містити                 |
-| ------------- | ------------------------------------------------------------ | ---------------------------------- |
-| `feature`     | Екран, сценарій користувача, вхід маршруту, оркестрація      | HTTP і спільні UI-примітиви        |
-| `data-access` | API, generated DTO на межі, перевірка відповіді, мапінг, кеш | JSX і маршрути                     |
-| `model`       | Типи, інваріанти, чисті перетворення                         | React, HTTP, API браузера          |
-| `ui`          | Повторно використовувані презентаційні компоненти домену     | API, маршрутизатор, серверний стан |
+| Layer         | Responsibility                                                       | Must not contain              |
+| ------------- | -------------------------------------------------------------------- | ----------------------------- |
+| `feature`     | Screen, user scenario, route entry, orchestration                    | HTTP and shared UI primitives |
+| `data-access` | API, generated DTOs at boundary, response validation, mapping, cache | JSX and routes                |
+| `model`       | Types, invariants, pure transformations                              | React, HTTP, browser APIs     |
+| `ui`          | Reusable domain presentation components                              | API, router, server state     |
 
-`model` створюється за наявності domain types, invariants або чистої логіки,
-яку споживає більше одного файла чи шару. Невеликий домен може почати з
-`feature`, доки окрема відповідальність фактично не з'явилась; після її появи
-відкладати межу через відсутність другого Nx project не можна.
+Create `model` when domain types, invariants, or pure logic are consumed by
+more than one file or layer. A small domain may start with `feature` until a
+separate responsibility actually appears; once it does, do not postpone the
+boundary because a second Nx project is missing.
 
-## Внутрішня структура доменної бібліотеки
+## Internal structure of a domain library
 
-`src/index.ts` у кожній бібліотеці — лише публічний API. Внутрішній код не
-розміщується поруч з ним «тимчасово» і не накопичується у великому файлі.
-Застосовуються такі папки, якщо відповідна роль існує:
+`src/index.ts` in each library is only its public API. Do not place internal
+code beside it “temporarily” or accumulate it in a large file. Use these
+directories when the corresponding role exists:
 
 ```text
 libs/admin/<domain>/
 ├── data-access/src/
 │   ├── index.ts
-│   ├── api/                # injectEndpoints, хуки, визначення кінцевих точок
-│   ├── contracts/          # приватні адаптери; DTO з OpenAPI не дублюються вручну
-│   ├── mappers/            # перетворення DTO <-> домен/запит
-│   ├── models/             # технічні типи запитів/кешу, якими володіє data-access
-│   └── validators/         # валідація відповідей/запитів на межі API
+│   ├── api/                # injectEndpoints, hooks, endpoint definitions
+│   ├── contracts/          # private adapters; do not manually duplicate OpenAPI DTOs
+│   ├── mappers/            # DTO <-> domain/request conversions
+│   ├── models/             # technical request/cache types owned by data-access
+│   └── validators/         # request/response validation at API boundary
 ├── model/src/
 │   ├── index.ts
-│   ├── entities/           # сутності домену й типи значень
-│   ├── queries/            # типи, початкові значення та інваріанти доменних запитів
-│   ├── mappers/            # чисті доменні перетворення
-│   └── validators/         # чиста доменна валідація, де вона потрібна
+│   ├── entities/           # domain entities and value types
+│   ├── queries/            # domain query types, defaults, and invariants
+│   ├── mappers/            # pure domain transformations
+│   └── validators/         # pure domain validation where needed
 ├── ui/src/
 │   ├── index.ts
-│   ├── components/         # повторно використовувані презентаційні компоненти
-│   ├── tables/             # оболонки таблиць, стовпці та комірки
-│   ├── forms/              # презентаційні форми та поля
-│   └── states/             # презентаційні стани завантаження/порожнього стану/помилки
+│   ├── components/         # reusable presentation components
+│   ├── tables/             # table shells, columns, and cells
+│   ├── forms/              # presentation forms and fields
+│   └── states/             # presentation loading/empty/error states
 └── feature/src/
     ├── index.ts
     ├── <domain>.routes.tsx
-    ├── pages/              # композиція маршрутів і сторінок
-    ├── components/         # елементи композиції лише для функціональності
-    ├── hooks/              # хуки оркестрації функціональності
-    └── state/              # локальні reducer/actions або тривалий клієнтський стан
+    ├── pages/              # route and page composition
+    ├── components/         # feature-only composition elements
+    ├── hooks/              # feature orchestration hooks
+    └── state/              # local reducer/actions or persistent client state
 ```
 
-Це не вимога створити всі папки наперед. Це вимога не змішувати ролі: кінцева
-точка не містить парсер DTO, мапер не містить React-компонент, а таблиця не
-містить серверний стан або маршрутизацію. Nx module-boundary rules повинні
-дозволяти документований напрям `feature -> ui/model/data-access`,
-`ui -> model` і `data-access -> model`, але забороняти зворотні залежності.
-Якщо фактичні `depConstraints` цьому суперечать, спочатку створюється
-architecture enabler/remediation task; domain types не залишаються у
-неправильному шарі лише через застарілу конфігурацію lint.
+This does not require creating every directory in advance. It requires keeping
+roles separate: an endpoint does not contain a DTO parser, a mapper does not
+contain a React component, and a table does not own server state or routing.
+Nx module-boundary rules should allow the documented directions
+`feature -> ui/model/data-access`, `ui -> model`, and `data-access -> model`,
+while prohibiting reverse dependencies. If actual `depConstraints` disagree,
+first create an architecture enabler/remediation task; do not leave domain
+types in the wrong layer only because lint configuration is outdated.
 
-### Приклад: товари
+### Example: products
 
-Домен `products` зберігає модель товару, типи, інваріанти запиту та сторінковий
-результат списку в `products/model`; `products/data-access` володіє кінцевою
-точкою, імпортує generated DTO для [OpenAPI-контракту](../../api/contract-workflow.md)
-та виконує перевірку й мапінг. Показані нижче файли — приклад цільової
-структури, а не свідчення наявності генерації.
+The `products` domain keeps the product model, types, query invariants, and
+paginated list result in `products/model`; `products/data-access` owns the
+endpoint, imports generated DTOs for the
+[OpenAPI contract](../../api/contract-workflow.md), and performs validation
+and mapping. The files below illustrate a target structure; they do not prove
+that code generation exists.
 
 ```text
 libs/admin/products/
@@ -139,9 +142,9 @@ libs/admin/products/
     └── mappers/
 ```
 
-## Внутрішня структура функціональності
+## Internal feature structure
 
-Внутрішні модулі групуються за призначенням сценарію:
+Group internal modules by scenario responsibility:
 
 ```text
 libs/admin/products/feature/src/
@@ -153,13 +156,13 @@ libs/admin/products/feature/src/
 └── state/
 ```
 
-Папки створюються лише за наявності відповідного коду. Якщо сторінка стає
-самостійною бізнес-межею, вона виділяється в окрему feature лише окремим
-архітектурним рішенням.
+Create directories only when corresponding code exists. If a page becomes an
+independent business boundary, split it into a separate feature only through
+a separate architecture decision.
 
 ## `admin/shared`
 
-`admin/shared` містить лише код, спільний для кількох доменів: UI-примітиви,
-API-клієнт, транспортні контракти, конфігурацію, утиліти й тестування. Він не
-залежить від доменів. Код, потрібний одному домену, не переноситься до `shared`
-заздалегідь.
+`admin/shared` contains only code shared across multiple domains: UI
+primitives, API client, transport contracts, configuration, utilities, and
+testing. It does not depend on domains. Do not move code needed by one domain
+to `shared` in advance.

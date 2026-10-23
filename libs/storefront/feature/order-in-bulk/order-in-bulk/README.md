@@ -1,3 +1,3 @@
-# Storefront: оптове замовлення
+# Storefront: bulk order
 
-Поточну межу сторінки та її склад описано в [карті функціональності](../../../../../docs/features/storefront/order-in-bulk.md). Назва бібліотеки не підтверджує наявність сценарію оформлення замовлення через API.
+The current page boundary and composition are described in the [feature map](../../../../../docs/features/storefront/order-in-bulk.md). The library name does not establish that an API checkout scenario exists.

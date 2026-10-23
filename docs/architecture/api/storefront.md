@@ -1,54 +1,52 @@
-# Поточна API-межа Storefront
+# Current Storefront API Boundary
 
-**Перевірено:** 2026-10-15 за `apps/storefront` і `libs/{storefront,shared}`.
-Ця сторінка описує Angular Storefront. [API-архітектура Admin](README.md)
-містить окремий **цільовий** React transport і не є поточним станом Storefront.
+**Checked:** 2026-10-15 against `apps/storefront` and
+`libs/{storefront,shared}`. This page describes Angular Storefront.
+[Admin API architecture](README.md) contains a separate **target** React
+transport and does not describe the current Storefront state.
 
-## Що реалізовано
+## What is implemented
 
-`apps/storefront/src/app/app.config.ts` реєструє Angular `HttpClient` із
-`withFetch()` та interceptor pipeline в такому порядку:
+`apps/storefront/src/app/app.config.ts` registers Angular `HttpClient` with
+`withFetch()` and an interceptor pipeline in this order:
 
-1. `baseUrlInterceptor` додає `environment.api.baseUrl` до відносних URL;
-   абсолютні `http(s)` URL не змінює.
-2. `loggingInterceptor` передає метадані запиту в `AppLogger` за прапорцем
-   `enableHttpLogs`; перевір його поведінку перед увімкненням логування у
-   середовищі з чутливими даними.
-3. `errorInterceptor` перетворює HTTP failure на `AppApiError` з кодом, статусом,
-   повідомленням, validation fields і, якщо є, `traceId`. Він розпізнає
-   Problem Details та масиви Ardalis validation errors.
+1. `baseUrlInterceptor` adds `environment.api.baseUrl` to relative URLs; it does not change absolute `http(s)` URLs.
+2. `loggingInterceptor` passes request metadata to `AppLogger` when the `enableHttpLogs` flag is set; check its behavior before enabling logging in an environment with sensitive data.
+3. `errorInterceptor` converts HTTP failures into `AppApiError` with a code, status, message, validation fields, and, when available, `traceId`. It recognizes Problem Details and arrays of Ardalis validation errors.
 
-`provideApiAndLogging(environment)` надає `API_BASE_URL`, прапорець HTTP-логів
-і конфігурацію `AppLogger`. У development `api.baseUrl` дорівнює
-`http://localhost:5000/storefront`, у production manifest —
-`https://api.brevi.com.ua/storefront`. Це **значення в коді**, а не
-підтвердження доступності backend або актуального deployment.
+`provideApiAndLogging(environment)` provides `API_BASE_URL`, the HTTP logging
+flag, and `AppLogger` configuration. In development, `api.baseUrl` is
+`http://localhost:5000/storefront`; in the production manifest, it is
+`https://api.brevi.com.ua/storefront`. These are **values in code**, not
+confirmation that the backend is reachable or that this is the current
+deployment.
 
-## Фактичні споживачі й стан
+## Actual consumers and state
 
-Пошук `HttpClient`, `http.get/post/put/delete`, `fetch` та `axios` у
-`apps/storefront` і `libs/storefront` не виявив поточного feature-запиту до
-backend. `libs/storefront/data-access` поки містить компонент-заготовку, а не
-реалізований API adapter. Каталог і сторінки використовують локальні дані та
-стан компонентів. Тому зараз немає карти конкретних Storefront operations,
-runtime-мапінгу DTO чи політики кешу, яку можна чесно описати як чинну.
+Searching for `HttpClient`, `http.get/post/put/delete`, `fetch`, and `axios` in
+`apps/storefront` and `libs/storefront` found no current feature request to the
+backend. `libs/storefront/data-access` currently contains a placeholder
+component, not an implemented API adapter. The catalog and pages use local
+data and component state. Therefore there is currently no concrete map of
+Storefront operations, runtime DTO mapping, or cache policy that can be
+accurately described as active.
 
-Серверний `apps/storefront/src/server.ts` не реалізує backend proxy: приклад
-`/api/**` закоментований. Transloco loader повертає локальні TypeScript
-переклади через `of(...)`, тому назва `TranslocoHttpLoader` сама по собі не
-означає HTTP-запит.
+The server in `apps/storefront/src/server.ts` does not implement a backend
+proxy: its `/api/**` example is commented out. The Transloco loader returns
+local TypeScript translations through `of(...)`, so the name
+`TranslocoHttpLoader` alone does not mean it makes an HTTP request.
 
-## Коли з'явиться перший API consumer
+## When the first API consumer is added
 
-До реалізації знайди операцію в backend OpenAPI й зафіксуй `operationId`,
-джерело snapshot та backend revision за
-[життєвим циклом контракту](contract-workflow.md). Розмісти transport і
-мапінг у відповідному Storefront `data-access` boundary, а feature залиш
-відповідальною за видимі loading/empty/error стани. Перевір наявні
-interceptors, runtime validation, SSR поведінку, auth/CSRF, cache та
-скасування саме для конкретної операції; не перенось механічно React Admin
-RTK Query/Axios правила.
+Before implementation, find the operation in backend OpenAPI and record its
+`operationId`, snapshot source, and backend revision according to the
+[API contract lifecycle](contract-workflow.md). Place transport and mapping in
+the appropriate Storefront `data-access` boundary, and keep the feature
+responsible for visible loading/empty/error states. Check existing
+interceptors, runtime validation, SSR behavior, auth/CSRF, cache, and
+cancellation for that specific operation; do not mechanically apply React
+Admin RTK Query/Axios rules.
 
-Після впровадження онови цю сторінку таблицею `operationId → consumer →
-mapper/model → cache/error behavior → тест`, зазначивши фактичні файли й
-перевірки. OpenAPI-схеми в Markdown не копіюй.
+After implementation, update this page with a table of
+`operationId → consumer → mapper/model → cache/error behavior → test`, naming
+the actual files and checks. Do not copy OpenAPI schemas into Markdown.

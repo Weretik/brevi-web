@@ -1,45 +1,50 @@
-# Storefront: компанія та інформаційні сторінки
+# Storefront: Company and Information Pages
 
-**Стан:** сім маршрутів і сторінок наявні, звірено 2026-10-16.
+**Status:** seven routes and pages exist, checked 2026-10-16.
 
-Бібліотека `about-us` містить окремі сторінки `/about-company`, `/delivery-and-payment`, `/articles`, `/agreement`, `/returns-exchanges`, `/our-work` і `/certificates` під мовними префіксами `/uk` та `/ru`. Кожна сторінка ліниво завантажується власним маршрутом; спільні локалізація, shell і SSR належать застосунку. Це група інформаційних сторінок, а не одна сторінка з усіма розділами.
+The `about-us` library contains separate pages for `/about-company`,
+`/delivery-and-payment`, `/articles`, `/agreement`, `/returns-exchanges`,
+`/our-work`, and `/certificates` under the `/uk` and `/ru` language prefixes.
+Each page is lazy-loaded through its own route; shared localization, shell,
+and SSR belong to the application. This is a group of information pages, not
+one page containing every section.
 
-## Схема будови
+## Structure diagram
 
 ```mermaid
 flowchart LR
-  App["apps/storefront: мова, shell і SSR"] --> Routes["about-us routes"]
-  Routes --> Pages["7 окремих lazy pages"]
-  Pages --> Content["інформаційний контент"]
+  App["apps/storefront: locale, shell, and SSR"] --> Routes["about-us routes"]
+  Routes --> Pages["7 separate lazy pages"]
+  Pages --> Content["informational content"]
 ```
 
-## Структура в коді
+## Code structure
 
 ```text
 libs/storefront/feature/about-us/
 └── src/lib/
     ├── pages/
     │   ├── about-company/
-    │   │   └── about-company.page.ts # приклад сторінки компанії
+    │   │   └── about-company.page.ts # company page example
     │   ├── agreement/
-    │   │   └── agreement.page.ts # угода
+    │   │   └── agreement.page.ts # agreement
     │   ├── articles/
-    │   │   └── articles.page.ts # статті
+    │   │   └── articles.page.ts # articles
     │   ├── certificates/
-    │   │   └── certificates.page.ts # сертифікати
+    │   │   └── certificates.page.ts # certificates
     │   ├── delivery-and-payment/
-    │   │   └── delivery-and-payment.page.ts # доставка
+    │   │   └── delivery-and-payment.page.ts # delivery
     │   ├── our-work/
-    │   │   └── our-work.page.ts # роботи
+    │   │   └── our-work.page.ts # work
     │   └── returns-exchanges/
-    │       └── returns-exchanges.page.ts # повернення
-    └── lib.routes.ts # маршрути і відповідність сторінок
+    │       └── returns-exchanges.page.ts # returns
+    └── lib.routes.ts # routes and page mapping
 ```
 
 ```text
 apps/storefront/
 └── src/app/
-    └── app.routes.ts # загальні маршрути
+    └── app.routes.ts # shared routes
 ```
 
-**Де шукати:** [маршрути і відповідність сторінок](../../../../libs/storefront/feature/about-us/src/lib/lib.routes.ts), [приклад сторінки компанії](../../../../libs/storefront/feature/about-us/src/lib/pages/about-company/about-company.page.ts), [загальні маршрути](../../../../apps/storefront/src/app/app.routes.ts), [runtime Storefront](../../../architecture/storefront/runtime.md).
+**Where to look:** [routes and page mapping](../../../../libs/storefront/feature/about-us/src/lib/lib.routes.ts), [company page example](../../../../libs/storefront/feature/about-us/src/lib/pages/about-company/about-company.page.ts), [shared routes](../../../../apps/storefront/src/app/app.routes.ts), [Storefront runtime](../../../architecture/storefront/runtime.md).

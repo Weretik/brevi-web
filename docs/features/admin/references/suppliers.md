@@ -1,21 +1,26 @@
-# Admin: постачальники
+# Admin: Suppliers
 
-**Стан:** реалізований маршрут і CRUD-інтерфейс, звірено 2026-10-16.
+**Status:** route and CRUD interface implemented, checked 2026-10-16.
 
-`/references/supplier` показує таблицю постачальників; діалог створює або редагує запис, окремий потік підтверджує видалення вибраних. `references/feature` містить стан і сценарій, `references/ui` — таблицю й діалог видалення, `references/model` — типи, `references/data-access` — endpoint і мапер. Помилки й оновлення списку обробляє сторінка через hooks.
+`/references/supplier` shows the supplier table; a dialog creates or edits a
+record, and a separate flow confirms deletion of selected rows.
+`references/feature` contains state and scenarios, `references/ui` contains the
+table and delete dialog, `references/model` contains types, and
+`references/data-access` contains the endpoint and mapper. The page handles
+errors and list refresh through hooks.
 
-## Схема будови
+## Structure diagram
 
 ```mermaid
 flowchart LR
-  Route["/references/supplier"] --> Page["references/feature: стан і сценарії"]
-  Page --> UI["references/ui: таблиця й діалог"]
-  Page --> Model["references/model: типи"]
-  Page --> Hooks["hooks: дії й оновлення списку"]
-  Hooks --> Data["references/data-access: endpoint і мапер"]
+  Route["/references/supplier"] --> Page["references/feature: state and scenarios"]
+  Page --> UI["references/ui: table and dialog"]
+  Page --> Model["references/model: types"]
+  Page --> Hooks["hooks: actions and list refresh"]
+  Hooks --> Data["references/data-access: endpoint and mapper"]
 ```
 
-## Структура в коді
+## Code structure
 
 ```text
 libs/admin/references/
@@ -23,19 +28,19 @@ libs/admin/references/
 │   ├── api/suppliers/
 │   │   └── suppliers.api.ts # API
 │   └── mappers/suppliers/
-│       └── suppliers.mapper.ts # мапер
+│       └── suppliers.mapper.ts # mapper
 ├── feature/src/
 │   ├── components/suppliers/
-│   │   └── supplier-dialog.tsx # редактор
+│   │   └── supplier-dialog.tsx # editor
 │   ├── hooks/suppliers/
-│   │   └── use-suppliers.ts # завантаження
+│   │   └── use-suppliers.ts # loading
 │   ├── pages/suppliers/
-│   │   └── suppliers-page.tsx # сторінка
-│   └── references.routes.tsx # маршрут
+│   │   └── suppliers-page.tsx # page
+│   └── references.routes.tsx # route
 ├── model/src/entities/suppliers/
-│   └── supplier.ts # модель
+│   └── supplier.ts # model
 └── ui/src/components/suppliers/
-    └── suppliers-grid.tsx # таблиця
+    └── suppliers-grid.tsx # table
 ```
 
-**Де шукати:** [маршрут](../../../../libs/admin/references/feature/src/references.routes.tsx), [сторінка](../../../../libs/admin/references/feature/src/pages/suppliers/suppliers-page.tsx), [API](../../../../libs/admin/references/data-access/src/api/suppliers/suppliers.api.ts), [SDD](../../../specs/admin/references/010-suppliers-pages/README.md).
+**Where to look:** [route](../../../../libs/admin/references/feature/src/references.routes.tsx), [page](../../../../libs/admin/references/feature/src/pages/suppliers/suppliers-page.tsx), [API](../../../../libs/admin/references/data-access/src/api/suppliers/suppliers.api.ts), [base SDD](../../../specs/admin/references/001-suppliers/README.md), [closed next-stage SDD](../../../specs/admin/references/010-suppliers-pages/README.md).

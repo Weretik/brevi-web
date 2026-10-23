@@ -1,56 +1,45 @@
-# Стан, API та форми Admin
+# Admin State, API, and Forms
 
-## Серверний стан і API
+## Server state and API
 
-- Серверний стан реалізується RTK Query і належить `data-access`.
-- Запланований кореневий Redux store розміщується в
-  `apps/admin-react/src/app/store.ts`; у поточному bootstrap цього файла немає.
-- Спільний API розміщений у `@admin/shared/api-client`; transport-деталі задані в
-  [ADR-0001](../adr/0001-admin-axios-transport.md).
-- `admin/core/auth` передає API-клієнту `AuthSessionAdapter`; API-клієнт не
-  зберігає токени й не знає endpoint оновлення сесії.
-- Кожен домен оголошує endpoints у власній `data-access`-бібліотеці через
-  `baseApi.injectEndpoints`.
-- Feature використовує лише експортовані типізовані hooks і не звертається до
-  `baseApi` напряму.
-- Усі зовнішні дані валідуються та перетворюються на межі `data-access`.
-- API feature фіксує `operationId` і версію backend OpenAPI до endpoint-коду;
-  generated DTO залишаються у transport/data-access. Порядок і стан
-  автоматизації описані у [contract workflow](../../api/contract-workflow.md).
+- Server state is implemented with RTK Query and belongs in `data-access`.
+- The planned root Redux store belongs in `apps/admin-react/src/app/store.ts`; this file is not present in the current bootstrap.
+- The shared API is in `@admin/shared/api-client`; transport details are defined in [ADR-0001](../adr/0001-admin-axios-transport.md).
+- `admin/core/auth` provides `AuthSessionAdapter` to the API client; the API client does not store tokens or know the session refresh endpoint.
+- Each domain declares endpoints in its own `data-access` library through `baseApi.injectEndpoints`.
+- A feature uses only exported typed hooks and does not access `baseApi` directly.
+- Validate and transform all external data at the `data-access` boundary.
+- An API feature records `operationId` and the backend OpenAPI version before endpoint code is added; generated DTOs remain in transport/data-access. The order and status of automation are described in the [contract workflow](../../api/contract-workflow.md).
 
-## Цільова структура `@admin/shared/api-client`
+## Target structure of `@admin/shared/api-client`
 
-`@admin/shared/api-client` — спільна transport infrastructure. Його кореневий
-`src/index.ts` містить лише стабільні публічні exports; усі внутрішні реалізації
-групуються за ролями:
+`@admin/shared/api-client` is shared transport infrastructure. Its root
+`src/index.ts` contains only stable public exports; internal implementations
+are grouped by role:
 
 ```text
 libs/admin/shared/api-client/src/
 ├── index.ts
-├── client/        # створення Axios instance
+├── client/        # Axios instance creation
 ├── contracts/     # ApiRequest, ApiError, auth contracts
-├── errors/        # нормалізація transport/API помилок і тести
-├── interceptors/  # auth header, refresh/retry, logging та їх installer
-├── rtk-query/     # baseApi і Axios base query
+├── errors/        # transport/API error normalization and tests
+├── interceptors/  # auth header, refresh/retry, logging, and installer
+├── rtk-query/     # baseApi and Axios base query
 └── runtime/       # runtime configuration: session adapter, error notifier
 ```
 
-- Один модуль не поєднує Axios client, interceptor, RTK Query base query,
-  transport contract і error mapper.
-- Interceptor не володіє глобальним application state; session adapter і error
-  notifier належать `runtime` та налаштовуються через публічний API.
-- Domain `data-access` libraries оголошують endpoints тільки через
-  `baseApi.injectEndpoints`; вони не створюють власний Axios instance і не
-  імпортують внутрішні модулі `api-client`.
-- Публічні exports transport layer змінюються лише окремим сумісним рішенням.
-- Зміна transport behavior супроводжується релевантними тестами error mapping
-  або interceptor behavior та перевіркою `npx nx build admin-react`.
+- A module does not combine the Axios client, interceptor, RTK Query base query, transport contract, and error mapper.
+- An interceptor does not own global application state; the session adapter and error notifier belong in `runtime` and are configured through the public API.
+- Domain `data-access` libraries declare endpoints only through `baseApi.injectEndpoints`; they do not create their own Axios instance or import internal `api-client` modules.
+- Change public transport layer exports only through a separate compatible decision.
+- A change to transport behavior includes relevant error mapping or interceptor behavior tests and verification with `npx nx build admin-react`.
 
-## Цільова структура `@admin/shared/config`
+## Target structure of `@admin/shared/config`
 
-`@admin/shared/config` ізолює Vite environment від решти Admin. Публічний
-`src/index.ts` експортує готовий `appConfig` і тип `AppConfig`; читання
-`import.meta.env`, парсинг значень та складання конфігурації не змішуються:
+`@admin/shared/config` isolates the Vite environment from the rest of Admin.
+The public `src/index.ts` exports the ready-to-use `appConfig` and the
+`AppConfig` type; reading `import.meta.env`, parsing values, and composing
+configuration are kept separate:
 
 ```text
 libs/admin/shared/config/src/
@@ -63,24 +52,21 @@ libs/admin/shared/config/src/
     └── app-config.ts
 ```
 
-- Лише `env/environment-reader.ts` звертається до `import.meta.env` і містить
-  посилання на типи Vite.
-- `config/app-config.ts` є чистою функцією з явним environment input; усі
-  fallback і parsing правила зосереджені в `env`.
-- Споживачі імпортують тільки `appConfig` з `@admin/shared/config`, а не Vite
-  env чи внутрішні модулі config.
+- Only `env/environment-reader.ts` accesses `import.meta.env` and references Vite types.
+- `config/app-config.ts` is a pure function with explicit environment input; all fallback and parsing rules are centralized in `env`.
+- Consumers import only `appConfig` from `@admin/shared/config`, not Vite env or internal config modules.
 
-## Локальний і клієнтський стан
+## Local and client state
 
-Локальний стан залишається у `feature`. Клієнтський стан домену, який має
-переживати розмонтування або використовуватися кількома сторінками, розміщується
-у `feature/state/<domain>.slice.ts`; reducer явно експортується для реєстрації в
-store. Не створюється slice для даних, які вже кешує RTK Query.
+Local state stays in `feature`. Domain client state that must survive unmounts
+or be used by multiple pages belongs in `feature/state/<domain>.slice.ts`; the
+reducer is explicitly exported for store registration. Do not create a slice
+for data already cached by RTK Query.
 
-## Форми
+## Forms
 
-Форма належить feature-сценарію. `ProductForm` отримує дані й обробники через
-props, не викликає API та не керує маршрутизацією; сторінки викликають mutations.
-Спільні контроли переносяться до `@admin/shared/ui` лише після доведеного
-повторного використання. Бібліотека форм і схема валідації обираються окремим ADR
-до першої реалізації.
+A form belongs to a feature scenario. `ProductForm` receives data and handlers
+through props, does not call the API or manage routing; pages call mutations.
+Move shared controls to `@admin/shared/ui` only after reuse is demonstrated.
+Choose the form library and validation schema in a separate ADR before the
+first implementation.

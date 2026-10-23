@@ -1,48 +1,53 @@
-# Admin: оболонка, навігація і сесія
+# Admin: Shell, Navigation, and Session
 
-**Стан:** наявна реалізація, звірено 2026-10-16.
+**Status:** implementation exists, checked 2026-10-16.
 
-`apps/admin-react` запускає React, складає providers і `AppRouter`. `AdminLayout` із `libs/admin/core/shell` показує навігацію та `Outlet`; список пунктів залежить від фактично доступних маршрутів. `libs/admin/core/auth` надає сесію для API transport, а `libs/admin/shared/config` — runtime-конфігурацію. Це спільна основа для доменних сторінок, а не окреме місце для їхніх бізнес-правил.
+`apps/admin-react` starts React and composes providers and `AppRouter`.
+`AdminLayout` from `libs/admin/core/shell` displays navigation and `Outlet`; the
+list of items depends on routes that are actually available.
+`libs/admin/core/auth` provides the session for API transport, while
+`libs/admin/shared/config` provides runtime configuration. This is the shared
+foundation for domain pages, not a separate place for their business rules.
 
-## Схема будови
+## Structure diagram
 
 ```mermaid
 flowchart LR
   App["apps/admin-react: providers"] --> Router["AppRouter"]
-  Router --> Layout["AdminLayout: навігація"]
-  Layout --> Outlet["Outlet: доменні сторінки"]
-  Auth["core/auth: сесія"] --> Transport["API transport"]
+  Router --> Layout["AdminLayout: navigation"]
+  Layout --> Outlet["Outlet: domain pages"]
+  Auth["core/auth: session"] --> Transport["API transport"]
   Config["shared/config"] --> App
 ```
 
-## Структура в коді
+## Code structure
 
 ```text
 apps/admin-react/
 └── src/app/
     ├── router/
-    │   ├── app-router.tsx # маршрутизатор
-    │   └── navigation-config.ts # навігація
-    └── app.tsx # композиція
+    │   ├── app-router.tsx # router
+    │   └── navigation-config.ts # navigation
+    └── app.tsx # composition
 ```
 
 ```text
 libs/admin/core/
 ├── auth/src/
 │   ├── session/
-│   │   └── auth-session.ts # сесія
-│   └── index.ts # сесія
+│   │   └── auth-session.ts # session
+│   └── index.ts # session
 └── shell/src/
     ├── layout/
-    │   └── admin-layout.tsx # оболонка та Outlet
+    │   └── admin-layout.tsx # shell and Outlet
     └── navigation/
-        └── admin-navigation.tsx # навігація
+        └── admin-navigation.tsx # navigation
 ```
 
 ```text
 libs/admin/shared/
 └── config/src/config/
-    └── app-config.ts # runtime-конфігурація
+    └── app-config.ts # runtime configuration
 ```
 
-**Де шукати:** [композиція](../../../apps/admin-react/src/app/app.tsx), [маршрутизатор](../../../apps/admin-react/src/app/router/app-router.tsx), [навігація](../../../apps/admin-react/src/app/router/navigation-config.ts), [сесія](../../../libs/admin/core/auth/src/index.ts), [архітектура маршрутів](../../architecture/admin/runtime/application.md), [специфікація оболонки](../../specs/admin/shell/001-react-admin-shell-theme/README.md).
+**Where to look:** [composition](../../../apps/admin-react/src/app/app.tsx), [router](../../../apps/admin-react/src/app/router/app-router.tsx), [navigation](../../../apps/admin-react/src/app/router/navigation-config.ts), [session](../../../libs/admin/core/auth/src/index.ts), [routing architecture](../../architecture/admin/runtime/application.md), [shell specification](../../specs/admin/shell/001-react-admin-shell-theme/README.md).

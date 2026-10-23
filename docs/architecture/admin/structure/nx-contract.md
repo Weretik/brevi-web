@@ -1,14 +1,14 @@
-# Nx-контракт і публічний API Admin
+# Admin Nx Contract and Public API
 
-## Теги та aliases
+## Tags and aliases
 
-Нові бібліотеки Admin отримують теги за областю, доменом і типом:
+New Admin libraries receive tags by scope, domain, and type:
 
 ```json
 { "tags": ["scope:admin", "domain:products", "type:feature"] }
 ```
 
-Aliases відповідають шаблону:
+Aliases follow these patterns:
 
 ```text
 @admin/<domain>/<layer>
@@ -16,21 +16,21 @@ Aliases відповідають шаблону:
 @admin/shared/<area>
 ```
 
-## Публічний API бібліотек
+## Public library API
 
-Кожна бібліотека розкриває дозволений API лише через `src/index.ts`. Сторінки за
-замовчуванням не експортуються: застосунок підключає конфігурацію маршрутів, а не
-реалізацію сторінки.
+Each library exposes its allowed API only through `src/index.ts`. Pages are
+not exported by default: the application wires route configuration, not page
+implementations.
 
 ```ts
-// Правильно
+// Correct
 import { productsRoutes } from '@admin/products/feature';
 import { ProductCard } from '@admin/products/ui';
 
-// Неправильно
+// Incorrect
 import { ProductsPage } from '@admin/products/feature/src/pages/ProductsPage';
 ```
 
-Цільова конфігурація `@nx/enforce-module-boundaries` перевіряє `scope`, `domain`
-і `type`. До повного налаштування `domain:*`, `type:model` та orchestration-виключень
-ці правила додатково перевіряються під час code review.
+The target `@nx/enforce-module-boundaries` configuration checks `scope`,
+`domain`, and `type`. Until `domain:*`, `type:model`, and orchestration
+exceptions are fully configured, also check these rules during code review.

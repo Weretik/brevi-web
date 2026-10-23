@@ -1,37 +1,36 @@
-# Архітектура Admin
+# Admin Architecture
 
-- **Область:** цільова архітектура React Web застосунку `apps/admin-react`
-- **Статус:** частково реалізована; фактичний стан описаний у
-  [frontend inventory](../frontend-inventory.md)
-- **Підхід:** domain-first
+- **Scope:** target architecture for the React Web application `apps/admin-react`
+- **Status:** partially implemented; the actual state is described in the [frontend inventory](../frontend-inventory.md)
+- **Approach:** domain-first
 
-## Призначення
+## Purpose
 
-Документи задають цільовий архітектурний контракт React Admin: межі доменів,
-допустимі залежності, організацію стану й API, правила Nx та SDD-процес. Нову
-можливість спочатку описують специфікацією, а потім реалізують у цих межах.
-Спільний shell і тема React Admin реалізовані за
-[SDD оболонки](../../specs/admin/shell/001-react-admin-shell-theme/README.md).
-[Карта наявних модулів](structure/modules.md) відокремлює реалізовані Nx projects і
-маршрути від цільових структур у решті документів. Перед зміною перевіряй
-фактичний стан у коді.
+These documents define the target architectural contract for React Admin:
+domain boundaries, allowed dependencies, state and API organization, Nx rules,
+and the SDD process. A new capability is first described in a specification,
+then implemented within these boundaries. The shared React Admin shell and
+theme are implemented according to the [shell SDD](../../specs/admin/shell/001-react-admin-shell-theme/README.md).
+The [map of existing modules](structure/modules.md) distinguishes implemented
+Nx projects and routes from target structures in the other documents. Check
+the actual state in code before making changes.
 
-## Карта документів
+## Document map
 
-- [Наявні модулі та маршрути](structure/modules.md)
-- [Фактичні функціональності Admin](../../features/README.md#admin-react-appsadmin-react)
-- [Застосунок і маршрутизація](runtime/application.md)
-- [Домени та внутрішня структура feature](structure/domains.md)
-- [Правила залежностей](structure/dependencies.md)
-- [Nx-контракт і публічний API](structure/nx-contract.md)
-- [Стан, API та форми](runtime/state-and-api.md)
-- [API-контракти та інтеграційні домовленості](../api/README.md)
-- [SDD-процес і відкриті рішення](sdd-process.md)
+- [Existing modules and routes](structure/modules.md)
+- [Existing Admin features](../../features/README.md#admin-react-appsadmin-react)
+- [Application and routing](runtime/application.md)
+- [Domains and internal feature structure](structure/domains.md)
+- [Dependency rules](structure/dependencies.md)
+- [Nx contract and public API](structure/nx-contract.md)
+- [State, API, and forms](runtime/state-and-api.md)
+- [API contracts and integration conventions](../api/README.md)
+- [SDD process and open decisions](sdd-process.md)
 
-Пов’язані стандарти:
+Related standards:
 
-- [Організація коду Admin](../../standards/admin/admin-code-organization.md)
-- [Інтерфейс Admin](../../standards/admin/admin-ui.md)
-- [Стратегія тестування](../../standards/shared/testing-rules.md)
-- [Правила безпеки](../../standards/admin/security-rules.md)
-- [ADR Admin](adr/)
+- [Admin code organization](../../standards/admin/admin-code-organization.md)
+- [Admin UI](../../standards/admin/admin-ui.md)
+- [Testing strategy](../../standards/shared/testing-rules.md)
+- [Security rules](../../standards/admin/security-rules.md)
+- [Admin ADRs](adr/)

@@ -1,38 +1,42 @@
-# Storefront: контакти
+# Storefront: Contacts
 
-**Стан:** наявний маршрут і сторінка, звірено 2026-10-16.
+**Status:** route and page exist, checked 2026-10-16.
 
-`/uk|ru/contacts` ліниво відкриває `ContactsPage`. Сторінка складає `ContactUs` і `OurTeam`, а заголовок і breadcrumbs формує з активної мови через Transloco та `PageHeader` зі `storefront/ui`. Фактичні інтерактивні дії перевіряй у секціях, не припускаючи backend-форму лише з назви `ContactUs`.
+`/uk|ru/contacts` lazily opens `ContactsPage`. The page composes `ContactUs`
+and `OurTeam`, while the heading and breadcrumbs are built from the active
+language through Transloco and `PageHeader` from `storefront/ui`. Check actual
+interactive behavior in the sections; do not assume a backend form from the
+name `ContactUs` alone.
 
-## Схема будови
+## Structure diagram
 
 ```mermaid
 flowchart LR
-  Route["/uk або /ru /contacts"] --> Page["ContactsPage"]
+  Route["/uk or /ru /contacts"] --> Page["ContactsPage"]
   Page --> Contact["ContactUs"]
   Page --> Team["OurTeam"]
-  Page --> Header["PageHeader: мова й breadcrumbs"]
+  Page --> Header["PageHeader: language and breadcrumbs"]
 ```
 
-## Структура в коді
+## Code structure
 
 ```text
 libs/storefront/feature/contacts/
 └── src/lib/
     ├── page/
-    │   └── contacts.page.ts # сторінка
+    │   └── contacts.page.ts # page
     ├── sections/
     │   ├── contact-us/
-    │   │   └── contact-us.ts # контактна секція
+    │   │   └── contact-us.ts # contact section
     │   └── our-team/
-    │       └── our-team.ts # секція команди
-    └── lib.routes.ts # маршрут
+    │       └── our-team.ts # team section
+    └── lib.routes.ts # route
 ```
 
 ```text
 libs/storefront/ui/
 └── src/lib/page-header/
-    └── page-header.ts # спільний заголовок
+    └── page-header.ts # shared heading
 ```
 
-**Де шукати:** [маршрут](../../../../libs/storefront/feature/contacts/src/lib/lib.routes.ts), [сторінка](../../../../libs/storefront/feature/contacts/src/lib/page/contacts.page.ts), [контактна секція](../../../../libs/storefront/feature/contacts/src/lib/sections/contact-us/contact-us.ts), [секція команди](../../../../libs/storefront/feature/contacts/src/lib/sections/our-team/our-team.ts).
+**Where to look:** [route](../../../../libs/storefront/feature/contacts/src/lib/lib.routes.ts), [page](../../../../libs/storefront/feature/contacts/src/lib/page/contacts.page.ts), [contact section](../../../../libs/storefront/feature/contacts/src/lib/sections/contact-us/contact-us.ts), [team section](../../../../libs/storefront/feature/contacts/src/lib/sections/our-team/our-team.ts).

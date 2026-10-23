@@ -1,24 +1,31 @@
-# Архітектура Storefront
+# Storefront Architecture
 
-**Область:** наявний Angular SSR застосунок `apps/storefront`. Цей розділ описує фактичну композицію, маршрути й модулі Brevi Storefront. Він не переносить правила React Admin на Angular.
+**Scope:** the existing Angular SSR application `apps/storefront`. This section
+describes the actual composition, routes, and modules of Brevi Storefront. It
+does not apply React Admin rules to Angular.
 
-## Де шукати код
+## Where to find code
 
-- [Карта наявних модулів](modules.md) — Nx projects Storefront і їхні ролі.
-- [Фактичні функціональності Storefront](../../features/README.md#storefront-angular-appsstorefront) — окремі описи сторінок і зв'язків.
-- [Виконання Storefront](runtime.md) — SSR, hydration, маршрути, локалізація, стан і перевірки.
-- [Поточна API-межа](../api/storefront.md) — налаштований HTTP pipeline і фактичні споживачі.
-- `apps/storefront/src/app/app.config.ts` — глобальні providers: router, HTTP/interceptors, hydration, Transloco і PrimeNG.
-- `apps/storefront/src/app/app.routes.ts` — локалізовані маршрути `/uk` і `/ru` та композиція маршрутів feature-бібліотек.
-- `libs/storefront/feature/*/src/lib/lib.routes.ts` — маршрути відповідних feature; у `order-in-bulk` і `regions` є додатковий однойменний рівень каталогу.
+- [Map of existing modules](modules.md) — Storefront Nx projects and their roles.
+- [Existing Storefront features](../../features/README.md#storefront-angular-appsstorefront) — individual page and relationship descriptions.
+- [Storefront runtime](runtime.md) — SSR, hydration, routes, localization, state, and checks.
+- [Current API boundary](../api/storefront.md) — configured HTTP pipeline and actual consumers.
+- `apps/storefront/src/app/app.config.ts` — global providers: router, HTTP/interceptors, hydration, Transloco, and PrimeNG.
+- `apps/storefront/src/app/app.routes.ts` — localized `/uk` and `/ru` routes and feature library route composition.
+- `libs/storefront/feature/*/src/lib/lib.routes.ts` — routes for the corresponding features; `order-in-bulk` and `regions` have an additional same-named nested directory.
 
-## Межі відповідальності
+## Responsibilities
 
-`apps/storefront` збирає застосунок. `libs/storefront/feature/*` містять окремі сценарії та сторінки; `shell` — спільну оболонку, `ui` — повторно використовувану презентацію, `data-access` — доступ до даних, `util` — утиліти. Загальні `libs/shared/*` використовуються за фактичними публічними API. Перед зміною перевір точні залежності в коді й Nx, не припускаючи, що кожна feature має власні `model` або `data-access` бібліотеки.
+`apps/storefront` composes the application. `libs/storefront/feature/*` contain
+individual scenarios and pages; `shell` is the shared shell, `ui` contains
+reusable presentation, `data-access` provides data access, and `util` contains
+utilities. Shared `libs/shared/*` are used according to their actual public
+APIs. Before making changes, check exact dependencies in the code and Nx; do
+not assume every feature has its own `model` or `data-access` library.
 
-## Правила та перевірки
+## Rules and checks
 
-- [Frontend inventory](../frontend-inventory.md) — поточний стек і Nx targets.
-- [Правила UI Storefront](../../standards/storefront-ui.md) — PrimeNG і стилізація.
-- [Індекс standards](../../standards/README.md) — область застосування інших правил.
-- [Специфікації](../../specs/README.md) — наявні feature specs; створюй нову лише за правилами проєкту.
+- [Frontend inventory](../frontend-inventory.md) — current stack and Nx targets.
+- [Storefront UI rules](../../standards/storefront-ui.md) — PrimeNG and styling.
+- [Standards index](../../standards/README.md) — scope of other rules.
+- [Specifications](../../specs/README.md) — existing feature specs; create a new one only under project rules.

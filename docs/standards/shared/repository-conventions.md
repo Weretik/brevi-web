@@ -1,12 +1,12 @@
-# Правила роботи з файлами репозиторію
+# Repository File Conventions
 
-## Код і межі зміни
+## Code and change boundaries
 
-- Зберігай наявні public APIs, поведінку та naming conventions, якщо задача не вимагає їх зміни.
-- Використовуй доменні, зрозумілі назви для нових змінних, параметрів, функцій і типів; не додавай speculative abstractions або dead code.
-- Тримай локальну зміну в її scope; не додавай незв'язані refactoring, оновлення dependencies або tooling.
+- Preserve existing public APIs, behavior, and naming conventions unless the task requires a change.
+- Use clear, domain-specific names for new variables, parameters, functions, and types; do not add speculative abstractions or dead code.
+- Keep local changes within their scope; do not add unrelated refactoring, dependency updates, or tooling.
 
-## Кодування тексту
+## Text encoding
 
-- Зберігай UTF-8 при читанні й записі файлів. Перевіряй, що українські та інші кириличні рядки не пошкодилися.
-- Видимий користувачу текст записуй читабельним UTF-8; `\uXXXX` використовуй лише тоді, коли цього вимагає конкретний формат або задача.
+- Preserve UTF-8 when reading and writing files. Check that Ukrainian and other Cyrillic text has not been corrupted.
+- Write user-visible text as readable UTF-8; use `\uXXXX` only when a specific format or task requires it.

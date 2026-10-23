@@ -1,21 +1,27 @@
-# Admin: товари
+# Admin: Products
 
-**Стан:** маршрути та сторінки реалізовані, звірено 2026-10-16.
+**Status:** routes and pages implemented, checked 2026-10-16.
 
-`/references/products` показує список з пошуком, сортуванням, сторінками й видаленням; `/create`, `/:id` і `/:id/edit` відкривають створення, деталі та редагування. `products/feature` володіє сценаріями, локальним станом і обробкою loading/error/empty; `products/ui` — презентацією; `products/model` — доменними моделями; `products/data-access` — API endpoints, маперами і валідацією відповіді. Сторінки ліниво завантажує route-файл; `AppRouter` імпортує тільки `productsRoutes`.
+`/references/products` shows a list with search, sorting, pagination, and
+deletion; `/create`, `/:id`, and `/:id/edit` open create, detail, and edit
+pages. `products/feature` owns scenarios, local state, and loading/error/empty
+handling; `products/ui` provides presentation; `products/model` provides domain
+models; and `products/data-access` provides API endpoints, mappers, and
+response validation. The route file lazy-loads pages; `AppRouter` imports only
+`productsRoutes`.
 
-## Схема будови
+## Structure diagram
 
 ```mermaid
 flowchart LR
   Router["AppRouter"] --> Routes["productsRoutes: lazy pages"]
-  Routes --> Feature["products/feature: список, деталі, редактор"]
-  Feature --> UI["products/ui: представлення"]
-  Feature --> Model["products/model: типи"]
-  Feature --> Data["products/data-access: API і мапери"]
+  Routes --> Feature["products/feature: list, detail, editor"]
+  Feature --> UI["products/ui: presentation"]
+  Feature --> Model["products/model: types"]
+  Feature --> Data["products/data-access: API and mappers"]
 ```
 
-## Структура в коді
+## Code structure
 
 ```text
 libs/admin/products/
@@ -23,22 +29,22 @@ libs/admin/products/
 │   ├── api/
 │   │   └── products.api.ts # API
 │   └── mappers/
-│       └── product.mapper.ts # мапер
+│       └── product.mapper.ts # mapper
 ├── feature/src/
 │   ├── components/product-editor/
-│   │   └── product-editor.tsx # редактор
+│   │   └── product-editor.tsx # editor
 │   ├── pages/
 │   │   ├── product-detail/
-│   │   │   └── product-detail-page.tsx # деталі
+│   │   │   └── product-detail-page.tsx # details
 │   │   ├── product-editor/
-│   │   │   └── product-create-page.tsx # створення
+│   │   │   └── product-create-page.tsx # creation
 │   │   └── product-list/
-│   │       └── products-page.tsx # сторінка списку
-│   └── products.routes.tsx # маршрути
+│   │       └── products-page.tsx # list page
+│   └── products.routes.tsx # routes
 ├── model/src/product-editor/
-│   └── product-draft.ts # чернетка
+│   └── product-draft.ts # draft
 └── ui/src/product-editor/core/
-    └── product-base-fields.tsx # поля форми
+    └── product-base-fields.tsx # form fields
 ```
 
-**Де шукати:** [маршрути](../../../../libs/admin/products/feature/src/products.routes.tsx), [сторінка списку](../../../../libs/admin/products/feature/src/pages/product-list/products-page.tsx), [редактор](../../../../libs/admin/products/feature/src/components/product-editor/product-editor.tsx), [API](../../../../libs/admin/products/data-access/src/api/products.api.ts), [специфікації товарів](../../../specs/admin/products/README.md).
+**Where to look:** [routes](../../../../libs/admin/products/feature/src/products.routes.tsx), [list page](../../../../libs/admin/products/feature/src/pages/product-list/products-page.tsx), [editor](../../../../libs/admin/products/feature/src/components/product-editor/product-editor.tsx), [API](../../../../libs/admin/products/data-access/src/api/products.api.ts), [product specifications](../../../specs/admin/products/README.md).

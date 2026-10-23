@@ -1,27 +1,23 @@
-# Правила UI Admin
+# Admin UI Rules
 
-## Мова та компоненти
+## Language and components
 
-- Видимі рядки, accessible names, empty/error messages і feature specs пишіть українською.
-- Використовуйте наявні MUI patterns і theme; не створюйте локальні design tokens без потреби.
-- Для table, dialog, select, pagination та інших складних business controls використовуйте наявні MUI components.
-- Не змінюйте глобальні стилі, theme або routing заради локальної feature.
+- Write visible strings, accessible names, empty/error messages, and feature specs in Ukrainian.
+- Use existing MUI patterns and theme; do not create local design tokens without a need.
+- Use existing MUI components for tables, dialogs, selects, pagination, and other complex business controls.
+- Do not change global styles, theme, or routing for a local feature.
 
-## Стани та доступність
+## States and accessibility
 
-- Кожен екран із server data визначає застосовні `loading`, `success`, `empty`, `error` та `forbidden` states.
-- Error state показує зрозуміле повідомлення без transport details і доступну retry-дію, якщо вона можлива.
-- Інтерактивні елементи мають semantic HTML, keyboard navigation, visible focus і доступне ім'я.
-- Icon-only control має `aria-label` або наявний еквівалент.
-- Перевіряйте layout на погоджених вузьких і широких breakpoints.
+- Each screen with server data defines applicable `loading`, `success`, `empty`, `error`, and `forbidden` states.
+- Error states show a clear message without transport details and an available retry action when possible.
+- Interactive elements use semantic HTML, keyboard navigation, visible focus, and an accessible name.
+- Icon-only controls have an `aria-label` or existing equivalent.
+- Check layout at the agreed narrow and wide breakpoints.
 
-## Перевірка UI
+## UI verification
 
-- `SC-*` описує очікуваний результат для користувача і не замінює test file.
-- Нова interaction або зміна loading, empty, error, forbidden чи success state
-  має focused component test після налаштування доступного test target.
-- Keyboard, focus і accessible-name behavior автоматизуйте на component level,
-  якщо DOM environment відтворює ризик; реальний browser journey перевіряйте E2E
-  лише для критичного flow.
-- Візуальну перевірку breakpoints і theme фіксуйте як manual evidence, доки в
-  repository немає погодженого visual-regression tooling.
+- `SC-*` describes the expected user outcome and does not replace a test file.
+- A new interaction or change to loading, empty, error, forbidden, or success behavior requires a focused component test once a suitable test target is configured.
+- Automate keyboard, focus, and accessible-name behavior at component level when the DOM environment reproduces the risk; use E2E for a real browser journey only for a critical flow.
+- Record visual checks of breakpoints and theme as manual evidence until the repository has agreed visual regression tooling.

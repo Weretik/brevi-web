@@ -1,34 +1,34 @@
-﻿# AI-навігація: Brevi Web
+# AI navigation: Brevi Web
 
-Це коротка точка входу для роботи в цьому frontend-репозиторії. Фактичний стан і правила визначають файли самого проєкту; читай документи, потрібні для конкретної задачі.
+This is a short entry point for working in this frontend repository. The project files define its actual state and rules; read only the documents needed for the specific task.
 
-## Контекст проєкту
+## Project context
 
-- [Frontend inventory](docs/architecture/frontend-inventory.md) — застосунки, інструменти та доступні Nx targets.
-- Архітектура застосунків: [Admin React](docs/architecture/admin/README.md) і [Storefront Angular](docs/architecture/storefront/README.md).
-- [Карта фактичних функціональностей](docs/features/README.md) — окремі описи Admin і Storefront з маршрутами, межами та кодом.
-- [Індекс standards](docs/standards/README.md) — сталі правила коду, UI, API, тестування, безпеки та постачання.
+- [Frontend inventory](docs/architecture/frontend-inventory.md) — applications, tools, and available Nx targets.
+- Application architecture: [Admin React](docs/architecture/admin/README.md) and [Storefront Angular](docs/architecture/storefront/README.md).
+- [Implemented feature map](docs/features/README.md) — separate Admin and Storefront descriptions with routes, boundaries, and code.
+- [Standards index](docs/standards/README.md) — stable rules for code, UI, API, testing, security, and delivery.
 
-Визнач застосунок за запитом і поточним кодом. Якщо вибір між React та Angular змінює результат і його не можна встановити з контексту, уточни його перед створенням файлів.
+Identify the application from the request and current code. If choosing between React and Angular affects the result and cannot be determined from context, clarify it before creating files. For task-specific context, navigate from the [feature map](docs/features/README.md) to the relevant feature card and code; read SDD, architecture, and standards only for the issues involved.
 
-Для нової реалізованої функціональності створи стислий опис її поведінки, компонентів, стану, даних та зв'язків у `docs/features/admin/` або `docs/features/storefront/`: використовуй наявну змістову групу (наприклад, `admin/references`, `admin/products` або `storefront/information`), якщо вона відповідає фічі; не створюй підкаталог заради однієї картки. Одразу додай посилання до [карти](docs/features/README.md). У картці під заголовком «Схема будови» додай компактну Mermaid-схему перевірених частин і зв'язків, а під «Структура в коді» — дерево фактичних каталогів і ключових файлів з короткими поясненнями ролей. Для різних коренів (`apps/`, `libs/`) використовуй окремі дерева; не зображай заплановану структуру як наявну. Для статичної сторінки достатньо маршруту й компонентів без вигаданих state чи API. Після суттєвої зміни наявної функціональності звір і онови її опис, схему та дерево коду. SDD зберігає вимоги й план, а карта описує фактичну реалізацію; неперевірені частини позначай явно.
+For a new or substantially changed feature, update the [feature map](docs/features/README.md) under the [delivery rules](docs/standards/shared/delivery-rules.md); do not document a minor internal change again.
 
-## Маршрутизація задач
+## Task routing
 
-| Задача                                                   | Навичка                                                  | Документація проєкту                                            |
-| -------------------------------------------------------- | -------------------------------------------------------- | --------------------------------------------------------------- |
-| Нова або змінена поведінка: специфікація                 | `$frontend-feature-spec`                                 | [Правила готовності](docs/standards/shared/delivery-rules.md)   |
-| Реалізація прийнятої специфікації                        | `$frontend-feature-delivery`                             | [Правила постачання](docs/standards/shared/delivery-rules.md)   |
-| Реалізація кількома агентами на прямий запит користувача | `$frontend-feature-orchestrator`                         | [Правила постачання](docs/standards/shared/delivery-rules.md)   |
-| Архітектурний аудит / системні порушення                 | `$frontend-code-audit` / `$frontend-remediation-plan`    | [Індекс standards](docs/standards/README.md)                    |
-| HTTP і API-контракти                                     | `$frontend-api-contract-sync`                            | [Contract workflow](docs/architecture/api/contract-workflow.md) |
-| Перевірка змін / передача на review                      | `$frontend-change-verification` / `$frontend-pr-handoff` | [Правила тестування](docs/standards/shared/testing-rules.md)    |
-| Розбіжності між кодом і документацією                    | `$frontend-docs-sync`                                    | [Індекс документації](docs/README.md)                           |
+| Task                                                          | Skill                                                    | Project documentation                                           |
+| ------------------------------------------------------------- | -------------------------------------------------------- | --------------------------------------------------------------- |
+| Specify new or changed behavior                               | `$frontend-feature-spec`                                 | [Readiness rules](docs/standards/shared/delivery-rules.md)      |
+| Implement an accepted specification                           | `$frontend-feature-delivery`                             | [Delivery rules](docs/standards/shared/delivery-rules.md)       |
+| Implement with multiple agents at the user's explicit request | `$frontend-feature-orchestrator`                         | [Delivery rules](docs/standards/shared/delivery-rules.md)       |
+| Architecture audit / systemic violations                      | `$frontend-code-audit` / `$frontend-remediation-plan`    | [Standards index](docs/standards/README.md)                     |
+| HTTP and API contracts                                        | `$frontend-api-contract-sync`                            | [Contract workflow](docs/architecture/api/contract-workflow.md) |
+| Verify changes / hand off for review                          | `$frontend-change-verification` / `$frontend-pr-handoff` | [Testing rules](docs/standards/shared/testing-rules.md)         |
+| Differences between code and documentation                    | `$frontend-docs-sync`                                    | [Documentation index](docs/README.md)                           |
 
-## Пріоритет процесу
+## Process priority
 
-Пряме доручення користувача та правила цього репозиторію визначають межі роботи. Для специфікації, реалізації й перевірки фічі використовуй відповідні `frontend-*` навички та проєктні документи як основний процес. Навички Superpowers можна застосовувати для конкретних методів, наприклад систематичного налагодження, але вони не додають повторного погодження, обов'язкових агентів, worktree чи окремого TDD-циклу поверх проєктного процесу. Виконуй перевірки та тестування за правилами цього репозиторію й вимогами задачі.
+The user's direct request and this repository's rules define the scope of work. For feature specification, implementation, and verification, use the relevant `frontend-*` skills and project documents as the primary process. Apply additional skills only for a needed method; they do not add repeated approval, mandatory agents, a worktree, or a separate TDD cycle on top of the project process. Run checks and tests according to this repository's rules and the task requirements.
 
-## Перевірки
+## Verification
 
-Обирай перевірки за зміненими Nx projects і [правилами тестування](docs/standards/shared/testing-rules.md). Наявні targets визначай із `project.json` або `npx nx show project <name> --json`; inventory є знімком, а поточна конфігурація має пріоритет.
+During implementation, run only automated tests for the changed feature and related parts under the [testing rules](docs/standards/shared/testing-rules.md). Run general tests, the full suite, coverage, production build, E2E, or a full audit only at the user's explicit request. Determine available targets from `project.json` or `npx nx show project <name> --json`; the inventory is a snapshot, while current configuration takes precedence.

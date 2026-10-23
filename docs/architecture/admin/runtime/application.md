@@ -1,49 +1,47 @@
-# Застосунок і маршрутизація Admin
+# Admin Application and Routing
 
-## Застосунок `apps/admin-react`
+## Application `apps/admin-react`
 
-Застосунок має бути точкою композиції. Тут розміщуються запуск React, кореневі провайдери,
-маршрутизація, глобальні стилі та підключення feature-бібліотек. Бізнес-правила,
-API-виклики й доменні компоненти тут не розміщуються.
+The application should be the composition root. It hosts React startup, root
+providers, routing, global styles, and feature library wiring. Business rules,
+API calls, and domain components do not belong here.
 
-Станом на 2026-10-16 `AppRouter` підключає спільний layout, кореневу сторінку,
-`productsRoutes`, `referencesRoutes` і fallback невідомої адреси. Реалізації
-сторінок завантажуються в доменних route-файлах, а застосунок імпортує
-лише публічні конфігурації маршрутів.
-Кожен домен експортує іменовану конфігурацію маршрутів із публічної точки входу.
+As of 2026-10-16, `AppRouter` wires the shared layout, root page,
+`productsRoutes`, `referencesRoutes`, and a fallback for unknown URLs. Page
+implementations are loaded from domain route files, while the application
+imports only public route configurations. Each domain exports a named route
+configuration from its public entry point.
 
 ```text
 productsRoutes   ─┐
 referencesRoutes ─┴→ AppRouter
 ```
 
-Приклад допустимого підключення:
+Example of valid wiring:
 
 ```ts
 import { productsRoutes } from '@admin/products/feature';
 import { referencesRoutes } from '@admin/references/feature';
 ```
 
-`AdminLayout` залишається елементом маршруту з `Outlet`. Розташування файла
-router може змінюватися без зміни цього правила.
+`AdminLayout` remains a route element with `Outlet`. The router file location
+may change without changing this rule.
 
-## Ліниве завантаження маршрутних функціональностей
+## Lazy loading route features
 
-- Сторінки функціональностей, які є входами маршрутів, експортують компонент
-  сторінки за замовчуванням і завантажуються короткою формою
-  `lazy(() => import('./pages/<page>'))` зі свого модуля `<domain>.routes.tsx`.
-  Адаптери іменованого експорту з `.then(...)` для маршрутних сторінок не
-  використовуються.
-- `AdminLayout` володіє єдиним резервним вмістом `Suspense` навколо `Outlet`;
-  сторінки та функціональності не дублюють індикатори завантаження маршруту.
-  Резервний вміст показує лише стан
-  завантаження route chunk; він не виконує server request і не дублює loading
-  state конкретної сторінки.
-- Каркас, конфігурація маршрутів і мінімальні метадані маршрутів можуть
-  залишатися в початковому чанку. Реалізація сторінок, важкий доменний UI та
-  необов'язкові пакети MUI X мають залишатися за відповідною межею маршруту.
-- Ручну конфігурацію чанків додають лише тоді, коли аналіз збірки виявляє
-  міжмаршрутну залежність, яку не може розділити ліниве завантаження на рівні
-  маршрутів.
-- Зміна route boundaries перевіряється lint для shell і змінених feature, а
-  також `npx nx build admin-react`; build output має містити окремі page chunks.
+- Feature pages used as route entries export a default page component and are
+  loaded with the short form `lazy(() => import('./pages/<page>'))` from their
+  `<domain>.routes.tsx` module. Do not use named-export adapters with
+  `.then(...)` for route pages.
+- `AdminLayout` owns the single `Suspense` fallback around `Outlet`; pages and
+  features do not duplicate route loading indicators. The fallback shows only
+  route chunk loading; it does not make a server request or duplicate a page's
+  loading state.
+- The shell, route configuration, and minimal route metadata may remain in
+  the initial chunk. Page implementations, heavy domain UI, and optional MUI X
+  packages must remain behind the relevant route boundary.
+- Add manual chunk configuration only when bundle analysis reveals a
+  cross-route dependency that route-level lazy loading cannot split.
+- Verify route boundary changes with lint for the shell and changed features,
+  as well as `npx nx build admin-react`; build output must contain separate
+  page chunks.

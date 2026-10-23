@@ -1,3 +1,3 @@
-# Storefront: каталог
+# Storefront: catalog
 
-Архітектура списку та сторінки товару описана в [карті функціональності](../../../../docs/features/storefront/catalog.md). Вимоги та стан окремого сценарію звіряй за кодом і відповідною SDD, якщо вона з'явиться.
+The list and product-page architecture are described in the [feature map](../../../../docs/features/storefront/catalog.md). Check the requirements and status of a specific scenario against code and its SDD, if one is created.

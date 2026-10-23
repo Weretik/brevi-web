@@ -1,21 +1,25 @@
-# Admin: додаткові довідники
+# Admin: Additional Reference Data
 
-**Стан:** реалізований маршрут перегляду та редагування, звірено 2026-10-16.
+**Status:** view and edit route implemented, checked 2026-10-16.
 
-`/references/additional-reference` показує таблицю й діалог редагування вибраного запису. `references/feature` володіє завантаженням, локальним вибором, помилкою і повідомленням після збереження; `references/ui` показує таблицю; `references/data-access` інкапсулює endpoint і мапер. Не припускай повний CRUD лише з назви довідника: поточна сторінка відкриває редагування.
+`/references/additional-reference` shows a table and an edit dialog for the
+selected record. `references/feature` owns loading, local selection, errors,
+and the message after saving; `references/ui` displays the table;
+`references/data-access` encapsulates the endpoint and mapper. Do not assume
+full CRUD from the reference data name: the current page opens an edit flow.
 
-## Схема будови
+## Structure diagram
 
 ```mermaid
 flowchart LR
-  Route["/references/additional-reference"] --> Page["references/feature: таблиця й вибір"]
-  Page --> Dialog["діалог редагування"]
-  Page --> UI["references/ui: таблиця"]
-  Page --> Data["references/data-access: endpoint і мапер"]
+  Route["/references/additional-reference"] --> Page["references/feature: table and selection"]
+  Page --> Dialog["edit dialog"]
+  Page --> UI["references/ui: table"]
+  Page --> Data["references/data-access: endpoint and mapper"]
   Dialog --> Data
 ```
 
-## Структура в коді
+## Code structure
 
 ```text
 libs/admin/references/
@@ -23,19 +27,19 @@ libs/admin/references/
 │   ├── api/additional-references/
 │   │   └── additional-references.api.ts # API
 │   └── mappers/additional-references/
-│       └── additional-references.mapper.ts # мапер
+│       └── additional-references.mapper.ts # mapper
 ├── feature/src/
 │   ├── components/additional-references/
-│   │   └── additional-reference-dialog.tsx # редактор
+│   │   └── additional-reference-dialog.tsx # editor
 │   ├── hooks/additional-references/
-│   │   └── use-additional-references.ts # завантаження
+│   │   └── use-additional-references.ts # loading
 │   ├── pages/additional-references/
-│   │   └── additional-references-page.tsx # сторінка
-│   └── references.routes.tsx # маршрут
+│   │   └── additional-references-page.tsx # page
+│   └── references.routes.tsx # route
 ├── model/src/entities/additional-references/
-│   └── additional-reference.ts # модель
+│   └── additional-reference.ts # model
 └── ui/src/components/additional-references/
-    └── additional-references-grid.tsx # таблиця
+    └── additional-references-grid.tsx # table
 ```
 
-**Де шукати:** [маршрут](../../../../libs/admin/references/feature/src/references.routes.tsx), [сторінка](../../../../libs/admin/references/feature/src/pages/additional-references/additional-references-page.tsx), [API](../../../../libs/admin/references/data-access/src/api/additional-references/additional-references.api.ts), [SDD](../../../specs/admin/references/011-additional-references-pages/README.md).
+**Where to look:** [route](../../../../libs/admin/references/feature/src/references.routes.tsx), [page](../../../../libs/admin/references/feature/src/pages/additional-references/additional-references-page.tsx), [API](../../../../libs/admin/references/data-access/src/api/additional-references/additional-references.api.ts), [SDD](../../../specs/admin/references/011-additional-references-pages/README.md).

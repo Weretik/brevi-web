@@ -1,35 +1,35 @@
-# ADR-0001: Axios-транспорт для Admin RTK Query
+# ADR-0001: Axios Transport for Admin RTK Query
 
-**Статус:** Прийнято  
-**Дата:** 2026-07-22
+**Status:** Accepted\
+**Date:** 2026-07-22
 
-## Контекст
+## Context
 
-Admin використовує RTK Query для серверного стану, кешування, станів завантаження
-та інвалідації. Застосунку потрібна єдина транспортна межа для заголовків
-авторизації, логування, оновлення токена й нормалізації HTTP-помилок. Доменні
-бібліотеки не викликають Axios напряму.
+Admin uses RTK Query for server state, caching, loading states, and
+invalidation. The application needs a single transport boundary for
+authorization headers, logging, token refresh, and HTTP error normalization.
+Domain libraries do not call Axios directly.
 
-## Рішення
+## Decision
 
-- `@admin/shared/api-client` володіє одним екземпляром Axios — `axiosClient`.
-- `baseApi` використовує `axiosBaseQuery`; кожен endpoint повертає `ApiRequest` і не викликає Axios напряму.
-- `axiosBaseQuery` передає `AbortSignal` до Axios і перетворює помилки на публічний контракт `ApiError`.
-- Interceptor запиту додає bearer token із `AuthSessionAdapter` та передає credentials.
-- Interceptor відповіді обробляє `401` один раз для запиту; паралельні `401` спільно використовують refresh promise.
-- `admin/core/auth` володіє токенами, endpoint оновлення та logout; під час bootstrap він налаштовує API-клієнт і оновлює access token.
-- HTTP-логи містять лише метод, URL, статус і тривалість; їх вмикає `VITE_ENABLE_HTTP_LOGS`.
+- `@admin/shared/api-client` owns one Axios instance: `axiosClient`.
+- `baseApi` uses `axiosBaseQuery`; each endpoint returns `ApiRequest` and does not call Axios directly.
+- `axiosBaseQuery` forwards `AbortSignal` to Axios and converts errors into the public `ApiError` contract.
+- The request interceptor adds a bearer token from `AuthSessionAdapter` and forwards credentials.
+- The response interceptor handles `401` once per request; concurrent `401` responses share a refresh promise.
+- `admin/core/auth` owns tokens, the refresh endpoint, and logout; during bootstrap it configures the API client and refreshes the access token.
+- HTTP logs contain only method, URL, status, and duration; `VITE_ENABLE_HTTP_LOGS` enables them.
 
-## Контракт інтеграції
+## Integration contract
 
-Auth feature передає `AuthSessionAdapter` через `configureApiClient`. `refreshAccessToken`
-виконує `POST /api/auth/session/refresh` із `withCredentials: true`, передає
-`kedr.csrf` як `X-CSRF-Token` та використовує окремий raw Axios-клієнт, щоб не
-створити рекурсивне оновлення.
+The auth feature passes `AuthSessionAdapter` through `configureApiClient`.
+`refreshAccessToken` sends `POST /api/auth/session/refresh` with
+`withCredentials: true`, passes `kedr.csrf` as `X-CSRF-Token`, and uses a
+separate raw Axios client to avoid recursive refresh.
 
-## Наслідки
+## Consequences
 
-- Domain `data-access` розширює `baseApi` через `injectEndpoints` і не використовує Axios API.
-- `feature` споживає лише згенеровані RTK Query hooks і доменні моделі.
-- DTO-to-model mapping та валідація відповідей залишаються відповідальністю domain `data-access`.
-- Публічний `ApiError` містить `code`, `status`, `message`, а за потреби `fieldErrors` і `traceId`.
+- Domain `data-access` extends `baseApi` through `injectEndpoints` and does not use the Axios API.
+- `feature` consumes only generated RTK Query hooks and domain models.
+- DTO-to-model mapping and response validation remain the responsibility of domain `data-access`.
+- Public `ApiError` contains `code`, `status`, and `message`, plus `fieldErrors` and `traceId` when needed.

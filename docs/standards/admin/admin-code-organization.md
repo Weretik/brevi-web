@@ -1,40 +1,27 @@
-# Правила коду Admin
+# Admin Code Organization Rules
 
-## Бібліотеки та залежності
+## Libraries and dependencies
 
-- Розміщуйте domain-код у `libs/admin/<domain>/{model,data-access,ui,feature}`.
-  Не створюйте порожні бібліотеки наперед, але щойно відповідальність існує,
-  вона повинна мати визначеного власника: domain types/invariants — `model`,
-  transport/cache — `data-access`, повторно використовуване domain
-  presentation — `ui`, orchestration — `feature`.
-- `model` містить pure TypeScript types, query, defaults та інваріанти; він не залежить від React, HTTP або browser API.
-- `data-access` володіє private DTO, mapper та RTK Query hooks; він не містить JSX, router або feature-local state.
-- `ui` містить presentational components, forms, tables і states; він не викликає API або router.
-- `feature` оркеструє page, hooks і локальний UI-state; він передає domain data та callbacks у `ui`.
-- Між libraries імпортуйте тільки через alias і public `src/index.ts`; deep
-  imports і aliases безпосередньо на внутрішній файл заборонені. Додатковий
-  entry point дозволений лише як окремий задокументований public contract із
-  власною перевіркою меж, а не як обхід кореневого `index.ts`.
-- Public API експортує лише контракти для споживачів. Transport helpers,
-  private DTO adapters, response parsers і внутрішні mappers не експортуються.
-- Nx tags і `depConstraints` повинні реалізовувати той самий напрям залежностей,
-  що й документація. Новий шар не вважається створеним, доки lint реально
-  дозволяє правильні й забороняє зворотні залежності.
+- Place domain code in `libs/admin/<domain>/{model,data-access,ui,feature}`.
+  Do not create empty libraries in advance, but once a responsibility exists,
+  give it a clear owner: domain types/invariants belong in `model`,
+  transport/cache in `data-access`, reusable domain presentation in `ui`, and
+  orchestration in `feature`.
+- `model` contains pure TypeScript types, queries, defaults, and invariants; it does not depend on React, HTTP, or browser APIs.
+- `data-access` owns private DTOs, mappers, and RTK Query hooks; it contains no JSX, router, or feature-local state.
+- `ui` contains presentational components, forms, tables, and states; it does not call APIs or the router.
+- `feature` orchestrates pages, hooks, and local UI state; it passes domain data and callbacks to `ui`.
+- Between libraries, import only through aliases and public `src/index.ts`; deep imports and aliases directly to internal files are prohibited. An additional entry point is allowed only as a separate documented public contract with its own boundary check, not as a way around the root `index.ts`.
+- Public APIs export only consumer contracts. Do not export transport helpers, private DTO adapters, response parsers, or internal mappers.
+- Nx tags and `depConstraints` must enforce the same dependency direction as the documentation. A layer is not considered established until lint actually allows valid dependencies and blocks reverse dependencies.
 
-## Структура та стан
+## Structure and state
 
-- Один файл, компонент і каталог має одну цілісну відповідальність.
-- Групуйте внутрішній код за роллю: `components`, `pages`, `hooks`, `state`, `forms`, `tables`, `mappers`, `contracts`.
-- У `feature` спочатку використовуйте рольові каталоги `pages`, `components`,
-  `hooks`, `model`, `state`. Якщо рольовий каталог містить два або більше
-  незалежних flows/resources (наприклад list, editor, detail і media), створіть
-  у ньому capability-підкаталоги: `pages/product-list`,
-  `components/product-list`, `hooks/product-list`. Test розміщується поруч із
-  файлом свого рівня: page test біля page, hook test біля hook. Вісім і більше
-  production-файлів у рольовому каталозі — обов'язковий сигнал для
-  зафіксованого рішення `split/keep` в code audit.
+- Give each file, component, and directory one cohesive responsibility.
+- Group internal code by role: `components`, `pages`, `hooks`, `state`, `forms`, `tables`, `mappers`, `contracts`.
+- In `feature`, start with role-based directories `pages`, `components`, `hooks`, `model`, `state`. If a role directory contains two or more independent flows/resources (for example, list, editor, detail, and media), add capability subdirectories such as `pages/product-list`, `components/product-list`, and `hooks/product-list`. Place each test beside the file at its level: page tests next to pages, hook tests next to hooks. Eight or more production files in a role directory is a required signal to record a `split/keep` decision in the code audit.
 
-### Цільова схема `feature`
+### Target `feature` structure
 
 ```text
 libs/admin/<domain>/feature/src/
@@ -60,18 +47,17 @@ libs/admin/<domain>/feature/src/
 └── index.ts
 ```
 
-Порядок вкладеності обов'язковий: спочатку роль, потім module/capability.
-Каталоги `model` і `state` створюйте лише за наявності відповідної
-відповідальності. Test завжди залишається поруч із production-файлом того
-самого рівня.
+Nesting order is required: role first, then module/capability. Create `model`
+and `state` directories only when they have a corresponding responsibility.
+Keep each test next to its production file at the same level.
 
-- Не створюйте звалищні каталоги або назви: `common`, `misc`, `helpers`, `utils`, `types` без доменного призначення.
-- Server data, loading і API errors належать RTK Query; не дублюйте їх у reducer.
-- Простий feature-local state зберігайте в component state; reducer створюйте лише для пов'язаних переходів або shared feature state.
-- Не виконуйте HTTP і не ховайте business rules у JSX.
+- Do not create junk directories or names such as `common`, `misc`, `helpers`, `utils`, or `types` without a domain purpose.
+- Server data, loading, and API errors belong to RTK Query; do not duplicate them in a reducer.
+- Keep simple feature-local state in component state; create a reducer only for related transitions or shared feature state.
+- Do not perform HTTP requests or hide business rules in JSX.
 
-## Сторінки та маршрути
+## Pages and routes
 
-- Page є оркестратором; toolbar, table, complex cell і feature-only dialog розділяйте за незалежною відповідальністю.
-- Reusable dialog/form належить `ui` і отримує values, errors та callbacks через props.
-- Route, guards, global store і theme не змінюйте без явного scope feature.
+- A page is an orchestrator; separate toolbars, tables, complex cells, and feature-only dialogs when they have independent responsibilities.
+- Reusable dialogs/forms belong in `ui` and receive values, errors, and callbacks through props.
+- Do not change routes, guards, the global store, or theme without explicit feature scope.

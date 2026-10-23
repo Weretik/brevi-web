@@ -1,52 +1,56 @@
-# Storefront: головна сторінка
+# Storefront: Home Page
 
-**Стан:** наявний маршрут і компоненти, звірено 2026-10-16.
+**Status:** route and components exist, checked 2026-10-16.
 
-Під `/uk` і `/ru` порожній дочірній шлях відкриває `HomePage`. Сторінка складає власні секції hero, прев'ю компанії й переваги з повторно використовуваними `ProductCategories` та `InStockWorkwear` зі `storefront/ui`. Маршрут ліниво завантажує page component; локалізацію й спільну оболонку забезпечує застосунок.
+Under `/uk` and `/ru`, the empty child path opens `HomePage`. The page composes
+its own hero, company preview, and highlights sections with the reusable
+`ProductCategories` and `InStockWorkwear` from `storefront/ui`. The route
+lazy-loads the page component; the application provides localization and the
+shared shell.
 
-## Схема будови
+## Structure diagram
 
 ```mermaid
 flowchart LR
-  App["apps/storefront: /uk або /ru"] --> Route["home route: lazy load"]
+  App["apps/storefront: /uk or /ru"] --> Route["home route: lazy load"]
   Route --> Page["HomePage"]
-  Page --> Sections["hero, компанія, переваги"]
-  Page --> UI["storefront/ui: категорії й товари"]
+  Page --> Sections["hero, company, highlights"]
+  Page --> UI["storefront/ui: categories and products"]
 ```
 
-## Структура в коді
+## Code structure
 
 ```text
 apps/storefront/
 └── src/app/
-    └── app.routes.ts # загальні маршрути
+    └── app.routes.ts # shared routes
 ```
 
 ```text
 libs/storefront/feature/home/
 └── src/lib/
     ├── page/
-    │   └── home.page.ts # сторінка
+    │   └── home.page.ts # page
     ├── sections/
     │   ├── about-preview/
-    │   │   └── about-preview.ts # про компанію
+    │   │   └── about-preview.ts # company preview
     │   ├── company-highlights/
-    │   │   └── company-highlights.ts # переваги
+    │   │   └── company-highlights.ts # highlights
     │   └── main-hero/
     │       └── main-hero.ts # hero
-    └── lib.routes.ts # маршрут feature
+    └── lib.routes.ts # feature route
 ```
 
 ```text
 libs/storefront/shell/
 └── src/
-    └── index.ts # спільна оболонка
+    └── index.ts # shared shell
 ```
 
 ```text
 libs/storefront/ui/
 └── src/lib/sections/product-categories/
-    └── product-categories.ts # спільні категорії
+    └── product-categories.ts # shared categories
 ```
 
-**Де шукати:** [загальні маршрути](../../../apps/storefront/src/app/app.routes.ts), [маршрут feature](../../../libs/storefront/feature/home/src/lib/lib.routes.ts), [сторінка](../../../libs/storefront/feature/home/src/lib/page/home.page.ts), [спільна оболонка](../../../libs/storefront/shell/src/index.ts).
+**Where to look:** [shared routes](../../../apps/storefront/src/app/app.routes.ts), [feature route](../../../libs/storefront/feature/home/src/lib/lib.routes.ts), [page](../../../libs/storefront/feature/home/src/lib/page/home.page.ts), [shared shell](../../../libs/storefront/shell/src/index.ts).

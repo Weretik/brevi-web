@@ -1,37 +1,41 @@
-# Storefront: оптове замовлення
+# Storefront: Bulk Order
 
-**Стан:** наявна інформаційна сторінка, звірено 2026-10-16; назва маршруту сама по собі не доводить наявність оформлення замовлення через API.
+**Status:** informational page exists, checked 2026-10-16; the route name alone
+does not prove that order placement through an API exists.
 
-`/uk|ru/order-in-bulk` відкриває `OrderInBulkPage`, яка складає власну hero-секцію, `ProductCategories` і `InStockWorkwear` зі `storefront/ui`. Бібліотека має вкладений шлях `order-in-bulk/order-in-bulk`. Перевіряй сценарії оформлення окремо від цієї сторінки перед описом інтеграції із замовленнями.
+`/uk|ru/order-in-bulk` opens `OrderInBulkPage`, which composes its own hero
+section, `ProductCategories`, and `InStockWorkwear` from `storefront/ui`. The
+library has a nested path `order-in-bulk/order-in-bulk`. Check order placement
+scenarios separately from this page before documenting order integration.
 
-## Схема будови
+## Structure diagram
 
 ```mermaid
 flowchart LR
-  Route["/uk або /ru /order-in-bulk"] --> Page["OrderInBulkPage"]
-  Page --> Hero["локальна hero-секція"]
-  Page --> UI["storefront/ui: категорії й товари"]
+  Route["/uk or /ru /order-in-bulk"] --> Page["OrderInBulkPage"]
+  Page --> Hero["local hero section"]
+  Page --> UI["storefront/ui: categories and products"]
 ```
 
-## Структура в коді
+## Code structure
 
 ```text
 libs/storefront/feature/order-in-bulk/
 └── order-in-bulk/src/lib/
     ├── page/order-in-bulk-page/
-    │   └── order-in-bulk.page.ts # сторінка
+    │   └── order-in-bulk.page.ts # page
     ├── sections/hero/
-    │   └── hero.ts # секція hero
-    └── lib.routes.ts # маршрут
+    │   └── hero.ts # hero section
+    └── lib.routes.ts # route
 ```
 
 ```text
 libs/storefront/ui/
 └── src/lib/sections/
     ├── in-stock-workwear/
-    │   └── in-stock-workwear.ts # спільні товари
+    │   └── in-stock-workwear.ts # shared products
     └── product-categories/
-        └── product-categories.ts # спільні категорії
+        └── product-categories.ts # shared categories
 ```
 
-**Де шукати:** [маршрут](../../../libs/storefront/feature/order-in-bulk/order-in-bulk/src/lib/lib.routes.ts), [сторінка](../../../libs/storefront/feature/order-in-bulk/order-in-bulk/src/lib/page/order-in-bulk-page/order-in-bulk.page.ts), [секція hero](../../../libs/storefront/feature/order-in-bulk/order-in-bulk/src/lib/sections/hero/hero.ts).
+**Where to look:** [route](../../../libs/storefront/feature/order-in-bulk/order-in-bulk/src/lib/lib.routes.ts), [page](../../../libs/storefront/feature/order-in-bulk/order-in-bulk/src/lib/page/order-in-bulk-page/order-in-bulk.page.ts), [hero section](../../../libs/storefront/feature/order-in-bulk/order-in-bulk/src/lib/sections/hero/hero.ts).

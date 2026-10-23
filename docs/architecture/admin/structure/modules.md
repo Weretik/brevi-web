@@ -1,13 +1,21 @@
-# Наявні модулі Admin
+# Existing Admin Modules
 
-Це карта Nx projects, які зараз є в репозиторії, а не перелік запланованих бібліотек. Джерело — `project.json` у зазначених каталогах; перед зміною перевір актуальний код і [frontend inventory](../../frontend-inventory.md). Цільові межі та можливі майбутні домени описані в [domains.md](domains.md).
+This is a map of Nx projects currently in the repository, not a list of planned
+libraries. The source is `project.json` in the listed directories; check the
+current code and [frontend inventory](../../frontend-inventory.md) before
+making changes. Target boundaries and possible future domains are described
+in [domains.md](domains.md).
 
-| Область      | Наявні Nx projects                                     | Відповідальність                              |
-| ------------ | ------------------------------------------------------ | --------------------------------------------- |
-| Застосунок   | `apps/admin-react`, `apps/admin-react-e2e`             | Композиція React Admin і браузерні перевірки  |
-| Core         | `libs/admin/core/{auth,shell}`                         | Сесія та каркас застосунку                    |
-| Products     | `libs/admin/products/{model,data-access,ui,feature}`   | Модель товарів, API, презентація та сценарії  |
-| References   | `libs/admin/references/{model,data-access,ui,feature}` | Довідники Admin                               |
-| Admin shared | `libs/admin/shared/{api-client,config,contracts}`      | API transport, конфігурація й контракти Admin |
+| Area         | Existing Nx projects                                   | Responsibility                                    |
+| ------------ | ------------------------------------------------------ | ------------------------------------------------- |
+| Application  | `apps/admin-react`, `apps/admin-react-e2e`             | React Admin composition and browser checks        |
+| Core         | `libs/admin/core/{auth,shell}`                         | Session and application shell                     |
+| Products     | `libs/admin/products/{model,data-access,ui,feature}`   | Product model, API, presentation, and scenarios   |
+| References   | `libs/admin/references/{model,data-access,ui,feature}` | Admin reference data                              |
+| Admin shared | `libs/admin/shared/{api-client,config,contracts}`      | API transport, configuration, and Admin contracts |
 
-Поточний router у `apps/admin-react/src/app/router/app-router.tsx` підключає products і references. `orders`, `clients`, `dashboard` і `core/permissions` у [цільовій схемі](domains.md) не означають, що відповідні Nx projects вже існують. Спільні бібліотеки `libs/shared/*` перевіряй за кодом і [frontend inventory](../../frontend-inventory.md).
+The current router in `apps/admin-react/src/app/router/app-router.tsx` wires
+products and references. `orders`, `clients`, `dashboard`, and
+`core/permissions` in the [target structure](domains.md) do not mean the
+corresponding Nx projects already exist. Check shared `libs/shared/*` against
+the code and [frontend inventory](../../frontend-inventory.md).

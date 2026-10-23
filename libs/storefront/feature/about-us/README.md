@@ -1,3 +1,3 @@
-# Storefront: інформаційні сторінки
+# Storefront: information pages
 
-Архітектура маршрутів компанії та інформаційних сторінок описана в [карті функціональності](../../../../docs/features/storefront/information/about-us.md). Вимоги та стан окремого сценарію звіряй за кодом і відповідною SDD, якщо вона з'явиться.
+The company and information-page routes are described in the [feature map](../../../../docs/features/storefront/information/about-us.md). Check the requirements and status of a specific scenario against code and its SDD, if one is created.

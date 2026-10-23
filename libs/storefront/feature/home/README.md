@@ -1,3 +1,3 @@
-# Storefront: головна
+# Storefront: home
 
-Архітектура маршруту, сторінки й секцій описана в [карті функціональності](../../../../docs/features/storefront/home.md). Вимоги та стан окремого сценарію звіряй за кодом і відповідною SDD, якщо вона з'явиться.
+The route, page, and section architecture are described in the [feature map](../../../../docs/features/storefront/home.md). Check the requirements and status of a specific scenario against code and its SDD, if one is created.

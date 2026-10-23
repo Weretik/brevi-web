@@ -1,3 +1,3 @@
-# Storefront: контакти
+# Storefront: contacts
 
-Архітектура сторінки та секцій описана в [карті функціональності](../../../../docs/features/storefront/information/contacts.md). Вимоги та стан окремого сценарію звіряй за кодом і відповідною SDD, якщо вона з'явиться.
+The page and section architecture are described in the [feature map](../../../../docs/features/storefront/information/contacts.md). Check the requirements and status of a specific scenario against code and its SDD, if one is created.

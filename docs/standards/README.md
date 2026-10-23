@@ -1,15 +1,15 @@
-# Правила frontend-розробки
+# Frontend Development Rules
 
-Це індекс сталих правил. Feature-специфікації посилаються на них і не копіюють
-їх у task-файли.
+This is the index of stable rules. Feature specifications link to these rules
+instead of copying them into task files.
 
-## За застосунком
+## By application
 
-- **Admin React:** [організація коду](admin/admin-code-organization.md), [UI](admin/admin-ui.md), [API та дані](admin/api-data-rules.md), [безпека](admin/security-rules.md), [архітектура й модулі](../architecture/admin/README.md).
-- **Storefront Angular:** [UI та PrimeNG](storefront-ui.md), [архітектура й модулі](../architecture/storefront/README.md). Admin-правила RTK Query, MUI та AuthSessionAdapter не застосовуються до Angular.
+- **Admin React:** [code organization](admin/admin-code-organization.md), [UI](admin/admin-ui.md), [API and data](admin/api-data-rules.md), [security](admin/security-rules.md), [architecture and modules](../architecture/admin/README.md).
+- **Storefront Angular:** [UI and PrimeNG](storefront-ui.md), [architecture and modules](../architecture/storefront/README.md). Admin rules for RTK Query, MUI, and AuthSessionAdapter do not apply to Angular.
 
-## Робочий процес
+## Workflow
 
-- [Правила тестування](shared/testing-rules.md) — загальний вибір рівня за ризиком; React/Vitest/RTK Query та `admin-react-e2e` розділи стосуються Admin. Storefront targets перевіряй у Nx та [inventory](../architecture/frontend-inventory.md).
-- [Правила постачання](shared/delivery-rules.md) — готовність, трасування та завершення feature.
-- [Правила роботи з файлами](shared/repository-conventions.md) — scope зміни та UTF-8.
+- [Testing rules](shared/testing-rules.md) — general risk-based level selection; React/Vitest/RTK Query and `admin-react-e2e` sections apply to Admin. Check Storefront targets in Nx and the [inventory](../architecture/frontend-inventory.md).
+- [Delivery rules](shared/delivery-rules.md) — readiness, traceability, and feature completion.
+- [Repository file rules](shared/repository-conventions.md) — change scope and UTF-8.

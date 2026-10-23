@@ -1,33 +1,37 @@
-# Storefront: сторінка 404
+# Storefront: 404 Page
 
-**Стан:** реалізована, звірено 2026-10-16.
+**Status:** implemented, checked 2026-10-16.
 
-`notFoundRoutes` підключає локалізований `/uk|ru/404`; невідомі шляхи всередині мовного префікса перенаправляються туди. `NotFoundPage` показує локалізований текст, дає перейти до каталогу або назад; коли історії немає, повертає на локалізований початок. Зовнішній wildcard у `apps/storefront` спершу додає поточний мовний префікс.
+`notFoundRoutes` wires localized `/uk|ru/404`; unknown paths within a language
+prefix redirect there. `NotFoundPage` shows localized text and provides links
+to the catalog or back; if there is no history, it returns to the localized
+home page. The outer wildcard in `apps/storefront` first adds the current
+language prefix.
 
-## Схема будови
+## Structure diagram
 
 ```mermaid
 flowchart LR
-  Unknown["невідомий шлях"] --> Wildcard["apps/storefront: мовний префікс"]
-  Wildcard --> Route["/uk або /ru /404"]
+  Unknown["unknown path"] --> Wildcard["apps/storefront: language prefix"]
+  Wildcard --> Route["/uk or /ru /404"]
   Route --> Page["NotFoundPage"]
-  Page --> Links["каталог або назад"]
+  Page --> Links["catalog or back"]
 ```
 
-## Структура в коді
+## Code structure
 
 ```text
 libs/storefront/feature/not-found/
 └── src/lib/
     ├── page/not-found-page/
-    │   └── not-found.page.ts # сторінка
-    └── lib.routes.ts # маршрут feature
+    │   └── not-found.page.ts # page
+    └── lib.routes.ts # feature route
 ```
 
 ```text
 apps/storefront/
 └── src/app/
-    └── app.routes.ts # кореневі маршрути
+    └── app.routes.ts # root routes
 ```
 
-**Де шукати:** [маршрут feature](../../../libs/storefront/feature/not-found/src/lib/lib.routes.ts), [сторінка](../../../libs/storefront/feature/not-found/src/lib/page/not-found-page/not-found.page.ts), [кореневі маршрути](../../../apps/storefront/src/app/app.routes.ts).
+**Where to look:** [feature route](../../../libs/storefront/feature/not-found/src/lib/lib.routes.ts), [page](../../../libs/storefront/feature/not-found/src/lib/page/not-found-page/not-found.page.ts), [root routes](../../../apps/storefront/src/app/app.routes.ts).

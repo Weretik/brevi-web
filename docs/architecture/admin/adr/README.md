@@ -1,5 +1,5 @@
-# ADR для Admin
+# Admin ADRs
 
-Рішення Admin зберігаються в цьому розділі:
+Admin decisions are recorded in this section:
 
-- [ADR-0001: транспорт Axios](0001-admin-axios-transport.md)
+- [ADR-0001: Axios transport](0001-admin-axios-transport.md)

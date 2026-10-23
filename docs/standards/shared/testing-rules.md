@@ -1,122 +1,90 @@
-# Правила тестування
+# Testing rules
 
-## Джерело tooling
+## Tooling source
 
-Перед плануванням тестів перевірте `package.json`, lockfile, Nx project targets,
-test configs і наявні test files. [Frontend inventory](../../architecture/frontend-inventory.md)
-є знімком, але фактичний repository state має пріоритет.
+Before planning tests, check `package.json`, the lockfile, Nx project targets, test configurations, and existing test files. The [frontend inventory](../../architecture/frontend-inventory.md) is a snapshot; the actual repository state takes precedence.
 
-Не вважайте Jest, Vitest, React Testing Library, Playwright чи інший інструмент
-доступним лише через звичність або згадку в документації.
-Dependency без config, target і виконуваного test file означає prerequisite,
-який оформлюється окремим `EN-*`. Новий package лише рекомендуйте, доки його
-встановлення не входить до погодженого scope.
+Do not assume Jest, Vitest, React Testing Library, Playwright, or another tool is available merely because it is familiar or mentioned in documentation. A dependency without configuration, a target, and an executable test file is a prerequisite to record as a separate `EN-*`. Only recommend a new package until installation is included in the agreed scope.
 
-## Вибір найвужчого рівня за ризиком
+## Choosing the narrowest level by risk
 
-| Ризик                                                           | Основний рівень тестування             |
-| --------------------------------------------------------------- | -------------------------------------- |
-| Чисті функції, мапінг, форматування, валідація                  | Модульний                              |
-| Хук, сховище, кеш, переходи стану, отримання даних              | Фокусний інтеграційний                 |
-| Компонент, форма, стан завантаження/порожній/помилка, взаємодія | Компонентний                           |
-| Навігація, глибоке посилання, дозвіл, сховище або адаптер       | Інтеграційний                          |
-| Мапінг запиту/відповіді API та помилки транспорту               | Фокусний інтеграційний або контрактний |
-| Критичний сценарій користувача між екранами/сервісами           | E2E                                    |
+| Risk                                                    | Primary test level              |
+| ------------------------------------------------------- | ------------------------------- |
+| Pure functions, mapping, formatting, validation         | Unit                            |
+| Hook, store, cache, state transitions, data fetching    | Focused integration             |
+| Component, form, loading/empty/error state, interaction | Component                       |
+| Navigation, deep link, permission, storage, or adapter  | Integration                     |
+| API request/response mapping and transport errors       | Focused integration or contract |
+| Critical user scenario across screens/services          | E2E                             |
 
-Один `SC-*` може мати кілька вузьких тестів для різних ризиків. Не повторюйте
-повний сценарій на unit, component, integration та E2E рівнях. E2E потрібен для
-критичного journey, а не автоматично для кожного acceptance scenario.
+One `SC-*` may have several focused tests for distinct risks. Do not repeat the full scenario at unit, component, integration, and E2E levels. E2E is for a critical journey, not automatically for every acceptance scenario.
 
-## Проєктування тестів від сценаріїв
+## Designing tests from scenarios
 
-`SC-*` не є виконуваним тестом. Це стабільний acceptance contract, з якого
-виводяться конкретні automated tests. Сценарій відповідає на питання «що бачить
-або може зробити користувач», а тест — «на якому технічному рівні найдешевше й
-надійно довести цей ризик».
+`SC-*` is not an executable test. It is a stable acceptance contract from which specific automated tests are derived. A scenario answers “what can the user see or do?”, while a test answers “at what technical level can we prove this risk most cheaply and reliably?”.
 
-Наприклад, один сценарій фільтрації може мати unit test нормалізації параметрів
-і component test підтвердження форми. Повторювати весь сценарій в обох тестах або
-додавати E2E без окремого journey-ризику не потрібно.
+For example, one filtering scenario may have a unit test for parameter normalization and a component test for form submission. Neither test needs to repeat the whole scenario, and E2E needs a separate journey risk.
 
-- Кожен новий або змінений observable behavior посилається на `SC-*` і
-  відповідні `R-*`.
-- Сценарій описує поведінку користувача у Given / When / Then без назв
-  components, hooks, stores, libraries або files.
-- Тест перевіряє public contract чи видимий результат. Один тест має один
-  зрозумілий outcome.
-- Component tests використовують semantic roles, accessible names і реальні
-  interaction events, які підтримує наявний setup.
-- Test data детерміновані й не містять secrets або реальних персональних даних.
-- Manual evidence допустиме лише для ризику, який наявне tooling об'єктивно не
-  може автоматизувати; причина записується в task і traceability.
+- Every new or changed observable behavior links to an `SC-*` and relevant `R-*`.
+- A scenario describes user behavior in Given/When/Then without component, hook, store, library, or file names.
+- A test checks a public contract or visible result. Each test has one clear outcome.
+- Component tests use semantic roles, accessible names, and actual interaction events supported by the current setup.
+- Test data is deterministic and contains no secrets or real personal information.
+- Manual evidence is allowed only for a risk that current tooling objectively cannot automate; record the reason in the task and traceability.
 
-## Архітектура тестів у цьому repository
+## Test architecture in this repository
 
-- Тести належать Nx project, поведінку якого перевіряють, і розміщуються поруч
-  із source як `*.test.ts`/`*.test.tsx` або в наявному project test directory.
-- Pure TypeScript rules перевіряються без DOM і framework providers.
-- State/data-fetching tests збирають мінімальний реальний store/provider graph і
-  підміняють лише зовнішню transport boundary. Не створюйте глобальний mock
-  backend або нову mocking library без окремого `EN-*`.
-- React component tests використовують Vitest і React Testing Library після
-  створення project target та одного `test-setup`. Глобальний setup містить лише
-  DOM matchers/polyfills; feature fixtures і mocks лишаються локальними.
-- App-level integration tests перевіряють composition providers, routing і
-  browser adapters лише коли ризик перетинає межі однієї library.
-- Browser E2E використовує окремий `admin-react-e2e` Nx project і покриває
-  кілька критичних journeys. Новий E2E додається лише для окремого journey-ризику.
-- Coverage збирається на CI після появи стабільного набору tests. Порогові
-  значення вводяться окремим рішенням на основі baseline, а не довільним числом.
+- Tests belong to the Nx project whose behavior they verify and live beside source as `*.test.ts`/`*.test.tsx` or in its existing test directory.
+- Test pure TypeScript rules without DOM or framework providers.
+- State/data-fetching tests assemble the minimum real store/provider graph and replace only the external transport boundary. Do not create a global mock backend or new mocking library without a separate `EN-*`.
+- React component tests use Vitest and React Testing Library after a project target and one `test-setup` are created. Global setup contains only DOM matchers/polyfills; feature fixtures and mocks stay local.
+- App-level integration tests verify provider composition, routing, and browser adapters only when risk crosses a library boundary.
+- Browser E2E uses a separate `admin-react-e2e` Nx project and covers a few critical journeys. Add E2E only for a separate journey risk.
+- Coverage is collected in CI after a stable test set exists. Thresholds are introduced by a separate decision based on a baseline, not an arbitrary number.
 
-Базовий React harness уже налаштований в `apps/admin-react`. Для нової library
-перевірте її Nx target/config і додайте перший behavioral test у відповідному
-`TS-*`. Наявний harness smoke перевіряє лише працездатність test infrastructure
-і не є evidence бізнес-сценарію.
+The base React harness is already configured in `apps/admin-react`. For a new library, check its Nx target/configuration and add the first behavioral test in the relevant `TS-*`. Existing harness smoke coverage checks only test infrastructure and is not evidence for a business scenario.
 
-## Імена тестів і команди
+## Test names and commands
 
-- `*.unit.test.ts` або `*.unit.test.tsx` — pure functions і validation.
-- `*.component.test.tsx` — React UI та user interactions.
-- `*.integration.test.ts` або `*.integration.test.tsx` — state, data fetching,
-  routing і browser boundaries.
-- `*.spec.ts` у `apps/admin-react-e2e` — browser E2E journeys.
+- `*.unit.test.ts` or `*.unit.test.tsx` — pure functions and validation.
+- `*.component.test.tsx` — React UI and user interactions.
+- `*.integration.test.ts` or `*.integration.test.tsx` — state, data fetching, routing, and browser boundaries.
+- `*.spec.ts` in `apps/admin-react-e2e` — browser E2E journeys.
 
-Команди верхнього рівня: `npm run test:web`, `npm run test:web:coverage`,
-`npm run test:web:e2e` та `npm run typecheck:tests`. Окремі порожні test levels
-можуть завершуватися успішно через `--passWithNoTests`, але readiness потребує
-щонайменше одного реально виконаного behavioral або infrastructure test.
+Top-level commands: `npm run test:web`, `npm run test:web:coverage`, `npm run test:web:e2e`, and `npm run typecheck:tests`. Individual empty test levels may pass through `--passWithNoTests`, but readiness requires at least one actual behavioral or infrastructure test.
 
 ## Red → Green → Refactor → Regression
 
-Для кожного нового testable behavior у `TS-*`:
+For each new testable behavior in `TS-*`:
 
-1. **Red** — додайте найменший behavioral test, запустіть його й зафіксуйте
-   очікувану невідповідність `R-*`/`SC-*`.
-2. **Green** — реалізуйте найменшу повну зміну, яка робить focused test зеленим.
-3. **Refactor** — поліпшіть структуру в межах тієї самої відповідальності та
-   повторіть focused test.
-4. **Regression** — запустіть affected suite/targets і запишіть команду та
-   результат.
+1. **Red** — add the smallest behavioral test, run it, and record the expected mismatch with `R-*`/`SC-*`.
+2. **Green** — implement the smallest complete change that makes the focused test pass.
+3. **Refactor** — improve structure within the same responsibility and rerun the focused test.
+4. **Regression** — run affected suites/targets and record the command and result.
 
-Compilation error, broken fixture, missing dependency, invalid test setup або
-unrelated failure не є валідним Red. Спочатку виправте prerequisite через
-`EN-*`, а потім отримайте behavioral Red.
+A compilation error, broken fixture, missing dependency, invalid test setup, or unrelated failure is not a valid Red result. Fix the prerequisite through `EN-*` first, then obtain a behavioral Red result.
 
-## Винятки
+## Exceptions
 
-Red-first може не мати сенсу для documentation-only work, generator/setup,
-нового test harness або platform prerequisite. Таку роботу оформлюйте `EN-*` з
-`Enables`, причиною винятку та replacement verification. Виняток не скасовує
-фінальну перевірку enabled scenario.
+Red-first may not make sense for documentation-only work, a generator/setup task, a new test harness, or a platform prerequisite. Record such work as `EN-*` with `Enables`, the exception reason, and replacement verification. The exception does not remove final verification of the enabled scenario.
 
-## Свідчення
+## Verification scope during implementation
 
-Task-файл зберігає test name/path, Red failure, Green result, refactor note і
-regression result. `traceability.md` містить лише посилання `SC → TS/EN → test →
-evidence` та статус. Для невиконаної команди вкажіть точну команду, failure
-point і чи причина pre-existing.
+Run only automated tests for the changed feature and directly related parts. Run general tests, a full app or repository suite, coverage, production build, E2E, and a full audit only at the user's explicit request. An unrequested full suite is not a feature completion condition.
 
-Для поточного репозиторію типові доступні перевірки:
+## Evidence
+
+| When               | Minimum action                                                                                                                                      |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Local change       | Run the changed Nx project's test (`npx nx test <project>` if it has a target); for documentation, check links and run `git diff --check`.          |
+| API or type change | Add `npm run contracts:check` or `npx nx typecheck <project>` for the affected boundary.                                                            |
+| Full CI            | The [workflow](../../../.github/workflows/ci.yml) runs lint, tests, and builds for PRs/pushes; rerun the full suite locally only on direct request. |
+
+Check targets and configuration with `npx nx show project <project> --json`.
+
+A task file stores the test name/path, Red failure, Green result, refactor note, and regression result. `traceability.md` contains only `SC → TS/EN → test → evidence` links and status. For an unrun command, state the exact command, failure point, and whether the cause is pre-existing.
+
+Typical available checks for this repository:
 
 ```powershell
 npx nx lint <project>
@@ -126,10 +94,4 @@ npx nx build <project>
 npm run format:check -- <paths>
 ```
 
-Виконуйте лише targets, які показує `npx nx show project <project> --json`.
-Для API feature додатково перевіряйте sync/generate/check за
-[contract workflow](../../architecture/api/contract-workflow.md), runtime mapping
-і помилки. Скрипти `contracts:sync`, `contracts:generate` та
-`contracts:check` визначені в кореневому `package.json`; запускайте застосовні
-команди й записуйте фактичний результат. Якщо потрібний contract prerequisite
-відсутній, оформіть конкретний `EN-*`, не позначаючи перевірку виконаною.
+Run only targets listed by `npx nx show project <project> --json`. For an API feature, also verify synchronization/generation/checking under the [contract workflow](../../architecture/api/contract-workflow.md), runtime mapping, and errors. The `contracts:sync`, `contracts:generate`, and `contracts:check` scripts are defined in root `package.json`; run applicable commands and record actual results. If a required contract prerequisite is absent, record a specific `EN-*` rather than marking the check complete.
