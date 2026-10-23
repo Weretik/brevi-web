@@ -1,18 +1,18 @@
-# 010 — Постачальники: таблиця й окремі сторінки
+# 010 — Suppliers: Table and Separate Pages
 
-- **Поверхня:** React Web
-- **Статус:** partially implemented; TS-002 verified, EN-001 and dependent
-  detail/edit delivery blocked by missing backend GET-by-ID contract
-- **Власник:** admin/references
-- **Оновлено:** 2026-09-30
+- **Surface:** React Web
+- **SDD status:** completed and closed by owner decision on 2026-10-20; no further work under this SDD is currently planned.
+- **Implementation status:** partially implemented; TS-002 was verified. EN-001 and the dependent detail/edit pages were not completed because the backend GET-by-ID contract is missing. Closing the SDD does not prove those items were implemented.
+- **Owner:** admin/references
+- **Updated:** 2026-10-20
 
-SDD наступного етапу для [реалізованих постачальників](../001-suppliers/README.md):
-row context menu замість колонки «Дії», український MUI Data Grid і окремі
-detail/create/edit сторінки з білими логічними секціями.
+The next-stage SDD for [implemented suppliers](../001-suppliers/README.md):
+row context menu instead of an “Actions” column, Ukrainian MUI Data Grid, and
+separate detail/create/edit pages with white semantic sections.
 
-## Навігація
+## Navigation
 
-- [Вимоги](requirements/overview.md)
+- [Requirements](requirements/overview.md)
 - [Design](design/frontend.md)
 - [API contract](contracts/api-contract.md)
 - [Traceability](traceability.md)

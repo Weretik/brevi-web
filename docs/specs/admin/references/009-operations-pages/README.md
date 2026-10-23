@@ -1,19 +1,19 @@
-# 009 — Операції: елементи та роботи
+# 009 — Operations: parts and work
 
-- **Поверхня:** React Web
-- **Статус:** delivered
-- **Власник:** admin/references
-- **Оновлено:** 2026-10-01
+- **Surface:** React Web
+- **Status:** delivered
+- **Owner:** admin/references
+- **Updated:** 2026-10-01
 
-Одна SDD для сторінки «Операції» з таблицями «Елементи» й «Роботи». Вона
-замінює action columns і create/view/edit dialogs на MUI-контекстні меню та
-адаптивні праві Drawer, зберігаючи поля й правила попередніх
-[004](../004-garment-parts/README.md) і
+One SDD covers the “Операції” page with “Елементи” and “Роботи” tables. It
+replaces action columns and create/view/edit dialogs with MUI context menus
+and responsive right-side Drawers while preserving the fields and rules from
+the earlier [004](../004-garment-parts/README.md) and
 [005](../005-garment-part-operations/README.md).
 
-## Навігація
+## Navigation
 
-- [Правила та сценарії](requirements/overview.md)
+- [Rules and scenarios](requirements/overview.md)
 - [Frontend design](design/frontend.md)
 - [API contract](contracts/api-contract.md)
 - [Traceability](traceability.md)
@@ -21,4 +21,4 @@
 - [Spec readiness](checklist/spec-readiness.md)
 - [Delivery readiness](checklist/delivery-readiness.md)
 - [Code audit](code-audit/audit.md)
-- [Інструкція](USAGE.md)
+- [Execution guide](USAGE.md)

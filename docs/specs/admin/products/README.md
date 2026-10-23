@@ -32,3 +32,5 @@
 [Наступна SDD для таблиці й окремих сторінок](003-products-table-pages/README.md)
 описує контекстне меню рядка, повну українську локалізацію MUI Data Grid,
 білі поверхні фільтрів і карткову композицію detail/create/edit.
+
+[Next sewing Article and composition SDD](004-sewing-articles-and-composition/README.md) specifies the planned Admin extension; implementation has not started.

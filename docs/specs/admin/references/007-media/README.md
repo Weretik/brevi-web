@@ -1,27 +1,27 @@
-# 007 — Медіа/Фото
+# 007 — Media/photos
 
-- **Поверхня:** React Web
-- **Статус:** delivery checkpoint; Admin authorization і частина Red evidence deferred
-- **Власник:** admin/products
-- **Оновлено:** 2026-09-29
+- **Surface:** React Web
+- **Status:** delivery checkpoint; Admin authorization and part of Red evidence deferred
+- **Owner:** admin/products
+- **Updated:** 2026-09-29
 
-Окрема сторінка керування фотографіями каталогу в групі меню «Загальні
-довідники». Співробітник бачить візуальну галерею, може знайти фото за назвою,
-завантажити нове й видалити непотрібне після підтвердження. Реалізацію і
-перевірки завершено; platform-wide захист Admin API лишається передумовою.
+The “Загальні довідники” menu contains a separate page for managing catalog
+photos. Staff can browse a visual gallery, find a photo by name, upload a new
+one, and delete an unwanted photo after confirmation. Implementation and
+verification are complete; platform-wide Admin API protection remains a prerequisite.
 
-## Навігація
+## Navigation
 
-- [Правила та приймальні сценарії](requirements/overview.md)
-- [Проєктування frontend](design/frontend.md)
-- [Модель даних](data-model.md)
-- [Споживання API-контракту](contracts/api-contract.md)
-- [Аудит відповідальностей](code-audit/audit.md)
-- [Трасування](traceability.md)
-- [Граф задач](tasks/README.md)
-- [Готовність специфікації](checklist/spec-readiness.md)
-- [Готовність до постачання](checklist/delivery-readiness.md)
-- [Як виконувати](USAGE.md)
+- [Rules and acceptance scenarios](requirements/overview.md)
+- [Frontend design](design/frontend.md)
+- [Data model](data-model.md)
+- [API contract consumption](contracts/api-contract.md)
+- [Responsibility audit](code-audit/audit.md)
+- [Traceability](traceability.md)
+- [Task graph](tasks/README.md)
+- [Specification readiness](checklist/spec-readiness.md)
+- [Delivery readiness](checklist/delivery-readiness.md)
+- [Execution guide](USAGE.md)
 
-Основа: наявні React-довідники, product media transport, Brevi MUI theme і
-контракт backend commit `e4c1588659684f3d5174fc6dfbfd5bfbd420a6ea`.
+Basis: existing React reference pages, product media transport, Brevi MUI
+theme, and backend contract commit `e4c1588659684f3d5174fc6dfbfd5bfbd420a6ea`.

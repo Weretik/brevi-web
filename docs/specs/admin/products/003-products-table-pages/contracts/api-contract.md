@@ -1,31 +1,31 @@
-# Товари — споживання API-контракту
+# Products — API contract consumption
 
-## Джерело та версія
+## Source and version
 
 - Backend repository: `https://github.com/Weretik/BreviERP.git`.
-- Канонічний entry point: `docs/sdd/contracts/openapi.yaml`.
-- Зафіксована версія backend: `e4c1588659684f3d5174fc6dfbfd5bfbd420a6ea`.
+- Canonical entry point: `docs/sdd/contracts/openapi.yaml`.
+- Pinned backend revision: `e4c1588659684f3d5174fc6dfbfd5bfbd420a6ea`.
 - Snapshot/provenance: `docs/contracts/openapi/backend/`,
   `docs/contracts/openapi/SOURCE.json`.
-- Generated types: `libs/admin/shared/contracts/src/generated/openapi.ts` через
+- Generated types: `libs/admin/shared/contracts/src/generated/openapi.ts` via
   `tools/contracts/contracts.mjs`.
-- Статус: **verified; нових операцій не потрібно**.
+- Status: **verified; no new operations needed**.
 
-| `operationId`         | Метод і шлях                   | Сценарії               | Статус |
+| `operationId`         | Method and path                | Scenarios              | Status |
 | --------------------- | ------------------------------ | ---------------------- | ------ |
-| `getAdminProducts`    | `GET /api/v1/products`         | SC-001, SC-003, SC-004 | є      |
-| `getAdminProductById` | `GET /api/v1/products/{id}`    | SC-005, SC-006         | є      |
-| `createProduct`       | `POST /api/v1/products`        | SC-006, SC-007         | є      |
-| `replaceProduct`      | `PUT /api/v1/products/{id}`    | SC-006, SC-007         | є      |
-| `deleteProduct`       | `DELETE /api/v1/products/{id}` | SC-001                 | є      |
+| `getAdminProducts`    | `GET /api/v1/products`         | SC-001, SC-003, SC-004 | exists |
+| `getAdminProductById` | `GET /api/v1/products/{id}`    | SC-005, SC-006         | exists |
+| `createProduct`       | `POST /api/v1/products`        | SC-006, SC-007         | exists |
+| `replaceProduct`      | `PUT /api/v1/products/{id}`    | SC-006, SC-007         | exists |
+| `deleteProduct`       | `DELETE /api/v1/products/{id}` | SC-001                 | exists |
 
-## Рішення frontend
+## Frontend decisions
 
 - Request/response mapping, runtime validation, errors, pagination, sorting,
-  filtering, abort і write protection лишаються з SDD 001/002.
-- Контекстне меню передає існуючим діям ID вибраного рядка й не виконує HTTP.
-- Detail/edit на прямій адресі використовують `getAdminProductById`; create й
-  replace після успіху можуть передати повний response у detail як уже
-  визначено попередньою SDD.
-- `contracts:check` є обов'язковою regression-перевіркою, хоча schema не
-  змінюється.
+  filtering, abort, and write protection remain as defined by SDD 001/002.
+- The context menu passes the selected row ID to existing actions and makes
+  no HTTP request itself.
+- Direct detail/edit URLs use `getAdminProductById`; after success, create and
+  replace may pass the full response to detail as defined by the earlier SDD.
+- `contracts:check` remains a required regression check although the schema
+  does not change.

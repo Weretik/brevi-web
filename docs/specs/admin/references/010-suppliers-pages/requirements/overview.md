@@ -1,97 +1,77 @@
-# Постачальники — правила та приймальні сценарії
+# Suppliers — Rules and Acceptance Scenarios
 
-## Мета та межі
+## Goals and scope
 
-- **Актор:** співробітник Admin.
-- **Мета:** переглядати й змінювати постачальників через компактну таблицю та
-  окремі сторінки.
-- **У межах:** context actions, українська locale, direct routes,
-  read-only detail, shared create/edit form, білі semantic surfaces.
-- **Поза межами:** нові supplier fields, зміна URL policy, масове редагування,
-  дизайн-токени, dependencies та інші розділи.
+- **Actor:** Admin employee.
+- **Goal:** View and edit suppliers through a compact table and separate pages.
+- **In scope:** context actions, Ukrainian locale, direct routes, read-only detail, shared create/edit form, white semantic surfaces.
+- **Out of scope:** new supplier fields, URL policy changes, bulk editing, design tokens, dependencies, and other sections.
 
-## Бізнес-правила
+## Business rules
 
-- **R-001:** Таблиця `/references/supplier` не має колонки «Дії». Правий клік
-  на рядку відкриває MUI Menu «Перегляд», «Змінити», «Видалити» для цього
-  постачальника; delete вимагає підтвердження й не змінює selection побічно.
-- **R-002:** Сфокусований рядок відкриває те саме меню через Context Menu key
-  або Shift+F10; меню закривається action/Escape/click-away і повертає фокус.
-- **R-003:** Усі системні написи Data Grid українські через централізовану
-  MUI/MUI X locale; no rows і no results також українські.
-- **R-004:** Окремі routes: `/references/supplier/create`,
-  `/references/supplier/:id`, `/references/supplier/:id/edit`. Direct URL і
-  reload читають supplier за ID й показують loading/error/not-found/retry.
-- **R-005:** Detail лише показує ID, назву, телефон, контактну особу, посилання
-  й нотатки. Дані згруповані в білі секції; безпечне http(s)-посилання можна
-  відкрити, а кнопка «Редагувати» веде до edit.
-- **R-006:** Create/edit мають одну form structure і validation. Create має
-  порожні user fields, edit — поточні значення; primary action — «Створити
-  постачальника» або «Зберегти зміни».
-- **R-007:** Усі поля лежать у білих MUI Card/Paper. Основні дані, контакти й
-  додаткова інформація утворюють окремі logical frames, якщо це покращує
-  читання; wide layout складається в одну колонку на вузькому viewport.
-- **R-008:** Використовуються готові MUI компоненти й Brevi theme; screenshots
-  задають тільки композицію.
+- **R-001:** The `/references/supplier` table has no “Actions” column. Right-clicking a row opens an MUI Menu with “View”, “Edit”, and “Delete” for that supplier; deletion requires confirmation and does not change selection as a side effect.
+- **R-002:** The focused row opens the same menu with the Context Menu key or Shift+F10; the menu closes on action/Escape/click-away and restores focus.
+- **R-003:** All Data Grid system labels are Ukrainian through centralized MUI/MUI X localization; no rows and no results messages are also Ukrainian.
+- **R-004:** Separate routes: `/references/supplier/create`, `/references/supplier/:id`, `/references/supplier/:id/edit`. Direct URLs and reloads fetch the supplier by ID and show loading/error/not-found/retry states.
+- **R-005:** Detail shows only the ID, name, phone, contact person, link, and notes. Data is grouped into white sections; a safe http(s) link can be opened, and the “Edit” button navigates to edit.
+- **R-006:** Create/edit share one form structure and validation. Create starts with empty user fields; edit starts with current values. The primary action is “Create supplier” or “Save changes”.
+- **R-007:** All fields appear in white MUI Card/Paper surfaces. Basic data, contacts, and additional information form separate logical frames where this improves readability; a wide layout collapses to one column on narrow viewports.
+- **R-008:** Use existing MUI components and the Brevi theme; screenshots guide composition only.
 
-## Приймальні сценарії
+## Acceptance scenarios
 
-### SC-001 — Контекстні дії
+### SC-001 — Context actions
 
-**Охоплює:** R-001, R-002
+**Covers:** R-001, R-002
 
-- **За умови** у таблиці є постачальник
-- **Коли** співробітник викликає menu рядка мишею або клавіатурою
-- **Тоді** бачить три дії правильного запису без колонки «Дії», а закриття
-  зберігає selection і повертає фокус.
+- **Given** a supplier is present in the table
+- **When** an employee opens its row menu with a mouse or keyboard
+- **Then** the three actions for the correct record appear without an “Actions” column, and closing the menu preserves selection and restores focus.
 
-### SC-002 — Український Data Grid
+### SC-002 — Ukrainian Data Grid
 
-**Охоплює:** R-003
+**Covers:** R-003
 
-- **За умови** доступні menus, filter, pagination або empty state
-- **Коли** співробітник взаємодіє з таблицею
-- **Тоді** всі системні тексти українські.
+- **Given** menus, filters, pagination, or an empty state are available
+- **When** an employee interacts with the table
+- **Then** all system text is Ukrainian.
 
 ### SC-003 — Read-only detail
 
-**Охоплює:** R-004, R-005
+**Covers:** R-004, R-005
 
-- **За умови** постачальник існує
-- **Коли** detail відкрито зі списку або прямою адресою
-- **Тоді** усі поля показані лише для читання в білих секціях, valid link
-  безпечно відкривається, а edit button веде до форми.
+- **Given** a supplier exists
+- **When** detail is opened from the list or by direct URL
+- **Then** all fields appear read-only in white sections, a valid link opens safely, and the edit button navigates to the form.
 
-### SC-004 — Спільна create/edit форма
+### SC-004 — Shared create/edit form
 
-**Охоплює:** R-006, R-007
+**Covers:** R-006, R-007
 
-- **За умови** створюється або редагується постачальник
-- **Коли** відкривається форма
-- **Тоді** структура однакова, create порожній, edit заповнений, а поля
-  згруповані в адаптивних білих frames.
+- **Given** a supplier is being created or edited
+- **When** the form opens
+- **Then** it has the same structure in both modes, is empty for create and populated for edit, and groups fields in responsive white frames.
 
-### SC-005 — Збереження й помилки
+### SC-005 — Save and errors
 
-**Охоплює:** R-004, R-006
+**Covers:** R-004, R-006
 
-- **За умови** форма валідна або API повертає validation/not-found/conflict error
-- **Коли** співробітник зберігає
-- **Тоді** успіх відкриває actual detail, а failure зберігає введене й дозволяє
-  виправити/retry без duplicate write.
+- **Given** the form is valid or the API returns a validation/not-found/conflict error
+- **When** the employee saves
+- **Then** success opens the actual detail page, while failure preserves input and allows correction/retry without a duplicate write.
 
-### SC-006 — Видалення
+### SC-006 — Deletion
 
-**Охоплює:** R-001
+**Covers:** R-001
 
-- **За умови** у menu вибрано «Видалити»
-- **Коли** співробітник підтверджує або скасовує
-- **Тоді** список оновлюється лише після успішного підтвердженого delete.
+- **Given** “Delete” is selected from the menu
+- **When** the employee confirms or cancels
+- **Then** the list refreshes only after a successfully confirmed deletion.
 
-### SC-007 — Адаптивні surface
+### SC-007 — Responsive surfaces
 
-**Охоплює:** R-007, R-008
+**Covers:** R-007, R-008
 
-- **За умови** detail або form відкриті
-- **Коли** viewport змінюється від широкого до вузького
-- **Тоді** білі logical frames переходять у вертикальну композицію без втрати полів.
+- **Given** detail or a form is open
+- **When** the viewport changes from wide to narrow
+- **Then** white logical frames become a vertical layout without losing fields.

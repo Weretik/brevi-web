@@ -1,22 +1,22 @@
-# 011 — Додаткові довідники: таблиця й окремі сторінки
+# 011 — Additional References: Table and Separate Pages
 
-- **Поверхня:** React Web
-- **Статус:** blocked; create/detail/delete відсутні в backend contract
-- **Власник:** admin/references
-- **Оновлено:** 2026-10-01
+- **Surface:** React Web
+- **Status:** blocked; create/detail/delete are absent from the backend contract
+- **Owner:** admin/references
+- **Updated:** 2026-10-01
 
-SDD розширює [поточний update-only сценарій](../006-additional-references/README.md)
-до узгодженого досвіду всіх загальних довідників: row context menu з трьома
-діями, окремі detail/create/edit сторінки, український MUI Data Grid і білі
-логічні поверхні. Нові create/read-by-id/delete дії не можуть бути
-реалізовані до backend/OpenAPI EN-001.
+This SDD expands the [current update-only scenario](../006-additional-references/README.md)
+into a consistent experience for all general references: a row context menu
+with three actions, separate detail/create/edit pages, a Ukrainian MUI Data Grid,
+and white semantic surfaces. The new create/read-by-id/delete operations cannot
+be implemented until backend/OpenAPI EN-001 is complete.
 
-Blocker повторно підтверджено 2026-10-01 на pinned snapshot і актуальному
+The blocker was reconfirmed on 2026-10-01 against the pinned snapshot and current
 backend `origin/master` `5d97cc098ade99068d1da70ccc0f6562ec852f2c`.
 
-## Навігація
+## Navigation
 
-- [Вимоги](requirements/overview.md)
+- [Requirements](requirements/overview.md)
 - [Frontend design](design/frontend.md)
 - [API contract](contracts/api-contract.md)
 - [Traceability](traceability.md)

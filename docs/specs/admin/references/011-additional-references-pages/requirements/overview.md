@@ -1,99 +1,78 @@
-# Додаткові довідники — правила та приймальні сценарії
+# Additional References — Rules and Acceptance Scenarios
 
-## Мета та межі
+## Purpose and Scope
 
-- **Актор:** співробітник Admin.
-- **Мета:** переглядати, створювати, редагувати й видаляти додаткові довідники
-  так само послідовно, як інші таблиці розділу.
-- **У межах:** table context menu, українська locale, create/detail/edit routes,
-  delete confirmation, current fields, white semantic surfaces.
-- **Поза межами:** нові business fields/units, масові дії, зміна формул,
-  global tokens, dependency upgrades та implementation без API contract.
+- **Actor:** Admin employee.
+- **Goal:** View, create, edit, and delete additional references as consistently as other tables in the section.
+- **In scope:** Table context menu, Ukrainian locale, create/detail/edit routes, delete confirmation, current fields, and white semantic surfaces.
+- **Out of scope:** New business fields/units, bulk actions, formula changes, global tokens, dependency upgrades, and implementation without an API contract.
 
-## Бізнес-правила
+## Business Rules
 
-- **R-001:** Таблиця `/references/additional-reference` не має колонки «Дії».
-  Правий клік на рядку відкриває «Перегляд», «Змінити», «Видалити» для цього
-  запису; delete завжди підтверджується.
-- **R-002:** Сфокусований рядок відкриває те саме меню через Context Menu key
-  або Shift+F10; action/Escape/click-away закривають його й повертають фокус.
-- **R-003:** Усі системні тексти Data Grid українські через централізовану
-  MUI/MUI X locale, включно з menus, pagination, filter, no rows/results.
-- **R-004:** Окремі routes: `/references/additional-reference/create`,
-  `/references/additional-reference/:id`,
-  `/references/additional-reference/:id/edit`. Direct URL/reload читає запис
-  за ID і розрізняє loading/error/not found/retry.
-- **R-005:** Detail є read-only і показує ID, назву, ключ, значення, одиницю й
-  опис у білих semantic sections; кнопка «Редагувати» веде до edit.
-- **R-006:** Create/edit використовують одну form structure і validation.
-  Create має всі user fields порожні/unselected, edit — поточні значення;
-  primary action — «Створити запис» або «Зберегти зміни».
-- **R-007:** Усі поля лежать у білих MUI Card/Paper. Основні ідентифікаційні
-  поля, значення/одиниця й опис утворюють окремі frames за змістом; horizontal
-  layout складається вертикально на вузькому viewport.
-- **R-008:** Create, GET-by-ID і delete виконуються лише після появи versioned
-  OpenAPI operations. До цього відповідні сценарії blocked, а UI не імітує
-  локальні CRUD-результати.
-- **R-009:** Використовуються готові MUI components і Brevi theme; screenshots
-  визначають композицію, не fields або units.
+- **R-001:** The `/references/additional-reference` table has no “Actions” column. Right-clicking a row opens “Перегляд”, “Змінити”, and “Видалити” for that record; deletion always requires confirmation.
+- **R-002:** The focused row opens the same menu using the Context Menu key or Shift+F10; an action, Escape, or click-away closes it and restores focus.
+- **R-003:** All Data Grid system text is in Ukrainian through the centralized MUI/MUI X locale, including menus, pagination, filters, and no-rows/results messages.
+- **R-004:** Separate routes: `/references/additional-reference/create`, `/references/additional-reference/:id`, and `/references/additional-reference/:id/edit`. A direct URL/reload fetches the record by ID and distinguishes loading/error/not found/retry states.
+- **R-005:** Detail is read-only and displays ID, name, key, value, unit, and description in white semantic sections; the “Редагувати” button navigates to edit.
+- **R-006:** Create/edit share one form structure and validation. Create has all user fields empty/unselected; edit shows current values. The primary action is “Створити запис” or “Зберегти зміни”.
+- **R-007:** All fields are placed in white MUI Card/Paper components. The main identification fields, value/unit, and description form separate frames by meaning; horizontal layouts stack vertically on narrow viewports.
+- **R-008:** Create, GET-by-ID, and delete are performed only after versioned OpenAPI operations exist. Until then, the related scenarios are blocked, and the UI does not simulate local CRUD results.
+- **R-009:** Use existing MUI components and the Brevi theme; screenshots define composition, not fields or units.
 
-## Приймальні сценарії
+## Acceptance Scenarios
 
-### SC-001 — Контекстне меню
+### SC-001 — Context Menu
 
-**Охоплює:** R-001, R-002
+**Covers:** R-001, R-002
 
-- **За умови** у таблиці є додатковий довідник
-- **Коли** співробітник викликає меню мишею або клавіатурою
-- **Тоді** бачить три дії правильного рядка без колонки «Дії», а закриття
-  повертає фокус.
+- **Given** an additional reference is present in the table
+- **When** an employee opens the menu with a mouse or keyboard
+- **Then** they see three actions for the correct row without an “Actions” column, and closing the menu restores focus.
 
-### SC-002 — Український Data Grid
+### SC-002 — Ukrainian Data Grid
 
-**Охоплює:** R-003
+**Covers:** R-003
 
-- **За умови** доступний системний control таблиці
-- **Коли** співробітник відкриває його
-- **Тоді** всі підписи й повідомлення українські.
+- **Given** a table system control is available
+- **When** an employee opens it
+- **Then** all labels and messages are in Ukrainian.
 
-### SC-003 — Read-only detail
+### SC-003 — Read-only Detail
 
-**Охоплює:** R-004, R-005, R-008
+**Covers:** R-004, R-005, R-008
 
-- **За умови** запис існує й detail contract доступний
-- **Коли** співробітник відкриває його зі списку або прямим URL
-- **Тоді** бачить всі поля лише для читання у білих sections і edit button.
+- **Given** the record exists and the detail contract is available
+- **When** an employee opens it from the list or by direct URL
+- **Then** they see all fields read-only in white sections and an edit button.
 
-### SC-004 — Спільна create/edit форма
+### SC-004 — Shared Create/Edit Form
 
-**Охоплює:** R-006–R-008
+**Covers:** R-006–R-008
 
-- **За умови** потрібні CRUD contracts доступні
-- **Коли** співробітник створює або редагує запис
-- **Тоді** структура однакова, create порожній, edit заповнений, а fields
-  згруповані в responsive white frames.
+- **Given** the required CRUD contracts are available
+- **When** an employee creates or edits a record
+- **Then** the structure is the same, create fields are empty, edit fields are populated, and fields are grouped into responsive white frames.
 
-### SC-005 — Збереження й помилки
+### SC-005 — Saving and Errors
 
-**Охоплює:** R-004, R-006, R-008
+**Covers:** R-004, R-006, R-008
 
-- **За умови** form valid або API повертає validation/not-found/conflict error
-- **Коли** співробітник зберігає
-- **Тоді** success відкриває actual detail, а failure зберігає введене й
-  дозволяє виправлення/retry без duplicate write.
+- **Given** the form is valid, or the API returns a validation/not-found/conflict error
+- **When** an employee saves
+- **Then** success opens the actual detail page, while failure preserves entered values and allows correction/retry without a duplicate write.
 
-### SC-006 — Видалення
+### SC-006 — Deletion
 
-**Охоплює:** R-001, R-008
+**Covers:** R-001, R-008
 
-- **За умови** delete contract доступний і вибрано «Видалити»
-- **Коли** співробітник підтверджує або скасовує
-- **Тоді** success оновлює список, а cancel/failure не прибирає рядок помилково.
+- **Given** the delete contract is available and “Видалити” has been selected
+- **When** an employee confirms or cancels
+- **Then** success refreshes the list, while cancel/failure does not incorrectly remove the row.
 
-### SC-007 — Адаптивні поверхні
+### SC-007 — Responsive Surfaces
 
-**Охоплює:** R-007, R-009
+**Covers:** R-007, R-009
 
-- **За умови** detail або form відкриті
-- **Коли** viewport змінюється
-- **Тоді** усі fields/data лишаються у білих logical frames без overflow.
+- **Given** detail or a form is open
+- **When** the viewport changes
+- **Then** all fields/data remain within white semantic frames without overflow.

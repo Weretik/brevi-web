@@ -1,28 +1,29 @@
-# 003 — Таблиця й окремі сторінки товарів
+# 003 — Product table and separate pages
 
-- **Поверхня:** React Web
-- **Статус:** implemented; delivery verified
-- **Власник:** admin/products
-- **Оновлено:** 2026-10-01
+- **Surface:** React Web
+- **Status:** implemented; delivery verified
+- **Owner:** admin/products
+- **Updated:** 2026-10-01
 
-Ця SDD змінює подання вже реалізованого сценарію товарів: прибирає колонку
-«Дії», додає MUI-контекстне меню рядка, завершує українську локалізацію MUI
-Data Grid і розкладає detail/create/edit на окремі білі змістові поверхні.
-Доменні поля й API лишаються визначеними попередніми
-[001](../001-products-table/README.md) та
+This SDD changes the presentation of the existing product scenario: it removes
+the “Дії” column, adds a MUI row context menu, completes the Ukrainian
+localization of MUI Data Grid, and places detail/create/edit content on separate
+white semantic surfaces. Domain fields and API behavior remain defined by the
+previous
+[001](../001-products-table/README.md) and
 [002](../002-admin-product-scenario/README.md).
 
-## Навігація
+## Navigation
 
-- [Правила та приймальні сценарії](requirements/overview.md)
-- [Проєктування frontend](design/frontend.md)
-- [Споживання API-контракту](contracts/api-contract.md)
-- [Трасування](traceability.md)
-- [Граф задач](tasks/README.md)
-- [Готовність специфікації](checklist/spec-readiness.md)
-- [Готовність до постачання](checklist/delivery-readiness.md)
-- [Аудит відповідальностей](code-audit/audit.md)
-- [Інструкція виконання](USAGE.md)
+- [Rules and acceptance scenarios](requirements/overview.md)
+- [Frontend design](design/frontend.md)
+- [API contract consumption](contracts/api-contract.md)
+- [Traceability](traceability.md)
+- [Task graph](tasks/README.md)
+- [Specification readiness](checklist/spec-readiness.md)
+- [Delivery readiness](checklist/delivery-readiness.md)
+- [Responsibility audit](code-audit/audit.md)
+- [Execution guide](USAGE.md)
 
-Візуальні орієнтири: [форми й деталі](../../table-visual-guidance.md) та
-[оригінальні вкладення](../../assets/visual-references/README.md).
+Visual references: [forms and details](../../table-visual-guidance.md) and
+[original attachments](../../assets/visual-references/README.md).

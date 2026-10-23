@@ -1,115 +1,114 @@
-# Товари — правила та приймальні сценарії
+# Products — rules and acceptance scenarios
 
-## Мета та межі
+## Goal and scope
 
-- **Актор:** співробітник Admin.
-- **Мета:** керувати товарами через компактну таблицю та окремі зрозумілі
-  сторінки перегляду, створення й редагування українською мовою.
-- **У межах:** контекстне меню рядка, локалізація MUI, білі поля фільтрів,
-  композиція наявних detail/create/edit і доступна навігація.
-- **Поза межами:** зміна доменних полів, API, розрахунків, авторизації,
-  глобальних дизайн-токенів, версій залежностей та public storefront.
+- **Actor:** Admin staff member.
+- **Goal:** manage products through a compact table and clear, separate view,
+  create, and edit pages in Ukrainian.
+- **In scope:** row context menu, MUI localization, white filter fields,
+  composition of existing detail/create/edit pages, and accessible navigation.
+- **Out of scope:** changes to domain fields, API, calculations, authorization,
+  global design tokens, dependency versions, and the public storefront.
 
-## Бізнес-правила
+## Business rules
 
-- **R-001:** Таблиця не має колонки «Дії». Контекстне меню конкретного рядка
-  відкривається правою кнопкою миші та містить «Перегляд», «Змінити» й
-  «Видалити»; видалення зберігає підтвердження. Меню закривається після вибору,
-  Escape або кліку поза ним і не змінює checkbox-вибір рядків.
-- **R-002:** Та сама трійка дій доступна з клавіатури для сфокусованого рядка
-  через клавішу контекстного меню або Shift+F10; фокус після закриття
-  повертається до рядка.
-- **R-003:** Усі вбудовані написи MUI Data Grid, які може побачити користувач,
-  українські. Офіційна `ukUA` доповнюється через підтриманий MUI locale API для
-  відсутніх ключів; локальні empty/no-results тексти не повертають англійську.
-- **R-004:** Пошук, тип і категорія над таблицею мають білу поверхню та чітку
-  межу на фоні сторінки в усіх станах. Їхня наявна серверна семантика не
-  змінюється.
-- **R-005:** Список, create, detail і edit зберігають маршрути
-  `/references/products`, `/create`, `/:id`, `/:id/edit`. Пряме відкриття й
-  reload detail/edit завантажують товар за ID та показують loading, not found,
-  error і retry без залежності від стану списку.
-- **R-006:** Detail є лише для читання. Дані згруповані за змістом у кілька
-  білих MUI-поверхонь; кнопка «Редагувати» веде до edit цього товару.
-- **R-007:** Create й edit використовують одну структуру та однакові поля й
-  валідацію. У create всі введені користувачем поля порожні або не вибрані; в
-  edit вони заповнені поточними даними. Основна дія має відповідний текст
-  «Створити товар» або «Зберегти зміни».
-- **R-008:** Кожна велика логічна група форми міститься у власній білій MUI
-  Card/Paper з відступом від інших груп. На широкому екрані сумісні групи
-  можуть стояти поруч, на вузькому — переходять в одну колонку; жодні поля не
-  лежать безпосередньо на фоні сторінки.
-- **R-009:** Використовуються наявні MUI/MUI X компоненти й тема Brevi.
-  Візуальні референси визначають композицію, а поля й дії — чинний контракт.
+- **R-001:** The table has no “Дії” column. Right-clicking a row opens its
+  context menu with “Перегляд”, “Змінити”, and “Видалити”; deletion still
+  requires confirmation. The menu closes after selection, Escape, or an outside
+  click and does not change checkbox row selection.
+- **R-002:** The same three actions are available for a focused row via the
+  context-menu key or Shift+F10; focus returns to the row when the menu closes.
+- **R-003:** All built-in MUI Data Grid labels visible to users are Ukrainian.
+  The official `ukUA` locale is extended through the supported MUI locale API
+  for missing keys; local empty/no-results messages do not revert to English.
+- **R-004:** Search, type, and category filters above the table have a white
+  surface and clear boundary against the page background in every state. Their
+  existing server-side semantics do not change.
+- **R-005:** List, create, detail, and edit retain `/references/products`,
+  `/create`, `/:id`, and `/:id/edit` routes. Opening or reloading detail/edit
+  directly loads the product by ID and shows loading, not found, error, and
+  retry states independently of list state.
+- **R-006:** Detail is read-only. Data is grouped by meaning across several
+  white MUI surfaces; “Редагувати” navigates to that product's edit page.
+- **R-007:** Create and edit use the same structure, fields, and validation.
+  User-entered fields are empty or unselected on create and populated with
+  current values on edit. The primary action reads “Створити товар” or
+  “Зберегти зміни”, respectively.
+- **R-008:** Each major logical form group has its own white MUI Card/Paper,
+  spaced from other groups. Compatible groups may sit side by side on wide
+  screens and stack in one column on narrow screens; no fields sit directly
+  on the page background.
+- **R-009:** Use existing MUI/MUI X components and the Brevi theme. Visual
+  references define composition; the current contract defines fields and actions.
 
-## Приймальні сценарії
+## Acceptance scenarios
 
-### SC-001 — Контекстні дії рядка
+### SC-001 — Row context actions
 
-**Охоплює:** R-001
+**Covers:** R-001
 
-- **За умови** у таблиці є товар
-- **Коли** співробітник відкриває контекстне меню його рядка
-- **Тоді** бачить три українські дії для цього товару без колонки «Дії», а
-  вибір перегляду чи зміни відкриває відповідну окрему сторінку.
+- **Given** a product appears in the table
+- **When** a staff member opens its row context menu
+- **Then** they see three Ukrainian actions for that product without a “Дії”
+  column, and view or edit opens the corresponding separate page.
 
-### SC-002 — Доступ до меню з клавіатури
+### SC-002 — Keyboard access to the menu
 
-**Охоплює:** R-002
+**Covers:** R-002
 
-- **За умови** рядок таблиці сфокусований
-- **Коли** співробітник викликає його контекстні дії з клавіатури та закриває меню
-- **Тоді** може вибрати кожну дію, а фокус повертається до того самого рядка.
+- **Given** a table row has focus
+- **When** a staff member invokes its context actions from the keyboard and closes the menu
+- **Then** each action can be selected, and focus returns to the same row.
 
-### SC-003 — Український інтерфейс таблиці
+### SC-003 — Ukrainian table interface
 
-**Охоплює:** R-003
+**Covers:** R-003
 
-- **За умови** таблиця має меню колонок, фільтри, пагінацію або порожній стан
-- **Коли** співробітник відкриває доступні елементи таблиці
-- **Тоді** всі системні підписи й повідомлення відображаються українською.
+- **Given** the table has a column menu, filters, pagination, or empty state
+- **When** a staff member opens the available table controls
+- **Then** all system labels and messages appear in Ukrainian.
 
-### SC-004 — Видимі фільтри
+### SC-004 — Visible filters
 
-**Охоплює:** R-004
+**Covers:** R-004
 
-- **За умови** відкрито список товарів у підтриманій темі
-- **Коли** співробітник шукає або вибирає тип чи категорію
-- **Тоді** кожне поле має білу поверхню, не зливається з фоном і зберігає
-  поточну поведінку запиту.
+- **Given** the product list is open in a supported theme
+- **When** a staff member searches or selects a type or category
+- **Then** each field has a white surface, remains distinct from the background,
+  and retains its current query behavior.
 
-### SC-005 — Окрема сторінка перегляду
+### SC-005 — Separate detail page
 
-**Охоплює:** R-005, R-006
+**Covers:** R-005, R-006
 
-- **За умови** існує товар із кількома групами даних
-- **Коли** співробітник відкриває його detail напряму або зі списку
-- **Тоді** бачить лише для читання логічні білі секції та кнопку переходу до
-  редагування; reload дає той самий результат.
+- **Given** a product has several data groups
+- **When** a staff member opens its detail page directly or from the list
+- **Then** they see read-only logical white sections and an edit button;
+  reloading yields the same result.
 
-### SC-006 — Спільна форма create/edit
+### SC-006 — Shared create/edit form
 
-**Охоплює:** R-007, R-008
+**Covers:** R-007, R-008
 
-- **За умови** співробітник створює новий товар або редагує наявний
-- **Коли** відкривається форма
-- **Тоді** структура й поля однакові, create порожній, edit заповнений, а
-  змістові групи розділені на адаптивні білі фрейми.
+- **Given** a staff member creates a product or edits an existing one
+- **When** the form opens
+- **Then** its structure and fields are the same, create is empty, edit is
+  populated, and semantic groups occupy responsive white surfaces.
 
-### SC-007 — Збереження й помилки
+### SC-007 — Saving and errors
 
-**Охоплює:** R-005, R-007
+**Covers:** R-005, R-007
 
-- **За умови** форма має коректні дані або сервер повертає помилку
-- **Коли** співробітник виконує основну дію
-- **Тоді** успіх відкриває актуальний detail, а помилка зберігає введене,
-  пояснює проблему й не допускає подвійного запиту.
+- **Given** the form has valid data or the server returns an error
+- **When** a staff member performs the primary action
+- **Then** success opens the current detail page, while an error preserves
+  input, explains the problem, and prevents a duplicate request.
 
-### SC-008 — Адаптивна композиція
+### SC-008 — Responsive composition
 
-**Охоплює:** R-008, R-009
+**Covers:** R-008, R-009
 
-- **За умови** сторінка має кілька змістових секцій
-- **Коли** ширина змінюється від вузької до широкої
-- **Тоді** секції перебудовуються без горизонтальної втрати полів, лишаються
-  окремими білими поверхнями й використовують узгоджені компоненти Brevi.
+- **Given** a page has several semantic sections
+- **When** its width changes from narrow to wide
+- **Then** sections reflow without clipping fields horizontally, remain
+  separate white surfaces, and use the agreed Brevi components.

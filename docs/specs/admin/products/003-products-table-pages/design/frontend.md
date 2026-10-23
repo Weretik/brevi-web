@@ -1,67 +1,67 @@
-# Товари — проєктування frontend
+# Products — frontend design
 
-## Наявний контекст
+## Existing context
 
-- Маршрути: `apps/admin-react/src/app/router/app-router.tsx`.
-- Список: `libs/admin/products/feature/src/pages/product-list/products-page.tsx`; зараз він
-  змішує query-state, колонки, фільтри, Data Grid і delete target та має
-  колонку «Дії».
+- Routes: `apps/admin-react/src/app/router/app-router.tsx`.
+- List: `libs/admin/products/feature/src/pages/product-list/products-page.tsx`;
+  currently combines query state, columns, filters, Data Grid, and delete
+  target, and has a “Дії” column.
 - Detail: `product-detail-page.tsx`, `product-detail-header.tsx`,
-  `product-detail-content.tsx`, type-specific detail і gallery; дані зараз
-  переважно розділені Divider, але не білими семантичними поверхнями.
-- Create/edit: `product-create-page.tsx`, `product-edit-page.tsx` і спільний
-  `product-editor.tsx`; структура вже спільна, але поля лежать на фоні між
-  Divider і основна кнопка має однаковий текст.
-- Дані: `libs/admin/products/data-access/src/`, `use-products.ts`,
-  `use-product.ts`, `use-product-lookups.ts`; окремий GET за ID уже є.
-- Локаль і тема: `apps/admin-react/src/app/theme/brevi-theme.ts`; кожна таблиця
-  зараз локально задає лише `noRowsLabel`, тому інші MUI-написи англійські.
-- Tooling: `admin-products-feature` і `admin-products-data-access` мають
-  `lint`, `typecheck`, `test`; feature також `typecheck-tests`. `admin-react`
-  має `lint`, `typecheck`, `typecheck-tests`, `test`, `build`;
-  `admin-react-e2e` має `lint`, `typecheck`, `e2e`.
+  `product-detail-content.tsx`, type-specific detail, and gallery; Divider
+  currently separates most data, without white semantic surfaces.
+- Create/edit: `product-create-page.tsx`, `product-edit-page.tsx`, and shared
+  `product-editor.tsx`; structure is already shared, but fields sit on the page
+  background between Dividers and the primary button has identical text.
+- Data: `libs/admin/products/data-access/src/`, `use-products.ts`,
+  `use-product.ts`, `use-product-lookups.ts`; a separate GET by ID exists.
+- Locale and theme: `apps/admin-react/src/app/theme/brevi-theme.ts`; each table
+  currently sets only `noRowsLabel` locally, leaving other MUI labels English.
+- Tooling: `admin-products-feature` and `admin-products-data-access` have
+  `lint`, `typecheck`, and `test`; feature also has `typecheck-tests`.
+  `admin-react` has `lint`, `typecheck`, `typecheck-tests`, `test`, and `build`;
+  `admin-react-e2e` has `lint`, `typecheck`, and `e2e`.
 
-## Відповідальності в межах роботи
+## Responsibilities within scope
 
-| Область           | Відповідальність і точні шляхи                                                                                                          |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| Спільна поведінка | Центральна українська MUI/MUI X locale у `apps/admin-react/src/app/theme/`; доповнює офіційну `ukUA` лише активними відсутніми ключами. |
-| Стан і дані       | Наявні hooks зберігають query, abort, retry та detail fetch; контекстне меню тримає лише поточний row ID і координати.                  |
-| React Web         | `products-page.tsx` або малі локальні компоненти для фільтрів/меню; detail/editor компонують MUI Card/Paper за доменними групами.       |
-| Навігація         | Чотири наявні маршрути лишаються; меню веде на detail/edit, detail-кнопка — на edit.                                                    |
-| API               | Наявні generated operations і runtime mapping без зміни transport contract.                                                             |
-| Перевірка         | Component tests для меню, locale, read-only і спільної форми; integration для routes; один Playwright journey list → detail → edit.     |
+| Area            | Responsibility and exact paths                                                                                                           |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Shared behavior | Central Ukrainian MUI/MUI X locale in `apps/admin-react/src/app/theme/`; extends official `ukUA` only for missing active keys.           |
+| State and data  | Existing hooks retain query, abort, retry, and detail fetch; the context menu stores only the current row ID and coordinates.            |
+| React Web       | `products-page.tsx` or small local filter/menu components; detail/editor compose MUI Card/Paper by domain group.                         |
+| Navigation      | Four existing routes remain; the menu goes to detail/edit, and the detail button goes to edit.                                           |
+| API             | Existing generated operations and runtime mapping without changing the transport contract.                                               |
+| Verification    | Component tests for menu, locale, read-only view, and shared form; route integration tests; one Playwright list → detail → edit journey. |
 
-## Початковий аудит відповідальностей
+## Initial responsibility audit
 
-| Файл/компонент                  | Наявні ролі та залежності                         | Рішення                                                                                 | Цільові межі                                                                                                         |
-| ------------------------------- | ------------------------------------------------- | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| `pages/products-page.tsx`       | Запит, toolbar, колонки, навігація, delete dialog | Розділити тільки меню й фільтри, якщо component test або читабельність цього потребують | `components/products-list-filters.tsx`, `components/product-row-context-menu.tsx` або лишити малу цілісну композицію |
-| `components/product-editor.tsx` | Завантаження lookup, draft, save і весь layout    | Зберегти orchestration; винести лише повторювану поверхню секції                        | `components/product-form-section.tsx` лише за реального повторного використання                                      |
-| `pages/product-detail-page.tsx` | Fetch states, actions, усі detail секції          | Зберегти orchestration, Card/Paper належать спеціалізованим detail-компонентам          | наявні `product-*-detail.tsx`                                                                                        |
-| `theme/brevi-theme.ts`          | Світла/темна тема та component defaults           | Додати core/data-grid `ukUA` й перевірений override без feature-текстів                 | окремий locale-файл у тій самій папці, якщо набір ключів нетривіальний                                               |
+| File/component                  | Existing roles and dependencies                    | Decision                                                                 | Target boundaries                                                                                                         |
+| ------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| `pages/products-page.tsx`       | Query, toolbar, columns, navigation, delete dialog | Split only menu and filters if component tests or readability require it | `components/products-list-filters.tsx`, `components/product-row-context-menu.tsx`, or retain a small coherent composition |
+| `components/product-editor.tsx` | Lookup loading, draft, save, and whole layout      | Retain orchestration; extract only a repeated section surface            | `components/product-form-section.tsx` only if actually reused                                                             |
+| `pages/product-detail-page.tsx` | Fetch states, actions, all detail sections         | Retain orchestration; specialized detail components own Card/Paper       | Existing `product-*-detail.tsx`                                                                                           |
+| `theme/brevi-theme.ts`          | Light/dark theme and component defaults            | Add core/data-grid `ukUA` and verified override without feature text     | Separate locale file in the same folder if the key set is substantial                                                     |
 
-## UI-рішення й референси
+## UI decisions and references
 
-- Detail орієнтується на `detail-customer-payments.png`,
-  `detail-order-timeline.png` і `detail-section-cards.png`.
-- Form орієнтується на `edit-product-layout.png`, `create-order-basic-billing.png`
-  та `create-order-line-items.png`. Дані прикладів не переносяться.
-- Офіційні MUI-патерни: [контекстне Menu](https://mui.com/material-ui/react-menu/#context-menu),
-  [row slot Data Grid](https://mui.com/x/react-data-grid/components/#row),
-  [локалізація Data Grid](https://mui.com/x/react-data-grid/localization/),
-  [локалізація Material UI](https://mui.com/material-ui/guides/localization/),
-  [Card](https://mui.com/material-ui/react-card/) і
+- Detail uses `detail-customer-payments.png`,
+  `detail-order-timeline.png` and `detail-section-cards.png`.
+- Form uses `edit-product-layout.png`, `create-order-basic-billing.png`, and
+  `create-order-line-items.png`. Example data is not copied.
+- Official MUI patterns: [context Menu](https://mui.com/material-ui/react-menu/#context-menu),
+  [Data Grid row slot](https://mui.com/x/react-data-grid/components/#row),
+  [Data Grid localization](https://mui.com/x/react-data-grid/localization/),
+  [Material UI localization](https://mui.com/material-ui/guides/localization/),
+  [Card](https://mui.com/material-ui/react-card/), and
   [responsive Grid](https://mui.com/system/react-grid/).
-- Встановлена `ukUA` Data Grid неповна, тому acceptance вимагає перевірити всі
-  реально доступні меню й додати тільки відсутні українські ключі через
+- The installed Data Grid `ukUA` locale is incomplete, so acceptance requires
+  checking every available menu and adding only missing Ukrainian keys through
   `localeText`/theme API.
 
-## Ризики
+## Risks
 
-- Після вилучення колонки дій потрібен клавіатурний еквівалент; component та
-  E2E evidence мають перевірити фокус і правильний row ID.
-- Білий Card/Paper у темній темі є свідомим вимогам цієї feature; контраст
-  тексту й полів треба перевірити окремо, не змінюючи глобальну палітру.
-- Контекстне меню не повинно перехоплювати меню заголовка Data Grid або ламати
+- Removing the actions column requires a keyboard equivalent; component and
+  E2E evidence must verify focus and the correct row ID.
+- White Card/Paper in the dark theme is an explicit feature requirement; text
+  and field contrast must be checked separately without changing the global palette.
+- The context menu must not intercept the Data Grid header menu or break
   checkbox selection.
