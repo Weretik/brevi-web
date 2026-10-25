@@ -19,4 +19,4 @@ set -eu
 export PATH="$node_bin:$PATH"
 echo "export PATH=\"$node_bin:\$PATH\"" >> "$CLAUDE_ENV_FILE"
 
-npm install --no-audit --no-fund
+npm install --no-save --no-audit --no-fund
