@@ -1,3 +1,4 @@
+import { productWholesalePriceLabel } from '@admin/products/ui';
 import { Box } from '@mui/material';
 import { Link } from 'react-router-dom';
 
@@ -53,8 +54,7 @@ export function createProductTableColumns(categories: ProductCategory[]): GridCo
       headerName: 'Мін. оптова ціна',
       width: 190,
       sortable: false,
-      valueFormatter: (value: number) =>
-        value > 0 ? value.toLocaleString('uk-UA') : 'Не розраховано',
+      valueFormatter: (_value: number, product: Product) => productWholesalePriceLabel(product),
     },
     {
       field: 'createdAtUtc',

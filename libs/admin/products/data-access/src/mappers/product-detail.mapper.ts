@@ -27,7 +27,7 @@ function sewingPrices(value: unknown): boolean {
 
 export function mapProductDetail(value: unknown): ProductDetail {
   const detail = record(value);
-  mapProduct(detail);
+  const product = mapProduct(detail);
   if (
     typeof detail['ruName'] !== 'string' ||
     typeof detail['descriptionUk'] !== 'string' ||
@@ -57,7 +57,7 @@ export function mapProductDetail(value: unknown): ProductDetail {
   ) {
     throw new Error('Некоректні деталі товару.');
   }
-  if (detail['type'] === 'Sewing') {
+  if (detail['type'] === 'Sewing' && detail['sewing'] !== null) {
     const sewing = record(detail['sewing']);
     if (
       !number(sewing['metersPerProduct']) ||
@@ -77,7 +77,7 @@ export function mapProductDetail(value: unknown): ProductDetail {
     ) {
       throw new Error('Некоректні дані швейного товару.');
     }
-  } else {
+  } else if (detail['type'] === 'Ppe' && detail['ppe'] !== null) {
     const ppe = record(detail['ppe']);
     if (
       !fields(ppe['supplier'], ['name'], ['id']) ||
@@ -90,5 +90,5 @@ export function mapProductDetail(value: unknown): ProductDetail {
       throw new Error('Некоректні дані ЗІЗ.');
     }
   }
-  return detail as unknown as ProductDetail;
+  return { ...detail, ...product } as unknown as ProductDetail;
 }

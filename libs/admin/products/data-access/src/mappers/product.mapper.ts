@@ -23,5 +23,10 @@ export function mapProduct(value: unknown): Product {
       throw new Error('Некоректне фото товару.');
     }
   }
-  return row as unknown as Product;
+  return {
+    ...row,
+    ...(row['type'] === 'Sewing'
+      ? { minimumWholesalePrice: 0, sewingPriceStatus: 'unpublished' }
+      : { minimumWholesalePrice: 0, ppePriceStatus: 'loading' }),
+  } as unknown as Product;
 }

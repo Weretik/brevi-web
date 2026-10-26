@@ -1,5 +1,7 @@
 import { Box, Stack, Typography } from '@mui/material';
 
+import { productWholesalePriceLabel } from './product-wholesale-price-label';
+
 import type { ProductDetail } from '@admin/products/model';
 
 interface Props {
@@ -25,12 +27,7 @@ export function ProductDetailHeader({ product }: Props) {
         <Typography>
           Категорії: {product.categories.map((category) => category.name).join(', ') || '—'}
         </Typography>
-        <Typography>
-          Мінімальна оптова ціна:{' '}
-          {product.minimumWholesalePrice > 0
-            ? product.minimumWholesalePrice.toLocaleString('uk-UA')
-            : 'Не розраховано'}
-        </Typography>
+        <Typography>Мінімальна оптова ціна: {productWholesalePriceLabel(product)}</Typography>
       </Box>
     </Stack>
   );

@@ -35,7 +35,7 @@ export function ProductsPage() {
   const { categories, error: categoriesError, reload: reloadCategories } = useProductCategories();
   const [deleteTarget, setDeleteTarget] = useState<Product | null>(null);
   const [rowMenu, setRowMenu] = useState<RowMenuState | null>(null);
-  const { page, loading, error, reload } = useProducts(query);
+  const { page, loading, error, reload, pricingError, reloadPrices } = useProducts(query);
 
   const columns = useMemo(() => createProductTableColumns(categories), [categories]);
 
@@ -146,6 +146,15 @@ export function ProductsPage() {
           sx={{ mb: 2 }}
         >
           {categoriesError}
+        </Alert>
+      )}
+      {pricingError && (
+        <Alert
+          severity="error"
+          action={<Button onClick={reloadPrices}>Повторити завантаження цін</Button>}
+          sx={{ mb: 2 }}
+        >
+          {pricingError}
         </Alert>
       )}
       <Box sx={{ minHeight: 440, width: '100%' }}>

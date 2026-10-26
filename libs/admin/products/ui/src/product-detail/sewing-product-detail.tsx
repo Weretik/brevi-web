@@ -1,4 +1,4 @@
-import { Box, Stack, Typography } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 
 import { ProductDetailSection } from './product-detail-section';
 
@@ -7,12 +7,6 @@ import type { ProductDetail } from '@admin/products/model';
 interface Props {
   sewing: NonNullable<ProductDetail['sewing']>;
 }
-
-const priceBands = [
-  { key: 'price1To10', label: '1–10' },
-  { key: 'price11To39', label: '11–39' },
-  { key: 'price40Plus', label: '40+' },
-] as const;
 
 export function SewingProductDetail({ sewing }: Props) {
   return (
@@ -49,35 +43,6 @@ export function SewingProductDetail({ sewing }: Props) {
             {operation.name} · {operation.minutes} хв
           </Typography>
         ))}
-        <Typography variant="subtitle1">Ціни за тканиною</Typography>
-        {sewing.prices === null ? (
-          <Typography>Ще не розраховано.</Typography>
-        ) : (
-          <>
-            {sewing.prices.byFabric.map((price) => (
-              <Box key={price.fabricId} sx={{ border: 1, borderColor: 'divider', p: 1 }}>
-                <Typography>Тканина #{price.fabricId}</Typography>
-                {priceBands.map((band) => (
-                  <Typography key={band.key}>
-                    {band.label}: {price[band.key]}
-                  </Typography>
-                ))}
-              </Box>
-            ))}
-            <Typography variant="subtitle1">Мінімум і максимум за діапазонами</Typography>
-            {priceBands.map((band) => {
-              const range = sewing.prices?.ranges[band.key];
-              return (
-                <Typography key={band.key}>
-                  {band.label}:{' '}
-                  {range
-                    ? `мін. ${range.minPrice} (тканина #${range.minFabricId}), макс. ${range.maxPrice} (тканина #${range.maxFabricId})`
-                    : 'ще не розраховано'}
-                </Typography>
-              );
-            })}
-          </>
-        )}
       </Stack>
     </ProductDetailSection>
   );

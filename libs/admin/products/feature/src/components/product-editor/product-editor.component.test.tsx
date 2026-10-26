@@ -1,5 +1,5 @@
 import { emptyProductDraft } from '@admin/products/model';
-import { cleanup, screen } from '@testing-library/react';
+import { cleanup, fireEvent, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -56,5 +56,30 @@ describe('ProductEditor', () => {
     expect(screen.getByRole('textbox', { name: 'Назва українською' })).toHaveValue('Куртка');
     expect(screen.getByRole('button', { name: 'Зберегти зміни' })).toBeEnabled();
     expect(screen.getAllByRole('region')).toHaveLength(6);
+  });
+
+  it('locks legacy Sewing norms and prevents changing the Product type when new composition exists', () => {
+    const draft = { ...emptyProductDraft('Sewing'), name: 'Куртка', ruName: 'Куртка' };
+    renderEditor(
+      <ProductEditor
+        initial={draft}
+        productId={8}
+        legacyNormsLocked
+        legacyNormsMessage="Для цього товару вже налаштовано нові артикули або склад."
+      />,
+    );
+
+    expect(screen.getByRole('spinbutton', { name: 'Метрів на виріб' })).toBeDisabled();
+    expect(screen.getByRole('textbox', { name: 'Назва українською' })).toBeEnabled();
+    expect(screen.getByRole('link', { name: 'До артикулів і складу' })).toHaveAttribute(
+      'href',
+      '/references/products/8',
+    );
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Тип товару' }));
+    fireEvent.click(screen.getByRole('option', { name: 'ЗІЗ' }));
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByText(/Тип не змінено/)).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton', { name: 'Метрів на виріб' })).toBeDisabled();
   });
 });

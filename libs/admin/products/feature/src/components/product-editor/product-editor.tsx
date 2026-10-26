@@ -15,6 +15,7 @@ import { Alert, Box, Button, CircularProgress, Stack, TextField, Typography } fr
 import { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+import { LegacySewingNormLockNotice } from './legacy-sewing-norm-lock-notice';
 import { ProductPhotoUpload } from './product-photo-upload';
 import { useProductLookups } from '../../hooks/product-editor/use-product-lookups';
 
@@ -23,9 +24,22 @@ import type { ProductDraft } from '@admin/products/model';
 interface Props {
   initial?: ProductDraft;
   productId?: number;
+  legacyNormsLocked?: boolean;
+  legacyNormsLoading?: boolean;
+  legacyNormsMessage?: string;
+  legacyNormsError?: string | null;
+  onRetryLegacyNorms?: () => void;
 }
 
-export function ProductEditor({ initial, productId }: Props) {
+export function ProductEditor({
+  initial,
+  productId,
+  legacyNormsLocked = false,
+  legacyNormsLoading = false,
+  legacyNormsMessage,
+  legacyNormsError,
+  onRetryLegacyNorms,
+}: Props) {
   const navigate = useNavigate();
   const [draft, setDraft] = useState<ProductDraft>(() => initial ?? emptyProductDraft());
   const [newId, setNewId] = useState('');
@@ -92,6 +106,14 @@ export function ProductEditor({ initial, productId }: Props) {
           {lookupError}
         </Alert>
       )}
+      <LegacySewingNormLockNotice
+        locked={legacyNormsLocked}
+        loading={legacyNormsLoading}
+        message={legacyNormsMessage}
+        error={legacyNormsError}
+        productId={productId}
+        onRetry={onRetryLegacyNorms}
+      />
       {message && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {message}
@@ -156,7 +178,15 @@ export function ProductEditor({ initial, productId }: Props) {
                 setDraft={setDraft}
                 errors={errors}
                 lookups={lookups}
-                onTypeChange={(type) => setPendingType(type === draft.type ? null : type)}
+                onTypeChange={(type) => {
+                  if (legacyNormsLocked && draft.type === 'Sewing' && type === 'Ppe') {
+                    setMessage(
+                      'Тип не змінено: спочатку перенесіть роботу зі старими нормами до розділу артикулів і складу.',
+                    );
+                    return;
+                  }
+                  setPendingType(type === draft.type ? null : type);
+                }}
               />
             </Stack>
           </ProductFormSection>
@@ -175,12 +205,37 @@ export function ProductEditor({ initial, productId }: Props) {
           <ProductFormSection
             label={draft.type === 'Sewing' ? 'Швейний товар' : 'Засіб індивідуального захисту'}
           >
-            <ProductTypeFields
-              draft={draft}
-              setDraft={setDraft}
-              errors={errors}
-              lookups={lookups}
-            />
+            {draft.type === 'Sewing' && legacyNormsLocked ? (
+              <Box component="fieldset" disabled sx={{ border: 0, m: 0, p: 0, minWidth: 0 }}>
+                <Box
+                  component="legend"
+                  sx={{
+                    position: 'absolute',
+                    width: 1,
+                    height: 1,
+                    overflow: 'hidden',
+                    clip: 'rect(0, 0, 0, 0)',
+                  }}
+                >
+                  Швейні норми старого формату
+                </Box>
+                <ProductTypeFields
+                  existingProduct={productId !== undefined}
+                  draft={draft}
+                  setDraft={setDraft}
+                  errors={errors}
+                  lookups={lookups}
+                />
+              </Box>
+            ) : (
+              <ProductTypeFields
+                existingProduct={productId !== undefined}
+                draft={draft}
+                setDraft={setDraft}
+                errors={errors}
+                lookups={lookups}
+              />
+            )}
           </ProductFormSection>
           <ProductFormSection label="Інформаційні блоки">
             <ProductInformationFields draft={draft} setDraft={setDraft} errors={errors} />

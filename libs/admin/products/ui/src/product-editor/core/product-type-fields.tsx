@@ -6,6 +6,7 @@ import type { ProductDraft } from '@admin/products/model';
 import type { Dispatch, SetStateAction } from 'react';
 
 interface Props {
+  existingProduct?: boolean;
   draft: ProductDraft;
   setDraft: Dispatch<SetStateAction<ProductDraft>>;
   errors: Record<string, string>;

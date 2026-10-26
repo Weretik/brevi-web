@@ -1,6 +1,6 @@
-import { screen } from '@testing-library/react';
+import { cleanup, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ProductDetailPage } from './product-detail-page';
 import { render } from '../../test-utils';
@@ -35,15 +35,34 @@ const product: ProductDetail = {
   ppe: null,
 };
 
+const pageMocks = vi.hoisted(() => ({
+  useProduct: vi.fn(),
+  sewingCompositionFeature: vi.fn((props: unknown) => {
+    void props;
+    return null;
+  }),
+}));
+
 vi.mock('../../hooks/product-detail/use-product', () => ({
-  useProduct: () => ({
+  useProduct: pageMocks.useProduct,
+}));
+
+vi.mock('../../components/sewing-composition/sewing-composition-feature', () => ({
+  SewingCompositionFeature: pageMocks.sewingCompositionFeature,
+}));
+
+beforeEach(() => {
+  pageMocks.useProduct.mockReturnValue({
     product,
     loading: false,
     error: null,
     notFound: false,
     reload: vi.fn(),
-  }),
-}));
+  });
+  pageMocks.sewingCompositionFeature.mockClear();
+});
+
+afterEach(cleanup);
 
 describe('ProductDetailPage', () => {
   it('groups read-only product data into semantic surfaces and keeps the edit route', () => {
@@ -70,5 +89,43 @@ describe('ProductDetailPage', () => {
       expect(screen.getByRole('region', { name })).toHaveClass('MuiCard-root');
     }
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    expect(pageMocks.sewingCompositionFeature.mock.calls.at(-1)?.[0]).toEqual(
+      expect.objectContaining({ productId: 8, onDirtyChange: expect.any(Function) }),
+    );
+  });
+
+  it('does not mount sewing composition orchestration for a PPE Product', () => {
+    const ppeProduct: ProductDetail = {
+      ...product,
+      type: 'Ppe',
+      sewing: null,
+      ppe: {
+        supplier: { id: 1, name: 'Постачальник' },
+        basePrice: 100,
+        retailPercent: { source: 'Custom', customPercent: 5 },
+        wholesalePercent: { source: 'Custom', customPercent: 10 },
+        retailPrice: 105,
+        wholesalePrice: 110,
+      },
+    };
+    pageMocks.useProduct.mockReturnValue({
+      product: ppeProduct,
+      loading: false,
+      error: null,
+      notFound: false,
+      reload: vi.fn(),
+    });
+    render(
+      <MemoryRouter initialEntries={['/references/products/8']}>
+        <Routes>
+          <Route path="/references/products/:id" element={<ProductDetailPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(pageMocks.sewingCompositionFeature).not.toHaveBeenCalled();
+    expect(
+      screen.queryByRole('region', { name: 'Артикули та склад виробу' }),
+    ).not.toBeInTheDocument();
   });
 });

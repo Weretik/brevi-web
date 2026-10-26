@@ -1,13 +1,12 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { PpeProductDetail } from './ppe-product-detail';
 import { SewingProductDetail } from './sewing-product-detail';
 
 import type { ProductDetail } from '@admin/products/model';
 
-describe('server calculated product detail', () => {
-  it('keeps fractional sewing output and shows all price bands', () => {
+describe('manufacturing metadata after price cutover', () => {
+  it('keeps manufacturing metadata without displaying old sale-price bands', () => {
     const sewing: NonNullable<ProductDetail['sewing']> = {
       metersPerProduct: 2,
       piecesPerShift: 25.6,
@@ -25,28 +24,8 @@ describe('server calculated product detail', () => {
     };
     render(<SewingProductDetail sewing={sewing} />);
     expect(screen.getByText('Продуктивність: 25.6')).toBeTruthy();
-    expect(screen.getByText('1–10: 100')).toBeTruthy();
-    expect(screen.getByText('11–39: 90')).toBeTruthy();
-    expect(screen.getByText('40+: 80')).toBeTruthy();
-    expect(screen.getByText(/мін\. 100/)).toBeTruthy();
-  });
-
-  it('shows mixed PPE percent sources and server prices', () => {
-    const ppe: NonNullable<ProductDetail['ppe']> = {
-      supplier: { id: 1, name: 'Постачальник' },
-      basePrice: 100,
-      retailPercent: {
-        source: 'Reference',
-        reference: { id: 2, name: 'Націнка', key: 'markup', value: 8, unit: '%' },
-      },
-      wholesalePercent: { source: 'Custom', customPercent: 5 },
-      retailPrice: 108,
-      wholesalePrice: 105,
-    };
-    render(<PpeProductDetail ppe={ppe} />);
-    expect(screen.getByText('Роздрібний відсоток: довідник «Націнка» 8%')).toBeTruthy();
-    expect(screen.getByText('Оптовий відсоток: власний 5%')).toBeTruthy();
-    expect(screen.getByText('Роздрібна ціна: 108')).toBeTruthy();
-    expect(screen.getByText('Оптова ціна: 105')).toBeTruthy();
+    expect(screen.queryByText('1–10: 100')).toBeNull();
+    expect(screen.queryByText('Ціни за тканиною')).toBeNull();
+    expect(screen.getByText(/Бавовна/)).toBeTruthy();
   });
 });

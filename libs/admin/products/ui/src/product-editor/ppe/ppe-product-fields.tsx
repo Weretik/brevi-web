@@ -9,97 +9,16 @@ interface Props {
   setDraft: Dispatch<SetStateAction<ProductDraft>>;
   errors: Record<string, string>;
   lookups: ProductLookups;
+  existingProduct?: boolean;
 }
-
-export function PpeProductFields({ draft, setDraft, errors, lookups }: Props) {
+export function PpeProductFields({
+  draft,
+  setDraft,
+  errors,
+  lookups,
+  existingProduct = false,
+}: Props) {
   if (draft.type !== 'Ppe') return null;
-  const percentField = (field: 'retailPercent' | 'wholesalePercent', label: string) => {
-    const value = draft[field];
-    return (
-      <Stack key={field} direction={{ xs: 'column', sm: 'row' }} sx={{ gap: 1 }}>
-        <TextField
-          select
-          label={label}
-          value={value.source}
-          sx={{ minWidth: 170 }}
-          onChange={(event) =>
-            setDraft((current) =>
-              current.type === 'Ppe'
-                ? {
-                    ...current,
-                    [field]:
-                      event.target.value === 'Reference'
-                        ? { source: 'Reference', additionalReferenceId: 0 }
-                        : { source: 'Custom', customPercent: 0 },
-                  }
-                : current,
-            )
-          }
-        >
-          <MenuItem value="Custom">Власний %</MenuItem>
-          <MenuItem value="Reference">З довідника</MenuItem>
-        </TextField>
-        {value.source === 'Custom' ? (
-          <TextField
-            label="Відсоток"
-            type="number"
-            value={value.customPercent}
-            error={Boolean(errors[field])}
-            helperText={errors[field]}
-            onChange={(event) =>
-              setDraft((current) =>
-                current.type === 'Ppe'
-                  ? {
-                      ...current,
-                      [field]: { source: 'Custom', customPercent: Number(event.target.value) },
-                    }
-                  : current,
-              )
-            }
-          />
-        ) : (
-          <Stack sx={{ gap: 1 }}>
-            <TextField
-              select
-              label="Додатковий довідник"
-              value={value.additionalReferenceId}
-              error={Boolean(errors[field])}
-              helperText={errors[field]}
-              sx={{ minWidth: 200 }}
-              onChange={(event) =>
-                setDraft((current) =>
-                  current.type === 'Ppe'
-                    ? {
-                        ...current,
-                        [field]: {
-                          source: 'Reference',
-                          additionalReferenceId: Number(event.target.value),
-                        },
-                      }
-                    : current,
-                )
-              }
-            >
-              <MenuItem value={0}>Оберіть</MenuItem>
-              {lookups.references
-                .filter((item) => item.unit === '%')
-                .map((item) => (
-                  <MenuItem key={item.id} value={item.id}>
-                    {item.name}
-                  </MenuItem>
-                ))}
-            </TextField>
-            {value.additionalReferenceId > 0 &&
-              !lookups.references.some(
-                (item) => item.id === value.additionalReferenceId && item.unit === '%',
-              ) && (
-                <Alert severity="error">Обраний довідник недоступний або не має одиниці %.</Alert>
-              )}
-          </Stack>
-        )}
-      </Stack>
-    );
-  };
   return (
     <Stack sx={{ gap: 2 }}>
       <Typography variant="h6">Засіб індивідуального захисту</Typography>
@@ -125,9 +44,12 @@ export function PpeProductFields({ draft, setDraft, errors, lookups }: Props) {
         ))}
       </TextField>
       <TextField
-        label="Базова ціна"
+        label={
+          existingProduct ? 'Початкова ціна постачальника (архів)' : 'Початкова ціна постачальника'
+        }
         type="number"
         value={draft.basePrice}
+        disabled={existingProduct}
         error={Boolean(errors['basePrice'])}
         helperText={errors['basePrice']}
         onChange={(event) =>
@@ -138,8 +60,10 @@ export function PpeProductFields({ draft, setDraft, errors, lookups }: Props) {
           )
         }
       />
-      {percentField('retailPercent', 'Роздрібний відсоток')}
-      {percentField('wholesalePercent', 'Оптовий відсоток')}
+      <Alert severity="info">
+        Поточні ціни й націнки налаштовуються та підтверджуються в розділі «Розрахунок цін ЗІЗ»
+        картки товару. Початкова ціна не активує розрахунок автоматично.
+      </Alert>
     </Stack>
   );
 }

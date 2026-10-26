@@ -1,10 +1,12 @@
 import { AppProviders } from './providers/app-providers';
 import { AppRouter } from './router/app-router';
 
-export function App() {
+import type { createAdminRouter } from './router/create-admin-router';
+
+export function App({ router }: { router?: ReturnType<typeof createAdminRouter> }) {
   return (
     <AppProviders>
-      <AppRouter />
+      <AppRouter router={router} />
     </AppProviders>
   );
 }

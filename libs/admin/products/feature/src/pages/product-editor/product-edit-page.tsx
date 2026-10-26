@@ -1,14 +1,18 @@
 import { draftFromDetail } from '@admin/products/model';
+import { adminApiErrorMessage } from '@admin/shared/api-client';
 import { Alert, Box, Button, CircularProgress } from '@mui/material';
 import { Link, useParams } from 'react-router-dom';
 
 import { ProductEditor } from '../../components/product-editor/product-editor';
 import { useProduct } from '../../hooks/product-detail/use-product';
+import { useLegacySewingNormLock } from '../../hooks/product-editor/use-legacy-sewing-norm-lock';
 
 export function ProductEditPage() {
   const { id: idText } = useParams();
   const id = Number(idText);
   const { product, loading, error, notFound, reload } = useProduct(id);
+  const sewingProduct = product?.type === 'Sewing';
+  const legacyNorms = useLegacySewingNormLock(id, sewingProduct);
   if (!Number.isInteger(id) || id < 1 || notFound)
     return (
       <Box sx={{ p: 3 }}>
@@ -35,7 +39,20 @@ export function ProductEditPage() {
   if (!product) return null;
   try {
     return (
-      <ProductEditor key={product.id} initial={draftFromDetail(product)} productId={product.id} />
+      <ProductEditor
+        key={product.id}
+        initial={draftFromDetail(product)}
+        productId={product.id}
+        legacyNormsLocked={legacyNorms.locked}
+        legacyNormsLoading={legacyNorms.loading}
+        legacyNormsMessage={legacyNorms.message}
+        legacyNormsError={
+          legacyNorms.error
+            ? adminApiErrorMessage(legacyNorms.error, 'Не вдалося перевірити старі норми.')
+            : null
+        }
+        onRetryLegacyNorms={() => void legacyNorms.retry()}
+      />
     );
   } catch (cause) {
     return (

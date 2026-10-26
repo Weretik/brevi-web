@@ -1,11 +1,21 @@
 import { resetAdminApiState } from '@admin/shared/api-client';
-import { render, screen, within } from '@testing-library/react';
+import { cleanup, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { App } from '../app';
+import { createAdminRouter } from './create-admin-router';
+
+const routers: ReturnType<typeof createAdminRouter>[] = [];
+function renderApp() {
+  const router = createAdminRouter();
+  routers.push(router);
+  return render(<App router={router} />);
+}
 
 afterEach(() => {
+  cleanup();
+  for (const router of routers.splice(0)) router.dispose();
   resetAdminApiState();
   window.history.replaceState({}, '', '/');
   window.localStorage.clear();
@@ -15,7 +25,7 @@ afterEach(() => {
 describe('React Admin routing', () => {
   it('shows all legacy sections without linking to pages that have not migrated', async () => {
     const user = userEvent.setup();
-    render(<App />);
+    renderApp();
     const navigation = screen.getByRole('navigation', { name: 'Основна навігація' });
     expect(within(navigation).queryByText('Початок')).not.toBeInTheDocument();
     const sections = [
@@ -77,7 +87,7 @@ describe('React Admin routing', () => {
 
   it('shows the start page without a home entry in the legacy menu', () => {
     window.history.replaceState({}, '', '/');
-    render(<App />);
+    renderApp();
 
     expect(screen.getByRole('main')).toHaveTextContent('Робочий простір адміністратора');
     expect(
@@ -90,7 +100,7 @@ describe('React Admin routing', () => {
   it('keeps the shell on an unknown URL and provides a way back', async () => {
     const user = userEvent.setup();
     window.history.replaceState({}, '', '/unknown');
-    render(<App />);
+    renderApp();
 
     expect(screen.getByRole('main')).toHaveTextContent('Сторінку не знайдено');
     await user.click(screen.getByRole('link', { name: 'На початок' }));
@@ -100,7 +110,7 @@ describe('React Admin routing', () => {
   it('opens suppliers directly inside the Brevi shell', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => [] }));
     window.history.replaceState({}, '', '/references/supplier');
-    render(<App />);
+    renderApp();
     await vi.dynamicImportSettled();
     expect(await screen.findByRole('heading', { name: 'Постачальники' })).toBeVisible();
     expect(
@@ -114,7 +124,7 @@ describe('React Admin routing', () => {
   it('opens additional references directly inside the Brevi shell', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => [] }));
     window.history.replaceState({}, '', '/references/additional-reference');
-    render(<App />);
+    renderApp();
     await vi.dynamicImportSettled();
     expect(await screen.findByRole('heading', { name: 'Додаткові довідники' })).toBeVisible();
     expect(
@@ -128,7 +138,7 @@ describe('React Admin routing', () => {
   it('opens garment accessories directly inside the Brevi shell', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => [] }));
     window.history.replaceState({}, '', '/references/garment-accessory?tab=fabrics');
-    render(<App />);
+    renderApp();
     await vi.dynamicImportSettled();
     expect(await screen.findByRole('heading', { name: 'Фурнітура' })).toBeVisible();
     expect(screen.getByRole('main')).toHaveTextContent('Тканини');
@@ -153,11 +163,9 @@ describe('React Admin routing', () => {
   it('opens operations directly and activates the shared legacy menu entry', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => [] }));
     window.history.replaceState({}, '', '/references/garment-part-operation');
-    render(<App />);
+    renderApp();
     await vi.dynamicImportSettled();
-    expect(
-      await screen.findByRole('heading', { name: 'Елементи виробу та роботи' }),
-    ).toBeVisible();
+    expect(await screen.findByRole('heading', { name: 'Елементи виробу та роботи' })).toBeVisible();
     expect(
       within(screen.getByRole('navigation', { name: 'Основна навігація' })).getByRole('link', {
         name: 'Операції',
@@ -194,7 +202,7 @@ describe('React Admin routing', () => {
       }),
     );
     window.history.replaceState({}, '', '/references/products');
-    render(<App />);
+    renderApp();
     await vi.dynamicImportSettled();
     expect(await screen.findByRole('heading', { name: 'Товари' })).toBeVisible();
     expect(
@@ -225,7 +233,7 @@ describe('React Admin routing', () => {
       ),
     );
     window.history.replaceState({}, '', '/references/media');
-    render(<App />);
+    renderApp();
 
     expect(await screen.findByRole('heading', { name: 'Медіа/Фото' })).toBeVisible();
     expect(
@@ -239,7 +247,7 @@ describe('React Admin routing', () => {
   it('persists the selected color mode', async () => {
     const user = userEvent.setup();
     window.history.replaceState({}, '', '/');
-    render(<App />);
+    renderApp();
 
     await user.click(screen.getByRole('button', { name: 'Вибрати тему оформлення' }));
     await user.click(screen.getByRole('menuitem', { name: 'Темна' }));

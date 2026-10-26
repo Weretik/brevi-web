@@ -1,4 +1,3 @@
-export * from './product-detail/ppe-product-detail';
 export * from './product-detail/product-characteristics-detail';
 export * from './product-detail/product-detail-content';
 export * from './product-detail/product-detail-gallery';
@@ -21,8 +20,16 @@ export * from './product-editor/sewing/sewing-accessory-fields';
 export * from './product-editor/sewing/sewing-fabric-fields';
 export * from './product-editor/sewing/sewing-operation-fields';
 export * from './product-editor/sewing/sewing-product-fields';
+export * from './forms/sewing-articles/sewing-articles-panel';
+export { productWholesalePriceLabel } from './product-detail/product-wholesale-price-label';
+export { SewingPricingPanel } from './components/sewing-pricing/sewing-pricing-panel';
+export * from './forms/sewing-composition/sewing-composition-editor';
 export * from './product-content/product-markdown';
 export * from './product-list/products-list-filters';
 export * from './media/media-delete-dialog';
 export * from './media/media-gallery';
 export * from './media/media-upload';
+
+export { PpePricingPanel } from './components/ppe-pricing/ppe-pricing-panel';
+export { PpeOfferForm } from './forms/ppe-pricing/ppe-offer-form';
+export { PpeRuleForm } from './forms/ppe-pricing/ppe-rule-form';
