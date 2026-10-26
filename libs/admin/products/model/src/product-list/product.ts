@@ -11,6 +11,8 @@ export interface Product {
   mainPhoto?: ProductMainPhoto | null;
   createdAtUtc: string;
   minimumWholesalePrice: number;
+  ppePriceStatus?: 'loading' | 'error' | 'calculated' | 'blocked';
+  sewingPriceStatus?: 'loading' | 'error' | 'published' | 'unpublished';
   updatedAtUtc: string | null;
 }
 

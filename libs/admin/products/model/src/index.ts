@@ -11,3 +11,25 @@ export * from './product-media/media-search';
 export * from './product-media/product-media';
 export * from './product-media/product-photos';
 export * from './sewing/product-fabrics';
+export * from './entities/sewing-articles';
+export * from './entities/sewing-pricing/sewing-price-tiers';
+export * from './entities/sewing-pricing/sewing-price-calculation';
+export * from './entities/sewing-pricing/sewing-publication';
+export * from './entities/sewing-pricing/published-sewing-product';
+export * from './queries/sewing-pricing/apply-published-sewing-price';
+export * from './entities/sewing-composition';
+export * from './queries/sewing-composition';
+export * from './mappers/sewing-composition';
+export * from './validators/sewing-composition';
+
+export type { PpePriceTiers } from './entities/ppe-pricing/ppe-price-tiers';
+export type { PpeMarkups } from './entities/ppe-pricing/ppe-markups';
+export type { PpeOfferValues } from './entities/ppe-pricing/ppe-offer-values';
+export type { PpeRuleValues } from './entities/ppe-pricing/ppe-rule-values';
+export type { PpeOfferVersion } from './entities/ppe-pricing/ppe-offer-version';
+export type { PpeRuleVersion } from './entities/ppe-pricing/ppe-rule-version';
+export type { PpeProductPricing } from './entities/ppe-pricing/ppe-product-pricing';
+export { applyPpePrice } from './queries/ppe-pricing/apply-ppe-price';
+
+export type { PpeRuleMarkupDraft } from './forms/ppe-pricing/ppe-rule-markup-draft';
+export { parsePpeMarkupDraft } from './validators/ppe-pricing/parse-ppe-markup-draft';
