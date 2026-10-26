@@ -1,0 +1,34 @@
+# Scoped PPE boundary review
+
+Scope: TS-P01/02/03, new PPE model/data-access/UI/feature and directly affected Product price consumers. Rules: docs/standards/admin/admin-code-organization.md and api-data-rules.md. This is not a repository-wide, visual or performance audit.
+
+| ID      | Severity / owner            | Evidence and impact                                                                                                                                           | Target / task                                                                                                                                                                                                                      | Status   |
+| ------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| AF-PP01 | Medium / Product projection | Legacy amounts remained available while an enrolled PPE calculation was unavailable. R-P04 requires one current source.                                       | TS-P03: `model/src/queries/ppe-pricing/apply-ppe-price.ts`; valid Red observed 999 instead of 136 and missing blocked status. Explicit confirmed non-enrollment alone preserves legacy.                                            | Verified |
+| AF-PP02 | Medium / mutation identity  | Unlike the UUID-only Sewing save, PPE writes have editable payloads. Reusing a failed request UUID after editing would conflict with server idempotency.      | TS-P02: `feature/src/hooks/ppe-pricing/use-ppe-version-actions.ts` fingerprints Product/expected-version/values, retains unchanged retry identity, prevents concurrent sends and locks conflicts. Retry/edited-payload tests pass. | Verified |
+| AF-PP03 | Medium / draft ownership    | Initial panel returned a loader during background fetch and keyed both drafts by both versions, so saving one input could discard unsaved edits to the other. | TS-P02: separate feature offer/rule editors and own-version keys; retain editors during refresh. `retains an unsaved rule draft when only the offer refreshes` passes.                                                             | Verified |
+| AF-PP04 | Low / UI responsibility     | Initial controlled forms assigned source/provenance timestamps in UI handlers. This mixed presentation with revision metadata ownership.                      | TS-P02: move revision metadata to feature-owned editors; UI only renders controlled fields and sends values/callbacks. Focused type/lint/component checks.                                                                         | Verified |
+
+AF-PP05 (Medium, TS-P02, Verified): missing rule fields were initially coerced to zero. Controlled string drafts now preserve blank input; `parsePpeMarkupDraft` rejects blank/nonfinite/negative/excess-precision values while allowing explicitly entered zero. Two valid Red cases failed against direct Number conversion, then passed with validation. The component regression confirms an emptied field stays blank and cannot submit. Domain prices still come only from the server.
+
+Role-first folders stay intact. PPE model has seven cohesive model files; other changed capability directories remain below eight direct production files. No additional Nx project, empty directory, deep import, Common/Utils directory or reverse dependency is needed. Shared scalar validators and safe error presentation moved to pricing folders only after Sewing and PPE both consumed them. Their APIs remain internal.
+
+Backend HTTP completeness is verified separately: absent markup tiers are rejected rather than bound as approved zero. The consumer uses generated request types and sends no actor, approval timestamp or calculated prices.
+
+Final self-review covers permission/error/loading/empty states, nullable values, stale read scope, independent drafts, bounded requests, idempotency, Ukrainian labels/responsive MUI layout and raw error exclusion. Server responses remain in RTK; no price formula runs in model/JSX. [Verification](../verification.md).
+
+## Structural follow-up — 2026-10-25
+
+AF-PP06 (Low, TS-P02, owner: PPE feature, verified): `feature/src/hooks/ppe-pricing/use-ppe-version-actions.ts:16` combined typed offer/rule mutation wiring with request fingerprint/UUID retention, in-flight state, error formatting and stale-conflict locking. Extract `use-ppe-version-request.ts` as the private request lifecycle owner. The original hook binds the two RTK mutations and their application values. Server data remains in RTK and the shared in-flight gate still serializes both actions. AF-PP02's earlier file location is historical; its retry behavior now belongs to this extracted hook.
+
+Keep decisions: Product response validation is one consumed-response boundary, distinct from mapping; retain its readiness/scope guards together. Each controlled offer/rule form and each feature draft editor owns one resource, so no further fragmentation is justified by line count. The 216-line component test groups observable workflow cases and is not production UI. Existing API/model/UI boundaries and public exports remain unchanged. No new library, route, store, module dependency or protocol is introduced.
+
+[Fresh structural verification](structure-verification.md).
+
+## TS-007 structural follow-up — 2026-10-25
+
+AF-PP07 (Low; owner: Product detail feature; TS-007; verified): `feature/src/pages/product-detail/product-detail-page.tsx:108` mixed routing/deletion/composition orchestration with current-price retry presentation and PPE onboarding wiring. Extract `components/product-detail/product-current-pricing.tsx` as the current-price section owner. It passes Product identity/initial metadata to the existing PPE feature and renders the supplied pricing error/retry callback. The page retains route/loading/delete/composition state; RTK remains the server-data owner. Public library entry points and routes are unchanged.
+
+Keep decisions: the PPE offer draft editor owns one resource and its revision provenance; controlled PPE fields own metadata presentation. The simplified Sewing detail owns one manufacturing view. Small selector/label functions and type-specific mappers are cohesive; splitting them further would add files without a separate responsibility. Existing PPE capability role folders have fewer than eight direct production files. No new Nx project, abstraction, transport definition or formula is introduced. Existing focused regression is the verification for this behavior-preserving extraction; no artificial Red test is required.
+
+[TS-007 structural verification](cutover-structure-verification.md).

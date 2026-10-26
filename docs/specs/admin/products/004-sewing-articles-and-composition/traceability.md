@@ -11,4 +11,4 @@
 
 ## Readiness
 
-This draft is ready for review but not for API integration: EN-001 depends on a versioned backend contract and pinned revision. Product/Article scope and frontend ownership are defined. No UI has been changed and no tests have been run.
+EN-001–003 and TS-001–006 are complete for the client-code scope: the backend contract is pinned, synchronized and generated; dirty navigation uses the data router. Implementation and focused evidence are recorded in the [2026-10-25 checkpoint](implementation.md), which supersedes the planned statuses above. Database/deployment verification is separate from the component and transport checks; no source import or deployed end-to-end scenario is claimed.

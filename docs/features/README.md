@@ -7,7 +7,7 @@ In each feature card, “Structure diagram” shows relationships between parts,
 ## Admin React (`apps/admin-react`)
 
 - Admin foundation: [shell, navigation, and session](admin/shell.md).
-- Products: [list, details, creation, and editing](admin/products/products.md); [media library](admin/products/media.md).
+- Products: [list, details, creation, and editing](admin/products/products.md); [media library](admin/products/media.md); [Sewing Articles and composition](admin/products/sewing-composition.md); [Article calculation and published prices](admin/products/sewing-pricing.md); [PPE pricing and input approval](admin/products/ppe-pricing.md).
 - Reference data: [suppliers](admin/references/suppliers.md); [hardware and fabrics](admin/references/materials.md); [garment parts and operations](admin/references/garment-parts.md); [additional reference data](admin/references/additional-references.md).
 
 ## Storefront Angular (`apps/storefront`)

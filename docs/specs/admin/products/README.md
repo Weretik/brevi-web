@@ -33,4 +33,10 @@
 описує контекстне меню рядка, повну українську локалізацію MUI Data Grid,
 білі поверхні фільтрів і карткову композицію detail/create/edit.
 
-[Next sewing Article and composition SDD](004-sewing-articles-and-composition/README.md) specifies the planned Admin extension; implementation has not started.
+[Sewing Article and composition SDD](004-sewing-articles-and-composition/README.md) records the implemented Admin extension, focused evidence and remaining deployment gates.
+
+[Sewing composition structure remediation](005-sewing-composition-structure/README.md) records the responsibility audit, decomposition tasks and verification for that delivered code.
+
+[Article pricing and published Product prices](006-sewing-pricing/README.md) implements the TS-005 React Admin consumer, with its own contract pin, data boundary and verification evidence.
+
+[PPE pricing and versioned input approval](007-ppe-pricing/README.md) implements the TS-006 Admin consumer.

@@ -12,6 +12,8 @@ The current [Admin product feature](../../../../../features/admin/products/produ
 
 ## Key path map
 
+**Implemented navigation decision, 2026-10-25:** EN-003 changes the application composition root to a React Router data router while preserving domain routes and lazy pages. The Sewing feature uses one navigation blocker for dirty/in-flight work, covering browser history and SPA links; scope switching has its local confirmation and browser unload has `beforeunload`. This replaces the draft assumption that a shared Admin dirty-state pattern already existed. The [feature card](../../../../../features/admin/products/sewing-composition.md) records actual paths.
+
 | Frontend path                                                                  | State                        | Responsibility                                                              |
 | ------------------------------------------------------------------------------ | ---------------------------- | --------------------------------------------------------------------------- |
 | `libs/admin/products/feature/src/pages/product-detail/product-detail-page.tsx` | Existing, change             | Add Article list and effective composition section.                         |

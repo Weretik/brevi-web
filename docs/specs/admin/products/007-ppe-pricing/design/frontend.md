@@ -1,0 +1,11 @@
+# Responsibility map
+
+Model: independent PPE offer/rule values and version models, current Product pricing and pure Product price projection. Data-access: generated operation aliases, separate consumed-response validation and DTO mapping, RTK batch reads and explicit offer/rule mutations. Feature: capability-role folders for batch Product projection, Article-independent PPE read/approval workflow and thin Product card integration. UI: presentational pricing panel, tier values/blockers and separate controlled offer/rule forms.
+
+Use existing Product caches and session access. One bounded PPE query per visible Product set; no per-row requests. Batch and detail with identical single-ID scope share RTK cache. Mutations invalidate Product IDs/list, rule writes invalidate all PPE pricing consumers through Product LIST. Only identities/drafts/transient write error live locally. Pricing panel is keyed by Product/version so a refreshed version resets its editor, while retry UUID remains stable for the unchanged request. API responses do not enter JSX. No new library, generic state wrapper, Common/Utils folder or deep import.
+
+TS-007 compatibility: Product metadata price fields are retired placeholders. Current PPE prices use only the versioned pricing endpoint, including non-enrolled/blocked states. The old PPE price component, old Sewing band view and percent controls are removed. Initial Product base cost may prefill an unapproved onboarding draft; existing base cost is archived/read-only. Generated contract shape stays compatible, but price semantics follow the explicit consumer cutover. [Revision](../cutover/README.md).
+
+Offer and rule drafts live in separate feature editors keyed only by their own version. The workflow retains both during background fetches and disables writes. A changed offer does not reset an unsaved rule. Provenance changes belong to the feature editor, not the controlled UI form. Missing rules can be created explicitly with visible entered fractions; no source-rule inference occurs.
+
+The private request lifecycle hook owns retry identity, concurrency and conflict/error state; the typed mutation adapter selects offer/rule endpoints and payloads. This internal split preserves existing scenarios and public exports.
