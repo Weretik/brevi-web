@@ -5,3 +5,8 @@ coverage
 package-lock.json
 pnpm-lock.yaml
 yarn.lock
+
+# Generated contracts must retain their source and generator formatting.
+docs/contracts/openapi/backend
+docs/contracts/openapi/SOURCE.json
+libs/admin/shared/contracts/src/generated

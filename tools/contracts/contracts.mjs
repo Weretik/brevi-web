@@ -61,6 +61,8 @@ function generate(output) {
       join(root, 'node_modules/prettier/bin/prettier.cjs'),
       '--config',
       join(root, 'prettier.config.cjs'),
+      '--ignore-path',
+      join(root, '.gitignore'),
       '--write',
       output,
     ],

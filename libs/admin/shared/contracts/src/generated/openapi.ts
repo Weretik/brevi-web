@@ -182,7 +182,10 @@ export interface paths {
     /** List garment part operations */
     get: operations['getGarmentPartOperations'];
     put?: never;
-    /** Create a garment part operation with a client supplied ID */
+    /**
+     * Create a garment part operation with a client supplied ID
+     * @description Requires CanManageProducts. Numeric edits append an approved pricing revision when the reference is versioned.
+     */
     post: operations['createGarmentPartOperation'];
     delete?: never;
     options?: never;
@@ -200,10 +203,16 @@ export interface paths {
       cookie?: never;
     };
     get?: never;
-    /** Update a garment part operation */
+    /**
+     * Update a garment part operation
+     * @description Requires CanManageProducts. Numeric edits append an approved pricing revision when the reference is versioned.
+     */
     put: operations['updateGarmentPartOperation'];
     post?: never;
-    /** Delete a garment part operation */
+    /**
+     * Delete a garment part operation
+     * @description Requires CanManageProducts. Numeric edits append an approved pricing revision when the reference is versioned.
+     */
     delete: operations['deleteGarmentPartOperation'];
     options?: never;
     head?: never;
@@ -258,7 +267,10 @@ export interface paths {
     /** List fabrics */
     get: operations['getFabrics'];
     put?: never;
-    /** Create a fabric with a client supplied ID */
+    /**
+     * Create a fabric with a client supplied ID
+     * @description Requires CanManageProducts. Numeric edits append an approved pricing revision when the reference is versioned.
+     */
     post: operations['createFabric'];
     delete?: never;
     options?: never;
@@ -276,10 +288,16 @@ export interface paths {
       cookie?: never;
     };
     get?: never;
-    /** Update a fabric */
+    /**
+     * Update a fabric
+     * @description Requires CanManageProducts. Numeric edits append an approved pricing revision when the reference is versioned.
+     */
     put: operations['updateFabric'];
     post?: never;
-    /** Delete a fabric */
+    /**
+     * Delete a fabric
+     * @description Requires CanManageProducts. Numeric edits append an approved pricing revision when the reference is versioned.
+     */
     delete: operations['deleteFabric'];
     options?: never;
     head?: never;
@@ -296,7 +314,10 @@ export interface paths {
     /** List garment accessories */
     get: operations['getGarmentAccessories'];
     put?: never;
-    /** Create a garment accessory with a client supplied ID */
+    /**
+     * Create a garment accessory with a client supplied ID
+     * @description Requires CanManageProducts. Numeric edits append an approved pricing revision when the reference is versioned.
+     */
     post: operations['createGarmentAccessory'];
     delete?: never;
     options?: never;
@@ -314,10 +335,16 @@ export interface paths {
       cookie?: never;
     };
     get?: never;
-    /** Update a garment accessory */
+    /**
+     * Update a garment accessory
+     * @description Requires CanManageProducts. Numeric edits append an approved pricing revision when the reference is versioned.
+     */
     put: operations['updateGarmentAccessory'];
     post?: never;
-    /** Delete a garment accessory */
+    /**
+     * Delete a garment accessory
+     * @description Requires CanManageProducts. Numeric edits append an approved pricing revision when the reference is versioned.
+     */
     delete: operations['deleteGarmentAccessory'];
     options?: never;
     head?: never;
@@ -396,6 +423,303 @@ export interface paths {
     post?: never;
     /** Delete a Product and its Product-owned details and links */
     delete: operations['deleteProduct'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/products/{productId}/articles': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        productId: components['parameters']['parameters-ProductId'];
+      };
+      cookie?: never;
+    };
+    /**
+     * List Articles for a Sewing Product
+     * @description Requires CatalogRead. The result is bounded to at most 200 Articles.
+     */
+    get: operations['listSewingArticles'];
+    put?: never;
+    /**
+     * Create a Sewing Product Article
+     * @description Requires CanManageProducts. Sale SKU is globally unique, trimmed and compared using ordinal case-sensitive equality; it is immutable after creation.
+     */
+    post: operations['createSewingArticle'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/products/{productId}/composition': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        productId: components['parameters']['parameters-ProductId'];
+      };
+      cookie?: never;
+    };
+    /**
+     * Get shared and effective Article composition
+     * @description Requires CatalogRead. Returns model-wide lines and shared operations when articleId is omitted. When articleId is supplied, also returns that Article's material lines; the effective materials are model-wide plus Article-scoped, and every material line identifies its scope.
+     */
+    get: operations['getSewingComposition'];
+    /**
+     * Replace model-wide Sewing composition
+     * @description Requires CanManageProducts. Replaces all model-wide materials and operations atomically. A stale expectedVersion returns 409; clients must not replay automatically and should retain the user's draft for resolution.
+     */
+    put: operations['replaceSewingComposition'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/products/{productId}/articles/{articleId}/composition': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        productId: components['parameters']['parameters-ProductId'];
+        articleId: components['parameters']['ArticleId'];
+      };
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Replace Article-specific material composition
+     * @description Requires CanManageProducts. Replaces all Article-specific materials atomically. A stale expectedVersion returns 409; clients must not replay automatically and should retain the user's draft for resolution.
+     */
+    put: operations['replaceSewingArticleComposition'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/products/{productId}/articles/{articleId}/pricing/calculations': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        productId: number;
+        articleId: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Save an immutable calculation using server time. A request UUID is globally unique; retries return the original snapshot, even after inputs change. Blocked results are saved for diagnosis. Requires CanManageProducts. */
+    post: operations['saveSewingCalculation'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/products/{productId}/articles/{articleId}/pricing/calculations/{calculationId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        productId: number;
+        articleId: number;
+        calculationId: string;
+      };
+      cookie?: never;
+    };
+    /** @description Read an immutable saved result scoped to its Product and Article. Requires CatalogRead. */
+    get: operations['getSewingCalculation'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/products/{productId}/articles/{articleId}/pricing/calculations/{calculationId}/publication': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        productId: number;
+        articleId: number;
+        calculationId: string;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Publish an unblocked current calculation. Replaying an already published calculation returns its original publication without replacing the current price. Requires CanManageProducts. */
+    post: operations['publishSewingCalculation'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/products/{productId}/articles/{articleId}/pricing/published': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        productId: number;
+        articleId: number;
+      };
+      cookie?: never;
+    };
+    /** @description Read the latest published price. Historical published prices remain stored after input changes. Requires CatalogRead. */
+    get: operations['getPublishedSewingPrice'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/pricing/sewing/settings/versions': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Append a complete approved settings revision effective at server time. expectedVersionId must match the latest revision; no partial setting updates. requestId makes retries idempotent. Requires CanManageProducts. */
+    post: operations['createSewingSettingsVersion'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/pricing/sewing/settings': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Read the current approved effective settings. Requires CatalogRead. */
+    get: operations['getSewingSettings'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/reference/pricing/other-costs/{code}/versions': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        code: string;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Append an approved revision to an existing non-inventory service cost. Unit and source identity are preserved. requestId makes retries idempotent; expectedVersionId prevents lost updates. Requires CanManageProducts. */
+    post: operations['reviseOtherCost'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/pricing/sewing/published': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Requires CatalogRead. Returns active Sewing Products, their active Article count and the latest stored publication per active Article. Missing, inactive and non-Sewing Product IDs are omitted. Empty articles means no published price. No cost or actor data is exposed. */
+    get: operations['getPublishedSewingProducts'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/pricing/ppe/products': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description CatalogRead. Bounded current PPE calculations from stored input versions; no live Sheet/XML or publication. Missing/non-PPE Products are omitted. Draft inputs yield blockers. Unenrolled Products are identified explicitly. */
+    get: operations['getPpeProductPrices'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/pricing/ppe/rules': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description CatalogRead. Latest exact-code rule, including an imported draft. */
+    get: operations['getPpePricingRule'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/pricing/ppe/rules/versions': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description CanManageProducts. Append and approve a version using server actor/time. expectedVersionId null only for first enrollment. Request UUID retries are actor/payload-bound. */
+    post: operations['createPpeRuleVersion'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/pricing/ppe/products/{productId}/offer/versions': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        productId: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description CanManageProducts. Append and approve a version using server actor/time. expectedVersionId null only for first enrollment. Request UUID retries are actor/payload-bound. */
+    post: operations['createPpeOfferVersion'];
+    delete?: never;
     options?: never;
     head?: never;
     patch?: never;
@@ -612,7 +936,10 @@ export interface components {
       mainPhoto?: components['schemas']['MainPhoto'] | null;
       /** Format: date-time */
       createdAtUtc: string;
-      /** @description Minimum calculated wholesale price; zero when a price cannot be calculated. */
+      /**
+       * @deprecated
+       * @description Retired compatibility placeholder, always zero. Read current Sewing publications or PPE prices through the Pricing API; zero is not a sale price.
+       */
       minimumWholesalePrice: number;
       /** Format: date-time */
       updatedAtUtc: string | null;
@@ -772,6 +1099,10 @@ export interface components {
       operations: components['schemas']['OperationDetail'][];
       /** @description Full unrounded fractional value. */
       piecesPerShift: number | null;
+      /**
+       * @deprecated
+       * @description Retired Product calculation, always null. Read published Article prices through getPublishedSewingProducts.
+       */
       prices: components['schemas']['SewingPrices'] | null;
     };
     ReferenceName: {
@@ -802,7 +1133,15 @@ export interface components {
       basePrice: number;
       retailPercent: components['schemas']['PercentDetail'];
       wholesalePercent: components['schemas']['PercentDetail'];
+      /**
+       * @deprecated
+       * @description Retired compatibility placeholder, always zero. Use getPpeProductPrices.
+       */
       retailPrice: number;
+      /**
+       * @deprecated
+       * @description Retired compatibility placeholder, always zero. Use getPpeProductPrices.
+       */
       wholesalePrice: number;
     };
     ProductDetail: components['schemas']['ProductListItem'] & {
@@ -818,6 +1157,422 @@ export interface components {
     };
     ReplaceProductRequest: components['schemas']['ProductWriteBase'] &
       Omit<components['schemas']['ProductTypeWrite'], 'type'>;
+    SewingArticle: {
+      /** Format: int64 */
+      id: number;
+      /** Format: int32 */
+      productId: number;
+      saleSku: string;
+      active: boolean;
+      /** Format: int32 */
+      sortOrder: number;
+    };
+    SewingArticleList: {
+      /** Format: int32 */
+      productId: number;
+      modelCode: string | null;
+      /** Format: int64 */
+      version: number;
+      articles: components['schemas']['SewingArticle'][];
+    };
+    CreateSewingArticleRequest: {
+      saleSku: string;
+      active: boolean;
+      /** Format: int32 */
+      sortOrder: number;
+      /**
+       * Format: int64
+       * @description Current model composition version used for optimistic concurrency.
+       */
+      expectedVersion: number;
+    };
+    /**
+     * @description Fabric uses Metre, Accessory uses Piece or Metre, and OtherCost uses Service.
+     * @enum {string}
+     */
+    SewingMaterialKind: 'Fabric' | 'Accessory' | 'OtherCost';
+    /**
+     * @description Kilogram is reserved; no currently supported material kind accepts it.
+     * @enum {string}
+     */
+    SewingMaterialUnit: 'Metre' | 'Piece' | 'Service' | 'Kilogram';
+    /** @description Effective line. Identity and review metadata are server-owned. */
+    SewingMaterial: {
+      /** Format: int64 */
+      id: number;
+      /** Format: int64 */
+      articleId: number | null;
+      /** @enum {string} */
+      scope: 'Model' | 'Article';
+      kind: components['schemas']['SewingMaterialKind'];
+      /** Format: int32 */
+      referenceId: number | null;
+      costCode: string | null;
+      quantity: number;
+      unit: components['schemas']['SewingMaterialUnit'];
+      required: boolean;
+      /** Format: int32 */
+      sortOrder: number;
+      reviewed: boolean;
+      reviewedBy: string | null;
+      /** Format: date-time */
+      reviewedAt: string | null;
+    };
+    /** @description Shared effective operation line. Identity and review metadata are server-owned. */
+    SewingOperation: {
+      /** Format: int64 */
+      id: number;
+      /** Format: int32 */
+      operationId: number;
+      quantity: number;
+      manualMinutes: number | null;
+      /** Format: int32 */
+      sortOrder: number;
+      reviewed: boolean;
+      reviewedBy: string | null;
+      /** Format: date-time */
+      reviewedAt: string | null;
+    };
+    SewingComposition: {
+      /** Format: int32 */
+      productId: number;
+      /** Format: int64 */
+      articleId: number | null;
+      modelCode: string | null;
+      /** Format: int64 */
+      version: number;
+      /** @description Model-wide and selected-Article lines; scope identifies each line. This is the effective set. */
+      materials: components['schemas']['SewingMaterial'][];
+      /** @description Shared effective operation lines. */
+      operations: components['schemas']['SewingOperation'][];
+      /** @description Human-readable blockers for review, missing fabric/operations, or unresolved OtherCost. */
+      blockers: string[];
+    };
+    SewingMaterialInput: {
+      kind: components['schemas']['SewingMaterialKind'];
+      /**
+       * Format: int32
+       * @description Required for Fabric and Accessory; null for OtherCost.
+       */
+      referenceId: number | null;
+      /** @description Required for OtherCost; null for Fabric and Accessory. */
+      costCode: string | null;
+      quantity: number;
+      unit: components['schemas']['SewingMaterialUnit'];
+      required: boolean;
+      /** Format: int32 */
+      sortOrder: number;
+      reviewed: boolean;
+    };
+    SewingOperationInput: {
+      /** Format: int32 */
+      operationId: number;
+      quantity: number;
+      manualMinutes: number | null;
+      /** Format: int32 */
+      sortOrder: number;
+      reviewed: boolean;
+    };
+    ReplaceSewingCompositionRequest: {
+      modelCode: string | null;
+      materials: components['schemas']['SewingMaterialInput'][];
+      operations: components['schemas']['SewingOperationInput'][];
+      /** Format: int64 */
+      expectedVersion: number;
+    };
+    ReplaceSewingArticleCompositionRequest: {
+      materials: components['schemas']['SewingMaterialInput'][];
+      /** Format: int64 */
+      expectedVersion: number;
+    };
+    SaveSewingCalculationRequest: {
+      /** Format: uuid */
+      requestId: string;
+    };
+    SewingCostBreakdown: {
+      /** Format: decimal */
+      materials: number;
+      /** Format: decimal */
+      otherCosts: number;
+      /** Format: decimal */
+      totalMinutes: number;
+      /** Format: decimal */
+      minuteCost: number;
+      /** Format: decimal */
+      seamstress: number;
+      /** Format: decimal */
+      cutting: number;
+      /** Format: decimal */
+      master: number;
+      /** Format: decimal */
+      manager: number;
+      /** Format: decimal */
+      bonus: number;
+      /** Format: decimal */
+      overhead: number;
+      /** Format: decimal */
+      materialsTotal: number;
+      /** Format: decimal */
+      fullCost: number;
+    };
+    SewingPriceTiers: {
+      /** Format: decimal */
+      retail: number;
+      /** Format: decimal */
+      wholesale: number;
+      /** Format: decimal */
+      largeWholesale: number;
+    };
+    SewingPricingBlocker: {
+      code: string;
+      inputKey: string | null;
+      message: string;
+    };
+    SewingArticleCalculation: {
+      breakdown: components['schemas']['SewingCostBreakdown'] | null;
+      prices: components['schemas']['SewingPriceTiers'] | null;
+      blockers: components['schemas']['SewingPricingBlocker'][];
+      isCalculated: boolean;
+    };
+    SewingPricingMaterialRow: {
+      /** Format: int64 */
+      lineId: number;
+      referenceKey: string;
+      /** Format: decimal */
+      quantity: number;
+      /** @enum {string} */
+      unit: 'Metre' | 'Piece' | 'Service';
+      isFabric: boolean;
+      isOtherCost: boolean;
+      isRequired: boolean;
+      isReviewed: boolean;
+    };
+    SewingPricingOperationRow: {
+      /** Format: int64 */
+      lineId: number;
+      /** Format: int64 */
+      operationId: number;
+      /** Format: decimal */
+      quantity: number;
+      manualMinutes: number | null;
+      isReviewed: boolean;
+    };
+    SewingArticlePricingSnapshot: {
+      /** Format: int64 */
+      productId: number;
+      /** Format: int64 */
+      articleId: number;
+      saleSku: string;
+      /** Format: int64 */
+      compositionVersion: number;
+      isActive: boolean;
+      materials: components['schemas']['SewingPricingMaterialRow'][];
+      operations: components['schemas']['SewingPricingOperationRow'][];
+    };
+    SewingCalculationSettings: {
+      /** Format: decimal */
+      monthlySalary: number;
+      /** Format: decimal */
+      workDays: number;
+      /** Format: decimal */
+      shiftMinutes: number;
+      /** Format: decimal */
+      seamstressCount: number;
+      /** Format: decimal */
+      assemblyRate: number;
+      /** Format: decimal */
+      cuttingRate: number;
+      /** Format: decimal */
+      masterRate: number;
+      /** Format: decimal */
+      managerRate: number;
+      /** Format: decimal */
+      bonusRate: number;
+      /** Format: decimal */
+      monthlyOverhead: number;
+      /** Format: decimal */
+      retailMultiplier: number;
+      /** Format: decimal */
+      wholesaleMultiplier: number;
+      /** Format: decimal */
+      largeWholesaleMultiplier: number;
+    };
+    SewingPricingSettingsSelection: {
+      /** Format: int64 */
+      id: number;
+      /** Format: int64 */
+      revision: number;
+      /** Format: date-time */
+      effectiveFrom: string;
+      formulaVersion: string;
+      settings: components['schemas']['SewingCalculationSettings'];
+    };
+    PricingReferenceValue: {
+      referenceKey: string;
+      /** Format: int64 */
+      versionId: number;
+      value: number | null;
+      unit: string;
+      isActive: boolean;
+      isApproved: boolean;
+      sourceCode: string;
+    };
+    SewingArticlePricePreview: {
+      /** Format: int64 */
+      productId: number;
+      /** Format: int64 */
+      articleId: number;
+      saleSku: string;
+      /** Format: int64 */
+      compositionVersion: number;
+      /** Format: date-time */
+      at: string;
+      settingsVersionId: number | null;
+      referenceVersionIds: number[];
+      calculation: components['schemas']['SewingArticleCalculation'];
+      inputs: components['schemas']['SewingArticlePricingSnapshot'];
+      settings: components['schemas']['SewingPricingSettingsSelection'] | null;
+      references: components['schemas']['PricingReferenceValue'][];
+    };
+    SavedSewingCalculation: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      requestId: string;
+      /** Format: date-time */
+      createdAt: string;
+      createdBy: string;
+      snapshot: components['schemas']['SewingArticlePricePreview'];
+    };
+    PublishedSewingPrice: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      calculationId: string;
+      /** Format: int64 */
+      productId: number;
+      /** Format: int64 */
+      articleId: number;
+      /** Format: date-time */
+      publishedAt: string;
+      publishedBy: string;
+      prices: components['schemas']['SewingPriceTiers'];
+    };
+    CreateSewingSettingsVersionRequest: {
+      /** Format: int64 */
+      expectedVersionId: number;
+      /** Format: uuid */
+      requestId: string;
+      settings: components['schemas']['SewingCalculationSettings'];
+    };
+    ReviseOtherCostRequest: {
+      /** Format: int64 */
+      expectedVersionId: number;
+      /** Format: decimal */
+      value: number;
+      /** Format: uuid */
+      requestId: string;
+    };
+    SewingPublishedArticlePrice: {
+      /** Format: int64 */
+      articleId: number;
+      saleSku: string;
+      /** Format: uuid */
+      publicationId: string;
+      /** Format: uuid */
+      calculationId: string;
+      /** Format: date-time */
+      publishedAt: string;
+      prices: components['schemas']['SewingPriceTiers'];
+    };
+    SewingPublishedProductPrices: {
+      /** Format: int32 */
+      productId: number;
+      articleCount: number;
+      articles: components['schemas']['SewingPublishedArticlePrice'][];
+    };
+    PpeOfferValues: {
+      ruleCode: string | null;
+      supplierCost: number | null;
+      externalRetail: number | null;
+      externalWholesale: number | null;
+      source: string;
+      sourceDate: string;
+      sourceReviewed: boolean;
+    };
+    PpeOfferVersion: {
+      /** Format: uuid */
+      id: string;
+      /** Format: int32 */
+      productId: number;
+      values: components['schemas']['PpeOfferValues'];
+      isApproved: boolean;
+      approvedBy: string | null;
+      approvedAt: string | null;
+      /** Format: date-time */
+      createdAt: string;
+    };
+    PpeMarkups: {
+      /** Format: decimal */
+      retail: number;
+      /** Format: decimal */
+      wholesale: number;
+      /** Format: decimal */
+      largeWholesale: number;
+    };
+    PpeRuleValues: {
+      code: string;
+      markups: components['schemas']['PpeMarkups'];
+      source: string;
+      sourceDate: string;
+    };
+    PpeRuleVersion: {
+      /** Format: uuid */
+      id: string;
+      values: components['schemas']['PpeRuleValues'];
+      isApproved: boolean;
+      approvedBy: string | null;
+      approvedAt: string | null;
+      /** Format: date-time */
+      createdAt: string;
+    };
+    PpePriceTiers: {
+      /** Format: decimal */
+      retail: number;
+      /** Format: decimal */
+      wholesale: number;
+      /** Format: decimal */
+      largeWholesale: number;
+    };
+    PpePricingBlocker: {
+      code: string;
+      inputKey: string;
+    };
+    PpePriceCalculation: {
+      prices: components['schemas']['PpePriceTiers'] | null;
+      blockers: components['schemas']['PpePricingBlocker'][];
+      isCalculated: boolean;
+    };
+    PpeProductPricing: {
+      /** Format: int32 */
+      productId: number;
+      isEnrolled: boolean;
+      offer: components['schemas']['PpeOfferVersion'] | null;
+      rule: components['schemas']['PpeRuleVersion'] | null;
+      calculation: components['schemas']['PpePriceCalculation'];
+    };
+    CreatePpeRuleVersionRequest: {
+      expectedVersionId: string | null;
+      /** Format: uuid */
+      requestId: string;
+      values: components['schemas']['PpeRuleValues'];
+    };
+    CreatePpeOfferVersionRequest: {
+      expectedVersionId: string | null;
+      /** Format: uuid */
+      requestId: string;
+      values: components['schemas']['PpeOfferValues'];
+    };
   };
   responses: {
     /** @description Validation failures including field identifiers. */
@@ -856,6 +1611,24 @@ export interface components {
         'application/json': string[];
       };
     };
+    /** @description Field-specific validation errors; writes are atomic and make no partial changes. */
+    'sewing-composition.openapi_components-responses-ValidationError': {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        'application/json': components['schemas']['components-schemas-ValidationError'][];
+      };
+    };
+    /** @description Stale version, duplicate sale SKU, or conflicting composition lines. */
+    'responses-ConflictError': {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        'application/json': string[];
+      };
+    };
   };
   parameters: {
     /** @description Must exactly match the `kedr.csrf` cookie value. */
@@ -874,6 +1647,8 @@ export interface components {
     SortBy: 'id' | 'name' | 'createdAt' | 'updatedAt';
     SortDirection: 'asc' | 'desc';
     ProductId: number;
+    'parameters-ProductId': number;
+    ArticleId: number;
   };
   requestBodies: never;
   headers: never;
@@ -1318,6 +2093,13 @@ export interface operations {
         };
         content?: never;
       };
+      /** @description Product management permission required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
       /** @description Garment part not found. */
       404: {
         headers: {
@@ -1352,6 +2134,13 @@ export interface operations {
       400: components['responses']['ValidationError'];
       /** @description Unauthorized. */
       401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product management permission required. */
+      403: {
         headers: {
           [name: string]: unknown;
         };
@@ -1394,6 +2183,13 @@ export interface operations {
       400: components['responses']['ValidationError'];
       /** @description Unauthorized. */
       401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product management permission required. */
+      403: {
         headers: {
           [name: string]: unknown;
         };
@@ -1619,6 +2415,13 @@ export interface operations {
         };
         content?: never;
       };
+      /** @description Product management permission required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
       /** @description Supplier not found. */
       404: {
         headers: {
@@ -1653,6 +2456,13 @@ export interface operations {
       400: components['responses']['responses-ValidationError'];
       /** @description Unauthorized. */
       401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product management permission required. */
+      403: {
         headers: {
           [name: string]: unknown;
         };
@@ -1695,6 +2505,13 @@ export interface operations {
       400: components['responses']['responses-ValidationError'];
       /** @description Unauthorized. */
       401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product management permission required. */
+      403: {
         headers: {
           [name: string]: unknown;
         };
@@ -1780,6 +2597,13 @@ export interface operations {
         };
         content?: never;
       };
+      /** @description Product management permission required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
     };
   };
   updateGarmentAccessory: {
@@ -1807,6 +2631,13 @@ export interface operations {
       400: components['responses']['responses-ValidationError'];
       /** @description Unauthorized. */
       401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product management permission required. */
+      403: {
         headers: {
           [name: string]: unknown;
         };
@@ -1849,6 +2680,13 @@ export interface operations {
       400: components['responses']['responses-ValidationError'];
       /** @description Unauthorized. */
       401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product management permission required. */
+      403: {
         headers: {
           [name: string]: unknown;
         };
@@ -2065,7 +2903,7 @@ export interface operations {
            *       "categoryIds": [
            *         12
            *       ],
-           *       "minimumWholesalePrice": 360.3,
+           *       "minimumWholesalePrice": 0,
            *       "categories": [
            *         {
            *           "id": 12,
@@ -2122,36 +2960,7 @@ export interface operations {
            *           }
            *         ],
            *         "piecesPerShift": 25.6,
-           *         "prices": {
-           *           "byFabric": [
-           *             {
-           *               "fabricId": 31,
-           *               "price1To10": 400.5,
-           *               "price11To39": 380.4,
-           *               "price40Plus": 360.3
-           *             }
-           *           ],
-           *           "ranges": {
-           *             "price1To10": {
-           *               "minPrice": 400.5,
-           *               "minFabricId": 31,
-           *               "maxPrice": 400.5,
-           *               "maxFabricId": 31
-           *             },
-           *             "price11To39": {
-           *               "minPrice": 380.4,
-           *               "minFabricId": 31,
-           *               "maxPrice": 380.4,
-           *               "maxFabricId": 31
-           *             },
-           *             "price40Plus": {
-           *               "minPrice": 360.3,
-           *               "minFabricId": 31,
-           *               "maxPrice": 360.3,
-           *               "maxFabricId": 31
-           *             }
-           *           }
-           *         }
+           *         "prices": null
            *       },
            *       "ppe": null
            *     }
@@ -2271,6 +3080,879 @@ export interface operations {
         content?: never;
       };
       409: components['responses']['ConflictError'];
+    };
+  };
+  listSewingArticles: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        productId: components['parameters']['parameters-ProductId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Bounded Article list and model composition version. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SewingArticleList'];
+        };
+      };
+      /** @description Access token missing or invalid. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Caller does not satisfy CatalogRead. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product not found or is not a Sewing Product. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createSewingArticle: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        productId: components['parameters']['parameters-ProductId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateSewingArticleRequest'];
+      };
+    };
+    responses: {
+      /** @description Article created. */
+      201: {
+        headers: {
+          Location?: string;
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SewingArticle'];
+        };
+      };
+      400: components['responses']['sewing-composition.openapi_components-responses-ValidationError'];
+      /** @description Access token missing or invalid. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Caller does not satisfy CanManageProducts. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product not found or is not a Sewing Product. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['responses-ConflictError'];
+    };
+  };
+  getSewingComposition: {
+    parameters: {
+      query?: {
+        /** @description When omitted, returns model-wide lines and shared operations without selecting an Article. */
+        articleId?: number;
+      };
+      header?: never;
+      path: {
+        productId: components['parameters']['parameters-ProductId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Composition and readiness blockers for the selected Article. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SewingComposition'];
+        };
+      };
+      400: components['responses']['sewing-composition.openapi_components-responses-ValidationError'];
+      /** @description Access token missing or invalid. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Caller does not satisfy CatalogRead. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product not found, is not Sewing, or Article does not belong to Product. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  replaceSewingComposition: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        productId: components['parameters']['parameters-ProductId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ReplaceSewingCompositionRequest'];
+      };
+    };
+    responses: {
+      /** @description Updated model-wide and effective composition with the new version. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SewingComposition'];
+        };
+      };
+      400: components['responses']['sewing-composition.openapi_components-responses-ValidationError'];
+      /** @description Access token missing or invalid. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Caller does not satisfy CanManageProducts. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product not found, is not Sewing, or referenced entity is missing. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['responses-ConflictError'];
+    };
+  };
+  replaceSewingArticleComposition: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        productId: components['parameters']['parameters-ProductId'];
+        articleId: components['parameters']['ArticleId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ReplaceSewingArticleCompositionRequest'];
+      };
+    };
+    responses: {
+      /** @description Updated effective composition and the new version. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SewingComposition'];
+        };
+      };
+      400: components['responses']['sewing-composition.openapi_components-responses-ValidationError'];
+      /** @description Access token missing or invalid. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Caller does not satisfy CanManageProducts. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product, Article or referenced entity not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['responses-ConflictError'];
+    };
+  };
+  saveSewingCalculation: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        productId: number;
+        articleId: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SaveSewingCalculationRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful result, including an idempotent replay. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SavedSewingCalculation'];
+        };
+      };
+      /** @description Invalid body, IDs or setting values. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication is required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The required access policy or authenticated actor claim is missing. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The scoped resource or published price does not exist. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Stale or blocked calculation, version conflict, or request UUID reused with another payload. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getSewingCalculation: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        productId: number;
+        articleId: number;
+        calculationId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful result, including an idempotent replay. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SavedSewingCalculation'];
+        };
+      };
+      /** @description Authentication is required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The required access policy or authenticated actor claim is missing. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The scoped resource or published price does not exist. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  publishSewingCalculation: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        productId: number;
+        articleId: number;
+        calculationId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful result, including an idempotent replay. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PublishedSewingPrice'];
+        };
+      };
+      /** @description Invalid body, IDs or setting values. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication is required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The required access policy or authenticated actor claim is missing. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The scoped resource or published price does not exist. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Stale or blocked calculation, version conflict, or request UUID reused with another payload. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getPublishedSewingPrice: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        productId: number;
+        articleId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful result, including an idempotent replay. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PublishedSewingPrice'];
+        };
+      };
+      /** @description Authentication is required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The required access policy or authenticated actor claim is missing. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The scoped resource or published price does not exist. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createSewingSettingsVersion: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateSewingSettingsVersionRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful result, including an idempotent replay. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SewingPricingSettingsSelection'];
+        };
+      };
+      /** @description Invalid body, IDs or setting values. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication is required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The required access policy or authenticated actor claim is missing. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The scoped resource or published price does not exist. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Stale or blocked calculation, version conflict, or request UUID reused with another payload. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getSewingSettings: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful result, including an idempotent replay. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SewingPricingSettingsSelection'];
+        };
+      };
+      /** @description Authentication is required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The required access policy or authenticated actor claim is missing. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The scoped resource or published price does not exist. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Multiple effective settings versions exist at the same instant. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  reviseOtherCost: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        code: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ReviseOtherCostRequest'];
+      };
+    };
+    responses: {
+      /** @description Successful result, including an idempotent replay. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': number;
+        };
+      };
+      /** @description Invalid body, IDs or setting values. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication is required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The required access policy or authenticated actor claim is missing. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The scoped resource or published price does not exist. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Stale or blocked calculation, version conflict, or request UUID reused with another payload. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getPublishedSewingProducts: {
+    parameters: {
+      query: {
+        productIds: number[];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Bounded published-price projection. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SewingPublishedProductPrices'][];
+        };
+      };
+      /** @description Provide 1–100 unique positive Product IDs. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description CatalogRead required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getPpeProductPrices: {
+    parameters: {
+      query: {
+        productIds: number[];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Current data or successfully appended approved version. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PpeProductPricing'][];
+        };
+      };
+      /** @description Invalid request. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Required policy or actor claim missing. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getPpePricingRule: {
+    parameters: {
+      query: {
+        code: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Current data or successfully appended approved version. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PpeRuleVersion'];
+        };
+      };
+      /** @description Invalid request. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Required policy or actor claim missing. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Rule absent. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createPpeRuleVersion: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreatePpeRuleVersionRequest'];
+      };
+    };
+    responses: {
+      /** @description Current data or successfully appended approved version. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PpeRuleVersion'];
+        };
+      };
+      /** @description Invalid request. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Required policy or actor claim missing. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description PPE Product missing. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Expected version changed, or request UUID reused with another actor or payload. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createPpeOfferVersion: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        productId: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreatePpeOfferVersionRequest'];
+      };
+    };
+    responses: {
+      /** @description Current data or successfully appended approved version. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PpeOfferVersion'];
+        };
+      };
+      /** @description Invalid request. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Required policy or actor claim missing. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description PPE Product missing. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Expected version changed, or request UUID reused with another actor or payload. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
     };
   };
 }
