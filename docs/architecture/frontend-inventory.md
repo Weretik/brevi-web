@@ -21,8 +21,8 @@ applications, package managers, or test targets change.
 
 ## Package manager and scripts
 
-See [technology and npm dependencies](technology-and-packages.md) for the
-detailed list of declared and resolved direct packages.
+See [technology stack and key libraries](technology-and-packages.md); versions
+are in root `package.json` and `package-lock.json`.
 
 - Node.js: `24.18.0`, pinned in `.nvmrc` and `.node-version`; supported range is `>=24.15.0 <25`.
 - Package manager: `npm@11.6.2`, lock file `package-lock.json`.

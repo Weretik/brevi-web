@@ -38,3 +38,7 @@ libs/storefront/ui/
 ```
 
 **Where to look:** [route](../../../../libs/storefront/feature/regions/regions/src/lib/lib.routes.ts), [page](../../../../libs/storefront/feature/regions/regions/src/lib/pages/regions-page/region.page.ts), [module map](../../../architecture/storefront/modules.md).
+
+## Tests
+
+No automated tests cover this feature yet; Storefront projects have no `test` target.

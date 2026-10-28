@@ -55,3 +55,13 @@ libs/admin/references/
 ```
 
 **Where to look:** [route](../../../../libs/admin/references/feature/src/references.routes.tsx), [tabs](../../../../libs/admin/references/feature/src/pages/garment-parts/garment-parts-page.tsx), [parts API](../../../../libs/admin/references/data-access/src/api/garment-parts/garment-parts.api.ts), [operations API](../../../../libs/admin/references/data-access/src/api/garment-part-operations/garment-part-operations.api.ts), [SDD](../../../specs/admin/references/009-operations-pages/README.md).
+
+## Tests
+
+- `libs/admin/references/data-access/src/mappers/<garment-parts|garment-part-operations>/*.unit.test.ts`, shared `libs/admin/references/data-access/src/api/integration/references.api.integration.test.ts`
+- `libs/admin/references/feature/src/pages/<garment-parts|garment-part-operations>/*.component.test.tsx`
+- `libs/admin/references/model/src/validators/garment-part-operations/`
+- shared editor `libs/admin/references/ui/src/components/reference-editor/reference-editor-drawer.test.tsx`
+- E2E (run only on request): `apps/admin-react-e2e/src/garment-parts.spec.ts`, `apps/admin-react-e2e/src/garment-part-operations.spec.ts`
+
+Focused run: `npx nx test admin-references-data-access -- garment-parts garment-part-operations`; `npx nx test admin-references-feature -- garment-parts garment-part-operations`; `npx nx test admin-references-model -- garment-part-operations`.

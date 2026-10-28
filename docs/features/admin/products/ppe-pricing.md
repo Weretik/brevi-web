@@ -59,3 +59,12 @@ An unchanged failed request retains its UUID; edited content gets another UUID. 
 [Structural audit follow-up](../../../specs/admin/products/007-ppe-pricing/code-audit/audit.md) separates typed mutations from UUID/retry/conflict state.
 
 [TS-007 cutover](../../../specs/admin/products/007-ppe-pricing/cutover/README.md) removes old price views and percent controls; initial cost can only prefill an unapproved draft.
+
+## Tests
+
+- `libs/admin/products/data-access/src/`: `api/ppe-pricing/`, `mappers/ppe-pricing/`
+- `libs/admin/products/feature/src/`: `components/ppe-pricing/`, `hooks/ppe-pricing/`
+- `libs/admin/products/model/src/`: `queries/ppe-pricing/`, `validators/ppe-pricing/`
+- `libs/admin/products/ui/src/product-editor/ppe/`
+
+Focused run: `npx nx test admin-products-data-access -- ppe`; `npx nx test admin-products-feature -- ppe`; `npx nx test admin-products-model -- ppe`; `npx nx test admin-products-ui -- ppe`.

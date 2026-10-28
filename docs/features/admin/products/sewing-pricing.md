@@ -56,3 +56,12 @@ No new route, reducer, theme or Nx project is added. Server payloads stay in RTK
 [Specification](../../../specs/admin/products/006-sewing-pricing/README.md) · [API/provenance](../../../specs/admin/products/006-sewing-pricing/contracts/api-contract.md) · [Verification](../../../specs/admin/products/006-sewing-pricing/verification.md) · [Scoped boundary review](../../../specs/admin/products/006-sewing-pricing/code-audit/audit.md).
 
 TS-007 retires the old Product sale-price arithmetic and manufacturing price-band display; [cutover](../../../specs/admin/products/007-ppe-pricing/cutover/README.md). Historical TS-005 evidence remains unchanged.
+
+## Tests
+
+- `libs/admin/products/data-access/src/`: `api/sewing-pricing/`, `mappers/sewing-pricing/`
+- `libs/admin/products/feature/src/`: `components/sewing-pricing/`, `hooks/sewing-pricing/`, `hooks/pricing/`
+- `libs/admin/products/model/src/queries/sewing-pricing/`
+- `libs/admin/products/ui/src/product-detail/`: `product-wholesale-price-label.unit.test.ts`, `product-calculations.component.test.tsx`
+
+Focused run: `npx nx test admin-products-data-access -- sewing-pricing`; `npx nx test admin-products-feature -- sewing-pricing hooks/pricing`; `npx nx test admin-products-model -- sewing-pricing`; `npx nx test admin-products-ui -- wholesale-price product-calculations`.
