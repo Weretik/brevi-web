@@ -2,7 +2,7 @@
 
 ## Tooling source
 
-Before planning tests, check `package.json`, the lockfile, Nx project targets, test configurations, and existing test files. The [frontend inventory](../../architecture/frontend-inventory.md) is a snapshot; the actual repository state takes precedence.
+Find existing tests in the feature card's `## Tests` section and check targets with `npx nx show project <project> --json`. Open `package.json`, the lockfile, or test configuration only when adding or changing a test tool. The [frontend inventory](../../architecture/frontend-inventory.md) is a snapshot; the actual repository state takes precedence.
 
 Do not assume Jest, Vitest, React Testing Library, Playwright, or another tool is available merely because it is familiar or mentioned in documentation. A dependency without configuration, a target, and an executable test file is a prerequisite to record as a separate `EN-*`. Only recommend a new package until installation is included in the agreed scope.
 

@@ -44,3 +44,11 @@ libs/admin/references/
 ```
 
 **Where to look:** [route](../../../../libs/admin/references/feature/src/references.routes.tsx), [page](../../../../libs/admin/references/feature/src/pages/suppliers/suppliers-page.tsx), [API](../../../../libs/admin/references/data-access/src/api/suppliers/suppliers.api.ts), [base SDD](../../../specs/admin/references/001-suppliers/README.md), [closed next-stage SDD](../../../specs/admin/references/010-suppliers-pages/README.md).
+
+## Tests
+
+- `libs/admin/references/data-access/src/mappers/<suppliers>/*.unit.test.ts`, shared `libs/admin/references/data-access/src/api/integration/references.api.integration.test.ts`
+- `libs/admin/references/feature/src/pages/<suppliers>/*.component.test.tsx`
+- shared editor `libs/admin/references/ui/src/components/reference-editor/reference-editor-drawer.test.tsx`
+
+Focused run: `npx nx test admin-references-data-access -- suppliers`; `npx nx test admin-references-feature -- suppliers`.

@@ -21,10 +21,13 @@ A feature is ready for implementation when:
 
 ## Documentation detail and ownership
 
-Describe a new feature with a short card in `docs/features/admin/` or `docs/features/storefront/` and add it to the index. The card includes behavior, route, components, state and data where applicable, a compact Mermaid diagram of verified relationships, and a tree of actual key files and their roles. Use separate trees for distinct `apps/` and `libs/` roots; do not present invented state, APIs, or planned files as existing. Review the card after a substantial change, while the SDD remains the source for requirements and plans. Do not create a subdirectory for a single card.
+Describe a new feature with a short card in `docs/features/admin/` or `docs/features/storefront/` and add it to the index. The card includes behavior, route, components, state and data where applicable, a compact Mermaid diagram of verified relationships, and a tree of actual key files and their roles. Use separate trees for distinct `apps/` and `libs/` roots; do not present invented state, APIs, or planned files as existing. End the card with a `## Tests` section: test files or Nx projects with the focused run command, or “No automated tests cover this feature yet.” Keep environment state, such as “deployed” or “migration applied”, out of cards; it belongs in SDD evidence. Review the card after a substantial change, while the SDD remains the source for requirements and plans. Do not create a subdirectory for a single card.
 
 - Root `AGENTS.md` is a brief entry point for project architecture, standards, and AI skills.
 - `docs/specs/README.md` is only an index of feature specifications.
+- When a specification's status changes, update its line in `docs/specs/README.md` in the same change.
+- When a feature's test files are added or moved, update the card's `## Tests` section.
+- Small changes (styles, texts, a refactoring inside a file) do not touch the card.
 - This document defines specification and delivery readiness.
 - A feature `README.md` contains the status and navigation for that feature.
 - A feature `USAGE.md` gives English instructions for creating that feature and lists the required files.

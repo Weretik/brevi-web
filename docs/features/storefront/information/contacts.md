@@ -40,3 +40,7 @@ libs/storefront/ui/
 ```
 
 **Where to look:** [route](../../../../libs/storefront/feature/contacts/src/lib/lib.routes.ts), [page](../../../../libs/storefront/feature/contacts/src/lib/page/contacts.page.ts), [contact section](../../../../libs/storefront/feature/contacts/src/lib/sections/contact-us/contact-us.ts), [team section](../../../../libs/storefront/feature/contacts/src/lib/sections/our-team/our-team.ts).
+
+## Tests
+
+No automated tests cover this feature yet; Storefront projects have no `test` target.

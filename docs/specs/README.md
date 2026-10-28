@@ -22,4 +22,9 @@ The Storefront currently has README files for its Nx feature libraries, but they
 - [Admin React: auth, permissions, and API foundation](admin/auth/001-auth-permissions-api-foundation/README.md)
 - [Specification creation and delivery rules](../standards/shared/delivery-rules.md)
 
-- [Admin React: sewing articles and composition](admin/products/004-sewing-articles-and-composition/README.md) — planned Admin extension, dependent on backend OpenAPI.
+- [Admin React: sewing articles and composition](admin/products/004-sewing-articles-and-composition/README.md) — implementation checkpoint 2026-10-25; remaining deployment gates in its implementation file.
+- [Admin React: sewing composition structure](admin/products/005-sewing-composition-structure/README.md) — structural remediation verified 2026-10-25.
+- [Admin React: Sewing Article pricing](admin/products/006-sewing-pricing/README.md) — implemented and verified 2026-10-25.
+- [Admin React: PPE pricing](admin/products/007-ppe-pricing/README.md) — implemented and verified 2026-10-25.
+
+When a specification's status changes, update its line here in the same change.

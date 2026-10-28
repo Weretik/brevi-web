@@ -56,3 +56,12 @@ libs/admin/references/
 ```
 
 **Where to look:** [route](../../../../libs/admin/references/feature/src/references.routes.tsx), [tabs](../../../../libs/admin/references/feature/src/pages/garment-accessories/garment-accessories-page.tsx), [fabrics page](../../../../libs/admin/references/feature/src/pages/fabrics/fabrics-page.tsx), [accessories API](../../../../libs/admin/references/data-access/src/api/garment-accessories/garment-accessories.api.ts), [fabrics API](../../../../libs/admin/references/data-access/src/api/fabrics/fabrics.api.ts), [SDD](../../../specs/admin/references/008-garment-materials-pages/README.md).
+
+## Tests
+
+- `libs/admin/references/data-access/src/mappers/<fabrics|garment-accessories>/*.unit.test.ts`, shared `libs/admin/references/data-access/src/api/integration/references.api.integration.test.ts`
+- `libs/admin/references/feature/src/pages/<fabrics|garment-accessories>/*.component.test.tsx`
+- shared editor `libs/admin/references/ui/src/components/reference-editor/reference-editor-drawer.test.tsx`
+- E2E (run only on request): `apps/admin-react-e2e/src/garment-accessories.spec.ts`
+
+Focused run: `npx nx test admin-references-data-access -- fabrics garment-accessories`; `npx nx test admin-references-feature -- fabrics garment-accessories`.

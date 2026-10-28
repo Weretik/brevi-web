@@ -54,3 +54,7 @@ libs/storefront/ui/
 ```
 
 **Where to look:** [shared routes](../../../apps/storefront/src/app/app.routes.ts), [feature route](../../../libs/storefront/feature/home/src/lib/lib.routes.ts), [page](../../../libs/storefront/feature/home/src/lib/page/home.page.ts), [shared shell](../../../libs/storefront/shell/src/index.ts).
+
+## Tests
+
+No automated tests cover this feature yet; Storefront projects have no `test` target.

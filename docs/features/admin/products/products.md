@@ -54,3 +54,13 @@ libs/admin/products/
 **Where to look:** [routes](../../../../libs/admin/products/feature/src/products.routes.tsx), [list page](../../../../libs/admin/products/feature/src/pages/product-list/products-page.tsx), [editor](../../../../libs/admin/products/feature/src/components/product-editor/product-editor.tsx), [API](../../../../libs/admin/products/data-access/src/api/products.api.ts), [product specifications](../../../specs/admin/products/README.md).
 
 [PPE three-tier pricing and input approval](ppe-pricing.md) supplies current prices for enrolled PPE Products; non-enrolled Products show explicit onboarding/blocker states.
+
+## Tests
+
+- `libs/admin/products/feature/src/`: `pages/product-list/`, `pages/product-detail/`, `components/product-editor/`, `hooks/product-detail/`
+- `libs/admin/products/data-access/src/products.api.integration.test.ts`
+- `libs/admin/products/model/src/`: `product-editor/`, `ordering/`, `sewing/product-fabrics.test.ts`
+- `libs/admin/products/ui/src/`: `product-detail/`, `product-editor/`, `product-content/`
+- E2E (run only on request): `apps/admin-react-e2e/src/products.spec.ts`
+
+Focused run: `npx nx test admin-products-feature -- product-list product-detail product-editor`; `npx nx test admin-products-data-access -- products.api`; `npx nx test admin-products-model -- product-editor ordering product-fabrics`; `npx nx test admin-products-ui -- product-detail product-editor product-content`.

@@ -35,3 +35,7 @@ apps/storefront/
 ```
 
 **Where to look:** [feature route](../../../libs/storefront/feature/not-found/src/lib/lib.routes.ts), [page](../../../libs/storefront/feature/not-found/src/lib/page/not-found-page/not-found.page.ts), [root routes](../../../apps/storefront/src/app/app.routes.ts).
+
+## Tests
+
+No automated tests cover this feature yet; Storefront projects have no `test` target.

@@ -2,7 +2,7 @@
 
 **Checked against routes and code:** 2026-10-16. This is a map of the implementation, not a list of future SDDs. Verify an individual scenario's status in the code and its related specification.
 
-In each feature card, “Structure diagram” shows relationships between parts, and “Code structure” shows actual directories and key files with their roles. Separate trees for `apps/` and `libs/` do not replace architecture documentation.
+In each feature card, “Structure diagram” shows relationships between parts, “Code structure” shows actual directories and key files with their roles, and “Tests” lists test files with the focused run command. Separate trees for `apps/` and `libs/` do not replace architecture documentation.
 
 ## Admin React (`apps/admin-react`)
 

@@ -49,3 +49,7 @@ libs/storefront/ui/
 ```
 
 **Where to look:** [routes](../../../libs/storefront/feature/catalog/src/lib/lib.routes.ts), [list](../../../libs/storefront/feature/catalog/src/lib/pages/products-list/products-list.page.ts), [product page](../../../libs/storefront/feature/catalog/src/lib/pages/product-page/product.page.ts), [product sections](../../../libs/storefront/feature/catalog/src/lib/sections/product-content/product-content.ts), [current API boundary](../../architecture/api/storefront.md).
+
+## Tests
+
+No automated tests cover this feature yet; Storefront projects have no `test` target.
