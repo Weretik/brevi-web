@@ -175,6 +175,17 @@ if (command === 'sync') {
     if (!productDependencies.includes('operationId: ' + operationId))
       throw Error('Missing operationId: ' + operationId);
   }
+  const quoteContract = readFileSync(join(snapshot, 'crm/quote-drafts.openapi.yaml'), 'utf8');
+  for (const operationId of [
+    'getCrmQuotes',
+    'getCrmQuote',
+    'createCrmQuote',
+    'saveCrmQuoteVersion',
+    'previewCrmQuotePrices',
+  ]) {
+    if (!quoteContract.includes('operationId: ' + operationId))
+      throw Error('Missing operationId: ' + operationId);
+  }
   const temporary = mkdtempSync(join(tmpdir(), 'brevi-contract-'));
   try {
     const output = join(temporary, 'openapi.ts');

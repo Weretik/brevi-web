@@ -81,3 +81,35 @@ paths:
     $ref: ./catalog/ppe-pricing.openapi.yaml#/paths/~1api~1v1~1pricing~1ppe~1rules~1versions
   /api/v1/pricing/ppe/products/{productId}/offer/versions:
     $ref: ./catalog/ppe-pricing.openapi.yaml#/paths/~1api~1v1~1pricing~1ppe~1products~1{productId}~1offer~1versions
+  /api/crm/customers:
+    $ref: ./crm/clients-quotes.openapi.yaml#/paths/~1api~1crm~1customers
+  /api/crm/customers/{customerId}:
+    $ref: ./crm/clients-quotes.openapi.yaml#/paths/~1api~1crm~1customers~1{customerId}
+  /api/crm/customers/{customerId}/contacts:
+    $ref: ./crm/clients-quotes.openapi.yaml#/paths/~1api~1crm~1customers~1{customerId}~1contacts
+  /api/crm/customers/{customerId}/contacts/{contactId}:
+    $ref: ./crm/clients-quotes.openapi.yaml#/paths/~1api~1crm~1customers~1{customerId}~1contacts~1{contactId}
+  /api/crm/customers/{customerId}/merge:
+    $ref: ./crm/clients-quotes.openapi.yaml#/paths/~1api~1crm~1customers~1{customerId}~1merge
+  /api/crm/quotes:
+    $ref: ./crm/quote-drafts.openapi.yaml#/paths/~1api~1crm~1quotes
+  /api/crm/quote-assignees:
+    $ref: ./crm/quote-drafts.openapi.yaml#/paths/~1api~1crm~1quote-assignees
+  /api/crm/quotes/price-previews:
+    $ref: ./crm/quote-drafts.openapi.yaml#/paths/~1api~1crm~1quotes~1price-previews
+  /api/crm/quotes/{quoteId}:
+    $ref: ./crm/quote-drafts.openapi.yaml#/paths/~1api~1crm~1quotes~1{quoteId}
+  /api/crm/quotes/{quoteId}/versions:
+    $ref: ./crm/quote-drafts.openapi.yaml#/paths/~1api~1crm~1quotes~1{quoteId}~1versions
+  /api/crm/quotes/{quoteId}/versions/{versionId}:
+    $ref: ./crm/quote-drafts.openapi.yaml#/paths/~1api~1crm~1quotes~1{quoteId}~1versions~1{versionId}
+  /api/crm/quotes/{quoteId}/events:
+    $ref: ./crm/quote-drafts.openapi.yaml#/paths/~1api~1crm~1quotes~1{quoteId}~1events
+  /api/crm/quotes/{quoteId}/reprice:
+    $ref: ./crm/quote-drafts.openapi.yaml#/paths/~1api~1crm~1quotes~1{quoteId}~1reprice
+  /api/crm/quotes/{quoteId}/copy:
+    $ref: ./crm/quote-drafts.openapi.yaml#/paths/~1api~1crm~1quotes~1{quoteId}~1copy
+  /api/crm/quotes/{quoteId}/transfer:
+    $ref: ./crm/quote-drafts.openapi.yaml#/paths/~1api~1crm~1quotes~1{quoteId}~1transfer
+  /api/crm/quotes/{quoteId}/archive:
+    $ref: ./crm/quote-drafts.openapi.yaml#/paths/~1api~1crm~1quotes~1{quoteId}~1archive
