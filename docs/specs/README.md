@@ -23,3 +23,5 @@ The Storefront currently has README files for its Nx feature libraries, but they
 - [Specification creation and delivery rules](../standards/shared/delivery-rules.md)
 
 - [Admin React: sewing articles and composition](admin/products/004-sewing-articles-and-composition/README.md) — planned Admin extension, dependent on backend OpenAPI.
+
+- [Admin React: клієнти, КП та індивідуальне пошиття](admin/clients/001-clients-quotes-custom-sewing/README.md) — клієнтський slice реалізовано 2026-10-26, наявну вкладку підключено; наступні фази КП/custom/документів/імпорту planned.

@@ -16,7 +16,7 @@ applications, package managers, or test targets change.
 ## Code boundaries
 
 - Angular Storefront uses Nx `shared` and `storefront` libraries.
-- React Admin composes the application in `apps/admin-react/src/app/`, has its shell in `libs/admin/core/shell`, and domain libraries for `products` and `references`.
+- React Admin composes the application in `apps/admin-react/src/app/`, has its shell in `libs/admin/core/shell`, and domain libraries for `products`, `references`, and `clients`.
 - The mobile application is outside this repository's scope.
 
 ## Package manager and scripts
@@ -40,3 +40,7 @@ detailed list of declared and resolved direct packages.
 An installed dependency does not by itself make a test level available. A new
 React library must have an executable Nx test target/configuration and focused
 tests. Add a new tool through a separate `EN-*` task before including it.
+
+## Client slice — 2026-10-26
+
+`admin-clients-{model,data-access,feature}` add scoped Vitest/lint/typecheck targets under `libs/admin/clients`. `admin-clients-ui` has lint/typecheck; presentational interaction coverage runs through feature, without an empty UI test runner. Project tags remain scope:admin/domain:clients/type:<layer>. See [actual feature structure](../features/admin/clients-and-quotes.md).
