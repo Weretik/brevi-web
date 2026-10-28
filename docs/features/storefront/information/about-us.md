@@ -48,3 +48,7 @@ apps/storefront/
 ```
 
 **Where to look:** [routes and page mapping](../../../../libs/storefront/feature/about-us/src/lib/lib.routes.ts), [company page example](../../../../libs/storefront/feature/about-us/src/lib/pages/about-company/about-company.page.ts), [shared routes](../../../../apps/storefront/src/app/app.routes.ts), [Storefront runtime](../../../architecture/storefront/runtime.md).
+
+## Tests
+
+No automated tests cover this feature yet; Storefront projects have no `test` target.

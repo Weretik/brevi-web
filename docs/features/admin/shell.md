@@ -51,3 +51,12 @@ libs/admin/shared/
 ```
 
 **Where to look:** [composition](../../../apps/admin-react/src/app/app.tsx), [router](../../../apps/admin-react/src/app/router/app-router.tsx), [navigation](../../../apps/admin-react/src/app/router/navigation-config.ts), [session](../../../libs/admin/core/auth/src/index.ts), [routing architecture](../../architecture/admin/runtime/application.md), [shell specification](../../specs/admin/shell/001-react-admin-shell-theme/README.md).
+
+## Tests
+
+- `libs/admin/core/shell/src/**/*.component.test.tsx`
+- `libs/admin/core/auth/src/session/*.test.ts`
+- `apps/admin-react/src/app/**/*.test.ts(x)` (router, providers, navigation, theme)
+- E2E (run only on request): `apps/admin-react-e2e/src/admin-react.shell.spec.ts`
+
+Focused run: `npx nx test admin-core-shell`; `npx nx test admin-core-auth`; `npx nx test admin-react -- src/app`.

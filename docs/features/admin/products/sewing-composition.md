@@ -56,3 +56,12 @@ The [responsibility audit](../../../specs/admin/products/004-sewing-articles-and
 The [controller/form follow-up](../../../specs/admin/products/005-sewing-composition-structure/follow-up.md) records the subsequent split and keep decisions.
 
 Selecting an Article also opens its [calculation and publication panel](sewing-pricing.md). Unsaved composition disables pricing writes; backend publication revalidates the saved inputs.
+
+## Tests
+
+- `libs/admin/products/data-access/src/`: `api/sewing-articles/`, `api/sewing-composition/`, `mappers/sewing-articles/`, `mappers/sewing-composition/`, `mappers/sewing-access/`
+- `libs/admin/products/feature/src/components/sewing-composition/`
+- `libs/admin/products/model/src/`: `mappers/sewing-composition/`, `queries/sewing-composition/`, `validators/sewing-composition/`
+- `libs/admin/products/ui/src/forms/`: `sewing-articles/`, `sewing-composition/`
+
+Focused run: `npx nx test admin-products-data-access -- sewing-articles sewing-composition sewing-access`; `npx nx test admin-products-feature -- sewing-composition`; `npx nx test admin-products-model -- sewing-composition`; `npx nx test admin-products-ui -- sewing-articles sewing-composition`.

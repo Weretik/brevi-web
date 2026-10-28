@@ -39,3 +39,7 @@ libs/storefront/ui/
 ```
 
 **Where to look:** [route](../../../libs/storefront/feature/order-in-bulk/order-in-bulk/src/lib/lib.routes.ts), [page](../../../libs/storefront/feature/order-in-bulk/order-in-bulk/src/lib/page/order-in-bulk-page/order-in-bulk.page.ts), [hero section](../../../libs/storefront/feature/order-in-bulk/order-in-bulk/src/lib/sections/hero/hero.ts).
+
+## Tests
+
+No automated tests cover this feature yet; Storefront projects have no `test` target.

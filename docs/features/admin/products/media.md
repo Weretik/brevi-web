@@ -39,3 +39,11 @@ libs/admin/products/
 ```
 
 **Where to look:** [route](../../../../libs/admin/products/feature/src/products.routes.tsx), [page](../../../../libs/admin/products/feature/src/pages/media-library/media-page.tsx), [loading hook](../../../../libs/admin/products/feature/src/hooks/media-library/use-media-library.ts), [API](../../../../libs/admin/products/data-access/src/api/product-media.api.ts).
+
+## Tests
+
+- `libs/admin/products/feature/src/pages/media-library/media-page.component.test.tsx`
+- `libs/admin/products/model/src/product-media/product-photos.test.ts`
+- E2E (run only on request): `apps/admin-react-e2e/src/media.spec.ts`
+
+Focused run: `npx nx test admin-products-feature -- media-library`; `npx nx test admin-products-model -- product-photos`.
