@@ -1,8 +1,17 @@
 import { describe, expect, it } from 'vitest';
 
+import { adminRouteDefinitions } from './admin-route-definitions';
 import { createNavigation } from './navigation-config';
 
 describe('legacy Admin navigation', () => {
+  it('connects the existing quote menu to the implemented routes without enabling archive actions', () => {
+    const paths = new Set(adminRouteDefinitions.map((route) => route.path));
+    const manager = createNavigation(paths).find((group) => group.id === 'service-manager');
+    expect(manager?.items.find((item) => item.id === 'quotes')?.to).toBe('/crm/quotes');
+    expect(paths.has('/crm/quotes/new')).toBe(true);
+    expect(paths.has('/crm/quotes/:quoteId')).toBe(true);
+    expect(manager?.items.find((item) => item.id === 'quote-archive')?.to).toBeUndefined();
+  });
   it('keeps 28 separate entries in the original five sections', () => {
     const groups = createNavigation(new Set(['/']));
 

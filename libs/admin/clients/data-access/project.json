@@ -1,0 +1,31 @@
+{
+  "name": "admin-clients-data-access",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/admin/clients/data-access/src",
+  "projectType": "library",
+  "tags": ["scope:admin", "domain:clients", "type:data-access"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": { "command": "eslint .", "cwd": "libs/admin/clients/data-access" }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit -p tsconfig.lib.json",
+        "cwd": "libs/admin/clients/data-access"
+      }
+    },
+    "typecheck-tests": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit -p tsconfig.spec.json",
+        "cwd": "libs/admin/clients/data-access"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": { "command": "vitest run", "cwd": "libs/admin/clients/data-access" }
+    }
+  }
+}

@@ -15,10 +15,10 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
     id: 'service-manager',
     label: 'Менеджер сервісу',
     items: [
-      { id: 'clients', label: 'Клієнти' },
+      { id: 'clients', label: 'Клієнти', path: '/crm/clients' },
       { id: 'leads', label: 'Ліди' },
       { id: 'service-suppliers', label: 'Постачальники' },
-      { id: 'quotes', label: 'Розрахунки та КП' },
+      { id: 'quotes', label: 'Розрахунки та КП', path: '/crm/quotes' },
       { id: 'price-list', label: 'Прайс' },
       { id: 'quote-archive', label: 'Архів КП' },
       { id: 'tasks', label: 'Завдання в роботу' },

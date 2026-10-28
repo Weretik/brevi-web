@@ -8,6 +8,10 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@admin/clients/model": ["libs/admin/clients/model/src/index.ts"],
+      "@admin/clients/ui": ["libs/admin/clients/ui/src/index.ts"],
+      "@admin/clients/data-access": ["libs/admin/clients/data-access/src/index.ts"],
+      "@admin/clients/feature": ["libs/admin/clients/feature/src/index.ts"],
       "@tokens/*": ["tools/tokens/*"],
       "@shared/ui": ["libs/shared/ui/src/index.ts"],
       "@shared/util": ["libs/shared/util/src/index.ts"],
