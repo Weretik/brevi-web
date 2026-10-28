@@ -3,7 +3,7 @@
 This is the index of versioned frontend documentation.
 
 - [Current frontend inventory](architecture/frontend-inventory.md)
-- [Technology and all direct npm dependencies](architecture/technology-and-packages.md) — large; open only for a dependency task
+- [Technology stack and key libraries](architecture/technology-and-packages.md)
 - [Admin architecture](architecture/admin/README.md)
 - [Storefront architecture](architecture/storefront/README.md)
 - [Admin and Storefront feature map](features/README.md)
