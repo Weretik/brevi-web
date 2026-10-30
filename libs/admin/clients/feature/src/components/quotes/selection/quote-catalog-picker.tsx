@@ -2,6 +2,7 @@ import { useListProductsQuery, useListSewingArticlesQuery } from '@admin/product
 import { Alert, Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
+import { QuoteCustomPicker } from './quote-custom-picker';
 import { quoteError } from '../../../errors/quotes/quote-error';
 
 import type { QuotePriceSelection } from '@admin/clients/model';
@@ -27,9 +28,10 @@ export function QuoteCatalogPicker({
   }, [input]);
   const products = useListProductsQuery(
     { search, page, pageSize: 10, type: selection.kind === 'sewing' ? 'Sewing' : 'Ppe' },
-    { skip: selection.kind === 'oneOffPpe' },
+    { skip: selection.kind === 'oneOffPpe' || selection.kind === 'customSewing' },
   );
-  const productId = selection.kind === 'oneOffPpe' ? 0 : selection.productId;
+  const productId =
+    selection.kind === 'oneOffPpe' || selection.kind === 'customSewing' ? 0 : selection.productId;
   const articles = useListSewingArticlesQuery(productId, {
     skip: selection.kind !== 'sewing' || productId <= 0,
   });
@@ -48,20 +50,31 @@ export function QuoteCatalogPicker({
           onChange(
             kind === 'sewing'
               ? { kind, productId: 0, articleId: 0 }
-              : kind === 'ppe'
-                ? { kind, productId: 0 }
-                : {
-                    kind: 'oneOffPpe',
-                    prices: { retail: 0, wholesale: 0, largeWholesale: 0, reason: '' },
-                  },
+              : kind === 'customSewing'
+                ? { kind: 'customSewing', versionId: '' }
+                : kind === 'ppe'
+                  ? { kind, productId: 0 }
+                  : {
+                      kind: 'oneOffPpe',
+                      prices: { retail: 0, wholesale: 0, largeWholesale: 0, reason: '' },
+                    },
           );
         }}
       >
         <MenuItem value="sewing">Пошиття з Catalog</MenuItem>
         <MenuItem value="ppe">СІЗ з Catalog</MenuItem>
         <MenuItem value="oneOffPpe">Разові СІЗ</MenuItem>
+        <MenuItem value="customSewing">Індивідуальне пошиття</MenuItem>
       </TextField>
-      {selection.kind !== 'oneOffPpe' && (
+      {selection.kind === 'customSewing' && (
+        <QuoteCustomPicker
+          key={selection.draftId ?? 'new'}
+          selection={selection}
+          disabled={disabled}
+          onChange={onChange}
+        />
+      )}
+      {selection.kind !== 'oneOffPpe' && selection.kind !== 'customSewing' && (
         <>
           <TextField
             label="Пошук товару КП"

@@ -1,22 +1,21 @@
 import { useListQuotesQuery } from '@admin/clients/data-access';
 import { QuotesTable } from '@admin/clients/ui';
 import { Alert, Box, Button, CircularProgress, Pagination, Stack, Typography } from '@mui/material';
+import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
+import { QuoteAdvancedFilters } from '../../../components/quotes/list/quote-advanced-filters';
 import { QuoteListFilters } from '../../../components/quotes/list/quote-list-filters';
 import { quoteError } from '../../../errors/quotes/quote-error';
+import { quoteListQuery } from '../../../mappers/quotes/quote-list-query';
 
-export default function QuotesPage() {
+export default function QuotesPage({ archivedView = false }: { archivedView?: boolean }) {
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
-  const search = (params.get('search') ?? '').slice(0, 300);
-  const pageNumber = Number(params.get('page') ?? 1);
-  const page =
-    Number.isInteger(pageNumber) && pageNumber >= 1 && pageNumber <= 1000000 ? pageNumber : 1;
-  const filter = params.get('state');
-  const state = filter === 'draft' || filter === 'ready' || filter === 'sent' ? filter : undefined;
-  const archived = params.get('archived') === 'true';
-  const query = useListQuotesQuery({ search, state, archived, page, pageSize: 25 });
+  const [advanced, setAdvanced] = useState(false);
+  const request = quoteListQuery(params, archivedView);
+  const { search = '', state, page, archived } = request;
+  const query = useListQuotesQuery(request);
   const data = query.currentData;
   const change = (key: string, value: string) => {
     const next = new URLSearchParams(params);
@@ -29,8 +28,63 @@ export default function QuotesPage() {
     <Box sx={{ p: { xs: 2, md: 3 } }}>
       <Stack spacing={2}>
         <Typography component="h1" variant="h4">
-          Розрахунки та КП
+          {archived ? 'Архів КП' : 'Розрахунки та КП'}
         </Typography>
+        {params.get('notice') === 'transferred' && (
+          <Alert severity="success">
+            КП передано. Список оновлено відповідно до вашого доступу.
+          </Alert>
+        )}
+        {params.get('notice') === 'access-changed' && (
+          <Alert severity="info">Доступ до КП змінився. Перевірте доступні КП у списку.</Alert>
+        )}
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
+          <Button onClick={() => navigate('/crm/quotes/introductions')}>
+            Добірки для знайомства
+          </Button>
+          <Button
+            onClick={() => {
+              const next = new URLSearchParams(params);
+              next.delete('archived');
+              next.delete('page');
+              next.delete('notice');
+              navigate({
+                pathname: archived ? '/crm/quotes' : '/crm/quotes/archive',
+                search: next.toString(),
+              });
+            }}
+          >
+            {archived ? 'Активні КП' : 'Архів КП'}
+          </Button>
+          <Button aria-expanded={advanced} onClick={() => setAdvanced(!advanced)}>
+            Додаткові фільтри
+          </Button>
+        </Stack>
+        {request.sourceQuoteId && (
+          <Alert
+            severity="info"
+            action={
+              <Button onClick={() => change('sourceQuoteId', '')}>Прибрати фільтр копій</Button>
+            }
+          >
+            Показано копії вибраного КП.
+          </Alert>
+        )}
+        {advanced && (
+          <QuoteAdvancedFilters
+            key={params.toString()}
+            query={request}
+            onApply={(values) => {
+              const next = new URLSearchParams(params);
+              for (const [key, value] of Object.entries(values)) {
+                if (value) next.set(key, value);
+                else next.delete(key);
+              }
+              next.delete('page');
+              setParams(next);
+            }}
+          />
+        )}
         <QuoteListFilters
           key={search}
           search={search}

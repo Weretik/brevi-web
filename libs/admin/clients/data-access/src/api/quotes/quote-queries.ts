@@ -15,6 +15,10 @@ export function quoteQueries(build: QuoteEndpointBuilder) {
         search?: string;
         state?: 'draft' | 'ready' | 'sent';
         archived?: boolean;
+        ownerId?: number;
+        createdFrom?: string;
+        createdBefore?: string;
+        sourceQuoteId?: string;
       }
     >({
       query: (params) => ({ url: '/api/crm/quotes', params }),

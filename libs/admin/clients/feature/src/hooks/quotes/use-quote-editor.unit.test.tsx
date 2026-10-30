@@ -14,6 +14,9 @@ vi.mock('@admin/clients/data-access', () => ({
 }));
 const initial: QuoteDetail = {
   publicId: 'quote',
+  versionId: 'version',
+  sourceQuoteId: null,
+  sourceVersionId: null,
   revision: 1,
   versionNumber: 1,
   state: 'draft',
@@ -76,6 +79,19 @@ function setup(detail: QuoteDetail | null = initial) {
   render(<RouterProvider router={router} />);
 }
 describe('quote editor writes (SC-Q01/02/04)', () => {
+  it('edits a sent snapshot into a new server draft while preserving the original basis', async () => {
+    setup({ ...initial, state: 'sent' });
+    const next = { ...initial, state: 'draft' as const, versionNumber: 2, revision: 2 };
+    api.save.mockReturnValue({ unwrap: () => Promise.resolve(next) });
+    expect(current.editable).toBe(true);
+    await act(async () => {
+      await current.save();
+    });
+    expect(api.save).toHaveBeenCalledTimes(1);
+    expect(api.preview).not.toHaveBeenCalled();
+    expect(current.detail?.state).toBe('draft');
+    expect(initial.draft.items[0].variants[0].basis!.value.retail).toBe(120);
+  });
   it('allows correction after a definite HTTP 400 even without field-specific errors', async () => {
     setup();
     act(() => current.setDraft({ ...initial.draft, items: [] }));

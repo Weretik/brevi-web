@@ -12,7 +12,7 @@ export function QuoteManualPriceFields({
   disabled: boolean;
   onChange: (selection: QuotePriceSelection) => void;
 }) {
-  if (selection.kind === 'sewing') return null;
+  if (selection.kind === 'sewing' || selection.kind === 'customSewing') return null;
   if (selection.kind === 'ppe')
     return (
       <Stack spacing={2}>

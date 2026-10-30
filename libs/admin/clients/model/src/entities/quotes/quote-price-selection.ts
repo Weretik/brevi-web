@@ -1,4 +1,5 @@
 export type QuotePriceSelection =
+  | { readonly kind: 'customSewing'; readonly versionId: string; readonly draftId?: string }
   | { readonly kind: 'sewing'; readonly productId: number; readonly articleId: number }
   | {
       readonly kind: 'ppe';

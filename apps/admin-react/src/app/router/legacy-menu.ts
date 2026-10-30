@@ -2,6 +2,7 @@ interface LegacyNavigationItem {
   id: string;
   label: string;
   path?: string;
+  requiredRole?: 'Admin';
 }
 
 interface LegacyNavigationGroup {
@@ -19,8 +20,14 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
       { id: 'leads', label: 'Ліди' },
       { id: 'service-suppliers', label: 'Постачальники' },
       { id: 'quotes', label: 'Розрахунки та КП', path: '/crm/quotes' },
+      {
+        id: 'issuer-settings',
+        label: 'Реквізити та шаблон КП',
+        path: '/crm/issuer-settings',
+        requiredRole: 'Admin',
+      },
       { id: 'price-list', label: 'Прайс' },
-      { id: 'quote-archive', label: 'Архів КП' },
+      { id: 'quote-archive', label: 'Архів КП', path: '/crm/quotes/archive' },
       { id: 'tasks', label: 'Завдання в роботу' },
       { id: 'deals', label: 'Угоди' },
     ],

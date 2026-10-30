@@ -20,7 +20,9 @@ export function mapQuoteVariant(entry: unknown): QuoteVariantDraft {
   if (
     variant['kind'] !== selection.kind ||
     (variant['productId'] ?? null) !==
-      (selection.kind === 'oneOffPpe' ? null : selection.productId) ||
+      (selection.kind === 'oneOffPpe' || selection.kind === 'customSewing'
+        ? null
+        : selection.productId) ||
     (variant['articleId'] ?? null) !== (selection.kind === 'sewing' ? selection.articleId : null)
   )
     throw new Error('Вибір варіанта не відповідає ціні.');

@@ -12,6 +12,16 @@ function validReason(reason: string): boolean {
 
 export function quotePriceErrors(selection: QuotePriceSelection): Record<string, string> {
   const errors: Record<string, string> = {};
+  if (selection.kind === 'customSewing') {
+    if (
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        selection.versionId,
+      ) ||
+      /^0{8}-0{4}-0{4}-0{4}-0{12}$/.test(selection.versionId)
+    )
+      errors['versionId'] = 'Оберіть збережену версію індивідуального пошиття.';
+    return errors;
+  }
   if (selection.kind !== 'oneOffPpe') {
     if (!Number.isSafeInteger(selection.productId) || selection.productId <= 0)
       errors['productId'] = 'Оберіть товар.';
