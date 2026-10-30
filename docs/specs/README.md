@@ -20,6 +20,7 @@ The Storefront currently has README files for its Nx feature libraries, but they
 - [React Admin migration order](admin/react-migration-roadmap.md)
 - [Admin: restore layers and module boundaries](admin/architecture/001-admin-layers-and-boundaries/README.md)
 - [Admin React: auth, permissions, and API foundation](admin/auth/001-auth-permissions-api-foundation/README.md)
+- [Public site on Next.js: migration plan from brevi.com.ua](site/migration/README.md) — plan accepted 2026-10-30; each step gets its own SDD.
 - [Specification creation and delivery rules](../standards/shared/delivery-rules.md)
 
 - [Admin React: sewing articles and composition](admin/products/004-sewing-articles-and-composition/README.md) — implementation checkpoint 2026-10-25; remaining deployment gates in its implementation file.

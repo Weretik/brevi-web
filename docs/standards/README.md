@@ -7,6 +7,7 @@ instead of copying them into task files.
 
 - **Admin React:** [code organization](admin/admin-code-organization.md), [UI](admin/admin-ui.md), [API and data](admin/api-data-rules.md), [security](admin/security-rules.md), [architecture and modules](../architecture/admin/README.md).
 - **Storefront Angular:** [UI and PrimeNG](storefront-ui.md), [architecture and modules](../architecture/storefront/README.md). Admin rules for RTK Query, MUI, and AuthSessionAdapter do not apply to Angular.
+- **Site Next.js (planned public site):** [design system «Строчка»](site/design-system.md), [SEO rules](site/seo-rules.md), [architecture](../architecture/site/README.md).
 
 ## Workflow
 
