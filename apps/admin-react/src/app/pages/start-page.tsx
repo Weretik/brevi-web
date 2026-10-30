@@ -1,4 +1,4 @@
-import { Paper, Typography } from '@mui/material';
+import { Link, Paper, Typography } from '@mui/material';
 
 export function StartPage() {
   return (
@@ -8,6 +8,11 @@ export function StartPage() {
       </Typography>
       <Typography color="text.secondary">
         Доступні розділи відображатимуться в навігації.
+      </Typography>
+      <Typography sx={{ mt: 3 }}>
+        <Link href="/brevi-erp/index.html">
+          Про BreviERP, конфіденційність та умови використання
+        </Link>
       </Typography>
     </Paper>
   );
