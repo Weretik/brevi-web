@@ -9,7 +9,7 @@ Brevi Web holds the Brevi Admin (React, staff manage the catalogue, reference da
 ## Project context
 
 - [Frontend inventory](docs/architecture/frontend-inventory.md) — applications, tools, and available Nx targets.
-- Application architecture: [Admin React](docs/architecture/admin/README.md) and [Storefront Angular](docs/architecture/storefront/README.md).
+- Application architecture: [Admin React](docs/architecture/admin/README.md), [Storefront Angular](docs/architecture/storefront/README.md) (unfinished, not deployed), and [Site Next.js](docs/architecture/site/README.md) (planned public site replacing `brevi.com.ua` by the [migration plan](docs/specs/site/migration/README.md); new public-site work goes here).
 - [Implemented feature map](docs/features/README.md) — separate Admin and Storefront descriptions with routes, boundaries, and code.
 - [Standards index](docs/standards/README.md) — stable rules for code, UI, API, testing, security, and delivery.
 - [Backend OpenAPI snapshot](docs/contracts/openapi/SOURCE.json) — synchronized backend contract and its source commit; see the [contract workflow](docs/architecture/api/contract-workflow.md).
