@@ -13,6 +13,7 @@ This is the index of versioned frontend documentation.
 - [Backend OpenAPI snapshot](contracts/openapi/SOURCE.json)
 - [Stable engineering rules](standards/README.md)
 - [Feature specifications](specs/README.md)
+- [Idea: sign-in and access like Kedr](ideas/auth-like-kedr.md) (Russian; not an accepted decision)
 - [AI task routing](../AGENTS.md)
 
 Stable rules belong in `architecture/` or `standards/`. Requirements, decisions, tasks, and evidence for a specific feature belong in its `specs/` directory.
