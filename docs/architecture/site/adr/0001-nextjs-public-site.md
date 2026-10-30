@@ -3,7 +3,7 @@
 **Status:** accepted
 **Decision date:** 2026-10-30
 **Owners:** product owner, frontend
-**Applications:** new `apps/site`. It replaces the live OpenCart site `brevi.com.ua` at cutover, and `apps/storefront` (Angular) is removed after that.
+**Applications:** new `apps/site`, rebuilt from the Brevi storefront `apps/storefront` (Angular), which is removed after cutover. At cutover it also takes over the domain `brevi.com.ua` from the old OpenCart site.
 **Related:** [design idea](../../../ideas/storefront-nextjs/README.md), [migration plan](../../../specs/site/migration/README.md), [SEO architecture](../platform/seo-architecture.md)
 
 ## Context
@@ -41,14 +41,14 @@ Build the public site as a new Next.js App Router application `apps/site` with:
 - Server-rendered, cached pages.
 - The BreviERP OpenAPI contract as the only data source, read on the server.
 
-Keep every indexed URL of the live site, including the language scheme and the localized slugs. Cut over the domain only after every indexed page type exists and the redirect map is complete. One React stack, the Kedr site as a proven reference, and first-class SEO primitives outweigh the cost of the rebuild.
+Rebuild the pages of the Brevi storefront and fill them from BreviERP. Use the Kedr URL scheme (`/uk`, `/ru`, slugs from BreviERP), and give every old `brevi.com.ua` URL one 301 to its new page. Host on Cloudflare. Cut over the domain only after every page type exists and the redirect map is complete. One React stack, the Kedr site as a proven reference, and first-class SEO primitives outweigh the cost of the rebuild.
 
 ## Consequences and verification
 
-- Simpler: per-route metadata and rendering, a real 404 status, the same patterns as the Kedr site, and one data source (BreviERP) instead of OpenCart.
-- Harder: BreviERP needs a public catalog API and a one-time import of OpenCart content (texts, slugs, images, SEO texts). Until cutover, OpenCart stays the source of truth for content.
+- Simpler: per-route metadata and rendering, a real 404 status, the same patterns as the Kedr site, and one data source (BreviERP).
+- Harder: BreviERP needs a public catalog API and SEO fields edited in Admin. Old URLs change, so the redirect map must be complete before cutover. The old site's database is not imported.
 - Code: `apps/site`, `libs/site/*`, Nx tags `scope:site` and `scope:site-shared`, the `@nx/next` plugin, CI targets for site tests and build. Projects are created with Nx generators and the shadcn CLI.
-- Reversibility: OpenCart keeps serving the domain until cutover. The switch is a DNS change and can be rolled back the same way.
+- Reversibility: the old site keeps serving the domain until cutover. The switch is a Cloudflare DNS change and can be rolled back the same way.
 - Compliance: `@nx/enforce-module-boundaries` rules for `scope:site`, and the SEO checks in the [SEO rules](../../../standards/site/seo-rules.md).
 
 ## History

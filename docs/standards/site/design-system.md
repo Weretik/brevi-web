@@ -58,7 +58,7 @@ These are the visual rules for `apps/site`. The source is design «Строчк�
    - Navigation: «Каталог», «Пошиття з логотипом», «Ціни для опту», «Галузі», «Про виробництво», «Контакти».
    - Search, «Заявка (n)», and the phone button (graphite with an orange icon).
    - The header stays visible on scroll.
-3. **Catalog:** a mega menu with every section and subsection of the live catalog. Real `<a href>` links only.
+3. **Catalog:** a mega menu with every section and subsection from BreviERP. Real `<a href>` links only.
 4. **Phone:** the menu in a side `Sheet`, search on its own row, and the phone and request as icons. The phone link is `tel:`.
 
 ## Product photos

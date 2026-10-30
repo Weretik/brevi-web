@@ -9,9 +9,9 @@ These are stable rules for every feature of the public Next.js site (`apps/site`
 - The main content is in the initial HTML: H1, text, prices, sizes, specs, and FAQ. Indexable content is never fetched only on the client.
 - Every indexable page has a unique title (≤ 60 characters) and description in both languages.
 - Links are real `<a href>` (Next.js `Link`). That covers menus, filters that lead to indexable landings, and pagination.
-- **Live `brevi.com.ua` URLs keep working.** A changed URL gets a permanent redirect from the maintained map, with no chains.
+- **Every old `brevi.com.ua` URL keeps working** through one permanent redirect from the maintained map, with no chains.
 - A new URL type is added to the policy table in the SEO architecture before release.
-- Migrated OpenCart texts keep their meaning. Fix typos and mismatches (for example, a spec that contradicts the description) during import review, not silently in code.
+- Texts reused from the old site are checked by hand: fix typos and mismatches (for example, a spec that contradicts the description) in Admin, not in code.
 
 ## Prohibited
 
@@ -30,5 +30,5 @@ These are stable rules for every feature of the public Next.js site (`apps/site`
 
 - Unit tests for URL models (locale paths, trailing slash, pagination), and for the metadata, alternates, robots, sitemap, and JSON-LD builders.
 - Rendered-output checks with `curl` against `next start`, recorded in the feature's `verification/seo-verification.md`: status code, `<title>`, description, canonical, `hreflang`, robots meta, and JSON-LD.
-- For migrated page types: a sample of live URLs (at least 20 per type from the OpenCart export) answers 200 on the new site, or a single 301 to the recorded target.
+- Before cutover: a sample of old URLs (at least 20 per page type from the old sitemap) answers a single 301 to a page that returns 200.
 - The `npx nx run site:build` route table matches the rendering choice in the SDD.
