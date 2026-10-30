@@ -12,10 +12,11 @@ in [domains.md](domains.md).
 | Core         | `libs/admin/core/{auth,shell}`                         | Session and application shell                     |
 | Products     | `libs/admin/products/{model,data-access,ui,feature}`   | Product model, API, presentation, and scenarios   |
 | References   | `libs/admin/references/{model,data-access,ui,feature}` | Admin reference data                              |
+| Clients      | `libs/admin/clients/{model,data-access,ui,feature}`    | Customers, quotes, documents, and custom sewing   |
 | Admin shared | `libs/admin/shared/{api-client,config,contracts}`      | API transport, configuration, and Admin contracts |
 
-The current router in `apps/admin-react/src/app/router/app-router.tsx` wires
-products and references. `orders`, `clients`, `dashboard`, and
-`core/permissions` in the [target structure](domains.md) do not mean the
+The route list in `apps/admin-react/src/app/router/admin-route-definitions.tsx`
+wires clients, products, and references. `orders`, `dashboard`, `shared/ui`,
+and `core/permissions` in the [target structure](domains.md) do not mean the
 corresponding Nx projects already exist. Check shared `libs/shared/*` against
 the code and [frontend inventory](../../frontend-inventory.md).
