@@ -9,7 +9,7 @@ This page holds the site-wide SEO decisions. Feature specifications apply them i
 
 The new site is built from the Brevi storefront and BreviERP data, so it uses its own URL scheme, the same one as the Kedr site: a locale prefix and slugs from BreviERP. The domain `brevi.com.ua` is indexed today (OpenCart), so at cutover **every old URL gets exactly one permanent 301** to the closest new page. A 301 passes almost all of a page's ranking, and hreflang, structured data, and better titles make up for the move.
 
-`[NEEDS CLARIFICATION: owner confirms this scheme; the alternative is to copy the old URLs one to one, which needs per-language slugs entered by hand in BreviERP]`.
+Owner decision 2026-10-30: this scheme, not a one-to-one copy of the old URLs.
 
 ## Origin and URL form
 

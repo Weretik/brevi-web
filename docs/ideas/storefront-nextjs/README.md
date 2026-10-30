@@ -92,7 +92,7 @@ Admin остаётся отдельным приложением на React SPA 
 
 Правила взяты из скилов плагина `nextjs-seo-site`: `nextjs-site-architecture`, `seo-setup`, `seo-catalog-urls`, `seo-structured-data`, `seo-i18n`, `seo-audit`. Подробно это расписано в [SEO-архитектуре](../../architecture/site/platform/seo-architecture.md) и в [описи страниц](../../specs/site/migration/feature-inventory.md).
 
-- **Адреса как у Кедра:** `/uk/...` и `/ru/...`, слаги из BreviERP. Каждый старый адрес brevi.com.ua (украинский в корне, русский под `/ru/`) получает один 301 на новую страницу. Список старых адресов берём из sitemap и Search Console, экспорт базы не нужен. Решение предложено 2026-10-30 и ждёт подтверждения владельца.
+- **Адреса как у Кедра:** `/uk/...` и `/ru/...`, слаги из BreviERP. Каждый старый адрес brevi.com.ua (украинский в корне, русский под `/ru/`) получает один 301 на новую страницу. Список старых адресов берём из sitemap и Search Console, экспорт базы не нужен. Решение владельца 2026-10-30.
 - **hreflang** `uk-UA`, `ru-UA` и `x-default` на каждой странице. Сейчас на живом сайте их нет.
 - **Метаданные:** короткий уникальный title (до ~60 символов) и description для каждой страницы и языка. Город в title только там, где он правдив: Полтава или региональная посадочная.
 - **JSON-LD:** Organization и LocalBusiness (Полтава, телефоны, часы работы), WebSite, BreadcrumbList, ItemList, Product с AggregateOffer (цена от и до по уровням), FAQPage там, где FAQ видно на странице.
