@@ -1,4 +1,5 @@
 export { adminApi, baseApi } from './rtk-query/base-api';
+export { requestApiBlob } from './client/request-api-blob';
 export {
   AdminApiProvider,
   createAdminApiStore,
