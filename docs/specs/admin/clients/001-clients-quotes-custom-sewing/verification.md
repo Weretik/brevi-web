@@ -1,6 +1,6 @@
 # Перевірка та приймання
 
-Клієнтський slice має автоматичні докази [виконання](evidence/clients-frontend-2026-10-26.md). Quote/custom/document/import сценарії залишаються planned; ручне приймання не позначено виконаним. Дотримуватися [правил тестування](../../../../standards/shared/testing-rules.md) та [контрактного workflow](../../../../architecture/api/contract-workflow.md). Не запускати повний suite/build без окремої потреби/вказівки; вибрати мінімальні перевірки змінених сценаріїв.
+Клієнти, P2 і P3 мають локальні автоматичні докази; [FE-005 evidence](evidence/fe-005-2026-10-28.md) фіксує 108 passing scoped tests. Custom/document/import planned; ручне/deployed приймання pending. Дотримуватися [правил тестування](../../../../standards/shared/testing-rules.md) та [контрактного workflow](../../../../architecture/api/contract-workflow.md); обирати мінімальні перевірки змінених сценаріїв.
 
 ## Обов'язкові докази реалізації
 
@@ -33,3 +33,26 @@
 7. Звірити імпортний report: неповні графи/байти видимі, mixed counterparties не стали всі клієнтами, repeated import не дублює. Backend має recovery rehearsal evidence.
 
 У task evidence записати browser/runtime, контрактний SHA, команди/сценарії, скріншоти лише де вони допомагають, невиконані перевірки й реальний вплив. Ручне приймання користувача фіксується окремо; написаний SDD не означає згоду з неперевіреним production результатом.
+
+## Commit/push handoff — 2026-10-30
+
+User explicitly authorized committing all accumulated Brevi work and pushing both repositories. Applied git-workflow:commit-batching. Frontend groups: contract snapshot/generated types/checker; shared role/blob capability; coupled CRM models/data/UI/feature/navigation; public legal pages; documentation. The CRM group intentionally keeps expanded discriminated models, mappers, public exports and their consumers together rather than leaving incompatible intermediate states.
+
+Fresh scoped checks before handoff:
+
+- contracts:check: canonical snapshot and generated types match backend 3ad90271721bc58b61fa1efa11ae6c2cd87e9866; three operation-checker tests passed.
+- node --test tools/legal/erp-public-pages.test.mjs: four public-document checks passed.
+- npx vitest run --config libs/admin/clients/model/vitest.config.mts: 16 files / 48 tests passed.
+- npx vitest run --config libs/admin/clients/data-access/vitest.config.mts: 19 files / 110 tests passed.
+- npx vitest run --config libs/admin/clients/ui/vitest.config.mts: one file / three tests passed.
+- npx tsc --noEmit -p libs/admin/clients/feature/tsconfig.spec.json: passed.
+- Initial concurrent feature run: 147 passed, two editor failures (one timeout, one dialog visibility wait). Isolated editor file: all seven passed. Repeated complete changed feature project with --maxWorkers=2: 38 files / 149 tests passed. No code/test behavior changed to obtain these results.
+- Initial routing regression (app-router, admin-route-layout, navigation-config): 13 passed, three async loading/timeout failures. Focused retry results are recorded below; do not describe the initial command as green.
+- npm run docs:check after incoming documentation merge: 523 files passed; git diff --check passed (line-ending notices only).
+- Normal repository pre-commit hooks ran formatting and ESLint on their configured staged file patterns; hooks were not skipped. Typical credential-pattern scan of outgoing/new files found no matching secrets; local ignored environment/secrets were not staged.
+
+Existing immutable backend commits were preserved. Incoming GitHub documentation was merged without force push or rewritten history. Backend master was pushed and independently matched origin at c0520b86550edbd21fcc713a1d1865e63e28b4fc. Frontend origin verification follows push.
+
+No full application suite, production build, browser/E2E, real OAuth consent or email send was performed for this Git handoff. Git push does not establish that public policies are deployed or Google approval is complete. FE-EN-003 publication, operator confirmation and send-only runtime/helper revision remain open.
+
+Routing focused retry: npx vitest run --config apps/admin-react/vitest.config.mts app-router.integration with filter opens suppliers / opens the product list / opens media, --maxWorkers=1 --testTimeout=30000: all three selected tests passed; seven other cases skipped by filter. Together with the first routing run, all 16 selected routing/navigation cases have passing observations. The longer timeout applies only to this command; repository tests and product behavior were unchanged.

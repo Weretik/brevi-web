@@ -6,13 +6,13 @@
 
 Використати передбачений архітектурою `libs/admin/clients/{feature,data-access,model,ui}`. Backend Crm не вимагає перейменовувати frontend domain на `crm`. Усередині кожного шару спочатку групувати за ролями (`pages`, `components`, `hooks`, `api`, `models`, `mappers`), усередині ролі — за можливостями `customers`, `quotes`, `custom-sewing`, `documents`; не створювати нову Nx library на кожну форму/DTO або порожні каталоги наперед. FE-EN-001 реєструє лише шари з реальною відповідальністю, public aliases `@admin/clients/<layer>`, project tags і dependency constraints.
 
-| Існуючий ID   | Запланований маршрут        | Поведінка                                                                                                           |
-| ------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| clients       | `/crm/clients`              | Список, створення; detail `/crm/clients/:customerId`, edit як стан сторінки/окрема дочірня форма за чинним патерном |
-| quotes        | `/crm/quotes`               | Список, `/crm/quotes/new`, `/crm/quotes/:quoteId`, перегляд вибраної version через query/child route                |
-| quote-archive | `/crm/quotes?archived=true` | Та сама функція списку з початковим архівним фільтром, не дубль модуля                                              |
+| Існуючий ID   | Запланований маршрут  | Поведінка                                                                                                           |
+| ------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| clients       | `/crm/clients`        | Список, створення; detail `/crm/clients/:customerId`, edit як стан сторінки/окрема дочірня форма за чинним патерном |
+| quotes        | `/crm/quotes`         | Список, `/crm/quotes/new`, `/crm/quotes/:quoteId`, перегляд вибраної version через query/child route                |
+| quote-archive | `/crm/quotes/archive` | Та сама функція списку з початковим архівним фільтром, не дубль модуля                                              |
 
-Client і quote list/new/detail маршрути реалізовано. Quote history/version selection і archive menu action — майбутній FE-005. `registeredPaths` перевіряє pathname; наявний quotes ID підключений до `/crm/quotes`, що перевірено navigation unit test. Для майбутнього archive query потрібен явний route/search mapping, а не порівняння повного query URL із pathname. Переходи до custom editor/issuer/templates — з контексту КП/дозволених налаштувань; не дублювати верхньорівневі пункти без продуктового рішення.
+Client і quote list/new/detail/history/archive маршрути реалізовано. Archive menu використовує ту саму QuotesPage з archivedView; history зберігає version/versionPage/eventPage/compare у URL. Custom editor/issuer/templates залишаються наступними фазами.
 
 ```mermaid
 flowchart LR
@@ -54,6 +54,6 @@ Save/reprice/transfer/archive invalidates точний detail/version/list scope
 
 ## Поточна реалізація клієнтів
 
-Фактичні customer та P2 quote paths описано в [implemented feature map](../../../../../features/admin/clients-and-quotes.md). Custom/document і quote lifecycle paths у таблиці залишаються target design; порожні каталоги не створювалися. Model/data-access/feature мають scoped tests; UI interaction покривається feature без порожнього окремого runner.
+Фактичні customer, P2 та P3 paths описано в [implemented feature map](../../../../../features/admin/clients-and-quotes.md). History, lifecycle writes і reprice мають окремі scenario hooks; copy/transfer/archive — окремі діалоги. Custom/document paths — target design. Generated DTO доступні лише data-access; model/UI не виконують HTTP. Access loss очищає protected admin API cache; звичайні записи інвалідують точний корінь і список.
 
 [Структурний аудит](../code-audit/audit.md) уточнює поточний client slice: сторінки/діалоги компонують UI, hooks керують формою й мутаціями; API query/customer/contact/merge builders збираються одним endpoint registration. Public aliases, контракт та URL не змінено.
