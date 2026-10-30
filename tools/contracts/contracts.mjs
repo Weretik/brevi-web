@@ -35,11 +35,15 @@ function files(directory, prefix = '') {
     .sort();
 }
 
+// Same digest on Windows and Linux: POSIX paths in one sort order, LF line endings.
 function digest(directory) {
   const hash = createHash('sha256');
-  for (const file of files(directory)) {
-    hash.update(file.replaceAll('\\', '/'));
-    hash.update(readFileSync(join(directory, file)));
+  const relativePaths = files(directory)
+    .map((file) => file.replaceAll('\\', '/'))
+    .sort();
+  for (const file of relativePaths) {
+    hash.update(file);
+    hash.update(readFileSync(join(directory, file), 'utf8').replaceAll('\r\n', '\n'));
   }
   return hash.digest('hex');
 }
