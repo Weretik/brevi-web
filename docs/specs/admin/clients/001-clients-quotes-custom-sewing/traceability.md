@@ -1,8 +1,8 @@
 # Трасування вимог, сценаріїв і доказів
 
-P3 SC-Q02/Q04–05: backend TS-005 audited and committed locally; FE-EN-002 snapshot/generation verified at `f185138fc1cfc6c71cf94fe4e7103652e6719b5b`. Independent comparison and current-read compatibility have [fresh evidence](evidence/p3-audit-handoff-2026-10-28.md); connected FE-005 completion remains pending.
+P3 SC-Q02/Q04–05: backend TS-005 та frontend FE-005 реалізовано локально; snapshot/generated types pinned to `f185138fc1cfc6c71cf94fe4e7103652e6719b5b`. [FE-005 evidence](evidence/fe-005-2026-10-28.md) містить Red/Green та scoped integration/DOM evidence; manual acceptance pending.
 
-Клієнтські частини SC-C01–05 та P2 draft portions of SC-Q01–04/Q06–07 мають автоматичні backend/frontend докази; ручне приймання pending. Історія/явний reprice/transfer/archive, видані документи, custom та імпорт лишаються planned. [Клієнтські докази](evidence/clients-frontend-2026-10-26.md), [P2 докази й тести](evidence/p2-frontend-2026-10-27.md). Спільні сценарії описані у requirements цього SDD та backend SDD; імпортні SC-M01–03 означають idempotent role-filtered import, чесну неповноту та recovery.
+Клієнтські частини SC-C01–05 та P2 draft portions of SC-Q01–04/Q06–07 мають автоматичні backend/frontend докази; ручне приймання pending. Історія/явний reprice/copy/transfer/archive реалізовані FE-005; видані документи, custom та імпорт лишаються planned. [Клієнтські докази](evidence/clients-frontend-2026-10-26.md), [P2 докази й тести](evidence/p2-frontend-2026-10-27.md). Спільні сценарії описані у requirements цього SDD та backend SDD; імпортні SC-M01–03 означають idempotent role-filtered import, чесну неповноту та recovery.
 
 | Rule                          | Scenario | Frontend tasks                                                                                  | Backend prerequisite           | Evidence                                            |
 | ----------------------------- | -------- | ----------------------------------------------------------------------------------------------- | ------------------------------ | --------------------------------------------------- |
@@ -41,3 +41,15 @@ P3 SC-Q02/Q04–05: backend TS-005 audited and committed locally; FE-EN-002 snap
 | R-I03 | SC-I03   | FE-008, FE-009, FE-011              | TS-010/011/016 | Seasonal PDF/privacy/pinned delivery               |
 
 Evidence для API містить реальний контрактний SHA; для UI — focused test/стан/дію та перевірку доступності; для PDF — rendered content/privacy; для імпорту — backend звіт звірки й restore. Backend tasks тут — залежності, не виконані frontend роботи.
+
+FE-005 follow-up audit, SC-Q02/Q05 → AF-FE-P3-003–005 → reprice hook and history/comparison component tests → [fresh evidence](evidence/fe-005-audit-refactor-2026-10-28.md). Verified locally; manual acceptance pending.
+
+FE-006 → frontend SC-S01–03 → configuration/alternative model tests, runtime custom/quote mappers, actual local HTTP cache tests, captured-retry hooks and editor/modal components → [64-case verified execution](evidence/fe-006-2026-10-28.md), historical backend `31424453f4bef63363167e3dc11e0bfa2857e64f`. AF-FE-P4-001 stale source-draft opener is verified fixed by the source-key test.
+
+FE-007 → SC-S03–05 / R-S02,R-S04–06 → finalized/historical file scope, actual multipart/binary transport, explicit flags/unknown retry/discard, private cache handling, template privacy/owned writes/immutable apply and explicit independent suggestion configuration → [114-case evidence](evidence/fe-007-2026-10-28.md), backend `fdb8095d4dfd52a9680b5a2768c706aea1aa8c4b`. P4 implementation complete; SC-S06 production export belongs to P6.
+
+FE-EN-002 P5 handoff → SC-Q07, SC-D01–02, SC-D04 → seven TS-009/010 issuer settings, ready and PDF operationIds in canonical snapshot and generated types → [contract evidence](evidence/fe-en-002-p5-2026-10-29.md), backend `e5f563456efd1b29a67a36805c2b3775ce2f9d06`. FE-008 owns frontend behavior and its separate test evidence; manual acceptance is pending.
+
+FE-009 → SC-D03/SC-S06 → pinned delivery/production API, runtime mappers, local HTTP/ZIP tests and explicit confirmation/captured-retry/late-response UI tests → [verification](evidence/fe-009-delivery-production-2026-10-30.md). Live SC-D03 acceptance remains gated by EN-004.
+
+SC-PUB01/02 → R-PUB01/02 → [FE-EN-003](tasks/readiness/fe-en-003.md) → tools/legal/erp-public-pages.test.mjs → [evidence](evidence/fe-en-003-public-pages-2026-10-30.md). SC-PUB03/R-PUB03 → FE-EN-003 deployment/runtime/Google gates → pending real publication and acceptance.

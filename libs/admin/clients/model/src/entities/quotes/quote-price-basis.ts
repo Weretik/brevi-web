@@ -11,5 +11,5 @@ export interface QuotePriceBasis {
   readonly largeWholesale: number | null;
   readonly blockers: readonly string[];
   readonly currency: 'UAH';
-  readonly taxBasis: 'catalog_no_extra_vat' | 'manual_no_extra_vat';
+  readonly taxBasis: 'catalog_no_extra_vat' | 'manual_no_extra_vat' | 'custom_no_extra_vat';
 }

@@ -14,6 +14,8 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { checkRequiredOperations } from './check-required-operations.mjs';
+
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const snapshot = join(root, 'docs/contracts/openapi/backend');
 const provenancePath = join(root, 'docs/contracts/openapi/SOURCE.json');
@@ -102,90 +104,7 @@ if (command === 'sync') {
 } else if (command === 'check') {
   const provenance = JSON.parse(readFileSync(provenancePath, 'utf8'));
   if (digest(snapshot) !== provenance.sha256) throw Error('Snapshot differs from provenance.');
-  const sessionContract = readFileSync(join(snapshot, 'identity/session.openapi.yaml'), 'utf8');
-  for (const operationId of [
-    'loginSession',
-    'refreshSession',
-    'logoutSession',
-    'getCurrentSession',
-  ]) {
-    if (!sessionContract.includes('operationId: ' + operationId))
-      throw Error('Missing operationId: ' + operationId);
-  }
-  const supplierContract = readFileSync(join(snapshot, 'reference/suppliers.openapi.yaml'), 'utf8');
-  for (const operationId of [
-    'getSuppliers',
-    'createSupplier',
-    'updateSupplier',
-    'deleteSupplier',
-  ]) {
-    if (!supplierContract.includes('operationId: ' + operationId))
-      throw Error('Missing operationId: ' + operationId);
-  }
-  const garmentContract = readFileSync(
-    join(snapshot, 'reference/garment-accessories.openapi.yaml'),
-    'utf8',
-  );
-  for (const operationId of [
-    'getGarmentAccessories',
-    'createGarmentAccessory',
-    'updateGarmentAccessory',
-    'deleteGarmentAccessory',
-  ]) {
-    if (!garmentContract.includes('operationId: ' + operationId))
-      throw Error('Missing operationId: ' + operationId);
-  }
-  const fabricContract = readFileSync(join(snapshot, 'reference/fabrics.openapi.yaml'), 'utf8');
-  for (const operationId of ['getFabrics', 'createFabric', 'updateFabric', 'deleteFabric']) {
-    if (!fabricContract.includes('operationId: ' + operationId))
-      throw Error('Missing operationId: ' + operationId);
-  }
-  const additionalContract = readFileSync(
-    join(snapshot, 'reference/additional-references.openapi.yaml'),
-    'utf8',
-  );
-  for (const operationId of ['getAdditionalReferences', 'updateAdditionalReference']) {
-    if (!additionalContract.includes('operationId: ' + operationId))
-      throw Error('Missing operationId: ' + operationId);
-  }
-  const productContract = readFileSync(
-    join(snapshot, 'catalog/product-catalog.openapi.yaml'),
-    'utf8',
-  );
-  for (const operationId of [
-    'getAdminProducts',
-    'getAdminProductById',
-    'createProduct',
-    'replaceProduct',
-    'deleteProduct',
-  ]) {
-    if (!productContract.includes('operationId: ' + operationId))
-      throw Error('Missing operationId: ' + operationId);
-  }
-  const productDependencies = readFileSync(
-    join(snapshot, 'catalog/product-dependencies.openapi.yaml'),
-    'utf8',
-  );
-  for (const operationId of [
-    'getAdminProductCategories',
-    'getCatalogMedia',
-    'uploadCatalogMedia',
-    'deleteCatalogMedia',
-  ]) {
-    if (!productDependencies.includes('operationId: ' + operationId))
-      throw Error('Missing operationId: ' + operationId);
-  }
-  const quoteContract = readFileSync(join(snapshot, 'crm/quote-drafts.openapi.yaml'), 'utf8');
-  for (const operationId of [
-    'getCrmQuotes',
-    'getCrmQuote',
-    'createCrmQuote',
-    'saveCrmQuoteVersion',
-    'previewCrmQuotePrices',
-  ]) {
-    if (!quoteContract.includes('operationId: ' + operationId))
-      throw Error('Missing operationId: ' + operationId);
-  }
+  checkRequiredOperations(snapshot);
   const temporary = mkdtempSync(join(tmpdir(), 'brevi-contract-'));
   try {
     const output = join(temporary, 'openapi.ts');

@@ -2,6 +2,8 @@ import type { QuotePriceSelection } from '../../entities/quotes/quote-price-sele
 
 export function sameQuoteSelection(left: QuotePriceSelection, right: QuotePriceSelection): boolean {
   if (left.kind !== right.kind) return false;
+  if (left.kind === 'customSewing' && right.kind === 'customSewing')
+    return left.versionId === right.versionId;
   if (left.kind === 'sewing' && right.kind === 'sewing')
     return left.productId === right.productId && left.articleId === right.articleId;
   if (left.kind === 'ppe' && right.kind === 'ppe')

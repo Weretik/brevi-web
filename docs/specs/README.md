@@ -27,6 +27,8 @@ The Storefront currently has README files for its Nx feature libraries, but they
 - [Admin React: sewing composition structure](admin/products/005-sewing-composition-structure/README.md) — structural remediation verified 2026-10-25.
 - [Admin React: Sewing Article pricing](admin/products/006-sewing-pricing/README.md) — implemented and verified 2026-10-25.
 - [Admin React: PPE pricing](admin/products/007-ppe-pricing/README.md) — implemented and verified 2026-10-25.
-- [Admin React: клієнти, КП та індивідуальне пошиття](admin/clients/001-clients-quotes-custom-sewing/README.md) — clients and P2 draft quotes implemented; P3 contract handoff and independent comparison verified; connected lifecycle UI and manual acceptance pending.
+- [Admin React: клієнти, КП та індивідуальне пошиття](admin/clients/001-clients-quotes-custom-sewing/README.md) — P1–P5 locally verified; P6 delivery/history and production UI implemented/automatically verified; live Gmail acceptance pending.
 
 When a specification's status changes, update its line here in the same change.
+
+- [FE-EN-003: BreviERP public legal pages](admin/clients/001-clients-quotes-custom-sewing/tasks/readiness/fe-en-003.md) — local implementation; publication and matching send-only runtime remain mandatory Gmail gates.

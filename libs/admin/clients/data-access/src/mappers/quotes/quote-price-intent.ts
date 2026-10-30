@@ -4,6 +4,15 @@ import type { operations } from '@admin/shared/contracts';
 type Intent =
   operations['previewCrmQuotePrices']['requestBody']['content']['application/json']['intent'];
 export function quotePriceIntent(selection: QuotePriceSelection): Intent {
+  if (selection.kind === 'customSewing')
+    return {
+      kind: 'customSewing',
+      customVersionPublicId: selection.versionId,
+      productId: null,
+      articleId: null,
+      override: null,
+      manualPrices: null,
+    };
   if (selection.kind === 'sewing')
     return {
       kind: 'sewing',

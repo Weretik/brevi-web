@@ -14,6 +14,8 @@ Current entry points are `libs/admin/shared/api-client/src/index.ts`,
 
 ## Purpose
 
+FE-007 compatible binary extension: public `requestApiBlob(ApiRequest, signal?)` reuses the same Axios instance, authentication refresh and error mapping for private downloads. Domain data-access validates MIME/size; feature owns the temporary URL. Binary responses stay outside RTK cache; JSON endpoints continue through the existing base query. [Decision and verification](../../specs/admin/clients/001-clients-quotes-custom-sewing/contracts/api-contract.md#p4-fe-007-handoff--2026-10-28).
+
 Admin sends API requests through a shared transport, normalizes backend errors,
 and supports cancellation.
 

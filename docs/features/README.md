@@ -6,7 +6,7 @@ In each feature card, “Structure diagram” shows relationships between parts,
 
 ## Admin React (`apps/admin-react`)
 
-- Clients: [клієнти, контакти, перевірка дублювання та чернетки КП](admin/clients-and-quotes.md).
+- Clients: [клієнти, КП, history/lifecycle, приватний custom editor, файли, шаблони та підказки](admin/clients-and-quotes.md).
 - Admin foundation: [shell, navigation, and session](admin/shell.md).
 - Products: [list, details, creation, and editing](admin/products/products.md); [media library](admin/products/media.md); [Sewing Articles and composition](admin/products/sewing-composition.md); [Article calculation and published prices](admin/products/sewing-pricing.md); [PPE pricing and input approval](admin/products/ppe-pricing.md).
 - Reference data: [suppliers](admin/references/suppliers.md); [hardware and fabrics](admin/references/materials.md); [garment parts and operations](admin/references/garment-parts.md); [additional reference data](admin/references/additional-references.md).
@@ -20,3 +20,5 @@ In each feature card, “Structure diagram” shows relationships between parts,
 - Navigation: [404 page](storefront/not-found.md).
 
 `apps/storefront/src/app/app.routes.ts` assembles localized `/uk` and `/ru` routes; `apps/admin-react/src/app/router/app-router.tsx` assembles Admin routes. Requirements and task specifications have a [separate SDD index](../specs/README.md); this map explains existing code and relationships. Add a new feature here together with its short description, and update the relevant page after architecture changes.
+
+- BreviERP public information: [description, privacy and terms](admin/public-legal-pages.md).

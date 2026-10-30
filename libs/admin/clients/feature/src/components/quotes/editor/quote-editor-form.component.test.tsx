@@ -8,6 +8,8 @@ import { QuoteEditorForm } from './quote-editor-form';
 import type { QuoteDetail } from '@admin/clients/model';
 
 const api = vi.hoisted(() => ({ create: vi.fn(), save: vi.fn(), preview: vi.fn() }));
+vi.mock('../lifecycle/quote-lifecycle-panel', () => ({ QuoteLifecyclePanel: () => null }));
+vi.mock('../../documents/quote-documents-panel', () => ({ QuoteDocumentsPanel: () => null }));
 vi.mock('@admin/clients/data-access', () => ({
   useCreateQuoteMutation: () => [api.create],
   useSaveQuoteVersionMutation: () => [api.save],
@@ -24,6 +26,9 @@ vi.mock('@admin/products/data-access', () => ({
 }));
 const detail: QuoteDetail = {
   publicId: 'quote',
+  versionId: 'version',
+  sourceQuoteId: null,
+  sourceVersionId: null,
   revision: 1,
   versionNumber: 1,
   state: 'draft',

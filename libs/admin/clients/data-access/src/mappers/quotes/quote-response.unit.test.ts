@@ -86,6 +86,17 @@ function fixture() {
 }
 
 describe('quote response boundary (SC-Q01/02/07)', () => {
+  it('retains the current version identity for an explicit lifecycle confirmation', () => {
+    expect(mapQuoteDetail(fixture())).toMatchObject({ versionId });
+  });
+  it('retains typed source versions for the old/new comparison', () => {
+    const basis = mapQuoteDetail(fixture()).draft.items[0].variants[0].basis!.value;
+    expect(basis.source).toMatchObject({
+      sourceId: versionId,
+      referenceVersionIds: [11, 12],
+      formulaVersion: 'sewing-sheet-v1',
+    });
+  });
   it.each(['recalculated', 'copied'])(
     'reopens the pinned P3 %s snapshot without repricing',
     (action) => {

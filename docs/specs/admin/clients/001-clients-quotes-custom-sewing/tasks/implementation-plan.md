@@ -1,6 +1,8 @@
 # Поетапна реалізація
 
-P1 та P2 реалізовано локально: FE-EN-001/002, FE-001/002 і FE-003/004 мають автоматичні докази; ручне приймання pending. P2 backend EN-002/TS-003/004 закріплено в `1c1f51dc7837f3d5e3a0da7326cb17b48d23e4d9`, frontend snapshot/generated types синхронізовано з цим SHA. Локальний backend commit дозволено користувачем 2026-10-27; push не виконувався. P3 in progress: TS-005 backend audited and committed as `f185138fc1cfc6c71cf94fe4e7103652e6719b5b`; current snapshot/generated types use this SHA. Independent FE-005 comparison is verified; connected lifecycle UI remains pending. [P2 evidence](../evidence/p2-frontend-2026-10-27.md).
+Latest P5 checkpoint — 2026-10-29: backend TS-009/010 committed locally as `e5f563456efd1b29a67a36805c2b3775ce2f9d06` without push, then FE-EN-002 synced and checked the clean OpenAPI. FE-008 ready/PDF integration passed focused automated tests; manual PDF/privacy acceptance remains open. TS-016 and FE-011 are partially implemented. [Contract evidence](../evidence/fe-en-002-p5-2026-10-29.md), [FE-008 evidence](../evidence/fe-008-integration-2026-10-29.md). No frontend commit/push authorization.
+
+P1–P4 реалізовано локально. FE-005 підключає історію та lifecycle; FE-006 додає приватний custom editor; FE-007 — files/templates/suggestions. Current snapshot/generated types pin backend `e5f563456efd1b29a67a36805c2b3775ce2f9d06`. No frontend commit/push is implied by this plan.
 
 | Фаза               | Backend prerequisite   | Frontend                  | Умова виходу                                                             |
 | ------------------ | ---------------------- | ------------------------- | ------------------------------------------------------------------------ |
@@ -13,7 +15,7 @@ P1 та P2 реалізовано локально: FE-EN-001/002, FE-001/002 і
 | P6 send/package    | EN-004, TS-011/012     | FE-EN-002, FE-009         | Правдиві delivery states, explicit test send, pinned production artifact |
 | P7 архів/приймання | EN-006, TS-013/014/015 | FE-010                    | Звірка/повнота або погоджені gaps, recovery та інтегровані докази        |
 
-EN-005 містить [NEEDS CLARIFICATION: фактичні реквізити продавця, формат/сфера номера та погоджені податкові/валютні формулювання]. Не вигадувати значення з порожньої таблиці. EN-004 потребує реального mail provider/config; EN-006 — повного експорту/байтів або погодженого gap scope й retention. Ці ворота не блокують клієнтів/чернетки.
+EN-005 підтверджено користувачем 2026-10-29: реквізити та податкова фраза з Calculator діють; формат номера N/M/YYYY, спільна місячна послідовність із 10. Backend TS-009/010 локально перевірено з PostgreSQL, FE-EN-002 завершено, FE-008 має автоматично перевірену інтеграцію; ручне PDF/privacy приймання відкрите. TS-016 і FE-011 часткові. EN-004 потребує реального mail provider/config; EN-006 — повного експорту/байтів або погодженого gap scope й retention.
 
 ## Атомарні задачі
 
@@ -40,4 +42,10 @@ EN-005 містить [NEEDS CLARIFICATION: фактичні реквізити 
 
 ## Закриття кожного slice
 
-Зафіксувати operationIds + справжній SHA → sync/generate/check → data-access runtime mapping → interaction та error tests → existing route/menu → focused code audit/форматування → manual narrow/wide/accessibility → evidence/traceability/implemented map. Не запускати міграції/імпорт/надсилання з UI до відповідного backend gate. Не комітити/пушити лише на підставі цього документа.
+Зафіксувати operationIds + справжній SHA → sync/generate/check → data-access runtime mapping → interaction та error tests → existing route/menu → focused code audit/форматування → evidence/traceability/implemented map; manual narrow/wide/accessibility перенесено користувачем на завершальне приймання. Не запускати міграції/імпорт/надсилання з UI до відповідного backend gate. Не комітити/пушити лише на підставі цього документа.
+
+P6 FE-009 delivery/history and production-export UI implemented with pinned contract; [automated evidence](../evidence/fe-009-delivery-production-2026-10-30.md). EN-004 live consent/send and template-management/new-selection integration remain separate.
+
+## Required before live Gmail acceptance
+
+[FE-EN-003](readiness/fe-en-003.md): implement and publish description/privacy/terms on office.brevi.com.ua; confirm operator, domain ownership, exact Google Branding URLs and send-only runtime/helper alignment. Sender pp.brevi@gmail.com; manual uncertain-result review; In production setup. These are mandatory EN-004/SC-D03 gates, not optional follow-ups.

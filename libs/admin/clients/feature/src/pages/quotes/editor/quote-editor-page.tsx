@@ -7,7 +7,10 @@ import { quoteError } from '../../../errors/quotes/quote-error';
 
 export default function QuoteEditorPage() {
   const { quoteId } = useParams<{ quoteId: string }>();
-  const query = useGetQuoteQuery(quoteId ?? '', { skip: !quoteId });
+  const query = useGetQuoteQuery(quoteId ?? '', {
+    skip: !quoteId,
+    refetchOnMountOrArgChange: true,
+  });
   const detail = query.currentData;
   return (
     <Box sx={{ p: { xs: 2, md: 3 }, maxWidth: 1200, mx: 'auto' }}>
@@ -24,7 +27,7 @@ export default function QuoteEditorPage() {
           </Alert>
         )}
         {!quoteId && <QuoteEditorForm key="new" initial={null} />}
-        {quoteId && detail && (
+        {quoteId && detail && !query.error && (
           <QuoteEditorForm
             key={quoteId}
             initial={detail}

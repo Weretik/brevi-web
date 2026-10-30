@@ -28,11 +28,7 @@ export function useQuoteWrite(
   const request = useStableRequest();
 
   const save = async (detail: QuoteDetail | null, draft: QuoteDraft) => {
-    if (
-      busy.current ||
-      (detail && (!detail.canEdit || detail.state !== 'draft' || detail.archived))
-    )
-      return;
+    if (busy.current || (detail && (!detail.canEdit || detail.archived))) return;
     const validation = captured.current ? {} : quoteDraftErrors(draft, Date.now());
     setErrors(validation);
     if (Object.keys(validation).length) return;

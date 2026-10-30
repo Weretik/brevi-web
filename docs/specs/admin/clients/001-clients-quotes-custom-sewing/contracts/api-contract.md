@@ -1,12 +1,48 @@
 # API-контракт споживача
 
-**Клієнтський та P2 draft-quote slices реалізовано; P3 contract handoff виконано.** Current snapshot backend SHA `f185138fc1cfc6c71cf94fe4e7103652e6719b5b` містить сім customer/contact/merge та тринадцять quote/directory operations. Джерело істини — `Weretik/BreviERP`, aggregate `docs/sdd/contracts/openapi.yaml`; feature sources — `crm/clients-quotes.openapi.yaml` і `crm/quote-drafts.openapi.yaml`. Connected FE-005 UI залишається in progress; custom/document operations planned.
+## P4 FE-007 handoff — 2026-10-28
+
+All rows below consume repository `https://github.com/Weretik/BreviERP.git`, immutable commit `fdb8095d4dfd52a9680b5a2768c706aea1aa8c4b`, aggregate `docs/sdd/contracts/openapi.yaml`. Snapshot/generated provenance checked after sync from the clean backend checkout. [Execution evidence](../evidence/fe-007-2026-10-28.md).
+
+| operationId                   | Canonical source under `docs/sdd/contracts/` | Consumer                                                           |
+| ----------------------------- | -------------------------------------------- | ------------------------------------------------------------------ |
+| `uploadCrmPrivateFile`        | `crm/private-files.openapi.yaml`             | Stage actual multipart File; same file/requestId on unknown result |
+| `getCrmPrivateFileContent`    | `crm/private-files.openapi.yaml`             | Authenticated uncached Blob; exact versionId/quoteId scope         |
+| `getCrmCustomSewingFiles`     | `crm/private-files.openapi.yaml`             | Same root/finalized/unique metadata; current or immutable scope    |
+| `setCrmCustomSewingFiles`     | `crm/private-files.openapi.yaml`             | Explicit flag/link selection, revision and stable requestId        |
+| `getCrmQuoteTemplates`        | `crm/custom-templates.openapi.yaml`          | Paged list with archived filter                                    |
+| `createCrmQuoteTemplate`      | `crm/custom-templates.openapi.yaml`          | Whitelisted selections/introduction; no private costs/artwork      |
+| `getCrmQuoteTemplate`         | `crm/custom-templates.openapi.yaml`          | Validated detail, version and canEdit                              |
+| `reviseCrmQuoteTemplate`      | `crm/custom-templates.openapi.yaml`          | Explicit new version from saved selections                         |
+| `setCrmQuoteTemplateArchived` | `crm/custom-templates.openapi.yaml`          | Owned/Admin archive or restore, revision                           |
+| `applyCrmQuoteTemplate`       | `crm/custom-templates.openapi.yaml`          | Review exact version, new private draft, separate calculate        |
+| `getCrmSewingSuggestions`     | `crm/custom-templates.openapi.yaml`          | Type/season norms, explicit new configuration                      |
+
+Generated DTOs remain in data-access; runtime mappers return client models. File queries use currentData, root tags and zero unused-cache retention. Finalization invalidates the root after success. Template writes invalidate exact template plus LIST; errors preserve input. 409 needs explicit refresh/correction; unknown writes replay captured payload/requestId. 413/415 remain upload errors, 503 remains unavailable/uncertain. Denied protected queries reset the API cache; workspace hides its local snapshot after file/template access loss.
+
+Compatible transport decision: additive shared `requestApiBlob(ApiRequest, signal?)` reuses existing Axios auth/refresh/error handling without changing JSON endpoints. Domain validates binary MIME/size; UI creates/revokes a temporary download URL. Blob bytes never enter RTK cache. No public media fallback or persisted blob IDs.
+
+**P4 FE-006/007 implemented/automatically verified.** Their historical handoff SHA is `fdb8095d4dfd52a9680b5a2768c706aea1aa8c4b`. The current snapshot is P5 backend SHA `e5f563456efd1b29a67a36805c2b3775ce2f9d06` and includes the prior client/quote/custom operations, TS-007 private files, TS-008 templates/suggestions, and TS-009/010 document operations. Source: `Weretik/BreviERP`, aggregate `docs/sdd/contracts/openapi.yaml`.
+
+## P5 TS-009/010 handoff — 2026-10-29
+
+The current [provenance manifest](../../../../../contracts/openapi/SOURCE.json) pins backend `e5f563456efd1b29a67a36805c2b3775ce2f9d06`. The canonical sources under `docs/sdd/contracts/` and the frontend snapshot contain these seven operations. [Handoff evidence](../evidence/fe-en-002-p5-2026-10-29.md) records sync/generation/check results. FE-008 owns runtime mapping, errors, cache behavior and UI verification.
+
+| operationId                      | Canonical source                   |
+| -------------------------------- | ---------------------------------- |
+| `getCrmIssuerSettings`           | `crm/issuer-settings.openapi.yaml` |
+| `createCrmIssuerSettingsVersion` | `crm/issuer-settings.openapi.yaml` |
+| `activateCrmIssuerSettings`      | `crm/issuer-settings.openapi.yaml` |
+| `prepareCrmQuote`                | `crm/quote-drafts.openapi.yaml`    |
+| `renderCrmQuotePdf`              | `crm/quote-pdf.openapi.yaml`       |
+| `getCrmQuotePdfArtifact`         | `crm/quote-pdf.openapi.yaml`       |
+| `downloadCrmQuotePdfArtifact`    | `crm/quote-pdf.openapi.yaml`       |
 
 Історична baseline ревізія backend `0529daf910b837eb808a662695706dda4beaf833` містить Catalog/Reference, але не CRM. Для кожного впровадженого slice FE-EN-002 фіксує новий **фактичний повний SHA чистого backend commit**, дату/source path/sync command у наявному manifest. Не використовувати старий SHA як доказ існування нової операції. Перевірені schemas генеруються tooling, DTO вручну не дублюються.
 
 ## Реєстр операцій і залежностей
 
-Backend implemented rows include seven customer operations, five draft-quote operations and eight P3 history/lifecycle/directory operations pinned below. P3 generated operations are available; connected feature consumers are not yet implemented. Для custom/document рядків schema та новий SHA очікують FE-EN-002 після відповідної backend-задачі. Кожний рядок має окремий operationId; URL сам по собі не є контрактом. Остаточний wire schema/errors — у погодженому backend OpenAPI, не у цьому Markdown.
+Backend implemented rows include seven customer operations, five draft-quote operations, eight P3 history/lifecycle/directory operations, P4 custom/file/template operations and seven P5 settings/ready/PDF operations. P5 generated operations are pinned to the SHA above; FE-008 consumer evidence is separate. Для майбутніх delivery/production рядків schema та новий SHA очікують FE-EN-002 після відповідної backend-задачі. Кожний рядок має окремий operationId; URL сам по собі не є контрактом. Остаточний wire schema/errors — у погодженому backend OpenAPI, не у цьому Markdown.
 
 | Метод | Шлях                                                       | operationId                      | Backend prerequisite |
 | ----- | ---------------------------------------------------------- | -------------------------------- | -------------------- |
@@ -47,9 +83,9 @@ Backend implemented rows include seven customer operations, five draft-quote ope
 | GET   | `/api/crm/issuer-settings`                                 | `getCrmIssuerSettings`           | TS-009 + FE-EN-002   |
 | POST  | `/api/crm/issuer-settings/versions`                        | `createCrmIssuerSettingsVersion` | TS-009 + FE-EN-002   |
 | PUT   | `/api/crm/issuer-settings/active`                          | `activateCrmIssuerSettings`      | TS-009 + FE-EN-002   |
-| POST  | `/api/crm/quotes/{quoteId}/documents`                      | `renderCrmQuoteDocument`         | TS-010 + FE-EN-002   |
-| GET   | `/api/crm/quotes/{quoteId}/documents/{artifactId}`         | `getCrmQuoteDocument`            | TS-010 + FE-EN-002   |
-| GET   | `/api/crm/quotes/{quoteId}/documents/{artifactId}/content` | `downloadCrmQuoteDocument`       | TS-010 + FE-EN-002   |
+| POST  | `/api/crm/quotes/{quoteId}/documents`                      | `renderCrmQuotePdf`              | TS-010 + FE-EN-002   |
+| GET   | `/api/crm/quotes/{quoteId}/documents/{artifactId}`         | `getCrmQuotePdfArtifact`         | TS-010 + FE-EN-002   |
+| GET   | `/api/crm/quotes/{quoteId}/documents/{artifactId}/content` | `downloadCrmQuotePdfArtifact`    | TS-010 + FE-EN-002   |
 | POST  | `/api/crm/quotes/{quoteId}/deliveries`                     | `enqueueCrmQuoteDelivery`        | TS-011 + FE-EN-002   |
 | GET   | `/api/crm/quotes/{quoteId}/deliveries`                     | `getCrmQuoteDeliveries`          | TS-011 + FE-EN-002   |
 | POST  | `/api/crm/quotes/{quoteId}/production-packages`            | `exportCrmProductionPackage`     | TS-012 + FE-EN-002   |
@@ -106,7 +142,7 @@ Canonical source for every new operation: backend `docs/sdd/contracts/crm/quote-
 | `transferCrmQuote`     | `f185138fc1cfc6c71cf94fe4e7103652e6719b5b` |
 | `setCrmQuoteArchived`  | `f185138fc1cfc6c71cf94fe4e7103652e6719b5b` |
 
-Sync/generate/check passed from a clean temporary detached checkout. Current quote reading accepts created/edited/recalculated/copied snapshots and preserves saved monetary values; other action values fail runtime validation. Generated DTOs stay in data-access. New P3 operation-specific mappers, hooks, history navigation, comparison confirmation, transfer cache purge and archive UI remain FE-005 work. [Audit and handoff evidence](../evidence/p3-audit-handoff-2026-10-28.md).
+Sync/generate/check passed from a clean temporary detached checkout. Current quote reading accepts created/edited/recalculated/copied snapshots and preserves saved monetary values; other action values fail runtime validation. Generated DTOs stay in data-access. P3 operation-specific mappers, scenario hooks, history URL state, reprice confirmation, transfer cache purge and archive UI are implemented locally. Normal writes invalidate exact quote and LIST; copy invalidates LIST. Access loss (403/404 or canEdit=false) resets the shared protected admin API cache including history, without resetting auth. Unknown writes replay captured payload/requestId; 409 preserves input. [Connected evidence](../evidence/fe-005-2026-10-28.md). [Audit and handoff evidence](../evidence/p3-audit-handoff-2026-10-28.md).
 
 ## Historical P2 details
 
@@ -125,3 +161,55 @@ Catalog selection reuses `getAdminProducts` and `listSewingArticles` from the sa
 P2 errors use 400 for invalid input, 409 for revision/basis/replay conflicts and normal 401/403/404 access handling. A conflict preserves the form; source refresh and dirty reload are explicit. Unknown write results (network, timeout, server/unknown error) freeze editing and retry the original captured payload/requestId until a definite result. Preview retry retains its ID after failure, then resets it after success so an explicit fresh preview does not replay an expired token. Late previews do not overwrite a changed selection.
 
 Cache: `Quote/LIST` plus exact quote IDs. Create invalidates list; version save invalidates that quote and list; preview does not invalidate quotes. No mutation retries automatically, no optimistic price/version updates. Saved bases serialize without a new token for text-only saves; changed selections require a fresh preview. Null prices and blockers remain null/visible in drafts. Unchanged saved selections have no reprice button in P2; P3 owns explicit same-selection reprice/history/copy/transfer/archive. [Evidence](../evidence/p2-frontend-2026-10-27.md).
+
+## P4 FE-006 handoff — 2026-10-28
+
+Repository `Weretik/BreviERP`, immutable backend commit `31424453f4bef63363167e3dc11e0bfa2857e64f`, feature source `docs/sdd/contracts/crm/custom-sewing.openapi.yaml`. The backend checkout was clean at synchronization. `contracts:sync`, `contracts:generate` and `contracts:check` all passed. SOURCE.json records the actual sync timestamp/command and snapshot digest. Earlier P2/P3 tables above retain their historical handoff revisions; the current snapshot contains their operations as well.
+
+| operationId                | Method / path                                               | Backend SHA                                |
+| -------------------------- | ----------------------------------------------------------- | ------------------------------------------ |
+| createCrmCustomSewingDraft | POST `/api/crm/custom-sewing`                               | `31424453f4bef63363167e3dc11e0bfa2857e64f` |
+| getCrmCustomSewingDraft    | GET `/api/crm/custom-sewing/{draftId}`                      | `31424453f4bef63363167e3dc11e0bfa2857e64f` |
+| saveCrmCustomSewingDraft   | PUT `/api/crm/custom-sewing/{draftId}`                      | `31424453f4bef63363167e3dc11e0bfa2857e64f` |
+| calculateCrmCustomSewing   | POST `/api/crm/custom-sewing/{draftId}/calculations`        | `31424453f4bef63363167e3dc11e0bfa2857e64f` |
+| saveCrmCustomSewingVersion | POST `/api/crm/custom-sewing/{draftId}/versions`            | `31424453f4bef63363167e3dc11e0bfa2857e64f` |
+| getCrmCustomSewingVersions | GET `/api/crm/custom-sewing/{draftId}/versions`             | `31424453f4bef63363167e3dc11e0bfa2857e64f` |
+| getCrmCustomSewingVersion  | GET `/api/crm/custom-sewing/{draftId}/versions/{versionId}` | `31424453f4bef63363167e3dc11e0bfa2857e64f` |
+
+`getCrmCustomSewingDrafts` in the target registry is not implemented in this snapshot and is not consumed by FE-006. Editor access uses an existing draft link or explicit creation, then its bounded saved-version list. No global discovery endpoint or raw-ID product workflow is invented. Existing quote operations in `crm/quote-drafts.openapi.yaml` accept a pinned custom version; generated transport types remain at data-access and map into local application models.
+
+FE-006 owns independent form state, explicit draft save/calculation/version confirmation and pinned quote selection. Only server results provide totals; blockers preserve editable inputs. Fabric alternatives are separate private drafts and do not publish Products or silently mutate another quote variant. File/template/suggestion UI remains FE-007; TS-007 operations under active backend development are not part of this committed frontend snapshot.
+
+## TS-016 consumer handoff — 2026-10-30
+
+Current synchronized revision: `e16b73d38d4c3ba149cf6253dcf3f2a70dc14f9d`, repository `https://github.com/Weretik/BreviERP.git`, canonical aggregate `docs/sdd/contracts/openapi.yaml`, module `docs/sdd/contracts/crm/introduction-templates.openapi.yaml`. Sync ran against clean backend HEAD, followed by generation and reproducibility check. Historical SHAs above record their original slices.
+
+| operationId                              | Consumer                   |
+| ---------------------------------------- | -------------------------- |
+| `getCrmIntroductionTemplates`            | FE-011 seasonal selections |
+| `createCrmIntroductionTemplate`          | FE-011 seasonal selections |
+| `getCrmIntroductionTemplate`             | FE-011 seasonal selections |
+| `reviseCrmIntroductionTemplate`          | FE-011 seasonal selections |
+| `setCrmIntroductionTemplateArchived`     | FE-011 seasonal selections |
+| `checkCrmIntroductionTemplate`           | FE-011 seasonal selections |
+| `applyCrmIntroductionTemplate`           | FE-011 seasonal selections |
+| `getCrmIntroductionFeaturedMapping`      | FE-011 seasonal selections |
+| `activateCrmIntroductionFeaturedMapping` | FE-011 seasonal selections |
+
+Runtime validation and DTO-to-model conversion belong to data-access. Template mutations preserve request IDs for unknown-result retries; conflicts require explicit refresh. Public check is tied to the exact current selection; edits invalidate approval. Apply creates an ordinary quote draft with a pinned introduction presentation; ready/PDF reuses FE-008. Email send remains P6.
+
+## P6 delivery and production consumer
+
+Pinned backend `Weretik/BreviERP`, SHA `3ad90271721bc58b61fa1efa11ae6c2cd87e9866`, canonical `docs/sdd/contracts/openapi.yaml`. Generated snapshot uses the normal sync tool; no DTO is hand-edited.
+
+| operationId                    | Canonical backend module                                  | Consumer |
+| ------------------------------ | --------------------------------------------------------- | -------- |
+| `getCrmActiveEmailTemplate`    | `docs/sdd/contracts/crm/email-templates.openapi.yaml`     | FE-009   |
+| `getCrmQuoteDeliveries`        | `docs/sdd/contracts/crm/quote-deliveries.openapi.yaml`    | FE-009   |
+| `getCrmQuoteDelivery`          | `docs/sdd/contracts/crm/quote-deliveries.openapi.yaml`    | FE-009   |
+| `enqueueCrmQuoteDelivery`      | `docs/sdd/contracts/crm/quote-deliveries.openapi.yaml`    | FE-009   |
+| `exportCrmProductionPackage`   | `docs/sdd/contracts/crm/production-packages.openapi.yaml` | FE-009   |
+| `getCrmProductionPackage`      | `docs/sdd/contracts/crm/production-packages.openapi.yaml` | FE-009   |
+| `downloadCrmProductionPackage` | `docs/sdd/contracts/crm/production-packages.openapi.yaml` | FE-009   |
+
+Read responses are runtime-validated and mapped to application views. Quote/version/resource mismatches reject the response. History is bounded/paged; private caches reset on403/404. Writes capture requestId and input for explicit same-key network retry; queued/unknown never become sent in client code. ZIP download verifies MIME/length/signature/SHA256 and uses a local opaque filename. Live send requires EN-004 provisioning; no OAuth secret is put in frontend.

@@ -5,8 +5,61 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import QuotesPage from './quotes-page';
 
 const hooks = vi.hoisted(() => ({ list: vi.fn() }));
-vi.mock('@admin/clients/data-access', () => ({ useListQuotesQuery: hooks.list }));
+vi.mock('@admin/clients/data-access', () => ({
+  useListQuotesQuery: hooks.list,
+  useGetQuoteAssigneesQuery: () => ({
+    currentData: { rows: [], totalPages: 1 },
+    isFetching: false,
+  }),
+}));
 describe('quote list route (SC-Q01/07)', () => {
+  it('uses the shared list for archive and clears the source filter with pagination', () => {
+    hooks.list.mockReturnValue({ currentData: { rows: [], totalPages: 0 }, isFetching: false });
+    render(
+      <MemoryRouter
+        initialEntries={[
+          '/crm/quotes/archive?page=2&sourceQuoteId=11111111-1111-4111-8111-111111111111',
+        ]}
+      >
+        <QuotesPage archivedView />
+      </MemoryRouter>,
+    );
+    expect(screen.getByRole('heading', { name: 'Архів КП' })).toBeInTheDocument();
+    expect(hooks.list.mock.calls.at(-1)?.[0]).toMatchObject({
+      archived: true,
+      page: 2,
+      sourceQuoteId: '11111111-1111-4111-8111-111111111111',
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Прибрати фільтр копій' }));
+    expect(hooks.list.mock.calls.at(-1)?.[0]).toEqual({
+      search: '',
+      state: undefined,
+      archived: true,
+      page: 1,
+      pageSize: 25,
+    });
+  });
+  it('applies explicit date filters through URL state and resets paging', () => {
+    hooks.list.mockReturnValue({ currentData: { rows: [], totalPages: 0 }, isFetching: false });
+    render(
+      <MemoryRouter initialEntries={['/crm/quotes?page=3']}>
+        <QuotesPage />
+      </MemoryRouter>,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Додаткові фільтри' }));
+    fireEvent.change(screen.getByLabelText('Створено від'), {
+      target: { value: '2026-10-28T09:00' },
+    });
+    fireEvent.change(screen.getByLabelText('Створено до'), {
+      target: { value: '2026-10-29T09:00' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Застосувати додаткові фільтри' }));
+    expect(hooks.list.mock.calls.at(-1)?.[0]).toMatchObject({
+      page: 1,
+      createdFrom: new Date('2026-10-28T09:00').toISOString(),
+      createdBefore: new Date('2026-10-29T09:00').toISOString(),
+    });
+  });
   afterEach(cleanup);
   it('shows an empty scoped list and resets page when searching', () => {
     hooks.list.mockReturnValue({

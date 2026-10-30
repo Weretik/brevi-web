@@ -1,0 +1,123 @@
+/* Shared presentation for the three public BreviERP documents. */
+:root {
+  color-scheme: light;
+  font-family: system-ui, sans-serif;
+  color: #1f2937;
+  background: #f5f7fa;
+  line-height: 1.7;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+header,
+main,
+footer {
+  max-width: 56rem;
+  margin: auto;
+  padding: 1.5rem;
+}
+header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  align-items: center;
+}
+.brand {
+  font-size: 1.5rem;
+  font-weight: 750;
+  text-decoration: none;
+}
+nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+}
+nav a {
+  padding-block: 0.35rem;
+}
+[aria-current='page'] {
+  font-weight: 700;
+}
+main {
+  background: white;
+  border: 1px solid #d7dee8;
+  border-radius: 0.75rem;
+}
+h1 {
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  line-height: 1.2;
+  margin-top: 0.25rem;
+}
+h2 {
+  font-size: 1.25rem;
+  line-height: 1.4;
+  margin-top: 2rem;
+}
+p,
+li,
+a,
+code {
+  overflow-wrap: anywhere;
+}
+li + li {
+  margin-top: 0.6rem;
+}
+a {
+  color: #174d91;
+  text-underline-offset: 0.18em;
+}
+a:hover {
+  text-decoration-thickness: 0.15em;
+}
+a:focus-visible {
+  outline: 3px solid #9b4a00;
+  outline-offset: 4px;
+}
+.updated,
+footer {
+  color: #4b5563;
+  font-size: 0.95rem;
+}
+.skip-link {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  padding: 0.75rem;
+  background: white;
+  transform: translateY(-200%);
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+@media (max-width: 36rem) {
+  main {
+    border-radius: 0;
+  }
+  header,
+  main,
+  footer {
+    padding: 1.25rem;
+  }
+}
+@media print {
+  :root {
+    background: white;
+    color: black;
+  }
+  header,
+  footer,
+  .skip-link {
+    display: none;
+  }
+  main {
+    max-width: none;
+    padding: 0;
+    border: 0;
+  }
+  a {
+    color: inherit;
+  }
+}

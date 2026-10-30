@@ -6,6 +6,15 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { App } from '../app';
 import { createAdminRouter } from './create-admin-router';
 
+vi.mock('@admin/core/auth', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@admin/core/auth')>()),
+  useGetAdminSessionRolesQuery: () => ({
+    currentData: ['Manager'],
+    isSuccess: true,
+    isFetching: false,
+  }),
+}));
+
 const routers: ReturnType<typeof createAdminRouter>[] = [];
 function renderApp() {
   const router = createAdminRouter();
@@ -80,7 +89,7 @@ describe('React Admin routing', () => {
           .map((item) => item.textContent?.replace('Ще не доступно', '')),
       ).toEqual(entries);
       expect(within(list).queryAllByRole('link')).toHaveLength(
-        section === 'Загальні довідники' ? 6 : 0,
+        section === 'Загальні довідники' ? 6 : section === 'Менеджер сервісу' ? 3 : 0,
       );
     }
   });

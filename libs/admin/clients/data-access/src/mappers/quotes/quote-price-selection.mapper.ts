@@ -11,8 +11,18 @@ import type { QuotePriceSelection } from '@admin/clients/model';
 
 export function mapQuoteSelection(value: unknown): QuotePriceSelection {
   const row = quoteRecord(value);
+  if (row['kind'] !== 'customSewing' && row['customVersionPublicId'] != null)
+    throw new Error('Зайве посилання на пошиття в іншому типі позиції.');
   let selection: QuotePriceSelection;
-  if (row['kind'] === 'sewing' && row['override'] == null && row['manualPrices'] == null)
+  if (
+    row['kind'] === 'customSewing' &&
+    row['productId'] == null &&
+    row['articleId'] == null &&
+    row['override'] == null &&
+    row['manualPrices'] == null
+  )
+    selection = { kind: 'customSewing', versionId: quoteText(row['customVersionPublicId']) };
+  else if (row['kind'] === 'sewing' && row['override'] == null && row['manualPrices'] == null)
     selection = {
       kind: 'sewing',
       productId: quoteInteger(row['productId']),
