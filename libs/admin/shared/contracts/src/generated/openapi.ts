@@ -1025,6 +1025,664 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/crm/quotes/{quoteId}/ready': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        quoteId: string;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Admin or owning Manager prepares exactly the saved current version. The server validates public recipient, visible prices, active verified seller/template and provisioned logo, allocates a monthly number once, and pins the immutable issue. Identical requestId replays the result. This does not render, download, queue or mark a document sent. */
+    post: operations['prepareCrmQuote'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quotes/{quoteId}/documents': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Queue a PDF for one pinned ready quote version
+     * @description Admin or owner Manager. Repeating the same version/template/render request returns the existing artifact; a failed artifact is retried. No email is sent.
+     */
+    post: operations['renderCrmQuotePdf'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quotes/{quoteId}/documents/{artifactId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Read private generation status and hash */
+    get: operations['getCrmQuotePdfArtifact'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quotes/{quoteId}/documents/{artifactId}/content': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Download stored PDF bytes without recalculating */
+    get: operations['downloadCrmQuotePdfArtifact'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/custom-sewing': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Authenticated Admin/Manager private scope. Mutations use actor-scoped requestId replay; stale revisions, source or tokens never overwrite. No publication or outgoing delivery. */
+    post: operations['createCrmCustomSewingDraft'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/custom-sewing/{draftId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        draftId: string;
+      };
+      cookie?: never;
+    };
+    /** @description Authenticated Admin/Manager private scope. Mutations use actor-scoped requestId replay; stale revisions, source or tokens never overwrite. No publication or outgoing delivery. */
+    get: operations['getCrmCustomSewingDraft'];
+    /** @description Authenticated Admin/Manager private scope. Mutations use actor-scoped requestId replay; stale revisions, source or tokens never overwrite. No publication or outgoing delivery. */
+    put: operations['saveCrmCustomSewingDraft'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/custom-sewing/{draftId}/calculations': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        draftId: string;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Authenticated Admin/Manager private scope. Mutations use actor-scoped requestId replay; stale revisions, source or tokens never overwrite. No publication or outgoing delivery. */
+    post: operations['calculateCrmCustomSewing'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/custom-sewing/{draftId}/versions': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        draftId: string;
+      };
+      cookie?: never;
+    };
+    /** @description Authenticated Admin/Manager private scope. Mutations use actor-scoped requestId replay; stale revisions, source or tokens never overwrite. No publication or outgoing delivery. */
+    get: operations['getCrmCustomSewingVersions'];
+    put?: never;
+    /** @description Authenticated Admin/Manager private scope. Mutations use actor-scoped requestId replay; stale revisions, source or tokens never overwrite. No publication or outgoing delivery. */
+    post: operations['saveCrmCustomSewingVersion'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/custom-sewing/{draftId}/versions/{versionId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        draftId: string;
+        versionId: string;
+      };
+      cookie?: never;
+    };
+    /** @description Authenticated Admin/Manager private scope. Mutations use actor-scoped requestId replay; stale revisions, source or tokens never overwrite. No publication or outgoing delivery. */
+    get: operations['getCrmCustomSewingVersion'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/custom-sewing/suggestions': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Price-free source-style norms from active source-reviewed Catalog unique model codes and approved exact references. Six garment groups use the confirmed legacy uk-UA lowercased, whitespace-collapsed exact model-name or type-plus-space prefix rule; unknown names excluded. summer/winter explicitly map to legacy profile Літо/Зима. Requires two unique models and each suggested reference in at least max(2,ceil(model count*0.7)) models. Quantity is upper median, varyingNorm uses legacy tolerance 0.0001. Duplicated identical articles count once per model; conflicting or missing references exclude the model. No automatic application. sourceLimitReached=true yields no partial norms. Only accessory and operation norms are suggested, matching the legacy source; fabric article choices and OtherCost rows do not enter the norm fingerprint. */
+    get: operations['getCrmSewingSuggestions'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quote-templates/introductions': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Manager may access own templates; Admin may access all. Foreign template/version is 404. */
+    get: operations['getCrmIntroductionTemplates'];
+    put?: never;
+    /** @description Manager may access own templates; Admin may access all. Foreign template/version is 404. */
+    post: operations['createCrmIntroductionTemplate'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quote-templates/introductions/{templateId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        templateId: string;
+      };
+      cookie?: never;
+    };
+    /** @description Manager may access own templates; Admin may access all. Foreign template/version is 404. */
+    get: operations['getCrmIntroductionTemplate'];
+    /** @description Manager may access own templates; Admin may access all. Foreign template/version is 404. */
+    put: operations['reviseCrmIntroductionTemplate'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quote-templates/introductions/{templateId}/archive': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        templateId: string;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Manager may access own templates; Admin may access all. Foreign template/version is 404. */
+    put: operations['setCrmIntroductionTemplateArchived'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quote-templates/introductions/{templateId}/check': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        templateId: string;
+      };
+      cookie?: never;
+    };
+    /** @description Read-only current offer validation. Returns current prices and public metadata; creates no quote and sends nothing. */
+    get: operations['checkCrmIntroductionTemplate'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quote-templates/introductions/{templateId}/apply': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        templateId: string;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Explicitly creates a new draft quote with current server price basis and pinned introduction snapshot; no ready transition or send. Actor-bound requestId replay and payload-conflict rules apply. */
+    post: operations['applyCrmIntroductionTemplate'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/introductions/featured-mapping': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Manager/Admin read active reviewed mapping. Missing configuration is 404. */
+    get: operations['getCrmIntroductionFeaturedMapping'];
+    /** @description Admin only. Resolves exact imported snapshot/source codes. Repeating the same active source triple and resolved IDs returns the existing active version; no requestId is accepted. */
+    put: operations['activateCrmIntroductionFeaturedMapping'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/email-templates': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Admin or Manager. Immutable version reference; no credentials or delivery side effects. */
+    get: operations['getCrmEmailTemplates'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/email-templates/versions': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Admin only. Plain-text versions; allowed placeholders: {recipientName}, {managerName}, {quoteNumber}. No send or default content. Actor-bound same requestId replays; changed payload409. */
+    post: operations['createCrmEmailTemplateVersion'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/email-templates/{versionId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        versionId: string;
+      };
+      cookie?: never;
+    };
+    /** @description Admin or Manager. Immutable version reference; no credentials or delivery side effects. */
+    get: operations['getCrmEmailTemplateVersion'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/email-templates/active': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Admin or Manager. Immutable version reference; no credentials or delivery side effects. */
+    get: operations['getCrmActiveEmailTemplate'];
+    /** @description Admin only. Plain-text versions; allowed placeholders: {recipientName}, {managerName}, {quoteNumber}. No send or default content. Actor-bound same requestId replays; changed payload409. */
+    put: operations['activateCrmEmailTemplate'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quotes/{quoteId}/production-packages': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        quoteId: string;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Manager owns quote; Admin may access all. Requires an exact issued quote version and explicit unique included/visible custom variant IDs. Actor-bound requestId replay checks current access before intent hash; same selected version/variants returns a stored package without current master/file reads. Export records an audit receipt but never marks sent, creates an order or calls Workshop. ZIP contains versioned allowlisted manifest and only verified production-flagged files. Max manifest1MiB/package64MiB/30 production files; deterministic internal archive paths. */
+    post: operations['exportCrmProductionPackage'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quotes/{quoteId}/production-packages/{packageId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        quoteId: string;
+        packageId: string;
+      };
+      cookie?: never;
+    };
+    get: operations['getCrmProductionPackage'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quotes/{quoteId}/production-packages/{packageId}/content': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        quoteId: string;
+        packageId: string;
+      };
+      cookie?: never;
+    };
+    /** @description Private application/zip bytes, no-store/private and nosniff, opaque production-{packageId}.zip filename. Length/hash are reverified. Historical download never recalculates or fetches current masters. */
+    get: operations['downloadCrmProductionPackage'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quotes/{quoteId}/deliveries': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        quoteId: string;
+      };
+      cookie?: never;
+    };
+    /** Read authorized bounded version-specific delivery history */
+    get: operations['getCrmQuoteDeliveries'];
+    put?: never;
+    /**
+     * Explicitly queue one pinned public email and PDF
+     * @description Current owner/Admin; exact current issued version and intact successful private PDF. Subject/body/PDF/provider/sender are server-owned. Replay verifies current authorization, returns the same delivery with its current status; changed input conflicts. Queue is not sent. Disabled or missing OAuth readiness returns503. No implicit retry after uncertain outcome. A fresh requestId cannot bypass a pending or unknown delivery for the same quote/version and case-insensitive recipient: returns409 delivery_unresolved_attempt_exists. Exact-key replay is allowed; only confirmed terminal outcomes permit a fresh explicit same-recipient request.
+     */
+    post: operations['enqueueCrmQuoteDelivery'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quotes/{quoteId}/deliveries/{deliveryId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        quoteId: string;
+        deliveryId: string;
+      };
+      cookie?: never;
+    };
+    /** Read current authorized state for one immutable delivery */
+    get: operations['getCrmQuoteDelivery'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quote-templates': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['getCrmQuoteTemplates'];
+    put?: never;
+    post: operations['createCrmQuoteTemplate'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quote-templates/{templateId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        templateId: string;
+      };
+      cookie?: never;
+    };
+    get: operations['getCrmQuoteTemplate'];
+    put: operations['reviseCrmQuoteTemplate'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quote-templates/{templateId}/apply': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        templateId: string;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Explicitly applies an immutable selected version to a NEW private TS-006 draft, without calculation. No historical supplier prices/private notes/artwork are copied. Applications require fresh sale approval. The selected customer-facing introduction is returned alongside the draft; the immutable version remains its source. */
+    post: operations['applyCrmQuoteTemplate'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quote-templates/{templateId}/archive': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        templateId: string;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put: operations['setCrmQuoteTemplateArchived'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/files': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Stage one actual private file under an accessible draft. Actor is server-owned. Upload does not finalize/link the file. Reuse the same requestId and identical content after an uncertain response. */
+    post: operations['uploadCrmPrivateFile'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/files/{fileId}/content': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        fileId: string;
+      };
+      cookie?: never;
+    };
+    /** @description Only finalized current or exact immutable version content. quoteId requires versionId and authorizes only that version pinned in the currently assigned quote. Private/no-store and nosniff headers; generic GUID filename. */
+    get: operations['getCrmPrivateFileContent'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/custom-sewing/{draftId}/files': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        draftId: string;
+      };
+      cookie?: never;
+    };
+    /** @description At most30 finalized file selections. Optional versionId returns immutable flags and metadata; optional quoteId limits access to that exact version pinned in an assigned quote. */
+    get: operations['getCrmCustomSewingFiles'];
+    /** @description Explicitly finalize/replace current draft links with independent showInQuote/production flags. Root revision and journal update atomically; existing versions remain unchanged. Actual verified uploaded bytes are required. */
+    put: operations['setCrmCustomSewingFiles'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/issuer-settings': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get the active verified issuer and document template pair
+     * @description Admin and Manager can read approved active settings. Active is null until an Admin creates and activates a pair.
+     */
+    get: operations['getCrmIssuerSettings'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/issuer-settings/versions': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Create immutable issuer and document template versions
+     * @description Admin only. Creating a version does not activate it or make a draft ready.
+     */
+    post: operations['createCrmIssuerSettingsVersion'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/issuer-settings/active': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Activate a matching issuer and template version pair
+     * @description Admin only. Expected revision arbitrates concurrent active pointer changes.
+     */
+    put: operations['activateCrmIssuerSettings'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2019,14 +2677,16 @@ export interface components {
       largeWholesale: number;
       reason: string;
     };
-    /** @description sewing requires productId and articleId; ppe requires productId and no articleId; oneOffPpe requires manualPrices and no catalog reference. Only ppe may carry an override. Server validates discriminator rules. */
+    /** @description sewing requires productId and articleId; ppe requires productId and no articleId; oneOffPpe requires manualPrices and no catalog reference. Only ppe may carry an override. customSewing requires customVersionPublicId only; the server hydrates its immutable saved composition and prices. Server validates discriminator rules. */
     CrmQuotePriceIntent: {
       /** @enum {string} */
-      kind: 'sewing' | 'ppe' | 'oneOffPpe';
+      kind: 'sewing' | 'ppe' | 'oneOffPpe' | 'customSewing';
       productId?: number | null;
       /** Format: int64 */
       articleId?: number | null;
       override?: components['schemas']['CrmQuotePriceOverride'] | null;
+      /** Format: uuid */
+      customVersionPublicId?: string | null;
       manualPrices?: components['schemas']['CrmQuoteManualPrices'] | null;
     };
     CrmQuoteTierVisibilityInput: {
@@ -2069,6 +2729,94 @@ export interface components {
       recipientName?: string | null;
       content: components['schemas']['CrmQuoteDraftContent'];
     };
+    CrmCustomMaterial: {
+      referenceId: number;
+      quantity: number;
+      unit: string;
+    };
+    CrmCustomOperation: {
+      referenceId: number;
+      quantity: number;
+      manualMinutes?: number | null;
+    };
+    CrmCustomApplication: {
+      /** @enum {string} */
+      kind: 'embroidery' | 'print';
+      location: string;
+      /** Format: uuid */
+      artworkFileId?: string | null;
+      cost: number;
+      saleAmount: number;
+      saleApproved: boolean;
+    };
+    CrmCustomConfiguration: {
+      name: string;
+      productType: string;
+      /** @enum {string} */
+      season: 'summer' | 'winter';
+      description: string;
+      clientComment: string;
+      internalNote: string;
+      fabrics: components['schemas']['CrmCustomMaterial'][];
+      accessories: components['schemas']['CrmCustomMaterial'][];
+      operations: components['schemas']['CrmCustomOperation'][];
+      applications: components['schemas']['CrmCustomApplication'][];
+      delivery: number;
+      packaging: number;
+    };
+    CrmCustomReferenceBasis: {
+      key: string;
+      /** Format: int64 */
+      versionId: number;
+      value: number | null;
+      unit: string;
+      sourceCode: string;
+    };
+    CrmCustomCostBreakdown: {
+      materials: number;
+      otherCosts: number;
+      totalMinutes: number;
+      minuteCost: number;
+      seamstress: number;
+      cutting: number;
+      master: number;
+      manager: number;
+      bonus: number;
+      overhead: number;
+      delivery: number;
+      packaging: number;
+      applicationCost: number;
+      applicationSale: number;
+    };
+    CrmCustomPriceBasis: {
+      /** Format: uuid */
+      token: string;
+      /** Format: date-time */
+      calculatedAt: string;
+      /** Format: date-time */
+      expiresAt: string;
+      /** @constant */
+      formulaVersion: 'custom-sewing-sheet-v1';
+      /** Format: int64 */
+      settingsVersionId: number | null;
+      references: components['schemas']['CrmCustomReferenceBasis'][];
+      breakdown: components['schemas']['CrmCustomCostBreakdown'] | null;
+      internalCost: number | null;
+      retail: number | null;
+      wholesale: number | null;
+      largeWholesale: number | null;
+      blockers: string[];
+      isCalculated: boolean;
+    };
+    CrmQuoteCustomVersionSnapshot: {
+      /** Format: uuid */
+      draftPublicId: string;
+      /** Format: uuid */
+      versionPublicId: string;
+      number: number;
+      configuration: components['schemas']['CrmCustomConfiguration'];
+      basis: components['schemas']['CrmCustomPriceBasis'];
+    };
     CrmQuoteCatalogPrice: {
       /** @enum {string} */
       kind: 'sewing' | 'ppe';
@@ -2098,6 +2846,7 @@ export interface components {
       /** Format: date-time */
       expiresAt: string;
       intent: components['schemas']['CrmQuotePriceIntent'];
+      customVersion?: components['schemas']['CrmQuoteCustomVersionSnapshot'] | null;
       source?: components['schemas']['CrmQuoteCatalogPrice'] | null;
       retail: number | null;
       wholesale: number | null;
@@ -2106,7 +2855,7 @@ export interface components {
       /** @constant */
       currency: 'UAH';
       /** @enum {string} */
-      taxBasis: 'catalog_no_extra_vat' | 'manual_no_extra_vat';
+      taxBasis: 'catalog_no_extra_vat' | 'manual_no_extra_vat' | 'custom_no_extra_vat';
     };
     CrmQuoteTierView: {
       /** @enum {string} */
@@ -2233,7 +2982,14 @@ export interface components {
       versionNumber: number;
       /** @enum {string} */
       action:
-        'created' | 'edited' | 'recalculated' | 'copied' | 'transferred' | 'archived' | 'restored';
+        | 'created'
+        | 'edited'
+        | 'recalculated'
+        | 'copied'
+        | 'transferred'
+        | 'archived'
+        | 'restored'
+        | 'readied';
       actorId: number;
       ownerId: number;
       previousOwnerId: number | null;
@@ -2283,6 +3039,581 @@ export interface components {
       expectedRevision: number;
       archived: boolean;
       reason: string;
+    };
+    CrmPrepareQuoteRequest: {
+      /** Format: uuid */
+      requestId: string;
+      /** Format: int64 */
+      expectedRevision: number;
+      /** Format: uuid */
+      versionId: string;
+    };
+    QuotePdfArtifact: {
+      /** Format: uuid */
+      artifactId: string;
+      /** @enum {string} */
+      status: 'queued' | 'processing' | 'succeeded' | 'failed';
+      sha256: string | null;
+      /** Format: int64 */
+      length: number | null;
+      errorCode: string | null;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+      /** Format: date-time */
+      generatedAt: string | null;
+    };
+    CrmCreateCustomDraftRequest: {
+      /** Format: uuid */
+      requestId: string;
+      /** Format: uuid */
+      customerPublicId?: string | null;
+      /** Format: uuid */
+      quotePublicId?: string | null;
+      configuration: components['schemas']['CrmCustomConfiguration'];
+    };
+    CrmCustomVersion: {
+      /** Format: uuid */
+      publicId: string;
+      number: number;
+      /** Format: uuid */
+      parentVersionId: string | null;
+      configuration: components['schemas']['CrmCustomConfiguration'];
+      basis: components['schemas']['CrmCustomPriceBasis'];
+      actorId: number;
+      /** Format: date-time */
+      createdAt: string;
+    };
+    CrmCustomDetail: {
+      /** Format: uuid */
+      publicId: string;
+      /** Format: int64 */
+      revision: number;
+      ownerId: number;
+      /** Format: uuid */
+      customerPublicId: string | null;
+      /** Format: uuid */
+      quotePublicId: string | null;
+      configuration: components['schemas']['CrmCustomConfiguration'];
+      currentVersion: components['schemas']['CrmCustomVersion'] | null;
+      preview: components['schemas']['CrmCustomPriceBasis'] | null;
+      /** Format: date-time */
+      updatedAt: string;
+      canEdit: boolean;
+      templateOrigin?: {
+        /** Format: uuid */
+        templatePublicId: string;
+        /** Format: uuid */
+        versionPublicId: string;
+        introduction: string;
+      } | null;
+    };
+    CrmSaveCustomDraftRequest: {
+      /** Format: uuid */
+      requestId: string;
+      /** Format: int64 */
+      expectedRevision: number;
+      configuration: components['schemas']['CrmCustomConfiguration'];
+    };
+    CrmCalculateCustomRequest: {
+      /** Format: uuid */
+      requestId: string;
+      /** Format: int64 */
+      expectedRevision: number;
+    };
+    CrmCustomVersionSummary: {
+      /** Format: uuid */
+      publicId: string;
+      number: number;
+      /** Format: uuid */
+      parentVersionId: string | null;
+      name: string;
+      actorId: number;
+      /** Format: date-time */
+      createdAt: string;
+    };
+    CrmCustomVersionPage: {
+      value: components['schemas']['CrmCustomVersionSummary'][];
+      pagedInfo: components['schemas']['CrmPagedInfo'];
+    };
+    CrmSaveCustomVersionRequest: {
+      /** Format: uuid */
+      requestId: string;
+      /** Format: int64 */
+      expectedRevision: number;
+      /** Format: uuid */
+      basisToken: string;
+    };
+    CrmSuggestionNorm: {
+      /** @enum {string} */
+      kind: 'accessory' | 'operation';
+      referenceId: number;
+      /** @description For operations, Operations means the operation quantity multiplier; manualMinutes is a separate explicit duration override. Accessory units come from approved reference rows. */
+      unit: string;
+      manualMinutes: number | null;
+      sampleSize: number;
+      minimumQuantity: number;
+      maximumQuantity: number;
+      varyingNorm: boolean;
+      quantity: number;
+    };
+    CrmSewingSuggestions: {
+      /** @enum {string} */
+      productType: 'Напівкомбінезон' | 'Комбінезон' | 'Куртка' | 'Штани' | 'Жилет' | 'Костюм';
+      /** @enum {string} */
+      season: 'summer' | 'winter';
+      sampleSize: number;
+      norms: components['schemas']['CrmSuggestionNorm'][];
+      sourceLimitReached: boolean;
+    };
+    CrmIntroductionTemplateSummary: {
+      /** Format: uuid */
+      templatePublicId: string;
+      ownerId: number;
+      /** Format: int64 */
+      revision: number;
+      archived: boolean;
+      /** Format: uuid */
+      versionPublicId: string;
+      versionNumber: number;
+      name: string;
+      /** Format: date-time */
+      updatedAt: string;
+    };
+    CrmIntroductionTemplatePage: {
+      value: components['schemas']['CrmIntroductionTemplateSummary'][];
+      pagedInfo: components['schemas']['CrmPagedInfo'];
+    };
+    CrmIntroductionSlotInput: {
+      /** @enum {integer} */
+      slotUid: 100 | 101 | 102 | 103 | 200 | 201 | 202 | 203;
+      productId: number;
+      /** Format: int64 */
+      articleId: number;
+    };
+    CrmCreateIntroductionTemplateRequest: {
+      /** Format: uuid */
+      requestId: string;
+      name: string;
+      /** @enum {string} */
+      layout: 'general' | 'summer' | 'winter';
+      /** Format: uuid */
+      emailTemplateVersionId: string;
+      selections: components['schemas']['CrmIntroductionSlotInput'][];
+      expectedRevision?: null;
+    };
+    CrmIntroductionSlot: {
+      /**
+       * @description Runtime numeric enum: 0=Summer, 1=Winter.
+       * @enum {integer}
+       */
+      season: 0 | 1;
+      position: number;
+      /** @enum {integer} */
+      uid: 100 | 101 | 102 | 103 | 200 | 201 | 202 | 203;
+    };
+    CrmIntroductionSelection: {
+      slot: components['schemas']['CrmIntroductionSlot'];
+      productId: number;
+      /** Format: int64 */
+      articleId: number;
+    };
+    CrmIntroductionSelectionSnapshot: {
+      /**
+       * @description Runtime numeric enum: 0=General, 1=Summer, 2=Winter.
+       * @enum {integer}
+       */
+      layout: 0 | 1 | 2;
+      /** Format: uuid */
+      mappingVersionId: string;
+      /** Format: uuid */
+      emailTemplateVersionId: string;
+      selections: components['schemas']['CrmIntroductionSelection'][];
+    };
+    CrmIntroductionTemplateDetail: {
+      /** Format: uuid */
+      templatePublicId: string;
+      ownerId: number;
+      /** Format: int64 */
+      revision: number;
+      archived: boolean;
+      /** Format: uuid */
+      versionPublicId: string;
+      versionNumber: number;
+      name: string;
+      /** Format: date-time */
+      updatedAt: string;
+      snapshot: components['schemas']['CrmIntroductionSelectionSnapshot'];
+    };
+    CrmReviseIntroductionTemplateRequest: {
+      /** Format: uuid */
+      requestId: string;
+      name: string;
+      /** @enum {string} */
+      layout: 'general' | 'summer' | 'winter';
+      /** Format: uuid */
+      emailTemplateVersionId: string;
+      selections: components['schemas']['CrmIntroductionSlotInput'][];
+      /** Format: int64 */
+      expectedRevision: number;
+    };
+    CrmArchiveIntroductionTemplateRequest: {
+      /** Format: uuid */
+      requestId: string;
+      /** Format: int64 */
+      expectedRevision: number;
+      archived: boolean;
+    };
+    CrmIntroductionPreparedSlot: {
+      selection: components['schemas']['CrmIntroductionSelection'];
+      modelName: string;
+      fabricName: string;
+      fabricComposition: string;
+      fabricDensity: string;
+      productUrl: string;
+      largeWholesale: number;
+      currentPrice: components['schemas']['CrmQuoteCatalogPrice'];
+    };
+    CrmIntroductionPreparedDraft: {
+      /**
+       * @description Runtime numeric enum: 0=General, 1=Summer, 2=Winter.
+       * @enum {integer}
+       */
+      layout: 0 | 1 | 2;
+      /** Format: uuid */
+      mappingVersionId: string;
+      /** Format: uuid */
+      emailTemplateVersionId: string;
+      slots: components['schemas']['CrmIntroductionPreparedSlot'][];
+    };
+    CrmApplyIntroductionTemplateRequest: {
+      /** Format: uuid */
+      requestId: string;
+      /** Format: uuid */
+      versionId?: string | null;
+      /** Format: uuid */
+      customerPublicId?: string | null;
+      /** Format: uuid */
+      contactPublicId?: string | null;
+      recipientName?: string | null;
+    };
+    CrmIntroductionFeaturedMapping: {
+      /** Format: uuid */
+      versionId: string;
+      summerProductId: number;
+      winterProductId: number;
+    };
+    CrmIntroductionFeaturedMappingRequest: {
+      snapshotHash: string;
+      summerModelCode: string;
+      winterModelCode: string;
+    };
+    CrmEmailTemplateSummary: {
+      /** Format: uuid */
+      versionId: string;
+      number: number;
+      name: string;
+      subject: string;
+      /** Format: date-time */
+      createdAt: string;
+    };
+    CrmEmailTemplatePage: {
+      value: components['schemas']['CrmEmailTemplateSummary'][];
+      pagedInfo: components['schemas']['CrmPagedInfo'];
+    };
+    CrmCreateEmailTemplateRequest: {
+      /** Format: uuid */
+      requestId: string;
+      name: string;
+      subject: string;
+      body: string;
+    };
+    CrmEmailTemplateDetail: {
+      /** Format: uuid */
+      versionId: string;
+      number: number;
+      name: string;
+      subject: string;
+      body: string;
+      /** Format: date-time */
+      createdAt: string;
+    };
+    CrmEmailTemplateSettings: {
+      /** Format: int64 */
+      revision: number;
+      active: components['schemas']['CrmEmailTemplateDetail'] | null;
+    };
+    CrmActivateEmailTemplateRequest: {
+      /** Format: uuid */
+      requestId: string;
+      /** Format: int64 */
+      expectedRevision: number;
+      /** Format: uuid */
+      versionId: string;
+    };
+    CrmExportProductionPackageRequest: {
+      /** Format: uuid */
+      requestId: string;
+      /** Format: uuid */
+      versionId: string;
+      variantIds: string[];
+    };
+    CrmProductionPackageDetail: {
+      /** Format: uuid */
+      packageId: string;
+      /** Format: uuid */
+      quoteId: string;
+      /** Format: uuid */
+      versionId: string;
+      /** @constant */
+      schemaVersion: 1;
+      sha256: string;
+      /** Format: int64 */
+      length: number;
+      /** @constant */
+      contentType: 'application/zip';
+      /** Format: date-time */
+      createdAt: string;
+    };
+    QuoteDeliveryDetail: {
+      /** Format: uuid */
+      deliveryId: string;
+      /** Format: uuid */
+      quoteId: string;
+      /** Format: uuid */
+      versionId: string;
+      /** Format: uuid */
+      artifactId: string;
+      /** Format: uuid */
+      emailTemplateVersionId: string;
+      recipientAddress: string;
+      /** @enum {string} */
+      status: 'queued' | 'sending' | 'reconciling' | 'unknown' | 'succeeded' | 'failed';
+      attempt: number;
+      errorCode?: string | null;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+      /** Format: date-time */
+      confirmedAt?: string | null;
+    };
+    EnqueueQuoteDeliveryRequest: {
+      /** Format: uuid */
+      requestId: string;
+      /** Format: uuid */
+      versionId: string;
+      /** Format: uuid */
+      artifactId: string;
+      /** Format: uuid */
+      emailTemplateVersionId: string;
+      /** Format: int64 */
+      expectedRevision: number;
+      /** Format: email */
+      recipientAddress: string;
+      managerName: string;
+    };
+    CrmTemplateSummary: {
+      /** Format: uuid */
+      publicId: string;
+      ownerId: number;
+      /** Format: int64 */
+      revision: number;
+      archived: boolean;
+      /** @enum {string} */
+      kind: 'customConfiguration';
+      versionNumber: number;
+      name: string;
+      productType: string;
+      season: string;
+      /** Format: date-time */
+      updatedAt: string;
+    };
+    CrmTemplatePage: {
+      value: components['schemas']['CrmTemplateSummary'][];
+      pagedInfo: {
+        pageNumber: number;
+        pageSize: number;
+        totalPages: number;
+        totalRecords: number;
+      };
+    };
+    CrmTemplateApplication: {
+      /** @enum {string} */
+      kind: 'embroidery' | 'print';
+      location: string;
+    };
+    CrmTemplateSelections: {
+      name: string;
+      productType: string;
+      /** @enum {string} */
+      season: 'summer' | 'winter';
+      description: string;
+      clientComment: string;
+      fabrics: components['schemas']['CrmCustomMaterial'][];
+      accessories: components['schemas']['CrmCustomMaterial'][];
+      operations: components['schemas']['CrmCustomOperation'][];
+      applications: components['schemas']['CrmTemplateApplication'][];
+    };
+    CrmCreateTemplateRequest: {
+      /** Format: uuid */
+      requestId: string;
+      /** @enum {string} */
+      kind: 'customConfiguration';
+      introduction: string;
+      selections: components['schemas']['CrmTemplateSelections'];
+    };
+    CrmTemplateDetail: {
+      /** Format: uuid */
+      publicId: string;
+      ownerId: number;
+      /** Format: int64 */
+      revision: number;
+      archived: boolean;
+      /** @enum {string} */
+      kind: 'customConfiguration';
+      /** Format: uuid */
+      versionId: string;
+      versionNumber: number;
+      introduction: string;
+      selections: components['schemas']['CrmTemplateSelections'];
+      /** Format: date-time */
+      updatedAt: string;
+      canEdit: boolean;
+    };
+    CrmReviseTemplateRequest: {
+      /** Format: uuid */
+      requestId: string;
+      /** Format: int64 */
+      expectedRevision: number;
+      /** @enum {string} */
+      kind: 'customConfiguration';
+      introduction: string;
+      selections: components['schemas']['CrmTemplateSelections'];
+    };
+    CrmApplyTemplateRequest: {
+      /** Format: uuid */
+      requestId: string;
+      /** Format: int64 */
+      expectedRevision: number;
+      /** Format: uuid */
+      versionId: string;
+      /** Format: uuid */
+      customerPublicId?: string | null;
+      /** Format: uuid */
+      quotePublicId?: string | null;
+    };
+    CrmAppliedTemplate: {
+      draft: components['schemas']['CrmCustomDetail'];
+      /** Format: uuid */
+      templateVersionId: string;
+      introduction: string;
+    };
+    CrmArchiveTemplateRequest: {
+      /** Format: uuid */
+      requestId: string;
+      /** Format: int64 */
+      expectedRevision: number;
+      archived: boolean;
+    };
+    CrmPrivateFile: {
+      /** Format: uuid */
+      publicId: string;
+      /** Format: uuid */
+      draftId: string;
+      /** @enum {string} */
+      contentType: 'application/pdf' | 'image/jpeg' | 'image/png';
+      /** Format: int64 */
+      length: number;
+      sha256: string;
+      /** @enum {string} */
+      state: 'Uploaded';
+      /**
+       * Format: date-time
+       * @description Temporary unattached expiry only. Finalized or historical referenced bytes are retained.
+       */
+      expiresAt: string;
+      showInQuote: boolean;
+      production: boolean;
+      isFinalized: boolean;
+    };
+    CrmCustomFileSelection: {
+      /** Format: uuid */
+      fileId: string;
+      showInQuote: boolean;
+      production: boolean;
+    };
+    CrmSetCustomFilesRequest: {
+      /** Format: uuid */
+      requestId: string;
+      /** Format: int64 */
+      expectedRevision: number;
+      files: components['schemas']['CrmCustomFileSelection'][];
+    };
+    CrmIssuerSettingsInput: {
+      legalName: string;
+      edrpou: string;
+      taxId: string;
+      iban: string;
+      address: string;
+      phone: string;
+      /** Format: email */
+      email: string;
+      /** Format: uri */
+      site: string;
+      bankName?: string | null;
+      mfo?: string | null;
+      /**
+       * @description Server-managed logical asset key; no arbitrary URL or path is accepted.
+       * @enum {string|null}
+       */
+      logoAssetKey?: 'brevi-wordmark' | null;
+    };
+    CrmDocumentTemplateInput: {
+      /** @enum {string} */
+      layoutKey: 'standard';
+      title: string;
+      vatNotice: string;
+      openingText: string;
+      ctaTitle: string;
+      ctaText: string;
+      ctaContactTemplate: string;
+    };
+    CrmIssuerSettingsDetail: {
+      /** Format: int64 */
+      revision: number;
+      isActive: boolean;
+      /** Format: uuid */
+      issuerVersionId: string;
+      /** Format: uuid */
+      templateVersionId: string;
+      versionNumber: number;
+      issuer: components['schemas']['CrmIssuerSettingsInput'];
+      template: components['schemas']['CrmDocumentTemplateInput'];
+      /** Format: date-time */
+      createdAt: string;
+    };
+    CrmActiveIssuerSettings: {
+      /** Format: int64 */
+      revision: number;
+      active: components['schemas']['CrmIssuerSettingsDetail'] | null;
+    };
+    CrmCreateIssuerSettingsVersionRequest: {
+      /** Format: uuid */
+      requestId: string;
+      issuer: components['schemas']['CrmIssuerSettingsInput'];
+      template: components['schemas']['CrmDocumentTemplateInput'];
+    };
+    CrmActivateIssuerSettingsRequest: {
+      /** Format: uuid */
+      requestId: string;
+      /** Format: int64 */
+      expectedRevision: number;
+      /** Format: uuid */
+      issuerVersionId: string;
+      /** Format: uuid */
+      templateVersionId: string;
     };
   };
   responses: {
@@ -2360,6 +3691,8 @@ export interface components {
     ProductId: number;
     'parameters-ProductId': number;
     ArticleId: number;
+    QuoteId: string;
+    ArtifactId: string;
   };
   requestBodies: never;
   headers: never;
@@ -5843,6 +7176,2636 @@ export interface operations {
         content?: never;
       };
       /** @description Revision, price source, blocked basis or requestId conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  prepareCrmQuote: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        quoteId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmPrepareQuoteRequest'];
+      };
+    };
+    responses: {
+      /** @description Current ready quote and pinned version/number. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmQuoteDetail'];
+        };
+      };
+      /** @description Invalid request or ready blocker (recipient, settings, price or logo). */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Missing or inaccessible quote. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Revision, version, state or requestId conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  renderCrmQuotePdf: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        quoteId: components['parameters']['QuoteId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: uuid */
+          versionId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Existing successful artifact */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['QuotePdfArtifact'];
+        };
+      };
+      /** @description Queued or processing artifact */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['QuotePdfArtifact'];
+        };
+      };
+      /** @description Invalid request */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Quote or issued version not found in actor scope */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Conflicting artifact request */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmQuotePdfArtifact: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        quoteId: components['parameters']['QuoteId'];
+        artifactId: components['parameters']['ArtifactId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Artifact metadata; PDF bytes are excluded */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['QuotePdfArtifact'];
+        };
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Artifact not found in actor quote scope */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  downloadCrmQuotePdfArtifact: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        quoteId: components['parameters']['QuoteId'];
+        artifactId: components['parameters']['ArtifactId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Exact stored successful PDF */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/pdf': string;
+        };
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Artifact or stored bytes not found in actor quote scope */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Generation is incomplete */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createCrmCustomSewingDraft: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmCreateCustomDraftRequest'];
+      };
+    };
+    responses: {
+      /** @description Scoped immutable or draft result. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmCustomDetail'];
+        };
+      };
+      /** @description Malformed request or pagination. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin/Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Missing or inaccessible resource. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Revision, replay, expired token or changed source conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Invalid composition or blocked calculation. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmCustomSewingDraft: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        draftId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Scoped immutable or draft result. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmCustomDetail'];
+        };
+      };
+      /** @description Malformed request or pagination. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin/Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Missing or inaccessible resource. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Revision, replay, expired token or changed source conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Invalid composition or blocked calculation. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  saveCrmCustomSewingDraft: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        draftId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmSaveCustomDraftRequest'];
+      };
+    };
+    responses: {
+      /** @description Scoped immutable or draft result. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmCustomDetail'];
+        };
+      };
+      /** @description Malformed request or pagination. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin/Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Missing or inaccessible resource. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Revision, replay, expired token or changed source conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Invalid composition or blocked calculation. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  calculateCrmCustomSewing: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        draftId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmCalculateCustomRequest'];
+      };
+    };
+    responses: {
+      /** @description Scoped immutable or draft result. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmCustomDetail'];
+        };
+      };
+      /** @description Malformed request or pagination. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin/Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Missing or inaccessible resource. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Revision, replay, expired token or changed source conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Invalid composition or blocked calculation. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmCustomSewingVersions: {
+    parameters: {
+      query?: {
+        page?: number;
+        pageSize?: number;
+      };
+      header?: never;
+      path: {
+        draftId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Scoped immutable or draft result. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmCustomVersionPage'];
+        };
+      };
+      /** @description Malformed request or pagination. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin/Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Missing or inaccessible resource. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Revision, replay, expired token or changed source conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Invalid composition or blocked calculation. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  saveCrmCustomSewingVersion: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        draftId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmSaveCustomVersionRequest'];
+      };
+    };
+    responses: {
+      /** @description Scoped immutable or draft result. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmCustomDetail'];
+        };
+      };
+      /** @description Malformed request or pagination. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin/Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Missing or inaccessible resource. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Revision, replay, expired token or changed source conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Invalid composition or blocked calculation. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmCustomSewingVersion: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        draftId: string;
+        versionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Scoped immutable or draft result. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmCustomVersion'];
+        };
+      };
+      /** @description Malformed request or pagination. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin/Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Missing or inaccessible resource. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Revision, replay, expired token or changed source conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Invalid composition or blocked calculation. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmSewingSuggestions: {
+    parameters: {
+      query: {
+        productType: 'Напівкомбінезон' | 'Комбінезон' | 'Куртка' | 'Штани' | 'Жилет' | 'Костюм';
+        season: 'summer' | 'winter';
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmSewingSuggestions'];
+        };
+      };
+      /** @description Invalid request or unsupported kind/filter */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role denied */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Missing or inaccessible template/version */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Revision, requestId payload, archive or concurrent mutation conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmIntroductionTemplates: {
+    parameters: {
+      query?: {
+        includeArchived?: boolean;
+        page?: number;
+        pageSize?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmIntroductionTemplatePage'];
+        };
+      };
+      /** @description Malformed input or business validation blockers; existing Result mapping uses 400. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role or actor denied */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createCrmIntroductionTemplate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmCreateIntroductionTemplateRequest'];
+      };
+    };
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmIntroductionTemplateDetail'];
+        };
+      };
+      /** @description Malformed input or business validation blockers; existing Result mapping uses 400. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role or actor denied */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Revision, requestId payload, archive, active mapping or price source conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmIntroductionTemplate: {
+    parameters: {
+      query?: {
+        /** @description Optional exact immutable version; absent selects current. */
+        versionId?: string;
+      };
+      header?: never;
+      path: {
+        templateId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmIntroductionTemplateDetail'];
+        };
+      };
+      /** @description Malformed input or business validation blockers; existing Result mapping uses 400. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role or actor denied */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Absent or inaccessible resource */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  reviseCrmIntroductionTemplate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        templateId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmReviseIntroductionTemplateRequest'];
+      };
+    };
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmIntroductionTemplateDetail'];
+        };
+      };
+      /** @description Malformed input or business validation blockers; existing Result mapping uses 400. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role or actor denied */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Absent or inaccessible resource */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Revision, requestId payload, archive, active mapping or price source conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  setCrmIntroductionTemplateArchived: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        templateId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmArchiveIntroductionTemplateRequest'];
+      };
+    };
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmIntroductionTemplateDetail'];
+        };
+      };
+      /** @description Malformed input or business validation blockers; existing Result mapping uses 400. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role or actor denied */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Absent or inaccessible resource */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Revision, requestId payload, archive, active mapping or price source conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  checkCrmIntroductionTemplate: {
+    parameters: {
+      query?: {
+        /** @description Optional exact immutable version; absent selects current. */
+        versionId?: string;
+      };
+      header?: never;
+      path: {
+        templateId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmIntroductionPreparedDraft'];
+        };
+      };
+      /** @description Malformed input or business validation blockers; existing Result mapping uses 400. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role or actor denied */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Absent or inaccessible resource */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Revision, requestId payload, archive, active mapping or price source conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  applyCrmIntroductionTemplate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        templateId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmApplyIntroductionTemplateRequest'];
+      };
+    };
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmQuoteDetail'];
+        };
+      };
+      /** @description Malformed input or business validation blockers; existing Result mapping uses 400. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role or actor denied */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Absent or inaccessible resource */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Revision, requestId payload, archive, active mapping or price source conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmIntroductionFeaturedMapping: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmIntroductionFeaturedMapping'];
+        };
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role or actor denied */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Absent or inaccessible resource */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  activateCrmIntroductionFeaturedMapping: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmIntroductionFeaturedMappingRequest'];
+      };
+    };
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmIntroductionFeaturedMapping'];
+        };
+      };
+      /** @description Malformed input or business validation blockers; existing Result mapping uses 400. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role or actor denied */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmEmailTemplates: {
+    parameters: {
+      query?: {
+        page?: number;
+        pageSize?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmEmailTemplatePage'];
+        };
+      };
+      /** @description Malformed request, invalid placeholder/text/header or pagination */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role/actor denied */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createCrmEmailTemplateVersion: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmCreateEmailTemplateRequest'];
+      };
+    };
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmEmailTemplateDetail'];
+        };
+      };
+      /** @description Malformed request, invalid placeholder/text/header or pagination */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role/actor denied */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Revision or requestId payload conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmEmailTemplateVersion: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        versionId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmEmailTemplateDetail'];
+        };
+      };
+      /** @description Malformed request, invalid placeholder/text/header or pagination */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role/actor denied */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Version missing */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmActiveEmailTemplate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmEmailTemplateSettings'];
+        };
+      };
+      /** @description Malformed request, invalid placeholder/text/header or pagination */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role/actor denied */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  activateCrmEmailTemplate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmActivateEmailTemplateRequest'];
+      };
+    };
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmEmailTemplateSettings'];
+        };
+      };
+      /** @description Malformed request, invalid placeholder/text/header or pagination */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role/actor denied */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Version missing */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Revision or requestId payload conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  exportCrmProductionPackage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        quoteId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmExportProductionPackageRequest'];
+      };
+    };
+    responses: {
+      /** @description Pinned immutable production artifact; no Workshop call/order creation. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmProductionPackageDetail'];
+        };
+      };
+      /** @description Invalid selection, no eligible custom version, missing immutable operation basis, invalid/missing source file or package bounds exceeded. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role denied */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Missing or inaccessible quote, version or artifact. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description RequestId payload conflict, archived quote, unissued version or stored artifact integrity conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmProductionPackage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        quoteId: string;
+        packageId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Pinned immutable production artifact; no Workshop call/order creation. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmProductionPackageDetail'];
+        };
+      };
+      /** @description Invalid selection, no eligible custom version, missing immutable operation basis, invalid/missing source file or package bounds exceeded. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role denied */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Missing or inaccessible quote, version or artifact. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description RequestId payload conflict, archived quote, unissued version or stored artifact integrity conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  downloadCrmProductionPackage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        quoteId: string;
+        packageId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Pinned immutable production artifact; no Workshop call/order creation. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/zip': string;
+        };
+      };
+      /** @description Invalid selection, no eligible custom version, missing immutable operation basis, invalid/missing source file or package bounds exceeded. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role denied */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Missing or inaccessible quote, version or artifact. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description RequestId payload conflict, archived quote, unissued version or stored artifact integrity conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmQuoteDeliveries: {
+    parameters: {
+      query?: {
+        page?: number;
+        pageSize?: number;
+      };
+      header?: never;
+      path: {
+        quoteId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Bounded delivery state history; no email body/PDF/token */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            value: components['schemas']['QuoteDeliveryDetail'][];
+            pagedInfo: {
+              /** Format: int64 */
+              pageNumber?: number;
+              /** Format: int64 */
+              pageSize?: number;
+              /** Format: int64 */
+              totalPages?: number;
+              /** Format: int64 */
+              totalRecords?: number;
+            };
+          };
+        };
+      };
+      /** @description Invalid bounded request or pagination */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication required */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role denied */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Missing or inaccessible quote/delivery */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  enqueueCrmQuoteDelivery: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        quoteId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['EnqueueQuoteDeliveryRequest'];
+      };
+    };
+    responses: {
+      /** @description One queued or replayed delivery */
+      202: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['QuoteDeliveryDetail'];
+        };
+      };
+      /** @description Invalid bounded request or pagination */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication required */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role denied */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Missing or inaccessible quote/delivery */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Revision, source or idempotency conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Sending readiness unavailable; no queue insertion */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmQuoteDelivery: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        quoteId: string;
+        deliveryId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Current state; succeeded means provider acceptance, not recipient receipt/read */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['QuoteDeliveryDetail'];
+        };
+      };
+      /** @description Authentication required */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role denied */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Missing or inaccessible quote/delivery */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmQuoteTemplates: {
+    parameters: {
+      query?: {
+        includeArchived?: boolean;
+        page?: number;
+        pageSize?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmTemplatePage'];
+        };
+      };
+      /** @description Invalid request or unsupported kind/filter */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role denied */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Missing or inaccessible template/version */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Revision, requestId payload, archive or concurrent mutation conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createCrmQuoteTemplate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmCreateTemplateRequest'];
+      };
+    };
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmTemplateDetail'];
+        };
+      };
+      /** @description Invalid request or unsupported kind/filter */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role denied */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Missing or inaccessible template/version */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Revision, requestId payload, archive or concurrent mutation conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmQuoteTemplate: {
+    parameters: {
+      query?: {
+        versionId?: string;
+      };
+      header?: never;
+      path: {
+        templateId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmTemplateDetail'];
+        };
+      };
+      /** @description Invalid request or unsupported kind/filter */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role denied */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Missing or inaccessible template/version */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Revision, requestId payload, archive or concurrent mutation conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  reviseCrmQuoteTemplate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        templateId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmReviseTemplateRequest'];
+      };
+    };
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmTemplateDetail'];
+        };
+      };
+      /** @description Invalid request or unsupported kind/filter */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role denied */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Missing or inaccessible template/version */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Revision, requestId payload, archive or concurrent mutation conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  applyCrmQuoteTemplate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        templateId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmApplyTemplateRequest'];
+      };
+    };
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmAppliedTemplate'];
+        };
+      };
+      /** @description Invalid request or unsupported kind/filter */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role denied */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Missing or inaccessible template/version */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Revision, requestId payload, archive or concurrent mutation conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  setCrmQuoteTemplateArchived: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        templateId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmArchiveTemplateRequest'];
+      };
+    };
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmTemplateDetail'];
+        };
+      };
+      /** @description Invalid request or unsupported kind/filter */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role denied */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Missing or inaccessible template/version */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Revision, requestId payload, archive or concurrent mutation conflict */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  uploadCrmPrivateFile: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'multipart/form-data': {
+          /** Format: uuid */
+          draftId: string;
+          /** Format: uuid */
+          requestId: string;
+          /** Format: binary */
+          file: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Success */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmPrivateFile'];
+        };
+      };
+      /** @description Malformed request, invalid selection or file limit. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role denied. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Missing or inaccessible root/file/version; unfinalized files are not downloadable. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Revision, requestId payload, expiration or lifecycle conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description File exceeds inclusive20MiB. */
+      413: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Only actual PDF/JPEG/PNG bytes matching canonical declared MIME are allowed. */
+      415: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Private byte storage unavailable; no public-media fallback. */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmPrivateFileContent: {
+    parameters: {
+      query?: {
+        versionId?: string;
+        quoteId?: string;
+      };
+      header?: never;
+      path: {
+        fileId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Verified private bytes, no-store. */
+      200: {
+        headers: {
+          'Cache-Control'?: 'private, no-store';
+          'X-Content-Type-Options'?: 'nosniff';
+          [name: string]: unknown;
+        };
+        content: {
+          'application/pdf': string;
+          'image/jpeg': string;
+          'image/png': string;
+        };
+      };
+      /** @description Malformed request, invalid selection or file limit. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role denied. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Missing or inaccessible root/file/version; unfinalized files are not downloadable. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Revision, requestId payload, expiration or lifecycle conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Private byte storage unavailable; no public-media fallback. */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmCustomSewingFiles: {
+    parameters: {
+      query?: {
+        versionId?: string;
+        quoteId?: string;
+      };
+      header?: never;
+      path: {
+        draftId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmPrivateFile'][];
+        };
+      };
+      /** @description Malformed request, invalid selection or file limit. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role denied. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Missing or inaccessible root/file/version; unfinalized files are not downloadable. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Revision, requestId payload, expiration or lifecycle conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Private byte storage unavailable; no public-media fallback. */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  setCrmCustomSewingFiles: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        draftId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmSetCustomFilesRequest'];
+      };
+    };
+    responses: {
+      /** @description Success */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmCustomDetail'];
+        };
+      };
+      /** @description Malformed request, invalid selection or file limit. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role denied. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Missing or inaccessible root/file/version; unfinalized files are not downloadable. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Revision, requestId payload, expiration or lifecycle conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Private byte storage unavailable; no public-media fallback. */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmIssuerSettings: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Active settings state */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmActiveIssuerSettings'];
+        };
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role denied */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createCrmIssuerSettingsVersion: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmCreateIssuerSettingsVersionRequest'];
+      };
+    };
+    responses: {
+      /** @description Immutable version pair */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmIssuerSettingsDetail'];
+        };
+      };
+      /** @description Malformed request or invalid verified values */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin required */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description requestId replay conflict or duplicate version */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  activateCrmIssuerSettings: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmActivateIssuerSettingsRequest'];
+      };
+    };
+    responses: {
+      /** @description Active settings state */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmActiveIssuerSettings'];
+        };
+      };
+      /** @description Malformed request or version pair mismatch */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin required */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Version missing */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Revision or requestId replay conflict */
       409: {
         headers: {
           [name: string]: unknown;
