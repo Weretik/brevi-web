@@ -22,6 +22,22 @@ function renderApp() {
   return render(<App router={router} />);
 }
 
+function expectEmptyGridPagination(pageSize: number) {
+  const main = within(screen.getByRole('main'));
+  // MUI hides this selector below sm; jsdom does not apply the desktop media query.
+  // Verify its labelled DOM contract separately from the always-visible actions.
+  const sizeSelector = main.getByLabelText('Рядків на сторінці:', {
+    selector: '[role="combobox"]',
+  });
+  expect(sizeSelector).toHaveTextContent(String(pageSize));
+  expect(main.getByText('0–0 з 0')).toBeVisible();
+  for (const name of ['Перейти на попередню сторінку', 'Перейти на наступну сторінку']) {
+    const button = main.getByRole('button', { name });
+    expect(button).toBeVisible();
+    expect(button).toBeDisabled();
+  }
+}
+
 afterEach(() => {
   cleanup();
   for (const router of routers.splice(0)) router.dispose();
@@ -116,6 +132,7 @@ describe('React Admin routing', () => {
     expect(screen.getByRole('main')).toHaveTextContent('Робочий простір адміністратора');
   });
 
+  // Includes the first lazy-loaded reference module and grid on a cold worker.
   it('opens suppliers directly inside the Brevi shell', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => [] }));
     window.history.replaceState({}, '', '/references/supplier');
@@ -128,7 +145,7 @@ describe('React Admin routing', () => {
       }),
     ).toHaveAttribute('href', '/references/supplier');
     expect(await screen.findByText('Постачальників поки немає')).toBeVisible();
-  });
+  }, 15_000);
 
   it('opens additional references directly inside the Brevi shell', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => [] }));
@@ -158,14 +175,14 @@ describe('React Admin routing', () => {
     ).toHaveAttribute('href', '/references/garment-accessory');
     expect(screen.getByRole('tab', { name: 'Тканини' })).toHaveAttribute('aria-selected', 'true');
     expect(await screen.findByText('Тканин поки немає')).toBeVisible();
-    expect(screen.getByRole('combobox', { name: 'Рядків на сторінці:' })).toBeVisible();
+    expectEmptyGridPagination(10);
     expect(screen.queryByRole('columnheader', { name: 'Дії' })).not.toBeInTheDocument();
 
     await userEvent.setup().click(screen.getByRole('tab', { name: 'Фурнітура виробу' }));
 
     expect(window.location.search).toBe('?tab=accessories');
     expect(await screen.findByText('Фурнітури поки немає')).toBeVisible();
-    expect(screen.getByRole('combobox', { name: 'Рядків на сторінці:' })).toBeVisible();
+    expectEmptyGridPagination(10);
     expect(screen.queryByRole('columnheader', { name: 'Дії' })).not.toBeInTheDocument();
   });
 
@@ -182,7 +199,7 @@ describe('React Admin routing', () => {
     ).toHaveAttribute('href', '/references/garment-part-operation');
     expect(screen.getByRole('tab', { name: 'Роботи' })).toHaveAttribute('aria-selected', 'true');
     expect(await screen.findByText('Робіт поки немає')).toBeVisible();
-    expect(screen.getByRole('combobox', { name: 'Рядків на сторінці:' })).toBeVisible();
+    expectEmptyGridPagination(10);
     expect(screen.queryByRole('columnheader', { name: 'Дії' })).not.toBeInTheDocument();
     await userEvent.setup().click(screen.getByRole('tab', { name: 'Елементи' }));
     expect(await screen.findByText('Елементів виробу поки немає')).toBeVisible();
@@ -220,7 +237,7 @@ describe('React Admin routing', () => {
       }),
     ).toHaveAttribute('href', '/references/products');
     expect(await screen.findByText('Товарів не знайдено')).toBeVisible();
-    expect(screen.getByRole('combobox', { name: 'Рядків на сторінці:' })).toBeVisible();
+    expectEmptyGridPagination(20);
     const idHeader = screen.getByRole('columnheader', { name: 'ID' });
     await user.hover(idHeader);
     const columnMenuButton = idHeader.querySelector<HTMLButtonElement>(
