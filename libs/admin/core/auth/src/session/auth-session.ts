@@ -1,4 +1,5 @@
 import { configureApiClient, resetAdminApiState } from '@admin/shared/api-client';
+import { appConfig } from '@admin/shared/config';
 
 import { getAccessToken, setAccessToken } from './session-state';
 import { requestAccessTokenRefresh, requestLogin, requestLogout } from './session-transport';
@@ -17,11 +18,19 @@ function clearLocalSession(): void {
 }
 
 export async function login(request: LoginRequest): Promise<void> {
+  if (appConfig.anonymousAccess) {
+    clearLocalSession();
+    return;
+  }
   const nextAccessToken = await requestLogin(request);
   setAccessToken(nextAccessToken);
 }
 
 export async function logout(): Promise<void> {
+  if (appConfig.anonymousAccess) {
+    clearLocalSession();
+    return;
+  }
   const accessToken = getAccessToken();
 
   try {
@@ -32,6 +41,11 @@ export async function logout(): Promise<void> {
 }
 
 export async function initializeAdminAuth(): Promise<void> {
+  if (appConfig.anonymousAccess) {
+    configureApiClient({});
+    clearLocalSession();
+    return;
+  }
   configureApiClient({
     authSession: {
       getAccessToken,

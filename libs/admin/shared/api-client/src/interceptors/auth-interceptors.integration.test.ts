@@ -68,4 +68,19 @@ describe('auth interceptors', () => {
     expect(onUnauthenticated).toHaveBeenCalledOnce();
     expect(client.request).not.toHaveBeenCalled();
   });
+  it('uses no bearer and never refreshes or retries when the auth adapter is removed', async () => {
+    const refreshAccessToken = vi.fn().mockResolvedValue('unused-token');
+    configureApiClient({
+      authSession: { getAccessToken: () => 'stale-token', refreshAccessToken },
+    });
+    configureApiClient({});
+    const config = await attachAuthorizationHeader(requestConfig());
+    expect(config.headers.has('Authorization')).toBe(false);
+    const client = { request: vi.fn() } as unknown as AxiosInstance;
+    await expect(retryAfterAuthRefresh(client, unauthorizedError(config))).rejects.toBeInstanceOf(
+      AxiosError,
+    );
+    expect(refreshAccessToken).not.toHaveBeenCalled();
+    expect(client.request).not.toHaveBeenCalled();
+  });
 });

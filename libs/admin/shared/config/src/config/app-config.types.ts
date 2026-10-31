@@ -1,4 +1,5 @@
 export interface AppConfig {
+  readonly anonymousAccess: boolean;
   readonly apiBaseUrl: string;
   readonly enableHttpLogs: boolean;
   readonly features: {

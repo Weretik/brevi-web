@@ -1,4 +1,5 @@
 import { configureApiClient, resetAdminApiState } from '@admin/shared/api-client';
+import { configureAppConfig } from '@admin/shared/config';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { initializeAdminAuth, login, logout } from './auth-session';
@@ -18,6 +19,7 @@ vi.mock('./session-transport', () => ({
 describe('admin auth lifecycle', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    configureAppConfig({ production: true });
     setAccessToken(null);
   });
 
@@ -63,6 +65,32 @@ describe('admin auth lifecycle', () => {
     await expect(logout()).rejects.toThrow('offline');
 
     expect(requestLogout).toHaveBeenCalledWith('active-token');
+    expect(getAccessToken()).toBeNull();
+    expect(resetAdminApiState).toHaveBeenCalledOnce();
+  });
+
+  it('starts anonymously without refreshing or retaining a stale bearer adapter', async () => {
+    configureAppConfig({ production: true, auth: { anonymousAccess: true } });
+    setAccessToken('stale-token');
+    await initializeAdminAuth();
+    expect(requestAccessTokenRefresh).not.toHaveBeenCalled();
+    expect(getAccessToken()).toBeNull();
+    expect(configureApiClient).toHaveBeenLastCalledWith({});
+    expect(resetAdminApiState).toHaveBeenCalledOnce();
+  });
+
+  it('does not log in or create a token while anonymous mode is enabled', async () => {
+    configureAppConfig({ production: true, auth: { anonymousAccess: true } });
+    await login({ email: 'admin@example.test', password: 'fixture-only' });
+    expect(requestLogin).not.toHaveBeenCalled();
+    expect(getAccessToken()).toBeNull();
+  });
+
+  it('clears anonymous local state without logging out the shared backend Admin', async () => {
+    configureAppConfig({ production: true, auth: { anonymousAccess: true } });
+    setAccessToken('stale-token');
+    await logout();
+    expect(requestLogout).not.toHaveBeenCalled();
     expect(getAccessToken()).toBeNull();
     expect(resetAdminApiState).toHaveBeenCalledOnce();
   });

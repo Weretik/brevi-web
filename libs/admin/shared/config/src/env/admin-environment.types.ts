@@ -1,5 +1,8 @@
 export interface AdminEnvironment {
   readonly production: boolean;
+  readonly auth?: {
+    readonly anonymousAccess?: boolean;
+  };
   readonly enableHttpLogs?: boolean;
   readonly app?: {
     readonly name?: string;

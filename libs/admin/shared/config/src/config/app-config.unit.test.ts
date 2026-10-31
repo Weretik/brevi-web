@@ -13,6 +13,7 @@ describe('createAppConfig', () => {
         features: { catalog: false, dashboard: true },
       }),
     ).toEqual({
+      anonymousAccess: false,
       apiBaseUrl: 'https://api.brevi.test',
       enableHttpLogs: true,
       features: { catalog: false, dashboard: true },
@@ -25,6 +26,7 @@ describe('createAppConfig', () => {
 
   it('uses Brevi defaults without inventing Kedr configuration', () => {
     expect(createAppConfig({ production: false })).toEqual({
+      anonymousAccess: false,
       apiBaseUrl: '',
       enableHttpLogs: false,
       features: { catalog: true, dashboard: true },
@@ -33,5 +35,10 @@ describe('createAppConfig', () => {
       routerBasename: '/',
       version: '0.1.0',
     });
+  });
+  it.each([false, true])('normalizes explicit anonymous access for production=%s', (production) => {
+    expect(createAppConfig({ production, auth: { anonymousAccess: true } }).anonymousAccess).toBe(
+      true,
+    );
   });
 });
