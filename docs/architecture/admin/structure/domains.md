@@ -40,6 +40,7 @@ libs/admin/core/
 │   ├── layout/             # layout composition and content outlet
 │   ├── navigation/         # navigation config, sidebar, mobile panel
 │   ├── components/         # top bar, breadcrumbs, menus
+│   ├── providers/          # application providers (theme, store, notices)
 │   └── hooks/              # shell-specific React hooks
 ├── auth/src/
 │   ├── index.ts
@@ -78,38 +79,10 @@ boundary because a second Nx project is missing.
 ## Internal structure of a domain library
 
 `src/index.ts` in each library is only its public API. Do not place internal
-code beside it “temporarily” or accumulate it in a large file. Use these
-directories when the corresponding role exists:
-
-```text
-libs/admin/<domain>/
-├── data-access/src/
-│   ├── index.ts
-│   ├── api/                # injectEndpoints, hooks, endpoint definitions
-│   ├── contracts/          # private adapters; do not manually duplicate OpenAPI DTOs
-│   ├── mappers/            # DTO <-> domain/request conversions
-│   ├── models/             # technical request/cache types owned by data-access
-│   └── validators/         # request/response validation at API boundary
-├── model/src/
-│   ├── index.ts
-│   ├── entities/           # domain entities and value types
-│   ├── queries/            # domain query types, defaults, and invariants
-│   ├── mappers/            # pure domain transformations
-│   └── validators/         # pure domain validation where needed
-├── ui/src/
-│   ├── index.ts
-│   ├── components/         # reusable presentation components
-│   ├── tables/             # table shells, columns, and cells
-│   ├── forms/              # presentation forms and fields
-│   └── states/             # presentation loading/empty/error states
-└── feature/src/
-    ├── index.ts
-    ├── <domain>.routes.tsx
-    ├── pages/              # route and page composition
-    ├── components/         # feature-only composition elements
-    ├── hooks/              # feature orchestration hooks
-    └── state/              # local reducer/actions or persistent client state
-```
+code beside it “temporarily” or accumulate it in a large file. The role-folder
+names for each layer, the nesting order, and the forbidden catch-all names are
+fixed in the [code organization rules](../../../standards/admin/admin-code-organization.md#role-folders);
+use them when the corresponding role exists.
 
 This does not require creating every directory in advance. It requires keeping
 roles separate: an endpoint does not contain a DTO parser, a mapper does not
@@ -144,21 +117,11 @@ libs/admin/products/
 
 ## Internal feature structure
 
-Group internal modules by scenario responsibility:
-
-```text
-libs/admin/products/feature/src/
-├── index.ts
-├── products.routes.tsx
-├── pages/
-├── components/
-├── hooks/
-└── state/
-```
-
-Create directories only when corresponding code exists. If a page becomes an
-independent business boundary, split it into a separate feature only through
-a separate architecture decision.
+A feature library groups pages, components, hooks, `model/`, and `state/` by
+role first and capability second, as shown in the
+[code organization rules](../../../standards/admin/admin-code-organization.md#nesting-and-size).
+If a page becomes an independent business boundary, split it into a separate
+feature only through a separate architecture decision.
 
 ## `admin/shared`
 
