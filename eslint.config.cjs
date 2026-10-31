@@ -1,4 +1,4 @@
-﻿const js = require('@eslint/js');
+const js = require('@eslint/js');
 const nx = require('@nx/eslint-plugin');
 const angular = require('angular-eslint');
 const prettierConfig = require('eslint-config-prettier');
@@ -219,6 +219,7 @@ module.exports = [
             {
               sourceTag: 'type:app',
               onlyDependOnLibsWithTags: [
+                'type:shell',
                 'type:core',
                 'type:feature',
                 'type:ui',

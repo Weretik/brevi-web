@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { LocaleNavigationService } from '@storefront/util';
@@ -9,6 +9,8 @@ import { ButtonDirective, ButtonIcon, ButtonLabel } from 'primeng/button';
   selector: 'lib-not-found-page',
   imports: [ButtonIcon, ButtonDirective, ButtonLabel, TranslocoPipe, RouterLink],
   templateUrl: './not-found.page.html',
+  // eslint-disable-next-line @angular-eslint/prefer-on-push-component-change-detection -- Preserve pre-Angular-22 eager rendering during the framework migration.
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './not-found.page.css',
 })
 export class NotFoundPage {

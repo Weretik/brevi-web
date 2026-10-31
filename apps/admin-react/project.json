@@ -48,7 +48,11 @@
         "port": 4301,
         "staticFilePath": "dist/apps/admin-react",
         "spa": true
-      }
+      },
+      "readyWhen": {
+        "signal": true
+      },
+      "dependsOn": ["build"]
     },
     "typecheck-tests": {
       "executor": "nx:run-commands",

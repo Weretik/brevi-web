@@ -6,6 +6,7 @@ import { defineConfig, loadEnv } from 'vite';
 
 import { environment as developmentEnvironment } from './src/environments/environment';
 import { environment as productionEnvironment } from './src/environments/environment.prod';
+import { nxReadySignal } from '@nx/vite/plugins/nx-ready-signal.plugin';
 
 export default defineConfig(({ mode }) => {
   const envDir = join(import.meta.dirname, 'src/environments');
@@ -40,6 +41,7 @@ export default defineConfig(({ mode }) => {
       babel({
         plugins: [['babel-plugin-react-compiler', { panicThreshold: 'none' }]],
       }),
+      nxReadySignal(),
     ],
     server: {
       host: 'localhost',

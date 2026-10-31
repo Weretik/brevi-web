@@ -27,10 +27,6 @@
       "cache": true,
       "inputs": ["default", "^production"]
     },
-    "@nx/vitest:test": {
-      "cache": true,
-      "inputs": ["default", "^production"]
-    },
     "@angular/build:application": {
       "cache": true,
       "dependsOn": ["^build"],
@@ -86,6 +82,14 @@
   },
   "analytics": false,
   "plugins": [
+    {
+      "plugin": "@nx/js/typescript",
+      "options": {
+        "typecheck": {
+          "targetName": "typecheck"
+        }
+      }
+    },
     {
       "plugin": "@nx/vite/plugin",
       "options": {
@@ -143,5 +147,8 @@
         "libs/storefront/util/**/*"
       ]
     }
-  ]
+  ],
+  "affected": {
+    "legacy": true
+  }
 }

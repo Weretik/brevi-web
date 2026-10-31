@@ -67,11 +67,18 @@
         "development": {
           "buildTarget": "storefront:build:development"
         }
+      },
+      "readyWhen": {
+        "signal": true
       }
     },
     "serve-static": {
       "continuous": true,
       "executor": "@nx/web:file-server",
+      "readyWhen": {
+        "signal": true
+      },
+      "dependsOn": ["build"],
       "options": {
         "buildTarget": "storefront:build",
         "staticFilePath": "dist/apps/storefront/browser",
