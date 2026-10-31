@@ -19,7 +19,7 @@ The Storefront currently has README files for its Nx feature libraries, but they
 - [Visual guidance for tables, menus, and forms](admin/table-visual-guidance.md)
 - [React Admin migration order](admin/react-migration-roadmap.md)
 - [Admin: restore layers and module boundaries](admin/architecture/001-admin-layers-and-boundaries/README.md)
-- [Admin React: auth, permissions, and API foundation](admin/auth/001-auth-permissions-api-foundation/README.md)
+- [Admin React: auth, permissions, and API foundation](admin/auth/001-auth-permissions-api-foundation/README.md) — TS-007 adds temporary anonymous Admin; normal mode is preserved, deployment separate.
 - [Public site on Next.js: migration plan from brevi.com.ua](site/migration/README.md) — plan accepted 2026-10-30; each step gets its own SDD.
 - [Specification creation and delivery rules](../standards/shared/delivery-rules.md)
 

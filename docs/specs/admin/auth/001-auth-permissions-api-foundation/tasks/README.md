@@ -15,3 +15,5 @@ TS-001–TS-004 і TS-006 завершено. TS-005 свідомо не вхо�
 granular permission contract і consumer. Backend commit
 `79cccf9b88168b726ac588640f6b397c0ed9afd4` відновив `deleteCatalogMedia`;
 snapshot, generated types і provenance узгоджені.
+
+- [TS-007 — temporary anonymous Admin](TS-007-temporary-anonymous.md): owner-requested reversible anonymous startup, role visibility and product access; scoped verification recorded in the task.

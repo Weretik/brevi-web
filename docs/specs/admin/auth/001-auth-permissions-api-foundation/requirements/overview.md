@@ -122,3 +122,9 @@ SC-008 відкладено в окрему майбутню feature за ріш
 | CSRF refresh           | refresh endpoint            | cross-site refresh misuse      | CSRF cookie/header validation                          | exact cookie-to-header mapping; credentials enabled | contract + focused transport test      |
 | Protected operations   | Admin routes/actions        | UI bypass або stale permission | backend authentication/authorization on every endpoint | guard лише UX; 401/403 fail closed                  | contract tests + permission tests      |
 | Error/log data         | error mapper/logger         | витік headers/body/PII         | sanitized server errors                                | method/sanitized URL/status/duration only           | unit tests + source review             |
+
+## Temporary anonymous access — owner decision 2026-10-31
+
+R-010: Admin must open and expose all existing role-gated navigation and product read/manage controls without login, session restore or /me in the explicitly enabled anonymous mode. It must not send an automatically attached bearer, issue/store fake credentials, or log out the shared backend Admin. Real business/API errors remain visible. Disabling this mode restores the current authenticated session/role behavior.
+
+SC-009: Given enabled anonymous mode and no session, when the user opens Admin and requests navigation/product access, then no auth-session network request is needed and all implemented role-gated controls are available. Given disabled mode, when opening Admin, then normal session restoration and actual server roles determine access. Verification: configuration unit, lifecycle/API transport integration and existing navigation components. [TS-007](../tasks/TS-007-temporary-anonymous.md).

@@ -13,3 +13,5 @@
 
 Дозволені переходи статусів: `planned`/`blocked` → `red` → `implemented` →
 `verified`. SC-008 не переходить у ready лише через створення каталогу.
+
+SC-009 → R-010 → [TS-007](tasks/TS-007-temporary-anonymous.md) → config unit, auth-session/session-roles API integration, Sewing access API integration, API interceptor regression and navigation component tests → local evidence in TS-007. Normal-mode regression is part of this task; deployment is separate.

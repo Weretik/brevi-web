@@ -28,3 +28,7 @@ granular permissions винесено за межі цієї delivery: `/me` н�
 першого permission consumer немає, тому порожня `admin/core/permissions`
 library не створюється. Final contract gate закрито backend commit
 `79cccf9b88168b726ac588640f6b397c0ed9afd4`.
+
+## Temporary anonymous Admin — 2026-10-31
+
+Owner requested temporary access without authentication to the Admin as well as the backend. [TS-007](tasks/TS-007-temporary-anonymous.md) implements the reversible auth.anonymousAccess flag in both development and production environment files. Normal session behavior remains available with the flag false. Deployment requires the matching backend ApiAccess:AnonymousEnabled mode; no fake token/user or new backend contract is introduced.

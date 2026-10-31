@@ -108,3 +108,11 @@ domain data-access -> public baseApi/adminApi compatibility -> Axios baseQuery
   backend contract; воно не є сигналом копіювати інший branding у UI/config.
 - `[NEEDS CLARIFICATION]`: які permission identifiers повертає backend, де вони
   містяться (`/me` або token claims), і який route/action є першим consumer.
+
+## Temporary anonymous mode — 2026-10-31
+
+Environment auth.anonymousAccess normalizes to AppConfig.anonymousAccess (default false). Both actual Admin build environments explicitly set true. Bootstrap uses the same existing initializeAdminAuth entry point; anonymous initialization removes the shared API auth adapter and clears old in-memory token/cache before mounting. Login/logout exports perform local clearing without contacting the real session service in this mode. No interceptor rewrite or feature route guard is needed: existing routes have no login redirect.
+
+The core session-roles query resolves a local Admin/Manager/User role projection and the Products Sewing access query resolves local canRead/canManage only while enabled. Both reuse normal server request/response validators when disabled. Their queryFn boundaries prevent /me entirely while anonymous, including on refetch. No invented session response or user ID is returned. Domain queries still call the real API, so backend mode must be active there. Restore requires false in both environment files and a frontend rebuild/reload; initialization clears stale access caches.
+
+No package or backend generated contract changes. Scope excludes storefront/site, deployments and browser/E2E. [Task and evidence](../tasks/TS-007-temporary-anonymous.md).
