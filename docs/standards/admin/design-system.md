@@ -81,7 +81,7 @@ Rules:
 | Column titles, metric labels, overlines | `overline`            | 11 px / 600, uppercase                     |
 | Metadata                                | `caption`             | 12 px                                      |
 
-Document numbers (`КП-1048`, `ЗМ-311`), sums, quantities, percentages, and dates use `monoFontFamily` from `typography.ts` with `fontVariantNumeric: 'tabular-nums'`, and numbers are right-aligned in tables. Buttons are never uppercase.
+Document numbers (`КП-1048`, `ЗМ-311`), sums, quantities, percentages, and dates use the mono face through the CSS variable `var(--admin-font-mono)` (set from `monoFontFamily` in `MuiCssBaseline`) with `fontVariantNumeric: 'tabular-nums'`, and numbers are right-aligned in tables. Buttons are never uppercase.
 
 ## Shape, spacing, and density
 

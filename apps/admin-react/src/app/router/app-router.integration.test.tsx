@@ -110,11 +110,21 @@ describe('React Admin routing', () => {
     }
   });
 
-  it('shows the start page without a home entry in the legacy menu', () => {
+  it('shows the demo overview with the BreviERP link moved to the profile menu', async () => {
+    const user = userEvent.setup();
     window.history.replaceState({}, '', '/');
     renderApp();
 
-    expect(screen.getByRole('main')).toHaveTextContent('Робочий простір адміністратора');
+    expect(
+      await screen.findByRole('heading', { name: 'Огляд виробництва' }, { timeout: 5000 }),
+    ).toBeVisible();
+    expect(screen.getByText('Демо-дані')).toBeVisible();
+    expect(screen.queryByRole('link', { name: /Про BreviERP/ })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Профіль' }));
+    expect(
+      await screen.findByRole('menuitem', { name: 'Про BreviERP, конфіденційність та умови' }),
+    ).toHaveAttribute('href', '/brevi-erp/index.html');
+    await user.keyboard('{Escape}');
     expect(
       within(screen.getByRole('navigation', { name: 'Основна навігація' })).queryByRole('link', {
         name: 'Початок',
@@ -129,7 +139,9 @@ describe('React Admin routing', () => {
 
     expect(screen.getByRole('main')).toHaveTextContent('Сторінку не знайдено');
     await user.click(screen.getByRole('link', { name: 'На початок' }));
-    expect(screen.getByRole('main')).toHaveTextContent('Робочий простір адміністратора');
+    expect(
+      await screen.findByRole('heading', { name: 'Огляд виробництва' }, { timeout: 5000 }),
+    ).toBeVisible();
   });
 
   // Includes the first lazy-loaded reference module and grid on a cold worker.

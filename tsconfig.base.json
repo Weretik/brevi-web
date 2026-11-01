@@ -47,7 +47,8 @@
       "@admin/products/ui": ["libs/admin/products/ui/src/index.ts"],
       "@admin/products/feature": ["libs/admin/products/feature/src/index.ts"],
       "@admin/references/ui": ["libs/admin/references/ui/src/index.ts"],
-      "@admin/core/shell": ["libs/admin/core/shell/src/index.ts"]
+      "@admin/core/shell": ["libs/admin/core/shell/src/index.ts"],
+      "@admin/dashboard/feature": ["libs/admin/dashboard/feature/src/index.ts"]
     }
   }
 }
