@@ -9,6 +9,12 @@ export interface AdminNavigationItem {
   to?: string;
 }
 
+/** A link in the profile menu, for example legal or about pages outside the SPA. */
+export interface AdminProfileLink {
+  label: string;
+  href: string;
+}
+
 export interface AdminNavigationGroup {
   id: string;
   label: string;

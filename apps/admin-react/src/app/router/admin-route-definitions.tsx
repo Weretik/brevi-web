@@ -1,11 +1,10 @@
 import { clientsRoutes } from '@admin/clients/feature';
+import { dashboardRoutes } from '@admin/dashboard/feature';
 import { productsRoutes } from '@admin/products/feature';
 import { referencesRoutes } from '@admin/references/feature';
 
-import { StartPage } from '../pages/start-page';
-
 export const adminRouteDefinitions = [
-  { path: '/', element: <StartPage /> },
+  ...dashboardRoutes,
   ...referencesRoutes,
   ...clientsRoutes,
   ...productsRoutes,

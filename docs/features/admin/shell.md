@@ -4,7 +4,10 @@
 
 `apps/admin-react` starts React and composes providers and `AppRouter`.
 `AdminLayout` from `libs/admin/core/shell` displays the graphite sidebar, the top
-bar with breadcrumbs and the theme menu, and `Outlet`; the list of items depends on
+bar (breadcrumbs, search, notifications, theme menu, and profile menu), and `Outlet`;
+search, notifications, and the profile entry are placeholders until a backend exists,
+while «Вийти» and app-provided profile links such as «Про BreviERP, конфіденційність
+та умови» work; the list of items depends on
 routes that are actually available. The sidebar collapses to icons on desktop (group
 flyouts, choice remembered) and opens as a drawer on phones. Look and behavior follow
 the [design system «Цех»](../../standards/admin/design-system.md).
