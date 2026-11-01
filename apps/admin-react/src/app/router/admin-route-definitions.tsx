@@ -1,6 +1,7 @@
 import { clientsRoutes } from '@admin/clients/feature';
 import { productsRoutes } from '@admin/products/feature';
 import { referencesRoutes } from '@admin/references/feature';
+import { remindersRoutes } from '@admin/reminders/feature';
 
 import { StartPage } from '../pages/start-page';
 
@@ -9,4 +10,5 @@ export const adminRouteDefinitions = [
   ...referencesRoutes,
   ...clientsRoutes,
   ...productsRoutes,
+  ...remindersRoutes,
 ];
