@@ -158,6 +158,11 @@ describe('AdminLayout', () => {
     renderShell();
 
     expect(screen.getByRole('button', { name: 'Розгорнути меню' })).toBeVisible();
+    const logoSources = screen
+      .getAllByRole('img', { name: 'Brevi' })
+      .map((logo) => logo.getAttribute('src'));
+    expect(logoSources).toContain('/assets/logo/brevi-mark-light.png');
+    expect(logoSources).not.toContain('/assets/logo/brevi-logo-light.png');
   });
 
   it('shows search, notifications, and profile with honest placeholders and a working logout', async () => {

@@ -33,6 +33,8 @@ flowchart LR
 
 ```text
 apps/admin-react/
+├── index.html # title, favicon links, fonts
+├── public/ # favicon.ico, favicon-32x32.png, apple-touch-icon.png, assets/logo/ (wordmark, mark)
 └── src/app/
     ├── router/
     │   ├── app-router.tsx # router
@@ -55,7 +57,7 @@ libs/admin/core/
     └── navigation/
         ├── navigation-palette.ts # palette.navigation type
         ├── menu/ # home link, groups, items, collapsed flyout, route matching
-        └── sidebar/ # drawers, panel, logo, collapse hook
+        └── sidebar/ # drawers, panel, logo (wordmark or mark when collapsed), collapse hook
 ```
 
 ```text
