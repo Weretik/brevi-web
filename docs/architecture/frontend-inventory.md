@@ -34,6 +34,7 @@ are in root `package.json` and `package-lock.json`.
 
 - Installed tools include Vitest, the Angular Vitest adapter, React Testing Library, `jest-dom`, `user-event`, and `@playwright/test`/`@nx/playwright`.
 - React Admin has a separate `vitest.config.mts`, jsdom configuration, and an executable unit, component, and integration test suite.
+- `admin-dashboard-feature` (`libs/admin/dashboard/feature`) has lint, typecheck, typecheck-tests, and Vitest test targets.
 - `admin-core-shell` has separate lint, typecheck, typecheck-tests, and Vitest test targets, as well as component tests.
 - `apps/admin-react-e2e` has a Playwright config, Chromium smoke tests, and Nx inferred targets. Install the Chromium binary locally or in CI with `npx playwright install chromium`.
 

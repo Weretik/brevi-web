@@ -9,7 +9,7 @@ const alertTones = ['success', 'info', 'warning', 'error'] as const;
 export const components: Components<Theme> = {
   MuiCssBaseline: {
     styleOverrides: (theme) => ({
-      ':root': { '--brevi-font-mono': monoFontFamily },
+      ':root': { '--admin-font-mono': monoFontFamily },
       body: { minWidth: 320 },
       ':focus-visible': { outline: `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 },
       '@media (prefers-reduced-motion: reduce)': {

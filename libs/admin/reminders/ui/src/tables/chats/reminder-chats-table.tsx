@@ -59,7 +59,7 @@ export function ReminderChatsTable({ rows, loading, busyId, onEdit, onTest, onAs
       headerName: 'Додано',
       minWidth: 150,
       renderCell: ({ row }) => (
-        <Typography variant="body2" sx={{ fontFamily: 'var(--brevi-font-mono)' }}>
+        <Typography variant="body2" sx={{ fontFamily: 'var(--admin-font-mono)' }}>
           {formatReminderDateTime(row.discoveredAt)}
         </Typography>
       ),

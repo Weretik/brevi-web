@@ -37,7 +37,7 @@ export function ReminderMetricStrip({ metrics }: Props) {
           </Typography>
           <Typography
             sx={{
-              fontFamily: 'var(--brevi-font-mono)',
+              fontFamily: 'var(--admin-font-mono)',
               fontVariantNumeric: 'tabular-nums',
               fontSize: 22,
               fontWeight: 600,

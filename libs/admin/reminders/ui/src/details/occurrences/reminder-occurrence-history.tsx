@@ -34,7 +34,7 @@ export function ReminderOccurrenceHistory({ actions }: Props) {
           </Typography>
           <Typography variant="caption" component="p" sx={{ color: 'text.secondary' }}>
             {action.actor.name} ·{' '}
-            <Box component="span" sx={{ fontFamily: 'var(--brevi-font-mono)' }}>
+            <Box component="span" sx={{ fontFamily: 'var(--admin-font-mono)' }}>
               {formatReminderDateTime(action.at)}
             </Box>
           </Typography>

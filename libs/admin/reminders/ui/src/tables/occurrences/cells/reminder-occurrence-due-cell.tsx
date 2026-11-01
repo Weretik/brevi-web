@@ -12,7 +12,7 @@ export function ReminderOccurrenceDueCell({
     <Typography
       variant="body2"
       sx={{
-        fontFamily: 'var(--brevi-font-mono)',
+        fontFamily: 'var(--admin-font-mono)',
         fontVariantNumeric: 'tabular-nums',
         color: overdue ? 'error.main' : undefined,
       }}

@@ -7,7 +7,7 @@ In each feature card, “Structure diagram” shows relationships between parts,
 ## Admin React (`apps/admin-react`)
 
 - Clients: [клієнти, КП, history/lifecycle, приватний custom editor, файли, шаблони та підказки](admin/clients-and-quotes.md).
-- Admin foundation: [shell, navigation, and session](admin/shell.md).
+- Admin foundation: [shell, navigation, and session](admin/shell.md); [overview page «Цех» on demo data](admin/dashboard.md).
 - Products: [list, details, creation, and editing](admin/products/products.md); [media library](admin/products/media.md); [Sewing Articles and composition](admin/products/sewing-composition.md); [Article calculation and published prices](admin/products/sewing-pricing.md); [PPE pricing and input approval](admin/products/ppe-pricing.md).
 - Reminders: [Telegram deadline reminders: tasks, periods, chats, days off](admin/reminders.md).
 - Reference data: [suppliers](admin/references/suppliers.md); [hardware and fabrics](admin/references/materials.md); [garment parts and operations](admin/references/garment-parts.md); [additional reference data](admin/references/additional-references.md).

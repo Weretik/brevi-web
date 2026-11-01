@@ -43,7 +43,7 @@ export function NonWorkingDaysTable({ days, busyDate, onRemove }: Props) {
           {days.map((day) => (
             <TableRow key={day.date} hover>
               <TableCell
-                sx={{ fontFamily: 'var(--brevi-font-mono)', fontVariantNumeric: 'tabular-nums' }}
+                sx={{ fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' }}
               >
                 {formatReminderDate(day.date)}
               </TableCell>

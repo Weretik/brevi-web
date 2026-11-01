@@ -11,7 +11,7 @@ export function ReminderClosedByCell({ occurrence }: { occurrence: ReminderOccur
       <Typography
         variant="caption"
         component="p"
-        sx={{ color: 'text.secondary', fontFamily: 'var(--brevi-font-mono)' }}
+        sx={{ color: 'text.secondary', fontFamily: 'var(--admin-font-mono)' }}
       >
         {formatReminderDateTime(occurrence.closedAt)}
       </Typography>

@@ -9,15 +9,22 @@ import {
 } from '../navigation/sidebar/admin-navigation-drawers';
 import { useNavigationCollapsed } from '../navigation/sidebar/use-navigation-collapsed';
 
-import type { AdminColorMode, AdminNavigationGroup } from '../shell.types';
+import type { AdminColorMode, AdminNavigationGroup, AdminProfileLink } from '../shell.types';
 
 interface AdminLayoutProps {
   navigation: readonly AdminNavigationGroup[];
   colorMode: AdminColorMode;
   onColorModeChange: (mode: AdminColorMode) => void;
+  /** Extra links in the profile menu. */
+  profileLinks?: readonly AdminProfileLink[];
 }
 
-export function AdminLayout({ navigation, colorMode, onColorModeChange }: AdminLayoutProps) {
+export function AdminLayout({
+  navigation,
+  colorMode,
+  onColorModeChange,
+  profileLinks = [],
+}: AdminLayoutProps) {
   const [isMobileNavigationOpen, setIsMobileNavigationOpen] = useState(false);
   const { isCollapsed, toggleCollapsed } = useNavigationCollapsed();
   const menuButtonRef = useRef<HTMLButtonElement>(null);
@@ -59,6 +66,7 @@ export function AdminLayout({ navigation, colorMode, onColorModeChange }: AdminL
           navigation={navigation}
           onColorModeChange={onColorModeChange}
           onMenuOpen={() => setIsMobileNavigationOpen(true)}
+          profileLinks={profileLinks}
         />
         <Box component="main" sx={{ minWidth: 0 }}>
           <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3, lg: 3.5 }, py: { xs: 2.5, lg: 3.5 } }}>

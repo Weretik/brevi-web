@@ -10,7 +10,7 @@ export function ReminderNextDueCell({ task }: { task: ReminderTask }) {
     <Box sx={{ py: 1, textAlign: 'right', width: '100%' }}>
       <Typography
         variant="body2"
-        sx={{ fontFamily: 'var(--brevi-font-mono)', fontVariantNumeric: 'tabular-nums' }}
+        sx={{ fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' }}
       >
         {formatReminderDate(next.dueDate)}
       </Typography>

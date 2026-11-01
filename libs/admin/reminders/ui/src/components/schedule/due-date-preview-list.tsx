@@ -8,7 +8,7 @@ interface Props {
   loading?: boolean;
 }
 
-const mono = { fontFamily: 'var(--brevi-font-mono)', fontVariantNumeric: 'tabular-nums' } as const;
+const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' } as const;
 
 /** Next deadlines of a task with the day reminders start. */
 export function DueDatePreviewList({ previews, loading }: Props) {

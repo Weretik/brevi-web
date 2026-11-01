@@ -51,7 +51,8 @@
       "@admin/reminders/model": ["libs/admin/reminders/model/src/index.ts"],
       "@admin/reminders/data-access": ["libs/admin/reminders/data-access/src/index.ts"],
       "@admin/reminders/ui": ["libs/admin/reminders/ui/src/index.ts"],
-      "@admin/reminders/feature": ["libs/admin/reminders/feature/src/index.ts"]
+      "@admin/reminders/feature": ["libs/admin/reminders/feature/src/index.ts"],
+      "@admin/dashboard/feature": ["libs/admin/dashboard/feature/src/index.ts"]
     }
   }
 }
