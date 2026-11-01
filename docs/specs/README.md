@@ -34,3 +34,5 @@ The Storefront currently has README files for its Nx feature libraries, but they
 When a specification's status changes, update its line here in the same change.
 
 - [FE-EN-003: BreviERP public legal pages](admin/clients/001-clients-quotes-custom-sewing/tasks/readiness/fe-en-003.md) — local implementation; publication and matching send-only runtime remain mandatory Gmail gates.
+
+[P6 release candidate and publication boundary](admin/clients/001-clients-quotes-custom-sewing/evidence/p6-release-2026-11-02.md) records the integrated build, backend publication/local migration and pending live deployment checks.
