@@ -1,4 +1,5 @@
 import { motion } from './motion';
+import { monoFontFamily } from './typography';
 
 import type { Components, Theme } from '@mui/material/styles';
 import type {} from '@mui/x-data-grid/themeAugmentation';
@@ -8,6 +9,7 @@ const alertTones = ['success', 'info', 'warning', 'error'] as const;
 export const components: Components<Theme> = {
   MuiCssBaseline: {
     styleOverrides: (theme) => ({
+      ':root': { '--brevi-font-mono': monoFontFamily },
       body: { minWidth: 320 },
       ':focus-visible': { outline: `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 },
       '@media (prefers-reduced-motion: reduce)': {
