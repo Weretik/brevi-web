@@ -49,3 +49,11 @@ P6 FE-009 delivery/history and production-export UI implemented with pinned cont
 ## Required before live Gmail acceptance
 
 [FE-EN-003](readiness/fe-en-003.md): implement and publish description/privacy/terms on office.brevi.com.ua; confirm operator, domain ownership, exact Google Branding URLs and send-only runtime/helper alignment. Sender pp.brevi@gmail.com; manual uncertain-result review; In production setup. These are mandatory EN-004/SC-D03 gates, not optional follow-ups.
+
+## P6 registry/new-selection continuation — 2026-11-01
+
+FE-009 consumes TS-017 for immutable list/detail/create/explicit activation; FE-011 now creates new selections with real paged email-version choices and keeps historical references. [Current evidence](../evidence/p6-registry-selections-2026-11-01.md). This supersedes the earlier P6 creation deferral after its registry prerequisite was implemented. Remaining P6 points are operator outcome-resolution and actual OAuth/send acceptance.
+
+## P6 manual continuation — 2026-11-01
+
+FE-009 manual result is implemented and locally verified with the canonical backend resolution operation: [evidence](../evidence/p6-manual-outcome-2026-11-01.md). Remaining real Gmail provisioning/consent/send acceptance is explicitly deferred by the owner; it does not block recording checked outcomes.

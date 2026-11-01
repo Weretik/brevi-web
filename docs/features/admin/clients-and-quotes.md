@@ -309,3 +309,100 @@ No Workshop order/send or client-side sent transition is implied. Active email t
 ## Tests — FE-009 audit regression
 
 `npx vitest run --config libs/admin/clients/data-access/vitest.config.mts p6-documents quote-document-access-loss documents.integration` and `npx vitest run --config libs/admin/clients/feature/vitest.config.mts p6-panels.component use-quote-documents.unit`. Tests cover explicit sends, cache rejection ordering, registry reads and verified ZIP, with no real Gmail send.
+
+## P6 manual unknown inspection
+
+Unknown delivery history instructs the operator to inspect Gmail Sent manually and not resend. It does not promise an automatic lookup or claim provider success. `ui/src/components/documents/delivery/quote-delivery-history.tsx` owns this presentation; the existing delivery hook/API and state mapper remain unchanged. The backend sends only and parks unknown outcomes. The explicit operator-confirmed outcome action is implemented in the continuation below.
+
+Test: `ui/src/components/documents/delivery/quote-delivery-history.component.test.tsx`; run `npx vitest run --config libs/admin/clients/ui/vitest.config.mts quote-delivery-history.component`. [Revision evidence](../../specs/admin/clients/001-clients-quotes-custom-sewing/evidence/p6-send-only-ui-2026-11-01.md).
+
+## P6 email registry and new selections
+
+The existing Quotes page links to `/crm/email-templates`; seasonal selections link there as well. Admin creates immutable plain-text subject/body versions and activates one in a separate confirmation using the settings revision. Manager has read-only list/detail access. The app passes current role state through a narrow feature-owned context; absent/refreshing/denied permission state blocks writes. Creation never activates a version or sends a message. Unknown writes retain their original request and lock editing until clarified; activation conflicts refresh settings without dropping the draft.
+
+Seasonal selections page actual immutable email versions and explicitly pin the chosen reference. Paging keeps the chosen version; reopening a saved selection keeps its historical reference until an explicit change. New/changed references require a successful registry read and a known version. Transient registry failure may preserve an unchanged historical reference; access denial clears private draft/options. The existing save/check/apply and server pricing/PDF pipeline is reused.
+
+```text
+apps/admin-react/src/app/router/
+  email-template-access.tsx                     core session -> feature permission provider
+  admin-route-definitions.tsx                    registry-only permission composition
+libs/admin/clients/
+  model/src/models/documents/email-template-view.ts        application registry views
+  model/src/forms/documents/email-template-draft.ts         values/defaults/error types
+  model/src/validators/documents/email-template-draft-validation.ts  pure input validation
+  data-access/src/api/documents/email-template.api.ts      five canonical registry operations
+  data-access/src/api/documents/email-template-access-loss.ts  deferred private-cache clearing
+  data-access/src/mappers/documents/email-template-registry.mapper.ts  bounded runtime mapping
+  feature/src/hooks/documents/email-templates/
+    email-template-session.tsx                  app-supplied permissions, fail-closed default
+    use-email-template-registry.ts              list/detail/create/activate orchestration
+  feature/src/pages/documents/email-templates-page.tsx      lazy screen composition
+  ui/src/components/documents/email-templates/              immutable version list
+  ui/src/forms/documents/email-templates/                   controlled create form
+  ui/src/details/documents/email-templates/                 plain-text version detail
+  ui/src/dialogs/documents/email-templates/                 activation confirmation
+  feature/src/hooks/introductions/use-introduction-email-templates.ts  paged registry choices
+  feature/src/clients.routes.tsx                lazy route
+```
+
+```mermaid
+flowchart LR
+  App[App core session adapter] --> Permission[Feature session context]
+  Quotes[Quotes / seasonal selections] --> Registry[Lazy email registry page]
+  Permission --> Registry
+  Registry --> Writes[Explicit create / confirmed activation]
+  Writes --> API[Generated-operation API and runtime mappers]
+  API --> Backend[Existing immutable backend registry]
+  Registry --> Read[Paged versions / plain-text detail]
+  Backend --> Choice[Explicit seasonal email-version choice]
+  Choice --> Pin[Saved selection reference]
+  Pin --> Existing[Existing check / apply / ready / PDF]
+```
+
+## Tests — P6 registry continuation
+
+- `npx vitest run --config libs/admin/clients/data-access/vitest.config.mts email-template-registry p6-documents`: registry mapping/HTTP/pagination/identity/invalidation/access loss and existing delivery mapping.
+- `npx vitest run --config libs/admin/clients/feature/vitest.config.mts use-email-template-registry email-templates-page.integration quotes-page.component`: role injection/loss, parked denial and explicit recovery, uncertain replay, activation conflict, real page/RTK Query and route entry.
+- `npx vitest run --config libs/admin/clients/model/vitest.config.mts email-template-draft-validation`: pure form/placeholder validation.
+- `npx vitest run --config libs/admin/clients/feature/vitest.config.mts use-introduction-editor.unit introductions-page.component`: real registry choices, stored-reference preservation, paging, blockers and captured save.
+- `npx vitest run --config libs/admin/clients/ui/vitest.config.mts email-template introduction-editor.component`: pure UI input/readonly/plain-text/form behavior.
+- `npx vitest run --config apps/admin-react/vitest.config.mts email-template-access.component`: app-to-feature permission bridge.
+
+[Current implementation evidence](../../specs/admin/clients/001-clients-quotes-custom-sewing/evidence/p6-registry-selections-2026-11-01.md). Manual unknown outcome resolution is implemented below; live Gmail acceptance is deferred and deployed browser acceptance remains separate.
+
+[Scoped P6 functional/structure audit](../../specs/admin/clients/001-clients-quotes-custom-sewing/code-audit/p6-registry-functional-audit-2026-11-01.md) records fixed role-revocation clearing, parked denied subscriptions, explicit recovery and role-based form/detail/dialog ownership. Component tests are colocated with their owners.
+
+## P6 manual outcome resolution
+
+FE-009 adds explicit manual sent/not_sent evidence for eligible unknown/expired attempts. The server owns eligibility, actor, time, attempt guards and immutable persistence. The browser requires evidence, distinguishes manual proof from provider acceptance, keeps captured same-key retries, refreshes conflicts explicitly, clears access loss and never starts a send from resolution. Missing optional metadata remains backward compatible.
+
+```text
+libs/admin/clients/
+  model/src/forms/documents/delivery-resolution-draft.ts
+  model/src/validators/documents/delivery-resolution-validation.ts
+  data-access/src/api/documents/quote-delivery-resolution.api.ts
+  data-access/src/validators/documents/delivery-resolution-response.ts
+  feature/src/hooks/documents/delivery/use-delivery-resolution.ts
+  feature/src/hooks/documents/delivery/use-delivery-attempt-refresh.ts
+  feature/src/hooks/documents/delivery/use-delivery-read-access.ts
+  feature/src/components/documents/delivery/quote-delivery-panel.tsx
+  ui/src/forms/documents/delivery/delivery-resolution-fields.tsx
+  ui/src/dialogs/documents/delivery/resolve-delivery-dialog.tsx
+  ui/src/components/documents/delivery/quote-delivery-history.tsx
+  ui/src/components/documents/delivery/quote-delivery-outcome.tsx
+```
+
+```mermaid
+flowchart LR
+  History[Eligible history attempt] --> Dialog[Explicit decision and evidence]
+  Dialog --> Hook[Resolution orchestration]
+  Hook --> Shared[Shared captured document action]
+  Shared --> API[Generated operation and runtime provenance mapping]
+  API --> Server[Immutable server resolution]
+  Server --> Read[Invalidate quote and delivery reads]
+  Read --> History
+```
+
+Tests: delivery-resolution mapper and localhost HTTP; use-delivery-resolution and real p6-panel interactions; history provenance and model evidence validation. Run commands and52passing assertions are in [manual outcome evidence](../../specs/admin/clients/001-clients-quotes-custom-sewing/evidence/p6-manual-outcome-2026-11-01.md). The feature shares the existing document action rather than competing parent locks. Backend migration must precede deploying this frontend; no OAuth credential is required for recording a check.
+
+Manual audit continuation: [AF-FE-P6-008–011 and55 scoped cases](../../specs/admin/clients/001-clients-quotes-custom-sewing/code-audit/p6-manual-functional-audit-2026-11-01.md) cover captured retry with parent feedback, sticky protected-read denial and ignored late responses. Refresh/access are separate hooks, controlled fields belong to UI forms, and runtime parsing belongs to data-access validators. Manual dialog tests are in feature/src/components/documents/delivery/quote-delivery-resolution.component.test.tsx; run npx vitest run --config libs/admin/clients/feature/vitest.config.mts use-delivery-resolution.component p6-panels.component quote-delivery-resolution.component.

@@ -29,7 +29,7 @@ The Storefront currently has README files for its Nx feature libraries, but they
 - [Admin React: sewing composition structure](admin/products/005-sewing-composition-structure/README.md) — structural remediation verified 2026-10-25.
 - [Admin React: Sewing Article pricing](admin/products/006-sewing-pricing/README.md) — implemented and verified 2026-10-25.
 - [Admin React: PPE pricing](admin/products/007-ppe-pricing/README.md) — implemented and verified 2026-10-25.
-- [Admin React: клієнти, КП та індивідуальне пошиття](admin/clients/001-clients-quotes-custom-sewing/README.md) — P1–P5 locally verified; P6 delivery/history and production UI implemented/automatically verified; live Gmail acceptance pending.
+- [Admin React: клієнти, КП та індивідуальне пошиття](admin/clients/001-clients-quotes-custom-sewing/README.md) — P1–P5 locally verified; P6 delivery/history/production, email registry UI and new-selection creation locally verified; manual unknown resolution locally verified; live Gmail acceptance deferred by the owner.
 
 When a specification's status changes, update its line here in the same change.
 

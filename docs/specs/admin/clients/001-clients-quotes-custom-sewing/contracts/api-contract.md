@@ -213,3 +213,27 @@ Pinned backend `Weretik/BreviERP`, SHA `3ad90271721bc58b61fa1efa11ae6c2cd87e9866
 | `downloadCrmProductionPackage` | `docs/sdd/contracts/crm/production-packages.openapi.yaml` | FE-009   |
 
 Read responses are runtime-validated and mapped to application views. Quote/version/resource mismatches reject the response. History is bounded/paged; private caches reset on403/404. Writes capture requestId and input for explicit same-key network retry; queued/unknown never become sent in client code. ZIP download verifies MIME/length/signature/SHA256 and uses a local opaque filename. Live send requires EN-004 provisioning; no OAuth secret is put in frontend.
+
+## P6 email registry consumer — 2026-11-01
+
+Source: `Weretik/BreviERP`, immutable SHA `cc7629de24a09333f644eea77ba51fb1363468c7`, canonical module `docs/sdd/contracts/crm/email-templates.openapi.yaml`; aggregate `docs/sdd/contracts/openapi.yaml`. This is the already synchronized SOURCE.json revision; neither the snapshot nor generated DTOs are edited for this consumer addition.
+
+| operationId                     | Path                                       | Consumer                           |
+| ------------------------------- | ------------------------------------------ | ---------------------------------- |
+| `getCrmEmailTemplates`          | GET `/api/crm/email-templates`             | FE-009 registry and FE-011 choices |
+| `getCrmEmailTemplateVersion`    | GET `/api/crm/email-templates/{versionId}` | FE-009 detail                      |
+| `getCrmActiveEmailTemplate`     | GET `/api/crm/email-templates/active`      | FE-009 settings/active revision    |
+| `createCrmEmailTemplateVersion` | POST `/api/crm/email-templates/versions`   | FE-009 immutable create            |
+| `activateCrmEmailTemplate`      | PUT `/api/crm/email-templates/active`      | FE-009 explicit activation         |
+
+Data-access uses operation-specific generated inputs and runtime-validates IDs, text, timestamps and pagination before returning application models. The existing compact active-template hook remains compatible with the send panel. Registry writes invalidate registry/settings/active reads after success; no activation or send is optimistic or automatic. Detail/activation responses must match the requested version. Access loss clears protected cache. Feature writes keep a captured same-key payload for an uncertain result, preserve create form on conflict, and require a fresh activation revision after conflict. Introduction selection preserves its stored email reference unless explicitly changed; choosing a new reference uses actual paged registry versions and never a seller-document template ID.
+
+## Current P6 manual-result contract — 2026-11-01
+
+Current snapshot is pinned to Weretik/BreviERP commit 431d799eb468f212f10bde3e058be3a3d94974ab, superseding historical revisions above. Canonical module: docs/sdd/contracts/crm/quote-deliveries.openapi.yaml; aggregate: docs/sdd/contracts/openapi.yaml.
+
+| operationId             | Consumer                             |
+| ----------------------- | ------------------------------------ |
+| resolveCrmQuoteDelivery | FE-009 explicit manual result dialog |
+
+The generated operation-specific body remains in data-access. Runtime mapping verifies exact quote/delivery/attempt/outcome/evidence and separates immutable manual provenance from provider confirmation. Missing optional fields on historical rows default to no manual control. Success invalidates quote and delivery tags; unknown writes retry the captured key/body,409 preserves input until explicit detail refresh, and current access loss clears private state. No provider credentials or caller-supplied actor/time reach the browser command.

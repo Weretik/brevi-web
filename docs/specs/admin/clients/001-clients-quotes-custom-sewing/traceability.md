@@ -53,3 +53,13 @@ FE-EN-002 P5 handoff → SC-Q07, SC-D01–02, SC-D04 → seven TS-009/010 issuer
 FE-009 → SC-D03/SC-S06 → pinned delivery/production API, runtime mappers, local HTTP/ZIP tests and explicit confirmation/captured-retry/late-response UI tests → [verification](evidence/fe-009-delivery-production-2026-10-30.md). Live SC-D03 acceptance remains gated by EN-004.
 
 SC-PUB01/02 → R-PUB01/02 → [FE-EN-003](tasks/readiness/fe-en-003.md) → tools/legal/erp-public-pages.test.mjs → [evidence](evidence/fe-en-003-public-pages-2026-10-30.md). SC-PUB03/R-PUB03 → FE-EN-003 deployment/runtime/Google gates → pending real publication and acceptance.
+
+SC-D03 / FE-009 send-only unknown → quote-delivery-history.component.test.tsx → [verified manual-inspection instruction](evidence/p6-send-only-ui-2026-11-01.md). No automatic Gmail lookup or live send is claimed.
+
+P6 TS-017 consumer / FE-009 / SC-D03 registry prerequisite → email-template-registry mapper/HTTP, email-template-draft, use-email-template-registry, pure registry UI, real-page RTK integration and app permission bridge → [registry/selection evidence](evidence/p6-registry-selections-2026-11-01.md). FE-011 / SC-I01–02 → real paged email choices, preserved historical reference, no arbitrary ID, same-key uncertain save → same evidence. Manual unknown-resolution and live Gmail acceptance remain separate.
+
+FE-009 / SC-D03 → AF-FE-P6-004–007 → role revocation, stable denial/recovery, model validation and relocated UI/integrated activation → [verified scoped audit](code-audit/p6-registry-functional-audit-2026-11-01.md). FE-011 existing page/form regression remains green; no backend/send contract changed.
+
+FE-009 / SC-D03 manual result → resolveCrmQuoteDelivery at 431d799eb468f212f10bde3e058be3a3d94974ab → delivery-resolution mapper/HTTP, use-delivery-resolution, real panel dialog, pure evidence validation and manual history provenance → [52-case evidence](evidence/p6-manual-outcome-2026-11-01.md). Supersedes earlier manual-action pending status; EN-004 real consent/send deferred by owner.
+
+SC-D03 / FE-009 → AF-FE-P6-008–011 → parent-feedback retry, sticky history/template denial, late-response suppression, independent refresh/access/form/validator owners → [verified manual-result audit](code-audit/p6-manual-functional-audit-2026-11-01.md).

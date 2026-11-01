@@ -185,3 +185,11 @@ The existing API/mapper, pure UI form/list/pickers and draft state already have 
 ## FE-009 frontend audit — 2026-10-30
 
 AF-FE-P6-001 Medium/verified: preserve403/404 rejection before shared document cache reset. AF-FE-P6-002 and003 Low/verified: separate binary ZIP, active-template reads and purpose-named document API; remove the private test-only mapper barrel. [Exact paths, findings and31-case verification](fe-009-functional-audit-2026-10-30.md). No live Gmail/browser/deployment acceptance is implied.
+
+## P6 registry and selection audit — 2026-11-01
+
+AF-FE-P6-004/005 Medium verified: role-loss clearing and parked denied reads instead of resubscription loop. AF-FE-P6-006/007 Low verified: pure form rules in model and separate UI forms/details/dialog with colocated tests. [Scope, exact findings and27-test verification](p6-registry-functional-audit-2026-11-01.md). Earlier audit findings/history are unchanged.
+
+## P6 manual-result audit — 2026-11-01
+
+AF-FE-P6-008 High verified: permit captured manual retry through the parent's own uncertain lock. AF-FE-P6-009 Medium verified: latch denied history/template reads, clear private state/release lock, ignore late responses and park subscriptions. AF-FE-P6-010/011 Low verified: separate read recovery/access/form/manual tests and move runtime validation to its role folder. [Exact findings and55-case evidence](p6-manual-functional-audit-2026-11-01.md). Scope is FE-009 manual result only; previous findings remain unchanged.
