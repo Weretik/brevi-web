@@ -3,6 +3,7 @@ import ContentCutOutlinedIcon from '@mui/icons-material/ContentCutOutlined';
 import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
 import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
 import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
+import NotificationsActiveOutlinedIcon from '@mui/icons-material/NotificationsActiveOutlined';
 
 import type { SvgIconComponent } from '@mui/icons-material';
 
@@ -70,6 +71,22 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
       { id: 'expenses', label: 'Витрати' },
       { id: 'reports', label: 'Звіти' },
       { id: 'accounting-references', label: 'Довідники' },
+    ],
+  },
+  {
+    id: 'reminders',
+    icon: NotificationsActiveOutlinedIcon,
+    section: 'Робота',
+    label: 'Нагадування',
+    items: [
+      { id: 'reminder-tasks', label: 'Задачі', path: '/reminders/tasks' },
+      { id: 'reminder-periods', label: 'Періоди', path: '/reminders/periods' },
+      { id: 'reminder-chats', label: 'Чати Telegram', path: '/reminders/chats' },
+      {
+        id: 'reminder-non-working-days',
+        label: 'Неробочі дні',
+        path: '/reminders/non-working-days',
+      },
     ],
   },
   {

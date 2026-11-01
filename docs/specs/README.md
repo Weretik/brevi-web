@@ -17,6 +17,7 @@ The Storefront currently has README files for its Nx feature libraries, but they
 - [Admin React: operations tables and pages](admin/references/009-operations-pages/README.md)
 - [Admin React: suppliers — SDD closed, implementation partial](admin/references/010-suppliers-pages/README.md)
 - [Admin React: additional reference tables and pages](admin/references/011-additional-references-pages/README.md)
+- [Admin React: Telegram reminders](admin/reminders/001-telegram-reminders/README.md) — implemented and locally verified 2026-11-01.
 - [Visual guidance for tables, menus, and forms](admin/table-visual-guidance.md)
 - [React Admin migration order](admin/react-migration-roadmap.md)
 - [Admin: restore layers and module boundaries](admin/architecture/001-admin-layers-and-boundaries/README.md)
