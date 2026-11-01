@@ -8,6 +8,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import { Fragment } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -61,7 +62,30 @@ export function AdminNavigation({
     <Box
       aria-label={ariaLabel}
       component="nav"
-      sx={{ flex: 1, minHeight: 0, overflowX: 'hidden', overflowY: 'auto', px: 1.5, pb: 2 }}
+      sx={(theme) => {
+        const nav = getNavigationPalette(theme);
+        const thumb = alpha(nav.textMuted, 0.35);
+        // Thin scrollbar in the sidebar colors instead of the light system one.
+        return {
+          flex: 1,
+          minHeight: 0,
+          overflowX: 'hidden',
+          overflowY: 'auto',
+          pb: 2,
+          px: 1.5,
+          scrollbarColor: `${thumb} ${nav.background}`,
+          scrollbarWidth: 'thin',
+          '&::-webkit-scrollbar': { width: 8 },
+          '&::-webkit-scrollbar-track': { background: nav.background },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: thumb,
+            border: `2px solid ${nav.background}`,
+            borderRadius: 8,
+          },
+          '&::-webkit-scrollbar-thumb:hover': { backgroundColor: nav.textMuted },
+          '&::-webkit-scrollbar-button': { display: 'none', height: 0 },
+        };
+      }}
     >
       <List disablePadding>
         <Box component="li" sx={{ listStyle: 'none', mb: 0.25 }}>
