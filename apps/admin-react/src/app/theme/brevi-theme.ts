@@ -3,24 +3,29 @@ import { createTheme } from '@mui/material/styles';
 import { ukUA as dataGridUkUA } from '@mui/x-data-grid/locales';
 import type {} from '@mui/x-data-grid/themeAugmentation';
 
-import { breviBrand, darkPalette, lightPalette } from './brevi-palette';
+import { components } from './components';
+import { motion } from './motion';
+import { darkPalette, lightPalette } from './palette';
+import { typography } from './typography';
 
 import type { ThemeOptions } from '@mui/material/styles';
 
 const sharedThemeOptions: ThemeOptions = {
-  shape: { borderRadius: 10 },
-  typography: {
-    fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-  },
-  components: {
-    MuiCssBaseline: {
-      styleOverrides: {
-        body: { minWidth: 320 },
-        ':focus-visible': { outline: `2px solid ${breviBrand}`, outlineOffset: 2 },
-      },
+  shape: { borderRadius: 8 },
+  typography,
+  transitions: {
+    duration: {
+      shortest: motion.duration.fast,
+      shorter: motion.duration.fast,
+      short: motion.duration.base,
+      standard: motion.duration.base,
+      complex: motion.duration.slow,
+      enteringScreen: motion.duration.base,
+      leavingScreen: motion.duration.fast,
     },
-    MuiButton: { styleOverrides: { root: { textTransform: 'none' } } },
+    easing: { easeOut: motion.easing.out },
   },
+  components,
 };
 
 const missingDataGridUkUA: ThemeOptions = {

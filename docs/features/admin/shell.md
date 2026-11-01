@@ -1,10 +1,13 @@
 # Admin: Shell, Navigation, and Session
 
-**Status:** implementation exists, checked 2026-10-16.
+**Status:** implementation exists, checked 2026-11-01 (design system «Цех»).
 
 `apps/admin-react` starts React and composes providers and `AppRouter`.
-`AdminLayout` from `libs/admin/core/shell` displays navigation and `Outlet`; the
-list of items depends on routes that are actually available.
+`AdminLayout` from `libs/admin/core/shell` displays the graphite sidebar, the top
+bar with breadcrumbs and the theme menu, and `Outlet`; the list of items depends on
+routes that are actually available. The sidebar collapses to icons on desktop (group
+flyouts, choice remembered) and opens as a drawer on phones. Look and behavior follow
+the [design system «Цех»](../../standards/admin/design-system.md).
 `libs/admin/core/auth` provides the session for API transport, while
 `libs/admin/shared/config` provides runtime configuration. This is the shared
 foundation for domain pages, not a separate place for their business rules.
@@ -30,7 +33,9 @@ apps/admin-react/
 └── src/app/
     ├── router/
     │   ├── app-router.tsx # router
+    │   ├── legacy-menu.ts # groups, icons, sections
     │   └── navigation-config.ts # navigation
+    ├── theme/ # palette, typography, motion, components
     └── app.tsx # composition
 ```
 
@@ -42,9 +47,12 @@ libs/admin/core/
 │   └── index.ts # session
 └── shell/src/
     ├── layout/
-    │   └── admin-layout.tsx # shell and Outlet
+    │   └── admin-layout.tsx # shell, collapse state, and Outlet
+    ├── components/top-bar/ # top bar and breadcrumbs; actions/ search, notifications, theme, profile
     └── navigation/
-        └── admin-navigation.tsx # navigation
+        ├── navigation-palette.ts # palette.navigation type
+        ├── menu/ # home link, groups, items, collapsed flyout, route matching
+        └── sidebar/ # drawers, panel, logo, collapse hook
 ```
 
 ```text
@@ -53,7 +61,7 @@ libs/admin/shared/
     └── app-config.ts # runtime configuration
 ```
 
-**Where to look:** [composition](../../../apps/admin-react/src/app/app.tsx), [router](../../../apps/admin-react/src/app/router/app-router.tsx), [navigation](../../../apps/admin-react/src/app/router/navigation-config.ts), [session](../../../libs/admin/core/auth/src/index.ts), [routing architecture](../../architecture/admin/runtime/application.md), [shell specification](../../specs/admin/shell/001-react-admin-shell-theme/README.md).
+**Where to look:** [composition](../../../apps/admin-react/src/app/app.tsx), [router](../../../apps/admin-react/src/app/router/app-router.tsx), [navigation](../../../apps/admin-react/src/app/router/navigation-config.ts), [session](../../../libs/admin/core/auth/src/index.ts), [routing architecture](../../architecture/admin/runtime/application.md), [shell specification](../../specs/admin/shell/001-react-admin-shell-theme/README.md), [design system specification](../../specs/admin/shell/002-workshop-design-system/README.md).
 
 ## Tests
 

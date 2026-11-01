@@ -1,3 +1,11 @@
+import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
+import ContentCutOutlinedIcon from '@mui/icons-material/ContentCutOutlined';
+import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
+import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
+import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
+
+import type { SvgIconComponent } from '@mui/icons-material';
+
 interface LegacyNavigationItem {
   id: string;
   label: string;
@@ -8,12 +16,16 @@ interface LegacyNavigationItem {
 interface LegacyNavigationGroup {
   id: string;
   label: string;
+  icon: SvgIconComponent;
+  section: 'Робота' | 'Дані';
   items: readonly LegacyNavigationItem[];
 }
 
 export const legacyGroups: readonly LegacyNavigationGroup[] = [
   {
     id: 'service-manager',
+    icon: GroupsOutlinedIcon,
+    section: 'Робота',
     label: 'Менеджер сервісу',
     items: [
       { id: 'clients', label: 'Клієнти', path: '/crm/clients' },
@@ -34,6 +46,8 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
   },
   {
     id: 'sewing-shop',
+    icon: ContentCutOutlinedIcon,
+    section: 'Робота',
     label: 'Швейний цех',
     items: [
       { id: 'schedule', label: 'Графік роботи' },
@@ -47,6 +61,8 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
   },
   {
     id: 'accounting',
+    icon: AccountBalanceWalletOutlinedIcon,
+    section: 'Робота',
     label: 'Бухгалтерія',
     items: [
       { id: 'bills', label: 'Рахунки' },
@@ -58,6 +74,8 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
   },
   {
     id: 'references',
+    icon: MenuBookOutlinedIcon,
+    section: 'Дані',
     label: 'Загальні довідники',
     items: [
       { id: 'products', label: 'Товари', path: '/references/products' },
@@ -83,6 +101,8 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
   },
   {
     id: 'general-reports',
+    icon: InsertChartOutlinedIcon,
+    section: 'Дані',
     label: 'Загальні звіти',
     items: [{ id: 'reports-overview', label: 'Загальні звіти' }],
   },

@@ -4,7 +4,9 @@ import SettingsBrightnessIcon from '@mui/icons-material/SettingsBrightnessOutlin
 import { IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
 import { useState, type MouseEvent } from 'react';
 
-import type { AdminColorMode } from '../shell.types';
+import { topBarIconButtonSx } from './top-bar-icon-button';
+
+import type { AdminColorMode } from '../../../shell.types';
 
 interface ColorSchemeMenuProps {
   mode: AdminColorMode;
@@ -12,9 +14,9 @@ interface ColorSchemeMenuProps {
 }
 
 const modes: { label: string; value: AdminColorMode }[] = [
-  { label: 'Системна', value: 'system' },
   { label: 'Світла', value: 'light' },
   { label: 'Темна', value: 'dark' },
+  { label: 'Системна', value: 'system' },
 ];
 
 export function ColorSchemeMenu({ mode, onModeChange }: ColorSchemeMenuProps) {
@@ -37,16 +39,9 @@ export function ColorSchemeMenu({ mode, onModeChange }: ColorSchemeMenuProps) {
           aria-haspopup="menu"
           aria-label="Вибрати тему оформлення"
           onClick={(event: MouseEvent<HTMLElement>) => setAnchorElement(event.currentTarget)}
-          sx={{
-            border: 1,
-            borderColor: 'divider',
-            borderRadius: 1.5,
-            color: 'primary.main',
-            height: 40,
-            width: 40,
-          }}
+          sx={topBarIconButtonSx}
         >
-          <ModeIcon />
+          <ModeIcon fontSize="small" />
         </IconButton>
       </Tooltip>
       <Menu

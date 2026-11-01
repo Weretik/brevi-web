@@ -7,6 +7,7 @@ The Storefront currently has README files for its Nx feature libraries, but they
 - [Admin: product list](admin/products/README.md)
 - [Admin: template migration](admin/migration/README.md)
 - [Admin React: shell and corporate theme](admin/shell/001-react-admin-shell-theme/README.md)
+- [Admin React: design system «Цех», new top bar and sidebar](admin/shell/002-workshop-design-system/README.md)
 - [Admin React: menu migration and header](admin/navigation/001-legacy-menu/README.md)
 - [Admin React: six reference tables](admin/references/README.md)
 - [Admin React: new product table and actions](admin/products/001-products-table/README.md)
