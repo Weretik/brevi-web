@@ -1,8 +1,8 @@
 # Контракт споживача: Нагадування
 
 - **Канонічний OpenAPI:** `docs/sdd/contracts/reminders/telegram-reminders.openapi.yaml` у
-  `https://github.com/Weretik/BreviERP.git`, коміт `cce618f9811cbf307ff0d6c216c587051b147e52`
-  (гілка PR #8; після злиття синхронізувати знову з комітом `master`).
+  `https://github.com/Weretik/BreviERP.git`, коміт `cc7629de24a09333f644eea77ba51fb1363468c7`
+  (`master` після злиття PR #8).
 - **Знімок:** `docs/contracts/openapi/backend/reminders/`, типи в `@admin/shared/contracts`.
 
 | operationId                 | Використання в адмінці                                  | Кеш                                  |

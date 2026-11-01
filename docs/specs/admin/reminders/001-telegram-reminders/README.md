@@ -62,7 +62,7 @@
 ## Перевірка — 2026-11-01
 
 - `npm run contracts:check`: знімок і типи відповідають BreviERP
-  `cce618f9811cbf307ff0d6c216c587051b147e52`.
+  `cc7629de24a09333f644eea77ba51fb1363468c7`.
 - `npx nx run-many -t lint,typecheck,typecheck-tests,test -p admin-reminders-model admin-reminders-data-access admin-reminders-ui admin-reminders-feature`:
   усе зелене (16 + 6 + 3 + 6 тестів).
 - `npx nx typecheck admin-react`; `npx nx test admin-react -- router`: 3 файли, 17 тестів.
