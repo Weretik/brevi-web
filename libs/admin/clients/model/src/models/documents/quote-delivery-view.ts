@@ -11,4 +11,14 @@ export interface QuoteDeliveryView {
   readonly createdAt: string;
   readonly updatedAt: string;
   readonly confirmedAt: string | null;
+  readonly canResolveManually?: boolean;
+  readonly manualResolution?: QuoteDeliveryManualResolutionView | null;
+}
+
+export interface QuoteDeliveryManualResolutionView {
+  readonly outcome: 'sent' | 'not_sent';
+  readonly actorId: number;
+  readonly attempt: number;
+  readonly evidenceNote: string;
+  readonly createdAt: string;
 }

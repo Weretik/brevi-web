@@ -1,4 +1,9 @@
-import { QuoteDeliveryForm, QuoteDeliveryHistory } from '@admin/clients/ui';
+import {
+  QuoteDeliveryForm,
+  QuoteDeliveryHistory,
+  QuoteDeliveryOutcome,
+  ResolveDeliveryDialog,
+} from '@admin/clients/ui';
 import { Alert, Button, CircularProgress, Pagination, Stack, Typography } from '@mui/material';
 
 import { useQuoteDelivery } from '../../../hooks/documents/delivery/use-quote-delivery';
@@ -56,21 +61,11 @@ export function QuoteDeliveryPanel({
             onManager={state.setManager}
             onSend={state.send}
           />
-          {state.accepted && (
-            <Alert severity={state.accepted.state === 'succeeded' ? 'success' : 'info'}>
-              {state.accepted.state === 'succeeded'
-                ? 'Прийняття листа підтверджено провайдером. Оновіть стан КП із сервера.'
-                : state.accepted.state === 'unknown'
-                  ? 'Результат надсилання невідомий. Очікуйте перевірки в історії.'
-                  : state.accepted.state === 'failed'
-                    ? 'Спроба завершилася без підтвердження надсилання.'
-                    : state.accepted.state === 'queued'
-                      ? 'Лист поставлено в чергу. Це ще не підтвердження надсилання.'
-                      : 'Сервер обробляє попередню спробу. Перевіряйте історію надсилань.'}
-            </Alert>
+          {state.accepted && <QuoteDeliveryOutcome delivery={state.accepted} />}
+          {!state.resolution.target && state.action.error && (
+            <Alert severity="error">{state.action.error}</Alert>
           )}
-          {state.action.error && <Alert severity="error">{state.action.error}</Alert>}
-          {state.action.uncertain && (
+          {!state.resolution.target && state.action.uncertain && (
             <Button
               type="button"
               disabled={state.action.pending}
@@ -88,6 +83,8 @@ export function QuoteDeliveryPanel({
               <QuoteDeliveryHistory
                 rows={state.history.currentData.rows}
                 currentVersionId={detail.versionId}
+                disabled={state.fieldsLocked}
+                onReview={state.resolution.open}
               />
               {state.history.currentData.totalPages > 1 && (
                 <Pagination
@@ -114,6 +111,26 @@ export function QuoteDeliveryPanel({
           </Button>
         </>
       )}
+      <ResolveDeliveryDialog
+        delivery={state.resolution.target}
+        versionLabel={
+          state.resolution.target?.versionId === detail.versionId
+            ? 'Поточна версія КП'
+            : 'Інша збережена версія КП'
+        }
+        value={state.resolution.draft}
+        errors={state.resolution.errors}
+        locked={state.resolution.locked}
+        canConfirm={state.resolution.canConfirm}
+        error={state.resolution.error}
+        uncertain={state.action.uncertain}
+        retryDisabled={state.action.pending || state.action.forbidden}
+        onChange={state.resolution.change}
+        onClose={state.resolution.close}
+        onConfirm={state.resolution.confirm}
+        onRetry={() => void state.action.execute()}
+        onRefresh={state.resolution.refresh}
+      />
     </Stack>
   );
 }

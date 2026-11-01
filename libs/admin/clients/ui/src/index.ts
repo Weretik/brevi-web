@@ -34,3 +34,13 @@ export { IntroductionTemplatesList } from './components/introductions/introducti
 export { QuoteDeliveryForm } from './components/documents/delivery/quote-delivery-form';
 export { QuoteDeliveryHistory } from './components/documents/delivery/quote-delivery-history';
 export { QuoteProductionActions } from './components/documents/production/quote-production-actions';
+
+export { EmailTemplateFields } from './forms/documents/email-templates/email-template-fields';
+export { EmailTemplateVersionsList } from './components/documents/email-templates/email-template-versions-list';
+export { EmailTemplateDetails } from './details/documents/email-templates/email-template-details';
+
+export { ActivateEmailTemplateDialog } from './dialogs/documents/email-templates/activate-email-template-dialog';
+
+export { ResolveDeliveryDialog } from './dialogs/documents/delivery/resolve-delivery-dialog';
+
+export { QuoteDeliveryOutcome } from './components/documents/delivery/quote-delivery-outcome';

@@ -19,6 +19,7 @@ import {
 } from './introduction-editor-values';
 import { introductionErrorMessage } from './introduction-error-message';
 import { useIntroductionDraft } from './use-introduction-draft';
+import { useIntroductionEmailTemplates } from './use-introduction-email-templates';
 import { useTemplateAction } from '../custom-templates/use-template-action';
 
 import type { IntroductionPreparedDraft, IntroductionTemplateDetail } from '@admin/clients/model';
@@ -26,6 +27,10 @@ import type { IntroductionPreparedDraft, IntroductionTemplateDetail } from '@adm
 export function useIntroductionEditor() {
   const navigate = useNavigate();
   const draft = useIntroductionDraft();
+  const emailTemplates = useIntroductionEmailTemplates(
+    draft.values.emailTemplateVersionId,
+    draft.source?.emailTemplateVersionId ?? null,
+  );
   const [page, setPage] = useState(1);
   const [includeArchived, setIncludeArchived] = useState(false);
   const [recipientName, setRecipientName] = useState('');
@@ -47,7 +52,9 @@ export function useIntroductionEditor() {
     draft.reset();
     setPrepared(null);
   });
-  const accessDenied = isAdminApiError(list.error) && [401, 403, 404].includes(list.error.status);
+  const accessDenied =
+    emailTemplates.denied ||
+    (isAdminApiError(list.error) && [401, 403, 404].includes(list.error.status));
   const busy = loading || action.pending || action.uncertain || action.forbidden || accessDenied;
   const reads = useRef({ epoch: 0, mounted: true, denied: false });
   reads.current.denied = accessDenied;
@@ -94,12 +101,13 @@ export function useIntroductionEditor() {
     }
   };
   const save = () => {
+    if (busy) return;
     const requestId = crypto.randomUUID();
     const values = draft.values;
     const source = draft.source;
     let selections;
     try {
-      if (!values.name.trim() || !values.emailTemplateVersionId)
+      if (!values.name.trim() || !emailTemplates.canUse(values.emailTemplateVersionId))
         throw new Error('Вкажіть назву та чинну версію шаблону листа.');
       selections = introductionWriteSelections(values.format, draft.slots);
     } catch (failure) {
@@ -201,6 +209,7 @@ export function useIntroductionEditor() {
     setRecipientName,
     list,
     mapping,
+    emailTemplates,
     action,
     busy,
     readError,

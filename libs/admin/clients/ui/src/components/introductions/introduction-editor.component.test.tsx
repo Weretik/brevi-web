@@ -1,5 +1,6 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+
 import { IntroductionModelPicker } from './introduction-selection-pickers';
 import { IntroductionTemplateForm } from './introduction-template-form';
 import { IntroductionTemplatesList } from './introduction-templates-list';
@@ -65,6 +66,34 @@ describe('first-contact selection editing (SC-I01–02)', () => {
     );
     expect(screen.getByRole('button', { name: 'Зберегти' })).toBeDisabled();
     expect(screen.getByText('Назва має містити не більше 300 символів.')).toBeInTheDocument();
+  });
+
+  it('lets the user explicitly select a real email version and locks selection during registry loading', () => {
+    const onChange = vi.fn();
+    const props = {
+      value: { name: 'Добірка', format: 'summer' as const, emailTemplateVersionId: '' },
+      emailTemplateOptions: [{ id: 'real-email-version', label: 'Лист · версія 2' }],
+      disabled: false,
+      submitLabel: 'Зберегти',
+      onChange,
+      onSave: vi.fn(),
+    };
+    const view = render(<IntroductionTemplateForm {...props} />);
+    expect(onChange).not.toHaveBeenCalled();
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: /Шаблон листа/ }));
+    fireEvent.click(screen.getByRole('option', { name: 'Лист · версія 2' }));
+    expect(onChange).toHaveBeenCalledWith({
+      ...props.value,
+      emailTemplateVersionId: 'real-email-version',
+    });
+    view.rerender(
+      <IntroductionTemplateForm {...props} emailTemplateSelectionDisabled saveDisabled />,
+    );
+    expect(screen.getByRole('combobox', { name: /Шаблон листа/ })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+    expect(screen.getByRole('button', { name: 'Зберегти' })).toBeDisabled();
   });
 
   it('does not reuse archived selections and emits the selected template identity for restore', () => {

@@ -23,6 +23,7 @@ export interface IntroductionDraftSource {
   readonly revision: number;
   readonly archived: boolean;
   readonly mappingVersionId: string;
+  readonly emailTemplateVersionId: string;
 }
 
 const emptyValues: IntroductionDraftValues = {

@@ -1,6 +1,6 @@
 import { introductionLayout } from '@admin/clients/model';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, useLocation } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import IntroductionsPage from './introductions-page';
@@ -41,6 +41,17 @@ vi.mock('../../hooks/introductions/use-introduction-editor', () => ({
       refetch: vi.fn(),
     },
     mapping: { currentData: { versionId: 'mapping', summerProductId: 1, winterProductId: 10 } },
+    emailTemplates: {
+      options: [{ id: 'email', label: 'Шаблон листа · версія 1' }],
+      page: 1,
+      totalPages: 2,
+      setPage: vi.fn(),
+      loading: false,
+      error: false,
+      unavailable: false,
+      canUse: () => true,
+      refetch: vi.fn(),
+    },
     action: { uncertain: false, pending: false, error: '', execute: vi.fn() },
     busy: false,
     readError: '',
@@ -65,6 +76,20 @@ afterEach(() => {
 });
 
 describe('introduction route composition', () => {
+  it('opens email-template management from the selection editor', () => {
+    function Location() {
+      return <output aria-label="Поточний маршрут">{useLocation().pathname}</output>;
+    }
+    render(
+      <MemoryRouter initialEntries={['/crm/quotes/introductions']}>
+        <IntroductionsPage />
+        <Location />
+      </MemoryRouter>,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Шаблони листів' }));
+    expect(screen.getByLabelText('Поточний маршрут')).toHaveTextContent('/crm/email-templates');
+  });
+
   it('opens an owned template and requires explicit current server approval before creating a quote', async () => {
     mocks.check.mockResolvedValue({ approved: true, blockers: [] });
     mocks.apply.mockResolvedValue(undefined);

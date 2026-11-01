@@ -5,10 +5,13 @@ import { QuoteDeliveryPanel } from './delivery/quote-delivery-panel';
 import { QuoteProductionPanel } from './production/quote-production-panel';
 import { quoteDetailFixture } from '../../testing/quotes/quote-detail.fixture';
 
-import type { QuoteDetail } from '@admin/clients/model';
+import type { QuoteDetail, QuoteDeliveryView } from '@admin/clients/model';
 
 const api = vi.hoisted(() => ({
+  rows: [] as QuoteDeliveryView[],
   enqueue: vi.fn(),
+  resolve: vi.fn(),
+  getDelivery: vi.fn(),
   export: vi.fn(),
   download: vi.fn(),
   refresh: vi.fn(),
@@ -24,12 +27,14 @@ vi.mock('@admin/clients/data-access', () => ({
     refetch: api.refresh,
   }),
   useGetQuoteDeliveriesQuery: () => ({
-    currentData: { rows: [], page: 1, pageSize: 25, totalPages: 0, total: 0 },
+    currentData: { rows: api.rows, page: 1, pageSize: 25, totalPages: 0, total: 0 },
     isLoading: false,
     isFetching: false,
     isError: false,
     refetch: api.refresh,
   }),
+  useResolveQuoteDeliveryMutation: () => [api.resolve],
+  useLazyGetQuoteDeliveryQuery: () => [api.getDelivery],
   useEnqueueQuoteDeliveryMutation: () => [api.enqueue],
   useExportQuoteProductionMutation: () => [api.export],
   downloadProductionPackage: api.download,
@@ -125,6 +130,7 @@ function confirm() {
 describe('P6 quote panels', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    api.rows = [];
     api.active = { id: 'template', label: 'Лист', number: 1 };
     api.enqueue.mockReturnValue({ unwrap: () => Promise.resolve(queued) });
     api.export.mockReturnValue({ unwrap: () => Promise.resolve(artifact) });
@@ -194,7 +200,9 @@ describe('P6 quote panels', () => {
     showDelivery();
     confirm();
     expect(
-      await screen.findByText('Результат надсилання невідомий. Очікуйте перевірки в історії.'),
+      await screen.findByText(
+        'Результат надсилання невідомий. Перевірте точний лист у Gmail вручну та зафіксуйте результат в історії.',
+      ),
     ).toBeVisible();
     expect(screen.queryByText(/Лист поставлено в чергу/)).not.toBeInTheDocument();
   });
@@ -279,4 +287,5 @@ describe('P6 quote panels', () => {
       screen.queryByRole('button', { name: 'Завантажити виробничий ZIP' }),
     ).not.toBeInTheDocument();
   });
+
 });

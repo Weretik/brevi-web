@@ -7,6 +7,7 @@ const IntroductionsPage = lazy(() => import('./pages/introductions/introductions
 const QuotesPage = lazy(() => import('./pages/quotes/list/quotes-page'));
 const QuoteEditorPage = lazy(() => import('./pages/quotes/editor/quote-editor-page'));
 const QuoteHistoryPage = lazy(() => import('./pages/quotes/history/quote-history-page'));
+const EmailTemplatesPage = lazy(() => import('./pages/documents/email-templates-page'));
 const IssuerSettingsPage = lazy(() => import('./pages/documents/issuer-settings-page'));
 const CustomEditorPage = lazy(() => import('./pages/custom-sewing/custom-editor-page'));
 export const clientsRoutes = [
@@ -22,4 +23,5 @@ export const clientsRoutes = [
   { path: '/crm/quotes/:quoteId', element: <QuoteEditorPage /> },
   { path: '/crm/quotes/:quoteId/history', element: <QuoteHistoryPage /> },
   { path: '/crm/issuer-settings', element: <IssuerSettingsPage /> },
+  { path: '/crm/email-templates', element: <EmailTemplatesPage /> },
 ] as const;

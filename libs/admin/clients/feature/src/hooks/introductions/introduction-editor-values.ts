@@ -29,6 +29,7 @@ export function introductionEditorValues(detail: IntroductionTemplateDetail) {
       revision: detail.revision,
       archived: detail.archived,
       mappingVersionId: detail.mappingVersionId,
+      emailTemplateVersionId: detail.emailTemplateVersionId,
     },
   };
 }

@@ -1,8 +1,13 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import QuotesPage from './quotes-page';
+import { clientsRoutes } from '../../../clients.routes';
+
+vi.mock('../../documents/email-templates-page', () => ({
+  default: () => <h1>Реєстр шаблонів листів</h1>,
+}));
 
 const hooks = vi.hoisted(() => ({ list: vi.fn() }));
 vi.mock('@admin/clients/data-access', () => ({
@@ -13,6 +18,23 @@ vi.mock('@admin/clients/data-access', () => ({
   }),
 }));
 describe('quote list route (SC-Q01/07)', () => {
+  it('opens email-template management from Quotes through the registered lazy route', async () => {
+    hooks.list.mockReturnValue({ currentData: { rows: [], totalPages: 0 }, isFetching: false });
+    const registry = clientsRoutes.find((route) => String(route.path) === '/crm/email-templates');
+    expect(registry).toBeDefined();
+    render(
+      <MemoryRouter initialEntries={['/crm/quotes']}>
+        <Routes>
+          <Route path="/crm/quotes" element={<QuotesPage />} />
+          <Route path="/crm/email-templates" element={registry?.element} />
+        </Routes>
+      </MemoryRouter>,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Шаблони листів' }));
+    expect(
+      await screen.findByRole('heading', { name: 'Реєстр шаблонів листів' }),
+    ).toBeInTheDocument();
+  });
   it('uses the shared list for archive and clears the source filter with pagination', () => {
     hooks.list.mockReturnValue({ currentData: { rows: [], totalPages: 0 }, isFetching: false });
     render(

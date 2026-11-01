@@ -3,8 +3,10 @@ import {
   useGetActiveQuoteEmailTemplateQuery,
   useGetQuoteDeliveriesQuery,
 } from '@admin/clients/data-access';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
+import { useDeliveryReadAccess } from './use-delivery-read-access';
+import { useDeliveryResolution } from './use-delivery-resolution';
 import { useDocumentAction } from '../use-document-action';
 
 import type {
@@ -25,19 +27,47 @@ export function useQuoteDelivery(
   const [manager, setManager] = useState('');
   const [capturedTemplate, setCapturedTemplate] = useState<EmailTemplateView | null>(null);
   const [accepted, setAccepted] = useState<QuoteDeliveryView | null>(null);
-  const action = useDocumentAction(onLock, () => {
+  const resetResolution = useRef<() => void>(() => undefined);
+  const clearPrivate = () => {
+    resetResolution.current();
     setAccepted(null);
     setCapturedTemplate(null);
     setRecipient('');
     setManager('');
+  };
+  const readAccess = useDeliveryReadAccess(() => {
+    clearPrivate();
+    onLock(false, false);
   });
+  const documentAction = useDocumentAction(
+    (pending, uncertain) =>
+      onLock(readAccess.isCurrent() && pending, readAccess.isCurrent() && uncertain),
+    clearPrivate,
+  );
+  const action = {
+    ...documentAction,
+    forbidden: documentAction.forbidden || readAccess.denied,
+    isCurrent: () => documentAction.isCurrent() && readAccess.isCurrent(),
+    execute: (run?: () => Promise<void>) =>
+      readAccess.isCurrent() ? documentAction.execute(run) : Promise.resolve(),
+  };
   const template = useGetActiveQuoteEmailTemplateQuery(undefined, { skip: action.forbidden });
   const history = useGetQuoteDeliveriesQuery(
     { quoteId: detail.publicId, page },
     { skip: action.forbidden, pollingInterval: 10000, skipPollingIfUnfocused: true },
   );
+  useEffect(
+    () => readAccess.observe(template.error, history.error),
+    [template.error, history.error, readAccess.observe],
+  );
   const [enqueue] = useEnqueueQuoteDeliveryMutation();
-  const fieldsLocked = disabled || action.pending || action.uncertain || action.forbidden;
+  const resolution = useDeliveryResolution(detail.publicId, disabled, action, (row) => {
+    setAccepted(row);
+    void history.refetch();
+  });
+  resetResolution.current = resolution.reset;
+  const fieldsLocked =
+    disabled || action.pending || action.uncertain || action.forbidden || !!resolution.target;
   const canSend =
     !fieldsLocked &&
     !detail.archived &&
@@ -73,6 +103,7 @@ export function useQuoteDelivery(
     });
   };
   return {
+    resolution,
     template,
     displayTemplate: action.pending || action.uncertain ? capturedTemplate : template.currentData,
     history,

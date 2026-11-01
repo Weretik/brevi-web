@@ -1496,6 +1496,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/crm/quotes/{quoteId}/deliveries/{deliveryId}/resolution': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Current owner Manager or Admin. Explicit checked manual result for unknown/expired attempt; never sends/reads Gmail. Actor/time immutable and separate from provider confirmation. Same actor/requestId/input replays, changed intent409. Active or terminal attempts409. */
+    post: operations['resolveCrmQuoteDelivery'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/crm/quote-templates': {
     parameters: {
       query?: never;
@@ -3584,6 +3601,15 @@ export interface components {
       /** Format: date-time */
       createdAt: string;
     };
+    QuoteDeliveryManualResolution: {
+      /** @enum {string} */
+      outcome: 'sent' | 'not_sent';
+      actorId: number;
+      attempt: number;
+      evidenceNote: string;
+      /** Format: date-time */
+      createdAt: string;
+    };
     QuoteDeliveryDetail: {
       /** Format: uuid */
       deliveryId: string;
@@ -3606,6 +3632,9 @@ export interface components {
       updatedAt: string;
       /** Format: date-time */
       confirmedAt?: string | null;
+      /** @description Server-owned: unknown or expired attempt eligible for explicit manual result. */
+      canResolveManually?: boolean;
+      manualResolution?: components['schemas']['QuoteDeliveryManualResolution'] | null;
     };
     EnqueueQuoteDeliveryRequest: {
       /** Format: uuid */
@@ -3621,6 +3650,14 @@ export interface components {
       /** Format: email */
       recipientAddress: string;
       managerName: string;
+    };
+    ResolveQuoteDeliveryRequest: {
+      /** Format: uuid */
+      requestId: string;
+      expectedAttempt: number;
+      /** @enum {string} */
+      outcome: 'sent' | 'not_sent';
+      evidenceNote: string;
     };
     CrmTemplateSummary: {
       /** Format: uuid */
@@ -9339,6 +9376,65 @@ export interface operations {
       };
       /** @description Missing or inaccessible quote/delivery */
       404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  resolveCrmQuoteDelivery: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ResolveQuoteDeliveryRequest'];
+      };
+    };
+    responses: {
+      /** @description Recorded or replayed manual result */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['QuoteDeliveryDetail'];
+        };
+      };
+      /** @description Invalid input or unknown JSON field */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Non-staff actor */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found or inaccessible */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Attempt/state/intent conflict */
+      409: {
         headers: {
           [name: string]: unknown;
         };

@@ -87,6 +87,29 @@ export type * from './models/introductions/introduction-editor-view';
 
 export type * from './models/introductions/introduction-template';
 
-export type { QuoteDeliveryView } from './models/documents/quote-delivery-view';
+export type {
+  QuoteDeliveryView,
+  QuoteDeliveryManualResolutionView,
+} from './models/documents/quote-delivery-view';
 export type { ProductionPackageView } from './models/documents/production-package-view';
-export type { EmailTemplateView } from './models/documents/email-template-view';
+export type {
+  EmailTemplateView,
+  EmailTemplateSummaryView,
+  EmailTemplateDetailView,
+  EmailTemplateSettingsView,
+  EmailTemplatePageView,
+} from './models/documents/email-template-view';
+
+export { emptyEmailTemplateDraft } from './forms/documents/email-template-draft';
+export type {
+  EmailTemplateDraft,
+  EmailTemplateDraftErrors,
+} from './forms/documents/email-template-draft';
+export { emailTemplateDraftErrors } from './validators/documents/email-template-draft-validation';
+
+export { emptyDeliveryResolutionDraft } from './forms/documents/delivery-resolution-draft';
+export type {
+  DeliveryResolutionDraft,
+  DeliveryResolutionErrors,
+} from './forms/documents/delivery-resolution-draft';
+export { deliveryResolutionErrors } from './validators/documents/delivery-resolution-validation';

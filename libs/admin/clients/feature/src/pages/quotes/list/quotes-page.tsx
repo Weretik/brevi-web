@@ -39,6 +39,7 @@ export default function QuotesPage({ archivedView = false }: { archivedView?: bo
           <Alert severity="info">Доступ до КП змінився. Перевірте доступні КП у списку.</Alert>
         )}
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
+          <Button onClick={() => navigate('/crm/email-templates')}>Шаблони листів</Button>
           <Button onClick={() => navigate('/crm/quotes/introductions')}>
             Добірки для знайомства
           </Button>

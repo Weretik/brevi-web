@@ -1,5 +1,7 @@
 import { Alert, Button, MenuItem, Stack, TextField } from '@mui/material';
+
 import { IntroductionFormatSelector } from './introduction-format-selector';
+
 import type {
   IntroductionEmailTemplateOption,
   IntroductionTemplateFormValue,
@@ -8,6 +10,8 @@ import type {
 export function IntroductionTemplateForm({
   value,
   emailTemplateOptions = [],
+  emailTemplateSelectionDisabled = false,
+  saveDisabled = false,
   disabled,
   submitLabel,
   onChange,
@@ -15,6 +19,8 @@ export function IntroductionTemplateForm({
 }: {
   value: IntroductionTemplateFormValue;
   emailTemplateOptions?: readonly IntroductionEmailTemplateOption[];
+  emailTemplateSelectionDisabled?: boolean;
+  saveDisabled?: boolean;
   disabled: boolean;
   submitLabel: string;
   onChange: (value: IntroductionTemplateFormValue) => void;
@@ -32,7 +38,7 @@ export function IntroductionTemplateForm({
       aria-label="Збереження сезонної добірки"
       onSubmit={(event) => {
         event.preventDefault();
-        if (!disabled && !incomplete) onSave();
+        if (!disabled && !incomplete && !saveDisabled) onSave();
       }}
     >
       <TextField
@@ -55,7 +61,7 @@ export function IntroductionTemplateForm({
         label="Шаблон листа"
         required
         value={value.emailTemplateVersionId}
-        disabled={disabled}
+        disabled={disabled || emailTemplateSelectionDisabled}
         helperText="Шаблон зберігається разом із добіркою. Надсилання виконується окремою дією."
         onChange={(event) => onChange({ ...value, emailTemplateVersionId: event.target.value })}
       >
@@ -76,7 +82,7 @@ export function IntroductionTemplateForm({
           Немає доступної версії шаблону листа. Перевірте налаштування перед збереженням добірки.
         </Alert>
       )}
-      <Button type="submit" variant="contained" disabled={disabled || incomplete}>
+      <Button type="submit" variant="contained" disabled={disabled || incomplete || saveDisabled}>
         {submitLabel}
       </Button>
     </Stack>

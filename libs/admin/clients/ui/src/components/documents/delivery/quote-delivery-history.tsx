@@ -1,4 +1,4 @@
-import { Alert, Chip, List, ListItem, Stack, Typography } from '@mui/material';
+import { Alert, Button, Chip, List, ListItem, Stack, Typography } from '@mui/material';
 
 import type { QuoteDeliveryView } from '@admin/clients/model';
 
@@ -13,9 +13,13 @@ const labels: Record<QuoteDeliveryView['state'], string> = {
 export function QuoteDeliveryHistory({
   rows,
   currentVersionId,
+  disabled = false,
+  onReview,
 }: {
   rows: readonly QuoteDeliveryView[];
   currentVersionId: string;
+  disabled?: boolean;
+  onReview?: (delivery: QuoteDeliveryView) => void;
 }) {
   if (rows.length === 0) return <Alert severity="info">Історія надсилань порожня.</Alert>;
   return (
@@ -31,7 +35,13 @@ export function QuoteDeliveryHistory({
               <Typography sx={{ overflowWrap: 'anywhere' }}>{row.recipient}</Typography>
               <Chip
                 size="small"
-                label={labels[row.state]}
+                label={
+                  row.manualResolution
+                    ? row.manualResolution.outcome === 'sent'
+                      ? 'Надсилання підтверджено вручну'
+                      : 'Ненадсилання підтверджено вручну'
+                    : labels[row.state]
+                }
                 color={
                   row.state === 'succeeded'
                     ? 'success'
@@ -49,14 +59,31 @@ export function QuoteDeliveryHistory({
             </Typography>
             {row.state === 'unknown' && (
               <Alert severity="warning">
-                Результат перевіряється. Не створюйте повторну відправку.
+                Результат надсилання невідомий. Перевірте папку «Надіслані» у Gmail вручну. Не
+                створюйте повторну відправку.
               </Alert>
             )}
-            {row.state === 'failed' && (
+            {row.state === 'failed' && !row.manualResolution && (
               <Alert severity="error">
                 Лист не було підтверджено. Перевірте поштовий сервіс і дані перед новою явною
                 спробою.
               </Alert>
+            )}
+            {row.manualResolution && (
+              <Stack spacing={0.5}>
+                <Typography variant="caption">
+                  Перевірив користувач {row.manualResolution.actorId} ·{' '}
+                  {new Date(row.manualResolution.createdAt).toLocaleString('uk-UA')}
+                </Typography>
+                <Typography sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
+                  {row.manualResolution.evidenceNote}
+                </Typography>
+              </Stack>
+            )}
+            {row.canResolveManually && onReview && (
+              <Button type="button" disabled={disabled} onClick={() => onReview(row)}>
+                Зафіксувати перевірений результат
+              </Button>
             )}
           </Stack>
         </ListItem>

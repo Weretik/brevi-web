@@ -77,5 +77,14 @@ export {
   useLazyGetQuoteProductionQuery,
 } from './api/documents/production-package.api';
 
-export { useGetActiveQuoteEmailTemplateQuery } from './api/documents/email-template.api';
+export {
+  useGetActiveQuoteEmailTemplateQuery,
+  useGetQuoteEmailTemplatesQuery,
+  useLazyGetQuoteEmailTemplateQuery,
+  useGetQuoteEmailTemplateSettingsQuery,
+  useCreateQuoteEmailTemplateMutation,
+  useActivateQuoteEmailTemplateMutation,
+} from './api/documents/email-template.api';
 export { downloadProductionPackage } from './api/documents/download-production-package';
+
+export { useResolveQuoteDeliveryMutation } from './api/documents/quote-delivery-resolution.api';

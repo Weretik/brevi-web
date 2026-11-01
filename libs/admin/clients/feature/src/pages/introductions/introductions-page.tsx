@@ -24,9 +24,6 @@ export default function IntroductionsPage() {
   const pickers = useIntroductionCatalogPickers(editor);
   const source = editor.draft.source;
   const disabled = editor.busy || !!source?.archived;
-  const currentEmailOptions = editor.draft.values.emailTemplateVersionId
-    ? [{ id: editor.draft.values.emailTemplateVersionId, label: 'Збережена версія шаблону листа' }]
-    : [];
   if (editor.accessDenied)
     return (
       <Box sx={{ p: { xs: 2, md: 3 } }}>
@@ -46,6 +43,7 @@ export default function IntroductionsPage() {
         </Typography>
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
           <Button onClick={() => navigate('/crm/quotes')}>Розрахунки та КП</Button>
+          <Button onClick={() => navigate('/crm/email-templates')}>Шаблони листів</Button>
           <Button disabled={editor.busy} onClick={editor.reset}>
             Нова добірка
           </Button>
@@ -119,13 +117,38 @@ export default function IntroductionsPage() {
         {editor.draft.dirty && (
           <Alert severity="info">Збережіть зміни перед перевіркою та створенням КП.</Alert>
         )}
+        {editor.emailTemplates.loading && (
+          <CircularProgress aria-label="Завантаження шаблонів листів" />
+        )}
+        {editor.emailTemplates.error && (
+          <Alert
+            severity="error"
+            action={
+              <Button onClick={() => void editor.emailTemplates.refetch()}>
+                Повторити завантаження шаблонів
+              </Button>
+            }
+          >
+            Не вдалося завантажити шаблони листів. Нову версію можна обрати після відновлення
+            доступу.
+          </Alert>
+        )}
         <IntroductionTemplateForm
           value={editor.draft.values}
-          emailTemplateOptions={currentEmailOptions}
+          emailTemplateOptions={editor.emailTemplates.options}
+          emailTemplateSelectionDisabled={editor.emailTemplates.unavailable}
+          saveDisabled={!editor.emailTemplates.canUse(editor.draft.values.emailTemplateVersionId)}
           disabled={disabled}
           onChange={editor.draft.change}
           onSave={editor.save}
           submitLabel={source ? 'Зберегти нову версію добірки' : 'Зберегти добірку'}
+        />
+        <Pagination
+          aria-label="Сторінки шаблонів листів"
+          page={editor.emailTemplates.page}
+          count={editor.emailTemplates.totalPages}
+          disabled={disabled || editor.emailTemplates.loading}
+          onChange={(_, value) => editor.emailTemplates.setPage(value)}
         />
         <TextField
           label="Одержувач нового КП"
