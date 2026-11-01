@@ -58,6 +58,12 @@ If the user authorizes an entire feature, phase, or set of `SC-*` scenarios, the
 
 Implement a feature in stages (one scenario, task slice, or layer at a time). After each stage, run a short structure check on the files that stage touched: split files, components, and hooks that mix responsibilities; split large visual components into smaller ones; and move crowded "dump" folders into logical folders or modules under the code organization rules. Do not leave this for the end of the feature. The check is local to changed files and is not the full code audit, which still runs only at the user's explicit request. After the last stage, do a short final pass over the whole feature.
 
+## Closing checklist
+
+Before reporting a feature complete, check each item that applies: the feature card and [feature catalog](../../features/README.md) row are created or updated; the [specification index](../../specs/README.md) row and traceability are current; the card's "Tests" section is current; the contract snapshot and generated types are synced after a backend change; loading, empty, and error states exist; the existing theme (light and dark), responsive rules, and locale are respected; architecture documentation is updated when a module, route, or boundary is added or changed; the staged structure checks are done.
+
+When changing an existing feature, open its card and the code and tests it lists before editing.
+
 ## Completion criteria
 
 All in-scope `SC-*` scenarios are implemented or explicitly deferred; tasks and checkpoints are complete; contracts, documentation, and implementation agree; and evidence of focused tests and regression for the affected feature is recorded. Checks needed for its risks pass or their absence is documented. General tests and a full suite run only at the user's explicit request. The delivery report lists scope, changed files, evidence, unrun checks, and real residual risks. Architecture findings in the current scope must be `verified`; an `open`, `blocked`, or `planned` finding blocks delivery, while `deferred-approved` requires a separate SDD/task, an owner, and explicit approval that the finding is not a prerequisite of the current result.
