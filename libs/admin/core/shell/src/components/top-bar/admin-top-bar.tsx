@@ -2,9 +2,12 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { AppBar, IconButton, Toolbar } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
+import { ColorSchemeMenu } from './actions/color-scheme-menu';
+import { NotificationsMenu } from './actions/notifications-menu';
+import { ProfileMenu } from './actions/profile-menu';
+import { topBarIconButtonSx } from './actions/top-bar-icon-button';
+import { TopBarSearch } from './actions/top-bar-search';
 import { AdminBreadcrumbs } from './admin-breadcrumbs';
-import { ColorSchemeMenu } from './color-scheme-menu';
-import { topBarIconButtonSx } from './top-bar-icon-button';
 
 import type { AdminColorMode, AdminNavigationGroup } from '../../shell.types';
 import type { RefObject } from 'react';
@@ -46,7 +49,10 @@ export function AdminTopBar({
           <MenuIcon fontSize="small" />
         </IconButton>
         <AdminBreadcrumbs navigation={navigation} />
+        <TopBarSearch />
+        <NotificationsMenu />
         <ColorSchemeMenu mode={colorMode} onModeChange={onColorModeChange} />
+        <ProfileMenu />
       </Toolbar>
     </AppBar>
   );

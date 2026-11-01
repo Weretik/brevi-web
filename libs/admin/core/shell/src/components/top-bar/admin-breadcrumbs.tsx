@@ -21,7 +21,12 @@ export function AdminBreadcrumbs({ navigation }: AdminBreadcrumbsProps) {
     <Breadcrumbs
       aria-label="Розташування"
       separator={<NavigateNextIcon fontSize="small" />}
-      sx={{ flexGrow: 1, minWidth: 0, '& .MuiBreadcrumbs-ol': { flexWrap: 'nowrap' } }}
+      sx={{
+        flexGrow: 1,
+        minWidth: 0,
+        '& .MuiBreadcrumbs-ol': { flexWrap: 'nowrap' },
+        '& .MuiBreadcrumbs-separator': { display: { xs: 'none', sm: 'flex' } },
+      }}
     >
       {trail.map((label, index) => {
         const isLast = index === trail.length - 1;

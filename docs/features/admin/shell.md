@@ -48,7 +48,7 @@ libs/admin/core/
 └── shell/src/
     ├── layout/
     │   └── admin-layout.tsx # shell, collapse state, and Outlet
-    ├── components/top-bar/ # top bar, breadcrumbs, theme menu
+    ├── components/top-bar/ # top bar and breadcrumbs; actions/ search, notifications, theme, profile
     └── navigation/
         ├── navigation-palette.ts # palette.navigation type
         ├── menu/ # home link, groups, items, collapsed flyout, route matching

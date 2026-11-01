@@ -4,11 +4,12 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { AdminLayout } from './admin-layout';
+import { AdminShellSessionProvider } from '../providers/admin-shell-session-provider';
 
-function renderShell(initialPath = '/') {
+function renderShell(initialPath = '/', onLogout?: () => Promise<void>) {
   const onColorModeChange = vi.fn();
 
-  render(
+  const ui = (
     <MemoryRouter initialEntries={[initialPath]}>
       <Routes>
         <Route
@@ -33,7 +34,11 @@ function renderShell(initialPath = '/') {
           <Route path="example" element={<h1>Приклад сторінки</h1>} />
         </Route>
       </Routes>
-    </MemoryRouter>,
+    </MemoryRouter>
+  );
+
+  render(
+    onLogout ? <AdminShellSessionProvider onLogout={onLogout}>{ui}</AdminShellSessionProvider> : ui,
   );
 
   return { onColorModeChange };
@@ -77,9 +82,6 @@ describe('AdminLayout', () => {
     expect(currentGroup).toHaveAttribute('aria-expanded', 'true');
     await user.click(currentGroup);
     expect(currentGroup).toHaveAttribute('aria-expanded', 'false');
-    expect(
-      screen.queryByRole('button', { name: /сповіщення|профіль|пошук/i }),
-    ).not.toBeInTheDocument();
   });
 
   it('closes mobile navigation after choosing a route and restores visible focus', async () => {
@@ -156,5 +158,23 @@ describe('AdminLayout', () => {
     renderShell();
 
     expect(screen.getByRole('button', { name: 'Розгорнути меню' })).toBeVisible();
+  });
+
+  it('shows search, notifications, and profile with honest placeholders and a working logout', async () => {
+    const user = userEvent.setup();
+    const onLogout = vi.fn().mockResolvedValue(undefined);
+    renderShell('/', onLogout);
+
+    await user.click(screen.getAllByRole('button', { name: 'Пошук' })[0]);
+    expect(await screen.findByText("Пошук скоро з'явиться")).toBeVisible();
+    await user.keyboard('{Escape}');
+
+    await user.click(screen.getByRole('button', { name: 'Сповіщення' }));
+    expect(await screen.findByText('Нових сповіщень немає')).toBeVisible();
+    await user.keyboard('{Escape}');
+
+    await user.click(screen.getByRole('button', { name: 'Профіль' }));
+    await user.click(await screen.findByRole('menuitem', { name: 'Вийти' }));
+    expect(onLogout).toHaveBeenCalledOnce();
   });
 });
