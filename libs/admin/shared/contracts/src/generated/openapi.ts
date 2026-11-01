@@ -1683,6 +1683,214 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/reminders/non-working-days': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['getReminderNonWorkingDays'];
+    put?: never;
+    post: operations['addReminderNonWorkingDay'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/reminders/non-working-days/{date}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete: operations['removeReminderNonWorkingDay'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/reminders/chats': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['getReminderChats'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/reminders/chats/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: operations['updateReminderChat'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/reminders/chats/{id}/test-message': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['sendReminderChatTest'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/reminders/occurrences': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['getReminderOccurrences'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/reminders/occurrences/{id}/close': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['closeReminderOccurrence'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/reminders/occurrences/{id}/reopen': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['reopenReminderOccurrence'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/reminders/tasks': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['getReminderTasks'];
+    put?: never;
+    post: operations['createReminderTask'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/reminders/tasks/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put: operations['updateReminderTask'];
+    post?: never;
+    delete: operations['archiveReminderTask'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/reminders/tasks/preview': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['previewReminderDueDates'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/reminders/tasks/assign-chat': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['assignReminderChat'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/reminders/telegram/connect': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post: operations['connectTelegramWebhook'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -3614,6 +3822,128 @@ export interface components {
       issuerVersionId: string;
       /** Format: uuid */
       templateVersionId: string;
+    };
+    NonWorkingDayResponse: {
+      /** Format: date */
+      date?: string;
+      note?: string | null;
+    };
+    NonWorkingDayInput: {
+      /** Format: date */
+      date?: string;
+      note?: string | null;
+    };
+    ReminderChatResponse: {
+      /** Format: int64 */
+      id?: number;
+      /** Format: int64 */
+      telegramChatId?: number;
+      kind?: string | null;
+      telegramTitle?: string | null;
+      displayName?: string | null;
+      isApproved?: boolean;
+      isBotMember?: boolean;
+      /** Format: date-time */
+      discoveredAt?: string;
+    };
+    ReminderChatInput: {
+      displayName?: string | null;
+      isApproved?: boolean;
+    };
+    ReminderActorResponse: {
+      name?: string | null;
+      /** Format: int64 */
+      telegramUserId?: number | null;
+      /** Format: int32 */
+      adminUserId?: number | null;
+    };
+    ReminderActionResponse: {
+      kind?: string | null;
+      actor?: components['schemas']['ReminderActorResponse'];
+      /** Format: date-time */
+      at?: string;
+      /** Format: date */
+      snoozedUntil?: string | null;
+    };
+    ReminderOccurrenceResponse: {
+      /** Format: int64 */
+      id?: number;
+      /** Format: int64 */
+      taskId?: number;
+      taskTitle?: string | null;
+      organization?: string | null;
+      period?: string | null;
+      /** Format: date */
+      dueDate?: string;
+      /** Format: date */
+      remindFrom?: string;
+      status?: string | null;
+      /** Format: date */
+      snoozedUntil?: string | null;
+      closedBy?: components['schemas']['ReminderActorResponse'];
+      /** Format: date-time */
+      closedAt?: string | null;
+      actions?: components['schemas']['ReminderActionResponse'][] | null;
+    };
+    ReminderOccurrencePage: {
+      items?: components['schemas']['ReminderOccurrenceResponse'][] | null;
+      /** Format: int32 */
+      total?: number;
+    };
+    ReminderScheduleInput: {
+      periodicity?: string | null;
+      dueRule?: string | null;
+      /** Format: int32 */
+      day?: number;
+      /** Format: int32 */
+      monthOffset?: number;
+      /** Format: int32 */
+      leadDays?: number;
+    };
+    DueDatePreview: {
+      period?: string | null;
+      /** Format: date */
+      dueDate?: string;
+      /** Format: date */
+      remindFrom?: string;
+    };
+    ReminderTaskResponse: {
+      /** Format: int64 */
+      id?: number;
+      title?: string | null;
+      organization?: string | null;
+      schedule?: components['schemas']['ReminderScheduleInput'];
+      /** Format: int64 */
+      chatId?: number | null;
+      chatName?: string | null;
+      /** Format: date */
+      activeFrom?: string;
+      isEnabled?: boolean;
+      nextDueDates?: components['schemas']['DueDatePreview'][] | null;
+      /** Format: date-time */
+      createdAt?: string;
+      /** Format: date-time */
+      updatedAt?: string | null;
+    };
+    ReminderTaskInput: {
+      title?: string | null;
+      organization?: string | null;
+      schedule?: components['schemas']['ReminderScheduleInput'];
+      /** Format: int64 */
+      chatId?: number | null;
+      /** Format: date */
+      activeFrom?: string | null;
+      isEnabled?: boolean;
+    };
+    PreviewReminderDueDatesRequest: {
+      schedule?: components['schemas']['ReminderScheduleInput'];
+      /** Format: date */
+      from?: string | null;
+    };
+    AssignReminderChatRequest: {
+      /** Format: int64 */
+      chatId?: number;
+      organizations?: string[] | null;
     };
   };
   responses: {
@@ -9807,6 +10137,625 @@ export interface operations {
       };
       /** @description Revision or requestId replay conflict */
       409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getReminderNonWorkingDays: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': components['schemas']['NonWorkingDayResponse'][];
+          'application/json': components['schemas']['NonWorkingDayResponse'][];
+          'text/json': components['schemas']['NonWorkingDayResponse'][];
+        };
+      };
+      /** @description Unauthenticated (normal mode) */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required (normal mode) */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  addReminderNonWorkingDay: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['NonWorkingDayInput'];
+        'text/json': components['schemas']['NonWorkingDayInput'];
+        'application/*+json': components['schemas']['NonWorkingDayInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': components['schemas']['NonWorkingDayResponse'];
+          'application/json': components['schemas']['NonWorkingDayResponse'];
+          'text/json': components['schemas']['NonWorkingDayResponse'];
+        };
+      };
+      /** @description Unauthenticated (normal mode) */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required (normal mode) */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  removeReminderNonWorkingDay: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        date: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated (normal mode) */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required (normal mode) */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getReminderChats: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': components['schemas']['ReminderChatResponse'][];
+          'application/json': components['schemas']['ReminderChatResponse'][];
+          'text/json': components['schemas']['ReminderChatResponse'][];
+        };
+      };
+      /** @description Unauthenticated (normal mode) */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required (normal mode) */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateReminderChat: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['ReminderChatInput'];
+        'text/json': components['schemas']['ReminderChatInput'];
+        'application/*+json': components['schemas']['ReminderChatInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': components['schemas']['ReminderChatResponse'];
+          'application/json': components['schemas']['ReminderChatResponse'];
+          'text/json': components['schemas']['ReminderChatResponse'];
+        };
+      };
+      /** @description Unauthenticated (normal mode) */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required (normal mode) */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  sendReminderChatTest: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated (normal mode) */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required (normal mode) */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getReminderOccurrences: {
+    parameters: {
+      query?: {
+        status?: string;
+        taskId?: number;
+        page?: number;
+        pageSize?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': components['schemas']['ReminderOccurrencePage'];
+          'application/json': components['schemas']['ReminderOccurrencePage'];
+          'text/json': components['schemas']['ReminderOccurrencePage'];
+        };
+      };
+      /** @description Unauthenticated (normal mode) */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required (normal mode) */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  closeReminderOccurrence: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': components['schemas']['ReminderOccurrenceResponse'];
+          'application/json': components['schemas']['ReminderOccurrenceResponse'];
+          'text/json': components['schemas']['ReminderOccurrenceResponse'];
+        };
+      };
+      /** @description Unauthenticated (normal mode) */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required (normal mode) */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  reopenReminderOccurrence: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': components['schemas']['ReminderOccurrenceResponse'];
+          'application/json': components['schemas']['ReminderOccurrenceResponse'];
+          'text/json': components['schemas']['ReminderOccurrenceResponse'];
+        };
+      };
+      /** @description Unauthenticated (normal mode) */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required (normal mode) */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getReminderTasks: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': components['schemas']['ReminderTaskResponse'][];
+          'application/json': components['schemas']['ReminderTaskResponse'][];
+          'text/json': components['schemas']['ReminderTaskResponse'][];
+        };
+      };
+      /** @description Unauthenticated (normal mode) */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required (normal mode) */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createReminderTask: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['ReminderTaskInput'];
+        'text/json': components['schemas']['ReminderTaskInput'];
+        'application/*+json': components['schemas']['ReminderTaskInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': components['schemas']['ReminderTaskResponse'];
+          'application/json': components['schemas']['ReminderTaskResponse'];
+          'text/json': components['schemas']['ReminderTaskResponse'];
+        };
+      };
+      /** @description Unauthenticated (normal mode) */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required (normal mode) */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateReminderTask: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['ReminderTaskInput'];
+        'text/json': components['schemas']['ReminderTaskInput'];
+        'application/*+json': components['schemas']['ReminderTaskInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': components['schemas']['ReminderTaskResponse'];
+          'application/json': components['schemas']['ReminderTaskResponse'];
+          'text/json': components['schemas']['ReminderTaskResponse'];
+        };
+      };
+      /** @description Unauthenticated (normal mode) */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required (normal mode) */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  archiveReminderTask: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated (normal mode) */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required (normal mode) */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  previewReminderDueDates: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['PreviewReminderDueDatesRequest'];
+        'text/json': components['schemas']['PreviewReminderDueDatesRequest'];
+        'application/*+json': components['schemas']['PreviewReminderDueDatesRequest'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': components['schemas']['DueDatePreview'][];
+          'application/json': components['schemas']['DueDatePreview'][];
+          'text/json': components['schemas']['DueDatePreview'][];
+        };
+      };
+      /** @description Unauthenticated (normal mode) */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required (normal mode) */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  assignReminderChat: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['AssignReminderChatRequest'];
+        'text/json': components['schemas']['AssignReminderChatRequest'];
+        'application/*+json': components['schemas']['AssignReminderChatRequest'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': number;
+          'application/json': number;
+          'text/json': number;
+        };
+      };
+      /** @description Unauthenticated (normal mode) */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required (normal mode) */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  connectTelegramWebhook: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/plain': string;
+          'application/json': string;
+          'text/json': string;
+        };
+      };
+      /** @description Unauthenticated (normal mode) */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required (normal mode) */
+      403: {
         headers: {
           [name: string]: unknown;
         };
