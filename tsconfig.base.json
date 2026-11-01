@@ -47,7 +47,11 @@
       "@admin/products/ui": ["libs/admin/products/ui/src/index.ts"],
       "@admin/products/feature": ["libs/admin/products/feature/src/index.ts"],
       "@admin/references/ui": ["libs/admin/references/ui/src/index.ts"],
-      "@admin/core/shell": ["libs/admin/core/shell/src/index.ts"]
+      "@admin/core/shell": ["libs/admin/core/shell/src/index.ts"],
+      "@admin/reminders/model": ["libs/admin/reminders/model/src/index.ts"],
+      "@admin/reminders/data-access": ["libs/admin/reminders/data-access/src/index.ts"],
+      "@admin/reminders/ui": ["libs/admin/reminders/ui/src/index.ts"],
+      "@admin/reminders/feature": ["libs/admin/reminders/feature/src/index.ts"]
     }
   }
 }
