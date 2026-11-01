@@ -8,3 +8,4 @@ export type {
   AdminShellLogoutAction,
   AdminShellSessionProviderProps,
 } from './providers/admin-shell-session-provider';
+export type { NavigationPalette } from './navigation/navigation-palette';

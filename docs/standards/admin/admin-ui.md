@@ -3,6 +3,7 @@
 ## Language and components
 
 - Write visible strings, accessible names, empty/error messages, and feature specs in Ukrainian.
+- Follow the [design system «Цех»](design-system.md) for every new screen: colors, type, density, page patterns, and the shell. Existing screens are restyled only on request.
 - Use existing MUI patterns and theme; do not create local design tokens without a need.
 - Use existing MUI components for tables, dialogs, selects, pagination, and other complex business controls.
 - Do not change global styles, theme, or routing for a local feature.

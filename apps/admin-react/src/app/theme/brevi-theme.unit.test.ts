@@ -12,7 +12,9 @@ describe('Brevi theme', () => {
   it('uses the Brevi brand in both schemes', () => {
     expect(lightTheme.palette.primary.main).toBe('#fd9600');
     expect(darkTheme.palette.primary.main).toBe('#fd9600');
-    expect(lightTheme.palette.background.default).toBe('#e6e6e6');
+    expect(lightTheme.palette.background.default).toBe('#eeeeeb');
+    expect(lightTheme.palette.navigation.background).toBe('#1e1e1e');
+    expect(darkTheme.palette.navigation.background).toBe('#0f0f12');
     expect(darkTheme.palette.background.default).toBe('#09090b');
   });
 
@@ -29,12 +31,12 @@ describe('Brevi theme', () => {
     }
   });
 
-  it('reads the existing Angular preference and falls back to system', () => {
+  it('reads the existing Angular preference and falls back to light', () => {
     window.localStorage.setItem('theme', 'dark');
     expect(readColorMode()).toBe('dark');
 
     window.localStorage.setItem('theme', 'unknown');
-    expect(readColorMode()).toBe('system');
+    expect(readColorMode()).toBe('light');
   });
 
   it('keeps working when browser storage is unavailable', () => {
@@ -45,7 +47,7 @@ describe('Brevi theme', () => {
       throw new Error('blocked');
     });
 
-    expect(readColorMode()).toBe('system');
+    expect(readColorMode()).toBe('light');
     expect(() => saveColorMode('dark')).not.toThrow();
   });
 });

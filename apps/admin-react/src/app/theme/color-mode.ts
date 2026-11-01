@@ -7,9 +7,9 @@ export function readColorMode(): AdminColorMode {
     const storedMode = window.localStorage.getItem(storageKey);
     return storedMode === 'light' || storedMode === 'dark' || storedMode === 'system'
       ? storedMode
-      : 'system';
+      : 'light';
   } catch {
-    return 'system';
+    return 'light';
   }
 }
 
