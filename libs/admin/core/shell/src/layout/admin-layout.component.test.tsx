@@ -1,7 +1,7 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { AdminLayout } from './admin-layout';
 
@@ -38,6 +38,8 @@ function renderShell(initialPath = '/') {
 
   return { onColorModeChange };
 }
+
+afterEach(() => window.localStorage.clear());
 
 describe('AdminLayout', () => {
   it('opens a section from the keyboard without offering an unavailable link', async () => {
@@ -106,5 +108,53 @@ describe('AdminLayout', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Темна' }));
 
     expect(onColorModeChange).toHaveBeenCalledWith('dark');
+  });
+
+  it('shows where the user is in the top bar and links home', () => {
+    renderShell('/example');
+
+    const breadcrumbs = screen.getByRole('navigation', { name: 'Розташування' });
+    expect(breadcrumbs).toHaveTextContent('Приклади');
+    expect(within(breadcrumbs).getByText('Приклад')).toHaveAttribute('aria-current', 'location');
+    expect(
+      within(screen.getByRole('navigation', { name: 'Основна навігація' })).getByRole('link', {
+        name: 'Головна',
+      }),
+    ).toHaveAttribute('href', '/');
+  });
+
+  it('collapses the desktop menu to icons, remembers it, and opens a group as a flyout', async () => {
+    const user = userEvent.setup();
+    renderShell();
+    const navigation = screen.getByRole('navigation', { name: 'Основна навігація' });
+
+    await user.click(screen.getByRole('button', { name: 'Згорнути меню' }));
+
+    expect(screen.getByRole('button', { name: 'Розгорнути меню' })).toBeVisible();
+    expect(window.localStorage.getItem('brevi-admin:navigation-collapsed')).toBe('true');
+
+    const groupButton = within(navigation).getByRole('button', { name: 'Приклади' });
+    expect(groupButton).toHaveAttribute('aria-haspopup', 'true');
+    await user.click(groupButton);
+
+    const flyout = await screen.findByRole('list', { name: 'Приклади' });
+    expect(groupButton).toHaveAttribute('aria-expanded', 'true');
+    expect(within(flyout).getByRole('link', { name: 'Приклад' })).toHaveAttribute(
+      'href',
+      '/example',
+    );
+    expect(
+      within(flyout).queryByRole('link', { name: 'Майбутній розділ' }),
+    ).not.toBeInTheDocument();
+
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(groupButton).toHaveAttribute('aria-expanded', 'false'));
+  });
+
+  it('starts collapsed when the choice was saved earlier', () => {
+    window.localStorage.setItem('brevi-admin:navigation-collapsed', 'true');
+    renderShell();
+
+    expect(screen.getByRole('button', { name: 'Розгорнути меню' })).toBeVisible();
   });
 });

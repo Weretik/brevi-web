@@ -12,7 +12,7 @@ test('mobile menu opens by keyboard and closes with visible focus', async ({ pag
   await page.setViewportSize({ width: 320, height: 720 });
   await page.goto('/');
 
-  await expect(page.getByText('Brevi Admin')).toBeVisible();
+  await expect(page.getByRole('navigation', { name: 'Розташування' })).toContainText('Головна');
   const menuButton = page.getByRole('button', { name: 'Відкрити меню навігації' });
   await menuButton.focus();
   await page.keyboard.press('Enter');
@@ -156,7 +156,7 @@ test('keeps the selected Brevi theme and follows the system scheme', async ({ pa
 
   await themeButton.click();
   await page.getByRole('menuitem', { name: 'Системна', exact: true }).click();
-  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(230, 230, 230)');
+  await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(238, 238, 235)');
   await page.emulateMedia({ colorScheme: 'dark' });
   await expect(page.locator('body')).toHaveCSS('background-color', 'rgb(9, 9, 11)');
 });

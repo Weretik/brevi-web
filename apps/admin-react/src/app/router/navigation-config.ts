@@ -9,6 +9,8 @@ export function createNavigation(
   return legacyGroups.map((group) => ({
     id: group.id,
     label: group.label,
+    icon: group.icon,
+    section: group.section,
     items: group.items
       .filter((item) => !item.requiredRole || roles.includes(item.requiredRole))
       .map((item) => ({
