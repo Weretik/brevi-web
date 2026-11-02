@@ -66,6 +66,12 @@ describe('fabrics tab', () => {
             ok: true,
             json: async () => [
               {
+                email: null,
+                purchaseCategories: null,
+                tags: null,
+                isActive: true,
+                keepinCrmId: null,
+                keepinSyncedAt: null,
                 id: 2,
                 name: 'Атлас',
                 link: null,
@@ -102,6 +108,12 @@ describe('fabrics tab', () => {
           ok: true,
           json: async () => [
             {
+              email: null,
+              purchaseCategories: null,
+              tags: null,
+              isActive: true,
+              keepinCrmId: null,
+              keepinSyncedAt: null,
               id: 2,
               name: 'Атлас',
               link: null,

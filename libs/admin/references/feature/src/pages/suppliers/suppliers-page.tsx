@@ -1,13 +1,16 @@
+import { filterSuppliers, lastSupplierKeepinSync } from '@admin/references/model';
 import { SupplierDeleteDialog, SuppliersGrid, SuppliersToolbar } from '@admin/references/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import SyncOutlinedIcon from '@mui/icons-material/SyncOutlined';
 import { Alert, Box, Button, Paper, Stack, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 
 import { SupplierDialog } from '../../components/suppliers/supplier-dialog';
 import { useSupplierDeletion } from '../../hooks/suppliers/use-supplier-deletion';
+import { useSupplierKeepinSync } from '../../hooks/suppliers/use-supplier-keepin-sync';
 import { useSuppliers } from '../../hooks/suppliers/use-suppliers';
 
-import type { Supplier, SupplierDialogMode } from '@admin/references/model';
+import type { Supplier, SupplierActivityFilter, SupplierDialogMode } from '@admin/references/model';
 
 export function SuppliersPage() {
   const { rows, loading, error, reload } = useSuppliers();
@@ -17,15 +20,18 @@ export function SuppliersPage() {
   } | null>(null);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const [search, setSearch] = useState('');
-  const query = search.trim().toLocaleLowerCase('uk');
+  const [activity, setActivity] = useState<SupplierActivityFilter>('active');
   const filteredRows = useMemo(
-    () =>
-      rows.filter((row) =>
-        [row.name, row.contactPerson, row.phoneNumber].some((value) =>
-          value?.toLocaleLowerCase('uk').includes(query),
-        ),
-      ),
-    [rows, query],
+    () => filterSuppliers(rows, search, activity),
+    [rows, search, activity],
+  );
+  const activityCounts = useMemo(
+    () => ({
+      active: rows.filter((row) => row.isActive).length,
+      inactive: rows.filter((row) => !row.isActive).length,
+      all: rows.length,
+    }),
+    [rows],
   );
   const {
     selection,
@@ -39,6 +45,9 @@ export function SuppliersPage() {
   } = useSupplierDeletion(setActionMessage);
 
   const nextId = rows.reduce((largest, row) => Math.max(largest, row.id), 0) + 1;
+  const [syncNotice, setSyncNotice] = useState<{ text: string; ok: boolean } | null>(null);
+  const { sync, syncing } = useSupplierKeepinSync((text, ok) => setSyncNotice({ text, ok }));
+  const lastSync = lastSupplierKeepinSync(rows);
 
   return (
     <Box sx={{ minWidth: 0 }}>
@@ -52,18 +61,51 @@ export function SuppliersPage() {
           </Typography>
           <Typography variant="h1">Постачальники</Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-            Контакти та інформація про постачальників
+            {lastSync ? (
+              <>
+                Картки оновлюються з KeepinCRM щодня. Останнє оновлення:{' '}
+                <Box component="span" sx={{ fontFamily: 'var(--admin-font-mono)' }}>
+                  {new Date(lastSync).toLocaleString('uk-UA', {
+                    dateStyle: 'short',
+                    timeStyle: 'short',
+                  })}
+                </Box>
+              </>
+            ) : (
+              'Контакти та інформація про постачальників'
+            )}
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddOutlinedIcon />}
-          onClick={() => setActive({ mode: 'create', supplier: null })}
-          sx={{ alignSelf: { xs: 'flex-start', sm: 'center' } }}
+        <Stack
+          direction="row"
+          sx={{ gap: 1, flexWrap: 'wrap', alignSelf: { xs: 'flex-start', sm: 'center' } }}
         >
-          Додати постачальника
-        </Button>
+          <Button
+            variant="outlined"
+            startIcon={<SyncOutlinedIcon />}
+            disabled={syncing}
+            onClick={() => void sync()}
+          >
+            {syncing ? 'Оновлення…' : 'Оновити з KeepinCRM'}
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<AddOutlinedIcon />}
+            onClick={() => setActive({ mode: 'create', supplier: null })}
+          >
+            Додати постачальника
+          </Button>
+        </Stack>
       </Stack>
+      {syncNotice && (
+        <Alert
+          severity={syncNotice.ok ? 'success' : 'error'}
+          onClose={() => setSyncNotice(null)}
+          sx={{ mb: 2 }}
+        >
+          {syncNotice.text}
+        </Alert>
+      )}
       {error && (
         <Alert
           severity="error"
@@ -90,6 +132,9 @@ export function SuppliersPage() {
         <SuppliersToolbar
           search={search}
           onSearchChange={setSearch}
+          activity={activity}
+          activityCounts={activityCounts}
+          onActivityChange={setActivity}
           count={filteredRows.length}
           total={rows.length}
           selectedCount={selectedIds.length}
@@ -101,7 +146,7 @@ export function SuppliersPage() {
         <SuppliersGrid
           rows={filteredRows}
           loading={loading}
-          searching={Boolean(query)}
+          searching={rows.length > 0}
           unavailable={Boolean(error)}
           selection={selection}
           onSelectionChange={setSelection}

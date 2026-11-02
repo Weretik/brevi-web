@@ -2,11 +2,30 @@ import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
 import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import { Button, IconButton, InputAdornment, Stack, TextField, Typography } from '@mui/material';
+import {
+  Button,
+  Chip,
+  IconButton,
+  InputAdornment,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material';
+
+import type { SupplierActivityFilter } from '@admin/references/model';
+
+const activityFilters: { value: SupplierActivityFilter; label: string }[] = [
+  { value: 'active', label: 'Активні' },
+  { value: 'inactive', label: 'Не використовуються' },
+  { value: 'all', label: 'Усі' },
+];
 
 interface Props {
   search: string;
   onSearchChange: (value: string) => void;
+  activity: SupplierActivityFilter;
+  activityCounts: Record<SupplierActivityFilter, number>;
+  onActivityChange: (value: SupplierActivityFilter) => void;
   count: number;
   total: number;
   selectedCount: number;
@@ -19,6 +38,9 @@ interface Props {
 export function SuppliersToolbar({
   search,
   onSearchChange,
+  activity,
+  activityCounts,
+  onActivityChange,
   count,
   total,
   selectedCount,
@@ -34,7 +56,7 @@ export function SuppliersToolbar({
     >
       <TextField
         size="small"
-        placeholder="Назва, контакт або телефон"
+        placeholder="Назва, контакт, телефон, email"
         value={search}
         onChange={(event) => onSearchChange(event.target.value)}
         sx={{ width: { xs: '100%', lg: 420 }, maxWidth: '100%' }}
@@ -63,6 +85,24 @@ export function SuppliersToolbar({
       />
       <Stack
         direction="row"
+        role="group"
+        aria-label="Фільтр за активністю"
+        sx={{ gap: 1, flexWrap: 'wrap' }}
+      >
+        {activityFilters.map(({ value, label }) => (
+          <Chip
+            key={value}
+            label={`${label} ${activityCounts[value]}`}
+            color={activity === value ? 'secondary' : 'default'}
+            variant={activity === value ? 'filled' : 'outlined'}
+            aria-pressed={activity === value}
+            onClick={() => onActivityChange(value)}
+            sx={{ height: 28, borderRadius: '6px' }}
+          />
+        ))}
+      </Stack>
+      <Stack
+        direction="row"
         sx={{ gap: 1, alignItems: 'center', flexWrap: 'wrap', ml: { lg: 'auto' } }}
       >
         <Typography
@@ -72,7 +112,7 @@ export function SuppliersToolbar({
           aria-label="Кількість постачальників"
           sx={{ mr: 1, fontVariantNumeric: 'tabular-nums' }}
         >
-          {search.trim() ? `Знайдено: ${count} із ${total}` : `Усього: ${total}`}
+          {count === total ? `Усього: ${total}` : `Знайдено: ${count} із ${total}`}
         </Typography>
         <Button
           variant="outlined"

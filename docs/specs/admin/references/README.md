@@ -20,4 +20,5 @@ The next agreed stage is captured in five separate change SDDs:
 - [Operations: parts and work](009-operations-pages/README.md);
 - [Suppliers](010-suppliers-pages/README.md) — SDD completed and closed, implementation partial;
 - [Additional references](011-additional-references-pages/README.md);
+- [Suppliers: KeepinCRM fields and sync](012-suppliers-keepincrm/README.md) — implemented 2026-11-02;
 - [Products](../products/003-products-table-pages/README.md) remains in the products domain.

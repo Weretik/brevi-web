@@ -1,6 +1,6 @@
 # Admin: Suppliers
 
-**Status:** route and CRUD interface implemented; «Цех» page revision checked 2026-11-02.
+**Status:** route and CRUD interface implemented; «Цех» page revision checked 2026-11-02; KeepinCRM sync and new fields added 2026-11-02 ([SDD 012](../../../specs/admin/references/012-suppliers-keepincrm/README.md)).
 
 `/references/supplier` shows the supplier table; a dialog creates or edits a
 record, and a separate flow confirms deletion of selected rows.
@@ -24,6 +24,16 @@ The editor presentation receives its draft, errors, save state, and callbacks
 through props; only the feature hook performs mutations. The grid merges its
 empty-state messages with the current Brevi theme's locale, preserving shared
 translations in light and dark modes.
+
+**KeepinCRM.** Most suppliers come from KeepinCRM (backend job daily, or the
+«Оновити з KeepinCRM» button, `POST /api/reference/suppliers/keepin-sync`). The
+table shows «Що закуповуємо», site, contact, phone, email and a status pill
+(«Активний» / «Не використовується»); the name cell shows the KeepinCRM ID. Filter
+chips «Активні / Не використовуються / Усі» (default «Активні») sit in the toolbar,
+and search also matches email and purchase categories. For a KeepinCRM supplier the
+editor disables the card fields and saves only «Використовувати в проєкті» and notes
+through `PUT /api/reference/suppliers/{id}/brevi-fields`; a manual supplier keeps
+full editing. The subtitle shows the last sync time.
 
 ## Structure diagram
 
@@ -60,6 +70,7 @@ libs/admin/references/
 │   ├── hooks/suppliers/
 │   │   ├── use-suppliers.ts # loading
 │   │   ├── use-supplier-editor.ts # draft and create/update mutations
+│   │   ├── use-supplier-keepin-sync.ts # «Оновити з KeepinCRM» action and notice
 │   │   └── use-supplier-deletion.ts # selection and deletion
 │   ├── pages/suppliers/
 │   │   └── suppliers-page.tsx # page
@@ -69,10 +80,15 @@ libs/admin/references/
 ├── model/src/mappers/suppliers/
 │   └── supplier-link.ts # shared HTTP(S) link normalization
 ├── model/src/forms/suppliers/
-│   └── supplier-form.ts # mode contract and pure draft conversion
+│   └── supplier-form.ts # mode contract, draft conversion, KeepinCRM-owned fields
+├── model/src/queries/suppliers/
+│   └── supplier-filters.ts # search and activity filter
+├── model/src/mappers/suppliers/
+│   └── supplier-keepin-sync.ts # sync summary text, last sync time
 ├── ui/src/components/suppliers/
 │   ├── suppliers-toolbar.tsx # search, count, refresh, bulk action
 │   ├── suppliers-grid.tsx # table, selection, empty states
+│   ├── supplier-status-pill.tsx # active / not used pill
 │   ├── suppliers-grid-footer.tsx # selection count and pagination
 │   ├── supplier-row-menu.tsx # view/edit/delete actions
 │   └── supplier-link-cell.tsx # safe external link presentation

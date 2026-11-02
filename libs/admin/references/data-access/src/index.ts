@@ -30,5 +30,7 @@ export {
   useCreateSupplierMutation,
   useDeleteSupplierMutation,
   useListSuppliersQuery,
+  useSyncSuppliersFromKeepinCrmMutation,
+  useUpdateSupplierBreviFieldsMutation,
   useUpdateSupplierMutation,
 } from './api/suppliers/suppliers.api';

@@ -21,6 +21,7 @@ export function SupplierDialog({ mode, supplier, nextId, onClose, onSaved }: Pro
       errors={editor.errors}
       message={editor.message}
       saving={editor.saving}
+      keepinCrmId={supplier?.keepinCrmId ?? null}
       onChange={editor.change}
       onSave={() => void editor.save()}
       onEnableEditing={editor.enableEditing}

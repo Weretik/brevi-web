@@ -56,6 +56,12 @@ describe('garment accessories page', () => {
             ok: true,
             json: async () => [
               {
+                email: null,
+                purchaseCategories: null,
+                tags: null,
+                isActive: true,
+                keepinCrmId: null,
+                keepinSyncedAt: null,
                 id: 2,
                 name: 'Атлас',
                 link: null,
@@ -69,6 +75,7 @@ describe('garment accessories page', () => {
       }),
     );
     renderPage();
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Створити' })).toBeEnabled());
     await user.click(screen.getByRole('button', { name: 'Створити' }));
     expect(screen.getByRole('dialog', { name: 'Нова фурнітура' })).toBeVisible();
     expect(screen.getByLabelText('Поточна адреса')).toHaveTextContent(
@@ -97,6 +104,12 @@ describe('garment accessories page', () => {
           ok: true,
           json: async () => [
             {
+              email: null,
+              purchaseCategories: null,
+              tags: null,
+              isActive: true,
+              keepinCrmId: null,
+              keepinSyncedAt: null,
               id: 2,
               name: 'Атлас',
               link: null,

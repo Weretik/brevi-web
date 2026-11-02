@@ -12,7 +12,18 @@ export function parseSuppliersResponse(value: unknown): SuppliersResponse {
     ) {
       throw new Error('Некоректний запис постачальника.');
     }
-    for (const field of ['link', 'contactPerson', 'phoneNumber', 'notes']) {
+    if (typeof row['isActive'] !== 'boolean') throw new Error('Некоректний запис постачальника.');
+    for (const field of [
+      'link',
+      'contactPerson',
+      'phoneNumber',
+      'notes',
+      'email',
+      'purchaseCategories',
+      'tags',
+      'keepinCrmId',
+      'keepinSyncedAt',
+    ]) {
       if (row[field] !== null && typeof row[field] !== 'string') {
         throw new Error('Некоректний запис постачальника.');
       }

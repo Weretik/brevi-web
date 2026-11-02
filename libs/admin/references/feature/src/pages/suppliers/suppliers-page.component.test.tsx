@@ -19,6 +19,12 @@ describe('suppliers page', () => {
         ok: true,
         json: async () => [
           {
+            email: null,
+            purchaseCategories: null,
+            tags: null,
+            isActive: true,
+            keepinCrmId: null,
+            keepinSyncedAt: null,
             id: 1,
             name: 'Атлас',
             link: null,
@@ -54,6 +60,12 @@ describe('suppliers page', () => {
         ok: true,
         json: async () => [
           {
+            email: null,
+            purchaseCategories: null,
+            tags: null,
+            isActive: true,
+            keepinCrmId: null,
+            keepinSyncedAt: null,
             id: 1,
             name: 'Атлас',
             link: null,
@@ -84,6 +96,12 @@ describe('suppliers page', () => {
         ok: true,
         json: async () => [
           {
+            email: null,
+            purchaseCategories: null,
+            tags: null,
+            isActive: true,
+            keepinCrmId: null,
+            keepinSyncedAt: null,
             id: 1,
             name: 'Атлас',
             link: 'supplier.example.com',
@@ -153,6 +171,12 @@ describe('suppliers page', () => {
             ok: true,
             json: async () => [
               {
+                email: null,
+                purchaseCategories: null,
+                tags: null,
+                isActive: true,
+                keepinCrmId: null,
+                keepinSyncedAt: null,
                 id: 1,
                 name: 'Атлас',
                 link: null,
@@ -187,8 +211,27 @@ describe('suppliers page', () => {
       return {
         ok: true,
         json: async () => [
-          { id: 1, name: 'Атлас', link: null, contactPerson: null, phoneNumber: null, notes: null },
           {
+            email: null,
+            purchaseCategories: null,
+            tags: null,
+            isActive: true,
+            keepinCrmId: null,
+            keepinSyncedAt: null,
+            id: 1,
+            name: 'Атлас',
+            link: null,
+            contactPerson: null,
+            phoneNumber: null,
+            notes: null,
+          },
+          {
+            email: null,
+            purchaseCategories: null,
+            tags: null,
+            isActive: true,
+            keepinCrmId: null,
+            keepinSyncedAt: null,
             id: 2,
             name: 'Текстиль',
             link: null,
@@ -226,6 +269,12 @@ describe('suppliers page', () => {
               ok: true,
               json: async () => [
                 {
+                  email: null,
+                  purchaseCategories: null,
+                  tags: null,
+                  isActive: true,
+                  keepinCrmId: null,
+                  keepinSyncedAt: null,
                   id: 1,
                   name: 'Атлас',
                   link: null,
@@ -234,6 +283,12 @@ describe('suppliers page', () => {
                   notes: null,
                 },
                 {
+                  email: null,
+                  purchaseCategories: null,
+                  tags: null,
+                  isActive: true,
+                  keepinCrmId: null,
+                  keepinSyncedAt: null,
                   id: 2,
                   name: 'Текстиль',
                   link: null,
@@ -262,6 +317,12 @@ describe('suppliers page', () => {
 
 const searchableSuppliers = [
   {
+    email: null,
+    purchaseCategories: null,
+    tags: null,
+    isActive: true,
+    keepinCrmId: null,
+    keepinSyncedAt: null,
     id: 1,
     name: 'Атлас',
     contactPerson: 'Олена Коваль',
@@ -270,6 +331,12 @@ const searchableSuppliers = [
     notes: 'Нотатка лише для перевірки',
   },
   {
+    email: null,
+    purchaseCategories: null,
+    tags: null,
+    isActive: true,
+    keepinCrmId: null,
+    keepinSyncedAt: null,
     id: 2,
     name: 'Текстиль',
     contactPerson: 'Андрій Бондар',
@@ -429,5 +496,110 @@ describe('suppliers workshop page', () => {
     await user.click(screen.getByRole('button', { name: 'Повторити' }));
     expect(await screen.findByText('Атлас')).toBeVisible();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+});
+
+const keepinSuppliers = [
+  {
+    id: 1,
+    name: 'Атлас',
+    contactPerson: 'Олена',
+    phoneNumber: '+380 50 111 22 33',
+    link: null,
+    notes: null,
+    email: 'atlas@example.com',
+    purchaseCategories: 'Тканини',
+    tags: null,
+    isActive: true,
+    keepinCrmId: '323',
+    keepinSyncedAt: '2026-11-02T07:00:00Z',
+  },
+  {
+    id: 2,
+    name: 'Старий постачальник',
+    contactPerson: null,
+    phoneNumber: null,
+    link: null,
+    notes: null,
+    email: null,
+    purchaseCategories: null,
+    tags: null,
+    isActive: false,
+    keepinCrmId: null,
+    keepinSyncedAt: null,
+  },
+];
+
+describe('suppliers from KeepinCRM', () => {
+  it('shows active suppliers by default and switches the activity filter', async () => {
+    const user = userEvent.setup();
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => keepinSuppliers }));
+    render(<SuppliersPage />);
+    expect(await screen.findByText('Атлас')).toBeVisible();
+    expect(screen.queryByText('Старий постачальник')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Не використовуються 1' }));
+    expect(await screen.findByText('Старий постачальник')).toBeVisible();
+    expect(screen.queryByText('Атлас')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Усі 2' }));
+    await user.type(screen.getByRole('textbox', { name: 'Пошук постачальників' }), 'atlas@');
+    expect(screen.getByText('Атлас')).toBeVisible();
+    expect(screen.queryByText('Старий постачальник')).not.toBeInTheDocument();
+  });
+
+  it('locks KeepinCRM card fields and saves only Brevi fields', async () => {
+    const user = userEvent.setup();
+    const fetchMock = vi
+      .fn()
+      .mockImplementation(async (_path: string, init?: RequestInit) =>
+        init?.method === 'PUT' ? { ok: true } : { ok: true, json: async () => keepinSuppliers },
+      );
+    vi.stubGlobal('fetch', fetchMock);
+    render(<SuppliersPage />);
+    await user.click(await screen.findByRole('button', { name: 'Дії: Атлас' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Редагувати' }));
+    expect(screen.getByRole('textbox', { name: 'Назва' })).toBeDisabled();
+    await user.click(screen.getByRole('switch', { name: 'Використовувати в проєкті' }));
+    await user.click(screen.getByRole('button', { name: 'Зберегти' }));
+    expect(await screen.findByText('Постачальника збережено.')).toBeVisible();
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/reference/suppliers/1/brevi-fields',
+      expect.objectContaining({ method: 'PUT' }),
+    );
+    expect(fetchMock).not.toHaveBeenCalledWith(
+      '/api/reference/suppliers/1',
+      expect.objectContaining({ method: 'PUT' }),
+    );
+  });
+
+  it('runs the KeepinCRM refresh and reports the summary or the error', async () => {
+    const user = userEvent.setup();
+    let syncCalls = 0;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockImplementation(async (_path: string, init?: RequestInit) => {
+        if (init?.method !== 'POST') return { ok: true, json: async () => keepinSuppliers };
+        syncCalls += 1;
+        return syncCalls === 1
+          ? {
+              ok: true,
+              json: async () => ({
+                received: 43,
+                created: 2,
+                linked: 1,
+                updated: 40,
+                missingInKeepinCrm: [],
+                syncedAt: '2026-11-02T08:00:00Z',
+              }),
+            }
+          : { ok: false, status: 503, json: async () => ({ errors: ['KeepinCRM недоступний.'] }) };
+      }),
+    );
+    render(<SuppliersPage />);
+    await screen.findByText('Атлас');
+    await user.click(screen.getByRole('button', { name: 'Оновити з KeepinCRM' }));
+    expect(await screen.findByText(/отримано 43, нових 2/)).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Оновити з KeepinCRM' }));
+    await waitFor(() => expect(screen.queryByText(/отримано 43/)).not.toBeInTheDocument());
+    expect(screen.getByRole('alert')).toHaveTextContent(/KeepinCRM/);
   });
 });
