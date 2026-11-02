@@ -1,13 +1,8 @@
-import {
-  Alert,
-  Button,
-  MenuItem,
-  Paper,
-  Skeleton,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { garmentAccessoryUnits } from '@admin/references/model';
+import { FormControlLabel, MenuItem, Stack, Switch, TextField } from '@mui/material';
+
+import { ReferenceFormSection } from '../reference-editor/reference-form-section';
+import { ReferenceSupplierSelect } from '../reference-editor/reference-supplier-select';
 
 import type {
   GarmentAccessoryField,
@@ -23,7 +18,7 @@ interface Props {
   suppliers: Supplier[];
   suppliersLoading: boolean;
   supplierError: string | null;
-  onChange: (field: GarmentAccessoryField, value: string) => void;
+  onChange: (field: GarmentAccessoryField, value: string | boolean) => void;
   onRetrySuppliers: () => void;
 }
 
@@ -39,11 +34,8 @@ export function GarmentAccessoryForm({
 }: Props) {
   return (
     <Stack sx={{ gap: 2 }}>
-      <Paper variant="outlined" sx={{ p: 2.5 }}>
-        <Stack sx={{ gap: 2 }}>
-          <Typography component="h3" variant="subtitle1" sx={{ fontWeight: 600 }}>
-            Основні дані
-          </Typography>
+      <ReferenceFormSection title="Основні дані">
+        <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ gap: 2 }}>
           <TextField
             label="ID"
             type="number"
@@ -53,71 +45,91 @@ export function GarmentAccessoryForm({
             error={Boolean(errors.id)}
             helperText={errors.id}
             slotProps={{ htmlInput: { min: 1, step: 1 } }}
-            fullWidth
+            sx={{ width: { sm: 120 } }}
           />
           <TextField
-            label="Назва"
-            value={values.name}
-            onChange={(event) => onChange('name', event.target.value)}
-            error={Boolean(errors.name)}
-            helperText={errors.name}
-            autoFocus
+            label="Код"
+            placeholder="FUR-044"
+            value={values.code}
+            onChange={(event) => onChange('code', event.target.value)}
+            error={Boolean(errors.code)}
+            helperText={errors.code ?? 'Код з таблиці калькулятора'}
+            slotProps={{ htmlInput: { maxLength: 20 } }}
             fullWidth
           />
         </Stack>
-      </Paper>
+        <TextField
+          label="Назва"
+          value={values.name}
+          onChange={(event) => onChange('name', event.target.value)}
+          error={Boolean(errors.name)}
+          helperText={errors.name}
+          autoFocus
+          fullWidth
+        />
+        <FormControlLabel
+          control={
+            <Switch
+              checked={values.isActive}
+              onChange={(event) => onChange('isActive', event.target.checked)}
+            />
+          }
+          label="Активна"
+        />
+      </ReferenceFormSection>
 
-      <Paper variant="outlined" sx={{ p: 2.5 }}>
-        <Stack sx={{ gap: 2 }}>
-          <Typography component="h3" variant="subtitle1" sx={{ fontWeight: 600 }}>
-            Закупівля
-          </Typography>
-          {suppliersLoading && <Skeleton variant="rounded" height={56} />}
-          {supplierError && (
-            <Alert
-              severity="error"
-              action={
-                <Button type="button" onClick={onRetrySuppliers}>
-                  Повторити
-                </Button>
-              }
-            >
-              {supplierError}
-            </Alert>
-          )}
-          {!suppliersLoading && !supplierError && (
-            <TextField
-              select
-              label="Постачальник"
-              value={values.supplierName}
-              onChange={(event) => onChange('supplierName', event.target.value)}
-              error={Boolean(errors.supplierName)}
-              helperText={errors.supplierName}
-              fullWidth
-            >
-              {values.supplierName &&
-                !suppliers.some((supplier) => supplier.name === values.supplierName) && (
-                  <MenuItem value={values.supplierName}>{values.supplierName}</MenuItem>
-                )}
-              {suppliers.map((supplier) => (
-                <MenuItem key={supplier.id} value={supplier.name}>
-                  {supplier.name}
-                </MenuItem>
-              ))}
-            </TextField>
-          )}
+      <ReferenceFormSection title="Закупівля">
+        <ReferenceSupplierSelect
+          value={values.supplierName}
+          error={errors.supplierName}
+          suppliers={suppliers}
+          loading={suppliersLoading}
+          loadError={supplierError}
+          onChange={(value) => onChange('supplierName', value)}
+          onRetry={onRetrySuppliers}
+        />
+        <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ gap: 2 }}>
           <TextField
-            label="Ціна"
+            label="Ціна, грн"
             type="number"
             value={values.price}
             onChange={(event) => onChange('price', event.target.value)}
             error={Boolean(errors.price)}
-            helperText={errors.price}
+            helperText={errors.price ?? 'Дата ціни оновиться сама'}
             slotProps={{ htmlInput: { min: 0, max: 10000, step: '0.01' } }}
             fullWidth
           />
+          <TextField
+            select
+            label="Одиниця"
+            value={values.unit}
+            onChange={(event) => onChange('unit', event.target.value)}
+            error={Boolean(errors.unit)}
+            helperText={errors.unit}
+            sx={{ minWidth: { sm: 160 } }}
+          >
+            {garmentAccessoryUnits.map((unit) => (
+              <MenuItem key={unit} value={unit}>
+                {unit}
+              </MenuItem>
+            ))}
+          </TextField>
         </Stack>
-      </Paper>
+      </ReferenceFormSection>
+
+      <ReferenceFormSection title="Нотатки">
+        <TextField
+          label="Коментар"
+          value={values.comment}
+          onChange={(event) => onChange('comment', event.target.value)}
+          error={Boolean(errors.comment)}
+          helperText={errors.comment}
+          multiline
+          minRows={2}
+          slotProps={{ htmlInput: { maxLength: 1000 } }}
+          fullWidth
+        />
+      </ReferenceFormSection>
     </Stack>
   );
 }

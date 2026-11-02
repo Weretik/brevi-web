@@ -1,13 +1,8 @@
-import {
-  Alert,
-  Button,
-  MenuItem,
-  Paper,
-  Skeleton,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { fabricTextLimits, suggestFabricProposalDescription } from '@admin/references/model';
+import { Button, FormControlLabel, Stack, Switch, TextField } from '@mui/material';
+
+import { ReferenceFormSection } from '../reference-editor/reference-form-section';
+import { ReferenceSupplierSelect } from '../reference-editor/reference-supplier-select';
 
 import type {
   FabricField,
@@ -23,9 +18,11 @@ interface Props {
   suppliers: Supplier[];
   suppliersLoading: boolean;
   supplierError: string | null;
-  onChange: (field: FabricField, value: string) => void;
+  onChange: (field: FabricField, value: string | boolean) => void;
   onRetrySuppliers: () => void;
 }
+
+type FabricTextField = Exclude<FabricField, 'isActive'>;
 
 export function FabricForm({
   creating,
@@ -37,13 +34,29 @@ export function FabricForm({
   onChange,
   onRetrySuppliers,
 }: Props) {
+  const text = (field: FabricTextField, label: string, extra: { multiline?: boolean } = {}) => (
+    <TextField
+      label={label}
+      value={values[field]}
+      onChange={(event) => onChange(field, event.target.value)}
+      error={Boolean(errors[field])}
+      helperText={errors[field]}
+      multiline={extra.multiline}
+      minRows={extra.multiline ? 2 : undefined}
+      slotProps={{
+        htmlInput: {
+          maxLength: fabricTextLimits[field as keyof typeof fabricTextLimits],
+        },
+      }}
+      fullWidth
+    />
+  );
+  const suggestion = suggestFabricProposalDescription(values);
+
   return (
     <Stack sx={{ gap: 2 }}>
-      <Paper variant="outlined" sx={{ p: 2.5 }}>
-        <Stack sx={{ gap: 2 }}>
-          <Typography component="h3" variant="subtitle1" sx={{ fontWeight: 600 }}>
-            Основні дані
-          </Typography>
+      <ReferenceFormSection title="Основні дані">
+        <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ gap: 2 }}>
           <TextField
             label="ID"
             type="number"
@@ -53,71 +66,74 @@ export function FabricForm({
             error={Boolean(errors.id)}
             helperText={errors.id}
             slotProps={{ htmlInput: { min: 1, step: 1 } }}
-            fullWidth
+            sx={{ width: { sm: 120 } }}
           />
           <TextField
-            label="Назва"
-            value={values.name}
-            onChange={(event) => onChange('name', event.target.value)}
-            error={Boolean(errors.name)}
-            helperText={errors.name}
-            autoFocus
+            label="Код"
+            placeholder="FAB-087"
+            value={values.code}
+            onChange={(event) => onChange('code', event.target.value)}
+            error={Boolean(errors.code)}
+            helperText={errors.code ?? 'Код з таблиці калькулятора'}
+            slotProps={{ htmlInput: { maxLength: fabricTextLimits.code } }}
             fullWidth
           />
         </Stack>
-      </Paper>
+        {text('name', 'Назва (UA)')}
+        {text('nameRu', 'Назва (RU)')}
+        <FormControlLabel
+          control={
+            <Switch
+              checked={values.isActive}
+              onChange={(event) => onChange('isActive', event.target.checked)}
+            />
+          }
+          label="Активна"
+        />
+      </ReferenceFormSection>
 
-      <Paper variant="outlined" sx={{ p: 2.5 }}>
-        <Stack sx={{ gap: 2 }}>
-          <Typography component="h3" variant="subtitle1" sx={{ fontWeight: 600 }}>
-            Закупівля
-          </Typography>
-          {suppliersLoading && <Skeleton variant="rounded" height={56} />}
-          {supplierError && (
-            <Alert
-              severity="error"
-              action={
-                <Button type="button" onClick={onRetrySuppliers}>
-                  Повторити
-                </Button>
-              }
-            >
-              {supplierError}
-            </Alert>
-          )}
-          {!suppliersLoading && !supplierError && (
-            <TextField
-              select
-              label="Постачальник"
-              value={values.providerName}
-              onChange={(event) => onChange('providerName', event.target.value)}
-              error={Boolean(errors.providerName)}
-              helperText={errors.providerName}
-              fullWidth
-            >
-              {values.providerName &&
-                !suppliers.some((supplier) => supplier.name === values.providerName) && (
-                  <MenuItem value={values.providerName}>{values.providerName}</MenuItem>
-                )}
-              {suppliers.map((supplier) => (
-                <MenuItem key={supplier.id} value={supplier.name}>
-                  {supplier.name}
-                </MenuItem>
-              ))}
-            </TextField>
-          )}
-          <TextField
-            label="Ціна"
-            type="number"
-            value={values.price}
-            onChange={(event) => onChange('price', event.target.value)}
-            error={Boolean(errors.price)}
-            helperText={errors.price}
-            slotProps={{ htmlInput: { min: 0, max: 10000, step: '0.01' } }}
-            fullWidth
-          />
-        </Stack>
-      </Paper>
+      <ReferenceFormSection title="Закупівля">
+        <ReferenceSupplierSelect
+          value={values.providerName}
+          error={errors.providerName}
+          suppliers={suppliers}
+          loading={suppliersLoading}
+          loadError={supplierError}
+          onChange={(value) => onChange('providerName', value)}
+          onRetry={onRetrySuppliers}
+        />
+        <TextField
+          label="Ціна за 1 м, грн"
+          type="number"
+          value={values.price}
+          onChange={(event) => onChange('price', event.target.value)}
+          error={Boolean(errors.price)}
+          helperText={errors.price ?? 'Дата ціни оновиться сама, коли ціна зміниться'}
+          slotProps={{ htmlInput: { min: 0, max: 10000, step: '0.01' } }}
+          fullWidth
+        />
+      </ReferenceFormSection>
+
+      <ReferenceFormSection title="Характеристики">
+        {text('composition', 'Склад (UA)')}
+        {text('compositionRu', 'Склад (RU)')}
+        {text('density', 'Щільність, г/м²')}
+      </ReferenceFormSection>
+
+      <ReferenceFormSection title="Для КП і нотатки">
+        {text('proposalDescription', 'Короткий опис для КП', { multiline: true })}
+        {suggestion && suggestion !== values.proposalDescription.trim() && (
+          <Button
+            type="button"
+            size="small"
+            sx={{ alignSelf: 'flex-start' }}
+            onClick={() => onChange('proposalDescription', suggestion)}
+          >
+            Заповнити зі складу та щільності
+          </Button>
+        )}
+        {text('comment', 'Коментар', { multiline: true })}
+      </ReferenceFormSection>
     </Stack>
   );
 }

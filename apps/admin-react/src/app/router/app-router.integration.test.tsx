@@ -84,7 +84,8 @@ describe('React Admin routing', () => {
         'Загальні довідники',
         [
           'Товари',
-          'Тканина та фурнітура',
+          'Тканини',
+          'Фурнітура',
           'Операції',
           'Постачальники',
           'Розрахунки',
@@ -105,7 +106,7 @@ describe('React Admin routing', () => {
           .map((item) => item.textContent?.replace('Ще не доступно', '')),
       ).toEqual(entries);
       expect(within(list).queryAllByRole('link')).toHaveLength(
-        section === 'Загальні довідники' ? 6 : section === 'Менеджер сервісу' ? 3 : 0,
+        section === 'Загальні довідники' ? 7 : section === 'Менеджер сервісу' ? 3 : 0,
       );
     }
   });
@@ -182,29 +183,34 @@ describe('React Admin routing', () => {
     expect(await screen.findByText('Додаткових довідників поки немає')).toBeVisible();
   });
 
-  it('opens garment accessories directly inside the Brevi shell', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => [] }));
+  it('sends the old fabrics tab to the fabrics page and opens accessories separately', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockImplementation(
+          async () =>
+            new Response('[]', { status: 200, headers: { 'Content-Type': 'application/json' } }),
+        ),
+    );
     window.history.replaceState({}, '', '/references/garment-accessory?tab=fabrics');
     renderApp();
     await vi.dynamicImportSettled();
+    expect(await screen.findByRole('heading', { name: 'Тканини' })).toBeVisible();
+    expect(window.location.pathname).toBe('/references/fabric');
+    const navigation = screen.getByRole('navigation', { name: 'Основна навігація' });
+    expect(within(navigation).getByRole('link', { name: 'Тканини' })).toHaveAttribute(
+      'href',
+      '/references/fabric',
+    );
+    expect(await screen.findByText(/Тканин поки немає/)).toBeVisible();
+    expectEmptyGridPagination(10);
+
+    await userEvent.setup().click(within(navigation).getByRole('link', { name: 'Фурнітура' }));
+
+    expect(window.location.pathname).toBe('/references/garment-accessory');
     expect(await screen.findByRole('heading', { name: 'Фурнітура' })).toBeVisible();
-    expect(screen.getByRole('main')).toHaveTextContent('Тканини');
-    expect(
-      within(screen.getByRole('navigation', { name: 'Основна навігація' })).getByRole('link', {
-        name: 'Тканина та фурнітура',
-      }),
-    ).toHaveAttribute('href', '/references/garment-accessory');
-    expect(screen.getByRole('tab', { name: 'Тканини' })).toHaveAttribute('aria-selected', 'true');
-    expect(await screen.findByText('Тканин поки немає')).toBeVisible();
-    expectEmptyGridPagination(10);
-    expect(screen.queryByRole('columnheader', { name: 'Дії' })).not.toBeInTheDocument();
-
-    await userEvent.setup().click(screen.getByRole('tab', { name: 'Фурнітура виробу' }));
-
-    expect(window.location.search).toBe('?tab=accessories');
-    expect(await screen.findByText('Фурнітури поки немає')).toBeVisible();
-    expectEmptyGridPagination(10);
-    expect(screen.queryByRole('columnheader', { name: 'Дії' })).not.toBeInTheDocument();
+    expect(await screen.findByText(/Фурнітури поки немає/)).toBeVisible();
   });
 
   it('opens operations directly and activates the shared legacy menu entry', async () => {

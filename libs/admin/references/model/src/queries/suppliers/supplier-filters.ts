@@ -1,6 +1,9 @@
-import type { Supplier } from '../../entities/suppliers/supplier';
+import { filterReferenceRows } from '../reference-lists/reference-activity-filter';
 
-export type SupplierActivityFilter = 'active' | 'inactive' | 'all';
+import type { Supplier } from '../../entities/suppliers/supplier';
+import type { ReferenceActivityFilter } from '../reference-lists/reference-activity-filter';
+
+export type SupplierActivityFilter = ReferenceActivityFilter;
 
 /** Local search over the loaded list: name, contact, phone, email, purchases and tags. */
 export function filterSuppliers(
@@ -8,18 +11,12 @@ export function filterSuppliers(
   search: string,
   activity: SupplierActivityFilter,
 ): Supplier[] {
-  const query = search.trim().toLocaleLowerCase('uk');
-  return rows.filter(
-    (row) =>
-      (activity === 'all' || row.isActive === (activity === 'active')) &&
-      (!query ||
-        [
-          row.name,
-          row.contactPerson,
-          row.phoneNumber,
-          row.email,
-          row.purchaseCategories,
-          row.tags,
-        ].some((value) => value?.toLocaleLowerCase('uk').includes(query))),
-  );
+  return filterReferenceRows(rows, search, activity, (row) => [
+    row.name,
+    row.contactPerson,
+    row.phoneNumber,
+    row.email,
+    row.purchaseCategories,
+    row.tags,
+  ]);
 }

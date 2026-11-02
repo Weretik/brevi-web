@@ -12,20 +12,20 @@ import {
   Typography,
 } from '@mui/material';
 
-import type { SupplierActivityFilter } from '@admin/references/model';
-
-const activityFilters: { value: SupplierActivityFilter; label: string }[] = [
-  { value: 'active', label: 'Активні' },
-  { value: 'inactive', label: 'Не використовуються' },
-  { value: 'all', label: 'Усі' },
-];
+import type { ReferenceActivityCounts, ReferenceActivityFilter } from '@admin/references/model';
 
 interface Props {
+  searchPlaceholder: string;
+  /** Accessible name of the search field, e.g. «Пошук тканин». */
+  searchLabel: string;
+  /** Accessible name of the counter, e.g. «Кількість тканин». */
+  countLabel: string;
+  activityLabels: Record<ReferenceActivityFilter, string>;
   search: string;
   onSearchChange: (value: string) => void;
-  activity: SupplierActivityFilter;
-  activityCounts: Record<SupplierActivityFilter, number>;
-  onActivityChange: (value: SupplierActivityFilter) => void;
+  activity: ReferenceActivityFilter;
+  activityCounts: ReferenceActivityCounts;
+  onActivityChange: (value: ReferenceActivityFilter) => void;
   count: number;
   total: number;
   selectedCount: number;
@@ -35,7 +35,14 @@ interface Props {
   onDelete: () => void;
 }
 
-export function SuppliersToolbar({
+const activityOrder: ReferenceActivityFilter[] = ['active', 'inactive', 'all'];
+
+/** «Цех» list toolbar: search, activity chips with counts, counter, reload and bulk delete. */
+export function ReferenceListToolbar({
+  searchPlaceholder,
+  searchLabel,
+  countLabel,
+  activityLabels,
   search,
   onSearchChange,
   activity,
@@ -56,12 +63,12 @@ export function SuppliersToolbar({
     >
       <TextField
         size="small"
-        placeholder="Назва, контакт, телефон, email"
+        placeholder={searchPlaceholder}
         value={search}
         onChange={(event) => onSearchChange(event.target.value)}
         sx={{ width: { xs: '100%', lg: 420 }, maxWidth: '100%' }}
         slotProps={{
-          htmlInput: { 'aria-label': 'Пошук постачальників' },
+          htmlInput: { 'aria-label': searchLabel },
           input: {
             startAdornment: (
               <InputAdornment position="start">
@@ -89,10 +96,10 @@ export function SuppliersToolbar({
         aria-label="Фільтр за активністю"
         sx={{ gap: 1, flexWrap: 'wrap' }}
       >
-        {activityFilters.map(({ value, label }) => (
+        {activityOrder.map((value) => (
           <Chip
             key={value}
-            label={`${label} ${activityCounts[value]}`}
+            label={`${activityLabels[value]} ${activityCounts[value]}`}
             color={activity === value ? 'secondary' : 'default'}
             variant={activity === value ? 'filled' : 'outlined'}
             aria-pressed={activity === value}
@@ -109,7 +116,7 @@ export function SuppliersToolbar({
           variant="body2"
           color="text.secondary"
           role="status"
-          aria-label="Кількість постачальників"
+          aria-label={countLabel}
           sx={{ mr: 1, fontVariantNumeric: 'tabular-nums' }}
         >
           {count === total ? `Усього: ${total}` : `Знайдено: ${count} із ${total}`}

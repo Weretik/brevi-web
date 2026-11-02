@@ -1,21 +1,23 @@
 import { expect, test } from '@playwright/test';
 
-test('garment accessories opens directly and from the legacy menu', async ({ page }) => {
-  await page.route('**/api/reference/garment-accessories', (route) =>
-    route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
-  );
+test('accessories and fabrics open directly and from the menu', async ({ page }) => {
+  for (const path of ['garment-accessories', 'fabrics'])
+    await page.route(`**/api/reference/${path}`, (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
+    );
   await page.goto('/references/garment-accessory');
-  await expect(page.getByRole('tab', { name: 'Фурнітура виробу' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Фурнітура' })).toBeVisible();
   await expect(page.getByText('Фурнітури поки немає')).toBeVisible();
   const navigation = page.getByRole('navigation', { name: 'Основна навігація' });
-  const materialsLink = navigation.getByRole('link', { name: 'Тканина та фурнітура' });
-  if (!(await materialsLink.isVisible())) {
+  const accessoriesLink = navigation.getByRole('link', { name: 'Фурнітура', exact: true });
+  if (!(await accessoriesLink.isVisible())) {
     await navigation.getByRole('button', { name: 'Загальні довідники' }).click();
   }
-  await expect(materialsLink).toHaveAttribute('href', '/references/garment-accessory');
-  await page.goto('/');
-  await page.goBack();
-  await expect(page.getByRole('tab', { name: 'Фурнітура виробу' })).toBeVisible();
+  await expect(accessoriesLink).toHaveAttribute('href', '/references/garment-accessory');
+  await navigation.getByRole('link', { name: 'Тканини', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Тканини' })).toBeVisible();
+  await page.goto('/references/garment-accessory?tab=fabrics');
+  await expect(page).toHaveURL(/\/references\/fabric$/);
 });
 
 test('garment accessory errors keep form values and deletion needs confirmation', async ({
@@ -34,7 +36,21 @@ test('garment accessory errors keep form values and deletion needs confirmation'
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify(
-        deleted ? [] : [{ id: 1, name: 'Блискавка', supplierName: 'Атлас', price: 12 }],
+        deleted
+          ? []
+          : [
+              {
+                id: 1,
+                code: 'FUR-001',
+                name: 'Блискавка',
+                supplierName: 'Атлас',
+                price: 12,
+                unit: 'шт.',
+                priceUpdatedAt: null,
+                isActive: true,
+                comment: null,
+              },
+            ],
       ),
     });
   });
@@ -43,7 +59,20 @@ test('garment accessory errors keep form values and deletion needs confirmation'
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify([
-        { id: 2, name: 'Атлас', link: null, contactPerson: null, phoneNumber: null, notes: null },
+        {
+          id: 2,
+          name: 'Атлас',
+          link: null,
+          contactPerson: null,
+          phoneNumber: null,
+          notes: null,
+          email: null,
+          purchaseCategories: null,
+          tags: null,
+          isActive: true,
+          keepinCrmId: null,
+          keepinSyncedAt: null,
+        },
       ]),
     }),
   );
@@ -54,20 +83,20 @@ test('garment accessory errors keep form values and deletion needs confirmation'
   });
   await page.goto('/references/garment-accessory');
   await expect(page.getByText('Блискавка')).toBeVisible();
-  await page.getByRole('button', { name: 'Створити' }).click();
+  await page.getByRole('button', { name: 'Додати фурнітуру' }).click();
   const drawer = page.getByRole('dialog', { name: 'Нова фурнітура' });
   await drawer.getByRole('textbox', { name: 'Назва' }).fill('Блискавка');
   await drawer.getByRole('combobox', { name: 'Постачальник' }).click();
   await page.getByRole('option', { name: 'Атлас' }).click();
-  await drawer.getByRole('spinbutton', { name: 'Ціна' }).fill('12');
+  await drawer.getByRole('spinbutton', { name: 'Ціна, грн' }).fill('12');
   await drawer.getByRole('button', { name: 'Зберегти' }).click();
   await expect(drawer.getByText('Назва вже існує.')).toBeVisible();
   await expect(drawer.getByRole('textbox', { name: 'Назва' })).toHaveValue('Блискавка');
   await drawer.getByRole('button', { name: 'Скасувати' }).click();
-  await expect(page.getByRole('button', { name: 'Створити' })).toBeFocused();
-  const row = page.getByRole('row', { name: /1.*Блискавка/ });
+  await expect(page.getByRole('button', { name: 'Додати фурнітуру' })).toBeFocused();
+  const row = page.getByRole('row', { name: /FUR-001.*Блискавка/ });
   await row.click({ button: 'right' });
-  await page.getByRole('menuitem', { name: 'Перегляд' }).click();
+  await page.getByRole('menuitem', { name: 'Переглянути' }).click();
   const viewDrawer = page.getByRole('dialog', { name: 'Перегляд фурнітури' });
   await expect(viewDrawer).toContainText('Блискавка');
   await viewDrawer.getByRole('button', { name: 'Редагувати' }).click();
@@ -98,17 +127,16 @@ test('garment accessories fits three widths in both themes', async ({ page }) =>
   for (const width of [320, 768, 1280]) {
     await page.setViewportSize({ width, height: 800 });
     await page.goto('/references/garment-accessory');
-    await expect(page.getByRole('tab', { name: 'Фурнітура виробу' })).toBeVisible();
     await expect(page.getByText('Фурнітури поки немає')).toBeVisible();
-    await page.getByRole('button', { name: 'Створити' }).click();
+    await page.getByRole('button', { name: 'Додати фурнітуру' }).click();
     const accessoryDrawer = page.getByRole('dialog', { name: 'Нова фурнітура' });
     const accessoryBounds = await accessoryDrawer.boundingBox();
     expect(accessoryBounds).not.toBeNull();
     expect((accessoryBounds?.x ?? 0) + (accessoryBounds?.width ?? 0)).toBeLessThanOrEqual(width);
     await accessoryDrawer.getByRole('button', { name: 'Скасувати' }).click();
-    await page.getByRole('tab', { name: 'Тканини' }).click();
+    await page.goto('/references/fabric');
     await expect(page.getByText('Тканин поки немає')).toBeVisible();
-    await page.getByRole('button', { name: 'Створити' }).click();
+    await page.getByRole('button', { name: 'Додати тканину' }).click();
     const fabricDrawer = page.getByRole('dialog', { name: 'Нова тканина' });
     const fabricBounds = await fabricDrawer.boundingBox();
     expect(fabricBounds).not.toBeNull();

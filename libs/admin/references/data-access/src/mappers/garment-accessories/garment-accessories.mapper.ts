@@ -1,30 +1,16 @@
+import type { GarmentAccessoriesResponse } from '../../contracts/garment-accessories/garment-accessories-response';
 import type { GarmentAccessory } from '@admin/references/model';
-import type { operations } from '@admin/shared/contracts';
 
-type GarmentAccessoryResponse =
-  operations['getGarmentAccessories']['responses'][200]['content']['application/json'];
-
-export function mapGarmentAccessories(value: unknown): GarmentAccessory[] {
-  if (!Array.isArray(value)) throw new Error('Некоректна відповідь списку фурнітури.');
-  return value.map((item: unknown) => {
-    if (!item || typeof item !== 'object') throw new Error('Некоректний запис фурнітури.');
-    const row = item as Record<string, unknown>;
-    if (
-      !Number.isInteger(row['id']) ||
-      (row['id'] as number) <= 0 ||
-      typeof row['name'] !== 'string' ||
-      typeof row['supplierName'] !== 'string' ||
-      typeof row['price'] !== 'number' ||
-      !Number.isFinite(row['price']) ||
-      (row['price'] as number) < 0
-    )
-      throw new Error('Некоректний запис фурнітури.');
-    const validRow: GarmentAccessoryResponse[number] = row as GarmentAccessoryResponse[number];
-    return {
-      id: validRow.id,
-      name: validRow.name,
-      supplierName: validRow.supplierName,
-      price: validRow.price,
-    };
-  });
+export function mapGarmentAccessories(value: GarmentAccessoriesResponse): GarmentAccessory[] {
+  return value.map((row) => ({
+    id: row.id,
+    code: row.code,
+    name: row.name,
+    supplierName: row.supplierName,
+    price: row.price,
+    unit: row.unit,
+    priceUpdatedAt: row.priceUpdatedAt,
+    isActive: row.isActive,
+    comment: row.comment,
+  }));
 }

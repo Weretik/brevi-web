@@ -2,7 +2,10 @@ import {
   useCreateGarmentAccessoryMutation,
   useUpdateGarmentAccessoryMutation,
 } from '@admin/references/data-access';
-import { validateGarmentAccessory } from '@admin/references/model';
+import {
+  createGarmentAccessoryFormValues,
+  validateGarmentAccessory,
+} from '@admin/references/model';
 import { adminApiErrorMessage, isAdminApiError } from '@admin/shared/api-client';
 import { useState } from 'react';
 
@@ -13,19 +16,22 @@ import type {
   GarmentAccessoryFieldErrors,
   GarmentAccessoryFormValues,
   GarmentAccessory,
+  GarmentAccessoryEditorMode,
 } from '@admin/references/model';
 
-export type GarmentAccessoryEditorMode = 'create' | 'view' | 'edit';
+export type { GarmentAccessoryEditorMode } from '@admin/references/model';
 
-function initialValues(
-  accessory: GarmentAccessory | null,
-  nextId: number,
-): GarmentAccessoryFormValues {
+const optional = (value: string) => value.trim() || null;
+
+function accessoryBody(values: GarmentAccessoryFormValues) {
   return {
-    id: String(accessory?.id ?? nextId),
-    name: accessory?.name ?? '',
-    supplierName: accessory?.supplierName ?? '',
-    price: accessory ? String(accessory.price) : '',
+    name: values.name.trim(),
+    supplierName: values.supplierName,
+    price: Number(values.price),
+    code: optional(values.code),
+    unit: values.unit,
+    isActive: values.isActive,
+    comment: optional(values.comment),
   };
 }
 
@@ -36,7 +42,7 @@ export function useGarmentAccessoryEditor(
   onSaved: () => void,
 ) {
   const [mode, setMode] = useState(initialMode);
-  const [values, setValues] = useState(() => initialValues(accessory, nextId));
+  const [values, setValues] = useState(() => createGarmentAccessoryFormValues(accessory, nextId));
   const [errors, setErrors] = useState<GarmentAccessoryFieldErrors>({});
   const [message, setMessage] = useState<string | null>(null);
   const [createGarmentAccessory, createState] = useCreateGarmentAccessoryMutation();
@@ -49,7 +55,7 @@ export function useGarmentAccessoryEditor(
     reload: retrySuppliers,
   } = useSuppliers();
 
-  function change(field: GarmentAccessoryField, value: string) {
+  function change(field: GarmentAccessoryField, value: string | boolean) {
     setValues((current) => ({ ...current, [field]: value }));
     setErrors((current) => ({ ...current, [field]: undefined }));
   }
@@ -61,11 +67,7 @@ export function useGarmentAccessoryEditor(
     if (Object.keys(validation).length) return;
     setMessage(null);
     try {
-      const body = {
-        name: values.name.trim(),
-        supplierName: values.supplierName,
-        price: Number(values.price),
-      };
+      const body = accessoryBody(values);
       if (mode === 'create')
         await createGarmentAccessory({ id: Number(values.id), ...body }).unwrap();
       else await updateGarmentAccessory({ id: Number(values.id), body }).unwrap();
