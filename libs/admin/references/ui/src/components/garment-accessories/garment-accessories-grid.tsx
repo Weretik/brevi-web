@@ -1,8 +1,7 @@
-import { Box, Typography } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
+import { formatIsoDate, formatUah } from '@admin/references/model';
 
-import { useReferenceRowContextMenu } from '../../hooks/reference-row-actions/use-reference-row-context-menu';
-import { ReferenceRowContextMenu } from '../reference-row-actions/reference-row-context-menu';
+import { ReferenceDataGrid } from '../reference-list/reference-data-grid';
+import { ReferenceStatusPill } from '../reference-list/reference-status-pill';
 
 import type { GarmentAccessory } from '@admin/references/model';
 import type { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
@@ -10,6 +9,8 @@ import type { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 interface Props {
   rows: GarmentAccessory[];
   loading: boolean;
+  searching?: boolean;
+  unavailable?: boolean;
   selection: GridRowSelectionModel;
   onSelectionChange: (selection: GridRowSelectionModel) => void;
   onView: (accessory: GarmentAccessory) => void;
@@ -17,66 +18,71 @@ interface Props {
   onDelete: (id: number) => void;
 }
 
-function GarmentAccessoriesEmptyOverlay() {
-  return (
-    <Box sx={{ display: 'grid', height: '100%', placeItems: 'center' }}>
-      <Typography>Фурнітури поки немає</Typography>
-    </Box>
-  );
-}
-
-export function GarmentAccessoriesGrid({
-  rows,
-  loading,
-  selection,
-  onSelectionChange,
-  onView,
-  onEdit,
-  onDelete,
-}: Props) {
-  const { rowMenu, closeRowMenu, rowSlotProps } = useReferenceRowContextMenu(rows);
-  const columns: GridColDef<GarmentAccessory>[] = [
-    { field: 'id', headerName: 'ID', width: 90 },
-    { field: 'name', headerName: 'Назва', flex: 1, minWidth: 180 },
-    { field: 'supplierName', headerName: 'Постачальник', flex: 1, minWidth: 160 },
-    {
-      field: 'price',
-      headerName: 'Ціна',
-      width: 140,
-      valueFormatter: (value: number) =>
-        `${new Intl.NumberFormat('uk-UA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value)} грн`,
-    },
-  ];
-
-  return (
-    <>
-      <Box sx={{ width: '100%', minHeight: 440 }}>
-        <DataGrid
-          aria-label="Фурнітура виробу"
-          rows={rows}
-          columns={columns}
-          loading={loading}
-          checkboxSelection
-          disableRowSelectionOnClick
-          disableRowSelectionExcludeModel
-          keepNonExistentRowsSelected
-          rowSelectionModel={selection}
-          onRowSelectionModelChange={onSelectionChange}
-          pageSizeOptions={[10, 25, 50]}
-          initialState={{ pagination: { paginationModel: { pageSize: 10, page: 0 } } }}
-          slots={{ noRowsOverlay: GarmentAccessoriesEmptyOverlay }}
-          slotProps={{ row: rowSlotProps }}
-        />
-      </Box>
-      <ReferenceRowContextMenu
-        anchorPosition={rowMenu?.anchorPosition ?? null}
-        row={rowMenu?.row ?? null}
-        rowName={rowMenu?.row.name ?? ''}
-        onClose={closeRowMenu}
-        onView={onView}
-        onEdit={onEdit}
-        onDelete={(row) => onDelete(row.id)}
+const columns: GridColDef<GarmentAccessory>[] = [
+  {
+    field: 'code',
+    headerName: 'Код',
+    width: 104,
+    cellClassName: 'reference-mono',
+    valueFormatter: (value: string | null) => value || '—',
+  },
+  {
+    field: 'name',
+    headerName: 'Назва',
+    flex: 1.5,
+    minWidth: 220,
+    cellClassName: 'reference-strong',
+  },
+  { field: 'supplierName', headerName: 'Постачальник', flex: 1, minWidth: 180 },
+  {
+    field: 'price',
+    headerName: 'Ціна',
+    width: 130,
+    type: 'number',
+    cellClassName: 'reference-mono',
+    valueFormatter: (value: number) => formatUah(value),
+  },
+  { field: 'unit', headerName: 'Одиниця', width: 100 },
+  {
+    field: 'priceUpdatedAt',
+    headerName: 'Дата ціни',
+    width: 112,
+    cellClassName: 'reference-mono',
+    valueFormatter: (value: string | null) => formatIsoDate(value),
+  },
+  {
+    field: 'comment',
+    headerName: 'Коментар',
+    flex: 1,
+    minWidth: 160,
+    valueFormatter: (value: string | null) => value || '—',
+  },
+  {
+    field: 'isActive',
+    headerName: 'Статус',
+    width: 160,
+    type: 'boolean',
+    align: 'left',
+    headerAlign: 'left',
+    renderCell: ({ value }) => (
+      <ReferenceStatusPill
+        active={Boolean(value)}
+        activeLabel="Активна"
+        inactiveLabel="Не використовується"
       />
-    </>
+    ),
+  },
+];
+
+export function GarmentAccessoriesGrid(props: Props) {
+  return (
+    <ReferenceDataGrid
+      ariaLabel="Фурнітура"
+      columns={columns}
+      emptyLabel="Фурнітури поки немає"
+      notFoundLabel="Фурнітури не знайдено"
+      menuLabel="Дії фурнітури"
+      {...props}
+    />
   );
 }

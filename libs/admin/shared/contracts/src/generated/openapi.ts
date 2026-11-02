@@ -278,6 +278,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/reference/fabrics/import': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Import the Calculator sheet «Тканини»
+     * @description Requires CanManageProducts. The caller sends the sheet rows as JSON (one-time transfer from the Calculator sheet). A row is matched by code (FAB-…); an older fabric without a code is linked when its name matches (case and punctuation ignored); the rest are created with the next ID. Supplier names are matched like the KeepinCRM sync; an unknown one becomes a new manual supplier, an empty one «Не вказано». dryRun (default) returns the preview only. Otherwise nothing is saved when any row has an error. deactivateMissing marks fabrics that are not in the sheet as not used. Repeating the same file changes nothing.
+     */
+    post: operations['importFabrics'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/reference/fabrics/{id}': {
     parameters: {
       query?: never;
@@ -290,7 +310,7 @@ export interface paths {
     get?: never;
     /**
      * Update a fabric
-     * @description Requires CanManageProducts. Numeric edits append an approved pricing revision when the reference is versioned.
+     * @description Requires CanManageProducts. Numeric edits append an approved pricing revision when the reference is versioned. A price change sets priceUpdatedAt to today (Kyiv).
      */
     put: operations['updateFabric'];
     post?: never;
@@ -319,6 +339,26 @@ export interface paths {
      * @description Requires CanManageProducts. Numeric edits append an approved pricing revision when the reference is versioned.
      */
     post: operations['createGarmentAccessory'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/reference/garment-accessories/import': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Import the Calculator sheet «Фурнітура»
+     * @description Requires CanManageProducts. Same rules as importFabrics with FUR- codes. unit is one of шт., м, послуга («шт», «м.», «Послуга» are accepted); an unknown unit is a row error.
+     */
+    post: operations['importGarmentAccessories'];
     delete?: never;
     options?: never;
     head?: never;
@@ -2090,11 +2130,34 @@ export interface components {
       name: string;
       price: number;
       providerName: string;
+      /** @description Calculator sheet ID (FAB-001…); unique when set. */
+      code: string | null;
+      nameRu: string | null;
+      composition: string | null;
+      compositionRu: string | null;
+      /** @description Density, g/m². */
+      density: string | null;
+      /** Format: date */
+      priceUpdatedAt: string | null;
+      /** @description «Активна». Inactive fabrics stay for history. */
+      isActive: boolean;
+      comment: string | null;
+      /** @description Short description for commercial proposals (КП). */
+      proposalDescription: string | null;
     };
     UpdateFabricRequest: {
       name: string;
       price: number;
       providerName: string;
+      code?: string | null;
+      nameRu?: string | null;
+      composition?: string | null;
+      compositionRu?: string | null;
+      density?: string | null;
+      /** @default true */
+      isActive: boolean;
+      comment?: string | null;
+      proposalDescription?: string | null;
     };
     CreateFabricRequest: components['schemas']['UpdateFabricRequest'] & {
       /** Format: int32 */
@@ -2106,21 +2169,111 @@ export interface components {
       errorCode?: string | null;
       severity?: number;
     };
+    FabricImportRow: {
+      /**
+       * Format: int32
+       * @description Sheet row number for the preview.
+       */
+      rowNumber: number;
+      code: string;
+      name: string;
+      nameRu?: string | null;
+      supplierName?: string | null;
+      composition?: string | null;
+      compositionRu?: string | null;
+      density?: string | null;
+      price: number;
+      /** Format: date */
+      priceUpdatedAt?: string | null;
+      isActive: boolean;
+      comment?: string | null;
+      proposalDescription?: string | null;
+    };
+    ImportFabricsRequest: {
+      rows: components['schemas']['FabricImportRow'][];
+      /** @default true */
+      dryRun: boolean;
+      /** @default false */
+      deactivateMissing: boolean;
+    };
+    ReferenceImportRow: {
+      /** Format: int32 */
+      rowNumber: number;
+      code: string;
+      name: string;
+      /** @enum {string} */
+      action: 'create' | 'update' | 'unchanged' | 'error';
+      /** @description Ukrainian labels of changed fields. */
+      changes: string[];
+      error: string | null;
+    };
+    ReferenceImportResult: {
+      /** @description False for a preview or when a row has an error; then nothing is saved. */
+      applied: boolean;
+      /** Format: int32 */
+      created: number;
+      /** Format: int32 */
+      updated: number;
+      /** Format: int32 */
+      unchanged: number;
+      /** Format: int32 */
+      errors: number;
+      newSuppliers: string[];
+      deactivated: string[];
+      rows: components['schemas']['ReferenceImportRow'][];
+    };
     GarmentAccessoryRow: {
       /** Format: int32 */
       id: number;
       name: string;
       price: number;
       supplierName: string;
+      /** @description Calculator sheet ID (FUR-001…); unique when set. */
+      code: string | null;
+      /** @enum {string} */
+      unit: 'шт.' | 'м' | 'послуга';
+      /** Format: date */
+      priceUpdatedAt: string | null;
+      isActive: boolean;
+      comment: string | null;
     };
     UpdateGarmentAccessoryRequest: {
       name: string;
       price: number;
       supplierName: string;
+      code?: string | null;
+      /**
+       * @description Default шт.
+       * @enum {string|null}
+       */
+      unit?: 'шт.' | 'м' | 'послуга' | null;
+      /** @default true */
+      isActive: boolean;
+      comment?: string | null;
     };
     CreateGarmentAccessoryRequest: components['schemas']['UpdateGarmentAccessoryRequest'] & {
       /** Format: int32 */
       id: number;
+    };
+    GarmentAccessoryImportRow: {
+      /** Format: int32 */
+      rowNumber: number;
+      code: string;
+      name: string;
+      supplierName?: string | null;
+      price: number;
+      unit?: string | null;
+      /** Format: date */
+      priceUpdatedAt?: string | null;
+      isActive: boolean;
+      comment?: string | null;
+    };
+    ImportGarmentAccessoriesRequest: {
+      rows: components['schemas']['GarmentAccessoryImportRow'][];
+      /** @default true */
+      dryRun: boolean;
+      /** @default false */
+      deactivateMissing: boolean;
     };
     SupplierRow: {
       /** Format: int32 */
@@ -4917,8 +5070,47 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Supplier not found. */
-      404: {
+    };
+  };
+  importFabrics: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ImportFabricsRequest'];
+      };
+    };
+    responses: {
+      /** @description Preview or result; applied tells whether anything was saved. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ReferenceImportResult'];
+        };
+      };
+      400: components['responses']['responses-ValidationError'];
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product management permission required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description A pricing revision conflict; reload and repeat. */
+      409: {
         headers: {
           [name: string]: unknown;
         };
@@ -4963,7 +5155,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Fabric or supplier not found. */
+      /** @description Fabric not found. */
       404: {
         headers: {
           [name: string]: unknown;
@@ -5094,6 +5286,52 @@ export interface operations {
       };
       /** @description Product management permission required. */
       403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  importGarmentAccessories: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ImportGarmentAccessoriesRequest'];
+      };
+    };
+    responses: {
+      /** @description Preview or result; applied tells whether anything was saved. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ReferenceImportResult'];
+        };
+      };
+      400: components['responses']['responses-ValidationError'];
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product management permission required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description A pricing revision conflict; reload and repeat. */
+      409: {
         headers: {
           [name: string]: unknown;
         };

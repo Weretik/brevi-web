@@ -2,10 +2,12 @@ import { Box } from '@mui/material';
 
 interface Props {
   active: boolean;
+  activeLabel: string;
+  inactiveLabel: string;
 }
 
-/** «Цех» status pill for «Використовувати в проєкті»: dot, soft background, text label. */
-export function SupplierStatusPill({ active }: Props) {
+/** «Цех» status pill: dot, soft background, text label. */
+export function ReferenceStatusPill({ active, activeLabel, inactiveLabel }: Props) {
   return (
     <Box
       component="span"
@@ -28,7 +30,7 @@ export function SupplierStatusPill({ active }: Props) {
         aria-hidden
         sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: 'currentColor' }}
       />
-      {active ? 'Активний' : 'Не використовується'}
+      {active ? activeLabel : inactiveLabel}
     </Box>
   );
 }

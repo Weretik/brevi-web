@@ -84,6 +84,7 @@ describe('referencesApi', () => {
             name: '',
             providerName: '',
             price: 1,
+            isActive: true,
           }),
         )
         .unwrap(),

@@ -31,7 +31,7 @@ export function FabricDrawer({ mode: initialMode, fabric, nextId, onClose, onSav
       description={
         readOnly
           ? 'Перевірте дані тканини або перейдіть до редагування.'
-          : 'Заповніть основні дані, постачальника та ціну.'
+          : 'Дані тканини з таблиці калькулятора: назви UA/RU, постачальник, ціна, склад.'
       }
       formId="fabric-form"
       paperWidth={600}
@@ -45,7 +45,7 @@ export function FabricDrawer({ mode: initialMode, fabric, nextId, onClose, onSav
       <Stack sx={{ gap: 2 }}>
         {editor.message && <Alert severity="error">{editor.message}</Alert>}
         {readOnly ? (
-          <FabricDetails values={editor.values} />
+          <FabricDetails values={editor.values} priceUpdatedAt={fabric?.priceUpdatedAt ?? null} />
         ) : (
           <FabricForm
             creating={editor.mode === 'create'}

@@ -1,8 +1,8 @@
-import { Box, Typography } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
+import { formatIsoDate, formatUah } from '@admin/references/model';
+import { Stack, Typography } from '@mui/material';
 
-import { useReferenceRowContextMenu } from '../../hooks/reference-row-actions/use-reference-row-context-menu';
-import { ReferenceRowContextMenu } from '../reference-row-actions/reference-row-context-menu';
+import { ReferenceDataGrid } from '../reference-list/reference-data-grid';
+import { ReferenceStatusPill } from '../reference-list/reference-status-pill';
 
 import type { Fabric } from '@admin/references/model';
 import type { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
@@ -10,6 +10,8 @@ import type { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 interface Props {
   rows: Fabric[];
   loading: boolean;
+  searching?: boolean;
+  unavailable?: boolean;
   selection: GridRowSelectionModel;
   onSelectionChange: (selection: GridRowSelectionModel) => void;
   onView: (fabric: Fabric) => void;
@@ -17,66 +19,90 @@ interface Props {
   onDelete: (id: number) => void;
 }
 
-function FabricsEmptyOverlay() {
-  return (
-    <Box sx={{ display: 'grid', height: '100%', placeItems: 'center' }}>
-      <Typography>Тканин поки немає</Typography>
-    </Box>
-  );
-}
-
-export function FabricsGrid({
-  rows,
-  loading,
-  selection,
-  onSelectionChange,
-  onView,
-  onEdit,
-  onDelete,
-}: Props) {
-  const { rowMenu, closeRowMenu, rowSlotProps } = useReferenceRowContextMenu(rows);
-  const columns: GridColDef<Fabric>[] = [
-    { field: 'id', headerName: 'ID', width: 90 },
-    { field: 'name', headerName: 'Назва', flex: 1, minWidth: 180 },
-    { field: 'providerName', headerName: 'Постачальник', flex: 1, minWidth: 160 },
-    {
-      field: 'price',
-      headerName: 'Ціна',
-      width: 140,
-      valueFormatter: (value: number) =>
-        `${new Intl.NumberFormat('uk-UA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value)} грн`,
-    },
-  ];
-
-  return (
-    <>
-      <Box sx={{ width: '100%', minHeight: 440 }}>
-        <DataGrid
-          aria-label="Тканини"
-          rows={rows}
-          columns={columns}
-          loading={loading}
-          checkboxSelection
-          disableRowSelectionOnClick
-          disableRowSelectionExcludeModel
-          keepNonExistentRowsSelected
-          rowSelectionModel={selection}
-          onRowSelectionModelChange={onSelectionChange}
-          pageSizeOptions={[10, 25, 50]}
-          initialState={{ pagination: { paginationModel: { pageSize: 10, page: 0 } } }}
-          slots={{ noRowsOverlay: FabricsEmptyOverlay }}
-          slotProps={{ row: rowSlotProps }}
-        />
-      </Box>
-      <ReferenceRowContextMenu
-        anchorPosition={rowMenu?.anchorPosition ?? null}
-        row={rowMenu?.row ?? null}
-        rowName={rowMenu?.row.name ?? ''}
-        onClose={closeRowMenu}
-        onView={onView}
-        onEdit={onEdit}
-        onDelete={(row) => onDelete(row.id)}
+const columns: GridColDef<Fabric>[] = [
+  {
+    field: 'code',
+    headerName: 'Код',
+    width: 104,
+    cellClassName: 'reference-mono',
+    valueFormatter: (value: string | null) => value || '—',
+  },
+  {
+    field: 'name',
+    headerName: 'Назва',
+    flex: 1.6,
+    minWidth: 240,
+    renderCell: ({ row }) => (
+      <Stack sx={{ justifyContent: 'center', height: '100%', minWidth: 0 }}>
+        <Typography variant="body2" noWrap sx={{ fontWeight: 600 }}>
+          {row.name}
+        </Typography>
+        {row.nameRu && (
+          <Typography variant="caption" color="text.secondary" noWrap sx={{ lineHeight: 1.2 }}>
+            RU: {row.nameRu}
+          </Typography>
+        )}
+      </Stack>
+    ),
+  },
+  { field: 'providerName', headerName: 'Постачальник', flex: 1, minWidth: 160 },
+  {
+    field: 'composition',
+    headerName: 'Склад',
+    flex: 1,
+    minWidth: 170,
+    valueFormatter: (value: string | null) => value || '—',
+  },
+  {
+    field: 'density',
+    headerName: 'Г/м²',
+    width: 84,
+    align: 'right',
+    headerAlign: 'right',
+    cellClassName: 'reference-mono',
+    valueFormatter: (value: string | null) => value || '—',
+  },
+  {
+    field: 'price',
+    headerName: 'Ціна за 1 м',
+    width: 130,
+    type: 'number',
+    cellClassName: 'reference-mono',
+    valueFormatter: (value: number) => formatUah(value),
+  },
+  {
+    field: 'priceUpdatedAt',
+    headerName: 'Дата ціни',
+    width: 112,
+    cellClassName: 'reference-mono',
+    valueFormatter: (value: string | null) => formatIsoDate(value),
+  },
+  {
+    field: 'isActive',
+    headerName: 'Статус',
+    width: 160,
+    type: 'boolean',
+    align: 'left',
+    headerAlign: 'left',
+    renderCell: ({ value }) => (
+      <ReferenceStatusPill
+        active={Boolean(value)}
+        activeLabel="Активна"
+        inactiveLabel="Не використовується"
       />
-    </>
+    ),
+  },
+];
+
+export function FabricsGrid(props: Props) {
+  return (
+    <ReferenceDataGrid
+      ariaLabel="Тканини"
+      columns={columns}
+      emptyLabel="Тканин поки немає"
+      notFoundLabel="Тканин не знайдено"
+      menuLabel="Дії тканини"
+      {...props}
+    />
   );
 }

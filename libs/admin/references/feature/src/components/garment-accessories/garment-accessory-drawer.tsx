@@ -55,7 +55,10 @@ export function GarmentAccessoryDrawer({
       <Stack sx={{ gap: 2 }}>
         {editor.message && <Alert severity="error">{editor.message}</Alert>}
         {readOnly ? (
-          <GarmentAccessoryDetails values={editor.values} />
+          <GarmentAccessoryDetails
+            values={editor.values}
+            priceUpdatedAt={accessory?.priceUpdatedAt ?? null}
+          />
         ) : (
           <GarmentAccessoryForm
             creating={editor.mode === 'create'}

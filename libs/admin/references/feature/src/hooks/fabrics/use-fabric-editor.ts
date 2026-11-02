@@ -1,25 +1,35 @@
 import { useCreateFabricMutation, useUpdateFabricMutation } from '@admin/references/data-access';
-import { validateFabric } from '@admin/references/model';
+import { createFabricFormValues, validateFabric } from '@admin/references/model';
 import { adminApiErrorMessage, isAdminApiError } from '@admin/shared/api-client';
 import { useState } from 'react';
 
 import { useSuppliers } from '../suppliers/use-suppliers';
 
 import type {
+  Fabric,
+  FabricEditorMode,
   FabricField,
   FabricFieldErrors,
   FabricFormValues,
-  Fabric,
 } from '@admin/references/model';
 
-export type FabricEditorMode = 'create' | 'view' | 'edit';
+export type { FabricEditorMode } from '@admin/references/model';
 
-function initialValues(fabric: Fabric | null, nextId: number): FabricFormValues {
+const optional = (value: string) => value.trim() || null;
+
+function fabricBody(values: FabricFormValues) {
   return {
-    id: String(fabric?.id ?? nextId),
-    name: fabric?.name ?? '',
-    providerName: fabric?.providerName ?? '',
-    price: fabric ? String(fabric.price) : '',
+    name: values.name.trim(),
+    providerName: values.providerName,
+    price: Number(values.price),
+    code: optional(values.code),
+    nameRu: optional(values.nameRu),
+    composition: optional(values.composition),
+    compositionRu: optional(values.compositionRu),
+    density: optional(values.density),
+    isActive: values.isActive,
+    comment: optional(values.comment),
+    proposalDescription: optional(values.proposalDescription),
   };
 }
 
@@ -30,7 +40,7 @@ export function useFabricEditor(
   onSaved: () => void,
 ) {
   const [mode, setMode] = useState(initialMode);
-  const [values, setValues] = useState(() => initialValues(fabric, nextId));
+  const [values, setValues] = useState(() => createFabricFormValues(fabric, nextId));
   const [errors, setErrors] = useState<FabricFieldErrors>({});
   const [message, setMessage] = useState<string | null>(null);
   const [createFabric, createState] = useCreateFabricMutation();
@@ -43,7 +53,7 @@ export function useFabricEditor(
     reload: retrySuppliers,
   } = useSuppliers();
 
-  function change(field: FabricField, value: string) {
+  function change(field: FabricField, value: string | boolean) {
     setValues((current) => ({ ...current, [field]: value }));
     setErrors((current) => ({ ...current, [field]: undefined }));
   }
@@ -55,11 +65,7 @@ export function useFabricEditor(
     if (Object.keys(validation).length) return;
     setMessage(null);
     try {
-      const body = {
-        name: values.name.trim(),
-        providerName: values.providerName,
-        price: Number(values.price),
-      };
+      const body = fabricBody(values);
       if (mode === 'create') await createFabric({ id: Number(values.id), ...body }).unwrap();
       else await updateFabric({ id: Number(values.id), body }).unwrap();
       onSaved();

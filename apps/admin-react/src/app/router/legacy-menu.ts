@@ -96,11 +96,8 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
     label: 'Загальні довідники',
     items: [
       { id: 'products', label: 'Товари', path: '/references/products' },
-      {
-        id: 'fabric-accessories',
-        label: 'Тканина та фурнітура',
-        path: '/references/garment-accessory',
-      },
+      { id: 'fabrics', label: 'Тканини', path: '/references/fabric' },
+      { id: 'garment-accessories', label: 'Фурнітура', path: '/references/garment-accessory' },
       {
         id: 'garment-part-operations',
         label: 'Операції',

@@ -7,7 +7,8 @@ import {
   useGridSelector,
 } from '@mui/x-data-grid';
 
-export function SuppliersGridFooter() {
+/** Footer of «Цех» reference grids: selected count and pagination. */
+export function ReferenceGridFooter() {
   const apiRef = useGridApiContext();
   const selection = useGridSelector(apiRef, gridRowSelectionStateSelector);
   return (

@@ -3,19 +3,33 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Divider, ListItemIcon, Menu, MenuItem } from '@mui/material';
 
-import type { Supplier } from '@admin/references/model';
+interface MenuRow {
+  id: number;
+  name: string;
+}
 
-interface Props {
-  row: Supplier | null;
+interface Props<Row extends MenuRow> {
+  row: Row | null;
   anchorPosition: { left: number; top: number } | null;
+  /** Menu label when no row is open, e.g. «Дії постачальника». */
+  fallbackLabel: string;
   onClose: (restoreFocus?: boolean) => void;
-  onView: (row: Supplier) => void;
-  onEdit: (row: Supplier) => void;
+  onView: (row: Row) => void;
+  onEdit: (row: Row) => void;
   onDelete: (id: number) => void;
 }
 
-export function SupplierRowMenu({ row, anchorPosition, onClose, onView, onEdit, onDelete }: Props) {
-  function run(action: (supplier: Supplier) => void) {
+/** Row actions of «Цех» reference grids: view, edit, delete. */
+export function ReferenceRowMenu<Row extends MenuRow>({
+  row,
+  anchorPosition,
+  fallbackLabel,
+  onClose,
+  onView,
+  onEdit,
+  onDelete,
+}: Props<Row>) {
+  function run(action: (value: Row) => void) {
     onClose(false);
     if (row) action(row);
   }
@@ -26,7 +40,7 @@ export function SupplierRowMenu({ row, anchorPosition, onClose, onView, onEdit, 
       anchorReference="anchorPosition"
       anchorPosition={anchorPosition ?? undefined}
       onClose={() => onClose()}
-      slotProps={{ list: { 'aria-label': row ? `Дії: ${row.name}` : 'Дії постачальника' } }}
+      slotProps={{ list: { 'aria-label': row ? `Дії: ${row.name}` : fallbackLabel } }}
     >
       <MenuItem onClick={() => run(onView)}>
         <ListItemIcon>
@@ -41,10 +55,7 @@ export function SupplierRowMenu({ row, anchorPosition, onClose, onView, onEdit, 
         Редагувати
       </MenuItem>
       <Divider />
-      <MenuItem
-        sx={{ color: 'error.main' }}
-        onClick={() => run((supplier) => onDelete(supplier.id))}
-      >
+      <MenuItem sx={{ color: 'error.main' }} onClick={() => run((value) => onDelete(value.id))}>
         <ListItemIcon sx={{ color: 'inherit' }}>
           <DeleteOutlineIcon fontSize="small" />
         </ListItemIcon>

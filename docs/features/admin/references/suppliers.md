@@ -86,12 +86,15 @@ libs/admin/references/
 ├── model/src/mappers/suppliers/
 │   └── supplier-keepin-sync.ts # sync summary text, last sync time
 ├── ui/src/components/suppliers/
-│   ├── suppliers-toolbar.tsx # search, count, refresh, bulk action
-│   ├── suppliers-grid.tsx # table, selection, empty states
-│   ├── supplier-status-pill.tsx # active / not used pill
-│   ├── suppliers-grid-footer.tsx # selection count and pagination
-│   ├── supplier-row-menu.tsx # view/edit/delete actions
+│   ├── suppliers-toolbar.tsx # supplier labels for the shared list toolbar
+│   ├── suppliers-grid.tsx # supplier columns for the shared «Цех» grid
 │   └── supplier-link-cell.tsx # safe external link presentation
+├── ui/src/components/reference-list/ # shared with fabrics and accessories
+│   ├── reference-list-toolbar.tsx # search, activity chips, count, refresh, bulk action
+│   ├── reference-data-grid.tsx # table, selection, empty states, row actions
+│   ├── reference-status-pill.tsx # active / not used pill
+│   ├── reference-grid-footer.tsx # selection count and pagination
+│   └── reference-row-menu.tsx # view/edit/delete actions
 └── ui/src/dialogs/suppliers/
     └── supplier-editor-dialog.tsx # form presentation without API hooks
 ```

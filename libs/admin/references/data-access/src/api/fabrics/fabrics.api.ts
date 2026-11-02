@@ -1,18 +1,17 @@
 import { adminApi, toAdminApiError } from '@admin/shared/api-client';
 
 import { mapFabrics } from '../../mappers/fabrics/fabrics.mapper';
+import { parseFabricsResponse } from '../../validators/fabrics/fabrics-response';
 import { referenceErrorMessages } from '../shared/reference-api.shared';
 
-import type { operations } from '@admin/shared/contracts';
-
-type CreateFabricBody = operations['createFabric']['requestBody']['content']['application/json'];
-type UpdateFabricBody = operations['updateFabric']['requestBody']['content']['application/json'];
+import type { CreateFabricBody, UpdateFabricBody } from '../../contracts/fabrics/fabrics-response';
+import type { Fabric } from '@admin/references/model';
 
 export const fabricsApi = adminApi.injectEndpoints({
   endpoints: (build) => ({
-    listFabrics: build.query<ReturnType<typeof mapFabrics>, void>({
+    listFabrics: build.query<Fabric[], void>({
       query: () => '/api/reference/fabrics',
-      transformResponse: mapFabrics,
+      transformResponse: (value: unknown) => mapFabrics(parseFabricsResponse(value)),
       transformErrorResponse: (error) => toAdminApiError(error, referenceErrorMessages),
       providesTags: (result) => [
         { type: 'Fabric', id: 'LIST' },
