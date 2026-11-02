@@ -510,13 +510,35 @@ test('PPE reference picker accepts only percent references and sends mixed sourc
   await page.route('**/api/catalog/media', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
   );
-  await page.route('**/api/reference/additional-references', (route) =>
+  await page.route('**/api/reference/pricing-parameters', (route) =>
     route.fulfill({
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify([
-        { id: 1, name: 'Націнка', key: 'markup', value: 8, unit: '%', description: null },
-        { id: 2, name: 'Вага', key: 'weight', value: 4, unit: 'kg', description: null },
+        {
+          id: 1,
+          code: 'MARKUP',
+          group: 'Прибуток',
+          name: 'Націнка',
+          value: 0.08,
+          unit: '%',
+          isCalculated: false,
+          updatedOn: null,
+          comment: null,
+          sortOrder: 1,
+        },
+        {
+          id: 2,
+          code: 'WEIGHT',
+          group: 'Інше',
+          name: 'Вага',
+          value: 4,
+          unit: 'kg',
+          isCalculated: false,
+          updatedOn: null,
+          comment: null,
+          sortOrder: 2,
+        },
       ]),
     }),
   );

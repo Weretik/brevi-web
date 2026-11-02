@@ -6,7 +6,8 @@ export const adminApi = createApi({
   reducerPath: 'adminApi',
   baseQuery: axiosBaseQuery,
   tagTypes: [
-    'AdditionalReference',
+    'PricingParameter',
+    'PpeMarkupRule',
     'Fabric',
     'GarmentAccessory',
     'GarmentPart',

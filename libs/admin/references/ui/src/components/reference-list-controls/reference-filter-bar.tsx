@@ -1,6 +1,7 @@
-import { Box, Link, Stack, Typography } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 
 import { ReferenceFilterChip } from './reference-filter-chip';
+import { ReferenceFilterRow } from './reference-filter-row';
 
 import type { ReferenceActivityCounts, ReferenceActivityFilter } from '@admin/references/model';
 import type { ReactNode } from 'react';
@@ -26,72 +27,38 @@ const activityOptions: { value: ReferenceActivityFilter; label: string }[] = [
   { value: 'all', label: 'Усі' },
 ];
 
-const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' };
-
-/**
- * «Цех» filter row between the search bar and the table: activity chips with counts, extra
- * filters, and on the right the selection («Вибрано 2 · Зняти вибір») or the number found.
- */
+/** The filter row of lists with an active flag: activity chips with counts, then extra filters. */
 export function ReferenceFilterBar({
   activity,
   activityCounts,
   onActivityChange,
   extraFilters,
-  count,
-  total,
-  countLabel,
-  selectedCount,
-  onClearSelection,
+  ...row
 }: Props) {
   return (
-    <Stack
-      direction={{ xs: 'column', sm: 'row' }}
-      sx={{ gap: 1.5, mb: 1.5, alignItems: { sm: 'center' }, justifyContent: 'space-between' }}
-    >
-      <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
-        <Stack direction="row" role="group" aria-label="Фільтр за активністю" sx={{ gap: 1 }}>
-          {activityOptions.map((option) => (
-            <ReferenceFilterChip
-              key={option.value}
-              label={option.label}
-              count={activityCounts[option.value]}
-              selected={activity === option.value}
-              onClick={() => onActivityChange(option.value)}
-            />
-          ))}
-        </Stack>
-        {extraFilters && (
-          <>
-            <Box aria-hidden sx={{ width: '1px', height: 20, bgcolor: 'divider', mx: 0.5 }} />
-            {extraFilters}
-          </>
-        )}
-      </Stack>
-      <Typography variant="body2" color="text.secondary" role="status" aria-label={countLabel}>
-        {selectedCount > 0 ? (
-          <>
-            Вибрано:{' '}
-            <Box component="span" sx={mono}>
-              {selectedCount}
-            </Box>{' '}
-            ·{' '}
-            <Link component="button" type="button" variant="body2" onClick={onClearSelection}>
-              Зняти вибір
-            </Link>
-          </>
-        ) : count !== total ? (
-          <>
-            Знайдено:{' '}
-            <Box component="span" sx={mono}>
-              {count}
-            </Box>{' '}
-            із{' '}
-            <Box component="span" sx={mono}>
-              {total}
-            </Box>
-          </>
-        ) : null}
-      </Typography>
-    </Stack>
+    <ReferenceFilterRow
+      {...row}
+      filters={
+        <>
+          <Stack direction="row" role="group" aria-label="Фільтр за активністю" sx={{ gap: 1 }}>
+            {activityOptions.map((option) => (
+              <ReferenceFilterChip
+                key={option.value}
+                label={option.label}
+                count={activityCounts[option.value]}
+                selected={activity === option.value}
+                onClick={() => onActivityChange(option.value)}
+              />
+            ))}
+          </Stack>
+          {extraFilters && (
+            <>
+              <Box aria-hidden sx={{ width: '1px', height: 20, bgcolor: 'divider', mx: 0.5 }} />
+              {extraFilters}
+            </>
+          )}
+        </>
+      }
+    />
   );
 }

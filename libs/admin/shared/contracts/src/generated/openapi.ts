@@ -136,24 +136,51 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/reference/additional-references': {
+  '/api/reference/pricing-parameters': {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /** List additional references */
-    get: operations['getAdditionalReferences'];
+    /**
+     * List pricing parameters in sheet order
+     * @description Anonymous. A calculated parameter (isCalculated) has its value computed from other parameters, for example MINUTE_COST_SEAMSTRESS = SALARY_SEAMSTRESS / (WORK_DAYS_MONTH × MINUTES_SHIFT); null when an input is missing. An empty list when there are none.
+     */
+    get: operations['getPricingParameters'];
     put?: never;
-    post?: never;
+    /**
+     * Add a pricing parameter
+     * @description Requires CanManageProducts. The ID is assigned by Brevi; updatedOn becomes today (Kyiv).
+     */
+    post: operations['createPricingParameter'];
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  '/api/reference/additional-references/{id}': {
+  '/api/reference/pricing-parameters/import': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Import both tables of the Calculator sheet «Налаштування цін»
+     * @description Requires CanManageProducts. Parameters are matched by code, PPE markup rules by name; the row number becomes the display order. dryRun (default) returns the preview only. Otherwise nothing is saved when any row has an error. deleteMissing deletes parameters and rules that are not in the sheet. Repeating the same file changes nothing.
+     */
+    post: operations['importPricingSettings'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/reference/pricing-parameters/{id}': {
     parameters: {
       query?: never;
       header?: never;
@@ -163,10 +190,55 @@ export interface paths {
       cookie?: never;
     };
     get?: never;
-    /** Update an additional reference */
-    put: operations['updateAdditionalReference'];
+    /**
+     * Update a pricing parameter
+     * @description Requires CanManageProducts. The code cannot change. When the value or type changes, updatedOn becomes today (Kyiv). A calculated parameter takes no value.
+     */
+    put: operations['updatePricingParameter'];
     post?: never;
+    /** Delete a pricing parameter */
+    delete: operations['deletePricingParameter'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/reference/ppe-markup-rules': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List PPE markup rules in sheet order */
+    get: operations['getPpeMarkupRules'];
+    put?: never;
+    /**
+     * Add a PPE markup rule
+     * @description Requires CanManageProducts. The name is unique and cannot change later; PPE offers refer to it.
+     */
+    post: operations['createPpeMarkupRule'];
     delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/reference/ppe-markup-rules/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    /** Update a PPE markup rule */
+    put: operations['updatePpeMarkupRule'];
+    post?: never;
+    /** Delete a PPE markup rule */
+    delete: operations['deletePpeMarkupRule'];
     options?: never;
     head?: never;
     patch?: never;
@@ -2093,28 +2165,126 @@ export interface components {
       contentType: string;
       originalFileName: string;
     };
-    AdditionalReferenceRow: {
+    PricingParameterRow: {
       /** Format: int32 */
       id: number;
+      code: string;
+      group: string;
       name: string;
-      key: string;
-      value: number;
+      value: number | null;
       unit: string;
-      description?: string | null;
+      isCalculated: boolean;
+      /** Format: date */
+      updatedOn: string | null;
+      comment: string | null;
+      /** Format: int32 */
+      sortOrder: number;
     };
-    UpdateAdditionalReferenceRequest: {
+    PricingParameterFields: {
+      group: string;
       name: string;
-      key: string;
-      value: number;
-      /** @enum {string} */
-      unit: 'шт.' | 'грн.' | '%';
-      description?: string | null;
+      /** @description Required unless isCalculated. */
+      value?: number | null;
+      unit: string;
+      /** @default false */
+      isCalculated: boolean;
+      comment?: string | null;
+      /**
+       * Format: int32
+       * @default 0
+       */
+      sortOrder: number;
+    };
+    CreatePricingParameterRequest: components['schemas']['PricingParameterFields'] & {
+      /** @description Stored upper-case. */
+      code: string;
     };
     ValidationError: {
       identifier: string;
       errorMessage: string;
       errorCode?: string | null;
       severity?: number;
+    };
+    PricingParameterImportRow: {
+      /** Format: int32 */
+      rowNumber: number;
+      code: string;
+      group: string;
+      name: string;
+      value?: number | null;
+      unit: string;
+      isCalculated: boolean;
+      /** Format: date */
+      updatedOn?: string | null;
+      comment?: string | null;
+    };
+    PpeMarkupRuleImportRow: {
+      /** Format: int32 */
+      rowNumber: number;
+      name: string;
+      retailMarkup: number;
+      wholesaleMarkup: number;
+      largeWholesaleMarkup: number;
+      priceNote?: string | null;
+      appliesTo?: string | null;
+    };
+    ImportPricingSettingsRequest: {
+      parameters: components['schemas']['PricingParameterImportRow'][];
+      ppeMarkupRules: components['schemas']['PpeMarkupRuleImportRow'][];
+      /** @default true */
+      dryRun: boolean;
+      /** @default false */
+      deleteMissing: boolean;
+    };
+    ReferenceImportRowResult: {
+      /** Format: int32 */
+      rowNumber: number;
+      code: string;
+      name: string;
+      /** @enum {string} */
+      action: 'create' | 'update' | 'unchanged' | 'error';
+      changes: string[];
+      error?: string | null;
+    };
+    PricingSettingsImportSection: {
+      created: number;
+      updated: number;
+      unchanged: number;
+      errors: number;
+      deleted: string[];
+      rows: components['schemas']['ReferenceImportRowResult'][];
+    };
+    PricingSettingsImportResult: {
+      applied: boolean;
+      parameters: components['schemas']['PricingSettingsImportSection'];
+      ppeMarkupRules: components['schemas']['PricingSettingsImportSection'];
+    };
+    PpeMarkupRuleRow: {
+      /** Format: int32 */
+      id: number;
+      name: string;
+      retailMarkup: number;
+      wholesaleMarkup: number;
+      largeWholesaleMarkup: number;
+      priceNote: string | null;
+      appliesTo: string | null;
+      /** Format: int32 */
+      sortOrder: number;
+    };
+    PpeMarkupRuleFields: {
+      retailMarkup: number;
+      wholesaleMarkup: number;
+      largeWholesaleMarkup: number;
+      priceNote?: string | null;
+      appliesTo?: string | null;
+      /**
+       * Format: int32
+       * @default 0
+       */
+      sortOrder: number;
+    };
+    CreatePpeMarkupRuleRequest: components['schemas']['PpeMarkupRuleFields'] & {
+      name: string;
     };
     GarmentPartOperationRow: {
       /** Format: int32 */
@@ -4685,7 +4855,7 @@ export interface operations {
       };
     };
   };
-  getAdditionalReferences: {
+  getPricingParameters: {
     parameters: {
       query?: never;
       header?: never;
@@ -4694,15 +4864,40 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Additional references. */
+      /** @description Parameters. */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['AdditionalReferenceRow'][];
+          'application/json': components['schemas']['PricingParameterRow'][];
         };
       };
+    };
+  };
+  createPricingParameter: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreatePricingParameterRequest'];
+      };
+    };
+    responses: {
+      /** @description The new parameter ID. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': number;
+        };
+      };
+      400: components['responses']['ValidationError'];
       /** @description Unauthorized. */
       401: {
         headers: {
@@ -4710,8 +4905,8 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description No additional references found. */
-      404: {
+      /** @description Product management permission required. */
+      403: {
         headers: {
           [name: string]: unknown;
         };
@@ -4719,7 +4914,46 @@ export interface operations {
       };
     };
   };
-  updateAdditionalReference: {
+  importPricingSettings: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ImportPricingSettingsRequest'];
+      };
+    };
+    responses: {
+      /** @description Preview or result; applied tells whether anything was saved. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PricingSettingsImportResult'];
+        };
+      };
+      400: components['responses']['ValidationError'];
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product management permission required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updatePricingParameter: {
     parameters: {
       query?: never;
       header?: never;
@@ -4730,11 +4964,11 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateAdditionalReferenceRequest'];
+        'application/json': components['schemas']['PricingParameterFields'];
       };
     };
     responses: {
-      /** @description Additional reference updated. */
+      /** @description Parameter updated. */
       200: {
         headers: {
           [name: string]: unknown;
@@ -4749,15 +4983,202 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Additional reference not found. */
+      /** @description Product management permission required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Parameter not found. */
       404: {
         headers: {
           [name: string]: unknown;
         };
         content?: never;
       };
-      /** @description Duplicate key or name. */
-      409: {
+    };
+  };
+  deletePricingParameter: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Parameter deleted. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product management permission required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Parameter not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getPpeMarkupRules: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Rules. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PpeMarkupRuleRow'][];
+        };
+      };
+    };
+  };
+  createPpeMarkupRule: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreatePpeMarkupRuleRequest'];
+      };
+    };
+    responses: {
+      /** @description The new rule ID. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': number;
+        };
+      };
+      400: components['responses']['ValidationError'];
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product management permission required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updatePpeMarkupRule: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PpeMarkupRuleFields'];
+      };
+    };
+    responses: {
+      /** @description Rule updated. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      400: components['responses']['ValidationError'];
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product management permission required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Rule not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  deletePpeMarkupRule: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Rule deleted. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product management permission required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Rule not found. */
+      404: {
         headers: {
           [name: string]: unknown;
         };

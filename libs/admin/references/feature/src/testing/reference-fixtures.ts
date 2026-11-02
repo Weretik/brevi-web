@@ -80,3 +80,33 @@ export function sewingSettingsResponse(): ApiRow {
     settings: { monthlySalary: 15652.8, workDays: 22, shiftMinutes: 400, assemblyRate: 0.25 },
   };
 }
+
+export function pricingParameterRow(overrides: ApiRow = {}): ApiRow {
+  return {
+    id: 7,
+    code: 'ASSEMBLY_RATE',
+    group: 'Виробництво',
+    name: 'Доплата на збирання виробу',
+    value: 0.25,
+    unit: '%',
+    isCalculated: false,
+    updatedOn: '2026-08-30',
+    comment: null,
+    sortOrder: 7,
+    ...overrides,
+  };
+}
+
+export function ppeMarkupRuleRow(overrides: ApiRow = {}): ApiRow {
+  return {
+    id: 1,
+    name: 'Взуття',
+    retailMarkup: 0.45,
+    wholesaleMarkup: 0.37,
+    largeWholesaleMarkup: 0.3,
+    priceNote: null,
+    appliesTo: 'Усе робоче взуття',
+    sortOrder: 2,
+    ...overrides,
+  };
+}
