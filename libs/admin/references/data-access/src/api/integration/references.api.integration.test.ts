@@ -77,4 +77,34 @@ describe('referencesApi', () => {
         .unwrap(),
     ).rejects.toMatchObject({ status: 400, fieldErrors: { name: 'Обов’язково' } });
   });
+
+  it('rejects malformed supplier data before it enters the query result', async () => {
+    configureAppConfig({ production: true, api: { baseUrl: 'http://localhost' } });
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify([
+            {
+              id: 1,
+              name: 'Атлас',
+              link: null,
+              contactPerson: null,
+              phoneNumber: null,
+              notes: 123,
+            },
+          ]),
+          { status: 200, headers: { 'Content-Type': 'application/json' } },
+        ),
+      ),
+    );
+    const errorLog = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      await expect(
+        adminStore.dispatch(suppliersApi.endpoints.listSuppliers.initiate()).unwrap(),
+      ).rejects.toMatchObject({ message: 'Некоректний запис постачальника.' });
+    } finally {
+      errorLog.mockRestore();
+    }
+  });
 });

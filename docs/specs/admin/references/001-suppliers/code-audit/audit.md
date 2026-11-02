@@ -1,53 +1,93 @@
-# Аудит відповідальностей коду — Постачальники
+# Локальний аудит постачальників: відповідальності та межі
 
-- **Feature:** `docs/specs/admin/references/001-suppliers`
-- **Scope:** уся погоджена feature
-- **Дата:** 2026-09-27
+- **Дата:** 2026-11-02.
+- **Обсяг:** поточна реалізація `/references/supplier`, компоненти й hooks постачальників, їхні model/data-access та публічні експорти. Це локальна перевірка за запитом власника, не повний аудит застосунку.
+- **Метод:** `web-frontend:frontend-code-audit`, застосовні перевірки UI, стану, публічних меж і фізичної структури; додатково `mui-admin-ui` для єдиного власника локалі.
+- **Статус:** verified locally; AF-001–AF-003 закриті свіжими перевірками у TS-007. Статус стосується лише цього локального аудиту.
+- **Залежна реалізація:** [TS-006](../tasks/TS-006-workshop-page.md). Її попередні результати тестів є історичними свідченнями функціональної перевірки, а не підтвердженням відсутності наведених порушень.
+- Первинний аудит був без змін runtime-коду. Після окремого запиту власника всі три знахідки виправлено в [TS-007](../tasks/TS-007-audit-fixes.md). Початкові описи нижче збережено як історію виявлення.
+- [Історичний аудит 2026-09-27](audit-2026-09-27.md) збережено окремо без зміни початкового вмісту.
 
-## Перед реалізацією
+## Джерела правил
 
-- [x] Переглянуто Angular supplier page, facade, dialog, data-access, React shell/router, Nx targets і тестову конфігурацію.
-- [x] Angular код має власні UI і transport межі; React shell має тільки навігацію і layout. Нові React правила та API належать окремим `references` feature/data-access libraries.
-- [x] `design/frontend.md` визначає цільові шляхи; прямий HTTP у React page заборонено.
+- `AGENTS.md`: цільові межі, обсяг перевірок, збереження сторонніх змін.
+- `docs/standards/admin/admin-code-organization.md`: Libraries and dependencies, Role folders, Nesting and size, Pages/routes/links.
+- `docs/architecture/admin/structure/domains.md`: власники feature/data-access/model/ui.
+- `docs/architecture/admin/runtime/state-and-api.md`: RTK Query і Forms.
+- `docs/standards/admin/admin-ui.md`: українська локаль та компоненти.
+- `/workspace/obsidian/plugins/web-frontend/skills/frontend-code-audit/SKILL.md`: локальний аудит і фіксація AF-*.
+- `/workspace/obsidian/plugins/web-frontend/skills/mui-admin-ui/SKILL.md:20`: локалізація через спільну тему, без дублювання localeText у кожній таблиці.
 
-## Після реалізації, до delivery checkpoint
+## Знахідки
 
-- [x] Повторно переглянуто весь код feature, public exports, імпорти та Nx targets після реалізації.
-- [x] API, mapper, hooks стану та дій, validation, grid, діалоги й router мають окремі власники; напрям імпортів і public API перевірено.
-- [x] Цілісні Angular UI/facade, React shell/router, contract tooling і транспортні файли залишено на місці; довжина файлу сама по собі не вимагала розділення.
+### AF-001 — Локальна localeText втрачає доповнення спільної теми
 
-## Результат аудиту
+- **Severity / status:** medium / verified.
+- **Походження:** додано під час поточного редизайну.
+- **Owner:** admin/references/ui.
+- **Свідчення:** `libs/admin/references/ui/src/components/suppliers/suppliers-grid.tsx:122` передає власний localeText із пакета ukUA. Спільна тема в `apps/admin-react/src/app/theme/brevi-theme.ts:31` окремо додає український `columnMenuAriaLabel`, якого немає в пакеті ukUA цієї версії.
+- **Правило:** `mui-admin-ui/SKILL.md:20`, Admin UI Rules / Language and components — локаль має спільного власника, системні назви українською.
+- **Вплив:** MUI getThemeProps замінює localeText цілком, а не об'єднує його ключі. Data Grid потім додає англійські defaults, тому кнопка меню колонки втрачає назву `Меню стовпця Назва` й отримує `Назва column menu`. Подальші виправлення словника в темі також не діятимуть тут.
+- **Перевірка:** Node-відтворення з установленими `createTheme`, `getThemeProps` та ukUA: спільна тема повертає `Меню стовпця Назва`, а конфігурація таблиці має `columnMenuAriaLabel === undefined`. Код установленого Data Grid (`DataGrid/useDataGridProps.mjs`) підтверджує доповнення англійськими defaults; ukUA.mjs залишає цей ключ закоментованим.
+- **Target:** лишити локаль спільній темі, а тексти порожніх станів винести в overlay; альтернативно об'єднувати локальні зміни з localeText саме поточної теми, зберігаючи її доповнення.
+- **Залежна задача:** TS-006, SC-006; виправлення: TS-007.
+- **Закриття:** таблиця об’єднує власні тексти станів із localeText поточної теми; імпорт ukUA з таблиці прибрано. Integration test з реальною lightTheme/darkTheme повертає український columnMenuAriaLabel — 2 passed.
+- **Потрібне свідчення закриття:** компонентний тест із реальною темою Brevi на українську доступну назву меню колонки та регресія трьох порожніх станів.
 
-| Шлях або область                                                                    | Наявна й впроваджена відповідальність                                            | Рішення та причина                                                                                      | Нові шляхи й межі імпортів                                      | Перевірка                                  |
-| ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- | ------------------------------------------ |
-| `libs/admin/feature/references/src/lib/pages/supplier/`                             | Старий Angular UI і facade                                                       | Залишити; React не імпортує Angular                                                                     | `libs/admin/references/feature/`                                | Огляд імпортів                             |
-| `libs/admin/data-access/src/lib/references/suppliers/`                              | Старий Angular transport/store                                                   | Залишити; React transport спирається на generated contract                                              | `libs/admin/references/data-access/`                            | Focused mapper/API tests                   |
-| `apps/admin-react/src/app/router/`                                                  | Спільна маршрутизація й активація меню                                           | Додати тільки route нової сторінки                                                                      | Публічний export feature                                        | Route test                                 |
-| `libs/admin/core/shell/`                                                            | Layout, теми й навігація                                                         | Повторно використати без змін                                                                           | —                                                               | App regression                             |
-| `tools/contracts/contracts.mjs`                                                     | Один спільний sync/generate/check workflow                                       | Залишити цілісним: усі три команди використовують одні шляхи, digest і generator                        | `docs/contracts/openapi/`, `libs/admin/shared/contracts/`       | `npm run contracts:check`                  |
-| `libs/admin/references/data-access/src/suppliers/`                                  | HTTP, runtime mapper, локальна модель                                            | Тримати окремими файлами; лише тут імпортується generated operation type                                | `@admin/shared/contracts` type-only                             | `npx nx test admin-references-data-access` |
-| `libs/admin/references/feature/src/hooks/suppliers/use-suppliers.ts`                | Read state, cancellation, reload                                                 | Залишити в hook: стан не належить grid або transport                                                    | `@admin/references/data-access`                                 | Component tests                            |
-| `libs/admin/references/model/src/validators/suppliers/supplier-validation.ts`       | Чисті правила полів                                                              | Перенести з `components/suppliers/`: hook і форма використовують правила без залежності від UI-каталогу | Імпортує лише тип `SupplierDraft`; React і HTTP тут відсутні    | Component tests                            |
-| `libs/admin/references/feature/src/hooks/suppliers/use-supplier-editor.ts`          | Draft, validation, create/update, save/error state                               | Винести з MUI-діалогу: життєвий цикл запису та повідомлення незалежні від JSX                           | Імпортує data-access і model; UI імпортує hook                  | Component tests                            |
-| `libs/admin/references/feature/src/hooks/suppliers/use-supplier-deletion.ts`        | Selection, підтвердження, batch delete та reconciliation після часткової помилки | Винести зі сторінки: стан і правила видалення незалежні від розмітки grid                               | Імпортує data-access; page імпортує hook                        | Component та E2E tests                     |
-| `libs/admin/references/feature/src/components/suppliers/supplier-dialog.tsx`        | Поля, доступне посилання, режими форми                                           | Залишити представлення в одному діалозі; save викликає hook, HTTP не викликає                           | Імпортує hook, model types і Supplier type                      | Component та E2E tests                     |
-| `libs/admin/references/feature/src/components/suppliers/suppliers-grid.tsx`         | Колонки, row actions, Data Grid                                                  | Винести зі сторінки: таблиця лише відображає рядки та передає події                                     | Імпортує лише Supplier type; дії передані props                 | Component та E2E tests                     |
-| `libs/admin/references/feature/src/components/suppliers/supplier-delete-dialog.tsx` | Підтвердження видалення                                                          | Винести зі сторінки: окрема UI-відповідальність без API і selection-правил                              | Керується props від page/hook                                   | Component та E2E tests                     |
-| `libs/admin/references/feature/src/pages/suppliers/suppliers-page.tsx`              | Композиція toolbar, повідомлень, grid і діалогів                                 | Залишити оркестрацію маршруту: обчислення next ID і відкриття діалогів залежать від поточної сторінки   | Публічний export із `src/index.ts`; імпортує компоненти й hooks | Component та E2E tests                     |
+### AF-002 — Діалог одночасно координує збереження і реалізує форму
 
-Циклів імпортів або дублювання transport-моделей не виявлено. Правила валідації залишаються в одному місці, а generated DTO не виходить із data-access. Підсумок повторних перевірок після розділення наведено нижче.
+- **Severity / status:** medium / verified.
+- **Походження:** існувало до редизайну; файл змінювався в поточній роботі, але ця межа лишилася.
+- **Owner:** admin/references/feature та admin/references/ui.
+- **Свідчення:** `libs/admin/references/feature/src/components/suppliers/supplier-dialog.tsx:29` підключає useSupplierEditor і збереження; той самий компонент з `:60` містить Dialog, усі поля, field errors, submit/Enter, посилання й кнопки режимів create/view/edit.
+- **Правило:** admin-code-organization.md:8–9,73 — feature передає дані й callback-и до ui, форми отримують значення та обробники через props; state-and-api.md:66–69 — форма не володіє API-сценарієм.
+- **Вплив:** змінити або перевірити відображення форми окремо від RTK Query/провайдера неможливо. Зміни полів і сценарію збереження мають одного власника в одному компоненті, хоча таблиця й інші форми домену вже мають межу feature → ui.
+- **Target:** залишити невеликий feature-контейнер із useSupplierEditor; винести цілісне відображення діалогу/форми до ui з props для draft, errors, mode, saving, message та callbacks. Не потрібно розділяти кожне поле або самі режими на окремі компоненти.
+- **Залежна задача:** TS-003 / TS-006; виправлення: TS-007.
+- **Закриття:** feature SupplierDialog — 30-рядковий контейнер; SupplierEditorDialog у ui/dialogs/suppliers отримує дані й callback-и. Режим і створення draft — model/forms. 3 standalone UI tests проходять без API-провайдера; 18 page tests підтверджують перегляд, перехід до редагування, збереження, Enter, помилки й інші сценарії.
+- **Потрібне свідчення закриття:** компонент відображення рендериться без AdminApiProvider; регресія перегляду, Enter, помилок полів і збереження через існуючі компонентні тести сторінки.
 
-## Повторна перевірка
+### AF-003 — Перевірка невідомої відповіді API знаходиться всередині mapper
 
-| Команда                                                                                                                                             | Результат                                                                                                                                                                 |
-| --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `npx nx test admin-references-feature`                                                                                                              | 7/7 пройшли після розділення. Перший паралельний запуск мав 2 таймаути та 2 нестійкі очікування вже закритого діалогу; повтор окремо пройшов після виправлення очікувань. |
-| `npx nx run-many -t test -p admin-references-data-access admin-react --parallel=1`                                                                  | Пройшло; data-access взято з Nx cache, admin-react виконано.                                                                                                              |
-| `npx nx run-many -t lint -p admin-references-feature admin-references-data-access admin-react admin-react-e2e admin-api-contract --parallel=1`      | 5/5 пройшли; 3 незмінені цілі взято з Nx cache. Перший lint feature виявив порядок імпортів, який виправлено.                                                             |
-| `npx nx run-many -t typecheck -p admin-references-feature admin-references-data-access admin-react admin-react-e2e admin-api-contract --parallel=1` | 5/5 пройшли.                                                                                                                                                              |
-| `npx nx run-many -t typecheck-tests -p admin-references-feature admin-react --parallel=1`                                                           | 2/2 пройшли.                                                                                                                                                              |
-| `npx nx build admin-react`                                                                                                                          | Production build пройшов; Vite попереджає про chunk понад 500 kB, без збою.                                                                                               |
-| `npx nx e2e admin-react-e2e`                                                                                                                        | 7/7 Chromium tests пройшли на production preview, зокрема дії постачальників і три ширини у двох темах.                                                                   |
-| `npm run contracts:check`, `npm run docs:check`                                                                                                     | Пройшли; OpenAPI provenance збігається, Markdown check: 220 файлів без помилок.                                                                                           |
+- **Severity / status:** low / verified.
+- **Походження:** існувало до редизайну; mapper не змінювався ним.
+- **Owner:** admin/references/data-access.
+- **Свідчення:** `libs/admin/references/data-access/src/mappers/suppliers/suppliers.mapper.ts:6` приймає unknown; рядки 7–20 перевіряють масив, об'єкти й поля, а рядок 22 приводить результат до generated DTO. Окремої перевіреної вхідної моделі mapper не отримує.
+- **Правило:** admin-code-organization.md / Role folders — API response validation належить data-access/validators, mapper отримує перевірені дані; фаза 04 frontend-code-audit прямо перевіряє цю межу.
+- **Вплив:** перевірка транспортної форми й перетворення в Supplier не мають окремих контрактів і тестових меж. Це структурний борг, а не доказ некоректного поточного результату API.
+- **Target:** виділити перевірку відповіді в data-access/validators/suppliers; mapper перетворює вже перевірені дані на Supplier. Не експортувати parser/DTO назовні data-access.
+- **Залежна задача:** TS-001; виправлення: TS-007.
+- **Закриття:** unknown перевіряє parseSuppliersResponse у validators/suppliers; private generated alias — contracts/suppliers; mapper приймає перевірений тип і явно формує Supplier. Endpoint композиційно викликає validator → mapper. 19 validator/mapper/API tests passed, включно з відхиленням некоректного payload через endpoint.
+- **Потрібне свідчення закриття:** тести некоректного payload та регресія перетворення/запиту списку; імпорти через публічні API лишаються чинними.
 
-Ручна перевірка реального backend API залишається для delivery checkpoint: браузерні тести використовують mock responses. Застереження Vite щодо розміру спільного bundle не спричинене розділенням відповідальностей і потребує окремої задачі, якщо стане вимогою продуктивності.
+## Початкові рішення split / keep
+
+| Файл або область                             | Рішення                | Підстава                                                                                                                                                                             |
+| -------------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| suppliers-page.tsx, 137 рядків               | keep                   | Координує query, локальний пошук, вибір і відкриття діалогів; таблицю та toolbar уже винесено. Простий стан не потребує додаткового reducer чи hook лише заради кількості рядків.    |
+| suppliers-grid.tsx, 166 рядків               | keep; виправити AF-001 | Колонки, параметри Data Grid і з'єднання меню — один життєвий цикл таблиці. API/router/generated DTO сюди не потрапляють. Конфігурація колонок сама по собі не вимагає нового файла. |
+| ui/components/suppliers, 6 production-файлів | keep                   | Toolbar, таблиця, меню, link cell, footer і підтвердження видалення мають окремі ролі. Поріг проєкту для обов'язкового перегляду папки — 8, його не досягнуто.                       |
+| feature/hooks/suppliers, 3 production-файли  | keep                   | Завантаження, редагування і видалення мають різні сценарії; серверні дані лишаються у RTK Query.                                                                                     |
+| supplier-dialog.tsx                          | split                  | Окремі власники сценарію й відображення форми: AF-002.                                                                                                                               |
+| suppliers.mapper.ts                          | split                  | Різні контракти перевірки unknown та перетворення: AF-003; причина не в розмірі файла.                                                                                               |
+| supplier-link.ts і SupplierLinkCell          | keep                   | Чисте перетворення URL відокремлено від MUI-відображення; доступ через public model export.                                                                                          |
+
+## Свідчення первинного аудиту
+
+- Публічні імпорти постачальників використовують alias і root index.ts; внутрішні компоненти меню/комірки/footer не додані в публічний barrel без потреби.
+- Пошук у supplier-ui та supplier-link model за API/router/generated DTO не знайшов таких імпортів. У ui немає транспортних викликів.
+- Метадані бібліотек та eslint depConstraints задають feature → ui/model/data-access, ui → model. Окремий негативний тест правил імпорту під час цього локального аудиту не запускався.
+- Наявні тести сторінки, link cell і URL переглянуто. Вони перевіряють поведінку, але не доводять відсутності структурних AF-002/AF-003 і не відтворюють AF-001 із реальною темою.
+- Попередні тести не повторювалися без зміни runtime-коду. Повний аудит, build, E2E і браузерні перевірки не виконувалися.
+- Нове свідчення AF-001 отримано без браузера; загальна shell-команда завершилася 1 через наступний rg без збігів (очікуваний результат пошуку), Node-відтворення завершилося успішно.
+
+Рекомендований порядок виправлення: AF-001 (нова регресія локалі), AF-002 (межа форми), AF-003 (борг transport validation). За запитом на перевірку виправлення не виконуються автоматично.
+
+## Перевірка після виправлень — TS-007
+
+- **Підсумок:** AF-001, AF-002, AF-003 — verified. Відкритих знахідок цього локального аудиту не залишилося.
+- feature → ui/model/data-access збережено; ui не імпортує API, router, feature або generated contracts; model/forms не імпортує React чи HTTP; DTO/validator/mapper не додані до публічного data-access index.ts.
+- Контейнер форми залишено у feature, цілісне відображення — у ui/dialogs. Немає потреби розділяти окремі поля або додавати новий reducer. У ui/components/suppliers лишається 6 production-файлів, у ui/dialogs/suppliers — 1.
+- Перевірено task-scoped diff: без raw HTML, нового транспорту, маршрутів чи токенів; RTK Query лишається власником серверного стану, таблиця — з віртуалізацією й пагінацією. Nullable payload і невідповідні типи перевіряються на транспортній межі.
+- Свіжі результати: 42 focused tests (2 theme integration + 3 form UI + 19 validator/mapper/API + 18 page), exit 0. Typecheck тестових і транзитивних runtime-меж feature/ui/data-access — exit 0; scoped ESLint — exit 0. Точні команди у TS-007.
+- Браузерні перевірки, E2E, production build, повні набори перевірок, commit, push і публікація в цій задачі не виконувалися.

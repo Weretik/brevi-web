@@ -15,3 +15,5 @@ export * from './components/garment-parts/garment-part-delete-dialog';
 export * from './components/garment-parts/garment-parts-grid';
 export * from './components/suppliers/supplier-delete-dialog';
 export * from './components/suppliers/suppliers-grid';
+export * from './components/suppliers/suppliers-toolbar';
+export * from './dialogs/suppliers/supplier-editor-dialog';

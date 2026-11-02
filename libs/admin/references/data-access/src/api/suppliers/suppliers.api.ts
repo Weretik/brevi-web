@@ -1,6 +1,7 @@
 import { adminApi, toAdminApiError } from '@admin/shared/api-client';
 
 import { mapSuppliers } from '../../mappers/suppliers/suppliers.mapper';
+import { parseSuppliersResponse } from '../../validators/suppliers/suppliers-response';
 import { referenceErrorMessages } from '../shared/reference-api.shared';
 
 import type { SupplierDraft } from '@admin/references/model';
@@ -29,7 +30,7 @@ export const suppliersApi = adminApi.injectEndpoints({
   endpoints: (build) => ({
     listSuppliers: build.query<ReturnType<typeof mapSuppliers>, void>({
       query: () => '/api/reference/suppliers',
-      transformResponse: mapSuppliers,
+      transformResponse: (value: unknown) => mapSuppliers(parseSuppliersResponse(value)),
       transformErrorResponse: (error) => toAdminApiError(error, referenceErrorMessages),
       providesTags: (result) => [
         { type: 'Supplier', id: 'LIST' },

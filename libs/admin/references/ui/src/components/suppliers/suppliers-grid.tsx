@@ -1,15 +1,22 @@
-import { Box, Typography } from '@mui/material';
+import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
+import { Box, IconButton } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { DataGrid } from '@mui/x-data-grid';
 
+import { SupplierLinkCell } from './supplier-link-cell';
+import { SupplierRowMenu } from './supplier-row-menu';
+import { SuppliersGridFooter } from './suppliers-grid-footer';
 import { useReferenceRowContextMenu } from '../../hooks/reference-row-actions/use-reference-row-context-menu';
-import { ReferenceRowContextMenu } from '../reference-row-actions/reference-row-context-menu';
 
 import type { Supplier } from '@admin/references/model';
 import type { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
+import type {} from '@mui/x-data-grid/themeAugmentation';
 
 interface Props {
   rows: Supplier[];
   loading: boolean;
+  searching?: boolean;
+  unavailable?: boolean;
   selection: GridRowSelectionModel;
   onSelectionChange: (selection: GridRowSelectionModel) => void;
   onView: (supplier: Supplier) => void;
@@ -20,30 +27,108 @@ interface Props {
 export function SuppliersGrid({
   rows,
   loading,
+  searching = false,
+  unavailable = false,
   selection,
   onSelectionChange,
   onView,
   onEdit,
   onDelete,
 }: Props) {
-  const { rowMenu, closeRowMenu, rowSlotProps } = useReferenceRowContextMenu(rows);
+  const theme = useTheme();
+  const { rowMenu, openRowMenu, closeRowMenu, rowSlotProps } = useReferenceRowContextMenu(rows);
   const columns: GridColDef<Supplier>[] = [
-    { field: 'id', headerName: 'ID', width: 90 },
-    { field: 'name', headerName: 'Назва', flex: 1, minWidth: 180 },
-    { field: 'phoneNumber', headerName: 'Телефон', flex: 1, minWidth: 150 },
-    { field: 'contactPerson', headerName: 'Контактна особа', flex: 1, minWidth: 170 },
-    { field: 'notes', headerName: 'Нотатки', flex: 1, minWidth: 180 },
-    { field: 'link', headerName: 'Посилання', flex: 1, minWidth: 150 },
+    {
+      field: 'id',
+      headerName: 'ID',
+      width: 72,
+      align: 'right',
+      headerAlign: 'right',
+      cellClassName: 'supplier-mono',
+    },
+    {
+      field: 'name',
+      headerName: 'Назва',
+      flex: 1.5,
+      minWidth: 220,
+      cellClassName: 'supplier-name',
+    },
+    {
+      field: 'contactPerson',
+      headerName: 'Контактна особа',
+      flex: 1,
+      minWidth: 170,
+      valueFormatter: (value: string | null) => value || '—',
+    },
+    {
+      field: 'phoneNumber',
+      headerName: 'Телефон',
+      width: 180,
+      cellClassName: 'supplier-mono',
+      valueFormatter: (value: string | null) => value || '—',
+    },
+    {
+      field: 'link',
+      headerName: 'Посилання',
+      flex: 1,
+      minWidth: 160,
+      renderCell: ({ value, tabIndex }) => (
+        <SupplierLinkCell value={value ?? null} tabIndex={tabIndex} />
+      ),
+    },
+    {
+      field: 'notes',
+      headerName: 'Нотатки',
+      flex: 1,
+      minWidth: 180,
+      valueFormatter: (value: string | null) => value || '—',
+    },
+    {
+      field: 'actions',
+      headerName: 'Дії',
+      width: 64,
+      align: 'center',
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      renderCell: ({ row, tabIndex }) => (
+        <IconButton
+          size="small"
+          aria-label={`Дії: ${row.name}`}
+          tabIndex={tabIndex}
+          aria-haspopup="menu"
+          aria-expanded={rowMenu?.row.id === row.id ? true : undefined}
+          onClick={(event) => {
+            event.stopPropagation();
+            const bounds = event.currentTarget.getBoundingClientRect();
+            openRowMenu(row, { left: bounds.right, top: bounds.bottom }, event.currentTarget);
+          }}
+          sx={{ width: 40, height: 40 }}
+        >
+          <MoreHorizOutlinedIcon fontSize="small" />
+        </IconButton>
+      ),
+    },
   ];
 
   return (
     <>
-      <Box sx={{ width: '100%', minHeight: 440 }}>
+      <Box sx={{ width: '100%', minWidth: 0 }}>
         <DataGrid
           aria-label="Постачальники"
           rows={rows}
           columns={columns}
           loading={loading}
+          rowHeight={44}
+          columnHeaderHeight={44}
+          localeText={{
+            ...theme.components?.MuiDataGrid?.defaultProps?.localeText,
+            noRowsLabel: unavailable
+              ? 'Список недоступний. Повторіть запит.'
+              : searching
+                ? 'Постачальників не знайдено'
+                : 'Постачальників поки немає',
+          }}
           checkboxSelection
           disableRowSelectionOnClick
           disableRowSelectionExcludeModel
@@ -52,27 +137,32 @@ export function SuppliersGrid({
           onRowSelectionModelChange={onSelectionChange}
           pageSizeOptions={[10, 25, 50]}
           initialState={{ pagination: { paginationModel: { pageSize: 10, page: 0 } } }}
-          slots={{ noRowsOverlay: SuppliersEmptyOverlay }}
+          slots={{ footer: SuppliersGridFooter }}
           slotProps={{ row: rowSlotProps }}
+          sx={{
+            minWidth: 0,
+            height: 538,
+            border: 0,
+            borderTop: 1,
+            borderColor: 'divider',
+            borderRadius: 0,
+            '& .supplier-mono': {
+              fontFamily: 'var(--admin-font-mono)',
+              fontVariantNumeric: 'tabular-nums',
+            },
+            '& .supplier-name': { fontWeight: 600 },
+            '& .MuiDataGrid-columnHeaders': { bgcolor: 'action.hover' },
+          }}
         />
       </Box>
-      <ReferenceRowContextMenu
+      <SupplierRowMenu
         anchorPosition={rowMenu?.anchorPosition ?? null}
         row={rowMenu?.row ?? null}
-        rowName={rowMenu?.row.name ?? ''}
         onClose={closeRowMenu}
         onView={onView}
         onEdit={onEdit}
-        onDelete={(row) => onDelete(row.id)}
+        onDelete={onDelete}
       />
     </>
-  );
-}
-
-function SuppliersEmptyOverlay() {
-  return (
-    <Box sx={{ display: 'grid', height: '100%', placeItems: 'center' }}>
-      <Typography>Постачальників поки немає</Typography>
-    </Box>
   );
 }

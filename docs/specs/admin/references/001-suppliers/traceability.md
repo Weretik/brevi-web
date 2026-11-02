@@ -1,5 +1,9 @@
 # Постачальники — трасування
 
+Ревізія «Цех»: SC-006–SC-010 → [TS-006](tasks/TS-006-workshop-page.md) → `suppliers-page.component.test.tsx`, `supplier-link-cell.component.test.tsx`, `supplier-link.unit.test.ts` → свідчення TS-006. Статус: verified locally with mock API. Правила: [R-007–R-011](design/workshop-revision.md).
+
+Виправлення аудиту: AF-001–AF-003 / SC-001–SC-003, SC-006–SC-010 → [TS-007](tasks/TS-007-audit-fixes.md) → `suppliers-grid.integration.test.tsx`, `supplier-editor-dialog.component.test.tsx`, `suppliers-response.unit.test.ts`, mapper/API tests та `suppliers-page.component.test.tsx` → свідчення TS-007. Статус: verified locally with mock API.
+
 | Сценарій | Правила             | Задачі / передумови            | Рівень                  | Тести (план)                                                                                          | Свідчення                                                                                                                                                    | Статус   |
 | -------- | ------------------- | ------------------------------ | ----------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------- |
 | SC-001   | R-001               | EN-001, EN-002, TS-001, TS-002 | data-access + component | `suppliers.mapper.unit.test.ts`, `suppliers-page.component.test.tsx`                                  | [EN-001](tasks/EN-001-backend-contract.md), [EN-002](tasks/EN-002-contract-tooling.md), [TS-001](tasks/TS-001-read-model.md), [TS-002](tasks/TS-002-grid.md) | verified |

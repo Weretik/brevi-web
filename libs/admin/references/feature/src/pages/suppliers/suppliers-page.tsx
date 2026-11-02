@@ -1,13 +1,13 @@
-import { SupplierDeleteDialog, SuppliersGrid } from '@admin/references/ui';
-import { Alert, Box, Button, Stack, Typography } from '@mui/material';
-import { useState } from 'react';
+import { SupplierDeleteDialog, SuppliersGrid, SuppliersToolbar } from '@admin/references/ui';
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import { Alert, Box, Button, Paper, Stack, Typography } from '@mui/material';
+import { useMemo, useState } from 'react';
 
 import { SupplierDialog } from '../../components/suppliers/supplier-dialog';
 import { useSupplierDeletion } from '../../hooks/suppliers/use-supplier-deletion';
 import { useSuppliers } from '../../hooks/suppliers/use-suppliers';
 
-import type { SupplierDialogMode } from '../../hooks/suppliers/use-supplier-editor';
-import type { Supplier } from '@admin/references/model';
+import type { Supplier, SupplierDialogMode } from '@admin/references/model';
 
 export function SuppliersPage() {
   const { rows, loading, error, reload } = useSuppliers();
@@ -16,6 +16,17 @@ export function SuppliersPage() {
     supplier: Supplier | null;
   } | null>(null);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+  const query = search.trim().toLocaleLowerCase('uk');
+  const filteredRows = useMemo(
+    () =>
+      rows.filter((row) =>
+        [row.name, row.contactPerson, row.phoneNumber].some((value) =>
+          value?.toLocaleLowerCase('uk').includes(query),
+        ),
+      ),
+    [rows, query],
+  );
   const {
     selection,
     setSelection,
@@ -30,29 +41,39 @@ export function SuppliersPage() {
   const nextId = rows.reduce((largest, row) => Math.max(largest, row.id), 0) + 1;
 
   return (
-    <Box sx={{ p: { xs: 2, md: 3 }, minWidth: 0 }}>
+    <Box sx={{ minWidth: 0 }}>
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
-        sx={{ justifyContent: 'space-between', gap: 2, mb: 2 }}
+        sx={{ justifyContent: 'space-between', alignItems: { sm: 'center' }, gap: 2, mb: 2.5 }}
       >
-        <Typography variant="h4" component="h1">
-          Постачальники
-        </Typography>
-        <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap' }}>
-          <Button
-            color="error"
-            disabled={!selectedIds.length}
-            onClick={() => requestDelete(selectedIds)}
-          >
-            Видалити вибрані ({selectedIds.length})
-          </Button>
-          <Button variant="contained" onClick={() => setActive({ mode: 'create', supplier: null })}>
-            Створити
-          </Button>
-        </Stack>
+        <Box>
+          <Typography variant="overline" color="text.secondary">
+            Довідники
+          </Typography>
+          <Typography variant="h1">Постачальники</Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+            Контакти та інформація про постачальників
+          </Typography>
+        </Box>
+        <Button
+          variant="contained"
+          startIcon={<AddOutlinedIcon />}
+          onClick={() => setActive({ mode: 'create', supplier: null })}
+          sx={{ alignSelf: { xs: 'flex-start', sm: 'center' } }}
+        >
+          Додати постачальника
+        </Button>
       </Stack>
       {error && (
-        <Alert severity="error" action={<Button onClick={reload}>Повторити</Button>}>
+        <Alert
+          severity="error"
+          sx={{ mb: 2 }}
+          action={
+            <Button disabled={loading} onClick={() => void reload()}>
+              Повторити
+            </Button>
+          }
+        >
           {error}
         </Alert>
       )}
@@ -60,19 +81,35 @@ export function SuppliersPage() {
         <Alert
           severity={actionMessage.startsWith('Не вдалося') ? 'error' : 'success'}
           onClose={() => setActionMessage(null)}
+          sx={{ mb: 2 }}
         >
           {actionMessage}
         </Alert>
       )}
-      <SuppliersGrid
-        rows={rows}
-        loading={loading}
-        selection={selection}
-        onSelectionChange={setSelection}
-        onView={(supplier) => setActive({ mode: 'view', supplier })}
-        onEdit={(supplier) => setActive({ mode: 'edit', supplier })}
-        onDelete={(id) => requestDelete([id])}
-      />
+      <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
+        <SuppliersToolbar
+          search={search}
+          onSearchChange={setSearch}
+          count={filteredRows.length}
+          total={rows.length}
+          selectedCount={selectedIds.length}
+          loading={loading}
+          deleting={deleting}
+          onReload={() => void reload()}
+          onDelete={() => requestDelete(selectedIds)}
+        />
+        <SuppliersGrid
+          rows={filteredRows}
+          loading={loading}
+          searching={Boolean(query)}
+          unavailable={Boolean(error)}
+          selection={selection}
+          onSelectionChange={setSelection}
+          onView={(supplier) => setActive({ mode: 'view', supplier })}
+          onEdit={(supplier) => setActive({ mode: 'edit', supplier })}
+          onDelete={(id) => requestDelete([id])}
+        />
+      </Paper>
       {active && (
         <SupplierDialog
           key={`${active.mode}-${active.supplier?.id ?? 'new'}`}

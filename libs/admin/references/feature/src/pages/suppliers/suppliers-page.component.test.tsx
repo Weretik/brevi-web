@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -11,7 +11,7 @@ afterEach(() => {
 });
 
 describe('suppliers page', () => {
-  it('opens row actions with the mouse without an action column or selection change', async () => {
+  it('keeps context actions available without changing row selection', async () => {
     const user = userEvent.setup();
     vi.stubGlobal(
       'fetch',
@@ -33,16 +33,16 @@ describe('suppliers page', () => {
     const row = await screen.findByRole('row', { name: /1.*Атлас/ });
     const rowCheckbox = row.querySelector('input[type="checkbox"]') as HTMLInputElement;
 
-    expect(screen.queryByRole('columnheader', { name: 'Дії' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Перегляд' })).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /створити/i })).toBeVisible();
+    expect(screen.getByRole('columnheader', { name: 'Дії' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Дії: Атлас' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Додати постачальника' })).toBeVisible();
     await user.click(rowCheckbox);
     fireEvent.contextMenu(row, { clientX: 80, clientY: 120 });
 
     expect(rowCheckbox).toBeChecked();
     expect(screen.getByRole('menu', { name: 'Дії: Атлас' })).toBeVisible();
-    expect(screen.getByRole('menuitem', { name: 'Перегляд' })).toBeVisible();
-    expect(screen.getByRole('menuitem', { name: 'Змінити' })).toBeVisible();
+    expect(screen.getByRole('menuitem', { name: 'Переглянути' })).toBeVisible();
+    expect(screen.getByRole('menuitem', { name: 'Редагувати' })).toBeVisible();
     expect(screen.getByRole('menuitem', { name: 'Видалити' })).toBeVisible();
   });
 
@@ -70,7 +70,7 @@ describe('suppliers page', () => {
     nameCell.focus();
 
     fireEvent.keyDown(nameCell, { key: 'F10', shiftKey: true });
-    expect(screen.getByRole('menuitem', { name: 'Перегляд' })).toBeVisible();
+    expect(screen.getByRole('menuitem', { name: 'Переглянути' })).toBeVisible();
     await user.keyboard('{Escape}');
 
     await waitFor(() => expect(nameCell).toHaveFocus());
@@ -97,11 +97,10 @@ describe('suppliers page', () => {
     render(<SuppliersPage />);
     const row = await screen.findByRole('row', { name: /1.*Атлас/ });
     fireEvent.contextMenu(row, { clientX: 80, clientY: 120 });
-    await user.click(screen.getByRole('menuitem', { name: 'Перегляд' }));
-    expect(screen.getByRole('link', { name: 'supplier.example.com' })).toHaveAttribute(
-      'href',
-      'https://supplier.example.com/',
-    );
+    await user.click(screen.getByRole('menuitem', { name: 'Переглянути' }));
+    expect(
+      within(screen.getByRole('dialog')).getByRole('link', { name: 'supplier.example.com' }),
+    ).toHaveAttribute('href', 'https://supplier.example.com/');
   });
 
   it('keeps entered values and field errors when creation fails', async () => {
@@ -117,7 +116,7 @@ describe('suppliers page', () => {
     );
     vi.stubGlobal('fetch', fetchMock);
     render(<SuppliersPage />);
-    await user.click(screen.getByRole('button', { name: 'Створити' }));
+    await user.click(screen.getByRole('button', { name: 'Додати постачальника' }));
     await user.type(screen.getByRole('textbox', { name: 'Назва' }), 'Атлас');
     await user.click(screen.getByRole('button', { name: 'Зберегти' }));
     expect(await screen.findByText('Назва вже існує.')).toBeVisible();
@@ -134,7 +133,7 @@ describe('suppliers page', () => {
       );
     vi.stubGlobal('fetch', fetchMock);
     render(<SuppliersPage />);
-    await user.click(screen.getByRole('button', { name: 'Створити' }));
+    await user.click(screen.getByRole('button', { name: 'Додати постачальника' }));
     const name = screen.getByRole('textbox', { name: 'Назва' });
     await user.type(name, 'Атлас{Enter}');
     await waitFor(() =>
@@ -258,5 +257,177 @@ describe('suppliers page', () => {
     await screen.findByText(/Не вдалося видалити ID: 1/);
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(screen.getByRole('button', { name: 'Видалити вибрані (2)' })).toBeVisible();
+  });
+});
+
+const searchableSuppliers = [
+  {
+    id: 1,
+    name: 'Атлас',
+    contactPerson: 'Олена Коваль',
+    phoneNumber: '+380 50 111 22 33',
+    link: null,
+    notes: 'Нотатка лише для перевірки',
+  },
+  {
+    id: 2,
+    name: 'Текстиль',
+    contactPerson: 'Андрій Бондар',
+    phoneNumber: '+380 67 444 55 66',
+    link: null,
+    notes: null,
+  },
+];
+
+function stubSupplierList() {
+  const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => searchableSuppliers });
+  vi.stubGlobal('fetch', fetchMock);
+  return fetchMock;
+}
+
+describe('suppliers workshop page', () => {
+  it('edits a viewed supplier through the feature editor and closes after saving', async () => {
+    const user = userEvent.setup();
+    const fetchMock = vi
+      .fn()
+      .mockImplementation(async (_path: string, init?: RequestInit) =>
+        init?.method === 'PUT' ? { ok: true } : { ok: true, json: async () => searchableSuppliers },
+      );
+    vi.stubGlobal('fetch', fetchMock);
+    render(<SuppliersPage />);
+    await user.click(await screen.findByRole('button', { name: 'Дії: Атлас' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Переглянути' }));
+    expect(screen.getByRole('textbox', { name: 'Назва' })).toBeDisabled();
+    await user.click(screen.getByRole('button', { name: 'Редагувати' }));
+    const name = screen.getByRole('textbox', { name: 'Назва' });
+    expect(name).toBeEnabled();
+    await user.clear(name);
+    await user.type(name, 'Атлас оновлений');
+    await user.click(screen.getByRole('button', { name: 'Зберегти' }));
+    expect(await screen.findByText('Постачальника збережено.')).toBeVisible();
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/reference/suppliers/1',
+      expect.objectContaining({ method: 'PUT' }),
+    );
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it.each(['  аТлАс  ', 'КОВАЛЬ', '111 22'])(
+    'finds a supplier by name, contact or phone: %s',
+    async (query) => {
+      const user = userEvent.setup();
+      stubSupplierList();
+      render(<SuppliersPage />);
+      await screen.findByRole('row', { name: /2.*Текстиль/ });
+      await user.type(screen.getByRole('textbox', { name: 'Пошук постачальників' }), query);
+      expect(screen.getByRole('row', { name: /1.*Атлас/ })).toBeVisible();
+      expect(screen.queryByRole('row', { name: /2.*Текстиль/ })).not.toBeInTheDocument();
+      expect(screen.getByRole('status', { name: 'Кількість постачальників' })).toHaveTextContent(
+        'Знайдено: 1 із 2',
+      );
+    },
+  );
+
+  it('distinguishes an empty search and restores rows when cleared', async () => {
+    const user = userEvent.setup();
+    stubSupplierList();
+    render(<SuppliersPage />);
+    await screen.findByText('Атлас');
+    await user.type(screen.getByRole('textbox', { name: 'Пошук постачальників' }), 'відсутній');
+    expect(await screen.findByText('Постачальників не знайдено')).toBeVisible();
+    expect(screen.queryByText('Постачальників поки немає')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Очистити пошук' }));
+    expect(await screen.findByText('Текстиль')).toBeVisible();
+  });
+
+  it('retains hidden selection and confirms only that supplier for deletion', async () => {
+    const user = userEvent.setup();
+    const fetchMock = stubSupplierList();
+    render(<SuppliersPage />);
+    const row = await screen.findByRole('row', { name: /1.*Атлас/ });
+    await user.click(within(row).getByRole('checkbox'));
+    await user.type(screen.getByRole('textbox', { name: 'Пошук постачальників' }), 'Текстиль');
+    expect(screen.getByText('Вибрано: 1')).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Видалити вибрані (1)' }));
+    const dialog = screen.getByRole('dialog');
+    expect(within(dialog).getByText('Видалити 1 вибраних записів?')).toBeVisible();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    await user.click(within(dialog).getByRole('button', { name: 'Видалити' }));
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        '/api/reference/suppliers/1',
+        expect.objectContaining({ method: 'DELETE' }),
+      ),
+    );
+    expect(fetchMock).not.toHaveBeenCalledWith(
+      '/api/reference/suppliers/2',
+      expect.objectContaining({ method: 'DELETE' }),
+    );
+  });
+
+  it('opens the visible action button with the keyboard and restores focus on Escape', async () => {
+    const user = userEvent.setup();
+    stubSupplierList();
+    render(<SuppliersPage />);
+    const button = await screen.findByRole('button', { name: 'Дії: Атлас' });
+    button.focus();
+    await user.keyboard('{Enter}');
+    expect(screen.getByRole('menuitem', { name: 'Редагувати' })).toBeVisible();
+    expect(screen.getByText('Вибрано: 0')).toBeVisible();
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(button).toHaveFocus());
+  });
+
+  it('refreshes data without clearing search and prevents a second concurrent refresh', async () => {
+    const user = userEvent.setup();
+    let completeRefresh!: (value: unknown) => void;
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => searchableSuppliers })
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            completeRefresh = resolve;
+          }),
+      );
+    vi.stubGlobal('fetch', fetchMock);
+    render(<SuppliersPage />);
+    await screen.findByText('Атлас');
+    const search = screen.getByRole('textbox', { name: 'Пошук постачальників' });
+    await user.type(search, 'Атлас');
+    await user.click(screen.getByRole('button', { name: 'Оновити' }));
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Оновити' })).toBeDisabled());
+    completeRefresh({
+      ok: true,
+      json: async () => [{ ...searchableSuppliers[0], name: 'Атлас оновлений' }],
+    });
+    expect(await screen.findByText('Атлас оновлений')).toBeVisible();
+    expect(search).toHaveValue('Атлас');
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Оновити' })).toBeEnabled());
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('shows an empty directory separately from an empty search', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => [] }));
+    render(<SuppliersPage />);
+    expect(await screen.findByText('Постачальників поки немає')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Видалити вибрані (0)' })).toBeDisabled();
+  });
+
+  it('recovers from a list error through the retry action', async () => {
+    const user = userEvent.setup();
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValueOnce({ ok: false, status: 500 })
+        .mockResolvedValueOnce({ ok: true, json: async () => searchableSuppliers }),
+    );
+    render(<SuppliersPage />);
+    expect(await screen.findByRole('alert')).toBeVisible();
+    expect(screen.queryByText('Постачальників поки немає')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Повторити' }));
+    expect(await screen.findByText('Атлас')).toBeVisible();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 });

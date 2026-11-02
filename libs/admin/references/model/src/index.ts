@@ -4,6 +4,8 @@ export * from './entities/garment-accessories/garment-accessory';
 export * from './entities/garment-parts/garment-part';
 export * from './entities/garment-part-operations/garment-part-operation';
 export * from './entities/suppliers/supplier';
+export * from './forms/suppliers/supplier-form';
+export * from './mappers/suppliers/supplier-link';
 export * from './validators/additional-references/additional-reference-validation';
 export * from './validators/fabrics/fabric-validation';
 export * from './validators/garment-accessories/garment-accessory-validation';

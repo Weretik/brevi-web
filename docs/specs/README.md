@@ -16,6 +16,8 @@ The Storefront currently has README files for its Nx feature libraries, but they
 - [Admin React: fabric and hardware tables and pages](admin/references/008-garment-materials-pages/README.md)
 - [Admin React: operations tables and pages](admin/references/009-operations-pages/README.md)
 - [Admin React: suppliers — SDD closed, implementation partial](admin/references/010-suppliers-pages/README.md)
+- [Admin React: suppliers — «Цех» page revision](admin/references/001-suppliers/design/workshop-revision.md) — implemented and locally verified with mock API on 2026-11-02; existing dialogs and API preserved.
+- [Admin React: suppliers — audit fixes AF-001–AF-003](admin/references/001-suppliers/tasks/TS-007-audit-fixes.md) — implemented and locally verified with focused tests on 2026-11-02.
 - [Admin React: additional reference tables and pages](admin/references/011-additional-references-pages/README.md)
 - [Admin React: Telegram reminders](admin/reminders/001-telegram-reminders/README.md) — implemented and locally verified 2026-11-01.
 - [Visual guidance for tables, menus, and forms](admin/table-visual-guidance.md)

@@ -20,7 +20,7 @@ export function useReferenceRowContextMenu<Row extends IdentifiableRow>(rows: Ro
     return rows.find((row) => row.id === rowId);
   }
 
-  function openRowMenu(
+  function openRowMenuForElement(
     element: HTMLDivElement,
     anchorPosition: RowMenuState<Row>['anchorPosition'],
     focusTarget: HTMLElement | null,
@@ -31,7 +31,7 @@ export function useReferenceRowContextMenu<Row extends IdentifiableRow>(rows: Ro
 
   function handleRowContextMenu(event: MouseEvent<HTMLDivElement>) {
     event.preventDefault();
-    openRowMenu(
+    openRowMenuForElement(
       event.currentTarget,
       { left: event.clientX + 2, top: event.clientY - 6 },
       document.activeElement instanceof HTMLElement ? document.activeElement : null,
@@ -43,22 +43,27 @@ export function useReferenceRowContextMenu<Row extends IdentifiableRow>(rows: Ro
     event.preventDefault();
     const focusTarget = event.target instanceof HTMLElement ? event.target : event.currentTarget;
     const bounds = event.currentTarget.getBoundingClientRect();
-    openRowMenu(
+    openRowMenuForElement(
       event.currentTarget,
       { left: bounds.left + 24, top: bounds.top + bounds.height / 2 },
       focusTarget,
     );
   }
 
-  function closeRowMenu() {
+  function closeRowMenu(restoreFocus = true) {
     const focusTarget = rowMenu?.focusTarget;
     setRowMenu(null);
-    requestAnimationFrame(() => focusTarget?.focus());
+    if (restoreFocus) requestAnimationFrame(() => focusTarget?.focus());
   }
 
   return {
     rowMenu,
     closeRowMenu,
+    openRowMenu: (
+      row: Row,
+      anchorPosition: RowMenuState<Row>['anchorPosition'],
+      focusTarget: HTMLElement,
+    ) => setRowMenu({ row, anchorPosition, focusTarget }),
     rowSlotProps: {
       onContextMenu: handleRowContextMenu,
       onKeyDown: handleRowKeyDown,

@@ -2,7 +2,7 @@ import {
   useCreateSupplierMutation,
   useUpdateSupplierMutation,
 } from '@admin/references/data-access';
-import { validateSupplier } from '@admin/references/model';
+import { createSupplierDraft, validateSupplier } from '@admin/references/model';
 import { adminApiErrorMessage, isAdminApiError } from '@admin/shared/api-client';
 import { useState } from 'react';
 
@@ -11,20 +11,8 @@ import type {
   SupplierFieldErrors,
   Supplier,
   SupplierDraft,
+  SupplierDialogMode,
 } from '@admin/references/model';
-
-export type SupplierDialogMode = 'create' | 'view' | 'edit';
-
-function initialDraft(supplier: Supplier | null, nextId: number): SupplierDraft {
-  return {
-    id: supplier?.id ?? nextId,
-    name: supplier?.name ?? '',
-    link: supplier?.link ?? '',
-    contactPerson: supplier?.contactPerson ?? '',
-    phoneNumber: supplier?.phoneNumber ?? '',
-    notes: supplier?.notes ?? '',
-  };
-}
 
 export function useSupplierEditor(
   initialMode: SupplierDialogMode,
@@ -33,7 +21,7 @@ export function useSupplierEditor(
   onSaved: () => void,
 ) {
   const [mode, setMode] = useState<SupplierDialogMode>(initialMode);
-  const [draft, setDraft] = useState<SupplierDraft>(() => initialDraft(supplier, nextId));
+  const [draft, setDraft] = useState<SupplierDraft>(() => createSupplierDraft(supplier, nextId));
   const [errors, setErrors] = useState<SupplierFieldErrors>({});
   const [message, setMessage] = useState<string | null>(null);
   const [createSupplier, createState] = useCreateSupplierMutation();
