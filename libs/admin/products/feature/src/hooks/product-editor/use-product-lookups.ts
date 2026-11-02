@@ -3,7 +3,7 @@ import {
   useListProductMediaQuery,
 } from '@admin/products/data-access';
 import {
-  useListAdditionalReferencesQuery,
+  useListPricingParametersQuery,
   useListFabricsQuery,
   useListGarmentAccessoriesQuery,
   useListGarmentPartOperationsQuery,
@@ -24,7 +24,7 @@ export function useProductLookups() {
   const accessories = useListGarmentAccessoriesQuery();
   const operations = useListGarmentPartOperationsQuery();
   const suppliers = useListSuppliersQuery();
-  const references = useListAdditionalReferencesQuery();
+  const references = useListPricingParametersQuery();
   const results = [categories, media, fabrics, accessories, operations, suppliers, references];
   const error = results.map((result) => visibleError(result.error)).find(Boolean);
   const lookups: ProductLookups = {

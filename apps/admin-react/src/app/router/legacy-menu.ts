@@ -105,9 +105,9 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
       { id: 'reference-suppliers', label: 'Постачальники', path: '/references/supplier' },
       { id: 'calculations', label: 'Розрахунки' },
       {
-        id: 'additional-references',
-        label: 'Додаткові довідники',
-        path: '/references/additional-reference',
+        id: 'pricing-parameters',
+        label: 'Параметри ціноутворення',
+        path: '/references/pricing-parameters',
       },
       { id: 'media', label: 'Медіа/Фото', path: '/references/media' },
     ],

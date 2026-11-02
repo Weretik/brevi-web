@@ -1,8 +1,4 @@
 export {
-  useListAdditionalReferencesQuery,
-  useUpdateAdditionalReferenceMutation,
-} from './api/additional-references/additional-references.api';
-export {
   useCreateFabricMutation,
   useDeleteFabricMutation,
   useListFabricsQuery,
@@ -27,6 +23,18 @@ export {
   useListGarmentPartOperationsQuery,
   useUpdateGarmentPartOperationMutation,
 } from './api/garment-part-operations/garment-part-operations.api';
+export {
+  useCreatePpeMarkupRuleMutation,
+  useDeletePpeMarkupRuleMutation,
+  useListPpeMarkupRulesQuery,
+  useUpdatePpeMarkupRuleMutation,
+} from './api/pricing-parameters/ppe-markup-rules.api';
+export {
+  useCreatePricingParameterMutation,
+  useDeletePricingParameterMutation,
+  useListPricingParametersQuery,
+  useUpdatePricingParameterMutation,
+} from './api/pricing-parameters/pricing-parameters.api';
 export {
   useCreateSupplierMutation,
   useDeleteSupplierMutation,

@@ -88,7 +88,7 @@ describe('React Admin routing', () => {
           'Операції',
           'Постачальники',
           'Розрахунки',
-          'Додаткові довідники',
+          'Параметри ціноутворення',
           'Медіа/Фото',
         ],
       ],
@@ -168,18 +168,27 @@ describe('React Admin routing', () => {
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   }, 15_000);
 
-  it('opens additional references directly inside the Brevi shell', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => [] }));
+  it('sends the old additional references URL to pricing parameters inside the Brevi shell', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockImplementation(
+          async () =>
+            new Response('[]', { status: 200, headers: { 'Content-Type': 'application/json' } }),
+        ),
+    );
     window.history.replaceState({}, '', '/references/additional-reference');
     renderApp();
     await vi.dynamicImportSettled();
-    expect(await screen.findByRole('heading', { name: 'Додаткові довідники' })).toBeVisible();
+    expect(await screen.findByRole('heading', { name: 'Параметри ціноутворення' })).toBeVisible();
+    expect(window.location.pathname).toBe('/references/pricing-parameters');
     expect(
       within(screen.getByRole('navigation', { name: 'Основна навігація' })).getByRole('link', {
-        name: 'Додаткові довідники',
+        name: 'Параметри ціноутворення',
       }),
-    ).toHaveAttribute('href', '/references/additional-reference');
-    expect(await screen.findByText('Додаткових довідників поки немає')).toBeVisible();
+    ).toHaveAttribute('href', '/references/pricing-parameters');
+    expect(await screen.findByText('Параметрів поки немає')).toBeVisible();
   });
 
   it('sends the old fabrics and accessories URLs to the one materials page', async () => {

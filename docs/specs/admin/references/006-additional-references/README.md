@@ -1,5 +1,7 @@
 # 006 — Додаткові довідники
 
+> **Replaced** on 2026-11-02 by [015 — Pricing parameters](../015-pricing-parameters-sheet/README.md). History only.
+
 - **Поверхня:** React Web
 - **Статус:** реалізовано; перевірка delivery checkpoint
 - **Власник:** admin/references

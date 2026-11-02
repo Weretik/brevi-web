@@ -1,5 +1,7 @@
 # 011 — Additional References: Table and Separate Pages
 
+> **Replaced** on 2026-11-02 by [015 — Pricing parameters](../015-pricing-parameters-sheet/README.md). History only.
+
 - **Surface:** React Web
 - **Status:** blocked; create/detail/delete are absent from the backend contract
 - **Owner:** admin/references

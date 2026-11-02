@@ -22,9 +22,15 @@ const requiredOperations = {
     'deleteGarmentAccessory',
   ],
   'reference/fabrics.openapi.yaml': ['getFabrics', 'createFabric', 'updateFabric', 'deleteFabric'],
-  'reference/additional-references.openapi.yaml': [
-    'getAdditionalReferences',
-    'updateAdditionalReference',
+  'reference/pricing-parameters.openapi.yaml': [
+    'getPricingParameters',
+    'createPricingParameter',
+    'updatePricingParameter',
+    'deletePricingParameter',
+    'getPpeMarkupRules',
+    'createPpeMarkupRule',
+    'updatePpeMarkupRule',
+    'deletePpeMarkupRule',
   ],
   'catalog/product-catalog.openapi.yaml': [
     'getAdminProducts',
