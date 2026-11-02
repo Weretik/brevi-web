@@ -91,6 +91,7 @@ libs/admin/references/
 - `libs/admin/references/ui/src/dialogs/suppliers/supplier-editor-dialog.component.test.tsx`
 - `libs/admin/references/data-access/src/validators/suppliers/suppliers-response.unit.test.ts`
 - `apps/admin-react/src/app/theme/suppliers-grid.integration.test.tsx` (real Brevi theme and shared locale)
+- `apps/admin-react/src/app/router/app-router.integration.test.tsx` (direct supplier URL inside the shell with a native mock Response)
 
 Focused run: `npx nx test admin-references-data-access -- suppliers`; `npx nx test admin-references-feature -- suppliers`.
 For link presentation: `npx nx test admin-references-ui`; normalization: `npx nx test admin-references-model -- supplier-link`.

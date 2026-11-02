@@ -146,7 +146,15 @@ describe('React Admin routing', () => {
 
   // Includes the first lazy-loaded reference module and grid on a cold worker.
   it('opens suppliers directly inside the Brevi shell', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => [] }));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        new Response(JSON.stringify([]), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      ),
+    );
     window.history.replaceState({}, '', '/references/supplier');
     renderApp();
     await vi.dynamicImportSettled();
@@ -157,6 +165,7 @@ describe('React Admin routing', () => {
       }),
     ).toHaveAttribute('href', '/references/supplier');
     expect(await screen.findByText('Постачальників поки немає')).toBeVisible();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   }, 15_000);
 
   it('opens additional references directly inside the Brevi shell', async () => {
