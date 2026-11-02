@@ -84,8 +84,7 @@ describe('React Admin routing', () => {
         'Загальні довідники',
         [
           'Товари',
-          'Тканини',
-          'Фурнітура',
+          'Тканини та фурнітура',
           'Операції',
           'Постачальники',
           'Розрахунки',
@@ -106,7 +105,7 @@ describe('React Admin routing', () => {
           .map((item) => item.textContent?.replace('Ще не доступно', '')),
       ).toEqual(entries);
       expect(within(list).queryAllByRole('link')).toHaveLength(
-        section === 'Загальні довідники' ? 7 : section === 'Менеджер сервісу' ? 3 : 0,
+        section === 'Загальні довідники' ? 6 : section === 'Менеджер сервісу' ? 3 : 0,
       );
     }
   });
@@ -183,7 +182,7 @@ describe('React Admin routing', () => {
     expect(await screen.findByText('Додаткових довідників поки немає')).toBeVisible();
   });
 
-  it('sends the old fabrics tab to the fabrics page and opens accessories separately', async () => {
+  it('sends the old fabrics and accessories URLs to the one materials page', async () => {
     vi.stubGlobal(
       'fetch',
       vi
@@ -196,20 +195,19 @@ describe('React Admin routing', () => {
     window.history.replaceState({}, '', '/references/garment-accessory?tab=fabrics');
     renderApp();
     await vi.dynamicImportSettled();
-    expect(await screen.findByRole('heading', { name: 'Тканини' })).toBeVisible();
-    expect(window.location.pathname).toBe('/references/fabric');
+    expect(await screen.findByRole('heading', { name: 'Тканини та фурнітура' })).toBeVisible();
+    expect(window.location.pathname).toBe('/references/materials');
     const navigation = screen.getByRole('navigation', { name: 'Основна навігація' });
-    expect(within(navigation).getByRole('link', { name: 'Тканини' })).toHaveAttribute(
+    expect(within(navigation).getByRole('link', { name: 'Тканини та фурнітура' })).toHaveAttribute(
       'href',
-      '/references/fabric',
+      '/references/materials',
     );
     expect(await screen.findByText(/Тканин поки немає/)).toBeVisible();
     expectEmptyGridPagination(10);
 
-    await userEvent.setup().click(within(navigation).getByRole('link', { name: 'Фурнітура' }));
+    await userEvent.setup().click(screen.getByRole('tab', { name: 'Фурнітура' }));
 
-    expect(window.location.pathname).toBe('/references/garment-accessory');
-    expect(await screen.findByRole('heading', { name: 'Фурнітура' })).toBeVisible();
+    expect(window.location.search).toBe('?tab=accessories');
     expect(await screen.findByText(/Фурнітури поки немає/)).toBeVisible();
   });
 

@@ -124,6 +124,15 @@ Use these for new pages. Prefer MUI components and the theme overrides; do not r
 - **Data card:** `Card` (outlined, 8 px) with a header row: `h6` title on the left, filter chips or a `primary.dark` text link on the right. Tables sit inside it and scroll horizontally inside the card.
 - **Filter chips:** 28 px chips, 6 px radius; the selected chip is the inverse surface (`secondary.main`). Counts go into the label («Чекають 8»).
 - **Tables:** MUI X Data Grid with the theme override: uppercase 11 px column titles in `text.secondary`, `divider` row lines, `action.hover` on hover, orange focus outline. Document numbers and numbers in mono; numbers right-aligned; statuses as pills.
+- **Reference list pattern:** every reference or list page (suppliers, fabrics, accessories, and new ones) stacks, top to bottom:
+  1. **Header:** overline, `h1`, `body2` line; on the right, actions. «Видалити» (`outlined` `error`, with the selected count) appears there only while rows are selected and always asks for confirmation; then secondary actions; then the one `contained` add action last.
+  2. **Tabs** (optional), when one page holds several related lists («Тканини / Фурнітура»); the tab is kept in `?tab=`.
+  3. **Search row:** its own full-width 48 px field on `background.paper`, never inside the filter row. Placeholder says what it searches («Знайти тканину за кодом, назвою…»), «/» focuses it, Escape and the clear button empty it.
+  4. **Filter row:** 32 px pill chips with counts («Активні 84»), the selected one inverse; extra filters (for example a supplier chip with a menu) after a thin divider. On the right, a status line: «Вибрано: N · Зняти вибір» while rows are selected, otherwise «Знайдено: N із M» while search or filters narrow the list, otherwise nothing.
+  5. **Table** in an outlined paper.
+
+  There is no «Оновити» button (lists refresh after every save) and no «Усього» counter (counts live on the chips). Shared components: `libs/admin/references/ui/src/components/reference-list-controls/` and `reference-list/`.
+
 - **Status pill:** 24 px, 999 px radius, a 6 px dot, `.light` background and `.main` text, always with a label.
 - **Stage board (kanban):** columns on `action.hover` with a colored dot, the stage name, and a count; cards on `background.paper` with a mono number and due date (overdue in `error.main`), title, client and quantity, a 4 px orange progress bar, and a percentage. Columns scroll horizontally on narrow screens. Use it for flows with stages (sewing orders, deals).
 - **Side cards:** a right column of 320–340 px on wide screens (cash balance, workload lists with thin bars); below `lg` it moves under the main content.

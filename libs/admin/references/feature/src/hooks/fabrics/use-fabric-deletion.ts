@@ -48,6 +48,7 @@ export function useFabricDeletion(onResult: (message: string) => void) {
   return {
     selection,
     setSelection,
+    clearSelection: () => setSelection({ type: 'include', ids: new Set() }),
     selectedIds: Array.from(selection.ids).map(Number).filter(Number.isInteger),
     pendingDeleteIds,
     deleting,

@@ -13,6 +13,7 @@ export * from './mappers/suppliers/supplier-link';
 export * from './queries/fabrics/fabric-filters';
 export * from './queries/garment-accessories/garment-accessory-filters';
 export * from './queries/reference-lists/reference-activity-filter';
+export * from './queries/reference-lists/reference-supplier-filter';
 export * from './queries/suppliers/supplier-filters';
 export * from './validators/additional-references/additional-reference-validation';
 export * from './validators/fabrics/fabric-validation';

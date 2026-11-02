@@ -1,16 +1,25 @@
 import { filterSuppliers, lastSupplierKeepinSync } from '@admin/references/model';
-import { SupplierDeleteDialog, SuppliersGrid, SuppliersToolbar } from '@admin/references/ui';
+import {
+  ReferenceBulkDeleteButton,
+  ReferenceFilterBar,
+  ReferenceListAlerts,
+  ReferencePageHeader,
+  ReferenceSearchBar,
+  SupplierDeleteDialog,
+  SuppliersGrid,
+} from '@admin/references/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import SyncOutlinedIcon from '@mui/icons-material/SyncOutlined';
-import { Alert, Box, Button, Paper, Stack, Typography } from '@mui/material';
-import { useMemo, useState } from 'react';
+import { Alert, Box, Button, Paper } from '@mui/material';
+import { useState } from 'react';
 
 import { SupplierDialog } from '../../components/suppliers/supplier-dialog';
+import { useReferenceListFilters } from '../../hooks/reference-lists/use-reference-list-filters';
 import { useSupplierDeletion } from '../../hooks/suppliers/use-supplier-deletion';
 import { useSupplierKeepinSync } from '../../hooks/suppliers/use-supplier-keepin-sync';
 import { useSuppliers } from '../../hooks/suppliers/use-suppliers';
 
-import type { Supplier, SupplierActivityFilter, SupplierDialogMode } from '@admin/references/model';
+import type { Supplier, SupplierDialogMode } from '@admin/references/model';
 
 export function SuppliersPage() {
   const { rows, loading, error, reload } = useSuppliers();
@@ -19,30 +28,8 @@ export function SuppliersPage() {
     supplier: Supplier | null;
   } | null>(null);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
-  const [search, setSearch] = useState('');
-  const [activity, setActivity] = useState<SupplierActivityFilter>('active');
-  const filteredRows = useMemo(
-    () => filterSuppliers(rows, search, activity),
-    [rows, search, activity],
-  );
-  const activityCounts = useMemo(
-    () => ({
-      active: rows.filter((row) => row.isActive).length,
-      inactive: rows.filter((row) => !row.isActive).length,
-      all: rows.length,
-    }),
-    [rows],
-  );
-  const {
-    selection,
-    setSelection,
-    selectedIds,
-    pendingDeleteIds,
-    deleting,
-    requestDelete,
-    cancelDelete,
-    confirmDelete,
-  } = useSupplierDeletion(setActionMessage);
+  const filters = useReferenceListFilters(rows, filterSuppliers);
+  const deletion = useSupplierDeletion(setActionMessage);
 
   const nextId = rows.reduce((largest, row) => Math.max(largest, row.id), 0) + 1;
   const [syncNotice, setSyncNotice] = useState<{ text: string; ok: boolean } | null>(null);
@@ -51,52 +38,48 @@ export function SuppliersPage() {
 
   return (
     <Box sx={{ minWidth: 0 }}>
-      <Stack
-        direction={{ xs: 'column', sm: 'row' }}
-        sx={{ justifyContent: 'space-between', alignItems: { sm: 'center' }, gap: 2, mb: 2.5 }}
-      >
-        <Box>
-          <Typography variant="overline" color="text.secondary">
-            Довідники
-          </Typography>
-          <Typography variant="h1">Постачальники</Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-            {lastSync ? (
-              <>
-                Картки оновлюються з KeepinCRM щодня. Останнє оновлення:{' '}
-                <Box component="span" sx={{ fontFamily: 'var(--admin-font-mono)' }}>
-                  {new Date(lastSync).toLocaleString('uk-UA', {
-                    dateStyle: 'short',
-                    timeStyle: 'short',
-                  })}
-                </Box>
-              </>
-            ) : (
-              'Контакти та інформація про постачальників'
-            )}
-          </Typography>
-        </Box>
-        <Stack
-          direction="row"
-          sx={{ gap: 1, flexWrap: 'wrap', alignSelf: { xs: 'flex-start', sm: 'center' } }}
-        >
-          <Button
-            variant="outlined"
-            startIcon={<SyncOutlinedIcon />}
-            disabled={syncing}
-            onClick={() => void sync()}
-          >
-            {syncing ? 'Оновлення…' : 'Оновити з KeepinCRM'}
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<AddOutlinedIcon />}
-            onClick={() => setActive({ mode: 'create', supplier: null })}
-          >
-            Додати постачальника
-          </Button>
-        </Stack>
-      </Stack>
+      <ReferencePageHeader
+        title="Постачальники"
+        subtitle={
+          lastSync ? (
+            <>
+              Картки оновлюються з KeepinCRM щодня. Останнє оновлення:{' '}
+              <Box component="span" sx={{ fontFamily: 'var(--admin-font-mono)' }}>
+                {new Date(lastSync).toLocaleString('uk-UA', {
+                  dateStyle: 'short',
+                  timeStyle: 'short',
+                })}
+              </Box>
+            </>
+          ) : (
+            'Контакти та інформація про постачальників'
+          )
+        }
+        actions={
+          <>
+            <ReferenceBulkDeleteButton
+              selectedCount={deletion.selectedIds.length}
+              disabled={deletion.deleting || loading}
+              onDelete={() => deletion.requestDelete(deletion.selectedIds)}
+            />
+            <Button
+              variant="outlined"
+              startIcon={<SyncOutlinedIcon />}
+              disabled={syncing}
+              onClick={() => void sync()}
+            >
+              {syncing ? 'Оновлення…' : 'Оновити з KeepinCRM'}
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<AddOutlinedIcon />}
+              onClick={() => setActive({ mode: 'create', supplier: null })}
+            >
+              Додати постачальника
+            </Button>
+          </>
+        }
+      />
       {syncNotice && (
         <Alert
           severity={syncNotice.ok ? 'success' : 'error'}
@@ -106,53 +89,40 @@ export function SuppliersPage() {
           {syncNotice.text}
         </Alert>
       )}
-      {error && (
-        <Alert
-          severity="error"
-          sx={{ mb: 2 }}
-          action={
-            <Button disabled={loading} onClick={() => void reload()}>
-              Повторити
-            </Button>
-          }
-        >
-          {error}
-        </Alert>
-      )}
-      {actionMessage && (
-        <Alert
-          severity={actionMessage.startsWith('Не вдалося') ? 'error' : 'success'}
-          onClose={() => setActionMessage(null)}
-          sx={{ mb: 2 }}
-        >
-          {actionMessage}
-        </Alert>
-      )}
+      <ReferenceListAlerts
+        error={error}
+        loading={loading}
+        onRetry={() => void reload()}
+        actionMessage={actionMessage}
+        onCloseActionMessage={() => setActionMessage(null)}
+      />
+      <ReferenceSearchBar
+        placeholder="Знайти постачальника за назвою, контактом, телефоном або email"
+        label="Пошук постачальників"
+        value={filters.search}
+        onChange={filters.setSearch}
+      />
+      <ReferenceFilterBar
+        activity={filters.activity}
+        activityCounts={filters.activityCounts}
+        onActivityChange={filters.setActivity}
+        count={filters.filteredRows.length}
+        total={filters.activityTotal}
+        countLabel="Кількість постачальників"
+        selectedCount={deletion.selectedIds.length}
+        onClearSelection={deletion.clearSelection}
+      />
       <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
-        <SuppliersToolbar
-          search={search}
-          onSearchChange={setSearch}
-          activity={activity}
-          activityCounts={activityCounts}
-          onActivityChange={setActivity}
-          count={filteredRows.length}
-          total={rows.length}
-          selectedCount={selectedIds.length}
-          loading={loading}
-          deleting={deleting}
-          onReload={() => void reload()}
-          onDelete={() => requestDelete(selectedIds)}
-        />
         <SuppliersGrid
-          rows={filteredRows}
+          rows={filters.filteredRows}
           loading={loading}
           searching={rows.length > 0}
           unavailable={Boolean(error)}
-          selection={selection}
-          onSelectionChange={setSelection}
+          selection={deletion.selection}
+          onSelectionChange={deletion.setSelection}
           onView={(supplier) => setActive({ mode: 'view', supplier })}
           onEdit={(supplier) => setActive({ mode: 'edit', supplier })}
-          onDelete={(id) => requestDelete([id])}
+          onDelete={(id) => deletion.requestDelete([id])}
         />
       </Paper>
       {active && (
@@ -169,10 +139,10 @@ export function SuppliersPage() {
         />
       )}
       <SupplierDeleteDialog
-        ids={pendingDeleteIds}
-        deleting={deleting}
-        onClose={cancelDelete}
-        onConfirm={() => void confirmDelete()}
+        ids={deletion.pendingDeleteIds}
+        deleting={deletion.deleting}
+        onClose={deletion.cancelDelete}
+        onConfirm={() => void deletion.confirmDelete()}
       />
     </Box>
   );
