@@ -10,12 +10,24 @@ interface Props {
   options: ReferenceSupplierOption[];
   value: ReferenceSupplierFilter;
   onChange: (value: ReferenceSupplierFilter) => void;
+  /** Chip label; the same menu also filters by another name column, such as the operation group. */
+  label?: string;
+  allLabel?: string;
+  emptyLabel?: string;
 }
 
-const noSupplierLabel = 'Без постачальника';
-
-/** Supplier chip with a menu of suppliers present in the list; selected = inverse chip. */
-export function ReferenceSupplierFilter({ options, value, onChange }: Props) {
+/**
+ * Chip with a menu of the names present in the list (suppliers by default) and their counts;
+ * selected = inverse chip.
+ */
+export function ReferenceSupplierFilter({
+  options,
+  value,
+  onChange,
+  label = 'Постачальник',
+  allLabel = 'Усі постачальники',
+  emptyLabel: noSupplierLabel = 'Без постачальника',
+}: Props) {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const selectedLabel = value === null ? null : value || noSupplierLabel;
 
@@ -27,7 +39,7 @@ export function ReferenceSupplierFilter({ options, value, onChange }: Props) {
   return (
     <>
       <ReferenceFilterChip
-        label={selectedLabel ? `Постачальник: ${selectedLabel}` : 'Постачальник'}
+        label={selectedLabel ? `${label}: ${selectedLabel}` : label}
         selected={value !== null}
         ariaHasPopup
         icon={<ExpandMoreOutlinedIcon fontSize="small" />}
@@ -40,7 +52,7 @@ export function ReferenceSupplierFilter({ options, value, onChange }: Props) {
         slotProps={{ paper: { sx: { maxHeight: 360, minWidth: 240 } } }}
       >
         <MenuItem selected={value === null} onClick={() => choose(null)}>
-          <ListItemText>Усі постачальники</ListItemText>
+          <ListItemText>{allLabel}</ListItemText>
         </MenuItem>
         {options.map((option) => (
           <MenuItem

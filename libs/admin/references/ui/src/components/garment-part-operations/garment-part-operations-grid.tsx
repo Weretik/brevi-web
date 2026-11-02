@@ -1,15 +1,24 @@
-import { Box, Typography } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
+import {
+  formatIsoDate,
+  formatOperationMinutes,
+  formatUah,
+  operationLabourCost,
+} from '@admin/references/model';
+import { useMemo } from 'react';
 
-import { useReferenceRowContextMenu } from '../../hooks/reference-row-actions/use-reference-row-context-menu';
-import { ReferenceRowContextMenu } from '../reference-row-actions/reference-row-context-menu';
+import { ReferenceDataGrid } from '../reference-list/reference-data-grid';
+import { ReferenceStatusPill } from '../reference-list/reference-status-pill';
 
-import type { GarmentPartOperation } from '@admin/references/model';
+import type { GarmentPartOperation, OperationLabourRates } from '@admin/references/model';
 import type { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 
 interface Props {
   rows: GarmentPartOperation[];
+  /** Sewing settings for the cost columns; `null` shows «—». */
+  rates: OperationLabourRates | null;
   loading: boolean;
+  searching?: boolean;
+  unavailable?: boolean;
   selection: GridRowSelectionModel;
   onSelectionChange: (selection: GridRowSelectionModel) => void;
   onView: (operation: GarmentPartOperation) => void;
@@ -17,60 +26,90 @@ interface Props {
   onDelete: (id: number) => void;
 }
 
-function GarmentPartOperationsEmptyOverlay() {
-  return (
-    <Box sx={{ display: 'grid', height: '100%', placeItems: 'center' }}>
-      <Typography>Робіт поки немає</Typography>
-    </Box>
-  );
+const dash = (value: string | null) => value || '—';
+
+function costColumn(
+  field: string,
+  headerName: string,
+  rates: OperationLabourRates | null,
+  pick: 'seamstress' | 'withAssembly',
+): GridColDef<GarmentPartOperation> {
+  return {
+    field,
+    headerName,
+    width: 128,
+    type: 'number',
+    sortable: true,
+    cellClassName: 'reference-mono',
+    valueGetter: (_value, row) => operationLabourCost(row, rates)?.[pick] ?? null,
+    valueFormatter: (value: number | null) => (value === null ? '—' : formatUah(value)),
+  };
 }
 
-export function GarmentPartOperationsGrid({
-  rows,
-  loading,
-  selection,
-  onSelectionChange,
-  onView,
-  onEdit,
-  onDelete,
-}: Props) {
-  const { rowMenu, closeRowMenu, rowSlotProps } = useReferenceRowContextMenu(rows);
-  const columns: GridColDef<GarmentPartOperation>[] = [
-    { field: 'id', headerName: 'ID', width: 90 },
-    { field: 'garmentPartName', headerName: 'Елемент', flex: 1, minWidth: 150 },
-    { field: 'name', headerName: 'Назва', flex: 1, minWidth: 180 },
-    { field: 'min', headerName: 'Хвилини (Min)', width: 140, type: 'number' },
-  ];
-
-  return (
-    <>
-      <Box sx={{ width: '100%', minHeight: 440 }}>
-        <DataGrid
-          aria-label="Операції (роботи)"
-          rows={rows}
-          columns={columns}
-          loading={loading}
-          checkboxSelection
-          disableRowSelectionOnClick
-          disableRowSelectionExcludeModel
-          keepNonExistentRowsSelected
-          rowSelectionModel={selection}
-          onRowSelectionModelChange={onSelectionChange}
-          pageSizeOptions={[10, 25, 50]}
-          initialState={{ pagination: { paginationModel: { pageSize: 10, page: 0 } } }}
-          slots={{ noRowsOverlay: GarmentPartOperationsEmptyOverlay }}
-          slotProps={{ row: rowSlotProps }}
+function operationColumns(rates: OperationLabourRates | null): GridColDef<GarmentPartOperation>[] {
+  return [
+    {
+      field: 'code',
+      headerName: 'Код',
+      width: 96,
+      cellClassName: 'reference-mono',
+      valueFormatter: dash,
+    },
+    { field: 'garmentPartName', headerName: 'Група', flex: 0.8, minWidth: 150 },
+    { field: 'element', headerName: 'Елемент', flex: 0.8, minWidth: 140, valueFormatter: dash },
+    { field: 'variant', headerName: 'Варіант', flex: 0.8, minWidth: 140, valueFormatter: dash },
+    {
+      field: 'name',
+      headerName: 'Назва',
+      flex: 1.5,
+      minWidth: 240,
+      cellClassName: 'reference-strong',
+    },
+    {
+      field: 'min',
+      headerName: 'Норма',
+      width: 96,
+      type: 'number',
+      cellClassName: 'reference-mono',
+      valueFormatter: (_value, row) => formatOperationMinutes(row),
+    },
+    costColumn('seamstressCost', 'Вартість', rates, 'seamstress'),
+    costColumn('assemblyCost', 'Зі збиранням', rates, 'withAssembly'),
+    {
+      field: 'normCheckedAt',
+      headerName: 'Перевірено',
+      width: 112,
+      cellClassName: 'reference-mono',
+      valueFormatter: (value: string | null) => formatIsoDate(value),
+    },
+    {
+      field: 'isActive',
+      headerName: 'Статус',
+      width: 160,
+      type: 'boolean',
+      align: 'left',
+      headerAlign: 'left',
+      renderCell: ({ value }) => (
+        <ReferenceStatusPill
+          active={Boolean(value)}
+          activeLabel="Активна"
+          inactiveLabel="Не використовується"
         />
-      </Box>
-      <ReferenceRowContextMenu
-        anchorPosition={rowMenu?.anchorPosition ?? null}
-        row={rowMenu?.row ?? null}
-        rowName={rowMenu?.row.name ?? ''}
-        onClose={closeRowMenu}
-        onView={onView}
-        onEdit={onEdit}
-        onDelete={(row) => onDelete(row.id)}
-      />
-    </>
+      ),
+    },
+  ];
+}
+
+export function GarmentPartOperationsGrid({ rates, ...props }: Props) {
+  const columns = useMemo(() => operationColumns(rates), [rates]);
+  return (
+    <ReferenceDataGrid
+      ariaLabel="Операції"
+      columns={columns}
+      emptyLabel="Операцій поки немає"
+      notFoundLabel="Операцій не знайдено"
+      menuLabel="Дії операції"
+      {...props}
+    />
   );
 }

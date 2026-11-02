@@ -8,10 +8,10 @@ test('garment parts opens directly and from the legacy menu', async ({ page }) =
     route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
   );
   await page.goto('/references/garment-part-operation');
-  await expect(page.getByRole('tab', { name: 'Елементи' })).toBeVisible();
-  await page.getByRole('tab', { name: 'Елементи' }).click();
-  await expect(page.getByText('Елементів виробу поки немає')).toBeVisible();
-  await expect(page).toHaveURL(/\?tab=parts$/);
+  await expect(page.getByRole('tab', { name: 'Групи деталей' })).toBeVisible();
+  await page.getByRole('tab', { name: 'Групи деталей' }).click();
+  await expect(page.getByText('Груп поки немає')).toBeVisible();
+  await expect(page).toHaveURL(/\?tab=groups$/);
   const navigation = page.getByRole('navigation', { name: 'Основна навігація' });
   await navigation.getByRole('button', { name: 'Загальні довідники' }).click();
   await expect(navigation.getByRole('link', { name: 'Операції' })).toHaveAttribute(
@@ -20,7 +20,7 @@ test('garment parts opens directly and from the legacy menu', async ({ page }) =
   );
   await page.goto('/');
   await page.goBack();
-  await expect(page.getByRole('tab', { name: 'Елементи' })).toBeVisible();
+  await expect(page.getByRole('tab', { name: 'Групи деталей' })).toBeVisible();
   await page.goForward();
   await expect(page.getByRole('heading', { name: 'Огляд виробництва' })).toBeVisible();
   await page.goBack();
@@ -49,16 +49,16 @@ test('garment parts opens the row menu and confirms deletion', async ({ page }) 
     deleted = true;
     return route.fulfill({ status: 200 });
   });
-  await page.goto('/references/garment-part-operation?tab=parts');
+  await page.goto('/references/garment-part-operation?tab=groups');
   await expect(page.getByText('Рукав')).toBeVisible();
   const row = page.getByRole('row', { name: /1.*Рукав/ });
   await row.click({ button: 'right' });
   await page.getByRole('menuitem', { name: 'Перегляд' }).click();
-  const drawer = page.getByRole('dialog', { name: 'Перегляд елемента виробу' });
+  const drawer = page.getByRole('dialog', { name: 'Перегляд групи деталей' });
   await expect(drawer).toContainText('Рукав');
-  await expect(page).toHaveURL(/\?tab=parts$/);
+  await expect(page).toHaveURL(/\?tab=groups$/);
   await drawer.getByRole('button', { name: 'Редагувати' }).click();
-  await expect(page.getByRole('dialog', { name: 'Редагування елемента виробу' })).toBeVisible();
+  await expect(page.getByRole('dialog', { name: 'Редагування групи деталей' })).toBeVisible();
   await expect(page.getByRole('textbox', { name: 'Назва' })).toHaveValue('Рукав');
   await page.getByRole('button', { name: 'Скасувати' }).click();
   await row.click({ button: 'right' });
@@ -82,10 +82,10 @@ test('garment parts fits three widths in both themes', async ({ page }) => {
   for (const width of [320, 768, 1280]) {
     await page.setViewportSize({ width, height: 800 });
     await page.goto('/references/garment-part-operation');
-    await expect(page.getByRole('tab', { name: 'Елементи' })).toBeVisible();
-    await page.getByRole('tab', { name: 'Елементи' }).click();
-    await page.getByRole('button', { name: 'Створити' }).click();
-    const drawer = page.getByRole('dialog', { name: 'Новий елемент виробу' });
+    await expect(page.getByRole('tab', { name: 'Групи деталей' })).toBeVisible();
+    await page.getByRole('tab', { name: 'Групи деталей' }).click();
+    await page.getByRole('button', { name: 'Додати групу' }).click();
+    const drawer = page.getByRole('dialog', { name: 'Нова група деталей' });
     const drawerBounds = await drawer.boundingBox();
     expect(drawerBounds).not.toBeNull();
     expect(drawerBounds?.x).toBeGreaterThanOrEqual(0);

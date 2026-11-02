@@ -9,7 +9,7 @@ export function useGarmentPartOperations() {
     loading: result.isLoading || result.isFetching,
     error:
       result.error && !empty
-        ? adminApiErrorMessage(result.error, 'Не вдалося завантажити роботи.')
+        ? adminApiErrorMessage(result.error, 'Не вдалося завантажити операції.')
         : null,
     reload: result.refetch,
   };

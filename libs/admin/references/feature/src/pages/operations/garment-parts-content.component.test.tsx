@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { GarmentPartsPage } from './garment-parts-page';
+import { OperationsPage } from './operations-page';
 import { render } from '../../test-utils';
 
 afterEach(() => {
@@ -16,41 +16,44 @@ function LocationProbe() {
   return <output aria-label="Поточна адреса">{`${location.pathname}${location.search}`}</output>;
 }
 
-function renderPage(initialEntry = '/references/garment-part-operation?tab=parts') {
+function renderPage(initialEntry = '/references/garment-part-operation?tab=groups') {
   return render(
     <MemoryRouter initialEntries={[initialEntry]}>
-      <GarmentPartsPage />
+      <OperationsPage />
       <LocationProbe />
     </MemoryRouter>,
   );
 }
 
-describe('garment parts page', () => {
+describe('operations page: groups tab', () => {
   it('restores the active tab from the URL and writes tab changes back to it', async () => {
     const user = userEvent.setup();
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => [] }));
     renderPage();
 
-    expect(screen.getByRole('tab', { name: 'Елементи' })).toHaveAttribute('aria-selected', 'true');
-    await user.click(screen.getByRole('tab', { name: 'Роботи' }));
+    expect(screen.getByRole('tab', { name: 'Групи деталей' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+    await user.click(screen.getByRole('tab', { name: 'Операції' }));
 
     expect(screen.getByLabelText('Поточна адреса')).toHaveTextContent(
-      '/references/garment-part-operation?tab=operations',
+      /^\/references\/garment-part-operation$/,
     );
   });
 
-  it('opens the create drawer without leaving the Elements list', async () => {
+  it('opens the create drawer without leaving the groups list', async () => {
     const user = userEvent.setup();
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => [] }));
     renderPage();
 
-    await user.click(await screen.findByRole('button', { name: 'Створити' }));
+    await user.click(await screen.findByRole('button', { name: 'Додати групу' }));
 
-    expect(screen.getByRole('dialog', { name: 'Новий елемент виробу' })).toBeVisible();
+    expect(screen.getByRole('dialog', { name: 'Нова група деталей' })).toBeVisible();
     expect(screen.getByRole('spinbutton', { name: 'ID' })).toHaveValue(1);
     expect(screen.getByRole('textbox', { name: 'Назва' })).toHaveValue('');
     expect(screen.getByLabelText('Поточна адреса')).toHaveTextContent(
-      '/references/garment-part-operation?tab=parts',
+      '/references/garment-part-operation?tab=groups',
     );
   });
 
@@ -71,15 +74,15 @@ describe('garment parts page', () => {
     expect(rowCheckbox).toBeChecked();
     await user.click(screen.getByRole('menuitem', { name: 'Перегляд' }));
 
-    expect(screen.getByRole('dialog', { name: 'Перегляд елемента виробу' })).toBeVisible();
+    expect(screen.getByRole('dialog', { name: 'Перегляд групи деталей' })).toBeVisible();
     expect(screen.getByText('Рукав', { selector: 'p' })).toBeVisible();
     expect(screen.getByLabelText('Поточна адреса')).toHaveTextContent(
-      '/references/garment-part-operation?tab=parts',
+      '/references/garment-part-operation?tab=groups',
     );
 
     await user.click(screen.getByRole('button', { name: 'Редагувати' }));
 
-    expect(screen.getByRole('dialog', { name: 'Редагування елемента виробу' })).toBeVisible();
+    expect(screen.getByRole('dialog', { name: 'Редагування групи деталей' })).toBeVisible();
     expect(screen.getByRole('textbox', { name: 'Назва' })).toHaveValue('Рукав');
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
@@ -100,13 +103,13 @@ describe('garment parts page', () => {
     );
     renderPage();
 
-    await user.click(await screen.findByRole('button', { name: 'Створити' }));
+    await user.click(await screen.findByRole('button', { name: 'Додати групу' }));
     await user.type(screen.getByRole('textbox', { name: 'Назва' }), 'Рукав');
     await user.click(screen.getByRole('button', { name: 'Зберегти' }));
 
     expect(await screen.findByText('Назва вже існує.')).toBeVisible();
     expect(screen.getByRole('textbox', { name: 'Назва' })).toHaveValue('Рукав');
-    expect(screen.getByRole('dialog', { name: 'Новий елемент виробу' })).toBeVisible();
+    expect(screen.getByRole('dialog', { name: 'Нова група деталей' })).toBeVisible();
   });
 
   it('opens the focused row menu from the keyboard and restores focus when it closes', async () => {

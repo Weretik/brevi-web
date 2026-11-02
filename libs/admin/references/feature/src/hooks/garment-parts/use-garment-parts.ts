@@ -9,7 +9,7 @@ export function useGarmentParts() {
     loading: result.isLoading || result.isFetching,
     error:
       result.error && !empty
-        ? adminApiErrorMessage(result.error, 'Не вдалося завантажити елементи виробу.')
+        ? adminApiErrorMessage(result.error, 'Не вдалося завантажити групи деталей.')
         : null,
     reload: result.refetch,
   };

@@ -15,9 +15,9 @@ interface Props {
 }
 
 const titles: Record<GarmentPartEditorMode, string> = {
-  create: 'Новий елемент виробу',
-  view: 'Перегляд елемента виробу',
-  edit: 'Редагування елемента виробу',
+  create: 'Нова група деталей',
+  view: 'Перегляд групи деталей',
+  edit: 'Редагування групи деталей',
 };
 
 export function GarmentPartDrawer({
@@ -37,7 +37,7 @@ export function GarmentPartDrawer({
       title={titles[mode]}
       description={
         readOnly
-          ? 'Перевірте дані елемента або перейдіть до редагування.'
+          ? 'Перевірте дані групи або перейдіть до редагування.'
           : 'Заповніть обов’язкові поля та збережіть зміни.'
       }
       formId="garment-part-form"

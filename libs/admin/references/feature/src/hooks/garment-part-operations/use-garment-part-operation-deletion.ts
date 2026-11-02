@@ -1,22 +1,21 @@
 import { useDeleteGarmentPartOperationMutation } from '@admin/references/data-access';
 import { useState } from 'react';
 
-export interface GarmentPartOperationActionResult {
-  message: string;
-  severity: 'success' | 'error';
-}
+import type { GridRowSelectionModel } from '@mui/x-data-grid';
 
-export function useGarmentPartOperationDeletion(
-  onResult: (result: GarmentPartOperationActionResult) => void,
-  retainFailedDeletes: (attemptedIds: readonly number[], failedIds: readonly number[]) => void,
-) {
+export function useGarmentPartOperationDeletion(onResult: (message: string) => void) {
   const [deleteGarmentPartOperation] = useDeleteGarmentPartOperationMutation();
+  const [selection, setSelection] = useState<GridRowSelectionModel>({
+    type: 'include',
+    ids: new Set(),
+  });
   const [pendingDeleteIds, setPendingDeleteIds] = useState<number[] | null>(null);
   const [deleting, setDeleting] = useState(false);
 
   function requestDelete(ids: number[]) {
     if (ids.length) setPendingDeleteIds(ids);
   }
+
   function cancelDelete() {
     if (!deleting) setPendingDeleteIds(null);
   }
@@ -28,18 +27,33 @@ export function useGarmentPartOperationDeletion(
       pendingDeleteIds.map((id) => deleteGarmentPartOperation(id).unwrap()),
     );
     const failedIds = pendingDeleteIds.filter((_, index) => results[index]?.status === 'rejected');
-    retainFailedDeletes(pendingDeleteIds, failedIds);
+    setSelection((current) => {
+      const retainedIds = new Set(
+        [...current.ids].filter(
+          (id) => !pendingDeleteIds.includes(Number(id)) || failedIds.includes(Number(id)),
+        ),
+      );
+      for (const id of failedIds) retainedIds.add(id);
+      return { type: 'include', ids: retainedIds };
+    });
     onResult(
       failedIds.length
-        ? {
-            message: `Не вдалося видалити ID: ${failedIds.join(', ')}. Решту списку оновлено.`,
-            severity: 'error',
-          }
-        : { message: 'Вибрані записи видалено.', severity: 'success' },
+        ? `Не вдалося видалити ID: ${failedIds.join(', ')}. Решту списку оновлено.`
+        : 'Вибрані записи видалено.',
     );
     setPendingDeleteIds(null);
     setDeleting(false);
   }
 
-  return { pendingDeleteIds, deleting, requestDelete, cancelDelete, confirmDelete };
+  return {
+    selection,
+    setSelection,
+    clearSelection: () => setSelection({ type: 'include', ids: new Set() }),
+    selectedIds: Array.from(selection.ids).map(Number).filter(Number.isInteger),
+    pendingDeleteIds,
+    deleting,
+    requestDelete,
+    cancelDelete,
+    confirmDelete,
+  };
 }

@@ -5,7 +5,7 @@ const AdditionalReferencesPage = lazy(
   () => import('./pages/additional-references/additional-references-page'),
 );
 const MaterialsPage = lazy(() => import('./pages/materials/materials-page'));
-const GarmentPartsPage = lazy(() => import('./pages/garment-parts/garment-parts-page'));
+const OperationsPage = lazy(() => import('./pages/operations/operations-page'));
 const SuppliersPage = lazy(() => import('./pages/suppliers/suppliers-page'));
 
 /** Old separate pages: `/references/garment-accessory` (with `?tab=fabrics` for fabrics). */
@@ -28,6 +28,6 @@ export const referencesRoutes = [
   { path: '/references/materials', element: <MaterialsPage /> },
   { path: '/references/fabric', element: <Navigate to="/references/materials" replace /> },
   { path: '/references/garment-accessory', element: <GarmentAccessoriesRedirect /> },
-  { path: '/references/garment-part-operation', element: <GarmentPartsPage /> },
+  { path: '/references/garment-part-operation', element: <OperationsPage /> },
   { path: '/references/additional-reference', element: <AdditionalReferencesPage /> },
 ] as const;

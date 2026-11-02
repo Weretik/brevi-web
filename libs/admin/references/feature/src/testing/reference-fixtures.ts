@@ -52,3 +52,31 @@ export function supplierRow(overrides: ApiRow = {}): ApiRow {
     ...overrides,
   };
 }
+
+export function operationRow(overrides: ApiRow = {}): ApiRow {
+  return {
+    id: 2,
+    code: 'OP-001',
+    garmentPartName: 'Рукав',
+    element: 'Рукав',
+    variant: 'Прямий',
+    name: 'Рукав куртки: прямий',
+    min: 6,
+    minutesPerProduct: false,
+    normCheckedAt: '2026-08-30',
+    isActive: true,
+    notes: null,
+    ...overrides,
+  };
+}
+
+/** Sewing settings with the sheet's minute cost (15 652,80 / (22 × 400) ≈ 1,7787 грн). */
+export function sewingSettingsResponse(): ApiRow {
+  return {
+    id: 1,
+    revision: 1,
+    effectiveFrom: '2026-08-01T00:00:00Z',
+    formulaVersion: 'sheet-v1',
+    settings: { monthlySalary: 15652.8, workDays: 22, shiftMinutes: 400, assemblyRate: 0.25 },
+  };
+}

@@ -184,9 +184,29 @@ export interface paths {
     put?: never;
     /**
      * Create a garment part operation with a client supplied ID
-     * @description Requires CanManageProducts. Numeric edits append an approved pricing revision when the reference is versioned.
+     * @description Requires CanManageProducts. The code (OP-…) is unique when given; a duplicate is a 400 on Request.Code. Numeric edits append an approved pricing revision when the reference is versioned.
      */
     post: operations['createGarmentPartOperation'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/reference/garment-part-operations/import': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Import the Calculator sheet «Операції»
+     * @description Requires CanManageProducts. The caller sends the sheet rows as JSON (one-time transfer from the Calculator sheet). A row is matched by code (OP-…); the rest are created with the next ID. «Група деталей» is matched by name (case and punctuation ignored); an unknown one becomes a new group. dryRun (default) returns the preview only. Otherwise nothing is saved when any row has an error. deleteMissing deletes operations that are not in the sheet; an operation still used by a product or price history is marked not used instead (keptInUse). Groups left without operations are then deleted. Repeating the same file changes nothing.
+     */
+    post: operations['importGarmentPartOperations'];
     delete?: never;
     options?: never;
     head?: never;
@@ -2099,18 +2119,97 @@ export interface components {
     GarmentPartOperationRow: {
       /** Format: int32 */
       id: number;
+      /** @description «Група деталей». */
       garmentPartName: string;
       name: string;
+      /** @description Norm in minutes; 0 when minutesPerProduct. */
       min: number;
+      /** @description Sheet code such as OP-001. */
+      code: string | null;
+      /** @description «Вузол / елемент». */
+      element: string | null;
+      /** @description «Варіант виконання». */
+      variant: string | null;
+      /** @description No fixed norm; the time is entered per product. */
+      minutesPerProduct: boolean;
+      /** Format: date */
+      normCheckedAt: string | null;
+      isActive: boolean;
+      notes: string | null;
     };
     UpdateGarmentPartOperationRequest: {
       garmentPartName: string;
       name: string;
+      /** @description Must be above 0 unless minutesPerProduct. */
       min: number;
+      code?: string | null;
+      element?: string | null;
+      variant?: string | null;
+      /** @default false */
+      minutesPerProduct: boolean;
+      /** Format: date */
+      normCheckedAt?: string | null;
+      /** @default true */
+      isActive: boolean;
+      notes?: string | null;
     };
     CreateGarmentPartOperationRequest: components['schemas']['UpdateGarmentPartOperationRequest'] & {
       /** Format: int32 */
       id: number;
+    };
+    GarmentPartOperationImportRow: {
+      /**
+       * Format: int32
+       * @description Sheet row number for the preview.
+       */
+      rowNumber: number;
+      code: string;
+      groupName: string;
+      element?: string | null;
+      variant?: string | null;
+      name: string;
+      min: number;
+      minutesPerProduct: boolean;
+      /** Format: date */
+      normCheckedAt?: string | null;
+      isActive: boolean;
+      notes?: string | null;
+    };
+    ImportGarmentPartOperationsRequest: {
+      rows: components['schemas']['GarmentPartOperationImportRow'][];
+      /** @default true */
+      dryRun: boolean;
+      /** @default false */
+      deleteMissing: boolean;
+    };
+    ReferenceImportRow: {
+      /** Format: int32 */
+      rowNumber: number;
+      code: string;
+      name: string;
+      /** @enum {string} */
+      action: 'create' | 'update' | 'unchanged' | 'error';
+      /** @description Ukrainian labels of changed fields. */
+      changes: string[];
+      error: string | null;
+    };
+    GarmentPartOperationImportResult: {
+      /** @description False for a preview or when a row has an error; then nothing is saved. */
+      applied: boolean;
+      /** Format: int32 */
+      created: number;
+      /** Format: int32 */
+      updated: number;
+      /** Format: int32 */
+      unchanged: number;
+      /** Format: int32 */
+      errors: number;
+      newGroups: string[];
+      deleted: string[];
+      /** @description Still used; marked not used instead of deleted. */
+      keptInUse: string[];
+      deletedGroups: string[];
+      rows: components['schemas']['ReferenceImportRow'][];
     };
     GarmentPartRow: {
       /** Format: int32 */
@@ -2195,17 +2294,6 @@ export interface components {
       dryRun: boolean;
       /** @default false */
       deactivateMissing: boolean;
-    };
-    ReferenceImportRow: {
-      /** Format: int32 */
-      rowNumber: number;
-      code: string;
-      name: string;
-      /** @enum {string} */
-      action: 'create' | 'update' | 'unchanged' | 'error';
-      /** @description Ukrainian labels of changed fields. */
-      changes: string[];
-      error: string | null;
     };
     ReferenceImportResult: {
       /** @description False for a preview or when a row has an error; then nothing is saved. */
@@ -4757,6 +4845,52 @@ export interface operations {
       };
     };
   };
+  importGarmentPartOperations: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ImportGarmentPartOperationsRequest'];
+      };
+    };
+    responses: {
+      /** @description Preview or result; applied tells whether anything was saved. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['GarmentPartOperationImportResult'];
+        };
+      };
+      400: components['responses']['ValidationError'];
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product management permission required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description A pricing revision conflict; reload and repeat. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   updateGarmentPartOperation: {
     parameters: {
       query?: never;
@@ -4992,6 +5126,13 @@ export interface operations {
       };
       /** @description Garment part not found. */
       404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The group still has operations. */
+      409: {
         headers: {
           [name: string]: unknown;
         };

@@ -2,18 +2,24 @@ import {
   useCreateGarmentPartOperationMutation,
   useUpdateGarmentPartOperationMutation,
 } from '@admin/references/data-access';
-import { validateGarmentPartOperation } from '@admin/references/model';
+import {
+  createGarmentPartOperationFormValues,
+  garmentPartOperationRequestBody,
+  validateGarmentPartOperation,
+} from '@admin/references/model';
 import { adminApiErrorMessage, isAdminApiError } from '@admin/shared/api-client';
 import { useState } from 'react';
 
+import { useGarmentParts } from '../garment-parts/use-garment-parts';
+
 import type {
-  GarmentPartOperationDraft,
+  GarmentPartOperation,
+  GarmentPartOperationEditorMode,
   GarmentPartOperationField,
   GarmentPartOperationFieldErrors,
-  GarmentPartOperation,
 } from '@admin/references/model';
 
-export type GarmentPartOperationEditorMode = 'create' | 'view' | 'edit';
+export type { GarmentPartOperationEditorMode } from '@admin/references/model';
 
 export function useGarmentPartOperationEditor(
   initialMode: GarmentPartOperationEditorMode,
@@ -22,50 +28,49 @@ export function useGarmentPartOperationEditor(
   onSaved: () => void,
 ) {
   const [mode, setMode] = useState(initialMode);
-  const [draft, setDraft] = useState<GarmentPartOperationDraft>({
-    id: operation?.id ?? nextId,
-    garmentPartName: operation?.garmentPartName ?? '',
-    name: operation?.name ?? '',
-    min: operation ? String(operation.min) : '0',
-  });
+  const [values, setValues] = useState(() =>
+    createGarmentPartOperationFormValues(operation, nextId),
+  );
   const [errors, setErrors] = useState<GarmentPartOperationFieldErrors>({});
   const [message, setMessage] = useState<string | null>(null);
   const [createGarmentPartOperation, createState] = useCreateGarmentPartOperationMutation();
   const [updateGarmentPartOperation, updateState] = useUpdateGarmentPartOperationMutation();
   const saving = createState.isLoading || updateState.isLoading;
+  const groups = useGarmentParts();
 
-  function change(field: GarmentPartOperationField, value: string) {
-    setDraft((current) => ({ ...current, [field]: field === 'id' ? Number(value) : value }));
+  function change(field: GarmentPartOperationField, value: string | boolean) {
+    setValues((current) => ({ ...current, [field]: value }));
     setErrors((current) => ({ ...current, [field]: undefined }));
   }
 
   async function save() {
     if (saving || mode === 'view') return;
-    const validation = validateGarmentPartOperation(draft);
+    const validation = validateGarmentPartOperation(values);
     setErrors(validation);
     if (Object.keys(validation).length) return;
     setMessage(null);
     try {
-      const body = {
-        garmentPartName: draft.garmentPartName.trim(),
-        name: draft.name.trim(),
-        min: Number(draft.min),
-      };
-      if (mode === 'create') await createGarmentPartOperation({ id: draft.id, ...body }).unwrap();
-      else await updateGarmentPartOperation({ id: draft.id, body }).unwrap();
+      const body = garmentPartOperationRequestBody(values);
+      const id = Number(values.id);
+      if (mode === 'create') await createGarmentPartOperation({ id, ...body }).unwrap();
+      else await updateGarmentPartOperation({ id, body }).unwrap();
       onSaved();
     } catch (error) {
       if (isAdminApiError(error)) setErrors(error.fieldErrors);
-      setMessage(adminApiErrorMessage(error, 'Не вдалося зберегти роботу.'));
+      setMessage(adminApiErrorMessage(error, 'Не вдалося зберегти операцію.'));
     }
   }
 
   return {
     mode,
-    draft,
+    values,
     errors,
     message,
     saving,
+    groups: groups.rows,
+    groupsLoading: groups.loading,
+    groupsError: groups.error,
+    retryGroups: groups.reload,
     change,
     save,
     enableEditing: () => setMode('edit'),

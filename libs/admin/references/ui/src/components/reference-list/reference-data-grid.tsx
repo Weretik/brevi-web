@@ -101,6 +101,7 @@ export function ReferenceDataGrid<Row extends ReferenceRow>({
                 ? notFoundLabel
                 : emptyLabel,
           }}
+          autoHeight
           checkboxSelection
           disableRowSelectionOnClick
           disableRowSelectionExcludeModel
@@ -113,7 +114,6 @@ export function ReferenceDataGrid<Row extends ReferenceRow>({
           slotProps={{ row: rowSlotProps }}
           sx={{
             minWidth: 0,
-            height: 538,
             border: 0,
             borderTop: 1,
             borderColor: 'divider',

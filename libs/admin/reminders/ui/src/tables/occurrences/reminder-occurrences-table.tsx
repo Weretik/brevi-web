@@ -82,8 +82,9 @@ export function ReminderOccurrencesTable(props: Props) {
     },
   ];
   return (
-    <Box sx={{ width: '100%', minHeight: 440 }}>
+    <Box sx={{ width: '100%' }}>
       <DataGrid
+        autoHeight
         aria-label="Періоди нагадувань"
         rows={rows}
         columns={columns}
