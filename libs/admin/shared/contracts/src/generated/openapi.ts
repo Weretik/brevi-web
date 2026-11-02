@@ -369,6 +369,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/reference/suppliers/keepin-sync': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Refresh suppliers from KeepinCRM
+     * @description Reads GET /v1/suppliers from KeepinCRM page by page. A linked supplier is refreshed by keepinCrmId, an unlinked supplier with the same name (ignoring case, punctuation and ТОВ/ФОП) is linked, the rest are created. isActive and notes are never changed; nothing is deleted. Safe to repeat. The daily Cloud Run job runs the same use case.
+     */
+    post: operations['syncSuppliersFromKeepinCrm'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/reference/suppliers/{id}': {
     parameters: {
       query?: never;
@@ -379,11 +399,36 @@ export interface paths {
       cookie?: never;
     };
     get?: never;
-    /** Update a supplier */
+    /**
+     * Update a supplier
+     * @description Manual suppliers only. For a KeepinCRM supplier (keepinCrmId set) it returns 400; use updateSupplierBreviFields.
+     */
     put: operations['updateSupplier'];
     post?: never;
     /** Delete a supplier */
     delete: operations['deleteSupplier'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/reference/suppliers/{id}/brevi-fields': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Change the fields Brevi always owns
+     * @description isActive («Використовувати в проєкті») and notes, for any supplier including a KeepinCRM one.
+     */
+    put: operations['updateSupplierBreviFields'];
+    post?: never;
+    delete?: never;
     options?: never;
     head?: never;
     patch?: never;
@@ -1978,7 +2023,8 @@ export interface components {
       publicUrl: string;
       contentType: string;
       storageKey: string;
-      status: string;
+      /** @enum {string} */
+      status: 'PendingUpload' | 'Ready';
     };
     UploadMediaResponse: {
       mediaFileId: number;
@@ -2082,8 +2128,20 @@ export interface components {
       name: string;
       link: string | null;
       contactPerson: string | null;
+      /** @description One or more phones; KeepinCRM phones are joined with ", ". */
       phoneNumber: string | null;
       notes: string | null;
+      email: string | null;
+      /** @description What Brevi buys from the supplier («Що закуповуємо»); from KeepinCRM for a linked supplier. */
+      purchaseCategories: string | null;
+      /** @description KeepinCRM tags, read-only. */
+      tags: string | null;
+      /** @description «Використовувати в проєкті». Always owned by Brevi. */
+      isActive: boolean;
+      /** @description KeepinCRM supplier ID. When set, name, purchaseCategories, link, contactPerson, phoneNumber, email and tags come from KeepinCRM and change only through syncSuppliersFromKeepinCrm. */
+      keepinCrmId: string | null;
+      /** Format: date-time */
+      keepinSyncedAt: string | null;
     };
     UpdateSupplierRequest: {
       name: string;
@@ -2091,10 +2149,33 @@ export interface components {
       contactPerson?: string | null;
       phoneNumber?: string | null;
       notes?: string | null;
+      /** Format: email */
+      email?: string | null;
+      purchaseCategories?: string | null;
+      /** @default true */
+      isActive: boolean;
     };
     CreateSupplierRequest: components['schemas']['UpdateSupplierRequest'] & {
       /** Format: int32 */
       id: number;
+    };
+    KeepinCrmSupplierSyncResult: {
+      /** Format: int32 */
+      received: number;
+      /** Format: int32 */
+      created: number;
+      /** Format: int32 */
+      linked: number;
+      /** Format: int32 */
+      updated: number;
+      /** @description Names of linked suppliers KeepinCRM no longer returns; they are kept in Brevi. */
+      missingInKeepinCrm: string[];
+      /** Format: date-time */
+      syncedAt: string;
+    };
+    UpdateSupplierBreviFieldsRequest: {
+      isActive: boolean;
+      notes?: string | null;
     };
     /** @enum {string} */
     ProductType: 'Sewing' | 'Ppe';
@@ -4295,7 +4376,10 @@ export interface operations {
     requestBody: {
       content: {
         'multipart/form-data': {
-          /** Format: binary */
+          /**
+           * Format: binary
+           * @description JPEG, PNG or WebP image up to 50 MiB.
+           */
           file: string;
         };
       };
@@ -5178,6 +5262,44 @@ export interface operations {
       };
     };
   };
+  syncSuppliersFromKeepinCrm: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Sync summary. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['KeepinCrmSupplierSyncResult'];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description KeepinCRM is not configured, unavailable, or returned no suppliers. Nothing changed. */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            errors: string[];
+          };
+        };
+      };
+    };
+  };
   updateSupplier: {
     parameters: {
       query?: never;
@@ -5229,6 +5351,45 @@ export interface operations {
     requestBody?: never;
     responses: {
       /** @description Supplier deleted. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      400: components['responses']['responses-ValidationError'];
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Supplier not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateSupplierBreviFields: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateSupplierBreviFieldsRequest'];
+      };
+    };
+    responses: {
+      /** @description Saved. */
       200: {
         headers: {
           [name: string]: unknown;

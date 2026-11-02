@@ -1,8 +1,13 @@
 import {
   useCreateSupplierMutation,
+  useUpdateSupplierBreviFieldsMutation,
   useUpdateSupplierMutation,
 } from '@admin/references/data-access';
-import { createSupplierDraft, validateSupplier } from '@admin/references/model';
+import {
+  createSupplierDraft,
+  isKeepinCrmSupplier,
+  validateSupplier,
+} from '@admin/references/model';
 import { adminApiErrorMessage, isAdminApiError } from '@admin/shared/api-client';
 import { useState } from 'react';
 
@@ -26,21 +31,26 @@ export function useSupplierEditor(
   const [message, setMessage] = useState<string | null>(null);
   const [createSupplier, createState] = useCreateSupplierMutation();
   const [updateSupplier, updateState] = useUpdateSupplierMutation();
-  const saving = createState.isLoading || updateState.isLoading;
+  const [updateBreviFields, breviFieldsState] = useUpdateSupplierBreviFieldsMutation();
+  const saving = createState.isLoading || updateState.isLoading || breviFieldsState.isLoading;
+  const fromKeepinCrm = isKeepinCrmSupplier(supplier);
 
-  function change(field: SupplierField, value: string) {
+  function change(field: SupplierField, value: string | boolean) {
     setDraft((current) => ({ ...current, [field]: field === 'id' ? Number(value) : value }));
     setErrors((current) => ({ ...current, [field]: undefined }));
   }
 
   async function save() {
     if (saving || mode === 'view') return;
-    const validation = validateSupplier(draft);
+    // A KeepinCRM card is read-only here: only the notes typed in Brevi are checked.
+    const { notes } = validateSupplier(draft);
+    const validation = fromKeepinCrm ? (notes ? { notes } : {}) : validateSupplier(draft);
     setErrors(validation);
     if (Object.keys(validation).length) return;
     setMessage(null);
     try {
       if (mode === 'create') await createSupplier(draft).unwrap();
+      else if (fromKeepinCrm) await updateBreviFields(draft).unwrap();
       else await updateSupplier(draft).unwrap();
       onSaved();
     } catch (error) {

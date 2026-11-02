@@ -19,6 +19,12 @@ describe('referencesApi', () => {
       new Response(
         JSON.stringify([
           {
+            email: null,
+            purchaseCategories: null,
+            tags: null,
+            isActive: true,
+            keepinCrmId: null,
+            keepinSyncedAt: null,
             id: 1,
             name: 'Атлас',
             link: null,
@@ -38,6 +44,12 @@ describe('referencesApi', () => {
 
     expect(suppliers).toEqual([
       {
+        email: null,
+        purchaseCategories: null,
+        tags: null,
+        isActive: true,
+        keepinCrmId: null,
+        keepinSyncedAt: null,
         id: 1,
         name: 'Атлас',
         link: null,
@@ -86,6 +98,12 @@ describe('referencesApi', () => {
         new Response(
           JSON.stringify([
             {
+              email: null,
+              purchaseCategories: null,
+              tags: null,
+              isActive: true,
+              keepinCrmId: null,
+              keepinSyncedAt: null,
               id: 1,
               name: 'Атлас',
               link: null,

@@ -8,6 +8,12 @@ export function mapSuppliers(value: SuppliersResponse): Supplier[] {
     link: row.link,
     contactPerson: row.contactPerson,
     phoneNumber: row.phoneNumber,
+    email: row.email,
+    purchaseCategories: row.purchaseCategories,
+    tags: row.tags,
+    isActive: row.isActive,
     notes: row.notes,
+    keepinCrmId: row.keepinCrmId,
+    keepinSyncedAt: row.keepinSyncedAt,
   }));
 }

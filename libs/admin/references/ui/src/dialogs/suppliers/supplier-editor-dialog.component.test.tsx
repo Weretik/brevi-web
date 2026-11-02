@@ -13,6 +13,9 @@ const draft: SupplierDraft = {
   phoneNumber: '',
   notes: '',
   link: 'supplier.example',
+  email: '',
+  purchaseCategories: '',
+  isActive: true,
 };
 
 afterEach(cleanup);

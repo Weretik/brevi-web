@@ -1,10 +1,11 @@
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
-import { Box, IconButton } from '@mui/material';
+import { Box, IconButton, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { DataGrid } from '@mui/x-data-grid';
 
 import { SupplierLinkCell } from './supplier-link-cell';
 import { SupplierRowMenu } from './supplier-row-menu';
+import { SupplierStatusPill } from './supplier-status-pill';
 import { SuppliersGridFooter } from './suppliers-grid-footer';
 import { useReferenceRowContextMenu } from '../../hooks/reference-row-actions/use-reference-row-context-menu';
 
@@ -51,7 +52,30 @@ export function SuppliersGrid({
       headerName: 'Назва',
       flex: 1.5,
       minWidth: 220,
-      cellClassName: 'supplier-name',
+      renderCell: ({ row }) => (
+        <Stack sx={{ justifyContent: 'center', height: '100%', minWidth: 0 }}>
+          <Typography variant="body2" noWrap sx={{ fontWeight: 600 }}>
+            {row.name}
+          </Typography>
+          {row.keepinCrmId && (
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              noWrap
+              sx={{ fontFamily: 'var(--admin-font-mono)', lineHeight: 1.2 }}
+            >
+              KeepinCRM {row.keepinCrmId}
+            </Typography>
+          )}
+        </Stack>
+      ),
+    },
+    {
+      field: 'purchaseCategories',
+      headerName: 'Що закуповуємо',
+      flex: 1,
+      minWidth: 160,
+      valueFormatter: (value: string | null) => value || '—',
     },
     {
       field: 'contactPerson',
@@ -69,7 +93,7 @@ export function SuppliersGrid({
     },
     {
       field: 'link',
-      headerName: 'Посилання',
+      headerName: 'Сайт',
       flex: 1,
       minWidth: 160,
       renderCell: ({ value, tabIndex }) => (
@@ -77,11 +101,20 @@ export function SuppliersGrid({
       ),
     },
     {
-      field: 'notes',
-      headerName: 'Нотатки',
+      field: 'email',
+      headerName: 'Email',
       flex: 1,
       minWidth: 180,
       valueFormatter: (value: string | null) => value || '—',
+    },
+    {
+      field: 'isActive',
+      headerName: 'Статус',
+      width: 170,
+      type: 'boolean',
+      align: 'left',
+      headerAlign: 'left',
+      renderCell: ({ value }) => <SupplierStatusPill active={Boolean(value)} />,
     },
     {
       field: 'actions',
@@ -119,7 +152,7 @@ export function SuppliersGrid({
           rows={rows}
           columns={columns}
           loading={loading}
-          rowHeight={44}
+          rowHeight={52}
           columnHeaderHeight={44}
           localeText={{
             ...theme.components?.MuiDataGrid?.defaultProps?.localeText,
@@ -150,7 +183,6 @@ export function SuppliersGrid({
               fontFamily: 'var(--admin-font-mono)',
               fontVariantNumeric: 'tabular-nums',
             },
-            '& .supplier-name': { fontWeight: 600 },
             '& .MuiDataGrid-columnHeaders': { bgcolor: 'action.hover' },
           }}
         />
