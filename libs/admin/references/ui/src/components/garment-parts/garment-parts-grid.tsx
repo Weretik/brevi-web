@@ -20,7 +20,7 @@ interface Props {
 function GarmentPartsEmptyOverlay() {
   return (
     <Box sx={{ display: 'grid', height: '100%', placeItems: 'center' }}>
-      <Typography>Елементів виробу поки немає</Typography>
+      <Typography>Груп поки немає</Typography>
     </Box>
   );
 }
@@ -45,7 +45,7 @@ export function GarmentPartsGrid({
       <Box sx={{ width: '100%' }}>
         <DataGrid
           autoHeight
-          aria-label="Елементи виробу"
+          aria-label="Групи деталей"
           rows={rows}
           columns={columns}
           loading={loading}

@@ -10,6 +10,8 @@ export * from './components/garment-accessories/garment-accessory-details';
 export * from './components/garment-accessories/garment-accessory-form';
 export * from './components/garment-accessories/garment-accessories-grid';
 export * from './components/garment-part-operations/garment-part-operation-delete-dialog';
+export * from './components/garment-part-operations/garment-part-operation-details';
+export * from './components/garment-part-operations/garment-part-operation-form';
 export * from './components/garment-part-operations/garment-part-operations-grid';
 export * from './components/garment-parts/garment-part-delete-dialog';
 export * from './components/garment-parts/garment-parts-grid';

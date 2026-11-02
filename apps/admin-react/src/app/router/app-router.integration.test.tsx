@@ -212,23 +212,30 @@ describe('React Admin routing', () => {
   });
 
   it('opens operations directly and activates the shared legacy menu entry', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => [] }));
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockImplementation(
+          async () =>
+            new Response('[]', { status: 200, headers: { 'Content-Type': 'application/json' } }),
+        ),
+    );
     window.history.replaceState({}, '', '/references/garment-part-operation');
     renderApp();
     await vi.dynamicImportSettled();
-    expect(await screen.findByRole('heading', { name: 'Елементи виробу та роботи' })).toBeVisible();
+    expect(await screen.findByRole('heading', { name: 'Операції' })).toBeVisible();
     expect(
       within(screen.getByRole('navigation', { name: 'Основна навігація' })).getByRole('link', {
         name: 'Операції',
       }),
     ).toHaveAttribute('href', '/references/garment-part-operation');
-    expect(screen.getByRole('tab', { name: 'Роботи' })).toHaveAttribute('aria-selected', 'true');
-    expect(await screen.findByText('Робіт поки немає')).toBeVisible();
+    expect(screen.getByRole('tab', { name: 'Операції' })).toHaveAttribute('aria-selected', 'true');
+    expect(await screen.findByText(/Операцій поки немає/)).toBeVisible();
     expectEmptyGridPagination(10);
-    expect(screen.queryByRole('columnheader', { name: 'Дії' })).not.toBeInTheDocument();
-    await userEvent.setup().click(screen.getByRole('tab', { name: 'Елементи' }));
-    expect(await screen.findByText('Елементів виробу поки немає')).toBeVisible();
-    expect(window.location.search).toBe('?tab=parts');
+    await userEvent.setup().click(screen.getByRole('tab', { name: 'Групи деталей' }));
+    expect(await screen.findByText('Груп поки немає')).toBeVisible();
+    expect(window.location.search).toBe('?tab=groups');
   });
 
   it('opens the product list directly with server total and an active menu link', async () => {

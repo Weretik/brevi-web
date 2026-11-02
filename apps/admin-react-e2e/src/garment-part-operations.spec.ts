@@ -8,11 +8,14 @@ test('operations open directly with the Brevi shell and shared tabs', async ({ p
     route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
   );
   await page.goto('/references/garment-part-operation');
-  await expect(page.getByRole('tab', { name: 'Роботи' })).toHaveAttribute('aria-selected', 'true');
-  await expect(page.getByText('Робіт поки немає')).toBeVisible();
+  await expect(page.getByRole('tab', { name: 'Операції' })).toHaveAttribute(
+    'aria-selected',
+    'true',
+  );
+  await expect(page.getByText('Операцій поки немає')).toBeVisible();
   await expect(page.getByRole('img', { name: 'Brevi' })).toBeVisible();
-  await page.getByRole('tab', { name: 'Елементи' }).click();
-  await expect(page.getByText('Елементів виробу поки немає')).toBeVisible();
+  await page.getByRole('tab', { name: 'Групи деталей' }).click();
+  await expect(page.getByText('Груп поки немає')).toBeVisible();
 });
 
 test('operations keep selection while the row menu confirms deletion', async ({ page }) => {
@@ -28,7 +31,21 @@ test('operations keep selection while the row menu confirms deletion', async ({ 
     return route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify([{ id: 2, garmentPartName: 'Рукав', name: 'Шов', min: 1 }]),
+      body: JSON.stringify([
+        {
+          id: 2,
+          code: 'OP-002',
+          garmentPartName: 'Рукав',
+          element: null,
+          variant: null,
+          name: 'Шов',
+          min: 1,
+          minutesPerProduct: false,
+          normCheckedAt: null,
+          isActive: true,
+          notes: null,
+        },
+      ]),
     });
   });
   await page.route('**/api/reference/garment-part-operations/2', (route) => {
@@ -45,9 +62,9 @@ test('operations keep selection while the row menu confirms deletion', async ({ 
   await row.click({ button: 'right' });
   await expect(rowCheckbox).toBeChecked();
   await page.getByRole('menuitem', { name: 'Змінити' }).click();
-  const drawer = page.getByRole('dialog', { name: 'Редагування роботи' });
+  const drawer = page.getByRole('dialog', { name: 'Редагування операції' });
   await expect(drawer.getByRole('textbox', { name: 'Назва' })).toHaveValue('Шов');
-  await expect(drawer.getByRole('combobox', { name: 'Елемент' })).toContainText('Рукав');
+  await expect(drawer.getByRole('combobox', { name: 'Група деталей' })).toContainText('Рукав');
   await expect(page).toHaveURL('/references/garment-part-operation');
   await drawer.getByRole('button', { name: 'Скасувати' }).click();
   await expect(rowCheckbox).toBeChecked();
@@ -77,7 +94,7 @@ test('operations fit three widths in both themes', async ({ page }) => {
   for (const width of [320, 768, 1280]) {
     await page.setViewportSize({ width, height: 800 });
     await page.goto('/references/garment-part-operation');
-    await expect(page.getByRole('tab', { name: 'Роботи' })).toHaveAttribute(
+    await expect(page.getByRole('tab', { name: 'Операції' })).toHaveAttribute(
       'aria-selected',
       'true',
     );

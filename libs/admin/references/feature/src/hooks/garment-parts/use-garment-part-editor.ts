@@ -50,7 +50,7 @@ export function useGarmentPartEditor(
       onSaved();
     } catch (error) {
       if (isAdminApiError(error)) setErrors(error.fieldErrors);
-      setMessage(adminApiErrorMessage(error, 'Не вдалося зберегти елемент виробу.'));
+      setMessage(adminApiErrorMessage(error, 'Не вдалося зберегти групу деталей.'));
     }
   }
 

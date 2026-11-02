@@ -23,6 +23,7 @@ export {
 export {
   useCreateGarmentPartOperationMutation,
   useDeleteGarmentPartOperationMutation,
+  useGetOperationLabourRatesQuery,
   useListGarmentPartOperationsQuery,
   useUpdateGarmentPartOperationMutation,
 } from './api/garment-part-operations/garment-part-operations.api';

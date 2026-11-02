@@ -1,30 +1,33 @@
-import type { GarmentPartOperation } from '@admin/references/model';
-import type { operations } from '@admin/shared/contracts';
+import type {
+  GarmentPartOperationsResponse,
+  SewingSettingsResponse,
+} from '../../contracts/garment-part-operations/garment-part-operations-response';
+import type { GarmentPartOperation, OperationLabourRates } from '@admin/references/model';
 
-type OperationsResponse =
-  operations['getGarmentPartOperations']['responses'][200]['content']['application/json'];
+export function mapGarmentPartOperations(
+  value: GarmentPartOperationsResponse,
+): GarmentPartOperation[] {
+  return value.map((row) => ({
+    id: row.id,
+    code: row.code,
+    garmentPartName: row.garmentPartName,
+    element: row.element,
+    variant: row.variant,
+    name: row.name,
+    min: row.min,
+    minutesPerProduct: row.minutesPerProduct,
+    normCheckedAt: row.normCheckedAt,
+    isActive: row.isActive,
+    notes: row.notes,
+  }));
+}
 
-export function mapGarmentPartOperations(value: unknown): GarmentPartOperation[] {
-  if (!Array.isArray(value)) throw new Error('Некоректна відповідь списку робіт.');
-  return value.map((item: unknown) => {
-    if (!item || typeof item !== 'object') throw new Error('Некоректна робота.');
-    const row = item as Record<string, unknown>;
-    if (
-      !Number.isInteger(row['id']) ||
-      (row['id'] as number) <= 0 ||
-      typeof row['garmentPartName'] !== 'string' ||
-      typeof row['name'] !== 'string' ||
-      typeof row['min'] !== 'number' ||
-      !Number.isFinite(row['min']) ||
-      row['min'] < 0
-    )
-      throw new Error('Некоректна робота.');
-    const validRow = row as OperationsResponse[number];
-    return {
-      id: validRow.id,
-      garmentPartName: validRow.garmentPartName,
-      name: validRow.name,
-      min: validRow.min,
-    };
-  });
+/** Minute cost as the sewing calculator computes it: salary / (work days × shift minutes). */
+export function mapOperationLabourRates({
+  settings,
+}: SewingSettingsResponse): OperationLabourRates {
+  return {
+    minuteCost: settings.monthlySalary / (settings.workDays * settings.shiftMinutes),
+    assemblyRate: settings.assemblyRate,
+  };
 }

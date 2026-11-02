@@ -22,4 +22,5 @@ The next agreed stage is captured in five separate change SDDs:
 - [Additional references](011-additional-references-pages/README.md);
 - [Suppliers: KeepinCRM fields and sync](012-suppliers-keepincrm/README.md) — implemented 2026-11-02;
 - [Fabrics and accessories: Calculator sheet fields and «Цех» pages](013-fabrics-accessories-sheet/README.md) — implemented 2026-11-02;
+- [Operations: Calculator sheet fields and a «Цех» page](014-operations-sheet/README.md) — implemented 2026-11-02;
 - [Products](../products/003-products-table-pages/README.md) remains in the products domain.
