@@ -533,7 +533,10 @@ const keepinSuppliers = [
 describe('suppliers from KeepinCRM', () => {
   it('shows active suppliers by default and switches the activity filter', async () => {
     const user = userEvent.setup();
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => keepinSuppliers }));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({ ok: true, json: async () => keepinSuppliers }),
+    );
     render(<SuppliersPage />);
     expect(await screen.findByText('Атлас')).toBeVisible();
     expect(screen.queryByText('Старий постачальник')).not.toBeInTheDocument();
