@@ -445,40 +445,12 @@ describe('suppliers workshop page', () => {
     await waitFor(() => expect(button).toHaveFocus());
   });
 
-  it('refreshes data without clearing search and prevents a second concurrent refresh', async () => {
-    const user = userEvent.setup();
-    let completeRefresh!: (value: unknown) => void;
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce({ ok: true, json: async () => searchableSuppliers })
-      .mockImplementationOnce(
-        () =>
-          new Promise((resolve) => {
-            completeRefresh = resolve;
-          }),
-      );
-    vi.stubGlobal('fetch', fetchMock);
-    render(<SuppliersPage />);
-    await screen.findByText('Атлас');
-    const search = screen.getByRole('textbox', { name: 'Пошук постачальників' });
-    await user.type(search, 'Атлас');
-    await user.click(screen.getByRole('button', { name: 'Оновити' }));
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Оновити' })).toBeDisabled());
-    completeRefresh({
-      ok: true,
-      json: async () => [{ ...searchableSuppliers[0], name: 'Атлас оновлений' }],
-    });
-    expect(await screen.findByText('Атлас оновлений')).toBeVisible();
-    expect(search).toHaveValue('Атлас');
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Оновити' })).toBeEnabled());
-    expect(fetchMock).toHaveBeenCalledTimes(2);
-  });
-
   it('shows an empty directory separately from an empty search', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => [] }));
     render(<SuppliersPage />);
     expect(await screen.findByText('Постачальників поки немає')).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Видалити вибрані (0)' })).toBeDisabled();
+    expect(screen.queryByRole('button', { name: /Видалити вибрані/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Оновити' })).not.toBeInTheDocument();
   });
 
   it('recovers from a list error through the retry action', async () => {

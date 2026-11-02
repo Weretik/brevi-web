@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { FabricsPage } from './fabrics-page';
+import { MaterialsPage } from './materials-page';
 import { render } from '../../test-utils';
 import { fabricRow, supplierRow } from '../../testing/reference-fixtures';
 
@@ -14,8 +14,8 @@ afterEach(() => {
 
 function openFabrics() {
   render(
-    <MemoryRouter initialEntries={['/references/fabric']}>
-      <FabricsPage />
+    <MemoryRouter initialEntries={['/references/materials']}>
+      <MaterialsPage />
     </MemoryRouter>,
   );
 }
@@ -34,7 +34,7 @@ function stubApi(fabrics: () => unknown[], write?: (path: string, init: RequestI
   return fetcher;
 }
 
-describe('fabrics page', () => {
+describe('materials page: fabrics tab', () => {
   it('waits for a verified list before offering an automatically assigned ID', () => {
     vi.stubGlobal(
       'fetch',
@@ -44,7 +44,8 @@ describe('fabrics page', () => {
       }),
     );
     openFabrics();
-    expect(screen.getByRole('heading', { name: 'Тканини' })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Тканини та фурнітура' })).toBeVisible();
+    expect(screen.getByRole('tab', { name: 'Тканини' })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByRole('button', { name: 'Додати тканину' })).toBeDisabled();
   });
 
@@ -170,6 +171,7 @@ describe('fabrics page', () => {
     );
     openFabrics();
     await screen.findByText('Бавовна');
+    expect(screen.queryByRole('button', { name: /Видалити вибрані/ })).not.toBeInTheDocument();
     const checkboxes = screen.getAllByRole('checkbox');
     await user.click(checkboxes[1]!);
     await user.click(checkboxes[2]!);
@@ -196,5 +198,29 @@ describe('fabrics page', () => {
     await user.keyboard('{Escape}');
 
     await waitFor(() => expect(codeCell).toHaveFocus());
+  });
+
+  it('filters by supplier, clears the selection, and switches to accessories', async () => {
+    const user = userEvent.setup();
+    stubApi(() => [
+      fabricRow(),
+      fabricRow({ id: 5, code: 'FAB-005', name: 'Бавовна', providerName: 'Тексика' }),
+    ]);
+    openFabrics();
+    await screen.findByText('Бавовна');
+    await user.click(screen.getByRole('button', { name: 'Постачальник' }));
+    await user.click(screen.getByRole('menuitem', { name: /Тексика/ }));
+    expect(screen.queryByText('Льон')).not.toBeInTheDocument();
+    expect(screen.getByRole('status', { name: 'Кількість тканин' })).toHaveTextContent(
+      'Знайдено: 1 із 2',
+    );
+
+    await user.click(within(screen.getByRole('row', { name: /FAB-005/ })).getByRole('checkbox'));
+    expect(screen.getByRole('button', { name: 'Видалити вибрані (1)' })).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Зняти вибір' }));
+    expect(screen.queryByRole('button', { name: /Видалити вибрані/ })).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('tab', { name: 'Фурнітура' }));
+    expect(await screen.findByRole('button', { name: 'Додати фурнітуру' })).toBeVisible();
   });
 });

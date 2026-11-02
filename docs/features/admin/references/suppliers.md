@@ -10,10 +10,12 @@ and pure form conversion, and `references/data-access` contains the endpoint,
 private response contract, validator, and mapper. The page handles
 errors and list refresh through hooks.
 
-The «Цех» page has a title and add action above one outlined table panel. Its
-toolbar filters the loaded list by name, contact person, or phone (case-insensitive,
-trimmed), reports the matching/total count, refreshes the API list, and confirms
-bulk deletion. Filtering preserves hidden selections; refresh preserves the query.
+The «Цех» page follows the [reference list pattern](../../../standards/admin/design-system.md):
+header with actions, a full-width search row, a filter row, then the table. Search
+matches name, contact person, or phone (case-insensitive, trimmed); the filter row
+shows «Знайдено: N із M» while search narrows the list and «Вибрано: N · Зняти вибір»
+while rows are selected. «Видалити» appears next to the header actions only while rows
+are selected and asks for confirmation. Filtering preserves hidden selections.
 Each row has a keyboard-accessible actions button in addition to the existing
 context menu and Shift+F10. Escape restores focus. The table renders HTTP(S)
 supplier links safely, uses mono IDs/phones and Ukrainian pagination, and scrolls
@@ -29,7 +31,7 @@ translations in light and dark modes.
 «Оновити з KeepinCRM» button, `POST /api/reference/suppliers/keepin-sync`). The
 table shows «Що закуповуємо», site, contact, phone, email and a status pill
 («Активний» / «Не використовується»); the name cell shows the KeepinCRM ID. Filter
-chips «Активні / Не використовуються / Усі» (default «Активні») sit in the toolbar,
+chips «Активні / Не використовуються / Усі» (default «Активні») sit in the filter row,
 and search also matches email and purchase categories. For a KeepinCRM supplier the
 editor disables the card fields and saves only «Використовувати в проєкті» and notes
 through `PUT /api/reference/suppliers/{id}/brevi-fields`; a manual supplier keeps
@@ -86,11 +88,16 @@ libs/admin/references/
 ├── model/src/mappers/suppliers/
 │   └── supplier-keepin-sync.ts # sync summary text, last sync time
 ├── ui/src/components/suppliers/
-│   ├── suppliers-toolbar.tsx # supplier labels for the shared list toolbar
 │   ├── suppliers-grid.tsx # supplier columns for the shared «Цех» grid
 │   └── supplier-link-cell.tsx # safe external link presentation
+├── ui/src/components/reference-list-controls/ # shared list header, search, filters
+│   ├── reference-page-header.tsx # overline, h1, subtitle, actions
+│   ├── reference-search-bar.tsx # full-width search row, «/» focuses it
+│   ├── reference-filter-bar.tsx # activity chips, extra filters, found / selected status
+│   ├── reference-supplier-filter.tsx # supplier chip with a menu
+│   ├── reference-bulk-delete-button.tsx # shown only while rows are selected
+│   └── reference-list-alerts.tsx # load error with retry, last action result
 ├── ui/src/components/reference-list/ # shared with fabrics and accessories
-│   ├── reference-list-toolbar.tsx # search, activity chips, count, refresh, bulk action
 │   ├── reference-data-grid.tsx # table, selection, empty states, row actions
 │   ├── reference-status-pill.tsx # active / not used pill
 │   ├── reference-grid-footer.tsx # selection count and pagination

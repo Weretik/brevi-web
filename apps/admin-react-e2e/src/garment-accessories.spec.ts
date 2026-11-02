@@ -1,23 +1,24 @@
 import { expect, test } from '@playwright/test';
 
-test('accessories and fabrics open directly and from the menu', async ({ page }) => {
+test('fabrics and accessories share one page with a tab switch', async ({ page }) => {
   for (const path of ['garment-accessories', 'fabrics'])
     await page.route(`**/api/reference/${path}`, (route) =>
       route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
     );
   await page.goto('/references/garment-accessory');
-  await expect(page.getByRole('heading', { name: 'Фурнітура' })).toBeVisible();
+  await expect(page).toHaveURL(/\/references\/materials\?tab=accessories$/);
+  await expect(page.getByRole('heading', { name: 'Тканини та фурнітура' })).toBeVisible();
   await expect(page.getByText('Фурнітури поки немає')).toBeVisible();
   const navigation = page.getByRole('navigation', { name: 'Основна навігація' });
-  const accessoriesLink = navigation.getByRole('link', { name: 'Фурнітура', exact: true });
-  if (!(await accessoriesLink.isVisible())) {
+  const materialsLink = navigation.getByRole('link', { name: 'Тканини та фурнітура' });
+  if (!(await materialsLink.isVisible())) {
     await navigation.getByRole('button', { name: 'Загальні довідники' }).click();
   }
-  await expect(accessoriesLink).toHaveAttribute('href', '/references/garment-accessory');
-  await navigation.getByRole('link', { name: 'Тканини', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Тканини' })).toBeVisible();
+  await expect(materialsLink).toHaveAttribute('href', '/references/materials');
+  await page.getByRole('tab', { name: 'Тканини' }).click();
+  await expect(page.getByText('Тканин поки немає')).toBeVisible();
   await page.goto('/references/garment-accessory?tab=fabrics');
-  await expect(page).toHaveURL(/\/references\/fabric$/);
+  await expect(page).toHaveURL(/\/references\/materials$/);
 });
 
 test('garment accessory errors keep form values and deletion needs confirmation', async ({
@@ -81,7 +82,7 @@ test('garment accessory errors keep form values and deletion needs confirmation'
     deleted = true;
     return route.fulfill({ status: 200 });
   });
-  await page.goto('/references/garment-accessory');
+  await page.goto('/references/materials?tab=accessories');
   await expect(page.getByText('Блискавка')).toBeVisible();
   await page.getByRole('button', { name: 'Додати фурнітуру' }).click();
   const drawer = page.getByRole('dialog', { name: 'Нова фурнітура' });
@@ -126,7 +127,7 @@ test('garment accessories fits three widths in both themes', async ({ page }) =>
   );
   for (const width of [320, 768, 1280]) {
     await page.setViewportSize({ width, height: 800 });
-    await page.goto('/references/garment-accessory');
+    await page.goto('/references/materials?tab=accessories');
     await expect(page.getByText('Фурнітури поки немає')).toBeVisible();
     await page.getByRole('button', { name: 'Додати фурнітуру' }).click();
     const accessoryDrawer = page.getByRole('dialog', { name: 'Нова фурнітура' });
@@ -134,7 +135,7 @@ test('garment accessories fits three widths in both themes', async ({ page }) =>
     expect(accessoryBounds).not.toBeNull();
     expect((accessoryBounds?.x ?? 0) + (accessoryBounds?.width ?? 0)).toBeLessThanOrEqual(width);
     await accessoryDrawer.getByRole('button', { name: 'Скасувати' }).click();
-    await page.goto('/references/fabric');
+    await page.goto('/references/materials');
     await expect(page.getByText('Тканин поки немає')).toBeVisible();
     await page.getByRole('button', { name: 'Додати тканину' }).click();
     const fabricDrawer = page.getByRole('dialog', { name: 'Нова тканина' });

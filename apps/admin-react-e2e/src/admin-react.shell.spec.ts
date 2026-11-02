@@ -19,11 +19,11 @@ test('mobile menu opens by keyboard and closes with visible focus', async ({ pag
   const mobileNavigation = page.getByRole('navigation', { name: 'Мобільна навігація' });
   await mobileNavigation.getByRole('button', { name: 'Загальні довідники' }).focus();
   await page.keyboard.press('Enter');
-  await expect(mobileNavigation.getByText('Тканина та фурнітура')).toBeVisible();
+  await expect(mobileNavigation.getByText('Тканини та фурнітура')).toBeVisible();
   await expect(mobileNavigation.getByText('Ще не доступно').first()).toBeVisible();
   await expect(
-    mobileNavigation.getByRole('link', { name: 'Тканина та фурнітура' }),
-  ).toHaveAttribute('href', '/references/garment-accessory');
+    mobileNavigation.getByRole('link', { name: 'Тканини та фурнітура' }),
+  ).toHaveAttribute('href', '/references/materials');
   await expect(mobileNavigation.getByRole('link', { name: 'Постачальники' })).toHaveCount(1);
   await page.keyboard.press('Escape');
 
@@ -131,10 +131,10 @@ test('fabrics tab keeps the shared URL and Brevi shell at three widths in both t
   );
   for (const width of [320, 768, 1280]) {
     await page.setViewportSize({ width, height: 800 });
-    await page.goto('/references/garment-accessory');
+    await page.goto('/references/materials?tab=accessories');
     await page.getByRole('tab', { name: 'Тканини' }).click();
     await expect(page.getByRole('grid', { name: 'Тканини' }).getByText('Льон')).toBeVisible();
-    await expect(page).toHaveURL(/\/references\/garment-accessory\?tab=fabrics$/);
+    await expect(page).toHaveURL(/\/references\/materials$/);
     for (const colorScheme of ['light', 'dark'] as const) {
       await page.emulateMedia({ colorScheme });
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(

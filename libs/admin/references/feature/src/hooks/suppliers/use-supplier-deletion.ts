@@ -49,6 +49,7 @@ export function useSupplierDeletion(onResult: (message: string) => void) {
   return {
     selection,
     setSelection,
+    clearSelection: () => setSelection({ type: 'include', ids: new Set() }),
     selectedIds,
     pendingDeleteIds,
     deleting,

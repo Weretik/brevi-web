@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { GarmentAccessoriesPage } from './garment-accessories-page';
+import { MaterialsPage } from './materials-page';
 import { render } from '../../test-utils';
 import { accessoryRow, supplierRow } from '../../testing/reference-fixtures';
 
@@ -14,8 +14,8 @@ afterEach(() => {
 
 function renderPage() {
   return render(
-    <MemoryRouter initialEntries={['/references/garment-accessory']}>
-      <GarmentAccessoriesPage />
+    <MemoryRouter initialEntries={['/references/materials?tab=accessories']}>
+      <MaterialsPage />
     </MemoryRouter>,
   );
 }
@@ -30,7 +30,7 @@ function stubApi(rows: () => unknown[], write?: (path: string, init: RequestInit
   return fetcher;
 }
 
-describe('garment accessories page', () => {
+describe('materials page: accessories tab', () => {
   it('shows code, unit, price date and status of the verified rows', async () => {
     stubApi(() => [
       accessoryRow(),
@@ -41,8 +41,8 @@ describe('garment accessories page', () => {
     expect(within(row).getByText('Фліс')).toBeVisible();
     expect(within(row).getByText('м')).toBeVisible();
     expect(within(row).getByText('ціна за 1 кг')).toBeVisible();
-    expect(screen.getByRole('heading', { name: 'Фурнітура' })).toBeVisible();
-    expect(screen.queryByRole('tab')).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Тканини та фурнітура' })).toBeVisible();
+    expect(screen.getByRole('tab', { name: 'Фурнітура' })).toHaveAttribute('aria-selected', 'true');
   });
 
   it('creates an accessory with unit and keeps a field error when creation fails', async () => {
