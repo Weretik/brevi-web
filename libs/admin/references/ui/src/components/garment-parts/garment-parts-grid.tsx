@@ -42,8 +42,9 @@ export function GarmentPartsGrid({
 
   return (
     <>
-      <Box sx={{ width: '100%', minHeight: 440 }}>
+      <Box sx={{ width: '100%' }}>
         <DataGrid
+          autoHeight
           aria-label="Елементи виробу"
           rows={rows}
           columns={columns}

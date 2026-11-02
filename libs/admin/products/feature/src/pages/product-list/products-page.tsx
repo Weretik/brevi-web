@@ -157,8 +157,9 @@ export function ProductsPage() {
           {pricingError}
         </Alert>
       )}
-      <Box sx={{ minHeight: 440, width: '100%' }}>
+      <Box sx={{ width: '100%' }}>
         <DataGrid
+          autoHeight
           aria-label="Товари"
           rows={loading || error ? [] : (page?.value ?? [])}
           columns={columns}

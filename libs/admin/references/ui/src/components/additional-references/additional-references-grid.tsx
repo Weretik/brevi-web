@@ -36,8 +36,9 @@ export function AdditionalReferencesGrid({ rows, loading, onEdit }: Props) {
     },
   ];
   return (
-    <Box sx={{ width: '100%', minHeight: 440 }}>
+    <Box sx={{ width: '100%' }}>
       <DataGrid
+        autoHeight
         aria-label="Додаткові довідники"
         rows={rows}
         columns={columns}
