@@ -688,6 +688,30 @@ export interface paths {
      */
     get: operations['getProductOverview'];
     put?: never;
+    /**
+     * Create a product from the page «Новий ЗІЗ» or «Нова модель»
+     * @description Requires CanManageProducts and an actor (CAT-009). The server picks the ID (largest + 1) and the slug (from the Ukrainian name; the code and then a number are added when it is taken). The name is Ukrainian only. An empty sewing code takes the next free MOD-XXX. The section must belong to the type. A PPE product needs the ppe block; the first price version is appended with source «Створення ЗІЗ». priceSaved is false when the product was saved but its price was not; the card then asks to save the price again.
+     */
+    post: operations['createCatalogProduct'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/products/overview/code-check': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Check a new product code and suggest the next sewing code
+     * @description CatalogRead. Whether the code is free for a new product of the type. For sewing, suggestedCode is the next free MOD-XXX. Without code only the suggestion is returned and isAvailable is null.
+     */
+    get: operations['getProductCodeCheck'];
+    put?: never;
     post?: never;
     delete?: never;
     options?: never;
@@ -953,6 +977,23 @@ export interface paths {
     };
     /** @description Requires CatalogRead. Returns active Sewing Products, their active Article count and the latest stored publication per active Article. Missing, inactive and non-Sewing Product IDs are omitted. Empty articles means no published price. No cost or actor data is exposed. */
     get: operations['getPublishedSewingProducts'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/pricing/ppe/rules/preview': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description CatalogRead. Three prices for a supplier price and rule before anything is saved (page «Новий ЗІЗ», CAT-009). Same calculator as the saved card; a draft rule gives the MissingRule blocker. */
+    get: operations['previewPpePrices'];
     put?: never;
     post?: never;
     delete?: never;
@@ -3085,6 +3126,51 @@ export interface components {
       /** Format: date-time */
       updatedAtUtc: string;
     };
+    CreatePpeSupplierRequest: {
+      /** Format: int32 */
+      supplierId: number;
+      supplierSku?: string | null;
+      /** Format: uri */
+      supplierUrl: string;
+      supplierPrice: number;
+      allowManualPrice: boolean;
+      ruleCode: string;
+      unit: string;
+    };
+    CreateCatalogProductRequest: {
+      /** @enum {string} */
+      type: 'Sewing' | 'Ppe';
+      /** @description Required for PPE; empty sewing code takes the next MOD-XXX. */
+      code?: string | null;
+      name: string;
+      /** Format: int32 */
+      sectionId: number;
+      /** @enum {string|null} */
+      season?: 'Літо' | 'Зима' | null;
+      isActive: boolean;
+      isVerified: boolean;
+      /** Format: uri */
+      currentSiteUrl?: string | null;
+      quoteDescription?: string | null;
+      ppe?: components['schemas']['CreatePpeSupplierRequest'] | null;
+    };
+    CreatedCatalogProduct: {
+      /** Format: int32 */
+      id: number;
+      /** @enum {string} */
+      type: 'Sewing' | 'Ppe';
+      code: string | null;
+      priceSaved: boolean;
+    };
+    ProductCodeCheck: {
+      code: string | null;
+      isAvailable: boolean | null;
+      /** Format: int32 */
+      takenByProductId: number | null;
+      takenByProductName: string | null;
+      /** @description Next free MOD-XXX for sewing; null for PPE. */
+      suggestedCode: string | null;
+    };
     UpdateProductOverviewRequest: {
       code?: string | null;
       /** Format: int32 */
@@ -3468,6 +3554,23 @@ export interface components {
       articleCount: number;
       articles: components['schemas']['SewingPublishedArticlePrice'][];
     };
+    PpePriceTiers: {
+      /** Format: decimal */
+      retail: number;
+      /** Format: decimal */
+      wholesale: number;
+      /** Format: decimal */
+      largeWholesale: number;
+    };
+    PpePricingBlocker: {
+      code: string;
+      inputKey: string;
+    };
+    PpePriceCalculation: {
+      prices: components['schemas']['PpePriceTiers'] | null;
+      blockers: components['schemas']['PpePricingBlocker'][];
+      isCalculated: boolean;
+    };
     PpeOfferValues: {
       ruleCode: string | null;
       supplierCost: number | null;
@@ -3512,23 +3615,6 @@ export interface components {
       approvedAt: string | null;
       /** Format: date-time */
       createdAt: string;
-    };
-    PpePriceTiers: {
-      /** Format: decimal */
-      retail: number;
-      /** Format: decimal */
-      wholesale: number;
-      /** Format: decimal */
-      largeWholesale: number;
-    };
-    PpePricingBlocker: {
-      code: string;
-      inputKey: string;
-    };
-    PpePriceCalculation: {
-      prices: components['schemas']['PpePriceTiers'] | null;
-      blockers: components['schemas']['PpePricingBlocker'][];
-      isCalculated: boolean;
     };
     PpeProductPricing: {
       /** Format: int32 */
@@ -7032,6 +7118,76 @@ export interface operations {
       };
     };
   };
+  createCatalogProduct: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateCatalogProductRequest'];
+      };
+    };
+    responses: {
+      /** @description Created. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CreatedCatalogProduct'];
+        };
+      };
+      400: components['responses']['ValidationError'];
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product management permission or actor claim missing. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The code or the name is already used by another product. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getProductCodeCheck: {
+    parameters: {
+      query: {
+        type: 'Sewing' | 'Ppe';
+        code?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Result. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductCodeCheck'];
+        };
+      };
+      400: components['responses']['ValidationError'];
+    };
+  };
   updateProductOverview: {
     parameters: {
       query?: never;
@@ -7787,6 +7943,50 @@ export interface operations {
         content?: never;
       };
       /** @description CatalogRead required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  previewPpePrices: {
+    parameters: {
+      query: {
+        ruleCode: string;
+        supplierPrice: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Prices or blockers. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PpePriceCalculation'];
+        };
+      };
+      /** @description Missing price or unknown rule. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Required policy missing. */
       403: {
         headers: {
           [name: string]: unknown;

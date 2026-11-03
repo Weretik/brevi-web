@@ -47,3 +47,4 @@ export * from './entities/ppe-card/ppe-supplier-offer';
 export * from './validators/ppe-card/ppe-supplier-offer-validation';
 export * from './forms/ppe-card/ppe-supplier-offer-form';
 export * from './queries/ppe-card/ppe-blocker-reasons';
+export * from './entities/product-create/product-create';
