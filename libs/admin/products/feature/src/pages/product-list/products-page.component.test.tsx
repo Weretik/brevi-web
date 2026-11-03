@@ -81,6 +81,11 @@ describe('ProductsPage', () => {
       within(grid).getByRole('link', { name: 'Відкрити «Костюм «Верде»» на сайті' }),
     ).toHaveAttribute('href', 'https://brevi.com.ua/specodyag-litnij/kostyum-verde');
 
+    expect(screen.getByRole('link', { name: 'Додати модель' })).toHaveAttribute(
+      'href',
+      '/references/products/new/sewing',
+    );
+
     await user.click(screen.getByRole('button', { name: /Без розділу/ }));
     expect(within(grid).queryByText('MOD-025')).not.toBeInTheDocument();
     expect(within(grid).getByText('Халат')).toBeInTheDocument();
@@ -96,5 +101,10 @@ describe('ProductsPage', () => {
     expect(within(grid).getByText('Рукавиці')).toBeInTheDocument();
     expect(within(grid).getByText('Захист рук')).toBeInTheDocument();
     expect(within(grid).queryByRole('columnheader', { name: 'Сезон' })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Додати ЗІЗ' })).toHaveAttribute(
+      'href',
+      '/references/products/new/ppe',
+    );
+    expect(screen.queryByRole('link', { name: 'Додати модель' })).not.toBeInTheDocument();
   });
 });

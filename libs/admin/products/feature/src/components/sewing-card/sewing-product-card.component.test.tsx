@@ -202,4 +202,22 @@ describe('SewingProductCard', () => {
       expect.objectContaining({ productId: 42, section: 'operations' }),
     );
   });
+
+  it('offers to continue the «Нова модель» wizard only while the model is not launched', () => {
+    renderCard();
+    expect(screen.queryByRole('link', { name: 'Продовжити заповнення' })).toBeNull();
+    cleanup();
+
+    const card = mocks.card();
+    mocks.card.mockReturnValue({
+      ...card,
+      row: { ...card.row, isActive: false },
+      summaryLoaded: true,
+    });
+    renderCard();
+    expect(screen.getByRole('link', { name: 'Продовжити заповнення' })).toHaveAttribute(
+      'href',
+      '/references/products/new/sewing?id=42&step=2',
+    );
+  });
 });

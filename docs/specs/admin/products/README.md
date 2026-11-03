@@ -46,3 +46,5 @@
 [009 Sewing product card](009-sewing-product-card/README.md) turns the sewing model page into a «Цех» card with tabs for articles, composition, labour and prices.
 
 [010 PPE product card](010-ppe-product-card/README.md) turns the PPE product page into a «Цех» card with supplier fields and the three prices, and makes «Додати» open the side panel in every «Довідники» table.
+
+[011 Product create pages](011-product-create-pages/README.md) adds the full pages «Новий ЗІЗ» and «Нова модель» built from the sheet instruction, and removes the old create form.

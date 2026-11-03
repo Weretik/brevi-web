@@ -135,6 +135,7 @@ Use these for new pages. Prefer MUI components and the theme overrides; do not r
 
   There is no «Оновити» button (lists refresh after every save) and no «Усього» counter (counts live on the chips). Shared components: `libs/admin/references/ui/src/components/reference-list-controls/` and `reference-list/`.
 
+- **Full create page:** a product (or another object with much more than a short form) is created on its own page, not in the side panel. The page follows the client's instruction for that object: blocks or wizard steps in the order of the instruction, required fields marked, a sticky right column (below the form under `lg`) with a readiness checklist that ticks itself, a live preview of the result (for example the three prices) and a collapsible «Інструкція». The primary action is enabled only when the required fields are valid. A long object is a wizard with clickable steps that saves a draft after the first step, so it can be finished later. Examples: «Новий ЗІЗ», «Нова модель» ([spec 011](../../specs/admin/products/011-product-create-pages/README.md)).
 - **Status pill:** 24 px, 999 px radius, a 6 px dot, `.light` background and `.main` text, always with a label.
 - **Stage board (kanban):** columns on `action.hover` with a colored dot, the stage name, and a count; cards on `background.paper` with a mono number and due date (overdue in `error.main`), title, client and quantity, a 4 px orange progress bar, and a percentage. Columns scroll horizontally on narrow screens. Use it for flows with stages (sewing orders, deals).
 - **Side cards:** a right column of 320–340 px on wide screens (cash balance, workload lists with thin bars); below `lg` it moves under the main content.
@@ -149,7 +150,7 @@ Use these for new pages. Prefer MUI components and the theme overrides; do not r
 4. Statuses are pills with text.
 5. Loading, empty, error, and forbidden states exist.
 6. Checked in light and dark themes, at phone, tablet, and desktop widths, with the sidebar expanded and collapsed.
-7. Adding and editing a list row uses the reference side panel, not a dialog or a page.
+7. Adding and editing a list row uses the reference side panel, not a dialog or a page; creating a product-like object uses a full create page.
 8. New routes are added to `apps/admin-react/src/app/router/legacy-menu.ts` so they appear in the sidebar and breadcrumbs.
 
 ## Do and don't

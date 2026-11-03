@@ -1,3 +1,4 @@
+import { isSewingCreateReady } from '@admin/products/model';
 import { SewingCardHeader, SewingLabourTable } from '@admin/products/ui';
 import { Alert, Box, Stack, Tab, Tabs } from '@mui/material';
 import { useState } from 'react';
@@ -43,6 +44,8 @@ export function SewingProductCard({ product, onDeleted }: Props) {
     Boolean(card.row),
     card.seamstressPerMinute,
   );
+  const launched =
+    card.row?.isActive !== false && (!card.summaryLoaded || isSewingCreateReady(card.articles));
   const sectionName =
     card.row?.sectionId == null ? null : (card.sectionNames.get(card.row.sectionId) ?? null);
 
@@ -59,6 +62,9 @@ export function SewingProductCard({ product, onDeleted }: Props) {
         siteUrl={card.row?.currentSiteUrl ?? null}
         status={card.status}
         canEdit={Boolean(card.row) && controller.canManage}
+        continueHref={
+          card.row && !launched ? `/references/products/new/sewing?id=${product.id}&step=2` : null
+        }
         deleteDisabled={drafts.dirty || controller.busy}
         onEdit={() => setEditing(true)}
         onDelete={() => setDeleting(true)}

@@ -5,6 +5,7 @@ import { PpeProductCard } from '../../components/ppe-card/ppe-product-card';
 import { SewingProductCard } from '../../components/sewing-card/sewing-product-card';
 import { useProduct } from '../../hooks/product-detail/use-product';
 
+import type { PpeCreatedState } from '../../hooks/ppe-create/use-ppe-create-submit';
 import type { ProductDetail } from '@admin/products/model';
 
 /** Product card page: the sewing model card (CAT-007) or the PPE card (CAT-008). */
@@ -14,7 +15,10 @@ export function ProductDetailPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const navigationType = useNavigationType();
-  const responseProduct = (location.state as { product?: ProductDetail } | null)?.product;
+  const routeState = location.state as
+    ({ product?: ProductDetail } & Partial<PpeCreatedState>) | null;
+  const responseProduct = routeState?.product;
+  const priceNotSaved = navigationType !== 'POP' && routeState?.ppePriceNotSaved === true;
   const initial =
     navigationType !== 'POP' && responseProduct?.id === id ? responseProduct : undefined;
   const { product, loading, error, notFound, reload } = useProduct(id, initial);
@@ -39,6 +43,11 @@ export function ProductDetailPage() {
       <Button component={Link} to="/references/products">
         ← До товарів
       </Button>
+      {priceNotSaved && (
+        <Alert severity="warning" sx={{ mt: 2 }}>
+          Товар створено, але ціну не збережено. Збережіть ціну в картці.
+        </Alert>
+      )}
       {loading && <CircularProgress aria-label="Завантаження товару" />}
       {notFound && <Alert severity="warning">Товар не знайдено.</Alert>}
       {error && (

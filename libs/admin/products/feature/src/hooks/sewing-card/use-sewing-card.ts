@@ -32,10 +32,13 @@ export function useSewingCard(productId: number) {
     sections: overview.sections,
     sectionNames: overview.sectionNames,
     reloadOverview: overview.reload,
+    overviewLoading: overview.loading,
     articles,
     totals,
     status,
     seamstressPerMinute,
+    /** The live Article summary has answered at least once. */
+    summaryLoaded: Boolean(summary.data),
     summaryLoading: summary.isLoading || summary.isFetching,
     summaryError: summary.error
       ? adminApiErrorMessage(summary.error, 'Не вдалося розрахувати артикули.')

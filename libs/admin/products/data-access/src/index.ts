@@ -48,3 +48,9 @@ export {
   useListProductOverviewQuery,
   useUpdateProductOverviewMutation,
 } from './api/product-overview/product-overview.api';
+export {
+  useCreateCatalogProductMutation,
+  useGetProductCodeCheckQuery,
+  useLazyGetProductCodeCheckQuery,
+  usePreviewPpePricesQuery,
+} from './api/product-create/product-create.api';

@@ -1,28 +1,16 @@
 import { ppeSupplierOfferLimits } from '@admin/products/model';
 import { ReferenceFormSection } from '@admin/references/ui';
-import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
-import {
-  Button,
-  FormControlLabel,
-  IconButton,
-  InputAdornment,
-  MenuItem,
-  Stack,
-  Switch,
-  TextField,
-} from '@mui/material';
+import { Button, FormControlLabel, MenuItem, Stack, Switch, TextField } from '@mui/material';
 
+import { PpeLinkField } from './ppe-link-field';
+import { PpeSupplierSelect } from './ppe-supplier-select';
+
+import type { PpeSupplierOption } from './ppe-supplier-select';
 import type {
   PpeSupplierOfferField,
   PpeSupplierOfferFieldErrors,
   PpeSupplierOfferFormValues,
 } from '@admin/products/model';
-
-export interface PpeSupplierOption {
-  id: number;
-  name: string;
-  isActive: boolean;
-}
 
 interface Props {
   values: PpeSupplierOfferFormValues;
@@ -43,7 +31,6 @@ interface Props {
 /** Supplier fields of the sheet tab «ЗІЗ» (columns D, F–H, K, N, O). */
 export function PpeSupplierForm(props: Props) {
   const { values, errors, readOnly, onChange } = props;
-  const url = values.supplierUrl.trim();
   const ruleMissing = values.ruleCode !== '' && !props.ruleNames.includes(values.ruleCode);
   return (
     <Stack
@@ -56,51 +43,23 @@ export function PpeSupplierForm(props: Props) {
       }}
     >
       <ReferenceFormSection title="Постачальник">
-        <TextField
-          select
+        <PpeSupplierSelect
           label="Постачальник"
           value={values.supplierId}
-          onChange={(event) =>
-            onChange('supplierId', event.target.value === '' ? '' : Number(event.target.value))
-          }
-          error={Boolean(errors.supplierId)}
-          helperText={errors.supplierId ?? 'Список постачальників — «Контрагенти».'}
+          suppliers={props.suppliers}
+          error={errors.supplierId}
+          helperText="Список постачальників — «Контрагенти»."
           disabled={readOnly}
-          fullWidth
-        >
-          <MenuItem value="">—</MenuItem>
-          {props.suppliers.map((supplier) => (
-            <MenuItem key={supplier.id} value={supplier.id}>
-              {supplier.isActive ? supplier.name : `${supplier.name} (не використовується)`}
-            </MenuItem>
-          ))}
-        </TextField>
-        <TextField
+          onChange={(value) => onChange('supplierId', value)}
+        />
+        <PpeLinkField
           label="Посилання на товар постачальника"
+          openLabel="Відкрити товар постачальника"
           value={values.supplierUrl}
-          onChange={(event) => onChange('supplierUrl', event.target.value)}
-          error={Boolean(errors.supplierUrl)}
-          helperText={errors.supplierUrl}
+          maxLength={ppeSupplierOfferLimits.supplierUrl}
+          error={errors.supplierUrl}
           disabled={readOnly}
-          fullWidth
-          slotProps={{
-            htmlInput: { maxLength: ppeSupplierOfferLimits.supplierUrl },
-            input: {
-              endAdornment: url ? (
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label="Відкрити товар постачальника"
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    edge="end"
-                  >
-                    <OpenInNewOutlinedIcon fontSize="small" />
-                  </IconButton>
-                </InputAdornment>
-              ) : undefined,
-            },
-          }}
+          onChange={(value) => onChange('supplierUrl', value)}
         />
         <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ gap: 2 }}>
           <TextField

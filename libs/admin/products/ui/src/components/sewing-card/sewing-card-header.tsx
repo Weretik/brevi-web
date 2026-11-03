@@ -18,6 +18,8 @@ interface Props {
   siteUrl: string | null;
   status: { label: string; tone: SewingCardTone };
   canEdit: boolean;
+  /** «Продовжити заповнення» in the «Нова модель» wizard while the model is not launched. */
+  continueHref?: string | null;
   deleteDisabled: boolean;
   onEdit: () => void;
   onDelete: () => void;
@@ -71,6 +73,11 @@ export function SewingCardHeader(props: Props) {
             endIcon={<OpenInNewOutlinedIcon fontSize="small" />}
           >
             На сайті
+          </Button>
+        )}
+        {props.continueHref && (
+          <Button variant="outlined" href={props.continueHref}>
+            Продовжити заповнення
           </Button>
         )}
         <Button

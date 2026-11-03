@@ -76,9 +76,9 @@ export function ProductOverviewContent({ type, tabs }: Props) {
               variant="contained"
               startIcon={<AddOutlinedIcon />}
               component={RouterLink}
-              to="/references/products/create"
+              to={sewing ? '/references/products/new/sewing' : '/references/products/new/ppe'}
             >
-              Додати товар
+              {sewing ? 'Додати модель' : 'Додати ЗІЗ'}
             </Button>
           </>
         }
