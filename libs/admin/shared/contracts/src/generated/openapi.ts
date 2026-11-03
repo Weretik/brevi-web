@@ -3286,6 +3286,11 @@ export interface components {
       contactName?: string | null;
       /** @description Phones of the active contacts. */
       phones?: string[] | null;
+      /**
+       * Format: date-time
+       * @description Last applied KeepinCRM sync that saw this client; null for a client without a KeepinCRM link.
+       */
+      keepinSyncedAt?: string | null;
     };
     CrmPagedInfo: {
       /** Format: int64 */
@@ -3369,6 +3374,11 @@ export interface components {
       deactivated: string[];
       deleted: string[];
       hiddenInUse: string[];
+      /**
+       * Format: date-time
+       * @description Time stamped on linked clients; null for a preview.
+       */
+      syncedAt?: string | null;
     };
     CrmReviseCustomerRequest: {
       /** Format: uuid */

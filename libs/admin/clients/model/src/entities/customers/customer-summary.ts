@@ -14,4 +14,6 @@ export interface CustomerSummary {
   readonly contactName: string | null;
   /** Phones of the active contacts (list only). */
   readonly phones: readonly string[];
+  /** Last applied KeepinCRM sync that saw this client (list only). */
+  readonly keepinSyncedAt: string | null;
 }

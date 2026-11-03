@@ -22,6 +22,7 @@ const row = {
   keepinCrmId: '10',
   contactName: 'Олена',
   phones: ['+380671234567'],
+  keepinSyncedAt: '2026-11-03T07:00:00Z',
 };
 vi.mock('@admin/clients/data-access', () => ({
   useListCustomersQuery: (query: Record<string, unknown>) => {
@@ -70,6 +71,12 @@ describe('«Контрагенти → Клієнти»', () => {
     expect(screen.getByRole('heading', { name: 'Клієнти' })).toBeVisible();
     expect(await screen.findByText('ТОВ Нове')).toBeVisible();
     expect(screen.getByText('KeepinCRM 10')).toBeVisible();
+    expect(screen.getByText(/Останнє оновлення:/)).toHaveTextContent(
+      new Date(row.keepinSyncedAt).toLocaleString('uk-UA', {
+        dateStyle: 'short',
+        timeStyle: 'short',
+      }),
+    );
     expect(screen.getByText('Олена')).toBeVisible();
     expect(screen.getByRole('button', { name: /Активні/ })).toHaveTextContent('1');
     expect(screen.getByRole('button', { name: /Не використовуються/ })).toHaveTextContent('3');

@@ -19,7 +19,13 @@ describe('CRM response boundary', () => {
   it('maps the KeepinCRM list fields and defaults them when the response leaves them out', () => {
     const page = mapCustomerPage({
       value: [
-        { ...summary, keepinCrmId: '10', contactName: 'Олена', phones: ['+380671234567'] },
+        {
+          ...summary,
+          keepinCrmId: '10',
+          contactName: 'Олена',
+          phones: ['+380671234567'],
+          keepinSyncedAt: '2026-11-03T07:00:00Z',
+        },
         summary,
       ],
       pagedInfo: { pageNumber: 1, pageSize: 25, totalPages: 1, totalRecords: 2 },
@@ -28,8 +34,14 @@ describe('CRM response boundary', () => {
       keepinCrmId: '10',
       contactName: 'Олена',
       phones: ['+380671234567'],
+      keepinSyncedAt: '2026-11-03T07:00:00Z',
     });
-    expect(page.rows[1]).toMatchObject({ keepinCrmId: null, contactName: null, phones: [] });
+    expect(page.rows[1]).toMatchObject({
+      keepinCrmId: null,
+      contactName: null,
+      phones: [],
+      keepinSyncedAt: null,
+    });
   });
   it('maps the KeepinCRM sync result', () => {
     expect(

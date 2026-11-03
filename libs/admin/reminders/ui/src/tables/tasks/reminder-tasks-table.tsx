@@ -72,9 +72,8 @@ export function ReminderTasksTable({ rows, loading, onEdit, onArchive }: Props) 
     },
   ];
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{ width: '100%', height: 'var(--admin-table-height)' }}>
       <DataGrid
-        autoHeight
         aria-label="Задачі нагадувань"
         rows={rows}
         columns={columns}

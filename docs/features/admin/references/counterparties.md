@@ -6,7 +6,7 @@
 
 The «Клієнти» tab follows reference pattern B. It has:
 
-- a header with «Оновити з KeepinCRM» and «Додати клієнта»;
+- a header with «Оновити з KeepinCRM» and «Додати клієнта», and a subtitle with the last KeepinCRM sync time, as for suppliers;
 - a search row;
 - the chips «Активні / Не використовуються / Усі», with counts from the server;
 - a server-paged «Цех» table: name with its KeepinCRM ID, type, contact person, phones and status.

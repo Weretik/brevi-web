@@ -114,4 +114,7 @@ export type {
 } from './forms/documents/delivery-resolution-draft';
 export { deliveryResolutionErrors } from './validators/documents/delivery-resolution-validation';
 export type { CustomerKeepinSyncResult } from './entities/customers/customer-keepin-sync-result';
-export { describeCustomerKeepinSync } from './mappers/customers/describe-customer-keepin-sync';
+export {
+  describeCustomerKeepinSync,
+  lastCustomerKeepinSync,
+} from './mappers/customers/describe-customer-keepin-sync';

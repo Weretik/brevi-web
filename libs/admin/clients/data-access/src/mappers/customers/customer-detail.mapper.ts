@@ -55,5 +55,6 @@ export function mapCustomerDetail(value: unknown): CustomerDetail {
     keepinCrmId: mapped.keepinCrmId,
     contactName: mapped.contactName,
     phones: mapped.phones,
+    keepinSyncedAt: mapped.keepinSyncedAt,
   };
 }

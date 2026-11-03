@@ -31,5 +31,13 @@ export function mapCustomerSummary(value: unknown): CustomerSummary {
     contactName: row['contactName'] === undefined ? null : nullableText(row['contactName']),
     phones:
       row['phones'] === undefined || row['phones'] === null ? [] : items(row['phones']).map(text),
+    keepinSyncedAt: syncTime(row['keepinSyncedAt']),
   };
+}
+
+function syncTime(value: unknown): string | null {
+  if (value === undefined || value === null) return null;
+  const time = text(value);
+  if (!Number.isFinite(Date.parse(time))) throw new Error('Некоректний час оновлення з KeepinCRM.');
+  return time;
 }
