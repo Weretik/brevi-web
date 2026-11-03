@@ -18,6 +18,7 @@ export function mapMediaFile(value: unknown): MediaFile {
     alt: nullableText(row['alt'], 'опис фото'),
     folderId: nullableInteger(row['folderId'], 'папка фото', 1),
     publicUrl: nonEmptyText(row['publicUrl'], 'адреса фото'),
+    thumbnailUrl: nullableText(row['thumbnailUrl'] ?? null, 'адреса прев’ю'),
     contentType: nonEmptyText(row['contentType'], 'тип фото'),
     sizeInBytes: integer(row['sizeInBytes'], 'розмір фото'),
     width: nullableInteger(row['width'], 'ширина фото', 1),

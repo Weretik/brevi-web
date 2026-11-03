@@ -18,6 +18,7 @@ const photo = (id: number, folderId: number | null, fileName: string): MediaFile
   alt: null,
   folderId,
   publicUrl: `https://cdn.test/${id}.jpg`,
+  thumbnailUrl: null,
   contentType: 'image/jpeg',
   sizeInBytes: 2_500_000,
   width: null,

@@ -2,7 +2,7 @@
 
 **Status:** implementation exists, checked 2026-11-03. [SDD](../../specs/admin/media/001-photo-library/README.md), [consumer contract](../../specs/admin/media/001-photo-library/contracts/api-contract.md).
 
-The sidebar group «Фото» opens `/media` (the old `/references/media` redirects there). The left column is the folder tree with «Усі фото» and photo counts; the right side has the search row, the chips «З підпапками» / «Лише ця папка», and a grid of photo cards with selection and pages of 48. «Завантажити фото» or dropping files anywhere on the page uploads several photos into the open folder (a full-screen drop overlay names the target folder). Results and errors show as toasts in the top right corner: green for success, yellow for warnings, red for errors; they hide by themselves. A photo opens in the side panel with its usages and «Редагувати» (name, alt, folder); selected photos can be moved or deleted. The folder menu creates subfolders, renames, moves and deletes empty folders. Data comes from the BreviERP Media API; folders are virtual and never change CDN URLs.
+The sidebar group «Фото» opens `/media` (the old `/references/media` redirects there). The left column is the folder tree with «Усі фото» and photo counts; the right side has the search row, the chips «З підпапками» / «Лише ця папка», and a grid of photo cards with selection and pages of 48. «Завантажити фото» or dropping files anywhere on the page uploads several photos into the open folder (a full-screen drop overlay names the target folder). Results and errors show as toasts in the top right corner: green for success, yellow for warnings, red for errors; they hide by themselves. Grid cards load the small WebP preview (`thumbnailUrl`) and fall back to the original, and show the size in pixels when known. A photo opens in the side panel with its usages and «Редагувати» (name, alt, folder); selected photos can be moved or deleted. The folder menu creates subfolders, renames, moves and deletes empty folders. Data comes from the BreviERP Media API; folders are virtual and never change CDN URLs.
 
 ## Structure diagram
 
@@ -56,6 +56,7 @@ The product editor still uses `libs/admin/products/data-access/src/api/product-m
 - `libs/admin/media/model/src/mappers/media-folder-tree.test.ts`, `libs/admin/media/model/src/validators/media-validation.test.ts`
 - `libs/admin/media/data-access/src/mappers/media-file.mapper.test.ts`
 - `libs/admin/media/ui/src/components/folder-tree/media-folder-tree.component.test.tsx`
+- `libs/admin/media/ui/src/components/gallery/media-file-preview.component.test.tsx` (preview → original → note)
 - `libs/admin/media/feature/src/pages/library/media-library-page.component.test.tsx` (includes drop upload)
 - `libs/admin/media/feature/src/hooks/library/use-media-toasts.unit.test.ts`
 - `libs/admin/products/data-access/src/products.api.integration.test.ts` (product editor paging and upload)
