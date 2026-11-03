@@ -52,7 +52,11 @@
       "@admin/reminders/data-access": ["libs/admin/reminders/data-access/src/index.ts"],
       "@admin/reminders/ui": ["libs/admin/reminders/ui/src/index.ts"],
       "@admin/reminders/feature": ["libs/admin/reminders/feature/src/index.ts"],
-      "@admin/dashboard/feature": ["libs/admin/dashboard/feature/src/index.ts"]
+      "@admin/dashboard/feature": ["libs/admin/dashboard/feature/src/index.ts"],
+      "@admin/media/model": ["libs/admin/media/model/src/index.ts"],
+      "@admin/media/data-access": ["libs/admin/media/data-access/src/index.ts"],
+      "@admin/media/ui": ["libs/admin/media/ui/src/index.ts"],
+      "@admin/media/feature": ["libs/admin/media/feature/src/index.ts"]
     }
   }
 }

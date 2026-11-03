@@ -23,6 +23,7 @@ The Storefront currently has README files for its Nx feature libraries, but they
 - [Admin React: fabrics and accessories — Calculator sheet fields and «Цех» pages](admin/references/013-fabrics-accessories-sheet/README.md) — implemented 2026-11-02.
 - [Admin React: operations — Calculator sheet fields and a «Цех» page](admin/references/014-operations-sheet/README.md) — implemented 2026-11-02.
 - [Admin React: Telegram reminders](admin/reminders/001-telegram-reminders/README.md) — implemented and locally verified 2026-11-01.
+- [Admin React: photo library with folders](admin/media/001-photo-library/README.md) — implemented and locally verified 2026-11-03; replaces 007-media.
 - [Visual guidance for tables, menus, and forms](admin/table-visual-guidance.md)
 - [React Admin migration order](admin/react-migration-roadmap.md)
 - [Admin: restore layers and module boundaries](admin/architecture/001-admin-layers-and-boundaries/README.md)

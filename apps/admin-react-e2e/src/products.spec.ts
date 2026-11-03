@@ -94,8 +94,8 @@ test('products create, edit, delete and direct detail use the Brevi shell', asyn
   await page.route('**/api/reference/product-categories/admin', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
   );
-  await page.route('**/api/catalog/media', (route) =>
-    route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
+  await page.route('**/api/media/files**', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: emptyMediaPage }),
   );
   await page.route('**/api/reference/**', (route) =>
     route.fulfill({
@@ -225,8 +225,8 @@ test('product pages fit supported widths and themes, and a missing detail has a 
   await page.route('**/api/reference/product-categories/admin', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
   );
-  await page.route('**/api/catalog/media', (route) =>
-    route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
+  await page.route('**/api/media/files**', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: emptyMediaPage }),
   );
   await page.route('**/api/reference/**', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
@@ -362,8 +362,8 @@ test('a sewing product can be created and fully replaced with its conditional fi
       body: JSON.stringify(detail()),
     });
   });
-  await page.route('**/api/catalog/media', (route) =>
-    route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
+  await page.route('**/api/media/files**', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: emptyMediaPage }),
   );
   await page.route('**/api/reference/**', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
@@ -408,55 +408,22 @@ test('a sewing product can be created and fully replaced with its conditional fi
   expect(replaced).not.toHaveProperty('supplierId');
 });
 
-test('only Ready photos can be attached and reordered', async ({ page }) => {
+test('library photos can be attached and reordered', async ({ page }) => {
   let submitted: Record<string, unknown> | null = null;
-  let uploadedReady = false;
-  await page.route('**/api/catalog/media', (route) => {
-    if (route.request().method() === 'POST')
+  const photos = [libraryPhoto(1, 'first.png'), libraryPhoto(3, 'third.png')];
+  await page.route('**/api/media/files**', (route) => {
+    if (route.request().method() === 'POST') {
+      photos.push(libraryPhoto(4, 'fourth.png'));
       return route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({
-          mediaFileId: 4,
-          storageKey: 'products/fourth.png',
-          publicUrl: '/fourth.png',
-          contentType: 'image/png',
-          originalFileName: 'fourth.png',
-        }),
+        body: JSON.stringify(libraryPhoto(4, 'fourth.png')),
       });
+    }
     return route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify([
-        {
-          id: 1,
-          originalFileName: 'first.png',
-          publicUrl: '/first.png',
-          contentType: 'image/png',
-          status: 'Ready',
-        },
-        {
-          id: 2,
-          originalFileName: 'pending.png',
-          publicUrl: '/pending.png',
-          contentType: 'image/png',
-          status: 'PendingUpload',
-        },
-        {
-          id: 3,
-          originalFileName: 'third.png',
-          publicUrl: '/third.png',
-          contentType: 'image/png',
-          status: 'Ready',
-        },
-        {
-          id: 4,
-          originalFileName: 'fourth.png',
-          publicUrl: '/fourth.png',
-          contentType: 'image/png',
-          status: uploadedReady ? 'Ready' : 'PendingUpload',
-        },
-      ]),
+      body: JSON.stringify({ items: photos, total: photos.length, page: 1, pageSize: 100 }),
     });
   });
   await page.route('**/api/reference/**', (route) =>
@@ -470,7 +437,6 @@ test('only Ready photos can be attached and reordered', async ({ page }) => {
   const mediaSelect = page.getByRole('combobox', { name: 'Додати наявне медіа' });
   await mediaSelect.click();
   await expect(page.getByRole('option', { name: 'first.png' })).toBeVisible();
-  await expect(page.getByRole('option', { name: 'pending.png' })).toHaveCount(0);
   await page.getByRole('option', { name: 'first.png' }).click();
   await expect(page.getByRole('img', { name: 'first.png' })).toBeVisible();
   await mediaSelect.click();
@@ -480,10 +446,6 @@ test('only Ready photos can be attached and reordered', async ({ page }) => {
   await page
     .locator('input[type="file"]')
     .setInputFiles({ name: 'fourth.png', mimeType: 'image/png', buffer: Buffer.from([1, 2, 3]) });
-  await expect(page.getByText('Фото ще не готове.')).toBeVisible();
-  await expect(page.getByRole('img', { name: 'fourth.png' })).toHaveCount(0);
-  uploadedReady = true;
-  await page.getByRole('button', { name: 'Перевірити готовність' }).click();
   await expect(page.getByRole('img', { name: 'fourth.png' })).toBeVisible();
   await page.getByRole('spinbutton', { name: 'ID товару' }).fill('21');
   await page.getByRole('textbox', { name: 'Назва українською' }).fill('Товар');
@@ -507,8 +469,8 @@ test('PPE reference picker accepts only percent references and sends mixed sourc
   await page.route('**/api/reference/**', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
   );
-  await page.route('**/api/catalog/media', (route) =>
-    route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }),
+  await page.route('**/api/media/files**', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: emptyMediaPage }),
   );
   await page.route('**/api/reference/pricing-parameters', (route) =>
     route.fulfill({
@@ -588,3 +550,20 @@ test('PPE reference picker accepts only percent references and sends mixed sourc
   expect(submitted?.['retailPercent']).toEqual({ source: 'Reference', additionalReferenceId: 1 });
   expect(submitted?.['wholesalePercent']).toEqual({ source: 'Custom', customPercent: 0 });
 });
+
+const emptyMediaPage = JSON.stringify({ items: [], total: 0, page: 1, pageSize: 100 });
+
+function libraryPhoto(id: number, fileName: string) {
+  return {
+    id,
+    fileName,
+    alt: null,
+    folderId: 1,
+    publicUrl: `/${fileName}`,
+    contentType: 'image/png',
+    sizeInBytes: 3,
+    width: null,
+    height: null,
+    createdAt: '2026-11-03T10:00:00Z',
+  };
+}

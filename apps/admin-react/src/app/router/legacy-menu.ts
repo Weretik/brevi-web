@@ -4,6 +4,7 @@ import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
 import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
 import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
 import NotificationsActiveOutlinedIcon from '@mui/icons-material/NotificationsActiveOutlined';
+import PhotoLibraryOutlinedIcon from '@mui/icons-material/PhotoLibraryOutlined';
 
 import type { SvgIconComponent } from '@mui/icons-material';
 
@@ -108,8 +109,14 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         label: 'Параметри ціноутворення',
         path: '/references/pricing-parameters',
       },
-      { id: 'media', label: 'Медіа/Фото', path: '/references/media' },
     ],
+  },
+  {
+    id: 'media',
+    icon: PhotoLibraryOutlinedIcon,
+    section: 'Дані',
+    label: 'Фото',
+    items: [{ id: 'media-library', label: 'Бібліотека фото', path: '/media' }],
   },
   {
     id: 'general-reports',

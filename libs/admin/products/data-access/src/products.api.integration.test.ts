@@ -59,16 +59,10 @@ describe('productsApi', () => {
   it('uses FormData for media upload and invalidates the media cache', async () => {
     configureAppConfig({ production: true, api: { baseUrl: 'http://localhost' } });
     const fetcher = vi.fn().mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          mediaFileId: 4,
-          storageKey: 'catalog/4.webp',
-          publicUrl: '/media/4.webp',
-          contentType: 'image/webp',
-          originalFileName: '4.webp',
-        }),
-        { status: 200, headers: { 'Content-Type': 'application/json' } },
-      ),
+      new Response(JSON.stringify(libraryPhoto(4)), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
     );
     vi.stubGlobal('fetch', fetcher);
     const file = new File(['image'], '4.webp', { type: 'image/webp' });
@@ -78,8 +72,50 @@ describe('productsApi', () => {
       .unwrap();
 
     expect(id).toBe(4);
-    expect(await (fetcher.mock.calls[0]?.[0] as Request).clone().formData()).toBeInstanceOf(
-      FormData,
-    );
+    const request = fetcher.mock.calls[0]?.[0] as Request;
+    expect(request.url).toContain('/api/media/files');
+    expect(await request.clone().formData()).toBeInstanceOf(FormData);
+  });
+
+  it('reads every page of the photo library for the product editor', async () => {
+    configureAppConfig({ production: true, api: { baseUrl: 'http://localhost' } });
+    const page = (items: unknown[], number: number) =>
+      new Response(JSON.stringify({ items, total: 101, page: number, pageSize: 100 }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce(
+        page(
+          Array.from({ length: 100 }, (_, index) => libraryPhoto(index + 1)),
+          1,
+        ),
+      )
+      .mockResolvedValueOnce(page([libraryPhoto(101)], 2));
+    vi.stubGlobal('fetch', fetcher);
+
+    const media = await adminStore
+      .dispatch(productMediaApi.endpoints.listProductMedia.initiate())
+      .unwrap();
+
+    expect(media).toHaveLength(101);
+    expect(media[100]).toMatchObject({ id: 101, originalFileName: '101.webp', status: 'Ready' });
+    expect((fetcher.mock.calls[1]?.[0] as Request).url).toContain('page=2&pageSize=100');
   });
 });
+
+function libraryPhoto(id: number) {
+  return {
+    id,
+    fileName: `${id}.webp`,
+    alt: null,
+    folderId: 1,
+    publicUrl: `/library/${id}.webp`,
+    contentType: 'image/webp',
+    sizeInBytes: 1000,
+    width: null,
+    height: null,
+    createdAt: '2026-11-03T10:00:00Z',
+  };
+}
