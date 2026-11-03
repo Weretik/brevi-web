@@ -2,7 +2,7 @@
 
 **Status:** route and CRUD interface implemented; «Цех» page revision checked 2026-11-02; KeepinCRM sync and new fields added 2026-11-02 ([SDD 012](../../../specs/admin/references/012-suppliers-keepincrm/README.md)).
 
-`/references/supplier` shows the supplier table; a dialog creates or edits a
+The «Постачальники» tab of [«Контрагенти»](counterparties.md) (`/references/counterparties`; the old `/references/supplier` redirects) shows the supplier table; a dialog creates or edits a
 record, and a separate flow confirms deletion of selected rows.
 `references/feature` contains state and scenarios, `references/ui` contains the
 table, editor presentation, and delete dialog, `references/model` contains types
@@ -41,7 +41,7 @@ full editing. The subtitle shows the last sync time.
 
 ```mermaid
 flowchart LR
-  Route["/references/supplier"] --> Page["references/feature: state and scenarios"]
+  Route["/references/counterparties"] --> Page["references/feature: state and scenarios"]
   Page --> UI["references/ui: table and dialog"]
   Page --> Model["references/model: types and form conversion"]
   Page --> Hooks["hooks: actions and list refresh"]

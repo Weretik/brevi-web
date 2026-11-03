@@ -35,7 +35,11 @@ export default function DashboardPage() {
           </Typography>
         </Box>
         <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 1.25 }}>
-          <Button component={RouterLink} to="/crm/clients" variant="outlined">
+          <Button
+            component={RouterLink}
+            to="/references/counterparties?tab=clients"
+            variant="outlined"
+          >
             Клієнти
           </Button>
           <Button

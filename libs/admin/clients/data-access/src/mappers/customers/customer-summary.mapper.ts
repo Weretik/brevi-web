@@ -2,6 +2,7 @@ import {
   flag,
   identifier,
   integer,
+  items,
   nullableText,
   record,
   text,
@@ -25,5 +26,10 @@ export function mapCustomerSummary(value: unknown): CustomerSummary {
     active: flag(row['active']),
     revision: integer(row['revision']),
     updatedAt,
+    // List-only fields; the detail response leaves them out.
+    keepinCrmId: row['keepinCrmId'] === undefined ? null : nullableText(row['keepinCrmId']),
+    contactName: row['contactName'] === undefined ? null : nullableText(row['contactName']),
+    phones:
+      row['phones'] === undefined || row['phones'] === null ? [] : items(row['phones']).map(text),
   };
 }

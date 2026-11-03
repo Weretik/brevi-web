@@ -50,5 +50,10 @@ export function mapCustomerDetail(value: unknown): CustomerDetail {
     contacts: mapped.contacts.map((c) => ({ ...c, channels: [...c.channels] })),
     externalIdentities: [...mapped.externalIdentities],
   };
-  return compatible;
+  return {
+    ...compatible,
+    keepinCrmId: mapped.keepinCrmId,
+    contactName: mapped.contactName,
+    phones: mapped.phones,
+  };
 }

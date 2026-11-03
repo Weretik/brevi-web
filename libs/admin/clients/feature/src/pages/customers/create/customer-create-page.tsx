@@ -11,7 +11,9 @@ export default function CustomerCreatePage() {
   return (
     <Box sx={{ p: { xs: 2, md: 3 }, maxWidth: 900 }}>
       <Stack spacing={2}>
-        <Button onClick={() => navigate('/crm/clients')}>До списку клієнтів</Button>
+        <Button onClick={() => navigate('/references/counterparties?tab=clients')}>
+          До списку клієнтів
+        </Button>
         <Typography component="h1" variant="h4">
           Новий клієнт
         </Typography>

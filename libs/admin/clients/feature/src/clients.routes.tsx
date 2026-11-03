@@ -1,6 +1,6 @@
 import { lazy } from 'react';
+import { Navigate } from 'react-router-dom';
 
-const CustomersPage = lazy(() => import('./pages/customers/list/customers-page'));
 const CustomerCreatePage = lazy(() => import('./pages/customers/create/customer-create-page'));
 const CustomerDetailPage = lazy(() => import('./pages/customers/detail/customer-detail-page'));
 const IntroductionsPage = lazy(() => import('./pages/introductions/introductions-page'));
@@ -13,7 +13,10 @@ const CustomEditorPage = lazy(() => import('./pages/custom-sewing/custom-editor-
 export const clientsRoutes = [
   { path: '/crm/custom-sewing/new', element: <CustomEditorPage /> },
   { path: '/crm/custom-sewing/:draftId', element: <CustomEditorPage /> },
-  { path: '/crm/clients', element: <CustomersPage /> },
+  {
+    path: '/crm/clients',
+    element: <Navigate to="/references/counterparties?tab=clients" replace />,
+  },
   { path: '/crm/clients/new', element: <CustomerCreatePage /> },
   { path: '/crm/clients/:customerId', element: <CustomerDetailPage /> },
   { path: '/crm/quotes', element: <QuotesPage /> },

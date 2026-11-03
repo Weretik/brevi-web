@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { mapCustomerDetail } from './customer-detail.mapper';
+import { mapCustomerKeepinSyncResult } from './customer-keepin-sync.mapper';
 import { mapCustomerPage } from './customer-page.mapper';
 
 const summary = {
@@ -15,6 +16,36 @@ const summary = {
   updatedAt: '2026-10-26T12:00:00Z',
 };
 describe('CRM response boundary', () => {
+  it('maps the KeepinCRM list fields and defaults them when the response leaves them out', () => {
+    const page = mapCustomerPage({
+      value: [
+        { ...summary, keepinCrmId: '10', contactName: 'Олена', phones: ['+380671234567'] },
+        summary,
+      ],
+      pagedInfo: { pageNumber: 1, pageSize: 25, totalPages: 1, totalRecords: 2 },
+    });
+    expect(page.rows[0]).toMatchObject({
+      keepinCrmId: '10',
+      contactName: 'Олена',
+      phones: ['+380671234567'],
+    });
+    expect(page.rows[1]).toMatchObject({ keepinCrmId: null, contactName: null, phones: [] });
+  });
+  it('maps the KeepinCRM sync result', () => {
+    expect(
+      mapCustomerKeepinSyncResult({
+        applied: true,
+        received: 2,
+        created: 1,
+        updated: 0,
+        unchanged: 1,
+        deactivated: [],
+        deleted: [],
+        hiddenInUse: [],
+      }),
+    ).toMatchObject({ applied: true, received: 2, created: 1, unchanged: 1 });
+    expect(() => mapCustomerKeepinSyncResult({ applied: true })).toThrow();
+  });
   it('preserves server paging totals instead of treating an empty page as empty database', () => {
     const result = mapCustomerPage({
       value: [],

@@ -32,3 +32,4 @@ export * from './components/reference-list-controls/reference-page-header';
 export * from './components/reference-list-controls/reference-search-bar';
 export * from './components/reference-list-controls/reference-supplier-filter';
 export * from './dialogs/suppliers/supplier-editor-dialog';
+export * from './components/reference-list/reference-status-pill';
