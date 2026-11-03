@@ -3,10 +3,11 @@ import { ReferenceEditorDrawer } from '@admin/references/ui';
 import { Alert, Button, Stack } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
+import { ProductOverviewPriceBlock } from './product-overview-price-block';
 import { useProductOverviewEditor } from '../../hooks/product-overview/use-product-overview-editor';
 
 import type { ProductOverviewEditorMode } from '../../hooks/product-overview/use-product-overview-editor';
-import type { ProductOverview } from '@admin/products/model';
+import type { ProductOverview, ProductOverviewPrices } from '@admin/products/model';
 import type { ProductSectionOption } from '@admin/products/ui';
 
 interface Props {
@@ -18,6 +19,11 @@ interface Props {
   onSaved: () => void;
   /** False inside the card itself. */
   showCardLink?: boolean;
+  /** List prices of the row (CAT-011); the price block is shown only with them. */
+  prices?: ProductOverviewPrices | null;
+  /** «Перерахувати ціни» of this sewing model. */
+  onRecalculate?: () => void;
+  recalculating?: boolean;
 }
 
 export function ProductOverviewDrawer({
@@ -28,6 +34,9 @@ export function ProductOverviewDrawer({
   onClose,
   onSaved,
   showCardLink = true,
+  prices,
+  onRecalculate,
+  recalculating,
 }: Props) {
   const editor = useProductOverviewEditor(initialMode, row, onSaved);
   const readOnly = editor.mode === 'view';
@@ -38,7 +47,7 @@ export function ProductOverviewDrawer({
       title={readOnly ? row.name : `Редагування: ${row.name}`}
       description={
         readOnly
-          ? 'Основні дані товару. Склад і ціни — у повній картці.'
+          ? 'Ціни, собівартість і дані для КП. Склад — у повній картці.'
           : 'Розділ, статус, перевірка і дані для КП.'
       }
       formId="product-overview-form"
@@ -52,10 +61,22 @@ export function ProductOverviewDrawer({
       <Stack sx={{ gap: 2 }}>
         {editor.message && <Alert severity="error">{editor.message}</Alert>}
         {readOnly ? (
-          <ProductOverviewDetails
-            row={row}
-            sectionName={row.sectionId === null ? null : (sectionNames.get(row.sectionId) ?? null)}
-          />
+          <>
+            {prices !== undefined && (
+              <ProductOverviewPriceBlock
+                row={row}
+                prices={prices}
+                onRecalculate={row.type === 'Sewing' ? onRecalculate : undefined}
+                recalculating={recalculating}
+              />
+            )}
+            <ProductOverviewDetails
+              row={row}
+              sectionName={
+                row.sectionId === null ? null : (sectionNames.get(row.sectionId) ?? null)
+              }
+            />
+          </>
         ) : (
           <ProductOverviewForm
             type={row.type}

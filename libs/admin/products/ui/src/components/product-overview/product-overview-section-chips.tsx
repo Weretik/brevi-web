@@ -9,15 +9,18 @@ interface Props {
   total: number;
   value: ProductSectionFilter;
   onChange: (value: ProductSectionFilter) => void;
+  /** «Без ціни» (CAT-011): combines with the section chip. */
+  withoutPrice?: { count: number; selected: boolean; onToggle: () => void };
 }
 
-/** «Усі», one chip per section in use, and «Без розділу», with counts. */
+/** «Усі», one chip per section in use, «Без розділу», and the «Без ціни» toggle, with counts. */
 export function ProductOverviewSectionChips({
   counts,
   sectionNames,
   total,
   value,
   onChange,
+  withoutPrice,
 }: Props) {
   return (
     <Stack
@@ -48,6 +51,14 @@ export function ProductOverviewSectionChips({
           />
         );
       })}
+      {withoutPrice && withoutPrice.count > 0 && (
+        <ReferenceFilterChip
+          label="Без ціни"
+          count={withoutPrice.count}
+          selected={withoutPrice.selected}
+          onClick={withoutPrice.onToggle}
+        />
+      )}
     </Stack>
   );
 }

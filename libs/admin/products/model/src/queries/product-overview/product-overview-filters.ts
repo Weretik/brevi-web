@@ -27,11 +27,12 @@ export function countProductsBySection(
   return [...known, ...unknown, ...withoutSection];
 }
 
-/** Section chip, then local search over code, name and quote description. */
+/** Section chip, then local search over code, name, quote description and `extraText` (article SKUs). */
 export function filterProductOverview(
   rows: ProductOverview[],
   search: string,
   section: ProductSectionFilter,
+  extraText: (row: ProductOverview) => readonly string[] = () => [],
 ): ProductOverview[] {
   const query = search.trim().toLocaleLowerCase('uk');
   return rows.filter(
@@ -39,7 +40,7 @@ export function filterProductOverview(
       (section === null ||
         (section === 'none' ? row.sectionId === null : row.sectionId === section)) &&
       (!query ||
-        [row.code, row.name, row.quoteDescription].some((value) =>
+        [row.code, row.name, row.quoteDescription, ...extraText(row)].some((value) =>
           value?.toLocaleLowerCase('uk').includes(query),
         )),
   );

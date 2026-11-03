@@ -14,6 +14,9 @@ export const components: Components<Theme> = {
         // Admin tables: own fixed height with an inner scroll, sized to the screen (laptop and desktop).
         '--admin-table-height': 'clamp(420px, calc(100dvh - 160px), 820px)',
       },
+      // Native scrollbars (tables, panels, page) follow the light/dark theme instead of the light system one.
+      html: { colorScheme: theme.palette.mode },
+      '*': { scrollbarColor: `${theme.palette.action.disabled} transparent` },
       body: { minWidth: 320 },
       ':focus-visible': { outline: `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 },
       '@media (prefers-reduced-motion: reduce)': {
