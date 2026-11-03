@@ -103,6 +103,16 @@ export function SewingOperationRow({
           </Button>
         )}
       </Stack>
+      <TextField
+        label="Коментар"
+        value={operation.comment}
+        onChange={(event) => onChange({ comment: event.target.value })}
+        error={Boolean(error('comment'))}
+        helperText={error('comment')}
+        slotProps={{ htmlInput: { maxLength: 500 } }}
+        disabled={readonly}
+        size="small"
+      />
     </Stack>
   );
 }

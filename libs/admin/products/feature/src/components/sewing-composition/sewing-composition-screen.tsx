@@ -2,6 +2,7 @@ import { SewingArticlesPanel } from '@admin/products/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
 import { Alert, Button, CircularProgress, Stack } from '@mui/material';
 
+import { CompositionScopeChips } from './composition-scope-chips';
 import { CompositionScopeEditors } from './composition-scope-editors';
 import { CompositionScopeHeader } from './composition-scope-header';
 import { CompositionStatusPanels } from './composition-status-panels';
@@ -14,9 +15,14 @@ import type { useSewingCompositionController } from '../../hooks/sewing-composit
 interface Props {
   productId: number;
   controller: ReturnType<typeof useSewingCompositionController>;
+  /**
+   * `all` is the whole composition with Articles and pricing. The sewing card shows `materials`
+   * (with a scope switch) and `operations` (model scope) on separate tabs.
+   */
+  section?: 'all' | 'materials' | 'operations';
 }
 
-export function SewingCompositionScreen({ productId, controller }: Props) {
+export function SewingCompositionScreen({ productId, controller, section = 'all' }: Props) {
   const {
     access,
     queries,
@@ -79,17 +85,21 @@ export function SewingCompositionScreen({ productId, controller }: Props) {
 
   return (
     <Stack sx={{ gap: 2 }}>
-      <SewingArticlesPanel
-        key={`${productId}-${articles.data?.articles.length ?? 0}`}
-        articles={view.articlesWithReadiness}
-        selectedArticleId={selectedArticleId}
-        version={articles.data?.version ?? 0}
-        canManage={canManage && Boolean(articles.data) && !articles.isLoading && !articles.isError}
-        creating={articleCreation.state.isLoading}
-        error={articleCreation.error}
-        onSelect={requestArticle}
-        onCreate={requestCreateArticle}
-      />
+      {section === 'all' && (
+        <SewingArticlesPanel
+          key={`${productId}-${articles.data?.articles.length ?? 0}`}
+          articles={view.articlesWithReadiness}
+          selectedArticleId={selectedArticleId}
+          version={articles.data?.version ?? 0}
+          canManage={
+            canManage && Boolean(articles.data) && !articles.isLoading && !articles.isError
+          }
+          creating={articleCreation.state.isLoading}
+          error={articleCreation.error}
+          onSelect={requestArticle}
+          onCreate={requestCreateArticle}
+        />
+      )}
       <CompositionStatusPanels
         listError={view.listError}
         lookupError={view.lookupErrorMessage}
@@ -106,12 +116,24 @@ export function SewingCompositionScreen({ productId, controller }: Props) {
         onRetryModel={() => void sharedComposition.refetch()}
         onRetrySelected={() => void selectedComposition.refetch()}
       />
-      <CompositionScopeHeader
-        scope={scope}
-        articleSku={view.selectedArticle?.saleSku}
-        onSelectModel={requestModel}
-      />
+      {section === 'all' && (
+        <CompositionScopeHeader
+          scope={scope}
+          articleSku={view.selectedArticle?.saleSku}
+          onSelectModel={requestModel}
+        />
+      )}
+      {section === 'materials' && (
+        <CompositionScopeChips
+          scope={scope}
+          articles={view.articlesWithReadiness}
+          selectedArticleId={selectedArticleId}
+          onSelectModel={requestModel}
+          onSelectArticle={requestArticle}
+        />
+      )}
       <CompositionScopeEditors
+        sections={section}
         scope={scope}
         modelDraft={modelDraft}
         modelDirty={modelDirty}
@@ -148,16 +170,19 @@ export function SewingCompositionScreen({ productId, controller }: Props) {
           onReload={() => void writes.reloadCurrent()}
         />
       )}
-      {scope === 'Article' && selectedArticleId !== null && view.selectedArticle && (
-        <SewingPricingFeature
-          key={`${productId}:${selectedArticleId}`}
-          productId={productId}
-          articleId={selectedArticleId}
-          compositionVersion={articles.data?.version ?? 0}
-          canManage={canManage}
-          dirty={drafts.dirty || busy}
-        />
-      )}
+      {section === 'all' &&
+        scope === 'Article' &&
+        selectedArticleId !== null &&
+        view.selectedArticle && (
+          <SewingPricingFeature
+            key={`${productId}:${selectedArticleId}`}
+            productId={productId}
+            articleId={selectedArticleId}
+            compositionVersion={articles.data?.version ?? 0}
+            canManage={canManage}
+            dirty={drafts.dirty || busy}
+          />
+        )}
       <UnsavedChangesDialog
         open={pendingSwitch !== null || navigationBlocked}
         navigationBlocked={navigationBlocked}

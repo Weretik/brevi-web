@@ -33,6 +33,7 @@ function toMaterialDraft(
     required: material.required,
     sortOrder: material.sortOrder,
     reviewed: material.reviewed,
+    comment: material.comment,
   };
 }
 function toOperationDraft(
@@ -45,5 +46,6 @@ function toOperationDraft(
     manualMinutes: operation.manualMinutes,
     sortOrder: operation.sortOrder,
     reviewed: operation.reviewed,
+    comment: operation.comment,
   };
 }

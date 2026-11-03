@@ -8,7 +8,13 @@ import { render } from '../../test-utils';
 
 import type { ProductOverview, ProductOverviewType } from '@admin/products/model';
 
-const row = (id: number, type: ProductOverviewType, code: string, name: string, sectionId: number | null): ProductOverview => ({
+const row = (
+  id: number,
+  type: ProductOverviewType,
+  code: string,
+  name: string,
+  sectionId: number | null,
+): ProductOverview => ({
   id,
   type,
   code,
@@ -24,14 +30,20 @@ const row = (id: number, type: ProductOverviewType, code: string, name: string, 
 });
 
 const data: Record<ProductOverviewType, ProductOverview[]> = {
-  Sewing: [row(1, 'Sewing', 'MOD-025', 'Костюм «Верде»', 1), row(2, 'Sewing', 'MOD-026', 'Халат', null)],
+  Sewing: [
+    row(1, 'Sewing', 'MOD-025', 'Костюм «Верде»', 1),
+    row(2, 'Sewing', 'MOD-026', 'Халат', null),
+  ],
   Ppe: [row(3, 'Ppe', '17', 'Рукавиці', 9)],
 };
 
 vi.mock('../../hooks/product-overview/use-product-overview', () => ({
   useProductOverview: (type: ProductOverviewType) => ({
     rows: data[type],
-    sections: type === 'Sewing' ? [{ id: 1, type, name: 'Одяг ЛІТО', isActive: true, comment: null, sortOrder: 1 }] : [],
+    sections:
+      type === 'Sewing'
+        ? [{ id: 1, type, name: 'Одяг ЛІТО', isActive: true, comment: null, sortOrder: 1 }]
+        : [],
     sectionNames: new Map([
       [1, 'Одяг ЛІТО'],
       [9, 'Захист рук'],
@@ -65,10 +77,9 @@ describe('ProductsPage', () => {
     const grid = screen.getByRole('grid', { name: 'Швейна продукція' });
     expect(within(grid).getByText('MOD-025')).toBeInTheDocument();
     expect(within(grid).getByText('08.09.2026')).toBeInTheDocument();
-    expect(within(grid).getByRole('link', { name: 'Відкрити «Костюм «Верде»» на сайті' })).toHaveAttribute(
-      'href',
-      'https://brevi.com.ua/specodyag-litnij/kostyum-verde',
-    );
+    expect(
+      within(grid).getByRole('link', { name: 'Відкрити «Костюм «Верде»» на сайті' }),
+    ).toHaveAttribute('href', 'https://brevi.com.ua/specodyag-litnij/kostyum-verde');
 
     await user.click(screen.getByRole('button', { name: /Без розділу/ }));
     expect(within(grid).queryByText('MOD-025')).not.toBeInTheDocument();

@@ -41,6 +41,7 @@ describe('Article composition transport', () => {
           required: true,
           sortOrder: 0,
           reviewed: true,
+          comment: '',
         },
       ],
       articleMaterials: [
@@ -54,6 +55,7 @@ describe('Article composition transport', () => {
           required: true,
           sortOrder: 0,
           reviewed: true,
+          comment: '',
         },
       ],
       operations: [],
@@ -68,6 +70,7 @@ describe('Article composition transport', () => {
     expect(body.materials).toHaveLength(1);
     expect(body.materials[0]).not.toHaveProperty('clientId');
     expect(body.materials[0].referenceId).toBe(59);
+    expect(body.materials[0].comment).toBeNull();
     expect(body).not.toHaveProperty('operations');
   });
 });

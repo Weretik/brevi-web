@@ -15,6 +15,8 @@ export function validateSewingOperations(
       (!Number.isFinite(operation.manualMinutes) || operation.manualMinutes <= 0)
     )
       errors[`${prefix}.manualMinutes`] = 'Вкажіть час більше нуля або залиште поле порожнім.';
+    if (operation.comment.trim().length > 500)
+      errors[`${prefix}.comment`] = 'Коментар — до 500 символів.';
   });
   return errors;
 }

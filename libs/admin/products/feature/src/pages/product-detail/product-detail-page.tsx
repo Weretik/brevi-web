@@ -3,7 +3,6 @@ import {
   ProductDetailGallery,
   ProductDetailHeader,
   ProductDetailSection,
-  SewingProductDetail,
 } from '@admin/products/ui';
 import { Alert, Box, Button, CircularProgress, Stack } from '@mui/material';
 import { useState } from 'react';
@@ -11,7 +10,7 @@ import { Link, useLocation, useNavigate, useNavigationType, useParams } from 're
 
 import { ProductDeleteDialog } from '../../components/product-deletion/product-delete-dialog';
 import { ProductCurrentPricing } from '../../components/product-detail/product-current-pricing';
-import { SewingCompositionFeature } from '../../components/sewing-composition/sewing-composition-feature';
+import { SewingProductCard } from '../../components/sewing-card/sewing-product-card';
 import { useProduct } from '../../hooks/product-detail/use-product';
 
 import type { ProductDetail } from '@admin/products/model';
@@ -26,7 +25,6 @@ export function ProductDetailPage() {
   const initial =
     navigationType !== 'POP' && responseProduct?.id === id ? responseProduct : undefined;
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [sewingDirty, setSewingDirty] = useState(false);
   const { product, loading, error, notFound, reload, pricingError, reloadPrices } = useProduct(
     id,
     initial,
@@ -46,7 +44,7 @@ export function ProductDetailPage() {
     );
 
   return (
-    <Box sx={{ p: { xs: 2, md: 3 }, maxWidth: 1080 }}>
+    <Box sx={{ p: { xs: 2, md: 3 }, maxWidth: product?.type === 'Sewing' ? 1440 : 1080 }}>
       <Button component={Link} to="/references/products">
         ← До товарів
       </Button>
@@ -57,7 +55,12 @@ export function ProductDetailPage() {
           {error}
         </Alert>
       )}
-      {product && !loading && !notFound && !error && (
+      {product && !loading && !notFound && !error && product.type === 'Sewing' && (
+        <Box sx={{ mt: 2 }}>
+          <SewingProductCard product={product} onDeleted={() => navigate('/references/products')} />
+        </Box>
+      )}
+      {product && !loading && !notFound && !error && product.type !== 'Sewing' && (
         <>
           <Stack sx={{ gap: 2, my: 2 }}>
             <ProductDetailSection label="Основні дані">
@@ -74,11 +77,7 @@ export function ProductDetailPage() {
                   >
                     Редагувати
                   </Button>
-                  <Button
-                    color="error"
-                    disabled={sewingDirty}
-                    onClick={() => setConfirmDelete(true)}
-                  >
+                  <Button color="error" onClick={() => setConfirmDelete(true)}>
                     Видалити
                   </Button>
                 </Stack>
@@ -86,21 +85,7 @@ export function ProductDetailPage() {
             </ProductDetailSection>
             <ProductDetailGallery photos={product.photos} />
             <ProductDetailContent product={product} />
-            {product.type === 'Sewing' && product.sewing && (
-              <SewingProductDetail sewing={product.sewing} />
-            )}
             <ProductCurrentPricing product={product} error={pricingError} onRetry={reloadPrices} />
-            {product.type === 'Sewing' && (
-              <ProductDetailSection label="Артикули та склад виробу">
-                {sewingDirty && (
-                  <Alert severity="warning" sx={{ mb: 2 }}>
-                    Спершу збережіть або відкиньте незбережені зміни складу, щоб перейти зі
-                    сторінки.
-                  </Alert>
-                )}
-                <SewingCompositionFeature productId={product.id} onDirtyChange={setSewingDirty} />
-              </ProductDetailSection>
-            )}
           </Stack>
         </>
       )}

@@ -42,3 +42,5 @@
 [PPE pricing and versioned input approval](007-ppe-pricing/README.md) implements the TS-006 Admin consumer.
 
 [008 «Товари»: two tables from the Calculator sheet](008-products-page/README.md) replaces the paged list with the sewing and PPE tables, section chips and the quote fields.
+
+[009 Sewing product card](009-sewing-product-card/README.md) turns the sewing model page into a «Цех» card with tabs for articles, composition, labour and prices.

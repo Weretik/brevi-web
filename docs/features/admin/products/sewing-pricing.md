@@ -62,6 +62,6 @@ TS-007 retires the old Product sale-price arithmetic and manufacturing price-ban
 - `libs/admin/products/data-access/src/`: `api/sewing-pricing/`, `mappers/sewing-pricing/`
 - `libs/admin/products/feature/src/`: `components/sewing-pricing/`, `hooks/sewing-pricing/`, `hooks/pricing/`
 - `libs/admin/products/model/src/queries/sewing-pricing/`
-- `libs/admin/products/ui/src/product-detail/`: `product-wholesale-price-label.unit.test.ts`, `product-calculations.component.test.tsx`
+- `libs/admin/products/ui/src/product-detail/`: `product-wholesale-price-label.unit.test.ts`; `libs/admin/products/feature/src/components/sewing-card/sewing-product-card.component.test.tsx`
 
-Focused run: `npx nx test admin-products-data-access -- sewing-pricing`; `npx nx test admin-products-feature -- sewing-pricing hooks/pricing`; `npx nx test admin-products-model -- sewing-pricing`; `npx nx test admin-products-ui -- wholesale-price product-calculations`.
+Focused run: `npx nx test admin-products-data-access -- sewing-pricing`; `npx nx test admin-products-feature -- sewing-pricing hooks/pricing`; `npx nx test admin-products-model -- sewing-pricing`; `npx nx test admin-products-ui -- wholesale-price`.

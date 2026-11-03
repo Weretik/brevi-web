@@ -14,5 +14,6 @@ export function mapSewingMaterialInput(line: SewingMaterialDraft): MaterialInput
     required: line.required,
     sortOrder: line.sortOrder,
     reviewed: line.reviewed,
+    comment: line.comment.trim() || null,
   };
 }

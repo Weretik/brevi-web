@@ -9,8 +9,8 @@ export function mapSewingComposition(value: unknown): SewingCompositionView {
     articleId: dto.articleId,
     modelCode: dto.modelCode,
     version: dto.version,
-    materials: dto.materials.map((line) => ({ ...line })),
-    operations: dto.operations.map((line) => ({ ...line })),
+    materials: dto.materials.map((line) => ({ ...line, comment: line.comment ?? '' })),
+    operations: dto.operations.map((line) => ({ ...line, comment: line.comment ?? '' })),
     blockers: [...dto.blockers],
   };
 }

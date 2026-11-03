@@ -3,7 +3,7 @@
 **Status:** routes and pages implemented, checked 2026-10-16.
 
 `/references/products` is the «Товари» page ([spec 008](../../../specs/admin/products/008-products-page/README.md)): tabs «Швейна продукція» (one row per model) and «ЗІЗ» (`?tab=ppe`), section chips, search, a drawer for code, section, season, active, «Перевірено», the current site link and the quote description, and bulk deletion. Site texts, SEO and photos are not shown there; they go to the planned «Контент сайту» module. `/create`, `/:id`, and `/:id/edit` open create, detail, and edit
-pages. `products/feature` owns scenarios, local state, and loading/error/empty
+pages. For a sewing model `/:id` is the «Цех» card ([spec 009](../../../specs/admin/products/009-sewing-product-card/README.md)): header, metrics and tabs «Артикули», «Комплектація», «Трудовитрати», «Ціни» (`?tab=`); PPE keeps the old detail layout. `products/feature` owns scenarios, local state, and loading/error/empty
 handling; `products/ui` provides presentation; `products/model` provides domain
 models; and `products/data-access` provides API endpoints, mappers, and
 response validation. The route file lazy-loads pages; `AppRouter` imports only
@@ -37,6 +37,8 @@ libs/admin/products/
 ├── feature/src/
 │   ├── components/product-editor/
 │   │   └── product-editor.tsx # editor
+│   ├── components/sewing-card/
+│   │   └── sewing-product-card.tsx # sewing model card
 │   ├── pages/
 │   │   ├── product-detail/
 │   │   │   └── product-detail-page.tsx # details
@@ -59,10 +61,11 @@ libs/admin/products/
 ## Tests
 
 - `libs/admin/products/model/src/`: `queries/product-overview/`, `forms/product-overview/`; `libs/admin/products/data-access/src/mappers/product-overview/`
-- `libs/admin/products/feature/src/`: `pages/product-list/`, `pages/product-detail/`, `components/product-editor/`, `hooks/product-detail/`
+- `libs/admin/products/feature/src/`: `pages/product-list/`, `pages/product-detail/`, `components/product-editor/`, `components/sewing-card/`, `hooks/product-detail/`
+- `libs/admin/products/model/src/queries/sewing-card/`; `libs/admin/products/data-access/src/mappers/sewing-pricing/sewing-article-summary.mapper.unit.test.ts`
 - `libs/admin/products/data-access/src/products.api.integration.test.ts`
 - `libs/admin/products/model/src/`: `product-editor/`, `ordering/`, `sewing/product-fabrics.test.ts`
 - `libs/admin/products/ui/src/`: `product-detail/`, `product-editor/`, `product-content/`
 - E2E (run only on request): `apps/admin-react-e2e/src/products.spec.ts`
 
-Focused run: `npx nx test admin-products-model -- product-overview`; `npx nx test admin-products-feature -- product-list product-detail product-editor`; `npx nx test admin-products-data-access -- products.api`; `npx nx test admin-products-model -- product-editor ordering product-fabrics`; `npx nx test admin-products-ui -- product-detail product-editor product-content`.
+Focused run: `npx nx test admin-products-model -- product-overview`; `npx nx test admin-products-feature -- product-list product-detail product-editor sewing-card`; `npx nx test admin-products-data-access -- products.api`; `npx nx test admin-products-model -- product-editor ordering product-fabrics`; `npx nx test admin-products-ui -- product-detail product-editor product-content`.
