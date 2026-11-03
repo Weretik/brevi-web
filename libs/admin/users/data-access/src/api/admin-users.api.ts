@@ -54,12 +54,17 @@ export const adminUsersApi = adminApi.injectEndpoints({
         body: { password },
       }),
     }),
+    deleteStaffAccount: build.mutation<void, number>({
+      query: (userId) => ({ url: `${root}/${userId}`, method: 'DELETE' }),
+      invalidatesTags: ['StaffAccount'],
+    }),
   }),
 });
 
 export const {
   useChangeStaffRoleMutation,
   useCreateStaffAccountMutation,
+  useDeleteStaffAccountMutation,
   useGetStaffAccountsQuery,
   useSetStaffBlockedMutation,
   useSetStaffPasswordMutation,

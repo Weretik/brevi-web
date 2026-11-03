@@ -1,4 +1,4 @@
-import { staffRoleLabels } from '@admin/users/model';
+import { getStaffAccountPermissions, hasDirector, staffRoleLabels } from '@admin/users/model';
 import {
   Alert,
   Button,
@@ -15,11 +15,12 @@ import { StaffAccountActionsMenu } from './staff-account-actions-menu';
 import { StaffStatusPill } from '../status/staff-status-pill';
 
 import type { StaffAccountAction } from './staff-account-actions-menu';
-import type { StaffAccount } from '@admin/users/model';
+import type { StaffAccount, StaffActor } from '@admin/users/model';
 
 interface StaffAccountsTableProps {
   accounts: readonly StaffAccount[];
-  currentUserId: number | null;
+  /** The signed-in staff member; decides which actions each row offers. */
+  actor: StaffActor;
   error: boolean;
   loading: boolean;
   onAction: (account: StaffAccount, action: StaffAccountAction) => void;
@@ -28,7 +29,7 @@ interface StaffAccountsTableProps {
 
 export function StaffAccountsTable({
   accounts,
-  currentUserId,
+  actor,
   error,
   loading,
   onAction,
@@ -41,6 +42,8 @@ export function StaffAccountsTable({
       </Alert>
     );
   }
+
+  const directorExists = hasDirector(accounts);
 
   return (
     <TableContainer>
@@ -65,7 +68,7 @@ export function StaffAccountsTable({
             </TableRow>
           ) : null}
           {accounts.map((account) => {
-            const isCurrentUser = account.id === currentUserId;
+            const isCurrentUser = account.id === actor.id;
 
             return (
               <TableRow hover key={account.id}>
@@ -86,8 +89,8 @@ export function StaffAccountsTable({
                 <TableCell align="right">
                   <StaffAccountActionsMenu
                     account={account}
-                    isCurrentUser={isCurrentUser}
                     onAction={onAction}
+                    permissions={getStaffAccountPermissions(account, actor, directorExists)}
                   />
                 </TableCell>
               </TableRow>

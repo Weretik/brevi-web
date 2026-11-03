@@ -1,9 +1,9 @@
+import { staffRoles } from '@admin/users/model';
+
 import type { components } from '@admin/shared/contracts';
 import type { StaffAccount, StaffRole } from '@admin/users/model';
 
 type StaffAccountResponse = components['schemas']['StaffAccountResponse'];
-
-const roles: readonly StaffRole[] = ['Admin', 'Manager'];
 
 const isStaffAccountResponse = (value: unknown): value is StaffAccountResponse => {
   if (!value || typeof value !== 'object') return false;
@@ -13,7 +13,7 @@ const isStaffAccountResponse = (value: unknown): value is StaffAccountResponse =
     typeof row.email === 'string' &&
     typeof row.fullName === 'string' &&
     typeof row.isBlocked === 'boolean' &&
-    roles.includes(row.role as StaffRole)
+    staffRoles.includes(row.role as StaffRole)
   );
 };
 

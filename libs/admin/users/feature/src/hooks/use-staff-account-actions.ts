@@ -1,6 +1,7 @@
 import {
   useChangeStaffRoleMutation,
   useCreateStaffAccountMutation,
+  useDeleteStaffAccountMutation,
   useSetStaffBlockedMutation,
   useSetStaffPasswordMutation,
 } from '@admin/users/data-access';
@@ -19,6 +20,7 @@ export function useStaffAccountActions(onSuccess: (message: string) => void) {
   const [changeRole, changeRoleState] = useChangeStaffRoleMutation();
   const [setBlocked, setBlockedState] = useSetStaffBlockedMutation();
   const [setPassword, setPasswordState] = useSetStaffPasswordMutation();
+  const [deleteStaff, deleteState] = useDeleteStaffAccountMutation();
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [passwordTarget, setPasswordTarget] = useState<StaffAccount | null>(null);
@@ -79,11 +81,15 @@ export function useStaffAccountActions(onSuccess: (message: string) => void) {
     try {
       if (action.type === 'changeRole') {
         await changeRole({ userId: account.id, role: action.role }).unwrap();
-      } else {
+      } else if (action.type === 'setBlocked') {
         await setBlocked({ userId: account.id, blocked: action.blocked }).unwrap();
+      } else {
+        await deleteStaff(account.id).unwrap();
       }
 
-      onSuccess('Зміни збережено.');
+      onSuccess(
+        action.type === 'delete' ? `Користувача ${account.email} видалено.` : 'Зміни збережено.',
+      );
       closeDialogs();
     } catch (actionError) {
       setError(getStaffErrorMessage(actionError));
@@ -94,7 +100,7 @@ export function useStaffAccountActions(onSuccess: (message: string) => void) {
     closeDialogs,
     confirm,
     confirmation,
-    confirming: changeRoleState.isLoading || setBlockedState.isLoading,
+    confirming: changeRoleState.isLoading || setBlockedState.isLoading || deleteState.isLoading,
     creating: createState.isLoading,
     error,
     isCreateOpen,

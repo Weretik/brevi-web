@@ -8,6 +8,13 @@ import type { StaffAccount } from '@admin/users/model';
 const accounts: StaffAccount[] = [
   { id: 1, email: 'admin@brevi.com.ua', fullName: 'Адмін', role: 'Admin', isBlocked: false },
   {
+    id: 3,
+    email: 'director@brevi.com.ua',
+    fullName: 'Директор',
+    role: 'Director',
+    isBlocked: false,
+  },
+  {
     id: 2,
     email: 'manager@brevi.com.ua',
     fullName: 'Олена',
@@ -16,11 +23,11 @@ const accounts: StaffAccount[] = [
   },
 ];
 
-const renderTable = (onAction = vi.fn()) =>
+const renderTable = (onAction = vi.fn(), actor = { id: 1, isDirector: false }) =>
   render(
     <StaffAccountsTable
       accounts={accounts}
-      currentUserId={1}
+      actor={actor}
       error={false}
       loading={false}
       onAction={onAction}
@@ -37,16 +44,30 @@ describe('StaffAccountsTable', () => {
     expect(within(managerRow).getByText('Заблокований')).toBeTruthy();
   });
 
-  it('does not let the admin demote or block themselves', () => {
+  it('does not let the admin change their role, block or delete themselves', () => {
     renderTable();
     fireEvent.click(screen.getByRole('button', { name: 'Дії для admin@brevi.com.ua' }));
 
-    expect(screen.getByRole('menuitem', { name: /менеджер/ }).getAttribute('aria-disabled')).toBe(
-      'true',
-    );
-    expect(
-      screen.getByRole('menuitem', { name: 'Заблокувати' }).getAttribute('aria-disabled'),
-    ).toBe('true');
+    expect(screen.getByRole('menuitem', { name: 'Встановити новий пароль' })).toBeTruthy();
+    expect(screen.queryByRole('menuitem', { name: /Зробити/ })).toBeNull();
+    expect(screen.queryByRole('menuitem', { name: 'Заблокувати' })).toBeNull();
+    expect(screen.queryByRole('menuitem', { name: 'Видалити' })).toBeNull();
+  });
+
+  it('gives the admin no actions on the director', () => {
+    renderTable();
+
+    expect(screen.queryByRole('button', { name: 'Дії для director@brevi.com.ua' })).toBeNull();
+  });
+
+  it('lets the director delete a manager and offers no second director', () => {
+    const onAction = vi.fn();
+    renderTable(onAction, { id: 3, isDirector: true });
+    fireEvent.click(screen.getByRole('button', { name: 'Дії для manager@brevi.com.ua' }));
+
+    expect(screen.queryByRole('menuitem', { name: /директор/ })).toBeNull();
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Видалити' }));
+    expect(onAction).toHaveBeenCalledWith(accounts[2], { type: 'delete' });
   });
 
   it('asks to unblock a blocked manager', () => {
@@ -55,6 +76,6 @@ describe('StaffAccountsTable', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Дії для manager@brevi.com.ua' }));
     fireEvent.click(screen.getByRole('menuitem', { name: 'Розблокувати' }));
 
-    expect(onAction).toHaveBeenCalledWith(accounts[1], { type: 'setBlocked', blocked: false });
+    expect(onAction).toHaveBeenCalledWith(accounts[2], { type: 'setBlocked', blocked: false });
   });
 });

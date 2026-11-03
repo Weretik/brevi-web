@@ -69,14 +69,37 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * List administrators and managers
-     * @description Policy `CanManageUsers` (role Admin). Customers are not listed.
+     * List staff accounts
+     * @description Policy `CanManageUsers` (role Admin; the director also holds Admin). Customers are not listed. Each account shows its strongest role.
      */
     get: operations['getStaffAccounts'];
     put?: never;
-    /** Create an administrator or manager */
+    /**
+     * Create a staff account
+     * @description There is at most one director.
+     */
     post: operations['createStaffAccount'];
     delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/admin/users/{userId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /**
+     * Delete a staff account
+     * @description Removes the account and its sessions for good. Nobody deletes their own account (400). Only the director deletes the director (403).
+     */
+    delete: operations['deleteStaffAccount'];
     options?: never;
     head?: never;
     patch?: never;
@@ -92,7 +115,7 @@ export interface paths {
     get?: never;
     /**
      * Change a staff account's role
-     * @description The account's sessions pick up the new role within 5 minutes. An administrator cannot change their own role (400).
+     * @description The account's sessions pick up the new role within 5 minutes. Only the director changes their own role; an administrator gets 400. Only the director changes the director (403). There is at most one director (409).
      */
     put: operations['changeStaffRole'];
     post?: never;
@@ -112,7 +135,7 @@ export interface paths {
     get?: never;
     /**
      * Block or unblock a staff account
-     * @description Blocking ends browser sessions within 5 minutes. An administrator cannot block their own account (400).
+     * @description Blocking ends browser sessions within 5 minutes. Nobody blocks their own account (400). Only the director changes the director (403).
      */
     put: operations['setStaffBlocked'];
     post?: never;
@@ -132,7 +155,7 @@ export interface paths {
     get?: never;
     /**
      * Set a new password for a staff account
-     * @description Ends the account's existing sessions.
+     * @description Ends the account's existing sessions. Only the director changes the director's password (403).
      */
     put: operations['setStaffPassword'];
     post?: never;
@@ -2467,10 +2490,10 @@ export interface components {
       /** Format: email */
       email: string;
       fullName: string;
-      roles: ('Admin' | 'Manager' | 'User')[];
+      roles: ('Director' | 'Admin' | 'Accountant' | 'Manager' | 'User')[];
     };
     /** @enum {string} */
-    StaffRole: 'Admin' | 'Manager';
+    StaffRole: 'Director' | 'Admin' | 'Accountant' | 'Manager';
     StaffAccountResponse: {
       /** Format: int32 */
       id: number;
@@ -5537,8 +5560,59 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Email already used */
+      /** @description Email already used, or a director already exists */
       409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  deleteStaffAccount: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Value of the `brevi.csrf` cookie. Required on every non-GET request made with the session cookie. */
+        'X-CSRF-Token': components['parameters']['CsrfHeader'];
+      };
+      path: {
+        userId: components['parameters']['UserId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Deleted */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Own account */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not an administrator, or the account is the director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No staff account with this ID */
+      404: {
         headers: {
           [name: string]: unknown;
         };
@@ -5587,7 +5661,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Not an administrator */
+      /** @description Not an administrator, or the account is the director */
       403: {
         headers: {
           [name: string]: unknown;
@@ -5596,6 +5670,13 @@ export interface operations {
       };
       /** @description No staff account with this ID */
       404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description A director already exists */
+      409: {
         headers: {
           [name: string]: unknown;
         };
@@ -5644,7 +5725,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Not an administrator */
+      /** @description Not an administrator, or the account is the director */
       403: {
         headers: {
           [name: string]: unknown;
@@ -5702,7 +5783,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Not an administrator */
+      /** @description Not an administrator, or the account is the director */
       403: {
         headers: {
           [name: string]: unknown;

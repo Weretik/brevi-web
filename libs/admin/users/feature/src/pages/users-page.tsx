@@ -1,4 +1,5 @@
 import { useGetStaffAccountsQuery } from '@admin/users/data-access';
+import { hasDirector } from '@admin/users/model';
 import {
   ConfirmActionDialog,
   CreateStaffPanel,
@@ -11,12 +12,15 @@ import { useState } from 'react';
 
 import { useStaffAccountActions } from '../hooks/use-staff-account-actions';
 
+import type { StaffActor } from '@admin/users/model';
+
 interface UsersPageProps {
-  currentUserId: number | null;
+  actor: StaffActor;
 }
 
-export default function UsersPage({ currentUserId }: UsersPageProps) {
+export default function UsersPage({ actor }: UsersPageProps) {
   const accountsQuery = useGetStaffAccountsQuery();
+  const accounts = accountsQuery.currentData ?? [];
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const actions = useStaffAccountActions(setSuccessMessage);
 
@@ -31,8 +35,9 @@ export default function UsersPage({ currentUserId }: UsersPageProps) {
             Користувачі
           </Typography>
           <Typography sx={{ color: 'text.secondary', mt: 0.5 }} variant="body2">
-            Адміністратори керують користувачами та бачать усі розділи. Менеджери працюють з
-            довідниками, товарами та клієнтами.
+            Директор і адміністратори керують користувачами та бачать усі розділи; директора змінює
+            лише директор. Менеджери працюють з довідниками, товарами та клієнтами. Бухгалтер поки
+            лише переглядає каталог.
           </Typography>
         </div>
         <Button onClick={actions.openCreate} startIcon={<AddIcon />} variant="contained">
@@ -41,8 +46,8 @@ export default function UsersPage({ currentUserId }: UsersPageProps) {
       </Stack>
       <Card sx={{ overflow: 'hidden' }} variant="outlined">
         <StaffAccountsTable
-          accounts={accountsQuery.currentData ?? []}
-          currentUserId={currentUserId}
+          accounts={accounts}
+          actor={actor}
           error={accountsQuery.isError}
           loading={accountsQuery.isFetching}
           onAction={actions.startAction}
@@ -50,6 +55,7 @@ export default function UsersPage({ currentUserId }: UsersPageProps) {
         />
       </Card>
       <CreateStaffPanel
+        directorExists={hasDirector(accounts)}
         error={actions.error}
         onClose={actions.closeDialogs}
         onSubmit={actions.submitCreate}

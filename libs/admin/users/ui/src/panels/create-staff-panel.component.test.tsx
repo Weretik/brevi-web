@@ -8,6 +8,7 @@ describe('CreateStaffPanel', () => {
     const onSubmit = vi.fn();
     render(
       <CreateStaffPanel
+        directorExists={false}
         error={null}
         onClose={vi.fn()}
         onSubmit={onSubmit}
@@ -27,6 +28,7 @@ describe('CreateStaffPanel', () => {
     const onClose = vi.fn();
     render(
       <CreateStaffPanel
+        directorExists={false}
         error={null}
         onClose={onClose}
         onSubmit={onSubmit}
@@ -51,5 +53,24 @@ describe('CreateStaffPanel', () => {
       }),
     );
     await waitFor(() => expect(onClose).toHaveBeenCalled());
+  });
+
+  it('does not offer a second director', () => {
+    render(
+      <CreateStaffPanel
+        directorExists
+        error={null}
+        onClose={vi.fn()}
+        onSubmit={vi.fn()}
+        open
+        submitting={false}
+      />,
+    );
+
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Роль' }));
+
+    expect(screen.getByRole('option', { name: 'Директор' }).getAttribute('aria-disabled')).toBe(
+      'true',
+    );
   });
 });

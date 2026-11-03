@@ -9,6 +9,23 @@ describe('getStaffErrorMessage', () => {
     );
   });
 
+  it('explains the director rules', () => {
+    expect(
+      getStaffErrorMessage({
+        code: 'Unknown',
+        status: 409,
+        message: 'There can be only one director.',
+      }),
+    ).toBe('Директор може бути лише один.');
+    expect(
+      getStaffErrorMessage({
+        code: 'Forbidden',
+        status: 403,
+        message: 'Only the director can change the director.',
+      }),
+    ).toBe('Директора може змінювати лише директор.');
+  });
+
   it('lists server validation messages', () => {
     expect(
       getStaffErrorMessage({

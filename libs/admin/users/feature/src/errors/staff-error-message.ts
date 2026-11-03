@@ -9,12 +9,16 @@ export const getStaffErrorMessage = (error: unknown): string => {
     return 'Не вдалося виконати дію. Спробуйте ще раз.';
   }
 
+  const aboutDirector = /director/i.test(error.message);
+
   if (error.status === 409) {
-    return 'Користувач з таким email вже існує.';
+    return aboutDirector ? 'Директор може бути лише один.' : 'Користувач з таким email вже існує.';
   }
 
   if (error.code === 'Forbidden') {
-    return 'Лише адміністратор може керувати користувачами.';
+    return aboutDirector
+      ? 'Директора може змінювати лише директор.'
+      : 'Лише адміністратор може керувати користувачами.';
   }
 
   if (error.code === 'NotFound') {

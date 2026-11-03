@@ -20,6 +20,8 @@ const emptyInput: CreateStaffAccountInput = {
 
 interface CreateStaffPanelProps {
   open: boolean;
+  /** There can be only one director, so the option is off once one exists. */
+  directorExists: boolean;
   submitting: boolean;
   /** Server error to show above the form. */
   error: string | null;
@@ -29,6 +31,7 @@ interface CreateStaffPanelProps {
 }
 
 export function CreateStaffPanel({
+  directorExists,
   error,
   onClose,
   onSubmit,
@@ -95,7 +98,7 @@ export function CreateStaffPanel({
           value={input.role}
         >
           {staffRoles.map((role) => (
-            <MenuItem key={role} value={role}>
+            <MenuItem disabled={role === 'Director' && directorExists} key={role} value={role}>
               {staffRoleLabels[role]}
             </MenuItem>
           ))}

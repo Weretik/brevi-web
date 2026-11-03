@@ -1,6 +1,7 @@
 export {
   useChangeStaffRoleMutation,
   useCreateStaffAccountMutation,
+  useDeleteStaffAccountMutation,
   useGetStaffAccountsQuery,
   useSetStaffBlockedMutation,
   useSetStaffPasswordMutation,

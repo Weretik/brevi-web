@@ -13,12 +13,16 @@ import { adminRouteDefinitions } from './admin-route-definitions';
 import { AdminRouteLayout } from './admin-route-layout';
 import { NotFoundPage } from '../pages/not-found-page';
 
-function useSignedInUserId(): number | null {
+import type { StaffActor } from '@admin/users/model';
+
+function useSignedInStaff(): StaffActor {
   const session = useAdminSession();
-  return session.status === 'authenticated' ? Number(session.user.id) : null;
+  return session.status === 'authenticated'
+    ? { id: Number(session.user.id), isDirector: session.user.roles.includes('Director') }
+    : { id: null, isDirector: false };
 }
 
-const usersRoutes = createUsersRoutes({ useCurrentUserId: useSignedInUserId });
+const usersRoutes = createUsersRoutes({ useStaffActor: useSignedInStaff });
 
 export function createAdminRouter() {
   return createBrowserRouter([

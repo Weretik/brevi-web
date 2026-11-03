@@ -14,6 +14,7 @@ const requiredOperations = {
     'changeStaffRole',
     'setStaffBlocked',
     'setStaffPassword',
+    'deleteStaffAccount',
   ],
   'reference/suppliers.openapi.yaml': [
     'getSuppliers',

@@ -3,8 +3,11 @@ import { staffRoleLabels } from '@admin/users/model';
 import type { StaffAccount } from '@admin/users/model';
 import type { StaffAccountAction } from '@admin/users/ui';
 
-/** Text of the confirmation dialog for a role change or blocking. */
-export type ConfirmableAction = Extract<StaffAccountAction, { type: 'changeRole' | 'setBlocked' }>;
+/** Text of the confirmation dialog for a role change, blocking or deletion. */
+export type ConfirmableAction = Extract<
+  StaffAccountAction,
+  { type: 'changeRole' | 'setBlocked' | 'delete' }
+>;
 
 export interface PendingConfirmation {
   account: StaffAccount;
@@ -27,6 +30,17 @@ export const describeConfirmation = (
       description: `${account.email} отримає роль «${staffRoleLabels[action.role]}». Нова роль діятиме протягом 5 хвилин.`,
       confirmLabel: 'Змінити роль',
       destructive: false,
+    };
+  }
+
+  if (action.type === 'delete') {
+    return {
+      account,
+      action,
+      title: 'Видалити користувача?',
+      description: `${account.email} буде видалено назавжди, а його сесії завершаться. Це не можна скасувати.`,
+      confirmLabel: 'Видалити',
+      destructive: true,
     };
   }
 
