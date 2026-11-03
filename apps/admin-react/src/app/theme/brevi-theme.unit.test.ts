@@ -18,6 +18,18 @@ describe('Brevi theme', () => {
     expect(darkTheme.palette.background.default).toBe('#09090b');
   });
 
+  it('makes native scrollbars follow the color scheme', () => {
+    for (const theme of [lightTheme, darkTheme]) {
+      const overrides = theme.components?.MuiCssBaseline?.styleOverrides;
+      const styles = (typeof overrides === 'function' ? overrides(theme) : overrides) as Record<
+        string,
+        Record<string, unknown>
+      >;
+      expect(styles['html']?.['colorScheme']).toBe(theme.palette.mode);
+      expect(styles['*']?.['scrollbarColor']).toContain('transparent');
+    }
+  });
+
   it('provides Ukrainian labels for Material UI and the data grid in both schemes', () => {
     for (const theme of [lightTheme, darkTheme]) {
       const dataGridLocale = theme.components?.MuiDataGrid?.defaultProps?.localeText;
