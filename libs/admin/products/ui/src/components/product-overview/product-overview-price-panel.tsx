@@ -1,5 +1,5 @@
 import { ReferenceFormSection } from '@admin/references/ui';
-import { Alert, Box, Button, Skeleton, Typography } from '@mui/material';
+import { Alert, Box, Skeleton, Typography } from '@mui/material';
 
 export interface ProductPanelMetric {
   label: string;
@@ -12,9 +12,6 @@ interface Props {
   error: string | null;
   /** Reasons the price cannot be calculated. */
   blockers: readonly string[];
-  /** «Перерахувати ціни» of one sewing model; absent for PPE. */
-  onRecalculate?: () => void;
-  recalculating?: boolean;
 }
 
 /** Side panel block (CAT-011 design C): materials, labour, cost and price date, two per row. */
@@ -23,8 +20,6 @@ export function ProductOverviewPricePanel({
   loading,
   error,
   blockers,
-  onRecalculate,
-  recalculating = false,
 }: Props) {
   return (
     <ReferenceFormSection title="Ціни і собівартість">
@@ -54,11 +49,6 @@ export function ProductOverviewPricePanel({
       </Box>
       {blockers.length > 0 && (
         <Alert severity="warning">Не розраховано: {blockers.join(', ')}.</Alert>
-      )}
-      {onRecalculate && (
-        <Button variant="outlined" disabled={recalculating} onClick={onRecalculate}>
-          Перерахувати ціни
-        </Button>
       )}
     </ReferenceFormSection>
   );

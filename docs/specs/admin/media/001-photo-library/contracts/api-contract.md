@@ -1,7 +1,7 @@
 # Consumer contract: photo library
 
 - **Canonical OpenAPI:** `docs/sdd/contracts/media/media-library.openapi.yaml` in
-  `https://github.com/Weretik/BreviERP.git`, commit `8ade8d0dbbe86666cca85df691e7d04b345ef9e5`
+  `https://github.com/Weretik/BreviERP.git`, commit `8e3cd1aa8525d0069c75da1570049388457da1f2`
   (PR #27, stage 1).
 - **Snapshot:** `docs/contracts/openapi/backend/media/`, types in `@admin/shared/contracts`.
 

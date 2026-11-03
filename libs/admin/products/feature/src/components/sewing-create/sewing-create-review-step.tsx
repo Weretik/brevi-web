@@ -33,8 +33,6 @@ export function SewingCreateReviewStep(props: Props) {
         productId={props.productId}
         articles={props.articles}
         articleId={articleId}
-        compositionVersion={props.compositionVersion}
-        canManage={props.canManage}
         dirty={props.dirty}
         onSelect={setArticleId}
       />

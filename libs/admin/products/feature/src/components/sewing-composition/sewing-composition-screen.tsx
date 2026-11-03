@@ -178,8 +178,6 @@ export function SewingCompositionScreen({ productId, controller, section = 'all'
             key={`${productId}:${selectedArticleId}`}
             productId={productId}
             articleId={selectedArticleId}
-            compositionVersion={articles.data?.version ?? 0}
-            canManage={canManage}
             dirty={drafts.dirty || busy}
           />
         )}

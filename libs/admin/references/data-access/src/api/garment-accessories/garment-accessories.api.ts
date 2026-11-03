@@ -2,7 +2,7 @@ import { adminApi, toAdminApiError } from '@admin/shared/api-client';
 
 import { mapGarmentAccessories } from '../../mappers/garment-accessories/garment-accessories.mapper';
 import { parseGarmentAccessoriesResponse } from '../../validators/garment-accessories/garment-accessories-response';
-import { referenceErrorMessages } from '../shared/reference-api.shared';
+import { referenceErrorMessages, productPricesTag } from '../shared/reference-api.shared';
 
 import type {
   CreateGarmentAccessoryBody,
@@ -26,7 +26,7 @@ export const garmentAccessoriesApi = adminApi.injectEndpoints({
       query: (body) => ({ url: '/api/reference/garment-accessories', method: 'POST', body }),
       transformErrorResponse: (error) => toAdminApiError(error, referenceErrorMessages),
       invalidatesTags: (_result, error) =>
-        error ? [] : [{ type: 'GarmentAccessory', id: 'LIST' }],
+        error ? [] : [productPricesTag, { type: 'GarmentAccessory', id: 'LIST' }],
     }),
     updateGarmentAccessory: build.mutation<void, { id: number; body: UpdateGarmentAccessoryBody }>({
       query: ({ id, body }) => ({
@@ -39,6 +39,7 @@ export const garmentAccessoriesApi = adminApi.injectEndpoints({
         error
           ? []
           : [
+              productPricesTag,
               { type: 'GarmentAccessory', id },
               { type: 'GarmentAccessory', id: 'LIST' },
             ],
@@ -50,6 +51,7 @@ export const garmentAccessoriesApi = adminApi.injectEndpoints({
         error
           ? []
           : [
+              productPricesTag,
               { type: 'GarmentAccessory', id },
               { type: 'GarmentAccessory', id: 'LIST' },
             ],

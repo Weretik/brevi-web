@@ -186,7 +186,7 @@ describe('SewingProductCard', () => {
     );
     expect(screen.getByLabelText('Адреса')).toHaveTextContent('?tab=pricing');
     expect(mocks.pricing.mock.calls.at(-1)?.[0]).toEqual(
-      expect.objectContaining({ productId: 42, articleId: 12, compositionVersion: 3 }),
+      expect.objectContaining({ productId: 42, articleId: 12 }),
     );
   });
 

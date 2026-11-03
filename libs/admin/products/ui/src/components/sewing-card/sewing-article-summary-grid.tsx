@@ -4,6 +4,7 @@ import {
   sewingReadyStatus,
 } from '@admin/products/model';
 import { Box } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { DataGrid } from '@mui/x-data-grid';
 import { useMemo } from 'react';
 
@@ -99,6 +100,7 @@ const columns: GridColDef<SewingArticleSummaryRow>[] = [
 
 /** «Артикули» tab: every site Article with live cost and three prices, as the sheet «Прайс на сайт». */
 export function SewingArticleSummaryGrid({ rows, loading, onOpen }: Props) {
+  const theme = useTheme();
   const sorted = useMemo(
     () => [...rows].sort((left, right) => left.sortOrder - right.sortOrder || left.id - right.id),
     [rows],
@@ -125,7 +127,10 @@ export function SewingArticleSummaryGrid({ rows, loading, onOpen }: Props) {
         onRowClick={({ row }) => onOpen(row.id)}
         pageSizeOptions={[10, 25, 50, 100]}
         initialState={{ pagination: { paginationModel: { pageSize: 25 } } }}
-        localeText={{ noRowsLabel: 'Артикулів поки немає' }}
+        localeText={{
+          ...theme.components?.MuiDataGrid?.defaultProps?.localeText,
+          noRowsLabel: 'Артикулів поки немає',
+        }}
         sx={{
           '& .MuiDataGrid-row': { cursor: 'pointer' },
           '& .MuiDataGrid-cell': { minHeight: 44 },

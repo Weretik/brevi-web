@@ -21,9 +21,6 @@ interface Props {
   showCardLink?: boolean;
   /** List prices of the row (CAT-011); the price block is shown only with them. */
   prices?: ProductOverviewPrices | null;
-  /** «Перерахувати ціни» of this sewing model. */
-  onRecalculate?: () => void;
-  recalculating?: boolean;
 }
 
 export function ProductOverviewDrawer({
@@ -35,8 +32,6 @@ export function ProductOverviewDrawer({
   onSaved,
   showCardLink = true,
   prices,
-  onRecalculate,
-  recalculating,
 }: Props) {
   const editor = useProductOverviewEditor(initialMode, row, onSaved);
   const readOnly = editor.mode === 'view';
@@ -63,12 +58,7 @@ export function ProductOverviewDrawer({
         {readOnly ? (
           <>
             {prices !== undefined && (
-              <ProductOverviewPriceBlock
-                row={row}
-                prices={prices}
-                onRecalculate={row.type === 'Sewing' ? onRecalculate : undefined}
-                recalculating={recalculating}
-              />
+              <ProductOverviewPriceBlock row={row} prices={prices} />
             )}
             <ProductOverviewDetails
               row={row}
