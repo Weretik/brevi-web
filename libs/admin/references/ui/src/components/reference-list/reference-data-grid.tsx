@@ -32,6 +32,10 @@ interface Props<Row extends ReferenceRow> {
   onView: (row: Row) => void;
   onEdit: (row: Row) => void;
   onDelete: (id: number) => void;
+  /** Rows that are details of another row (no checkbox, no menu). */
+  isDetailRow?: (row: Row) => boolean;
+  /** Column sorting; off when the row order carries meaning (detail rows follow their parent). */
+  sortable?: boolean;
 }
 
 /**
@@ -53,9 +57,12 @@ export function ReferenceDataGrid<Row extends ReferenceRow>({
   onView,
   onEdit,
   onDelete,
+  isDetailRow,
+  sortable = true,
 }: Props<Row>) {
   const theme = useTheme();
-  const { rowMenu, openRowMenu, closeRowMenu, rowSlotProps } = useReferenceRowContextMenu(rows);
+  const menuRows = isDetailRow ? rows.filter((row) => !isDetailRow(row)) : rows;
+  const { rowMenu, openRowMenu, closeRowMenu, rowSlotProps } = useReferenceRowContextMenu(menuRows);
   const actionsColumn: GridColDef<Row> = {
     field: 'actions',
     headerName: 'Дії',
@@ -64,23 +71,24 @@ export function ReferenceDataGrid<Row extends ReferenceRow>({
     sortable: false,
     filterable: false,
     disableColumnMenu: true,
-    renderCell: ({ row, tabIndex }) => (
-      <IconButton
-        size="small"
-        aria-label={`Дії: ${row.name}`}
-        tabIndex={tabIndex}
-        aria-haspopup="menu"
-        aria-expanded={rowMenu?.row.id === row.id ? true : undefined}
-        onClick={(event) => {
-          event.stopPropagation();
-          const bounds = event.currentTarget.getBoundingClientRect();
-          openRowMenu(row, { left: bounds.right, top: bounds.bottom }, event.currentTarget);
-        }}
-        sx={{ width: 40, height: 40 }}
-      >
-        <MoreHorizOutlinedIcon fontSize="small" />
-      </IconButton>
-    ),
+    renderCell: ({ row, tabIndex }) =>
+      isDetailRow?.(row) ? null : (
+        <IconButton
+          size="small"
+          aria-label={`Дії: ${row.name}`}
+          tabIndex={tabIndex}
+          aria-haspopup="menu"
+          aria-expanded={rowMenu?.row.id === row.id ? true : undefined}
+          onClick={(event) => {
+            event.stopPropagation();
+            const bounds = event.currentTarget.getBoundingClientRect();
+            openRowMenu(row, { left: bounds.right, top: bounds.bottom }, event.currentTarget);
+          }}
+          sx={{ width: 40, height: 40 }}
+        >
+          <MoreHorizOutlinedIcon fontSize="small" />
+        </IconButton>
+      ),
   };
 
   return (
@@ -89,7 +97,14 @@ export function ReferenceDataGrid<Row extends ReferenceRow>({
         <DataGrid
           aria-label={ariaLabel}
           rows={rows}
-          columns={[...columns, actionsColumn]}
+          columns={(sortable
+            ? columns
+            : columns.map((column) => ({ ...column, sortable: false }))
+          ).concat(actionsColumn)}
+          isRowSelectable={isDetailRow ? ({ row }) => !isDetailRow(row) : undefined}
+          getRowClassName={
+            isDetailRow ? ({ row }) => (isDetailRow(row) ? 'reference-detail-row' : '') : undefined
+          }
           loading={loading}
           rowHeight={52}
           columnHeaderHeight={44}
@@ -123,6 +138,8 @@ export function ReferenceDataGrid<Row extends ReferenceRow>({
               fontVariantNumeric: 'tabular-nums',
             },
             '& .reference-strong': { fontWeight: 600 },
+            '& .reference-detail-row': { bgcolor: 'action.hover' },
+            '& .reference-detail-row .MuiDataGrid-cellCheckbox > *': { visibility: 'hidden' },
             '& .MuiDataGrid-columnHeaders': { bgcolor: 'action.hover' },
           }}
         />

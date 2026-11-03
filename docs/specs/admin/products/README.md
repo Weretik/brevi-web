@@ -48,3 +48,5 @@
 [010 PPE product card](010-ppe-product-card/README.md) turns the PPE product page into a «Цех» card with supplier fields and the three prices, and makes «Додати» open the side panel in every «Довідники» table.
 
 [011 Product create pages](011-product-create-pages/README.md) adds the full pages «Новий ЗІЗ» and «Нова модель» built from the sheet instruction, and removes the old create form.
+
+[012 Prices on the «Товари» list](012-product-list-prices/README.md) shows the three prices per model with expandable articles, the «Без ціни» filter, the side panel costs and «Перерахувати всі».

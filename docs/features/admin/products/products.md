@@ -2,7 +2,7 @@
 
 **Status:** routes and pages implemented, checked 2026-10-16.
 
-`/references/products` is the «Товари» page ([spec 008](../../../specs/admin/products/008-products-page/README.md)): tabs «Швейна продукція» (one row per model) and «ЗІЗ» (`?tab=ppe`), section chips, search, a drawer for code, section, season, active, «Перевірено», the current site link and the quote description, and bulk deletion. Site texts, SEO and photos are not shown there; they go to the planned «Контент сайту» module. `/new/ppe` is the «Новий ЗІЗ» page (four blocks of the sheet instruction, debounced code check and price preview, a sticky «Готовність» / «Ціни в прайсі» / «Інструкція» panel; on success it opens the PPE card), `/new/sewing` is «Нова модель» (5-step wizard that saves an inactive draft after step 1, `?id=&step=`; [spec 011](../../../specs/admin/products/011-product-create-pages/README.md)), the old `/create` redirects to the list, and `/:id` and `/:id/edit` open detail and edit
+`/references/products` is the «Товари» page ([spec 008](../../../specs/admin/products/008-products-page/README.md)): tabs «Швейна продукція» (one row per model) and «ЗІЗ» (`?tab=ppe`), section chips, search, a drawer for code, section, season, active, «Перевірено», the current site link and the quote description, and bulk deletion. Site texts, SEO and photos are not shown there; they go to the planned «Контент сайту» module. The list shows prices ([spec 012](../../../specs/admin/products/012-product-list-prices/README.md)): per model three tiers 1–9 / 10–40 / від 41 («від …» across articles), an arrow opens the articles with their prices, stale prices are marked, «Без ціни» filters, the view panel shows materials, labour, cost and the price date, and «Перерахувати всі» (sewing) previews and then publishes changed prices. `/new/ppe` is the «Новий ЗІЗ» page (four blocks of the sheet instruction, debounced code check and price preview, a sticky «Готовність» / «Ціни в прайсі» / «Інструкція» panel; on success it opens the PPE card), `/new/sewing` is «Нова модель» (5-step wizard that saves an inactive draft after step 1, `?id=&step=`; [spec 011](../../../specs/admin/products/011-product-create-pages/README.md)), the old `/create` redirects to the list, and `/:id` and `/:id/edit` open detail and edit
 pages. For a sewing model `/:id` is the «Цех» card ([spec 009](../../../specs/admin/products/009-sewing-product-card/README.md)): header, metrics and tabs «Артикули», «Комплектація», «Трудовитрати», «Ціни» (`?tab=`); A PPE product's `/:id` is the PPE card ([spec 010](../../../specs/admin/products/010-ppe-product-card/README.md)): supplier fields of the sheet tab «ЗІЗ» and the three prices. `products/feature` owns scenarios, local state, and loading/error/empty
 handling; `products/ui` provides presentation; `products/model` provides domain
 models; and `products/data-access` provides API endpoints, mappers, and
@@ -32,6 +32,7 @@ libs/admin/products/
 │   ├── api/
 │   │   └── products.api.ts # API
 │   │   └── product-overview/product-overview.api.ts # «Товари» page API
+│   │   └── product-overview/product-overview-prices.api.ts # list prices and recalculation
 │   └── mappers/
 │       └── product.mapper.ts # mapper
 ├── feature/src/
@@ -50,7 +51,7 @@ libs/admin/products/
 │   │   │   └── sewing-create-page.tsx # «Нова модель», 5-step wizard; hooks/components in */sewing-create/
 │   │   └── product-list/
 │   │       ├── products-page.tsx # «Товари» tabs
-│   │       └── product-overview-content.tsx # one table with chips and drawer
+│   │       └── product-overview-content.tsx # one table with prices, chips, drawer, «Перерахувати всі»
 │   └── products.routes.tsx # routes
 ├── model/src/product-editor/
 │   └── product-draft.ts # draft
@@ -64,7 +65,7 @@ libs/admin/products/
 
 ## Tests
 
-- `libs/admin/products/model/src/`: `queries/product-overview/`, `forms/product-overview/`; `libs/admin/products/data-access/src/mappers/product-overview/`
+- `libs/admin/products/model/src/`: `queries/product-overview/`, `forms/product-overview/`; `libs/admin/products/data-access/src/mappers/product-overview/`, `validators/product-overview/`
 - `libs/admin/products/feature/src/`: `pages/product-list/`, `pages/product-detail/`, `components/product-editor/`, `components/sewing-card/`, `components/ppe-card/`, `hooks/product-detail/`
 - `libs/admin/products/model/src/queries/sewing-card/`; `libs/admin/products/data-access/src/mappers/sewing-pricing/sewing-article-summary.mapper.unit.test.ts`
 - `libs/admin/products/data-access/src/products.api.integration.test.ts`

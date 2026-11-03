@@ -15,6 +15,7 @@ function adaptStubbedFetch(): void {
     const response = await (input instanceof Request && init === undefined
       ? testFetch(`${new URL(input.url).pathname}${new URL(input.url).search}`, {
           method: input.method,
+          ...(input.method === 'GET' ? {} : { body: await input.clone().text() }),
         })
       : testFetch(input, init));
     if (response instanceof Response) return response;

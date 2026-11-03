@@ -719,6 +719,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/products/overview/prices': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Prices of every «Товари» row (CAT-011)
+     * @description CatalogRead. Sewing: for every Article the published (fixed) prices and the live prices calculated from today's inputs; isStale when they differ. from is the lowest published price of each tier among active Articles. status is Ready (all published and current), Stale (a published price differs from the live one), Unpublished (a calculable active Article has no published price) or Blocked (no active Article has a price or a calculable price; blockers are the calculation codes). PPE: the live price from the current offer and rule, pricesUpdatedAt is the offer date, articles is empty. Tiers are 1–9, 10–40 and from 41 pieces.
+     */
+    get: operations['getProductOverviewPrices'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/products/{id}/overview': {
     parameters: {
       query?: never;
@@ -735,6 +755,26 @@ export interface paths {
      */
     put: operations['updateProductOverview'];
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/products/sheet-import': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Import all products from the Calculator sheet (preview or apply)
+     * @description Requires CanManageProducts and an actor (CAT-010). One-time transfer of the tabs «Товари» (with «Прайс на сайт», «Комплектація виробів», «Трудовитрати виробів») and «ЗІЗ». A row matches a stored product by type and code (sewing model ID, PPE site article), else by the exact name of the same type; a matched product keeps its ID and slug, the rest are created (ID largest + 1, slug as in createCatalogProduct). Names are Ukrainian only; the Russian name column gets a copy. A matched sewing model gets its article list and whole composition replaced; a checked model's lines are marked reviewed by «Google-таблиця» at Kyiv midnight of verifiedOn. A PPE product gets a new offer version (source «Імпорт з таблиці») only when the supplier price, the rule or a given Insight price differs; no supplier price means no version. With deleteMissing, every product of either type that no row matches is deleted. dryRun (default true) never writes. Any problem means nothing is written; warnings (unknown rule imported as none, no supplier price or link) do not stop the import. All writes run in one database transaction.
+     */
+    post: operations['importSheetProducts'];
     delete?: never;
     options?: never;
     head?: never;
@@ -962,6 +1002,23 @@ export interface paths {
     put?: never;
     /** @description Append an approved revision to an existing non-inventory service cost. Unit and source identity are preserved. requestId makes retries idempotent; expectedVersionId prevents lost updates. Requires CanManageProducts. */
     post: operations['reviseOtherCost'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/pricing/sewing/recalculation': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Requires CanManageProducts and an actor claim (CAT-011). «Перерахувати всі» and «Перерахувати ціни» of one model. Every active Article whose live price is calculable and was never published or differs from its published price gets a new saved calculation and a publication, one transaction per model. productIds null means every Sewing model. dryRun (default true) only reports. Blocked Articles keep their published price and are listed with their blocker codes. */
+    post: operations['recalculateSewingPrices'];
     delete?: never;
     options?: never;
     head?: never;
@@ -3171,6 +3228,39 @@ export interface components {
       /** @description Next free MOD-XXX for sewing; null for PPE. */
       suggestedCode: string | null;
     };
+    ProductPriceTiers: {
+      retail: number;
+      wholesale: number;
+      largeWholesale: number;
+    };
+    ProductOverviewArticlePrices: {
+      /** Format: int64 */
+      articleId: number;
+      saleSku: string;
+      active: boolean;
+      /**
+       * Format: int32
+       * @description The Article's own fabric, else the model's first fabric; names the Article in the price list.
+       */
+      fabricId: number | null;
+      published: components['schemas']['ProductPriceTiers'] | null;
+      /** Format: date-time */
+      publishedAt: string | null;
+      live: components['schemas']['ProductPriceTiers'] | null;
+      isStale: boolean;
+      blockers: string[];
+    };
+    ProductOverviewPrices: {
+      /** Format: int32 */
+      productId: number;
+      /** @enum {string} */
+      status: 'Ready' | 'Stale' | 'Unpublished' | 'Blocked';
+      from: components['schemas']['ProductPriceTiers'] | null;
+      /** Format: date-time */
+      pricesUpdatedAt: string | null;
+      blockers: string[];
+      articles: components['schemas']['ProductOverviewArticlePrices'][];
+    };
     UpdateProductOverviewRequest: {
       code?: string | null;
       /** Format: int32 */
@@ -3183,6 +3273,141 @@ export interface components {
       /** Format: uri */
       currentSiteUrl?: string | null;
       quoteDescription?: string | null;
+    };
+    SheetSewingArticleRow: {
+      saleSku: string;
+      isActive: boolean;
+    };
+    SheetSewingMaterialRow: {
+      /** Format: int32 */
+      rowNumber: number;
+      /** @description Sale SKU of the article; null for a line shared by all articles. */
+      article?: string | null;
+      /** @enum {string} */
+      kind: 'Fabric' | 'Accessory';
+      /** @description FAB-… or FUR-…. */
+      code: string;
+      quantity: number;
+      /**
+       * @description A fabric is in metres.
+       * @enum {string}
+       */
+      unit: 'Metre' | 'Piece';
+      isRequired: boolean;
+      comment?: string | null;
+    };
+    SheetSewingOperationRow: {
+      /** Format: int32 */
+      rowNumber: number;
+      /** @description Operations are shared by all articles; a value is a problem. */
+      article?: null;
+      /** @description OP-…; the same operation may appear more than once. */
+      code: string;
+      quantity: number;
+      manualMinutes?: number | null;
+      comment?: string | null;
+    };
+    SheetSewingRow: {
+      /** Format: int32 */
+      rowNumber: number;
+      /** @description Model ID MOD-…. */
+      code: string;
+      name: string;
+      /** @description Sewing section name in Reference «Типи і розділи». */
+      section?: string | null;
+      /** @enum {string|null} */
+      season?: 'Літо' | 'Зима' | null;
+      isActive: boolean;
+      isVerified: boolean;
+      /** @description dd.MM.yyyy. */
+      verifiedOn?: string | null;
+      /** Format: uri */
+      currentSiteUrl?: string | null;
+      quoteDescription?: string | null;
+      articles: components['schemas']['SheetSewingArticleRow'][];
+      materials: components['schemas']['SheetSewingMaterialRow'][];
+      operations: components['schemas']['SheetSewingOperationRow'][];
+    };
+    SheetPpeRow: {
+      /** Format: int32 */
+      rowNumber: number;
+      /** @description Site article. */
+      code: string;
+      name: string;
+      /** @description PPE section name in Reference «Типи і розділи». */
+      section?: string | null;
+      unit?: string | null;
+      /** Format: uri */
+      currentSiteUrl?: string | null;
+      /** @description Reference supplier name, trimmed, ignoring case; the sheet typo «3C-Макркет» means «3C-Маркет». */
+      supplierName?: string | null;
+      /** Format: uri */
+      supplierUrl?: string | null;
+      supplierSku?: string | null;
+      /** @description Null means no price version (warning). */
+      supplierPrice?: number | null;
+      isActive: boolean;
+      allowManualPrice: boolean;
+      isVerified: boolean;
+      /** @description dd.MM.yyyy. */
+      verifiedOn?: string | null;
+      /** @description PPE rule code (the rule name); an unknown one is imported as none (warning). */
+      ruleCode?: string | null;
+      quoteDescription?: string | null;
+      insightWholesale?: number | null;
+      insightRetail?: number | null;
+    };
+    ImportSheetProductsRequest: {
+      sewing: components['schemas']['SheetSewingRow'][];
+      ppe: components['schemas']['SheetPpeRow'][];
+      /**
+       * @description Only compute the report; nothing is saved.
+       * @default true
+       */
+      dryRun: boolean;
+      /**
+       * @description Delete stored products that no row matches.
+       * @default false
+       */
+      deleteMissing: boolean;
+    };
+    SheetImportCounts: {
+      /** Format: int32 */
+      created: number;
+      /** Format: int32 */
+      updated: number;
+      /** Format: int32 */
+      unchanged: number;
+    };
+    SheetImportDeletion: {
+      /** Format: int32 */
+      id: number;
+      /** @enum {string} */
+      type: 'Sewing' | 'Ppe';
+      code: string | null;
+      name: string;
+    };
+    SheetImportIssue: {
+      /** @enum {string} */
+      scope: 'sewing' | 'ppe';
+      /**
+       * Format: int32
+       * @description Null for a stored product that is not in the sheet.
+       */
+      rowNumber: number | null;
+      code: string | null;
+      /** @description Ukrainian. */
+      message: string;
+    };
+    SheetImportReport: {
+      applied: boolean;
+      sewing: components['schemas']['SheetImportCounts'];
+      ppe: components['schemas']['SheetImportCounts'];
+      toDelete: components['schemas']['SheetImportDeletion'][];
+      /** @description Blocking; nothing is written while there is any. */
+      problems: components['schemas']['SheetImportIssue'][];
+      /** @description Not blocking. */
+      warnings: components['schemas']['SheetImportIssue'][];
     };
     SewingArticle: {
       /** Format: int64 */
@@ -3535,6 +3760,36 @@ export interface components {
       value: number;
       /** Format: uuid */
       requestId: string;
+    };
+    RecalculateSewingPricesRequest: {
+      productIds?: number[] | null;
+      /** @default true */
+      dryRun: boolean;
+    };
+    SewingRecalculationChange: {
+      /** Format: int32 */
+      productId: number;
+      modelCode: string | null;
+      /** Format: int64 */
+      articleId: number;
+      saleSku: string;
+      before: components['schemas']['SewingPriceTiers'] | null;
+      after: components['schemas']['SewingPriceTiers'];
+    };
+    SewingRecalculationBlocked: {
+      /** Format: int32 */
+      productId: number;
+      modelCode: string | null;
+      /** Format: int64 */
+      articleId: number;
+      saleSku: string;
+      blockers: string[];
+    };
+    SewingRecalculationReport: {
+      applied: boolean;
+      unchanged: number;
+      changes: components['schemas']['SewingRecalculationChange'][];
+      blocked: components['schemas']['SewingRecalculationBlocked'][];
     };
     SewingPublishedArticlePrice: {
       /** Format: int64 */
@@ -7188,6 +7443,49 @@ export interface operations {
       400: components['responses']['ValidationError'];
     };
   };
+  getProductOverviewPrices: {
+    parameters: {
+      query: {
+        type: 'Sewing' | 'Ppe';
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description One entry per product of the type. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductOverviewPrices'][];
+        };
+      };
+      /** @description Unknown type. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description CatalogRead required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   updateProductOverview: {
     parameters: {
       query?: never;
@@ -7233,6 +7531,52 @@ export interface operations {
         content?: never;
       };
       /** @description Another product of the same type has this code. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  importSheetProducts: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ImportSheetProductsRequest'];
+      };
+    };
+    responses: {
+      /** @description Report. applied is false for a preview and whenever problems is not empty. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SheetImportReport'];
+        };
+      };
+      400: components['responses']['ValidationError'];
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product management permission or actor claim missing. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The database rejected the write (changed meanwhile); nothing is saved. */
       409: {
         headers: {
           [name: string]: unknown;
@@ -7900,6 +8244,65 @@ export interface operations {
         content?: never;
       };
       /** @description Stale or blocked calculation, version conflict, or request UUID reused with another payload. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  recalculateSewingPrices: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RecalculateSewingPricesRequest'];
+      };
+    };
+    responses: {
+      /** @description Report; applied is false for a dry run or when nothing changed. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SewingRecalculationReport'];
+        };
+      };
+      /** @description productIds must be null or 1–500 positive IDs. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product management permission or actor claim missing. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description A Product ID is missing or is not a Sewing Product. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Inputs changed during the run; models before it stay published. */
       409: {
         headers: {
           [name: string]: unknown;
