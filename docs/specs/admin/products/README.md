@@ -49,4 +49,6 @@
 
 [011 Product create pages](011-product-create-pages/README.md) adds the full pages «Новий ЗІЗ» and «Нова модель» built from the sheet instruction, and removes the old create form.
 
-[012 Prices on the «Товари» list](012-product-list-prices/README.md) shows the three prices per model with expandable articles, the «Без ціни» filter, the side panel costs and «Перерахувати всі».
+[012 Prices on the «Товари» list](012-product-list-prices/README.md) shows the three prices per model with expandable articles, the «Без ціни» filter and the side panel costs.
+
+[013 Automatic Sewing prices](013-automatic-sewing-prices/README.md) removes «Перерахувати всі», the stale marker and the manual calculate/publish buttons: prices are published by the backend.

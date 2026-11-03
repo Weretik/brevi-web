@@ -1,12 +1,8 @@
-import type {
-  ProductOverviewPricesResponse,
-  SewingRecalculationReportResponse,
-} from '../../contracts/product-overview/product-overview-prices.dto';
+import type { ProductOverviewPricesResponse } from '../../contracts/product-overview/product-overview-prices.dto';
 import type {
   ProductOverviewPrices,
   ProductPriceStatus,
   SewingPriceTiers,
-  SewingRecalculationReport,
 } from '@admin/products/model';
 
 type Tiers = { retail: number; wholesale: number; largeWholesale: number } | null | undefined;
@@ -37,28 +33,4 @@ export function mapProductOverviewPrices(
       blockers: article.blockers,
     })),
   }));
-}
-
-export function mapSewingRecalculationReport(
-  value: SewingRecalculationReportResponse,
-): SewingRecalculationReport {
-  return {
-    applied: value.applied,
-    unchanged: value.unchanged,
-    changes: value.changes.map((change) => ({
-      productId: change.productId,
-      modelCode: change.modelCode ?? null,
-      articleId: change.articleId,
-      saleSku: change.saleSku,
-      before: tiers(change.before),
-      after: tiers(change.after) as SewingPriceTiers,
-    })),
-    blocked: value.blocked.map((line) => ({
-      productId: line.productId,
-      modelCode: line.modelCode ?? null,
-      articleId: line.articleId,
-      saleSku: line.saleSku,
-      blockers: line.blockers,
-    })),
-  };
 }

@@ -8,7 +8,7 @@ import {
   parseGarmentPartOperationsResponse,
   parseSewingSettingsResponse,
 } from '../../validators/garment-part-operations/garment-part-operations-response';
-import { referenceErrorMessages } from '../shared/reference-api.shared';
+import { referenceErrorMessages, productPricesTag } from '../shared/reference-api.shared';
 
 import type {
   CreateGarmentPartOperationBody,
@@ -41,6 +41,7 @@ export const garmentPartOperationsApi = adminApi.injectEndpoints({
         error
           ? []
           : [
+              productPricesTag,
               { type: 'GarmentPartOperation', id: 'LIST' },
               { type: 'GarmentPart', id: 'LIST' },
             ],
@@ -59,6 +60,7 @@ export const garmentPartOperationsApi = adminApi.injectEndpoints({
         error
           ? []
           : [
+              productPricesTag,
               { type: 'GarmentPartOperation', id },
               { type: 'GarmentPartOperation', id: 'LIST' },
             ],
@@ -70,6 +72,7 @@ export const garmentPartOperationsApi = adminApi.injectEndpoints({
         error
           ? []
           : [
+              productPricesTag,
               { type: 'GarmentPartOperation', id },
               { type: 'GarmentPartOperation', id: 'LIST' },
             ],

@@ -1,5 +1,4 @@
-import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
-import { Box, Tooltip, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 import { sewingPriceFormat } from '../sewing-pricing/sewing-price-format';
 
@@ -13,20 +12,8 @@ export type ProductPriceTier = keyof SewingPriceTiers;
 
 const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' };
 
-function Price({
-  value,
-  prefix,
-  warning,
-  muted,
-  hint,
-}: {
-  value: number;
-  prefix?: string;
-  warning?: boolean;
-  muted?: boolean;
-  hint?: string;
-}) {
-  const text = (
+function Price({ value, prefix, muted }: { value: number; prefix?: string; muted?: boolean }) {
+  return (
     <Box
       component="span"
       sx={{
@@ -34,7 +21,7 @@ function Price({
         display: 'inline-flex',
         alignItems: 'center',
         gap: 0.5,
-        color: warning ? 'warning.main' : muted ? 'text.secondary' : 'text.primary',
+        color: muted ? 'text.secondary' : 'text.primary',
       }}
     >
       {prefix && (
@@ -43,10 +30,8 @@ function Price({
         </Typography>
       )}
       {sewingPriceFormat(value)}
-      {warning && <ErrorOutlineOutlinedIcon sx={{ fontSize: 16 }} aria-hidden />}
     </Box>
   );
-  return hint ? <Tooltip title={hint}>{text}</Tooltip> : text;
 }
 
 const blockedLabel = (
@@ -67,7 +52,10 @@ function lowestLive(prices: ProductOverviewPrices): SewingPriceTiers | null {
     : null;
 }
 
-/** Model row: «від …» across Articles, a warning when prices are stale or not yet published. */
+/**
+ * Model row: «від …» across Articles. Prices are published automatically (CAT-012), so the published price is the
+ * one shown; the live price, muted, only covers the moment before its first publication.
+ */
 export function ProductModelPriceCell({
   prices,
   tier,
@@ -79,44 +67,14 @@ export function ProductModelPriceCell({
   showsRange: boolean;
 }) {
   if (!prices) return '—';
-  if (!prices.from) {
-    const live = lowestLive(prices);
-    if (live)
-      return (
-        <Price
-          value={live[tier]}
-          prefix={showsRange ? 'від' : undefined}
-          muted
-          hint="Розраховано, ще не опубліковано. Натисніть «Перерахувати всі»."
-        />
-      );
-    if (tier !== 'retail') return '—';
-    return prices.status === 'Unpublished' ? (
-      <Typography component="span" variant="body2" color="warning.main">
-        Не опубліковано
-      </Typography>
-    ) : (
-      blockedLabel
-    );
-  }
-  const stale = prices.status === 'Stale';
-  return (
-    <Price
-      value={prices.from[tier]}
-      prefix={showsRange ? 'від' : undefined}
-      warning={stale || prices.status === 'Unpublished'}
-      hint={
-        stale
-          ? 'Ціни застаріли: вхідні дані змінилися. Натисніть «Перерахувати».'
-          : prices.status === 'Unpublished'
-            ? 'Не всі артикули мають опубліковану ціну.'
-            : undefined
-      }
-    />
-  );
+  const prefix = showsRange ? 'від' : undefined;
+  if (prices.from) return <Price value={prices.from[tier]} prefix={prefix} />;
+  const live = lowestLive(prices);
+  if (live) return <Price value={live[tier]} prefix={prefix} muted />;
+  return tier === 'retail' ? blockedLabel : '—';
 }
 
-/** Article row: the published price; the live one when nothing is published yet. */
+/** Article row: the published price; the live one, muted, before its first publication. */
 export function ProductArticlePriceCell({
   article,
   tier,
@@ -124,19 +82,7 @@ export function ProductArticlePriceCell({
   article: ProductArticlePrices;
   tier: ProductPriceTier;
 }) {
-  if (article.published)
-    return (
-      <Price
-        value={article.published[tier]}
-        warning={article.isStale}
-        hint={
-          article.isStale && article.live
-            ? `Після перерахунку: ${sewingPriceFormat(article.live[tier])}`
-            : undefined
-        }
-      />
-    );
-  if (article.live)
-    return <Price value={article.live[tier]} muted hint="Розраховано, ще не опубліковано" />;
+  if (article.published) return <Price value={article.published[tier]} />;
+  if (article.live) return <Price value={article.live[tier]} muted />;
   return tier === 'retail' ? blockedLabel : '—';
 }

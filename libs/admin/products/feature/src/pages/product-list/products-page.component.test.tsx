@@ -195,60 +195,14 @@ describe('ProductsPage', () => {
     expect(within(grid).getByText('Халат')).toBeInTheDocument();
   });
 
-  it('previews «Перерахувати всі» and publishes only after the confirmation', async () => {
-    const report = (applied: boolean) => ({
-      applied,
-      unchanged: 1,
-      changes: [
-        {
-          productId: 1,
-          modelCode: 'MOD-025',
-          articleId: 602,
-          saleSku: '602',
-          before: tiers(1372.85),
-          after: tiers(1400),
-        },
-      ],
-      blocked: [
-        {
-          productId: 2,
-          modelCode: 'MOD-026',
-          articleId: 700,
-          saleSku: '700',
-          blockers: ['MissingOperations'],
-        },
-      ],
-    });
-    const bodies: unknown[] = [];
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
-        const body =
-          input instanceof Request ? await input.clone().json() : JSON.parse(String(init?.body));
-        bodies.push(body);
-        return new Response(JSON.stringify(report(!(body as { dryRun: boolean }).dryRun)), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        });
-      }),
-    );
-    const user = userEvent.setup();
+  it('has no manual recalculation: prices are published automatically', () => {
     renderPage();
 
-    await user.click(screen.getByRole('button', { name: 'Перерахувати всі' }));
-    const dialog = await screen.findByRole('dialog', { name: 'Перерахувати всі ціни швейки' });
-    expect(
-      within(dialog).getByText(/Буде опубліковано 1 нових цін у 1 моделях/),
-    ).toBeInTheDocument();
-    expect(within(dialog).getByText(/Немає трудовитрат/)).toBeInTheDocument();
-    expect(bodies).toEqual([{ productIds: null, dryRun: true }]);
-
-    await user.click(within(dialog).getByRole('button', { name: 'Перерахувати і опублікувати' }));
-    expect(await screen.findByText('Опубліковано 1 нових цін.')).toBeInTheDocument();
-    expect(bodies[1]).toEqual({ productIds: null, dryRun: false });
+    expect(screen.getByRole('grid', { name: 'Швейна продукція' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Перерахувати всі' })).not.toBeInTheDocument();
   });
 
-  it('switches to the PPE table with live prices and no recalculation', async () => {
+  it('switches to the PPE table with live prices', async () => {
     const user = userEvent.setup();
     renderPage();
 

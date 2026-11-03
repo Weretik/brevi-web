@@ -2,7 +2,7 @@ import { adminApi, toAdminApiError } from '@admin/shared/api-client';
 
 import { mapPpeMarkupRules } from '../../mappers/pricing-parameters/pricing-parameters.mapper';
 import { parsePpeMarkupRulesResponse } from '../../validators/pricing-parameters/pricing-parameters-response';
-import { referenceErrorMessages } from '../shared/reference-api.shared';
+import { referenceErrorMessages, productPricesTag } from '../shared/reference-api.shared';
 
 import type {
   CreatePpeMarkupRuleBody,
@@ -26,7 +26,8 @@ export const ppeMarkupRulesApi = adminApi.injectEndpoints({
     createPpeMarkupRule: build.mutation<number, CreatePpeMarkupRuleBody>({
       query: (body) => ({ url: '/api/reference/ppe-markup-rules', method: 'POST', body }),
       transformErrorResponse: (error) => toAdminApiError(error, referenceErrorMessages),
-      invalidatesTags: (_result, error) => (error ? [] : [{ type: tag, id: 'LIST' }]),
+      invalidatesTags: (_result, error) =>
+        error ? [] : [productPricesTag, { type: tag, id: 'LIST' }],
     }),
     updatePpeMarkupRule: build.mutation<void, { id: number; body: UpdatePpeMarkupRuleBody }>({
       query: ({ id, body }) => ({
@@ -36,23 +37,13 @@ export const ppeMarkupRulesApi = adminApi.injectEndpoints({
       }),
       transformErrorResponse: (error) => toAdminApiError(error, referenceErrorMessages),
       invalidatesTags: (_result, error, { id }) =>
-        error
-          ? []
-          : [
-              { type: tag, id },
-              { type: tag, id: 'LIST' },
-            ],
+        error ? [] : [productPricesTag, { type: tag, id }, { type: tag, id: 'LIST' }],
     }),
     deletePpeMarkupRule: build.mutation<void, number>({
       query: (id) => ({ url: `/api/reference/ppe-markup-rules/${id}`, method: 'DELETE' }),
       transformErrorResponse: (error) => toAdminApiError(error, referenceErrorMessages),
       invalidatesTags: (_result, error, id) =>
-        error
-          ? []
-          : [
-              { type: tag, id },
-              { type: tag, id: 'LIST' },
-            ],
+        error ? [] : [productPricesTag, { type: tag, id }, { type: tag, id: 'LIST' }],
     }),
   }),
 });

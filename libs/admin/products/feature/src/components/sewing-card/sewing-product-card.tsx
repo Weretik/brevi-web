@@ -131,8 +131,6 @@ export function SewingProductCard({ product, onDeleted }: Props) {
           productId={product.id}
           articles={card.articles}
           articleId={pricingArticleId}
-          compositionVersion={queries.articles.data?.version ?? 0}
-          canManage={controller.canManage}
           dirty={drafts.dirty || controller.busy}
           onSelect={setPricingArticleId}
         />

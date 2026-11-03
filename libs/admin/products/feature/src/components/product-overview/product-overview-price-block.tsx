@@ -7,18 +7,10 @@ import type { ProductOverview, ProductOverviewPrices } from '@admin/products/mod
 interface Props {
   row: ProductOverview;
   prices: ProductOverviewPrices | null;
-  onRecalculate?: () => void;
-  recalculating?: boolean;
 }
 
 /** The price block of the «Товари» side panel, loading the model's costs or the PPE offer. */
-export function ProductOverviewPriceBlock({ row, prices, onRecalculate, recalculating }: Props) {
+export function ProductOverviewPriceBlock({ row, prices }: Props) {
   const panel = useProductPanelPrices(row, prices);
-  return (
-    <ProductOverviewPricePanel
-      {...panel}
-      onRecalculate={onRecalculate}
-      recalculating={recalculating}
-    />
-  );
+  return <ProductOverviewPricePanel {...panel} />;
 }

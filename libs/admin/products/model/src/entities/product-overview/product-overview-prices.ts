@@ -29,28 +29,3 @@ export interface ProductOverviewPrices {
   blockers: string[];
   articles: ProductArticlePrices[];
 }
-
-/** One Article whose price «Перерахувати всі» publishes; `before` is null when it had none. */
-export interface SewingRecalculationChange {
-  productId: number;
-  modelCode: string | null;
-  articleId: number;
-  saleSku: string;
-  before: SewingPriceTiers | null;
-  after: SewingPriceTiers;
-}
-
-export interface SewingRecalculationBlocked {
-  productId: number;
-  modelCode: string | null;
-  articleId: number;
-  saleSku: string;
-  blockers: string[];
-}
-
-export interface SewingRecalculationReport {
-  applied: boolean;
-  unchanged: number;
-  changes: SewingRecalculationChange[];
-  blocked: SewingRecalculationBlocked[];
-}

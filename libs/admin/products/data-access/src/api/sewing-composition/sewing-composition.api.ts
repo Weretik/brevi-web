@@ -27,7 +27,13 @@ export const sewingCompositionApi = adminApi.injectEndpoints({
       transformResponse: mapSewingComposition,
       transformErrorResponse: sewingCompositionError,
       invalidatesTags: (_result, error, { productId }) =>
-        error ? [] : [sewingCompositionTag(productId)],
+        error
+          ? []
+          : [
+              sewingCompositionTag(productId),
+              { type: 'Product', id: productId },
+              { type: 'Product', id: 'PRICES' },
+            ],
     }),
     replaceSewingArticleComposition: build.mutation<SewingCompositionView, SewingCompositionDraft>({
       query: (draft) => ({
@@ -38,7 +44,13 @@ export const sewingCompositionApi = adminApi.injectEndpoints({
       transformResponse: mapSewingComposition,
       transformErrorResponse: sewingCompositionError,
       invalidatesTags: (_result, error, { productId }) =>
-        error ? [] : [sewingCompositionTag(productId)],
+        error
+          ? []
+          : [
+              sewingCompositionTag(productId),
+              { type: 'Product', id: productId },
+              { type: 'Product', id: 'PRICES' },
+            ],
     }),
   }),
 });

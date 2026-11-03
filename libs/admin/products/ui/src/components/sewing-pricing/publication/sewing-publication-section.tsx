@@ -13,9 +13,6 @@ export function SewingPublicationSection(
   const { published } = props;
   return (
     <>
-      <Typography variant="subtitle1" component="h4">
-        Опублікована ціна
-      </Typography>
       {props.publicationLoading && (
         <CircularProgress size={22} aria-label="Завантаження опублікованої ціни" />
       )}
@@ -30,13 +27,15 @@ export function SewingPublicationSection(
       {published ? (
         <>
           <Typography variant="body2">
-            Опубліковано {new Date(published.publishedAt).toLocaleString('uk-UA')}
+            Оновлено {new Date(published.publishedAt).toLocaleString('uk-UA')}
           </Typography>
           <SewingPriceTiersView prices={published.prices} />
         </>
       ) : (
         !props.publicationLoading &&
-        !props.publicationError && <Alert severity="info">Ціну ще не опубліковано.</Alert>
+        !props.publicationError && <Alert severity="info">
+            Ціни ще немає: перевірте, чи заповнений склад артикула.
+          </Alert>
       )}
     </>
   );

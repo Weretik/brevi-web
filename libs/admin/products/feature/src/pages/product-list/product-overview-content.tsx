@@ -3,7 +3,6 @@ import {
   ProductOverviewDeleteDialog,
   ProductOverviewGrid,
   ProductOverviewSectionChips,
-  SewingRecalculationDialog,
 } from '@admin/products/ui';
 import { useReferenceDeletion } from '@admin/references/feature';
 import {
@@ -14,15 +13,13 @@ import {
   ReferenceSearchBar,
 } from '@admin/references/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
-import CalculateOutlinedIcon from '@mui/icons-material/CalculateOutlined';
-import { Alert, Box, Button, CircularProgress, Paper } from '@mui/material';
+import { Alert, Box, Button, Paper } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 
 import { ProductOverviewDrawer } from '../../components/product-overview/product-overview-drawer';
 import { useProductListRows } from '../../hooks/product-overview/use-product-list-rows';
 import { useProductOverview } from '../../hooks/product-overview/use-product-overview';
-import { useSewingRecalculation } from '../../hooks/product-overview/use-sewing-recalculation';
 
 import type { ProductOverviewEditorMode } from '../../hooks/product-overview/use-product-overview-editor';
 import type { ProductListRow, ProductOverview, ProductOverviewType } from '@admin/products/model';
@@ -46,7 +43,6 @@ export function ProductOverviewContent({ type, tabs }: Props) {
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const [deleteProduct] = useDeleteProductMutation();
   const deletion = useReferenceDeletion((id) => deleteProduct(id).unwrap(), setActionMessage);
-  const recalculation = useSewingRecalculation(setActionMessage);
   const open = (mode: ProductOverviewEditorMode, row: ProductListRow) => {
     if (row.kind === 'model') setActive({ mode, row: row.product });
   };
@@ -59,22 +55,6 @@ export function ProductOverviewContent({ type, tabs }: Props) {
         subtitle="Швейна продукція — одна модель в рядку, ЗІЗ — один артикул сайту. Тексти і фото сайту згодом будуть у «Контенті сайту»"
         actions={
           <>
-            {sewing && (
-              <Button
-                variant="outlined"
-                startIcon={
-                  recalculation.running ? (
-                    <CircularProgress size={18} color="inherit" />
-                  ) : (
-                    <CalculateOutlinedIcon />
-                  )
-                }
-                disabled={recalculation.running || loading}
-                onClick={() => recalculation.start(null)}
-              >
-                {recalculation.running ? 'Рахуємо…' : 'Перерахувати всі'}
-              </Button>
-            )}
             <ReferenceBulkDeleteButton
               selectedCount={deletion.selectedIds.length}
               disabled={deletion.deleting || loading}
@@ -151,8 +131,6 @@ export function ProductOverviewContent({ type, tabs }: Props) {
           sections={sections}
           sectionNames={sectionNames}
           prices={prices.get(active.row.id) ?? null}
-          onRecalculate={() => recalculation.start([active.row.id])}
-          recalculating={recalculation.running}
           onClose={() => setActive(null)}
           onSaved={() => {
             setActive(null);
@@ -160,14 +138,6 @@ export function ProductOverviewContent({ type, tabs }: Props) {
           }}
         />
       )}
-      <SewingRecalculationDialog
-        report={recalculation.report}
-        scope={recalculation.scope}
-        applying={recalculation.running}
-        error={recalculation.error}
-        onClose={recalculation.cancel}
-        onConfirm={recalculation.confirm}
-      />
       <ProductOverviewDeleteDialog
         ids={deletion.pendingDeleteIds}
         deleting={deletion.deleting}

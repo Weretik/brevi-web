@@ -19,46 +19,42 @@ const response = (value: unknown) =>
   });
 
 describe('Sewing pricing transport', () => {
-  it('sends only the request UUID when calculating and the saved UUID when publishing', async () => {
+  it('loads the published price and the calculation behind it', async () => {
     configureAppConfig({ production: true, api: { baseUrl: 'http://localhost' } });
     const fetcher = vi.fn().mockImplementation(async (request: Request) =>
-      request.url.endsWith('/publication')
+      request.url.endsWith('/published')
         ? response({
             id: '33333333-3333-4333-8333-333333333333',
             calculationId: sewingCalculationFixture.id,
             productId: 42,
             articleId: 501,
             publishedAt: '2026-10-25T11:00:00Z',
-            publishedBy: 'manager',
+            publishedBy: 'auto',
             prices: sewingCalculationFixture.snapshot.calculation.prices,
           })
         : response(sewingCalculationFixture),
     );
     vi.stubGlobal('fetch', fetcher);
-    const saved = await store
-      .dispatch(
-        sewingCalculationsApi.endpoints.saveSewingCalculation.initiate({
-          productId: 42,
-          articleId: 501,
-          requestId: sewingCalculationFixture.requestId,
-        }),
-      )
-      .unwrap();
-    const request = fetcher.mock.calls[0]?.[0] as Request;
-    expect(await request.clone().json()).toEqual({ requestId: sewingCalculationFixture.requestId });
-    expect(saved.fullCost).toBe(200);
     const published = await store
       .dispatch(
-        sewingPublicationsApi.endpoints.publishSewingCalculation.initiate({
+        sewingPublicationsApi.endpoints.getPublishedSewingPrice.initiate({
           productId: 42,
           articleId: 501,
-          calculationId: saved.id,
         }),
       )
       .unwrap();
-    expect(published.calculationId).toBe(saved.id);
+    const calculation = await store
+      .dispatch(
+        sewingCalculationsApi.endpoints.getSewingCalculation.initiate({
+          productId: 42,
+          articleId: 501,
+          calculationId: published.calculationId,
+        }),
+      )
+      .unwrap();
+    expect(calculation.fullCost).toBe(200);
     expect((fetcher.mock.calls.at(-1)?.[0] as Request).url).toContain(
-      `/calculations/${saved.id}/publication`,
+      `/calculations/${published.calculationId}`,
     );
   });
   it('loads the whole Product set in one bounded request', async () => {
