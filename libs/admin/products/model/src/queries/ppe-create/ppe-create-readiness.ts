@@ -9,8 +9,6 @@ export type PpeCodeCheckState = 'idle' | 'checking' | 'available' | 'taken' | 'u
 export interface PpeCreateReadinessItem {
   label: string;
   done: boolean;
-  /** «Перевірено вручну» can wait until after the product is created. */
-  optional: boolean;
 }
 
 /** The «Готовність» checklist of the page «Новий ЗІЗ»; `errors` are all rule errors of the form. */
@@ -19,7 +17,7 @@ export function ppeCreateReadiness(
   errors: PpeCreateFieldErrors,
   codeState: PpeCodeCheckState,
 ): PpeCreateReadinessItem[] {
-  const item = (label: string, done: boolean, optional = false) => ({ label, done, optional });
+  const item = (label: string, done: boolean) => ({ label, done });
   return [
     item('Назва і унікальний артикул', !errors.name && !errors.code && codeState === 'available'),
     item('Розділ і одиниця', !errors.sectionId && !errors.unit),
@@ -27,7 +25,6 @@ export function ppeCreateReadiness(
     item('Посилання постачальника', !errors.supplierUrl),
     item('Ціна постачальника більша за 0', !errors.supplierPrice),
     item('Правило націнки', !errors.ruleCode),
-    item('Перевірено вручну (можна пізніше)', values.isVerified, true),
   ];
 }
 

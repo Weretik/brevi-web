@@ -5,10 +5,10 @@ import { useState } from 'react';
 
 import type { ProductOverview } from '@admin/products/model';
 
-type OverviewFlags = { isActive?: boolean; isVerified?: boolean };
+type OverviewFlags = { isActive?: boolean };
 
 /**
- * «Перевірено» and «Активна» of the draft through the «Товари» overview update; every other
+ * «Активна» of the draft through the «Товари» overview update; every other
  * overview field is sent as it is saved now.
  */
 export function useSewingCreateOverview(row: ProductOverview | null) {

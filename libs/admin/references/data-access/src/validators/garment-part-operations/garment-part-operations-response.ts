@@ -21,7 +21,7 @@ export function parseGarmentPartOperationsResponse(value: unknown): GarmentPartO
       row['min'] < 0 ||
       typeof row['minutesPerProduct'] !== 'boolean' ||
       typeof row['isActive'] !== 'boolean' ||
-      ['code', 'element', 'variant', 'normCheckedAt', 'notes'].some(
+      ['code', 'element', 'variant', 'notes'].some(
         (field) => row[field] !== null && typeof row[field] !== 'string',
       )
     ) {

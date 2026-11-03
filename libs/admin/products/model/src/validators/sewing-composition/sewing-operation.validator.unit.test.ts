@@ -12,7 +12,6 @@ describe('Operation draft validation', () => {
           quantity: 0,
           manualMinutes: -1,
           sortOrder: 0,
-          reviewed: false,
           comment: '',
         },
       ]),

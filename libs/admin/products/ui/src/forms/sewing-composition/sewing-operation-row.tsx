@@ -1,12 +1,4 @@
-import {
-  Button,
-  Checkbox,
-  FormControlLabel,
-  MenuItem,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
 
 import type { ProductLookups } from '../../product-editor/core/product-lookups';
 import type { SewingOperationDraft } from '@admin/products/model';
@@ -86,16 +78,6 @@ export function SewingOperationRow({
           helperText={error('manualMinutes')}
           slotProps={{ htmlInput: { min: 0, step: 'any' } }}
           disabled={readonly}
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={operation.reviewed}
-              onChange={(_, checked) => onChange({ reviewed: checked })}
-              disabled={readonly}
-            />
-          }
-          label="Перевірено"
         />
         {canManage && (
           <Button color="error" onClick={onRemove} disabled={saving}>

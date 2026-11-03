@@ -1,6 +1,6 @@
 # Admin: Sewing Article pricing
 
-Read-only consumer of versioned backend pricing. Open a saved Sewing Product and select an Article on «Розрахунок» or in the composition section: the panel shows the current published price and the retained calculation behind it. The backend publishes a new price after every saved input change ([spec 013](../../../specs/admin/products/013-automatic-sewing-prices/README.md)); there are no calculate or publish buttons. Imported composition is reviewed through the existing editor, never automatically.
+Read-only consumer of versioned backend pricing. Open a saved Sewing Product and select an Article on «Розрахунок» or in the composition section: the panel shows the current published price and the retained calculation behind it. The backend publishes a new price after every saved input change ([spec 013](../../../specs/admin/products/013-automatic-sewing-prices/README.md)); there are no calculate or publish buttons, and no «Розраховано … · Версія складу · Налаштування» line. Imported composition is priced as it is; there is no review step.
 
 The panel shows three prices for 1–9, 10–40 and 41+ units with their date, then component costs, minutes/minute cost, full cost and composition/settings revisions. Unsaved composition changes show a hint to save. Saving a composition, an Article or a Reference price input refreshes the cached `Product` queries.
 

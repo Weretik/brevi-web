@@ -14,7 +14,6 @@ export interface GarmentPartOperation {
   /** No fixed norm: the time is entered per product (OP-155 «Нестандартна операція»). */
   minutesPerProduct: boolean;
   /** ISO date of the last norm check. */
-  normCheckedAt: string | null;
   isActive: boolean;
   notes: string | null;
 }

@@ -25,17 +25,11 @@ export function SewingCardMetrics({ totals, labourMinutes }: Props) {
           label: 'Артикули',
           value: `${totals.ready} з ${totals.articles}`,
           note: 'готові до розрахунку',
-          tone: totals.articles > 0 && totals.ready === totals.articles ? 'success' : 'warning',
+          tone: totals.articles > 0 && totals.ready === totals.articles ? undefined : 'warning',
         },
         { label: 'Трудовитрати', value: `${minutes.format(labourMinutes)} хв`, note: 'на 1 виріб' },
         { label: 'Собівартість', value: range(totals.fullCost) },
         { label: 'Ціна 1–9 шт.', value: range(totals.retail), note: 'з ПДВ' },
-        {
-          label: 'Ціна в прайсі',
-          value: totals.unpublished ? `${totals.unpublished} змін` : 'Актуальна',
-          note: totals.unpublished ? 'нова ціна ще не опублікована' : undefined,
-          tone: totals.unpublished ? 'warning' : undefined,
-        },
       ]}
     />
   );

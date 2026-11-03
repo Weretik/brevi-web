@@ -43,7 +43,6 @@ vi.mock('../../hooks/sewing-composition/use-sewing-composition-controller', () =
             quantity: 2,
             manualMinutes: null,
             sortOrder: 0,
-            reviewed: true,
             comment: 'Комір',
           },
         ],
@@ -117,8 +116,6 @@ beforeEach(() => {
       sectionId: 1,
       season: 'Літо',
       isActive: true,
-      isVerified: true,
-      verifiedOn: '08.09.2026',
       currentSiteUrl: 'https://brevi.com.ua/verde',
       quoteDescription: null,
       updatedAtUtc: '2026-11-03T00:00:00Z',
@@ -164,7 +161,7 @@ describe('SewingProductCard', () => {
     expect(screen.getByRole('heading', { name: 'Костюм «Верде»' })).toBeVisible();
     expect(screen.getByText('MOD-025 · Одяг ЛІТО · Літо')).toBeVisible();
     expect(screen.getAllByText('Без ціни: 1 з 2').length).toBeGreaterThan(0);
-    expect(screen.getByText('Перевірено 08.09.2026')).toBeVisible();
+    expect(screen.queryByText(/Перевірено/)).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'На сайті' })).toHaveAttribute(
       'href',
       'https://brevi.com.ua/verde',

@@ -64,11 +64,6 @@ export function SewingCreateDraftStep(props: Props) {
           controller={controller}
           labour={props.draft.labour}
           costsKnown={card.seamstressPerMinute !== null}
-          verified={card.row?.isVerified ?? false}
-          verifiedOn={card.row?.verifiedOn ?? null}
-          saving={props.overview.saving}
-          message={props.overview.message}
-          onVerifiedChange={(isVerified) => void props.overview.save({ isVerified })}
         />
       );
     case 5:

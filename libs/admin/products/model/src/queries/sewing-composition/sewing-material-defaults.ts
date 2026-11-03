@@ -26,9 +26,7 @@ export function emptySewingMaterial(
     costCode: null,
     quantity: 1,
     unit: materialUnitForKind(kind),
-    required: true,
     sortOrder,
-    reviewed: false,
     comment: '',
   };
 }

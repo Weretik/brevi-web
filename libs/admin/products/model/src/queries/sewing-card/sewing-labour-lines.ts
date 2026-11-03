@@ -10,7 +10,6 @@ export interface SewingLabourLine {
   /** Seamstress pay for the line, as the sheet's «Вартість, грн»; null without a live price. */
   cost: number | null;
   manual: boolean;
-  reviewed: boolean;
   comment: string;
 }
 
@@ -41,7 +40,6 @@ export function sewingLabourLines(
       minutes,
       cost: minutes === null || seamstressPerMinute === null ? null : minutes * seamstressPerMinute,
       manual: operation.manualMinutes !== null,
-      reviewed: operation.reviewed,
       comment: operation.comment,
     };
   });

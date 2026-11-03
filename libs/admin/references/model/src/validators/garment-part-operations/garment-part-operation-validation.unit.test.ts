@@ -13,7 +13,6 @@ const valid: GarmentPartOperationFormValues = {
   name: 'Рукав куртки: прямий',
   min: '6',
   minutesPerProduct: false,
-  normCheckedAt: '2026-08-30',
   isActive: true,
   notes: '',
 };

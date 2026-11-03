@@ -7,15 +7,12 @@ export interface GarmentPartOperationFormValues {
   name: string;
   min: string;
   minutesPerProduct: boolean;
-  normCheckedAt: string;
   isActive: boolean;
   notes: string;
 }
 
 export type GarmentPartOperationField = keyof GarmentPartOperationFormValues;
 export type GarmentPartOperationFieldErrors = Partial<Record<GarmentPartOperationField, string>>;
-
-const isoDate = /^\d{4}-\d{2}-\d{2}$/;
 
 export function validateGarmentPartOperation(
   values: GarmentPartOperationFormValues,
@@ -37,8 +34,6 @@ export function validateGarmentPartOperation(
     (!values.min.trim() || !Number.isFinite(min) || min <= 0 || min > 10000)
   )
     errors.min = 'Вкажіть норму від 0 до 10000 хв.';
-  if (values.normCheckedAt && !isoDate.test(values.normCheckedAt))
-    errors.normCheckedAt = 'Вкажіть дату.';
   if (values.notes.trim().length > 1000) errors.notes = 'Не більше 1000 символів.';
   return errors;
 }

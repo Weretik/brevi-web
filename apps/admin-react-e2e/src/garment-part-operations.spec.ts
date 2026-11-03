@@ -41,7 +41,6 @@ test('operations keep selection while the row menu confirms deletion', async ({ 
           name: 'Шов',
           min: 1,
           minutesPerProduct: false,
-          normCheckedAt: null,
           isActive: true,
           notes: null,
         },

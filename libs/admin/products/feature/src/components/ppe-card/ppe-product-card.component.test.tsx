@@ -49,8 +49,6 @@ function cardData(update: Partial<PpeSupplierOffer> = {}, canManage = true) {
       sectionId: 9,
       season: null,
       isActive: true,
-      isVerified: true,
-      verifiedOn: '09.09.2026',
       currentSiteUrl: 'https://brevi.com.ua/odyag-vologozahysnyj/kostyum-vologozahysnyj',
       quoteDescription: null,
       updatedAtUtc: '2026-11-03T10:00:00Z',

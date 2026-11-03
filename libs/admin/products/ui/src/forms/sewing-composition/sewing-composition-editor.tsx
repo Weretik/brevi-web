@@ -63,7 +63,7 @@ export function SewingCompositionEditor({
       {blockers.length > 0 && (
         <Alert severity="warning" aria-label="Причини блокування розрахунку">
           <Typography component="div" sx={{ fontWeight: 600 }}>
-            Потрібна перевірка
+            Не вистачає даних для розрахунку
           </Typography>
           <ul>
             {blockers.map((blocker, index) => (

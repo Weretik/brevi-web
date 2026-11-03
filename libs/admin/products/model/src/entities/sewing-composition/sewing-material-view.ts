@@ -5,6 +5,4 @@ export interface SewingMaterialView extends Omit<SewingMaterialDraft, 'clientId'
   id: number;
   articleId: number | null;
   scope: SewingMaterialScope;
-  reviewedBy: string | null;
-  reviewedAt: string | null;
 }

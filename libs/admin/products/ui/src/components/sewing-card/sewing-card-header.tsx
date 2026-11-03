@@ -13,8 +13,6 @@ interface Props {
   sectionName: string | null;
   season: string | null;
   active: boolean | null;
-  verifiedOn: string | null;
-  verified: boolean;
   siteUrl: string | null;
   /** Only a problem; null when everything is priced. */
   status: { label: string; tone: SewingCardTone } | null;
@@ -51,14 +49,6 @@ export function SewingCardHeader(props: Props) {
             <SewingCardStatusPill label={props.status.label} tone={props.status.tone} />
           )}
           {props.active === false && <SewingCardStatusPill label="Вимкнена" tone="neutral" />}
-          <SewingCardStatusPill
-            label={
-              props.verified
-                ? `Перевірено${props.verifiedOn ? ` ${props.verifiedOn}` : ''}`
-                : 'Не перевірено'
-            }
-            tone={props.verified ? 'success' : 'neutral'}
-          />
         </Stack>
       </Stack>
       <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap', flexShrink: 0 }}>

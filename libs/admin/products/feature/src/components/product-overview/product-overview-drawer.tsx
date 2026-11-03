@@ -43,7 +43,7 @@ export function ProductOverviewDrawer({
       description={
         readOnly
           ? 'Ціни, собівартість і дані для КП. Склад — у повній картці.'
-          : 'Розділ, статус, перевірка і дані для КП.'
+          : 'Розділ, статус і дані для КП.'
       }
       formId="product-overview-form"
       paperWidth={560}
@@ -71,7 +71,6 @@ export function ProductOverviewDrawer({
             values={editor.values}
             errors={editor.errors}
             sections={sections}
-            verifiedOn={row.verifiedOn}
             onChange={editor.change}
           />
         )}

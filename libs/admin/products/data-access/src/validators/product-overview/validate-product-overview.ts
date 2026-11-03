@@ -41,8 +41,6 @@ function validItem(value: unknown): boolean {
     isSectionId(row['sectionId']) &&
     isSeason(row['season']) &&
     typeof row['isActive'] === 'boolean' &&
-    typeof row['isVerified'] === 'boolean' &&
-    isText(row['verifiedOn']) &&
     isText(row['currentSiteUrl']) &&
     isText(row['quoteDescription']) &&
     typeof row['updatedAtUtc'] === 'string' &&

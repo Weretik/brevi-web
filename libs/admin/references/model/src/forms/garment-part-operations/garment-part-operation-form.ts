@@ -16,7 +16,6 @@ export function createGarmentPartOperationFormValues(
     name: operation?.name ?? '',
     min: operation && !operation.minutesPerProduct ? String(operation.min) : '',
     minutesPerProduct: operation?.minutesPerProduct ?? false,
-    normCheckedAt: operation?.normCheckedAt ?? '',
     isActive: operation?.isActive ?? true,
     notes: operation?.notes ?? '',
   };
@@ -34,7 +33,6 @@ export function garmentPartOperationRequestBody(values: GarmentPartOperationForm
     element: optional(values.element),
     variant: optional(values.variant),
     minutesPerProduct: values.minutesPerProduct,
-    normCheckedAt: values.normCheckedAt || null,
     isActive: values.isActive,
     notes: optional(values.notes),
   };

@@ -22,7 +22,6 @@ describe('SewingCompositionEditor', () => {
             quantity: 1,
             manualMinutes: null,
             sortOrder: 0,
-            reviewed: true,
             comment: '',
           },
         ]}
@@ -55,9 +54,7 @@ describe('SewingCompositionEditor', () => {
             costCode: null,
             quantity: 1,
             unit: 'Metre',
-            required: true,
             sortOrder: 0,
-            reviewed: true,
             comment: '',
           },
         ]}
@@ -68,7 +65,6 @@ describe('SewingCompositionEditor', () => {
             quantity: 1,
             manualMinutes: null,
             sortOrder: 0,
-            reviewed: true,
             comment: '',
           },
         ]}
@@ -79,7 +75,7 @@ describe('SewingCompositionEditor', () => {
         }}
         canManage
         dirty
-        blockers={['Операцію не перевірено']}
+        blockers={['Немає часу операції.']}
         onMaterialsChange={onMaterialsChange}
         onOperationsChange={vi.fn()}
         onSave={vi.fn()}
@@ -88,15 +84,13 @@ describe('SewingCompositionEditor', () => {
     );
 
     expect(screen.getByRole('alert', { name: 'Причини блокування розрахунку' })).toHaveTextContent(
-      'Операцію не перевірено',
+      'Немає часу операції.',
     );
     expect(screen.getByText('Нормативний час: 4 хв')).toBeInTheDocument();
     fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Тканина' }));
     expect(screen.getByRole('option', { name: 'Бавовна' })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('option', { name: 'Бавовна' }));
-    expect(onMaterialsChange).toHaveBeenCalledWith([
-      expect.objectContaining({ referenceId: 3, reviewed: false }),
-    ]);
+    expect(onMaterialsChange).toHaveBeenCalledWith([expect.objectContaining({ referenceId: 3 })]);
     fireEvent.click(screen.getByRole('button', { name: 'Додати матеріал' }));
     expect(onMaterialsChange).toHaveBeenCalledWith(
       expect.arrayContaining([
@@ -123,9 +117,7 @@ describe('SewingCompositionEditor', () => {
             costCode: null,
             quantity: 1,
             unit: 'Metre',
-            required: true,
             sortOrder: 0,
-            reviewed: false,
             comment: '',
           },
         ]}
@@ -160,9 +152,7 @@ describe('SewingCompositionEditor', () => {
             costCode: null,
             quantity: 1,
             unit: 'Metre',
-            required: true,
             sortOrder: 0,
-            reviewed: false,
             comment: '',
           },
         ]}

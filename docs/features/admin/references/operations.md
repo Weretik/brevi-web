@@ -9,7 +9,7 @@ follows the [reference list pattern](../../../standards/admin/design-system.md):
 - a header with «Видалити» and «Додати операцію»;
 - a full-width search row over code, group, element, variant and name;
 - activity chips and a group filter;
-- a table with code, group, element, variant, name, norm, the two cost columns, check date and status;
+- a table with code, group, element, variant, name, norm, the two cost columns and status;
 - a row menu and an editor drawer.
 
 The cost columns are not stored. They are computed from the norm and the current sewing settings (`GET /api/v1/pricing/sewing/settings`): «Вартість» is minutes × minute cost, and «Зі збиранням» is that × (1 + assembly rate). If the settings cannot be read, the cells show «—». An operation with «Час вказується для кожного виробу» has no norm and no cost.

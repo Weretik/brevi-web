@@ -23,10 +23,7 @@ export function validateSewingModel(
   values: SewingModelFormValues,
   codeCheck: ProductCodeCheck | null = null,
 ): SewingModelFieldErrors {
-  const shared = validateProductOverview(
-    { ...values, isActive: false, isVerified: false },
-    'Sewing',
-  );
+  const shared = validateProductOverview({ ...values, isActive: false }, 'Sewing');
   const errors: SewingModelFieldErrors = {
     ...(shared.code ? { code: shared.code } : {}),
     ...(shared.currentSiteUrl ? { currentSiteUrl: shared.currentSiteUrl } : {}),

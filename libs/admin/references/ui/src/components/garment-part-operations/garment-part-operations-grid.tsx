@@ -1,9 +1,4 @@
-import {
-  formatIsoDate,
-  formatOperationMinutes,
-  formatUah,
-  operationLabourCost,
-} from '@admin/references/model';
+import { formatOperationMinutes, formatUah, operationLabourCost } from '@admin/references/model';
 import { useMemo } from 'react';
 
 import { ReferenceDataGrid } from '../reference-list/reference-data-grid';
@@ -75,13 +70,6 @@ function operationColumns(rates: OperationLabourRates | null): GridColDef<Garmen
     },
     costColumn('seamstressCost', 'Вартість', rates, 'seamstress'),
     costColumn('assemblyCost', 'Зі збиранням', rates, 'withAssembly'),
-    {
-      field: 'normCheckedAt',
-      headerName: 'Перевірено',
-      width: 112,
-      cellClassName: 'reference-mono',
-      valueFormatter: (value: string | null) => formatIsoDate(value),
-    },
     {
       field: 'isActive',
       headerName: 'Статус',

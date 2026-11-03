@@ -53,3 +53,4 @@
 
 [013 Automatic Sewing prices](013-automatic-sewing-prices/README.md) removes «Перерахувати всі», the stale marker and the manual calculate/publish buttons: prices are published by the backend.
 [014 «Товари» list from one server page](014-product-list-server-page/README.md): search, filters, sort and paging on the server with prices and fabric variants in the same request; «Відкрити повну картку» in the row; statuses only for problems.
+[015 Remove review marks](015-remove-review-marks/README.md): no «Перевірено», «Обов’язковий», «Ціна в прайсі» or «Розраховано …» line; marks only for problems.

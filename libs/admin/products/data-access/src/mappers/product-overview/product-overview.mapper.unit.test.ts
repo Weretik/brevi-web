@@ -25,8 +25,6 @@ const row = {
   sectionId: 2,
   season: 'Літо',
   isActive: true,
-  isVerified: true,
-  verifiedOn: '08.09.2026',
   currentSiteUrl: 'https://brevi.com.ua/specodyag-litnij/kostyum-verde',
   quoteDescription: null,
   updatedAtUtc: '2026-11-03T10:00:00Z',

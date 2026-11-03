@@ -26,8 +26,6 @@ const product = (id: number, variants: ProductVariant[]): ProductOverview => ({
   sectionId: null,
   season: null,
   isActive: true,
-  isVerified: false,
-  verifiedOn: null,
   currentSiteUrl: null,
   quoteDescription: null,
   updatedAtUtc: '2026-11-03T10:00:00Z',

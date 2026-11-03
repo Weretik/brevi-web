@@ -7,7 +7,6 @@ export function emptySewingOperation(clientId: string, sortOrder: number): Sewin
     quantity: 1,
     manualMinutes: null,
     sortOrder,
-    reviewed: false,
     comment: '',
   };
 }

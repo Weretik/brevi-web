@@ -1,13 +1,11 @@
 /**
- * Short reasons of the sheet's «Статус розрахунку» («Немає трудовитрат», «Операції не підтверджено» …)
+ * Short reasons of the sheet's «Статус розрахунку» («Немає трудовитрат», «Немає тканини» …)
  * for the pricing blocker codes of the backend engine.
  */
 const reasons: Record<string, string> = {
   MissingOperations: 'Немає трудовитрат',
-  UnreviewedOperation: 'Операції не підтверджено',
   MissingOperationTime: 'Немає часу операції',
   MissingFabric: 'Немає тканини',
-  UnreviewedMaterial: 'Комплектацію не перевірено',
   MissingCost: 'Неповна комплектація',
   MissingMaterialCost: 'Неповна комплектація',
   InactiveReference: 'Неповна комплектація',
@@ -33,11 +31,6 @@ export function sewingBlockerReasons(blockers: ReadonlyArray<{ code: string }>):
 
 const compositionPatterns: Array<[RegExp, string]> = [
   [/^Article is inactive\.$/, 'Артикул неактивний.'],
-  [
-    /^Required material line \d+ has not been reviewed\.$/,
-    'Не всі обов’язкові матеріали перевірені.',
-  ],
-  [/^Required operation line \d+ has not been reviewed\.$/, 'Операції не підтверджено.'],
   [
     /^Other cost line \d+ requires the versioned Article pricing check\.$/,
     'Додаткові витрати перевіряються під час розрахунку артикула.',

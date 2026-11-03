@@ -29,8 +29,7 @@ export const sewingCreateStepInfo: Record<SewingCreateStep, SewingCreateStepInfo
   4: {
     title: 'Операції',
     hint: 'трудовитрати',
-    instruction:
-      'Вкажіть час, кількість і яку частину виробу шиє операція. «Перевірено» — тільки після реальної перевірки.',
+    instruction: 'Вкажіть час, кількість і яку частину виробу шиє операція.',
   },
   5: {
     title: 'Перевірка',
@@ -45,7 +44,7 @@ export const sewingShiftMinutes = 480;
 /** One line of «Що заважає розрахунку». `unknown` until the data to check it exists. */
 export type SewingCreateCheckState = 'ok' | 'blocking' | 'unknown';
 
-export type SewingCreateCheckKey = 'article' | 'materials' | 'composition' | 'labour' | 'reviewed';
+export type SewingCreateCheckKey = 'article' | 'materials' | 'composition' | 'labour';
 
 export interface SewingCreateCheck {
   key: SewingCreateCheckKey;
@@ -58,5 +57,4 @@ export const sewingCreateCheckLabels: Record<SewingCreateCheckKey, string> = {
   materials: 'Немає тканини / фурнітури',
   composition: 'Неповна комплектація',
   labour: 'Немає трудовитрат',
-  reviewed: 'Операції не підтверджено',
 };

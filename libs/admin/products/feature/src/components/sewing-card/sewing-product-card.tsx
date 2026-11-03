@@ -57,8 +57,6 @@ export function SewingProductCard({ product, onDeleted }: Props) {
         sectionName={sectionName}
         season={card.row?.season ?? null}
         active={card.row?.isActive ?? null}
-        verified={card.row?.isVerified ?? false}
-        verifiedOn={card.row?.verifiedOn ?? null}
         siteUrl={card.row?.currentSiteUrl ?? null}
         status={card.status}
         canEdit={Boolean(card.row) && controller.canManage}

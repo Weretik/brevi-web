@@ -16,7 +16,6 @@ export interface PpeCreateFormValues {
   ruleCode: string;
   allowManualPrice: boolean;
   isActive: boolean;
-  isVerified: boolean;
 }
 
 export type PpeCreateField = keyof PpeCreateFormValues;
@@ -35,7 +34,6 @@ export const ppeCreateFormDefaults: PpeCreateFormValues = {
   ruleCode: '',
   allowManualPrice: false,
   isActive: true,
-  isVerified: false,
 };
 
 /** Units the sheet uses most; the field still takes any text. */
@@ -50,7 +48,6 @@ export function ppeCreateBody(values: PpeCreateFormValues): CreateCatalogProduct
     sectionId: values.sectionId === '' ? 0 : values.sectionId,
     season: null,
     isActive: values.isActive,
-    isVerified: values.isVerified,
     currentSiteUrl: values.currentSiteUrl.trim() || null,
     quoteDescription: null,
     ppe: {
@@ -71,7 +68,6 @@ const serverFields: Record<string, PpeCreateField> = {
   sectionid: 'sectionId',
   currentsiteurl: 'currentSiteUrl',
   isactive: 'isActive',
-  isverified: 'isVerified',
   supplierid: 'supplierId',
   suppliersku: 'supplierSku',
   supplierurl: 'supplierUrl',

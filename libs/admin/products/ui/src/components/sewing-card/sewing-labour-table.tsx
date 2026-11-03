@@ -10,7 +10,6 @@ import {
   Typography,
 } from '@mui/material';
 
-import { SewingCardStatusPill } from './sewing-card-status-pill';
 import { sewingPriceFormat } from '../sewing-pricing/sewing-price-format';
 
 import type { SewingLabourLine } from '@admin/products/model';
@@ -45,7 +44,6 @@ export function SewingLabourTable({ lines, costsKnown }: Props) {
             <TableCell align="right">Час, хв</TableCell>
             <TableCell align="right">Вартість</TableCell>
             <TableCell>Коментар</TableCell>
-            <TableCell>Статус перевірки</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -73,12 +71,6 @@ export function SewingLabourTable({ lines, costsKnown }: Props) {
               <TableCell sx={{ minWidth: 160, color: 'text.secondary' }}>
                 {line.comment || '—'}
               </TableCell>
-              <TableCell>
-                <SewingCardStatusPill
-                  label={line.reviewed ? 'Перевірено' : 'Не перевірено'}
-                  tone={line.reviewed ? 'success' : 'warning'}
-                />
-              </TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -92,7 +84,7 @@ export function SewingLabourTable({ lines, costsKnown }: Props) {
             <TableCell align="right" sx={{ ...mono, fontWeight: 600 }}>
               {costsKnown ? sewingPriceFormat(totalCost) : '—'}
             </TableCell>
-            <TableCell colSpan={2} sx={{ color: 'text.secondary' }}>
+            <TableCell sx={{ color: 'text.secondary' }}>
               {costsKnown
                 ? 'Зарплата швачки з урахуванням збирання'
                 : 'Вартість з’явиться, коли артикул розраховується'}

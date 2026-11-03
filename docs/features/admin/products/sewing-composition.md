@@ -2,7 +2,7 @@
 
 **Implemented code:** 2026-10-25. **Surface:** saved Sewing Product detail at `/references/products/:id`. [Specification and evidence](../../../specs/admin/products/004-sewing-articles-and-composition/implementation.md).
 
-An authorized user views Articles, common materials/operations, selected-Article materials and calculation-readiness blockers. Managers and administrators can create a sale SKU and save reviewed norms. Effective composition is displayed with explicit scope; shared lines are never duplicated into Article-specific writes. Price publication is not part of this screen.
+An authorized user views Articles, common materials/operations, selected-Article materials and calculation-readiness blockers. Managers and administrators can create a sale SKU and save norms; lines have no review or required marks ([spec 015](../../../specs/admin/products/015-remove-review-marks/README.md)). Effective composition is displayed with explicit scope; shared lines are never duplicated into Article-specific writes. Price publication is not part of this screen.
 
 ```text
 libs/admin/products/

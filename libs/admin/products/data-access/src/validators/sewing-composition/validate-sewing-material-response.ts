@@ -6,7 +6,6 @@ import {
   sewingResponsePositive,
 } from '../sewing-response-values';
 import { isSewingLineComment } from './is-sewing-line-comment';
-import { isSewingReviewMetadata } from './is-sewing-review-metadata';
 
 import type { SewingMaterialDto } from '../../contracts/sewing-composition/sewing-material.dto';
 
@@ -22,8 +21,6 @@ export function validateSewingMaterialResponse(
         (line['scope'] === 'Article' && line['articleId'] === articleId && articleId !== null)) &&
       sewingResponsePositive(line['quantity']) &&
       sewingResponseInteger(line['sortOrder']) &&
-      typeof line['required'] === 'boolean' &&
-      isSewingReviewMetadata(line) &&
       isSewingLineComment(line['comment']),
   );
   ensureSewingResponse(

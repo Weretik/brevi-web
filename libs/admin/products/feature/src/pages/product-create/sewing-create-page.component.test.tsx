@@ -50,8 +50,6 @@ const row = {
   sectionId: 4,
   season: 'Літо' as const,
   isActive: false,
-  isVerified: false,
-  verifiedOn: null,
   currentSiteUrl: null,
   quoteDescription: 'Легкий костюм',
   updatedAtUtc: '2026-11-03T00:00:00Z',
@@ -187,7 +185,6 @@ describe('SewingCreatePage («Нова модель»)', () => {
         name: 'Халат «Мед»',
         sectionId: 4,
         isActive: false,
-        isVerified: false,
         ppe: null,
       }),
     );
@@ -221,11 +218,7 @@ describe('SewingCreatePage («Нова модель»)', () => {
 
     await user.click(screen.getByRole('tab', { name: /Операції/ }));
     expect(screen.getByLabelText('Адреса')).toHaveTextContent('step=4');
-    await user.click(screen.getByRole('switch', { name: 'Перевірено та підтверджено' }));
-    expect(mocks.update).toHaveBeenCalledWith({
-      id: 42,
-      body: expect.objectContaining({ isVerified: true, isActive: false, code: 'MOD-025' }),
-    });
+    expect(screen.queryByRole('switch', { name: /Перевірено/ })).not.toBeInTheDocument();
   });
 
   it('launches the model on the last step and opens its card', async () => {
@@ -247,8 +240,6 @@ describe('SewingCreatePage («Нова модель»)', () => {
         sectionId: 4,
         season: 'Літо',
         isActive: true,
-        isVerified: false,
-        verifiedOn: null,
         currentSiteUrl: null,
         quoteDescription: 'Легкий костюм',
       },

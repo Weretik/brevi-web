@@ -25,8 +25,6 @@ export function mapProductOverviewItem(row: ProductOverviewItemResponse): Produc
     sectionId: row.sectionId ?? null,
     season: row.season ?? null,
     isActive: row.isActive,
-    isVerified: row.isVerified,
-    verifiedOn: row.verifiedOn ?? null,
     currentSiteUrl: row.currentSiteUrl ?? null,
     quoteDescription: row.quoteDescription ?? null,
     updatedAtUtc: row.updatedAtUtc,

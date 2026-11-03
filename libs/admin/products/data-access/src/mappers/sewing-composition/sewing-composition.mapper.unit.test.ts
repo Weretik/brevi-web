@@ -1,10 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { mapSewingComposition } from './sewing-composition.mapper';
-import {
-  compositionResponseFixture as composition,
-  sharedMaterial,
-} from '../../test-fixtures/sewing-composition/composition-response.fixture';
+import { compositionResponseFixture as composition } from '../../test-fixtures/sewing-composition/composition-response.fixture';
 
 describe('Sewing composition response mapping', () => {
   it('keeps shared materials, selected fabric and operation quantities distinct', () => {
@@ -15,14 +12,8 @@ describe('Sewing composition response mapping', () => {
     ]);
     expect(result.operations[0]?.quantity).toBe(2);
   });
-  it('rejects an effective line from a different Article and incomplete review metadata', () => {
+  it('rejects an effective line from a different Article and an invalid quantity', () => {
     expect(() => mapSewingComposition({ ...composition, articleId: 247 })).toThrow();
-    expect(() =>
-      mapSewingComposition({
-        ...composition,
-        materials: [{ ...sharedMaterial, reviewedAt: null }],
-      }),
-    ).toThrow();
     expect(() =>
       mapSewingComposition({
         ...composition,

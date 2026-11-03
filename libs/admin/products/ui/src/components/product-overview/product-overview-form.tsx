@@ -21,21 +21,13 @@ interface Props {
   values: ProductOverviewFormValues;
   errors: ProductOverviewFieldErrors;
   sections: ProductSectionOption[];
-  verifiedOn: string | null;
   onChange: <Field extends ProductOverviewField>(
     field: Field,
     value: ProductOverviewFormValues[Field],
   ) => void;
 }
 
-export function ProductOverviewForm({
-  type,
-  values,
-  errors,
-  sections,
-  verifiedOn,
-  onChange,
-}: Props) {
+export function ProductOverviewForm({ type, values, errors, sections, onChange }: Props) {
   const sewing = type === 'Sewing';
   return (
     <Stack sx={{ gap: 2 }}>
@@ -92,19 +84,6 @@ export function ProductOverviewForm({
             />
           }
           label="Активний"
-        />
-        <FormControlLabel
-          control={
-            <Switch
-              checked={values.isVerified}
-              onChange={(event) => onChange('isVerified', event.target.checked)}
-            />
-          }
-          label={
-            values.isVerified && verifiedOn
-              ? `Перевірено ${verifiedOn}`
-              : 'Перевірено (ставить директор)'
-          }
         />
       </ReferenceFormSection>
       <ReferenceFormSection title="Для КП">

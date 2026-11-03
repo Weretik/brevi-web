@@ -18,7 +18,6 @@ export function mapPpeOffer(value: unknown, productId: number): PpeOfferVersion 
       externalWholesale: row.values.externalWholesale,
       source: row.values.source,
       sourceDate: row.values.sourceDate,
-      sourceReviewed: row.values.sourceReviewed,
     },
   };
 }

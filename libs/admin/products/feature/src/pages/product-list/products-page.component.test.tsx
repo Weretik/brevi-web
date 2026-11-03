@@ -45,8 +45,6 @@ const row = (
   sectionId,
   season: type === 'Sewing' ? 'Літо' : null,
   isActive: true,
-  isVerified: id === 1,
-  verifiedOn: id === 1 ? '08.09.2026' : null,
   currentSiteUrl: id === 1 ? 'https://brevi.com.ua/specodyag-litnij/kostyum-verde' : null,
   quoteDescription: 'Костюм із курткою та штанами.',
   updatedAtUtc: '2026-11-03T10:00:00Z',

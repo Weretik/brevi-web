@@ -1,12 +1,4 @@
-import {
-  Button,
-  Checkbox,
-  FormControlLabel,
-  MenuItem,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Button, MenuItem, Stack, TextField, Typography } from '@mui/material';
 
 import type { ProductLookups } from '../../product-editor/core/product-lookups';
 import type { SewingMaterialDraft, SewingMaterialKind } from '@admin/products/model';
@@ -137,26 +129,6 @@ export function SewingMaterialRow({
           disabled={readonly}
         />
         <TextField label="Одиниця" value={unitLabel[material.unit]} disabled />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={material.required}
-              onChange={(_, checked) => onChange({ required: checked })}
-              disabled={readonly}
-            />
-          }
-          label="Обов’язковий"
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={material.reviewed}
-              onChange={(_, checked) => onChange({ reviewed: checked })}
-              disabled={readonly}
-            />
-          }
-          label="Перевірено"
-        />
         {canManage && (
           <Button color="error" onClick={onRemove} disabled={saving}>
             Видалити

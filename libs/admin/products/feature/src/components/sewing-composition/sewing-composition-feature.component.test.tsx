@@ -54,12 +54,8 @@ const sharedView = {
       costCode: null,
       quantity: 2,
       unit: 'Piece' as const,
-      required: true,
       sortOrder: 0,
-      reviewed: true,
       comment: '',
-      reviewedBy: 'admin',
-      reviewedAt: '2026-10-20T09:00:00Z',
     },
   ],
   operations: [
@@ -69,10 +65,7 @@ const sharedView = {
       quantity: 1,
       manualMinutes: 4,
       sortOrder: 0,
-      reviewed: true,
       comment: '',
-      reviewedBy: 'admin',
-      reviewedAt: '2026-10-20T09:00:00Z',
     },
   ],
   blockers: [],
@@ -94,12 +87,8 @@ const articleView = {
       costCode: null,
       quantity: 3.6,
       unit: 'Metre' as const,
-      required: true,
       sortOrder: 0,
-      reviewed: true,
       comment: '',
-      reviewedBy: 'admin',
-      reviewedAt: '2026-10-20T09:00:00Z',
     },
   ],
   operations: sharedView.operations,
@@ -179,7 +168,6 @@ function renderFeature(initialEntries = ['/']) {
 }
 
 async function selectArticle() {
-  expect(screen.getByText(/Готовність не перевірена/)).toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', { name: /Артикул 246/ }));
   expect(await screen.findByRole('heading', { name: 'Склад артикулу 246' })).toBeInTheDocument();
 }

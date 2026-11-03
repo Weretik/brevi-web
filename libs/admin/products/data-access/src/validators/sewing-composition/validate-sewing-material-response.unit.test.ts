@@ -12,10 +12,6 @@ const line = (kind: string, unit: string) => ({
   unit,
   quantity: 0.5,
   sortOrder: 0,
-  required: true,
-  reviewed: true,
-  reviewedBy: 'Google-таблиця',
-  reviewedAt: '2026-11-03T00:00:00Z',
   comment: null,
 });
 

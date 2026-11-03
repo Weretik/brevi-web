@@ -50,7 +50,7 @@ describe('PPE response boundary', () => {
     ])
       expect(() => mapPpeProducts([row], [42])).toThrow();
   });
-  it('maps source-reviewed draft blockers without prices or automatic approval', () => {
+  it('maps draft blockers without prices or automatic approval', () => {
     const row = structuredClone(ppePricingFixture) as Record<string, unknown>;
     row['offer'] = {
       ...ppePricingFixture.offer,
@@ -66,7 +66,7 @@ describe('PPE response boundary', () => {
     expect(mapPpeProducts([row], [42])[0]).toMatchObject({
       prices: null,
       blockers: ['UnapprovedOffer'],
-      offer: { isApproved: false, values: { sourceReviewed: true } },
+      offer: { isApproved: false },
     });
   });
 });

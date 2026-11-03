@@ -797,7 +797,7 @@ export interface paths {
     get: operations['getProductOverviewItem'];
     /**
      * Replace the «Товари» page fields of a product
-     * @description Requires CanManageProducts (open while temporary anonymous access is on). Every field is replaced. A PPE product needs a code (site article). The section must exist in Reference «Типи і розділи» and belong to the product type. Season is for sewing only. When isVerified is true and verifiedOn is empty, the stored date is kept or today (Kyiv) is set; when isVerified is false, the date is cleared. Only the director sets the check (an agreement while the API is anonymous, not enforced).
+     * @description Requires CanManageProducts (open while temporary anonymous access is on). Every field is replaced. A PPE product needs a code (site article). The section must exist in Reference «Типи і розділи» and belong to the product type. Season is for sewing only.
      */
     put: operations['updateProductOverview'];
     post?: never;
@@ -818,7 +818,7 @@ export interface paths {
     put?: never;
     /**
      * Import all products from the Calculator sheet (preview or apply)
-     * @description Requires CanManageProducts and an actor (CAT-010). One-time transfer of the tabs «Товари» (with «Прайс на сайт», «Комплектація виробів», «Трудовитрати виробів») and «ЗІЗ». A row matches a stored product by type and code (sewing model ID, PPE site article), else by the exact name of the same type; a matched product keeps its ID and slug, the rest are created (ID largest + 1, slug as in createCatalogProduct). Names are Ukrainian only; the Russian name column gets a copy. A matched sewing model gets its article list and whole composition replaced; a checked model's lines are marked reviewed by «Google-таблиця» at Kyiv midnight of verifiedOn. A PPE product gets a new offer version (source «Імпорт з таблиці») only when the supplier price, the rule or a given Insight price differs; no supplier price means no version. With deleteMissing, every product of either type that no row matches is deleted. dryRun (default true) never writes. Any problem means nothing is written; warnings (unknown rule imported as none, no supplier price or link) do not stop the import. All writes run in one database transaction.
+     * @description Requires CanManageProducts and an actor (CAT-010). One-time transfer of the tabs «Товари» (with «Прайс на сайт», «Комплектація виробів», «Трудовитрати виробів») and «ЗІЗ». A row matches a stored product by type and code (sewing model ID, PPE site article), else by the exact name of the same type; a matched product keeps its ID and slug, the rest are created (ID largest + 1, slug as in createCatalogProduct). Names are Ukrainian only; the Russian name column gets a copy. A matched sewing model gets its article list and whole composition replaced; the note «Спільна складова для всіх артикулів моделі» that the sheet repeats on shared lines is dropped. A PPE product gets a new offer version (source «Імпорт з таблиці», dated the import day) only when the supplier price, the rule or a given Insight price differs; no supplier price means no version. With deleteMissing, every product of either type that no row matches is deleted. dryRun (default true) never writes. Any problem means nothing is written; warnings (unknown rule imported as none, no supplier price or link) do not stop the import. All writes run in one database transaction.
      */
     post: operations['importSheetProducts'];
     delete?: never;
@@ -2694,8 +2694,6 @@ export interface components {
       variant: string | null;
       /** @description No fixed norm; the time is entered per product. */
       minutesPerProduct: boolean;
-      /** Format: date */
-      normCheckedAt: string | null;
       isActive: boolean;
       notes: string | null;
     };
@@ -2709,8 +2707,6 @@ export interface components {
       variant?: string | null;
       /** @default false */
       minutesPerProduct: boolean;
-      /** Format: date */
-      normCheckedAt?: string | null;
       /** @default true */
       isActive: boolean;
       notes?: string | null;
@@ -2732,8 +2728,6 @@ export interface components {
       name: string;
       min: number;
       minutesPerProduct: boolean;
-      /** Format: date */
-      normCheckedAt?: string | null;
       isActive: boolean;
       notes?: string | null;
     };
@@ -3261,9 +3255,6 @@ export interface components {
       /** @enum {string|null} */
       season: 'Літо' | 'Зима' | null;
       isActive: boolean;
-      isVerified: boolean;
-      /** @description Check date as dd.MM.yyyy; older imported rows may hold other text. */
-      verifiedOn: string | null;
       /** @description Product page on the current public site; quotes take photos from it (temporary). */
       currentSiteUrl: string | null;
       /** @description Short description for a quote (КП). */
@@ -3334,7 +3325,6 @@ export interface components {
       /** @enum {string|null} */
       season?: 'Літо' | 'Зима' | null;
       isActive: boolean;
-      isVerified: boolean;
       /** Format: uri */
       currentSiteUrl?: string | null;
       quoteDescription?: string | null;
@@ -3364,8 +3354,6 @@ export interface components {
       /** @enum {string|null} */
       season?: 'Літо' | 'Зима' | null;
       isActive: boolean;
-      isVerified: boolean;
-      verifiedOn?: string | null;
       /** Format: uri */
       currentSiteUrl?: string | null;
       quoteDescription?: string | null;
@@ -3389,7 +3377,6 @@ export interface components {
        * @enum {string}
        */
       unit: 'Metre' | 'Piece';
-      isRequired: boolean;
       comment?: string | null;
     };
     SheetSewingOperationRow: {
@@ -3414,9 +3401,6 @@ export interface components {
       /** @enum {string|null} */
       season?: 'Літо' | 'Зима' | null;
       isActive: boolean;
-      isVerified: boolean;
-      /** @description dd.MM.yyyy. */
-      verifiedOn?: string | null;
       /** Format: uri */
       currentSiteUrl?: string | null;
       quoteDescription?: string | null;
@@ -3444,9 +3428,6 @@ export interface components {
       supplierPrice?: number | null;
       isActive: boolean;
       allowManualPrice: boolean;
-      isVerified: boolean;
-      /** @description dd.MM.yyyy. */
-      verifiedOn?: string | null;
       /** @description PPE rule code (the rule name); an unknown one is imported as none (warning). */
       ruleCode?: string | null;
       quoteDescription?: string | null;
@@ -3544,7 +3525,7 @@ export interface components {
      * @enum {string}
      */
     SewingMaterialUnit: 'Metre' | 'Piece' | 'Service' | 'Kilogram';
-    /** @description Effective line. Identity and review metadata are server-owned. */
+    /** @description Effective line. Identity is server-owned. */
     SewingMaterial: {
       /** Format: int64 */
       id: number;
@@ -3558,17 +3539,12 @@ export interface components {
       costCode: string | null;
       quantity: number;
       unit: components['schemas']['SewingMaterialUnit'];
-      required: boolean;
       /** Format: int32 */
       sortOrder: number;
-      reviewed: boolean;
-      reviewedBy: string | null;
-      /** Format: date-time */
-      reviewedAt: string | null;
       /** @description Free note, for example which garment part an operation belongs to. */
       comment: string | null;
     };
-    /** @description Shared effective operation line. Identity and review metadata are server-owned. */
+    /** @description Shared effective operation line. Identity is server-owned. */
     SewingOperation: {
       /** Format: int64 */
       id: number;
@@ -3578,10 +3554,6 @@ export interface components {
       manualMinutes: number | null;
       /** Format: int32 */
       sortOrder: number;
-      reviewed: boolean;
-      reviewedBy: string | null;
-      /** Format: date-time */
-      reviewedAt: string | null;
       /** @description Free note, for example which garment part an operation belongs to. */
       comment: string | null;
     };
@@ -3597,7 +3569,7 @@ export interface components {
       materials: components['schemas']['SewingMaterial'][];
       /** @description Shared effective operation lines. */
       operations: components['schemas']['SewingOperation'][];
-      /** @description Human-readable blockers for review, missing fabric/operations, or unresolved OtherCost. */
+      /** @description Human-readable blockers for missing fabric/operations or unresolved OtherCost. */
       blockers: string[];
     };
     SewingMaterialInput: {
@@ -3611,10 +3583,8 @@ export interface components {
       costCode: string | null;
       quantity: number;
       unit: components['schemas']['SewingMaterialUnit'];
-      required: boolean;
       /** Format: int32 */
       sortOrder: number;
-      reviewed: boolean;
       /** @description Free note, for example which garment part an operation belongs to. */
       comment?: string | null;
     };
@@ -3625,7 +3595,6 @@ export interface components {
       manualMinutes: number | null;
       /** Format: int32 */
       sortOrder: number;
-      reviewed: boolean;
       /** @description Free note, for example which garment part an operation belongs to. */
       comment?: string | null;
     };
@@ -3728,8 +3697,6 @@ export interface components {
       unit: 'Metre' | 'Piece' | 'Service';
       isFabric: boolean;
       isOtherCost: boolean;
-      isRequired: boolean;
-      isReviewed: boolean;
     };
     SewingPricingOperationRow: {
       /** Format: int64 */
@@ -3739,7 +3706,6 @@ export interface components {
       /** Format: decimal */
       quantity: number;
       manualMinutes: number | null;
-      isReviewed: boolean;
     };
     SewingArticlePricingSnapshot: {
       /** Format: int64 */
@@ -3899,7 +3865,6 @@ export interface components {
       externalWholesale: number | null;
       source: string;
       sourceDate: string;
-      sourceReviewed: boolean;
     };
     PpeOfferVersion: {
       /** Format: uuid */

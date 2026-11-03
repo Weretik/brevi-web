@@ -30,13 +30,12 @@ function article(update: Partial<SewingArticleSummaryRow> = {}): SewingArticleSu
   };
 }
 
-const operation = (reviewed: boolean): SewingOperationDraft => ({
+const operation = (): SewingOperationDraft => ({
   clientId: 'a',
   operationId: 7,
   quantity: 1,
   manualMinutes: null,
   sortOrder: 0,
-  reviewed,
   comment: 'Комір',
 });
 
@@ -61,20 +60,18 @@ describe('«Нова модель» steps', () => {
       materials: 'unknown',
       composition: 'unknown',
       labour: 'unknown',
-      reviewed: 'unknown',
     });
     expect(states(sewingCreateChecklist({ articles: [], operations: [] }))).toEqual({
       article: 'blocking',
       materials: 'unknown',
       composition: 'unknown',
       labour: 'blocking',
-      reviewed: 'blocking',
     });
     const blocked = article({
       calculated: false,
       blockers: [
         { code: 'MissingFabric', inputKey: null },
-        { code: 'UnreviewedOperation', inputKey: null },
+        { code: 'MissingSettings', inputKey: null },
       ],
     });
     const checks = sewingCreateChecklist({ articles: [blocked], operations: null });
@@ -83,29 +80,26 @@ describe('«Нова модель» steps', () => {
       materials: 'blocking',
       composition: 'ok',
       labour: 'ok',
-      reviewed: 'blocking',
     });
     expect(checks.map((check) => check.label)).toEqual([
       'Немає артикула',
       'Немає тканини / фурнітури',
       'Неповна комплектація',
       'Немає трудовитрат',
-      'Операції не підтверджено',
     ]);
     expect(
-      states(sewingCreateChecklist({ articles: [blocked], operations: [operation(true)] }))
-        .reviewed,
+      states(sewingCreateChecklist({ articles: [blocked], operations: [operation()] })).labour,
     ).toBe('ok');
   });
 
   it('marks done steps and readiness', () => {
-    const ready = sewingCreateChecklist({ articles: [article()], operations: [operation(true)] });
+    const ready = sewingCreateChecklist({ articles: [article()], operations: [operation()] });
     expect(sewingCreateDoneSteps({ hasDraft: false, checks: ready, active: false })).toEqual([]);
     expect(sewingCreateDoneSteps({ hasDraft: true, checks: ready, active: false })).toEqual([
       1, 2, 3, 4,
     ]);
-    const unreviewed = sewingCreateChecklist({ articles: [], operations: [operation(false)] });
-    expect(sewingCreateDoneSteps({ hasDraft: true, checks: unreviewed, active: true })).toEqual([
+    const noArticle = sewingCreateChecklist({ articles: [], operations: [] });
+    expect(sewingCreateDoneSteps({ hasDraft: true, checks: noArticle, active: true })).toEqual([
       1, 5,
     ]);
     expect(isSewingCreateReady([article()])).toBe(true);

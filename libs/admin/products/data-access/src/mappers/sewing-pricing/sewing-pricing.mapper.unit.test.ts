@@ -42,7 +42,7 @@ describe('Sewing pricing response boundary', () => {
       breakdown: null,
       prices: null,
       blockers: [
-        { code: 'UnreviewedOperation', inputKey: 'OperationLine:2', message: 'Review required.' },
+        { code: 'MissingOperationTime', inputKey: 'OperationLine:2', message: 'Time required.' },
       ],
     };
     expect(mapSewingCalculation(blocked, { productId: 42, articleId: 501 }).prices).toBeNull();

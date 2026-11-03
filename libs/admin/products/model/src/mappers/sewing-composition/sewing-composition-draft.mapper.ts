@@ -30,9 +30,7 @@ function toMaterialDraft(
     costCode: material.costCode,
     quantity: material.quantity,
     unit: material.unit,
-    required: material.required,
     sortOrder: material.sortOrder,
-    reviewed: material.reviewed,
     comment: material.comment,
   };
 }
@@ -45,7 +43,6 @@ function toOperationDraft(
     quantity: operation.quantity,
     manualMinutes: operation.manualMinutes,
     sortOrder: operation.sortOrder,
-    reviewed: operation.reviewed,
     comment: operation.comment,
   };
 }

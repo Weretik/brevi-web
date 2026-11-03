@@ -42,10 +42,6 @@ export interface ProductOverview {
   sectionId: number | null;
   season: ProductSeason | null;
   isActive: boolean;
-  /** «Перевірено»: set by the director. */
-  isVerified: boolean;
-  /** Check date text, dd.mm.yyyy. */
-  verifiedOn: string | null;
   /** Product page on the current public site; quotes take photos from it (temporary). */
   currentSiteUrl: string | null;
   /** «Короткий опис для КП». */

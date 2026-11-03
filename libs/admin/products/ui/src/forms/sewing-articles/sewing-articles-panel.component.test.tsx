@@ -30,7 +30,7 @@ describe('SewingArticlesPanel', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /Артикул 246/ }));
 
-    expect(screen.getByText(/Потрібна перевірка: Немає тканини/)).toBeInTheDocument();
+    expect(screen.getByText(/Активний · Немає тканини/)).toBeInTheDocument();
     expect(onSelect).toHaveBeenCalledWith(501);
     expect(screen.queryByRole('form', { name: 'Створити артикул' })).not.toBeInTheDocument();
   });

@@ -26,7 +26,6 @@ describe('ppeCreateBody', () => {
       sectionId: 9,
       season: null,
       isActive: true,
-      isVerified: false,
       currentSiteUrl: null,
       quoteDescription: null,
       ppe: {

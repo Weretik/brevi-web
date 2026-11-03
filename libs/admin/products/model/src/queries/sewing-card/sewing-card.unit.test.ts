@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { sewingBlockerReasons, translateCompositionBlockers } from './sewing-blocker-reasons';
-import { isSewingPricePublished, sewingCardTotals } from './sewing-card-totals';
+import { sewingCardTotals } from './sewing-card-totals';
 import { sewingLabourLines } from './sewing-labour-lines';
 
 import type { SewingArticleSummaryRow } from '../../entities/sewing-card/sewing-article-summary';
@@ -31,21 +31,21 @@ describe('sewing card (CAT-007)', () => {
     expect(
       sewingBlockerReasons([
         { code: 'MissingOperations' },
-        { code: 'UnreviewedMaterial' },
-        { code: 'UnreviewedMaterial' },
+        { code: 'MissingFabric' },
+        { code: 'MissingFabric' },
         { code: 'Something' },
       ]),
-    ).toEqual(['Немає трудовитрат', 'Комплектацію не перевірено', 'Не розраховано']);
+    ).toEqual(['Немає трудовитрат', 'Немає тканини', 'Не розраховано']);
     expect(
       translateCompositionBlockers([
-        'Required material line 4 has not been reviewed.',
-        'Required material line 5 has not been reviewed.',
+        'No effective fabric line is configured.',
+        'No effective fabric line is configured.',
         'No operation lines are configured.',
       ]),
-    ).toEqual(['Не всі обов’язкові матеріали перевірені.', 'Немає трудовитрат.']);
+    ).toEqual(['Немає тканини.', 'Немає трудовитрат.']);
   });
 
-  it('counts ready articles, price ranges and prices waiting for publication', () => {
+  it('counts ready articles and price ranges', () => {
     const totals = sewingCardTotals([
       row({}),
       row({ id: 2, fullCost: 520, prices: { ...tiers, retail: 950 } }),
@@ -64,9 +64,7 @@ describe('sewing card (CAT-007)', () => {
       minutes: 54,
       fullCost: { min: 500, max: 520 },
       retail: { min: 900, max: 950 },
-      unpublished: 1,
     });
-    expect(isSewingPricePublished(row({ published: null }))).toBe(false);
   });
 
   it('takes manual time over the norm and spreads the seamstress pay by minutes', () => {
@@ -78,7 +76,6 @@ describe('sewing card (CAT-007)', () => {
           quantity: 2,
           manualMinutes: null,
           sortOrder: 0,
-          reviewed: true,
           comment: 'Комір',
         },
         {
@@ -87,7 +84,6 @@ describe('sewing card (CAT-007)', () => {
           quantity: 1,
           manualMinutes: 9,
           sortOrder: 1,
-          reviewed: false,
           comment: '',
         },
       ],
@@ -109,7 +105,6 @@ describe('sewing card (CAT-007)', () => {
       quantity: 1,
       manualMinutes: null,
       sortOrder: 0,
-      reviewed: false,
       comment: '',
     };
     expect(sewingLabourLines([unknown], [], null)[0]).toMatchObject({

@@ -25,10 +25,8 @@ export function SewingArticleList({ articles, selectedArticleId, onSelect }: Pro
                 <>
                   {article.active ? 'Активний' : 'Неактивний'}
                   {article.readiness &&
-                    (article.readiness.ready
-                      ? ' · Готовий до розрахунку'
-                      : ` · Потрібна перевірка: ${article.readiness.blockers.join('; ')}`)}
-                  {!article.readiness && ' · Готовність не перевірена · оберіть артикул'}
+                    !article.readiness.ready &&
+                    ` · ${article.readiness.blockers.join('; ')}`}
                 </>
               }
             />

@@ -22,7 +22,6 @@ export interface CreateCatalogProductInput {
   sectionId: number;
   season: 'Літо' | 'Зима' | null;
   isActive: boolean;
-  isVerified: boolean;
   currentSiteUrl: string | null;
   quoteDescription: string | null;
   ppe: CreatePpeSupplierInput | null;
