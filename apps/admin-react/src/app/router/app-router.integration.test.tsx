@@ -75,6 +75,7 @@ describe('React Admin routing', () => {
         'Загальні довідники',
         [
           'Товари',
+          'Типи і розділи',
           'Тканини та фурнітура',
           'Операції',
           'Контрагенти',
@@ -96,7 +97,7 @@ describe('React Admin routing', () => {
           .map((item) => item.textContent?.replace('Ще не доступно', '')),
       ).toEqual(entries);
       expect(within(list).queryAllByRole('link')).toHaveLength(
-        section === 'Загальні довідники' ? 6 : section === 'Менеджер сервісу' ? 2 : 0,
+        section === 'Загальні довідники' ? 7 : section === 'Менеджер сервісу' ? 2 : 0,
       );
     }
   });

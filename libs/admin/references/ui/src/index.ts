@@ -33,3 +33,8 @@ export * from './components/reference-list-controls/reference-search-bar';
 export * from './components/reference-list-controls/reference-supplier-filter';
 export * from './dialogs/suppliers/supplier-editor-dialog';
 export * from './components/reference-list/reference-status-pill';
+export * from './components/product-sections/product-section-delete-dialog';
+export * from './components/product-sections/product-section-details';
+export * from './components/product-sections/product-section-form';
+export * from './components/product-sections/product-section-type-chips';
+export * from './components/product-sections/product-sections-grid';

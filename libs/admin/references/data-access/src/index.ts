@@ -36,6 +36,12 @@ export {
   useUpdatePricingParameterMutation,
 } from './api/pricing-parameters/pricing-parameters.api';
 export {
+  useCreateProductSectionMutation,
+  useDeleteProductSectionMutation,
+  useListProductSectionsQuery,
+  useUpdateProductSectionMutation,
+} from './api/product-sections/product-sections.api';
+export {
   useCreateSupplierMutation,
   useDeleteSupplierMutation,
   useListSuppliersQuery,

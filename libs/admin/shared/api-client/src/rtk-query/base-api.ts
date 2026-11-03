@@ -15,6 +15,7 @@ export const adminApi = createApi({
     'Media',
     'Product',
     'ProductCategory',
+    'ProductSection',
     'Supplier',
   ],
   endpoints: () => ({}),

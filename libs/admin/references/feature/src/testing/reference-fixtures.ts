@@ -110,3 +110,15 @@ export function ppeMarkupRuleRow(overrides: ApiRow = {}): ApiRow {
     ...overrides,
   };
 }
+
+export function productSectionRow(overrides: ApiRow = {}): ApiRow {
+  return {
+    id: 1,
+    type: 'Sewing',
+    name: 'Одяг ЛІТО',
+    isActive: true,
+    comment: 'Літній одяг',
+    sortOrder: 2,
+    ...overrides,
+  };
+}

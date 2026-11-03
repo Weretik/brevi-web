@@ -31,7 +31,7 @@ describe('legacy Admin navigation', () => {
       '/reminders/non-working-days',
     ]);
   });
-  it('keeps 25 shared entries in the original five sections and adds reminders for Manager', () => {
+  it('keeps 26 shared entries in the original five sections and adds reminders for Manager', () => {
     const groups = createNavigation(new Set(['/']));
 
     expect(groups.map((group) => group.label)).toEqual([
@@ -42,8 +42,8 @@ describe('legacy Admin navigation', () => {
       'Загальні довідники',
       'Загальні звіти',
     ]);
-    expect(groups.map((group) => group.items.length)).toEqual([6, 7, 5, 4, 7, 1]);
-    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(30);
+    expect(groups.map((group) => group.items.length)).toEqual([6, 7, 5, 4, 8, 1]);
+    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(31);
     expect(groups[0].items.map((item) => item.id)).not.toContain('clients');
   });
   it('shows issuer settings only for the server Admin role', () => {
@@ -62,7 +62,7 @@ describe('legacy Admin navigation', () => {
   it('enables the media link only with its registered route', () => {
     const groups = createNavigation(new Set(['/', '/references/media']));
 
-    expect(groups[4].items[6]).toMatchObject({
+    expect(groups[4].items[7]).toMatchObject({
       id: 'media',
       label: 'Медіа/Фото',
       to: '/references/media',
@@ -74,8 +74,8 @@ describe('legacy Admin navigation', () => {
     const unavailable = createNavigation(new Set(['/']));
     const available = createNavigation(new Set(['/', legacyPath]));
 
-    expect(unavailable[4].items[3].to).toBeUndefined();
-    expect(available[4].items[3].to).toBe(legacyPath);
+    expect(unavailable[4].items[4].to).toBeUndefined();
+    expect(available[4].items[4].to).toBe(legacyPath);
     expect(available[0].items[2].to).toBeUndefined();
   });
 });

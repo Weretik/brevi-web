@@ -29,3 +29,7 @@ export * from './validators/garment-parts/garment-part-validation';
 export * from './validators/pricing-parameters/ppe-markup-rule-validation';
 export * from './validators/pricing-parameters/pricing-parameter-validation';
 export * from './validators/suppliers/supplier-validation';
+export * from './entities/product-sections/product-section';
+export * from './forms/product-sections/product-section-form';
+export * from './queries/product-sections/product-section-filters';
+export * from './validators/product-sections/product-section-validation';
