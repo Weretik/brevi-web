@@ -34,7 +34,7 @@ export function validateSewingMaterialResponse(
       (line['kind'] === 'Accessory' &&
         sewingResponseInteger(line['referenceId'], 1) &&
         line['costCode'] === null &&
-        line['unit'] === 'Piece') ||
+        (line['unit'] === 'Piece' || line['unit'] === 'Metre')) ||
       (line['kind'] === 'OtherCost' &&
         line['referenceId'] === null &&
         typeof line['costCode'] === 'string' &&
