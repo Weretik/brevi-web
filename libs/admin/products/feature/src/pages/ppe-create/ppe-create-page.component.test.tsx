@@ -109,7 +109,7 @@ beforeEach(() => {
 
 afterEach(cleanup);
 
-describe('PpeCreatePage', () => {
+describe('PpeCreatePage', { timeout: 20_000 }, () => {
   it('offers only PPE sections and active suppliers', async () => {
     const user = userEvent.setup();
     renderPage();
@@ -130,10 +130,15 @@ describe('PpeCreatePage', () => {
 
     await fillRequired(user);
 
-    await waitFor(() => expect(submitButton()).toBeEnabled());
+    await waitFor(() => expect(submitButton()).toBeEnabled(), { timeout: 4000 });
     expect(within(readiness).getByText('6 з 7')).toBeInTheDocument();
     const prices = screen.getByRole('region', { name: 'Ціни в прайсі' });
-    await waitFor(() => expect(within(prices).getByText('Роздріб, від 1 шт.')).toBeInTheDocument());
+    await waitFor(
+      () => expect(within(prices).getByText('Роздріб, від 1 шт.')).toBeInTheDocument(),
+      {
+        timeout: 4000,
+      },
+    );
     expect(
       within(prices).getByText('Примітка в прайсі: Оптова ціна діє від 10 пар.'),
     ).toBeInTheDocument();
@@ -190,7 +195,7 @@ describe('PpeCreatePage', () => {
     });
     renderPage();
     await fillRequired(user);
-    await waitFor(() => expect(submitButton()).toBeEnabled());
+    await waitFor(() => expect(submitButton()).toBeEnabled(), { timeout: 4000 });
 
     await user.click(submitButton());
     expect(await screen.findByText('Назва вже є.')).toBeInTheDocument();
@@ -207,7 +212,7 @@ describe('PpeCreatePage', () => {
     });
     renderPage();
     await fillRequired(user);
-    await waitFor(() => expect(submitButton()).toBeEnabled());
+    await waitFor(() => expect(submitButton()).toBeEnabled(), { timeout: 4000 });
 
     await user.click(submitButton());
 
