@@ -675,6 +675,48 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/products/overview': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List products for the «Товари» page
+     * @description Anonymous. All products of the type, sorted by code (MOD-2 before MOD-10, article 9 before 17) then name; products without a code come last. An empty list when there are none.
+     */
+    get: operations['getProductOverview'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/products/{id}/overview': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Replace the «Товари» page fields of a product
+     * @description Requires CanManageProducts (open while temporary anonymous access is on). Every field is replaced. A PPE product needs a code (site article). The section must exist in Reference «Типи і розділи» and belong to the product type. Season is for sewing only. When isVerified is true and verifiedOn is empty, the stored date is kept or today (Kyiv) is set; when isVerified is false, the date is cleared. Only the director sets the check (an agreement while the API is anonymous, not enforced).
+     */
+    put: operations['updateProductOverview'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/products/{productId}/articles': {
     parameters: {
       query?: never;
@@ -2980,6 +3022,45 @@ export interface components {
     };
     ReplaceProductRequest: components['schemas']['ProductWriteBase'] &
       Omit<components['schemas']['ProductTypeWrite'], 'type'>;
+    ProductOverviewRow: {
+      /** Format: int32 */
+      id: number;
+      /** @enum {string} */
+      type: 'Sewing' | 'Ppe';
+      /** @description Model ID (MOD-…) for sewing */
+      code: string | null;
+      name: string;
+      /**
+       * Format: int32
+       * @description ID from /api/reference/product-sections.
+       */
+      sectionId: number | null;
+      /** @enum {string|null} */
+      season: 'Літо' | 'Зима' | null;
+      isActive: boolean;
+      isVerified: boolean;
+      /** @description Check date as dd.MM.yyyy; older imported rows may hold other text. */
+      verifiedOn: string | null;
+      /** @description Product page on the current public site; quotes take photos from it (temporary). */
+      currentSiteUrl: string | null;
+      /** @description Short description for a quote (КП). */
+      quoteDescription: string | null;
+      /** Format: date-time */
+      updatedAtUtc: string;
+    };
+    UpdateProductOverviewRequest: {
+      code?: string | null;
+      /** Format: int32 */
+      sectionId?: number | null;
+      /** @enum {string|null} */
+      season?: 'Літо' | 'Зима' | null;
+      isActive: boolean;
+      isVerified: boolean;
+      verifiedOn?: string | null;
+      /** Format: uri */
+      currentSiteUrl?: string | null;
+      quoteDescription?: string | null;
+    };
     SewingArticle: {
       /** Format: int64 */
       id: number;
@@ -6819,6 +6900,88 @@ export interface operations {
         content?: never;
       };
       409: components['responses']['ConflictError'];
+    };
+  };
+  getProductOverview: {
+    parameters: {
+      query?: {
+        type?: 'Sewing' | 'Ppe';
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Rows. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductOverviewRow'][];
+        };
+      };
+      /** @description Unknown type. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateProductOverview: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateProductOverviewRequest'];
+      };
+    };
+    responses: {
+      /** @description Saved. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      400: components['responses']['ValidationError'];
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product management permission required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Another product of the same type has this code. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
     };
   };
   listSewingArticles: {

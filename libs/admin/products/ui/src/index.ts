@@ -25,7 +25,6 @@ export { productWholesalePriceLabel } from './product-detail/product-wholesale-p
 export { SewingPricingPanel } from './components/sewing-pricing/sewing-pricing-panel';
 export * from './forms/sewing-composition/sewing-composition-editor';
 export * from './product-content/product-markdown';
-export * from './product-list/products-list-filters';
 export * from './media/media-delete-dialog';
 export * from './media/media-gallery';
 export * from './media/media-upload';
@@ -33,3 +32,8 @@ export * from './media/media-upload';
 export { PpePricingPanel } from './components/ppe-pricing/ppe-pricing-panel';
 export { PpeOfferForm } from './forms/ppe-pricing/ppe-offer-form';
 export { PpeRuleForm } from './forms/ppe-pricing/ppe-rule-form';
+export * from './components/product-overview/product-overview-details';
+export * from './components/product-overview/product-overview-form';
+export * from './components/product-overview/product-overview-grid';
+export * from './components/product-overview/product-overview-section-chips';
+export * from './components/product-overview/product-overview-delete-dialog';

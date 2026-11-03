@@ -33,3 +33,8 @@ export { applyPpePrice } from './queries/ppe-pricing/apply-ppe-price';
 
 export type { PpeRuleMarkupDraft } from './forms/ppe-pricing/ppe-rule-markup-draft';
 export { parsePpeMarkupDraft } from './validators/ppe-pricing/parse-ppe-markup-draft';
+
+export * from './entities/product-overview/product-overview';
+export * from './queries/product-overview/product-overview-filters';
+export * from './validators/product-overview/product-overview-validation';
+export * from './forms/product-overview/product-overview-form';

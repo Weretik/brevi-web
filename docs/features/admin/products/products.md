@@ -2,8 +2,7 @@
 
 **Status:** routes and pages implemented, checked 2026-10-16.
 
-`/references/products` shows a list with search, sorting, pagination, and
-deletion; `/create`, `/:id`, and `/:id/edit` open create, detail, and edit
+`/references/products` is the «Товари» page ([spec 008](../../../specs/admin/products/008-products-page/README.md)): tabs «Швейна продукція» (one row per model) and «ЗІЗ» (`?tab=ppe`), section chips, search, a drawer for code, section, season, active, «Перевірено», the current site link and the quote description, and bulk deletion. Site texts, SEO and photos are not shown there; they go to the planned «Контент сайту» module. `/create`, `/:id`, and `/:id/edit` open create, detail, and edit
 pages. `products/feature` owns scenarios, local state, and loading/error/empty
 handling; `products/ui` provides presentation; `products/model` provides domain
 models; and `products/data-access` provides API endpoints, mappers, and
@@ -32,6 +31,7 @@ libs/admin/products/
 ├── data-access/src/
 │   ├── api/
 │   │   └── products.api.ts # API
+│   │   └── product-overview/product-overview.api.ts # «Товари» page API
 │   └── mappers/
 │       └── product.mapper.ts # mapper
 ├── feature/src/
@@ -43,7 +43,8 @@ libs/admin/products/
 │   │   ├── product-editor/
 │   │   │   └── product-create-page.tsx # creation
 │   │   └── product-list/
-│   │       └── products-page.tsx # list page
+│   │       ├── products-page.tsx # «Товари» tabs
+│   │       └── product-overview-content.tsx # one table with chips and drawer
 │   └── products.routes.tsx # routes
 ├── model/src/product-editor/
 │   └── product-draft.ts # draft
@@ -57,10 +58,11 @@ libs/admin/products/
 
 ## Tests
 
+- `libs/admin/products/model/src/`: `queries/product-overview/`, `forms/product-overview/`; `libs/admin/products/data-access/src/mappers/product-overview/`
 - `libs/admin/products/feature/src/`: `pages/product-list/`, `pages/product-detail/`, `components/product-editor/`, `hooks/product-detail/`
 - `libs/admin/products/data-access/src/products.api.integration.test.ts`
 - `libs/admin/products/model/src/`: `product-editor/`, `ordering/`, `sewing/product-fabrics.test.ts`
 - `libs/admin/products/ui/src/`: `product-detail/`, `product-editor/`, `product-content/`
 - E2E (run only on request): `apps/admin-react-e2e/src/products.spec.ts`
 
-Focused run: `npx nx test admin-products-feature -- product-list product-detail product-editor`; `npx nx test admin-products-data-access -- products.api`; `npx nx test admin-products-model -- product-editor ordering product-fabrics`; `npx nx test admin-products-ui -- product-detail product-editor product-content`.
+Focused run: `npx nx test admin-products-model -- product-overview`; `npx nx test admin-products-feature -- product-list product-detail product-editor`; `npx nx test admin-products-data-access -- products.api`; `npx nx test admin-products-model -- product-editor ordering product-fabrics`; `npx nx test admin-products-ui -- product-detail product-editor product-content`.

@@ -1,31 +1,41 @@
-import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
+import { cleanup, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { ProductsPage } from './products-page';
+import { ProductsPage, productsTabOf } from './products-page';
 import { render } from '../../test-utils';
 
-const product = {
-  id: 8,
-  name: 'Куртка',
-  type: 'Sewing' as const,
-  categoryIds: [],
-  mainPhoto: null,
-  minimumWholesalePrice: 10,
-  createdAtUtc: '2026-09-01T00:00:00Z',
-  updatedAtUtc: null,
+import type { ProductOverview, ProductOverviewType } from '@admin/products/model';
+
+const row = (id: number, type: ProductOverviewType, code: string, name: string, sectionId: number | null): ProductOverview => ({
+  id,
+  type,
+  code,
+  name,
+  sectionId,
+  season: type === 'Sewing' ? 'Літо' : null,
+  isActive: true,
+  isVerified: id === 1,
+  verifiedOn: id === 1 ? '08.09.2026' : null,
+  currentSiteUrl: id === 1 ? 'https://brevi.com.ua/specodyag-litnij/kostyum-verde' : null,
+  quoteDescription: 'Костюм із курткою та штанами.',
+  updatedAtUtc: '2026-11-03T10:00:00Z',
+});
+
+const data: Record<ProductOverviewType, ProductOverview[]> = {
+  Sewing: [row(1, 'Sewing', 'MOD-025', 'Костюм «Верде»', 1), row(2, 'Sewing', 'MOD-026', 'Халат', null)],
+  Ppe: [row(3, 'Ppe', '17', 'Рукавиці', 9)],
 };
 
-vi.mock('../../hooks/product-list/use-product-categories', () => ({
-  useProductCategories: () => ({ categories: [], error: null, reload: vi.fn() }),
-}));
-vi.mock('../../hooks/product-list/use-products', () => ({
-  useProducts: () => ({
-    page: {
-      value: [product],
-      pagedInfo: { pageNumber: 1, pageSize: 20, totalPages: 1, totalRecords: 1 },
-    },
+vi.mock('../../hooks/product-overview/use-product-overview', () => ({
+  useProductOverview: (type: ProductOverviewType) => ({
+    rows: data[type],
+    sections: type === 'Sewing' ? [{ id: 1, type, name: 'Одяг ЛІТО', isActive: true, comment: null, sortOrder: 1 }] : [],
+    sectionNames: new Map([
+      [1, 'Одяг ЛІТО'],
+      [9, 'Захист рук'],
+    ]),
     loading: false,
     error: null,
     reload: vi.fn(),
@@ -34,63 +44,46 @@ vi.mock('../../hooks/product-list/use-products', () => ({
 
 afterEach(cleanup);
 
-function renderPage() {
+function renderPage(url = '/references/products') {
   return render(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={[url]}>
       <ProductsPage />
     </MemoryRouter>,
   );
 }
 
 describe('ProductsPage', () => {
-  it('opens actions for the contextual row without changing checkbox selection', async () => {
-    const user = userEvent.setup();
-    renderPage();
-    const row = await screen.findByRole('row', { name: /8.*Куртка/ });
-    const rowCheckbox = row.querySelector('input[type="checkbox"]') as HTMLInputElement;
-
-    expect(screen.queryByRole('columnheader', { name: 'Дії' })).not.toBeInTheDocument();
-    await user.click(rowCheckbox);
-    fireEvent.contextMenu(row, { clientX: 80, clientY: 120 });
-
-    expect(rowCheckbox).toBeChecked();
-    expect(screen.getByRole('menuitem', { name: 'Перегляд' })).toHaveAttribute(
-      'href',
-      '/references/products/8',
-    );
-    expect(screen.getByRole('menuitem', { name: 'Змінити' })).toHaveAttribute(
-      'href',
-      '/references/products/8/edit',
-    );
-    expect(screen.getByRole('menuitem', { name: 'Видалити' })).toBeVisible();
+  it('reads the tab from the URL', () => {
+    expect(productsTabOf('ppe')).toBe('Ppe');
+    expect(productsTabOf(null)).toBe('Sewing');
   });
 
-  it('opens the same menu with Shift+F10 and restores focus after Escape', async () => {
+  it('shows sewing models with section chips and filters by section', async () => {
     const user = userEvent.setup();
     renderPage();
-    const row = await screen.findByRole('row', { name: /8.*Куртка/ });
-    const nameCell = screen.getByRole('gridcell', { name: 'Куртка' });
-    nameCell.focus();
 
-    fireEvent.keyDown(nameCell, { key: 'F10', shiftKey: true });
-    expect(screen.getByRole('menuitem', { name: 'Перегляд' })).toBeVisible();
-    await user.keyboard('{Escape}');
+    const grid = screen.getByRole('grid', { name: 'Швейна продукція' });
+    expect(within(grid).getByText('MOD-025')).toBeInTheDocument();
+    expect(within(grid).getByText('08.09.2026')).toBeInTheDocument();
+    expect(within(grid).getByRole('link', { name: 'Відкрити «Костюм «Верде»» на сайті' })).toHaveAttribute(
+      'href',
+      'https://brevi.com.ua/specodyag-litnij/kostyum-verde',
+    );
 
-    await waitFor(() => expect(nameCell).toHaveFocus());
-    expect(row).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /Без розділу/ }));
+    expect(within(grid).queryByText('MOD-025')).not.toBeInTheDocument();
+    expect(within(grid).getByText('Халат')).toBeInTheDocument();
   });
 
-  it('keeps all query fields on a white surface', () => {
+  it('switches to the PPE table without a season column', async () => {
+    const user = userEvent.setup();
     renderPage();
 
-    for (const control of [
-      screen.getByRole('textbox', { name: 'Пошук за ID або назвою' }),
-      screen.getByRole('combobox', { name: 'Тип' }),
-      screen.getByRole('combobox', { name: 'Категорія' }),
-    ]) {
-      const surface = control.closest('.MuiOutlinedInput-root');
-      expect(surface).not.toBeNull();
-      expect(getComputedStyle(surface!).backgroundColor).toBe('rgb(255, 255, 255)');
-    }
+    await user.click(screen.getByRole('tab', { name: 'ЗІЗ' }));
+
+    const grid = screen.getByRole('grid', { name: 'ЗІЗ' });
+    expect(within(grid).getByText('Рукавиці')).toBeInTheDocument();
+    expect(within(grid).getByText('Захист рук')).toBeInTheDocument();
+    expect(within(grid).queryByRole('columnheader', { name: 'Сезон' })).not.toBeInTheDocument();
   });
 });

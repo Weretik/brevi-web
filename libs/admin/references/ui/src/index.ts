@@ -38,3 +38,7 @@ export * from './components/product-sections/product-section-details';
 export * from './components/product-sections/product-section-form';
 export * from './components/product-sections/product-section-type-chips';
 export * from './components/product-sections/product-sections-grid';
+export * from './components/reference-list/reference-data-grid';
+export * from './components/reference-list-controls/reference-filter-chip';
+export * from './components/reference-editor/reference-form-section';
+export * from './components/reference-editor/reference-details-list';

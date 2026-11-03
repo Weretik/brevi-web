@@ -40,3 +40,5 @@
 [Article pricing and published Product prices](006-sewing-pricing/README.md) implements the TS-005 React Admin consumer, with its own contract pin, data boundary and verification evidence.
 
 [PPE pricing and versioned input approval](007-ppe-pricing/README.md) implements the TS-006 Admin consumer.
+
+[008 «Товари»: two tables from the Calculator sheet](008-products-page/README.md) replaces the paged list with the sewing and PPE tables, section chips and the quote fields.
