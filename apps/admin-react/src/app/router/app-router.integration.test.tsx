@@ -81,9 +81,9 @@ describe('React Admin routing', () => {
           'Контрагенти',
           'Розрахунки',
           'Параметри ціноутворення',
-          'Медіа/Фото',
         ],
       ],
+      ['Фото', ['Бібліотека фото']],
       ['Загальні звіти', ['Загальні звіти']],
     ] as const;
 
@@ -97,7 +97,13 @@ describe('React Admin routing', () => {
           .map((item) => item.textContent?.replace('Ще не доступно', '')),
       ).toEqual(entries);
       expect(within(list).queryAllByRole('link')).toHaveLength(
-        section === 'Загальні довідники' ? 7 : section === 'Менеджер сервісу' ? 2 : 0,
+        section === 'Загальні довідники'
+          ? 6
+          : section === 'Менеджер сервісу'
+            ? 2
+            : section === 'Фото'
+              ? 1
+              : 0,
       );
     }
   });
@@ -263,26 +269,35 @@ describe('React Admin routing', () => {
     expect(await screen.findByRole('grid', { name: 'ЗІЗ' })).toBeVisible();
   }, 15_000);
 
-  it('opens media directly inside the Brevi shell', async () => {
+  it('moves the old media link to the photo library inside the Brevi shell', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockResolvedValue(
-        new Response(JSON.stringify([]), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        }),
-      ),
+      vi
+        .fn()
+        .mockImplementation((request: Request) =>
+          Promise.resolve(
+            new Response(
+              JSON.stringify(
+                request.url.includes('/api/media/files')
+                  ? { items: [], total: 0, page: 1, pageSize: 48 }
+                  : [],
+              ),
+              { status: 200, headers: { 'Content-Type': 'application/json' } },
+            ),
+          ),
+        ),
     );
     window.history.replaceState({}, '', '/references/media');
     renderApp();
 
-    expect(await screen.findByRole('heading', { name: 'Медіа/Фото' })).toBeVisible();
+    expect(await screen.findByRole('heading', { name: 'Фото' })).toBeVisible();
+    expect(window.location.pathname).toBe('/media');
     expect(
       within(screen.getByRole('navigation', { name: 'Основна навігація' })).getByRole('link', {
-        name: 'Медіа/Фото',
+        name: 'Бібліотека фото',
       }),
-    ).toHaveAttribute('href', '/references/media');
-    expect(await screen.findByText('Медіатека поки порожня.')).toBeVisible();
+    ).toHaveAttribute('href', '/media');
+    expect(await screen.findByText('Бібліотека поки порожня.')).toBeVisible();
   });
 
   it('persists the selected color mode', async () => {

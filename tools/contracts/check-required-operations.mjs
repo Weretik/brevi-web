@@ -39,11 +39,18 @@ const requiredOperations = {
     'replaceProduct',
     'deleteProduct',
   ],
-  'catalog/product-dependencies.openapi.yaml': [
-    'getAdminProductCategories',
-    'getCatalogMedia',
-    'uploadCatalogMedia',
-    'deleteCatalogMedia',
+  'catalog/product-dependencies.openapi.yaml': ['getAdminProductCategories'],
+  'media/media-library.openapi.yaml': [
+    'getMediaFolders',
+    'createMediaFolder',
+    'updateMediaFolder',
+    'deleteMediaFolder',
+    'searchMediaFiles',
+    'getMediaFile',
+    'uploadMediaFile',
+    'updateMediaFile',
+    'moveMediaFiles',
+    'deleteMediaFile',
   ],
   'crm/quote-drafts.openapi.yaml': [
     'getCrmQuotes',

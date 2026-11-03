@@ -3,6 +3,8 @@ import { Box, Stack, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 
 interface Props {
+  /** Small line above the title; «Довідники» on reference pages. */
+  overline?: string;
   title: string;
   subtitle: ReactNode;
   /** Right side: bulk delete (only while rows are selected), secondary actions, the primary one. */
@@ -10,7 +12,7 @@ interface Props {
 }
 
 /** «Цех» page header of a reference: overline, h1, secondary line, actions on the right. */
-export function ReferencePageHeader({ title, subtitle, actions }: Props) {
+export function ReferencePageHeader({ overline = 'Довідники', title, subtitle, actions }: Props) {
   return (
     <Stack
       direction={{ xs: 'column', md: 'row' }}
@@ -18,7 +20,7 @@ export function ReferencePageHeader({ title, subtitle, actions }: Props) {
     >
       <Box sx={{ minWidth: 0 }}>
         <Typography variant="overline" color="text.secondary">
-          Довідники
+          {overline}
         </Typography>
         <Typography variant="h1">{title}</Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
