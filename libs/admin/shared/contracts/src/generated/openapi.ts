@@ -7730,7 +7730,7 @@ export interface operations {
           'application/json': components['schemas']['ProductOverviewPage'];
         };
       };
-      /** @description Unknown type */
+      /** @description Unknown type, section, sort or direction, or an invalid page. */
       400: {
         headers: {
           [name: string]: unknown;
