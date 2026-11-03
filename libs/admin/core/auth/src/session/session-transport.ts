@@ -1,71 +1,62 @@
+import { csrfHeaderName, readCsrfToken } from '@admin/shared/api-client';
 import { appConfig } from '@admin/shared/config';
 import axios from 'axios';
 
+import type { SessionUser } from './session-user';
 import type { operations } from '@admin/shared/contracts';
 
-export type LoginRequest = operations['loginSession']['requestBody']['content']['application/json'];
-type LoginSessionResponse =
-  operations['loginSession']['responses'][200]['content']['application/json'];
-type RefreshSessionResponse =
-  operations['refreshSession']['responses'][200]['content']['application/json'];
+export type LoginRequest =
+  operations['loginCookieSession']['requestBody']['content']['application/json'];
+type SessionUserResponse =
+  operations['getCurrentSession']['responses'][200]['content']['application/json'];
 
-function getAuthUrl(path: string): string {
-  return new URL(path, appConfig.apiBaseUrl).toString();
-}
+const getAuthUrl = (path: string): string => new URL(path, appConfig.apiBaseUrl).toString();
 
-function getCookieValue(name: string): string | null {
-  if (typeof document === 'undefined') return null;
+const toSessionUser = (response: SessionUserResponse): SessionUser => ({
+  id: response.userId,
+  email: response.email,
+  fullName: response.fullName,
+  roles: response.roles,
+});
 
-  const prefix = `${name}=`;
-  const cookie = document.cookie.split('; ').find((value) => value.startsWith(prefix));
-  if (!cookie) return null;
-
-  try {
-    return decodeURIComponent(cookie.slice(prefix.length));
-  } catch {
-    return null;
-  }
-}
-
-function readAccessToken(response: LoginSessionResponse | RefreshSessionResponse): string {
-  if (typeof response.accessToken !== 'string' || response.accessToken.length === 0) {
-    throw new Error('Session response does not contain an access token.');
-  }
-
-  return response.accessToken;
-}
-
-export async function requestLogin(request: LoginRequest): Promise<string> {
-  const response = await axios.post<LoginSessionResponse>(
-    getAuthUrl('/api/auth/session/login'),
+/** Signs in with the HttpOnly session cookie. Throws an axios error on 401 or 429. */
+export const requestLogin = async (request: LoginRequest): Promise<SessionUser> => {
+  const response = await axios.post<SessionUserResponse>(
+    getAuthUrl('/api/auth/cookie/login'),
     request,
-    { withCredentials: true },
-  );
-
-  return readAccessToken(response.data);
-}
-
-export async function requestAccessTokenRefresh(): Promise<string> {
-  const csrfToken = getCookieValue('kedr.csrf');
-  const response = await axios.post<RefreshSessionResponse>(
-    getAuthUrl('/api/auth/session/refresh'),
-    {},
     {
-      headers: csrfToken ? { 'X-CSRF-Token': csrfToken } : undefined,
       withCredentials: true,
     },
   );
 
-  return readAccessToken(response.data);
-}
+  return toSessionUser(response.data);
+};
 
-export async function requestLogout(accessToken: string): Promise<void> {
+export const requestLogout = async (): Promise<void> => {
+  const csrfToken = readCsrfToken();
   await axios.post(
-    getAuthUrl('/api/auth/session/logout'),
+    getAuthUrl('/api/auth/cookie/logout'),
     {},
     {
-      headers: { Authorization: `Bearer ${accessToken}` },
+      headers: csrfToken ? { [csrfHeaderName]: csrfToken } : undefined,
       withCredentials: true,
     },
   );
-}
+};
+
+/** Returns the signed-in user, or null when there is no valid session cookie. */
+export const requestCurrentUser = async (): Promise<SessionUser | null> => {
+  try {
+    const response = await axios.get<SessionUserResponse>(getAuthUrl('/api/auth/session/me'), {
+      withCredentials: true,
+    });
+
+    return toSessionUser(response.data);
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      return null;
+    }
+
+    throw error;
+  }
+};

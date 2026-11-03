@@ -5,7 +5,6 @@ const trimTrailingSlash = (value: string): string => value.replace(/\/$/, '');
 
 export function createAppConfig(environment: AdminEnvironment): AppConfig {
   return {
-    anonymousAccess: environment.auth?.anonymousAccess ?? false,
     apiBaseUrl: environment.production ? trimTrailingSlash(environment.api?.baseUrl ?? '') : '',
     enableHttpLogs: environment.enableHttpLogs ?? false,
     features: {

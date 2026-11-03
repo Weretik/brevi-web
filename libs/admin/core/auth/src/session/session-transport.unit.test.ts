@@ -2,60 +2,72 @@ import { configureAppConfig } from '@admin/shared/config';
 import axios from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { requestAccessTokenRefresh, requestLogin, requestLogout } from './session-transport';
+import { requestCurrentUser, requestLogin, requestLogout } from './session-transport';
 
-vi.mock('axios', () => ({ default: { post: vi.fn() } }));
+vi.mock('axios', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('axios')>();
+  return { ...actual, default: { ...actual.default, get: vi.fn(), post: vi.fn() } };
+});
 
 const post = vi.mocked(axios.post);
+const get = vi.mocked(axios.get);
+const meResponse = {
+  userId: '1',
+  email: 'admin@brevi.com.ua',
+  fullName: 'Адміністратор',
+  roles: ['Admin'],
+};
 
-describe('session transport', () => {
+describe('cookie session transport', () => {
   beforeEach(() => {
     configureAppConfig({ production: true, api: { baseUrl: 'http://localhost' } });
     post.mockReset();
-    document.cookie = 'kedr.csrf=; Max-Age=0; Path=/';
+    get.mockReset();
+    document.cookie = 'brevi.csrf=; Max-Age=0; Path=/';
   });
 
-  it('reads the CSRF cookie and maps the generated refresh response', async () => {
-    document.cookie = 'kedr.csrf=csrf%20value; Path=/';
-    post.mockResolvedValue({
-      data: { tokenType: 'Bearer', accessToken: 'next-token', expiresIn: 900 },
-    });
+  it('signs in with the cookie endpoint and maps the user', async () => {
+    post.mockResolvedValue({ data: meResponse });
 
-    await expect(requestAccessTokenRefresh()).resolves.toBe('next-token');
+    await expect(
+      requestLogin({ email: 'admin@brevi.com.ua', password: 'secret-pass' }),
+    ).resolves.toEqual({
+      id: '1',
+      email: 'admin@brevi.com.ua',
+      fullName: 'Адміністратор',
+      roles: ['Admin'],
+    });
     expect(post).toHaveBeenCalledWith(
-      'http://localhost/api/auth/session/refresh',
+      'http://localhost/api/auth/cookie/login',
+      { email: 'admin@brevi.com.ua', password: 'secret-pass' },
+      { withCredentials: true },
+    );
+  });
+
+  it('signs out with the CSRF cookie value and no bearer token', async () => {
+    document.cookie = 'brevi.csrf=csrf%20value; Path=/';
+    post.mockResolvedValue({ data: undefined });
+
+    await requestLogout();
+
+    expect(post).toHaveBeenCalledWith(
+      'http://localhost/api/auth/cookie/logout',
       {},
-      expect.objectContaining({
-        headers: { 'X-CSRF-Token': 'csrf value' },
-        withCredentials: true,
+      { headers: { 'X-CSRF-Token': 'csrf value' }, withCredentials: true },
+    );
+  });
+
+  it('returns null for the current user without a session', async () => {
+    get.mockRejectedValue(
+      new axios.AxiosError('Unauthorized', '401', undefined, undefined, {
+        status: 401,
+        data: {},
+        statusText: '',
+        headers: {},
+        config: { headers: new axios.AxiosHeaders() },
       }),
     );
-  });
 
-  it('maps login and sends logout with the in-memory bearer token', async () => {
-    post.mockResolvedValueOnce({
-      data: { tokenType: 'Bearer', accessToken: 'login-token', expiresIn: 900 },
-    });
-    post.mockResolvedValueOnce({ data: undefined });
-
-    await expect(requestLogin({ email: 'admin@brevi.test', password: 'secret' })).resolves.toBe(
-      'login-token',
-    );
-    await requestLogout('login-token');
-
-    expect(post).toHaveBeenNthCalledWith(
-      2,
-      'http://localhost/api/auth/session/logout',
-      {},
-      { headers: { Authorization: 'Bearer login-token' }, withCredentials: true },
-    );
-  });
-
-  it('rejects a response without an access token', async () => {
-    post.mockResolvedValue({ data: { tokenType: 'Bearer', expiresIn: 900 } });
-
-    await expect(requestLogin({ email: 'admin@brevi.test', password: 'secret' })).rejects.toThrow(
-      'access token',
-    );
+    await expect(requestCurrentUser()).resolves.toBeNull();
   });
 });

@@ -12,23 +12,8 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-describe('Sewing access in temporary anonymous Admin', () => {
-  it('enables reading and management without a session request', async () => {
-    configureAppConfig({
-      production: true,
-      api: { baseUrl: 'https://api.example.test' },
-      auth: { anonymousAccess: true },
-    });
-    const fetcher = vi.fn().mockRejectedValue(new Error('No session expected'));
-    vi.stubGlobal('fetch', fetcher);
-    const access = await store
-      .dispatch(sewingAccessApi.endpoints.getSewingAccess.initiate())
-      .unwrap();
-    expect(access).toEqual({ canRead: true, canManage: true });
-    expect(fetcher).not.toHaveBeenCalled();
-  });
-
-  it('restores the server-based read-only User role when disabled', async () => {
+describe('Sewing access from the current session', () => {
+  it('uses the server roles: User reads but cannot manage', async () => {
     configureAppConfig({ production: true, api: { baseUrl: 'https://api.example.test' } });
     const fetcher = vi.fn().mockResolvedValue(
       new Response(JSON.stringify({ roles: ['User'] }), {

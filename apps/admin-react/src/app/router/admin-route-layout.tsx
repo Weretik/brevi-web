@@ -1,23 +1,21 @@
-import { useGetAdminSessionRolesQuery } from '@admin/core/auth';
 import { AdminLayout } from '@admin/core/shell';
+import { usersPath } from '@admin/users/feature';
 
 import { adminRouteDefinitions } from './admin-route-definitions';
 import { createNavigation } from './navigation-config';
 import { useAdminColorMode } from '../providers/color-mode-provider';
 
-const registeredPaths = new Set(adminRouteDefinitions.map((route) => route.path));
+import type { SessionUser } from '@admin/core/auth';
+
+const registeredPaths = new Set([...adminRouteDefinitions.map((route) => route.path), usersPath]);
 
 const profileLinks = [
   { label: 'Про BreviERP, конфіденційність та умови', href: '/brevi-erp/index.html' },
 ] as const;
 
-export function AdminRouteLayout() {
+export function AdminRouteLayout({ user }: { user: SessionUser }) {
   const { colorMode, changeColorMode } = useAdminColorMode();
-  const session = useGetAdminSessionRolesQuery(undefined, { refetchOnMountOrArgChange: true });
-  const navigation = createNavigation(
-    registeredPaths,
-    session.isSuccess && !session.isFetching ? (session.currentData ?? []) : [],
-  );
+  const navigation = createNavigation(registeredPaths, user.roles);
 
   return (
     <AdminLayout
