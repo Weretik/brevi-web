@@ -728,7 +728,7 @@ export interface paths {
     };
     /**
      * Prices of every «Товари» row (CAT-011)
-     * @description CatalogRead. Sewing: for every Article the published (fixed) prices and the live prices calculated from today's inputs; isStale when they differ. from is the lowest published price of each tier among active Articles. status is Ready (all published and current), Stale (a published price differs from the live one), Unpublished (a calculable active Article has no published price) or Blocked (no active Article has a price or a calculable price; blockers are the calculation codes). PPE: the live price from the current offer and rule, pricesUpdatedAt is the offer date, articles is empty. Tiers are 1–9, 10–40 and from 41 pieces.
+     * @description CatalogRead. Sewing: for every Article the published (fixed) prices and the live prices calculated from today's inputs; isStale when they differ. from is the lowest published price of each tier among active Articles. status is Ready (all published and current), Stale (a published price differs from the live one; automatic publication, CAT-012, normally clears it at once), Unpublished (a calculable active Article has no published price) or Blocked (no active Article has a price or a calculable price; blockers are the calculation codes). PPE: the live price from the current offer and rule, pricesUpdatedAt is the offer date, articles is empty. Tiers are 1–9, 10–40 and from 41 pieces.
      */
     get: operations['getProductOverviewPrices'];
     put?: never;
@@ -1002,23 +1002,6 @@ export interface paths {
     put?: never;
     /** @description Append an approved revision to an existing non-inventory service cost. Unit and source identity are preserved. requestId makes retries idempotent; expectedVersionId prevents lost updates. Requires CanManageProducts. */
     post: operations['reviseOtherCost'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/v1/pricing/sewing/recalculation': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** @description Requires CanManageProducts and an actor claim (CAT-011). «Перерахувати всі» and «Перерахувати ціни» of one model. Every active Article whose live price is calculable and was never published or differs from its published price gets a new saved calculation and a publication, one transaction per model. productIds null means every Sewing model. dryRun (default true) only reports. Blocked Articles keep their published price and are listed with their blocker codes. */
-    post: operations['recalculateSewingPrices'];
     delete?: never;
     options?: never;
     head?: never;
@@ -3760,36 +3743,6 @@ export interface components {
       value: number;
       /** Format: uuid */
       requestId: string;
-    };
-    RecalculateSewingPricesRequest: {
-      productIds?: number[] | null;
-      /** @default true */
-      dryRun: boolean;
-    };
-    SewingRecalculationChange: {
-      /** Format: int32 */
-      productId: number;
-      modelCode: string | null;
-      /** Format: int64 */
-      articleId: number;
-      saleSku: string;
-      before: components['schemas']['SewingPriceTiers'] | null;
-      after: components['schemas']['SewingPriceTiers'];
-    };
-    SewingRecalculationBlocked: {
-      /** Format: int32 */
-      productId: number;
-      modelCode: string | null;
-      /** Format: int64 */
-      articleId: number;
-      saleSku: string;
-      blockers: string[];
-    };
-    SewingRecalculationReport: {
-      applied: boolean;
-      unchanged: number;
-      changes: components['schemas']['SewingRecalculationChange'][];
-      blocked: components['schemas']['SewingRecalculationBlocked'][];
     };
     SewingPublishedArticlePrice: {
       /** Format: int64 */
@@ -8244,65 +8197,6 @@ export interface operations {
         content?: never;
       };
       /** @description Stale or blocked calculation, version conflict, or request UUID reused with another payload. */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  recalculateSewingPrices: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['RecalculateSewingPricesRequest'];
-      };
-    };
-    responses: {
-      /** @description Report; applied is false for a dry run or when nothing changed. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['SewingRecalculationReport'];
-        };
-      };
-      /** @description productIds must be null or 1–500 positive IDs. */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Authentication required. */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Product management permission or actor claim missing. */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description A Product ID is missing or is not a Sewing Product. */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Inputs changed during the run; models before it stay published. */
       409: {
         headers: {
           [name: string]: unknown;

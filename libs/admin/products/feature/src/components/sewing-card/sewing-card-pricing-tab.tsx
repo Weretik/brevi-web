@@ -9,13 +9,11 @@ interface Props {
   productId: number;
   articles: SewingArticleSummaryRow[];
   articleId: number | null;
-  compositionVersion: number;
-  canManage: boolean;
   dirty: boolean;
   onSelect: (articleId: number) => void;
 }
 
-/** «Розрахунок»: the cost breakdown of one Article, saving the calculation and publishing the price. */
+/** «Розрахунок»: the price of one Article and its cost breakdown; prices are published automatically. */
 export function SewingCardPricingTab(props: Props) {
   if (!props.articles.length)
     return (
@@ -46,8 +44,6 @@ export function SewingCardPricingTab(props: Props) {
         key={`${props.productId}:${selected.id}`}
         productId={props.productId}
         articleId={selected.id}
-        compositionVersion={props.compositionVersion}
-        canManage={props.canManage}
         dirty={props.dirty}
       />
     </Stack>

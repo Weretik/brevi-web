@@ -27,7 +27,6 @@ export * from './components/product-overview/product-overview-form';
 export * from './components/product-overview/product-overview-grid';
 export * from './components/product-overview/product-price-cells';
 export * from './components/product-overview/product-overview-price-panel';
-export * from './components/product-overview/sewing-recalculation-dialog';
 export * from './components/product-overview/product-overview-section-chips';
 export * from './components/product-overview/product-overview-delete-dialog';
 export * from './components/sewing-card/sewing-card-header';

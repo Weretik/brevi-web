@@ -1,18 +1,28 @@
-import { Paper, Stack, Typography } from '@mui/material';
+import { Alert, Paper, Stack, Typography } from '@mui/material';
 
 import { SewingCalculationSection } from './calculation/sewing-calculation-section';
 import { SewingPublicationSection } from './publication/sewing-publication-section';
-import { SewingPricingActions } from './workflow/sewing-pricing-actions';
 
 import type { SewingPricingPanelProps } from './sewing-pricing-panel-props';
 
+/**
+ * The Article price of the sewing card. Read-only: the backend publishes a new price automatically whenever its
+ * inputs change (CAT-012), and the history keeps every earlier one.
+ */
 export function SewingPricingPanel(props: SewingPricingPanelProps) {
   return (
     <Paper variant="outlined" sx={{ p: { xs: 1.5, sm: 2 } }}>
       <Stack sx={{ gap: 2 }}>
         <Typography variant="h6" component="h3">
-          Розрахунок і ціна артикула
+          Ціна артикула
         </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Ціна оновлюється сама, коли змінюються тканини, фурнітура, операції, склад або
+          параметри ціноутворення.
+        </Typography>
+        {props.dirty && (
+          <Alert severity="warning">Збережіть зміни складу, щоб ціна перерахувалася.</Alert>
+        )}
         <SewingPublicationSection
           published={props.published}
           publicationLoading={props.publicationLoading}
@@ -24,17 +34,6 @@ export function SewingPricingPanel(props: SewingPricingPanelProps) {
           calculationLoading={props.calculationLoading}
           calculationError={props.calculationError}
           onRetryCalculation={props.onRetryCalculation}
-        />
-        <SewingPricingActions
-          calculation={props.calculation}
-          dirty={props.dirty}
-          stale={props.stale}
-          writeError={props.writeError}
-          alreadyPublished={props.alreadyPublished}
-          busy={props.busy}
-          canManage={props.canManage}
-          onCalculate={props.onCalculate}
-          onPublish={props.onPublish}
         />
       </Stack>
     </Paper>

@@ -2,7 +2,7 @@ import { adminApi, toAdminApiError } from '@admin/shared/api-client';
 
 import { mapPricingParameters } from '../../mappers/pricing-parameters/pricing-parameters.mapper';
 import { parsePricingParametersResponse } from '../../validators/pricing-parameters/pricing-parameters-response';
-import { referenceErrorMessages } from '../shared/reference-api.shared';
+import { referenceErrorMessages, productPricesTag } from '../shared/reference-api.shared';
 
 import type {
   CreatePricingParameterBody,
@@ -27,7 +27,8 @@ export const pricingParametersApi = adminApi.injectEndpoints({
     createPricingParameter: build.mutation<number, CreatePricingParameterBody>({
       query: (body) => ({ url: '/api/reference/pricing-parameters', method: 'POST', body }),
       transformErrorResponse: (error) => toAdminApiError(error, referenceErrorMessages),
-      invalidatesTags: (_result, error) => (error ? [] : [{ type: tag, id: 'LIST' }]),
+      invalidatesTags: (_result, error) =>
+        error ? [] : [productPricesTag, { type: tag, id: 'LIST' }],
     }),
     updatePricingParameter: build.mutation<void, { id: number; body: UpdatePricingParameterBody }>({
       query: ({ id, body }) => ({
@@ -37,23 +38,13 @@ export const pricingParametersApi = adminApi.injectEndpoints({
       }),
       transformErrorResponse: (error) => toAdminApiError(error, referenceErrorMessages),
       invalidatesTags: (_result, error, { id }) =>
-        error
-          ? []
-          : [
-              { type: tag, id },
-              { type: tag, id: 'LIST' },
-            ],
+        error ? [] : [productPricesTag, { type: tag, id }, { type: tag, id: 'LIST' }],
     }),
     deletePricingParameter: build.mutation<void, number>({
       query: (id) => ({ url: `/api/reference/pricing-parameters/${id}`, method: 'DELETE' }),
       transformErrorResponse: (error) => toAdminApiError(error, referenceErrorMessages),
       invalidatesTags: (_result, error, id) =>
-        error
-          ? []
-          : [
-              { type: tag, id },
-              { type: tag, id: 'LIST' },
-            ],
+        error ? [] : [productPricesTag, { type: tag, id }, { type: tag, id: 'LIST' }],
     }),
   }),
 });

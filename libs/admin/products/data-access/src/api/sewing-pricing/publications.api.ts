@@ -17,23 +17,7 @@ export const sewingPublicationsApi = adminApi.injectEndpoints({
       transformErrorResponse: sewingPricingError,
       providesTags: (_result, _error, { productId }) => [{ type: 'Product', id: productId }],
     }),
-    publishSewingCalculation: build.mutation<SewingPublication, Scope & { calculationId: string }>({
-      query: ({ productId, articleId, calculationId }) => ({
-        url: `/api/v1/products/${productId}/articles/${articleId}/pricing/calculations/${calculationId}/publication`,
-        method: 'POST',
-      }),
-      transformResponse: (value, _meta, scope) => mapSewingPublication(value, scope),
-      transformErrorResponse: sewingPricingError,
-      invalidatesTags: (_result, error, { productId }) =>
-        error
-          ? []
-          : [
-              { type: 'Product', id: productId },
-              { type: 'Product', id: 'LIST' },
-            ],
-    }),
   }),
 });
 
-export const { useGetPublishedSewingPriceQuery, usePublishSewingCalculationMutation } =
-  sewingPublicationsApi;
+export const { useGetPublishedSewingPriceQuery } = sewingPublicationsApi;

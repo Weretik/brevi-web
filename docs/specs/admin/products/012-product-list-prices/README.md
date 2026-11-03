@@ -1,6 +1,6 @@
 # 012 — Prices on the «Товари» list
 
-**Status:** implemented 2026-11-03. **Backend:** BreviERP [CAT-011](https://github.com/Weretik/BreviERP/blob/master/docs/sdd/specs/catalog/011-product-list-prices/README.md) (`getProductOverviewPrices`, `recalculateSewingPrices`).
+**Status:** implemented 2026-11-03; S-02, S-05 and the recalculation part of S-06 replaced by automatic publication in [013](../013-automatic-sewing-prices/README.md). **Backend:** BreviERP [CAT-011](https://github.com/Weretik/BreviERP/blob/master/docs/sdd/specs/catalog/011-product-list-prices/README.md) (`getProductOverviewPrices`, `recalculateSewingPrices`).
 
 The client's old site showed every article with its three prices. The owner chose list design B (one row per model, the lowest prices «від …», an arrow opens the articles with their prices) with the side panel of design C (short quote description, materials, labour, cost, price date) and one-button recalculation for sewing. PPE prices stay live.
 

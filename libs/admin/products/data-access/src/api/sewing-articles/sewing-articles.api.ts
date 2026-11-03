@@ -26,7 +26,13 @@ export const sewingArticlesApi = adminApi.injectEndpoints({
       transformResponse: mapSewingArticle,
       transformErrorResponse: sewingCompositionError,
       invalidatesTags: (_result, error, { productId }) =>
-        error ? [] : [sewingCompositionTag(productId)],
+        error
+          ? []
+          : [
+              sewingCompositionTag(productId),
+              { type: 'Product', id: productId },
+              { type: 'Product', id: 'PRICES' },
+            ],
     }),
   }),
 });
