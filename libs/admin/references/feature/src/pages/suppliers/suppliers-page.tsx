@@ -20,8 +20,10 @@ import { useSupplierKeepinSync } from '../../hooks/suppliers/use-supplier-keepin
 import { useSuppliers } from '../../hooks/suppliers/use-suppliers';
 
 import type { Supplier, SupplierDialogMode } from '@admin/references/model';
+import type { ReactNode } from 'react';
 
-export function SuppliersPage() {
+/** «Контрагенти → Постачальники»; `tabs` are the page tabs shown above the header. */
+export function SuppliersPage({ tabs }: { tabs?: ReactNode } = {}) {
   const { rows, loading, error, reload } = useSuppliers();
   const [active, setActive] = useState<{
     mode: SupplierDialogMode;
@@ -38,6 +40,7 @@ export function SuppliersPage() {
 
   return (
     <Box sx={{ minWidth: 0 }}>
+      {tabs}
       <ReferencePageHeader
         title="Постачальники"
         subtitle={

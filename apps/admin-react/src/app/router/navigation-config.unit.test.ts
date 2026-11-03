@@ -31,7 +31,7 @@ describe('legacy Admin navigation', () => {
       '/reminders/non-working-days',
     ]);
   });
-  it('keeps 27 shared entries in the original five sections and adds reminders for Manager', () => {
+  it('keeps 25 shared entries in the original five sections and adds reminders for Manager', () => {
     const groups = createNavigation(new Set(['/']));
 
     expect(groups.map((group) => group.label)).toEqual([
@@ -42,9 +42,9 @@ describe('legacy Admin navigation', () => {
       'Загальні довідники',
       'Загальні звіти',
     ]);
-    expect(groups.map((group) => group.items.length)).toEqual([8, 7, 5, 4, 7, 1]);
-    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(32);
-    expect(groups[0].items[2].id).not.toBe(groups[4].items[3].id);
+    expect(groups.map((group) => group.items.length)).toEqual([6, 7, 5, 4, 7, 1]);
+    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(30);
+    expect(groups[0].items.map((item) => item.id)).not.toContain('clients');
   });
   it('shows issuer settings only for the server Admin role', () => {
     const paths = new Set(['/crm/issuer-settings', '/crm/quotes']);
@@ -70,7 +70,7 @@ describe('legacy Admin navigation', () => {
   });
 
   it('enables a legacy URL only when the React route is registered', () => {
-    const legacyPath = '/references/supplier';
+    const legacyPath = '/references/counterparties';
     const unavailable = createNavigation(new Set(['/']));
     const available = createNavigation(new Set(['/', legacyPath]));
 

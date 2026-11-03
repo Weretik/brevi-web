@@ -920,6 +920,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/crm/customers/keepin-sync': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Admin or Manager. Reads every KeepinCRM client (GET /clients, q[lead_false]=true) and brings Brevi clients in line, matched only by the external identity keepincrm/client/id. dryRun (default true) saves nothing. removeUnlinked is Admin-only and is for the one-time transfer - Brevi clients without a KeepinCRM link are deleted, those used by quotes or custom sewing are hidden. The daily brevierp-sync step keepin-clients runs the same use case with dryRun false and removeUnlinked false. */
+    post: operations['syncCrmCustomersFromKeepinCrm'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/crm/customers/{customerId}': {
     parameters: {
       query?: never;
@@ -3263,6 +3280,12 @@ export interface components {
       revision: number;
       /** Format: date-time */
       updatedAt: string;
+      /** @description KeepinCRM client ID; null for a client created in Brevi. */
+      keepinCrmId?: string | null;
+      /** @description Active contact, the primary one first. */
+      contactName?: string | null;
+      /** @description Phones of the active contacts. */
+      phones?: string[] | null;
     };
     CrmPagedInfo: {
       /** Format: int64 */
@@ -3329,6 +3352,23 @@ export interface components {
       canMerge: boolean;
       contacts: components['schemas']['CrmContact'][];
       externalIdentities: components['schemas']['CrmExternalIdentity'][];
+    };
+    CrmKeepinSyncRequest: {
+      /** @default true */
+      dryRun: boolean;
+      /** @default false */
+      removeUnlinked: boolean;
+    };
+    CrmKeepinSyncResult: {
+      applied: boolean;
+      received: number;
+      created: number;
+      updated: number;
+      unchanged: number;
+      /** @description Linked clients missing from KeepinCRM, marked not used. */
+      deactivated: string[];
+      deleted: string[];
+      hiddenInUse: string[];
     };
     CrmReviseCustomerRequest: {
       /** Format: uuid */
@@ -7447,6 +7487,51 @@ export interface operations {
         content: {
           'application/json': string[];
         };
+      };
+    };
+  };
+  syncCrmCustomersFromKeepinCrm: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['CrmKeepinSyncRequest'];
+      };
+    };
+    responses: {
+      /** @description Preview or applied result. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmKeepinSyncResult'];
+        };
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Role, numeric actor claim, or Admin for removeUnlinked required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description KeepinCRM key missing, KeepinCRM unavailable, or no clients returned. Nothing changed. */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };

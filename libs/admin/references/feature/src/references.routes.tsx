@@ -6,7 +6,7 @@ const PricingParametersPage = lazy(
 );
 const MaterialsPage = lazy(() => import('./pages/materials/materials-page'));
 const OperationsPage = lazy(() => import('./pages/operations/operations-page'));
-const SuppliersPage = lazy(() => import('./pages/suppliers/suppliers-page'));
+const CounterpartiesPage = lazy(() => import('./pages/counterparties/counterparties-page'));
 
 /** Old separate pages: `/references/garment-accessory` (with `?tab=fabrics` for fabrics). */
 function GarmentAccessoriesRedirect() {
@@ -24,7 +24,8 @@ function GarmentAccessoriesRedirect() {
 }
 
 export const referencesRoutes = [
-  { path: '/references/supplier', element: <SuppliersPage /> },
+  { path: '/references/counterparties', element: <CounterpartiesPage /> },
+  { path: '/references/supplier', element: <Navigate to="/references/counterparties" replace /> },
   { path: '/references/materials', element: <MaterialsPage /> },
   { path: '/references/fabric', element: <Navigate to="/references/materials" replace /> },
   { path: '/references/garment-accessory', element: <GarmentAccessoriesRedirect /> },

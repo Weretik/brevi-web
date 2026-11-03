@@ -56,16 +56,7 @@ describe('React Admin routing', () => {
     const sections = [
       [
         'Менеджер сервісу',
-        [
-          'Клієнти',
-          'Ліди',
-          'Постачальники',
-          'Розрахунки та КП',
-          'Прайс',
-          'Архів КП',
-          'Завдання в роботу',
-          'Угоди',
-        ],
+        ['Ліди', 'Розрахунки та КП', 'Прайс', 'Архів КП', 'Завдання в роботу', 'Угоди'],
       ],
       [
         'Швейний цех',
@@ -86,7 +77,7 @@ describe('React Admin routing', () => {
           'Товари',
           'Тканини та фурнітура',
           'Операції',
-          'Постачальники',
+          'Контрагенти',
           'Розрахунки',
           'Параметри ціноутворення',
           'Медіа/Фото',
@@ -105,7 +96,7 @@ describe('React Admin routing', () => {
           .map((item) => item.textContent?.replace('Ще не доступно', '')),
       ).toEqual(entries);
       expect(within(list).queryAllByRole('link')).toHaveLength(
-        section === 'Загальні довідники' ? 6 : section === 'Менеджер сервісу' ? 3 : 0,
+        section === 'Загальні довідники' ? 6 : section === 'Менеджер сервісу' ? 2 : 0,
       );
     }
   });
@@ -145,7 +136,7 @@ describe('React Admin routing', () => {
   });
 
   // Includes the first lazy-loaded reference module and grid on a cold worker.
-  it('opens suppliers directly inside the Brevi shell', async () => {
+  it('sends the old suppliers URL to «Контрагенти» inside the Brevi shell', async () => {
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue(
@@ -159,11 +150,14 @@ describe('React Admin routing', () => {
     renderApp();
     await vi.dynamicImportSettled();
     expect(await screen.findByRole('heading', { name: 'Постачальники' })).toBeVisible();
-    expect(
-      within(screen.getByRole('navigation', { name: 'Основна навігація' })).getByRole('link', {
-        name: 'Постачальники',
-      }),
-    ).toHaveAttribute('href', '/references/supplier');
+    expect(window.location.pathname).toBe('/references/counterparties');
+    expect(screen.getByRole('tab', { name: 'Клієнти' })).toBeVisible();
+    const navigation = screen.getByRole('navigation', { name: 'Основна навігація' });
+    expect(within(navigation).getByRole('link', { name: 'Контрагенти' })).toHaveAttribute(
+      'href',
+      '/references/counterparties',
+    );
+    expect(within(navigation).queryByRole('link', { name: 'Клієнти' })).not.toBeInTheDocument();
     expect(await screen.findByText('Постачальників поки немає')).toBeVisible();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   }, 15_000);

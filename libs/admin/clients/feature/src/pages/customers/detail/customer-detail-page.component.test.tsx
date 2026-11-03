@@ -89,7 +89,7 @@ describe('customer detail conflicts', () => {
     const router = createMemoryRouter(
       [
         { path: '/crm/clients/:customerId', element: <CustomerDetailPage /> },
-        { path: '/crm/clients', element: <div>Клієнтський список</div> },
+        { path: '/references/counterparties', element: <div>Клієнтський список</div> },
       ],
       { initialEntries: [`/crm/clients/${fixture.customer.publicId}`] },
     );

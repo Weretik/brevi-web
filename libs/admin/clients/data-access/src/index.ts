@@ -5,6 +5,7 @@ export {
   useReviseCustomerMutation,
   useSaveCustomerContactMutation,
   useMergeCustomersMutation,
+  useSyncCustomersFromKeepinCrmMutation,
 } from './api/customers/customers.api';
 export {
   useListQuotesQuery,

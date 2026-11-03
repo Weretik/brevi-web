@@ -29,9 +29,7 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
     section: 'Робота',
     label: 'Менеджер сервісу',
     items: [
-      { id: 'clients', label: 'Клієнти', path: '/crm/clients' },
       { id: 'leads', label: 'Ліди' },
-      { id: 'service-suppliers', label: 'Постачальники' },
       { id: 'quotes', label: 'Розрахунки та КП', path: '/crm/quotes' },
       {
         id: 'issuer-settings',
@@ -102,7 +100,7 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         label: 'Операції',
         path: '/references/garment-part-operation',
       },
-      { id: 'reference-suppliers', label: 'Постачальники', path: '/references/supplier' },
+      { id: 'counterparties', label: 'Контрагенти', path: '/references/counterparties' },
       { id: 'calculations', label: 'Розрахунки' },
       {
         id: 'pricing-parameters',

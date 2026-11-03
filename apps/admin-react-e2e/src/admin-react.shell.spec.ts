@@ -24,7 +24,7 @@ test('mobile menu opens by keyboard and closes with visible focus', async ({ pag
   await expect(
     mobileNavigation.getByRole('link', { name: 'Тканини та фурнітура' }),
   ).toHaveAttribute('href', '/references/materials');
-  await expect(mobileNavigation.getByRole('link', { name: 'Постачальники' })).toHaveCount(1);
+  await expect(mobileNavigation.getByRole('link', { name: 'Контрагенти' })).toHaveCount(1);
   await page.keyboard.press('Escape');
 
   await expect(page.getByRole('navigation', { name: 'Мобільна навігація' })).toBeHidden();
@@ -38,7 +38,7 @@ test('mobile menu opens by keyboard and closes with visible focus', async ({ pag
   expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
 });
 
-test('suppliers URL opens directly and stays in the Brevi shell', async ({ page }) => {
+test('old suppliers URL opens «Контрагенти» and stays in the Brevi shell', async ({ page }) => {
   await page.route('**/api/reference/suppliers', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) }),
   );
@@ -47,9 +47,10 @@ test('suppliers URL opens directly and stays in the Brevi shell', async ({ page 
   await expect(page.getByText('Постачальників поки немає')).toBeVisible();
   const navigation = page.getByRole('navigation', { name: 'Основна навігація' });
   await navigation.getByRole('button', { name: 'Загальні довідники' }).click();
-  await expect(navigation.getByRole('link', { name: 'Постачальники' })).toHaveAttribute(
+  await expect(page).toHaveURL(/\/references\/counterparties$/);
+  await expect(navigation.getByRole('link', { name: 'Контрагенти' })).toHaveAttribute(
     'href',
-    '/references/supplier',
+    '/references/counterparties',
   );
   await page.goto('/');
   await page.goBack();

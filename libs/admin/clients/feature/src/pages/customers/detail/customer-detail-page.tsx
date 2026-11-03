@@ -40,7 +40,9 @@ export default function CustomerDetailPage() {
   return (
     <Box sx={{ p: { xs: 2, md: 3 }, maxWidth: 1100 }}>
       <Stack spacing={2}>
-        <Button onClick={() => navigate('/crm/clients')}>До списку клієнтів</Button>
+        <Button onClick={() => navigate('/references/counterparties?tab=clients')}>
+          До списку клієнтів
+        </Button>
         {(query.isLoading || (!customer && query.isFetching)) && (
           <CircularProgress aria-label="Завантаження клієнта" />
         )}
