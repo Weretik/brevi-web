@@ -1,15 +1,15 @@
+// @vitest-environment jsdom
 import { AxiosError, AxiosHeaders } from 'axios';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { retryAfterAuthRefresh } from './auth-refresh.interceptor';
-import { attachAuthorizationHeader } from './auth-request.interceptor';
+import { attachCsrfHeader } from './csrf-request.interceptor';
+import { handleUnauthorized } from './unauthorized.interceptor';
 import { configureApiClient, configureApiErrorNotifier } from '../runtime/api-client-runtime';
 
 import type { TimedRequestConfig } from './api-logging.interceptor';
-import type { AxiosInstance, AxiosResponse } from 'axios';
 
-const requestConfig = (url = '/api/products'): TimedRequestConfig =>
-  ({ headers: new AxiosHeaders(), url }) as TimedRequestConfig;
+const requestConfig = (method: string, url = '/api/products'): TimedRequestConfig =>
+  ({ headers: new AxiosHeaders(), method, url }) as TimedRequestConfig;
 
 const unauthorizedError = (config: TimedRequestConfig): AxiosError =>
   new AxiosError('Unauthorized', undefined, config, undefined, {
@@ -23,64 +23,40 @@ const unauthorizedError = (config: TimedRequestConfig): AxiosError =>
 afterEach(() => {
   configureApiClient({});
   configureApiErrorNotifier(undefined);
+  document.cookie = 'brevi.csrf=; Max-Age=0; Path=/';
 });
 
-describe('auth interceptors', () => {
-  it('adds the current access token without owning session state', async () => {
-    configureApiClient({ authSession: { getAccessToken: () => 'access-token' } });
-    const config = await attachAuthorizationHeader(requestConfig());
-    expect(config.headers.get('Authorization')).toBe('Bearer access-token');
+describe('cookie session interceptors', () => {
+  it('sends the CSRF cookie value only on requests that change data', () => {
+    document.cookie = 'brevi.csrf=csrf%20value; Path=/';
+
+    expect(attachCsrfHeader(requestConfig('post')).headers.get('X-CSRF-Token')).toBe('csrf value');
+    expect(attachCsrfHeader(requestConfig('get')).headers.has('X-CSRF-Token')).toBe(false);
   });
 
-  it('shares one refresh between concurrent unauthorized requests', async () => {
-    const refreshAccessToken = vi.fn().mockResolvedValue('next-token');
-    configureApiClient({ authSession: { getAccessToken: () => null, refreshAccessToken } });
-    const request = vi.fn().mockResolvedValue({ status: 200 } satisfies Partial<AxiosResponse>);
-    const client = { request } as unknown as AxiosInstance;
-    const firstConfig = requestConfig();
-    const secondConfig = requestConfig();
+  it('never adds a bearer token', () => {
+    document.cookie = 'brevi.csrf=value; Path=/';
 
-    await Promise.all([
-      retryAfterAuthRefresh(client, unauthorizedError(firstConfig)),
-      retryAfterAuthRefresh(client, unauthorizedError(secondConfig)),
-    ]);
-
-    expect(refreshAccessToken).toHaveBeenCalledTimes(1);
-    expect(request).toHaveBeenCalledTimes(2);
-    expect(firstConfig.headers.get('Authorization')).toBe('Bearer next-token');
-    expect(secondConfig.headers.get('Authorization')).toBe('Bearer next-token');
+    expect(attachCsrfHeader(requestConfig('put')).headers.has('Authorization')).toBe(false);
   });
 
-  it('fails closed when refresh cannot restore a session', async () => {
+  it('ends the session on a 401 from a data request', async () => {
     const onUnauthenticated = vi.fn();
-    configureApiClient({
-      authSession: {
-        getAccessToken: () => null,
-        refreshAccessToken: async () => null,
-        onUnauthenticated,
-      },
-    });
-    const client = { request: vi.fn() } as unknown as AxiosInstance;
+    configureApiClient({ authSession: { onUnauthenticated } });
 
     await expect(
-      retryAfterAuthRefresh(client, unauthorizedError(requestConfig())),
+      handleUnauthorized(unauthorizedError(requestConfig('get'))),
     ).rejects.toBeInstanceOf(AxiosError);
     expect(onUnauthenticated).toHaveBeenCalledOnce();
-    expect(client.request).not.toHaveBeenCalled();
   });
-  it('uses no bearer and never refreshes or retries when the auth adapter is removed', async () => {
-    const refreshAccessToken = vi.fn().mockResolvedValue('unused-token');
-    configureApiClient({
-      authSession: { getAccessToken: () => 'stale-token', refreshAccessToken },
-    });
-    configureApiClient({});
-    const config = await attachAuthorizationHeader(requestConfig());
-    expect(config.headers.has('Authorization')).toBe(false);
-    const client = { request: vi.fn() } as unknown as AxiosInstance;
-    await expect(retryAfterAuthRefresh(client, unauthorizedError(config))).rejects.toBeInstanceOf(
-      AxiosError,
-    );
-    expect(refreshAccessToken).not.toHaveBeenCalled();
-    expect(client.request).not.toHaveBeenCalled();
+
+  it('leaves a 401 from sign-in to the login page', async () => {
+    const onUnauthenticated = vi.fn();
+    configureApiClient({ authSession: { onUnauthenticated } });
+
+    await expect(
+      handleUnauthorized(unauthorizedError(requestConfig('post', '/api/auth/cookie/login'))),
+    ).rejects.toBeInstanceOf(AxiosError);
+    expect(onUnauthenticated).not.toHaveBeenCalled();
   });
 });

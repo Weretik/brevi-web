@@ -1,6 +1,5 @@
 import { createServer } from 'node:http';
 
-import { configureApiClient } from '@admin/shared/api-client';
 import { configureStore } from '@reduxjs/toolkit';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -68,10 +67,8 @@ const store = () =>
 beforeAll(async () => {
   await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
   runtime.port = (server.address() as { port: number }).port;
-  configureApiClient({ authSession: { getAccessToken: () => 'fixture-token' } });
 });
 afterAll(async () => {
-  configureApiClient({});
   await new Promise<void>((resolve) => server.close(() => resolve()));
 });
 beforeEach(() => {
@@ -97,7 +94,7 @@ describe('private file authenticated transport', () => {
       expect(requests[0]?.type).toMatch(/^multipart\/form-data; boundary=/);
       expect(requests[0]?.body).toContain('%PDF-1.7');
       expect(requests[0]?.body).toContain(customVersionId);
-      expect(requests[0]?.auth).toBe('Bearer fixture-token');
+      expect(requests[0]?.auth).toBeUndefined();
     } finally {
       api.dispatch(customFilesApi.util.resetApiState());
     }
@@ -152,7 +149,7 @@ describe('private file authenticated transport', () => {
     });
     expect(await blob.text()).toBe('%PDF-1.7');
     expect(blob.type).toBe('application/pdf');
-    expect(requests[0]?.auth).toBe('Bearer fixture-token');
+    expect(requests[0]?.auth).toBeUndefined();
     expect(requests[0]?.url).toContain(`versionId=${customVersionId}`);
   });
   it.each([404, 409, 413, 415, 503])('preserves real transport status %s', async (code) => {

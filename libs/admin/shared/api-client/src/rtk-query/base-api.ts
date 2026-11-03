@@ -16,6 +16,7 @@ export const adminApi = createApi({
     'Product',
     'ProductCategory',
     'ProductSection',
+    'StaffAccount',
     'Supplier',
   ],
   endpoints: () => ({}),

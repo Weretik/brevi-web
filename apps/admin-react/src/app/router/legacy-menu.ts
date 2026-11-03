@@ -2,6 +2,7 @@ import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalance
 import ContentCutOutlinedIcon from '@mui/icons-material/ContentCutOutlined';
 import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
 import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
+import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined';
 import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
 import NotificationsActiveOutlinedIcon from '@mui/icons-material/NotificationsActiveOutlined';
 import PhotoLibraryOutlinedIcon from '@mui/icons-material/PhotoLibraryOutlined';
@@ -124,5 +125,12 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
     section: 'Дані',
     label: 'Загальні звіти',
     items: [{ id: 'reports-overview', label: 'Загальні звіти' }],
+  },
+  {
+    id: 'administration',
+    icon: ManageAccountsOutlinedIcon,
+    section: 'Дані',
+    label: 'Адміністрування',
+    items: [{ id: 'users', label: 'Користувачі', path: '/admin/users', requiredRole: 'Admin' }],
   },
 ];

@@ -36,9 +36,8 @@ export interface ApiErrorMessages {
   readonly fallback?: string;
 }
 
+/** The browser session lives in an HttpOnly cookie; the client only hears that it ended. */
 export interface AuthSessionAdapter {
-  readonly getAccessToken: () => string | null | Promise<string | null>;
-  readonly refreshAccessToken?: () => Promise<string | null>;
   readonly onUnauthenticated?: () => void | Promise<void>;
 }
 
