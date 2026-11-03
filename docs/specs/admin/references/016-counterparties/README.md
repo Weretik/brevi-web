@@ -10,6 +10,7 @@ Step 4 of moving the client's Calculator into Brevi. The product owner asked on 
 - **R-02:** The old addresses redirect: `/references/supplier` → `/references/counterparties`, and `/crm/clients` → `/references/counterparties?tab=clients`. Client cards stay at `/crm/clients/:id` and `/crm/clients/new`, and their back button returns to the clients tab.
 - **R-03:** The clients tab follows reference pattern B: a header with «Оновити з KeepinCRM» and «Додати клієнта», a full-width search row, activity chips with server counts, then the table. Search, the activity filter and the page live in the URL and run on the server; search waits 300 ms after typing.
 - **R-04:** The table shows the name with its KeepinCRM ID, the type, the contact person, the phones and the status. Clicking a row opens the card.
+- **R-06:** Like suppliers, the clients subtitle shows «Картки оновлюються з KeepinCRM щодня. Останнє оновлення: …», the latest `keepinSyncedAt` of the listed clients. It shows the plain description until the first sync.
 - **R-05:** «Оновити з KeepinCRM» runs the daily refresh (applied, never deleting) and reports the counts. The one-time transfer that deletes old clients is not a button. It runs once through the API after a preview and the owner's confirmation.
 
 ## Scenarios

@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { describeCustomerKeepinSync } from './describe-customer-keepin-sync';
+import {
+  describeCustomerKeepinSync,
+  lastCustomerKeepinSync,
+} from './describe-customer-keepin-sync';
+
+import type { CustomerSummary } from '../../entities/customers/customer-summary';
 
 const result = {
   applied: true,
@@ -21,5 +26,17 @@ describe('describeCustomerKeepinSync', () => {
     expect(
       describeCustomerKeepinSync({ ...result, deactivated: ['ТОВ Зникле (KeepinCRM 11)'] }),
     ).toContain('Немає в KeepinCRM (позначені як не використовуються): ТОВ Зникле (KeepinCRM 11).');
+  });
+});
+
+describe('lastCustomerKeepinSync', () => {
+  it('picks the latest sync time and ignores clients without one', () => {
+    const rows = [
+      { keepinSyncedAt: '2026-11-02T07:00:00Z' },
+      { keepinSyncedAt: null },
+      { keepinSyncedAt: '2026-11-03T07:00:00Z' },
+    ] as CustomerSummary[];
+    expect(lastCustomerKeepinSync(rows)).toBe('2026-11-03T07:00:00Z');
+    expect(lastCustomerKeepinSync([])).toBeNull();
   });
 });

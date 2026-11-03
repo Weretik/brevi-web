@@ -1,3 +1,4 @@
+import { lastCustomerKeepinSync } from '@admin/clients/model';
 import { CustomersReferenceGrid } from '@admin/clients/ui';
 import {
   ReferenceFilterBar,
@@ -30,13 +31,28 @@ export function CustomersReferenceContent({ tabs }: Props) {
   const { sync, syncing } = useCustomerKeepinSync((text, ok) => setNotice({ text, ok }));
   const { list } = state;
   const page = list.currentData;
+  const lastSync = lastCustomerKeepinSync(page?.rows ?? []);
 
   return (
     <Box sx={{ minWidth: 0 }}>
       {tabs}
       <ReferencePageHeader
         title="Клієнти"
-        subtitle="Клієнти з KeepinCRM. Назва, контакт і телефони оновлюються щодня."
+        subtitle={
+          lastSync ? (
+            <>
+              Картки оновлюються з KeepinCRM щодня. Останнє оновлення:{' '}
+              <Box component="span" sx={{ fontFamily: 'var(--admin-font-mono)' }}>
+                {new Date(lastSync).toLocaleString('uk-UA', {
+                  dateStyle: 'short',
+                  timeStyle: 'short',
+                })}
+              </Box>
+            </>
+          ) : (
+            'Клієнти з KeepinCRM. Назва, контакт і телефони оновлюються щодня.'
+          )
+        }
         actions={
           <>
             <Button
