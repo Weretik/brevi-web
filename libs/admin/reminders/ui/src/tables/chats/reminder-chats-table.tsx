@@ -82,9 +82,8 @@ export function ReminderChatsTable({ rows, loading, busyId, onEdit, onTest, onAs
     },
   ];
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{ width: '100%', height: 'var(--admin-table-height)' }}>
       <DataGrid
-        autoHeight
         aria-label="Чати Telegram"
         rows={rows}
         columns={columns}

@@ -98,7 +98,6 @@ export function CustomersReferenceGrid({
       loading={loading}
       rowHeight={52}
       columnHeaderHeight={44}
-      autoHeight
       disableColumnMenu
       disableRowSelectionOnClick
       paginationMode="server"
@@ -117,6 +116,7 @@ export function CustomersReferenceGrid({
       }}
       sx={{
         minWidth: 0,
+        height: 'var(--admin-table-height)',
         border: 0,
         borderTop: 1,
         borderColor: 'divider',

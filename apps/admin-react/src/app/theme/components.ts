@@ -9,7 +9,11 @@ const alertTones = ['success', 'info', 'warning', 'error'] as const;
 export const components: Components<Theme> = {
   MuiCssBaseline: {
     styleOverrides: (theme) => ({
-      ':root': { '--admin-font-mono': monoFontFamily },
+      ':root': {
+        '--admin-font-mono': monoFontFamily,
+        // Admin tables: own fixed height with an inner scroll, sized to the screen (laptop and desktop).
+        '--admin-table-height': 'clamp(420px, calc(100dvh - 160px), 820px)',
+      },
       body: { minWidth: 320 },
       ':focus-visible': { outline: `2px solid ${theme.palette.primary.main}`, outlineOffset: 2 },
       '@media (prefers-reduced-motion: reduce)': {

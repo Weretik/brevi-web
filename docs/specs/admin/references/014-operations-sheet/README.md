@@ -15,7 +15,7 @@ The Calculator sheet «Операції» (187 operations in 27 groups) replaces
 | R-02 | Operation fields: code (OP-…), group, element, variant, name, norm in minutes, «Час вказується для кожного виробу», check date, «Активна», notes.                                                                                                                             |
 | R-03 | «Вартість» = norm × minute cost; «Зі збиранням» = that × (1 + assembly rate). The minute cost is monthly salary / (work days × shift minutes) from the current sewing settings. Nothing is stored. If the settings cannot be read, the cells show «—» and the header says so. |
 | R-04 | Search covers code, group, element, variant and name; activity chips and a group filter narrow the list.                                                                                                                                                                      |
-| R-05 | Lists, chips, row menu, drawer and table height follow the reference list pattern (no inner scroll).                                                                                                                                                                          |
+| R-05 | Lists, chips, row menu, drawer and table height follow the reference list pattern (standard table height, inner scroll).                                                                                                                                                      |
 
 ## Scenarios
 

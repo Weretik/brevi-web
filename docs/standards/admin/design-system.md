@@ -124,13 +124,13 @@ Use these for new pages. Prefer MUI components and the theme overrides; do not r
 - **Data card:** `Card` (outlined, 8 px) with a header row: `h6` title on the left, filter chips or a `primary.dark` text link on the right. Tables sit inside it and scroll horizontally inside the card.
 - **Filter chips:** 28 px chips, 6 px radius; the selected chip is the inverse surface (`secondary.main`). Counts go into the label («Чекають 8»).
 - **Tables:** MUI X Data Grid with the theme override: uppercase 11 px column titles in `text.secondary`, `divider` row lines, `action.hover` on hover, orange focus outline. Document numbers and numbers in mono; numbers right-aligned; statuses as pills.
-- **Table height:** a table is never limited in height and never scrolls vertically inside the page. Data Grid uses `autoHeight`, with no fixed `height`, `minHeight` or `maxHeight` on it or its wrapper, so only the page scrolls (no double scroll). Long lists are split by pagination (10/25/50/100 rows), not by an inner scroll. Horizontal scroll inside the table card stays allowed on narrow screens.
+- **Table height:** the page and the table scroll separately (double scroll is intended, the client asked for it). A Data Grid has its own standard height `var(--admin-table-height)` (defined in the admin theme: `clamp(420px, calc(100dvh - 160px), 820px)`, so it fits a laptop screen below the top bar and does not grow too tall on a large monitor) and scrolls its rows inside; the page scrolls around it. Set the height on the grid or its wrapper; do not use `autoHeight`. Pagination (10/25/50/100 rows) stays. Horizontal scroll inside the table card stays allowed on narrow screens.
 - **Reference list pattern:** every reference or list page (suppliers, fabrics, accessories, and new ones) stacks, top to bottom:
   1. **Header:** overline, `h1`, `body2` line; on the right, actions. «Видалити» (`outlined` `error`, with the selected count) appears there only while rows are selected and always asks for confirmation; then secondary actions; then the one `contained` add action last.
   2. **Tabs** (optional), when one page holds several related lists («Тканини / Фурнітура»); the tab is kept in `?tab=`.
   3. **Search row:** its own full-width 48 px field on `background.paper`, never inside the filter row. Placeholder says what it searches («Знайти тканину за кодом, назвою…»), «/» focuses it, Escape and the clear button empty it.
   4. **Filter row:** 32 px pill chips with counts («Активні 84»), the selected one inverse; extra filters (for example a supplier chip with a menu) after a thin divider. On the right, a status line: «Вибрано: N · Зняти вибір» while rows are selected, otherwise «Знайдено: N із M» while search or filters narrow the list, otherwise nothing.
-  5. **Table** in an outlined paper, full height (see «Table height»).
+  5. **Table** in an outlined paper, with the standard table height (see «Table height»).
 
   There is no «Оновити» button (lists refresh after every save) and no «Усього» counter (counts live on the chips). Shared components: `libs/admin/references/ui/src/components/reference-list-controls/` and `reference-list/`.
 
