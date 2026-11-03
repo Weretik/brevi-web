@@ -123,7 +123,7 @@ export function SewingRecalculationDialog({
           Скасувати
         </Button>
         <Button variant="contained" disabled={applying || !changes.length} onClick={onConfirm}>
-          Перерахувати і опублікувати
+          {applying ? 'Публікуємо…' : 'Перерахувати і опублікувати'}
         </Button>
       </DialogActions>
     </Dialog>

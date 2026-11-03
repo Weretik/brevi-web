@@ -15,7 +15,7 @@ import {
 } from '@admin/references/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import CalculateOutlinedIcon from '@mui/icons-material/CalculateOutlined';
-import { Alert, Box, Button, Paper } from '@mui/material';
+import { Alert, Box, Button, CircularProgress, Paper } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 
@@ -62,11 +62,17 @@ export function ProductOverviewContent({ type, tabs }: Props) {
             {sewing && (
               <Button
                 variant="outlined"
-                startIcon={<CalculateOutlinedIcon />}
+                startIcon={
+                  recalculation.running ? (
+                    <CircularProgress size={18} color="inherit" />
+                  ) : (
+                    <CalculateOutlinedIcon />
+                  )
+                }
                 disabled={recalculation.running || loading}
                 onClick={() => recalculation.start(null)}
               >
-                Перерахувати всі
+                {recalculation.running ? 'Рахуємо…' : 'Перерахувати всі'}
               </Button>
             )}
             <ReferenceBulkDeleteButton

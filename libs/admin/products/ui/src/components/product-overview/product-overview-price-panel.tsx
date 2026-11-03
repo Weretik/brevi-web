@@ -1,5 +1,5 @@
 import { ReferenceFormSection } from '@admin/references/ui';
-import { Alert, Box, Button, Skeleton, Typography } from '@mui/material';
+import { Alert, Box, Button, CircularProgress, Skeleton, Typography } from '@mui/material';
 
 export interface ProductPanelMetric {
   label: string;
@@ -56,8 +56,13 @@ export function ProductOverviewPricePanel({
         <Alert severity="warning">Не розраховано: {blockers.join(', ')}.</Alert>
       )}
       {onRecalculate && (
-        <Button variant="outlined" disabled={recalculating} onClick={onRecalculate}>
-          Перерахувати ціни
+        <Button
+          variant="outlined"
+          disabled={recalculating}
+          startIcon={recalculating ? <CircularProgress size={18} color="inherit" /> : undefined}
+          onClick={onRecalculate}
+        >
+          {recalculating ? 'Рахуємо…' : 'Перерахувати ціни'}
         </Button>
       )}
     </ReferenceFormSection>

@@ -55,6 +55,18 @@ const blockedLabel = (
   </Typography>
 );
 
+/** Lowest live price of each tier among active, calculable Articles. */
+function lowestLive(prices: ProductOverviewPrices): SewingPriceTiers | null {
+  const live = prices.articles.filter((a) => a.active && a.live).map((a) => a.live!);
+  return live.length
+    ? {
+        retail: Math.min(...live.map((x) => x.retail)),
+        wholesale: Math.min(...live.map((x) => x.wholesale)),
+        largeWholesale: Math.min(...live.map((x) => x.largeWholesale)),
+      }
+    : null;
+}
+
 /** Model row: «від …» across Articles, a warning when prices are stale or not yet published. */
 export function ProductModelPriceCell({
   prices,
@@ -68,6 +80,16 @@ export function ProductModelPriceCell({
 }) {
   if (!prices) return '—';
   if (!prices.from) {
+    const live = lowestLive(prices);
+    if (live)
+      return (
+        <Price
+          value={live[tier]}
+          prefix={showsRange ? 'від' : undefined}
+          muted
+          hint="Розраховано, ще не опубліковано. Натисніть «Перерахувати всі»."
+        />
+      );
     if (tier !== 'retail') return '—';
     return prices.status === 'Unpublished' ? (
       <Typography component="span" variant="body2" color="warning.main">
