@@ -44,3 +44,5 @@
 [008 «Товари»: two tables from the Calculator sheet](008-products-page/README.md) replaces the paged list with the sewing and PPE tables, section chips and the quote fields.
 
 [009 Sewing product card](009-sewing-product-card/README.md) turns the sewing model page into a «Цех» card with tabs for articles, composition, labour and prices.
+
+[010 PPE product card](010-ppe-product-card/README.md) turns the PPE product page into a «Цех» card with supplier fields and the three prices, and makes «Додати» open the side panel in every «Довідники» table.

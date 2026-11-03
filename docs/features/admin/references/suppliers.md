@@ -42,12 +42,12 @@ full editing. The subtitle shows the last sync time.
 ```mermaid
 flowchart LR
   Route["/references/counterparties"] --> Page["references/feature: state and scenarios"]
-  Page --> UI["references/ui: table and dialog"]
+  Page --> UI["references/ui: table and side panel"]
   Page --> Model["references/model: types and form conversion"]
   Page --> Hooks["hooks: actions and list refresh"]
-  Page --> Editor["feature: supplier-dialog container"]
+  Page --> Editor["feature: supplier-drawer container"]
   Editor --> Hooks
-  Editor --> Form["ui: SupplierEditorDialog (props only)"]
+  Editor --> Form["ui: SupplierEditorDrawer (props only)"]
   Hooks --> Data["data-access: suppliers.api"]
   Data --> Validator["validators: unknown → validated response"]
   Validator --> Mapper["mappers: response → Supplier"]
@@ -102,8 +102,8 @@ libs/admin/references/
 │   ├── reference-status-pill.tsx # active / not used pill
 │   ├── reference-grid-footer.tsx # selection count and pagination
 │   └── reference-row-menu.tsx # view/edit/delete actions
-└── ui/src/dialogs/suppliers/
-    └── supplier-editor-dialog.tsx # form presentation without API hooks
+└── ui/src/components/suppliers/
+    └── supplier-editor-drawer.tsx # side panel form without API hooks (ReferenceEditorDrawer)
 ```
 
 **Where to look:** [route](../../../../libs/admin/references/feature/src/references.routes.tsx), [page](../../../../libs/admin/references/feature/src/pages/suppliers/suppliers-page.tsx), [API](../../../../libs/admin/references/data-access/src/api/suppliers/suppliers.api.ts), [base SDD](../../../specs/admin/references/001-suppliers/README.md), [closed next-stage SDD](../../../specs/admin/references/010-suppliers-pages/README.md).
@@ -112,7 +112,7 @@ libs/admin/references/
 
 - `libs/admin/references/data-access/src/mappers/suppliers/suppliers.mapper.unit.test.ts`, shared `libs/admin/references/data-access/src/api/integration/references.api.integration.test.ts`
 - `libs/admin/references/feature/src/pages/suppliers/suppliers-page.component.test.tsx`
-- `libs/admin/references/ui/src/components/suppliers/supplier-link-cell.component.test.tsx`
+- `libs/admin/references/ui/src/components/suppliers/supplier-link-cell.component.test.tsx`, `supplier-editor-drawer.component.test.tsx`
 - `libs/admin/references/model/src/mappers/suppliers/supplier-link.unit.test.ts`
 - `libs/admin/references/ui/src/dialogs/suppliers/supplier-editor-dialog.component.test.tsx`
 - `libs/admin/references/data-access/src/validators/suppliers/suppliers-response.unit.test.ts`

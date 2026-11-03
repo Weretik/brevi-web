@@ -1,31 +1,41 @@
 import { useCreateCustomerMutation } from '@admin/clients/data-access';
+import { customerDraft, customerErrors } from '@admin/clients/model';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { customerError } from '../../errors/customer-error';
-import { useClientDirtyGuard } from '../navigation/use-client-dirty-guard';
 import { useCustomerRequest } from '../requests/use-customer-request';
 
-import type { CustomerDraft } from '@admin/clients/model';
+import type { CustomerDetail, CustomerDraft } from '@admin/clients/model';
 
-export function useCustomerCreate() {
+/** Draft, checks and save of a new client in the «Контрагенти → Клієнти» side panel. */
+export function useCustomerCreate(onCreated: (customer: CustomerDetail) => void) {
   const [create, state] = useCreateCustomerMutation();
-  const [dirty, setDirty] = useState(false);
+  const [draft, setDraft] = useState<CustomerDraft>(() => customerDraft());
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [duplicates, setDuplicates] = useState('');
   const [error, setError] = useState<string | null>(null);
   const requestId = useCustomerRequest();
-  const navigate = useNavigate();
-  const { blocker, allowNavigation } = useClientDirtyGuard(dirty);
-  async function save(draft: CustomerDraft) {
+
+  async function save() {
+    const found = customerErrors(draft);
+    setErrors(found);
+    if (Object.keys(found).length) return;
     setError(null);
     try {
-      const customer = await create({ draft, requestId: requestId(draft) }).unwrap();
-      allowNavigation();
-      navigate(`/crm/clients/${customer.publicId}`, { replace: true });
-    } catch (error) {
-      setError(customerError(error));
+      onCreated(await create({ draft, requestId: requestId(draft) }).unwrap());
+    } catch (failure) {
+      setError(customerError(failure));
     }
   }
 
-  return { state, duplicates, setDuplicates, error, navigate, blocker, save, setDirty };
+  return {
+    draft,
+    setDraft,
+    errors,
+    error,
+    saving: state.isLoading,
+    duplicates,
+    checkDuplicates: () => setDuplicates(draft.taxIdentity.trim() || draft.displayName.trim()),
+    save,
+  };
 }

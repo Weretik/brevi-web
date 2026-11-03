@@ -13,7 +13,7 @@ import SyncOutlinedIcon from '@mui/icons-material/SyncOutlined';
 import { Alert, Box, Button, Paper } from '@mui/material';
 import { useState } from 'react';
 
-import { SupplierDialog } from '../../components/suppliers/supplier-dialog';
+import { SupplierDrawer } from '../../components/suppliers/supplier-drawer';
 import { useReferenceListFilters } from '../../hooks/reference-lists/use-reference-list-filters';
 import { useSupplierDeletion } from '../../hooks/suppliers/use-supplier-deletion';
 import { useSupplierKeepinSync } from '../../hooks/suppliers/use-supplier-keepin-sync';
@@ -129,7 +129,7 @@ export function SuppliersPage({ tabs }: { tabs?: ReactNode } = {}) {
         />
       </Paper>
       {active && (
-        <SupplierDialog
+        <SupplierDrawer
           key={`${active.mode}-${active.supplier?.id ?? 'new'}`}
           mode={active.mode}
           supplier={active.supplier}

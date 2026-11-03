@@ -1,6 +1,6 @@
 # Admin: PPE pricing
 
-TS-006 consumes Brevi-owned rule/offer versions. A Product card shows server-calculated retail, wholesale and large-wholesale prices, or actionable blockers. Source review and Brevi approval are separate. Managers explicitly save/approve offer and rule values; rule edits warn that the rule is shared. No approval or price arithmetic runs automatically in the client.
+TS-006 consumes Brevi-owned rule/offer versions. Since [spec 010](../../../specs/admin/products/010-ppe-product-card/README.md) the PPE card edits the sheet «ЗІЗ» supplier fields (`GET`/`PUT /api/v1/products/{id}/ppe-offer`); a changed supplier price or rule makes the backend append an approved offer version. Rules are edited only in «Параметри ціноутворення». The card shows server-calculated retail, wholesale and large-wholesale prices, or the sheet reasons. No price arithmetic runs in the client.
 
 Product list/detail load PPE IDs through one bounded batch query. Enrolled PPE never falls back to legacy prices during blocked/loading/error states. Non-enrolled PPE is blocked until explicit onboarding; old metadata amounts never supply current prices. Sewing still selects its published Article prices through its own batch. There is no new route, store, theme, runtime Sheet/XML call or quote behavior.
 
@@ -11,14 +11,12 @@ flowchart LR
   Products[Product list / detail] --> Selection[useProductPrices]
   Selection --> PPE[usePpeProductPrices]
   Selection --> Sewing[Existing publication projection]
-  Card[PpePricingFeature] --> Read[Current pricing / session access]
-  Read --> API[PPE RTK endpoints]
+  Card[PpeProductCard] --> CardData[usePpeCard / usePpeSupplierForm]
+  CardData --> API[PPE RTK endpoints]
   PPE --> API
-  Editors[Separate offer / rule drafts] --> Actions[Version actions / UUID retry / conflict lock]
-  Actions --> API
   API --> Boundary[Generated DTO / validation / mapping]
   Boundary --> Models[Independent application models]
-  Models --> UI[Tiers / blockers / controlled forms]
+  Models --> UI[Supplier form / prices panel]
 ```
 
 ## Code structure
@@ -38,21 +36,15 @@ libs/admin/products/
     api/ppe-pricing/                      # Product batch / offer / rule endpoints and errors
   feature/src/
     hooks/pricing/use-product-prices.ts    # combines separate Sewing and PPE projections
-    hooks/ppe-pricing/                   # Product batch / typed mutation adapter / request lifecycle
-    model/pricing/                       # shared safe error presentation
-    components/product-detail/product-current-pricing.tsx # detail pricing status / PPE onboarding boundary
-    components/ppe-pricing/
-      ppe-pricing-feature.tsx             # read/access/loading/error orchestration
-      ppe-pricing-inputs-editor.tsx       # shared write status and child identity
-      ppe-offer-version-editor.tsx        # offer draft/provenance, keyed only by offer version
-      ppe-rule-version-editor.tsx         # rule draft/provenance, keyed only by rule version
+    hooks/ppe-pricing/use-ppe-product-prices.ts # Product batch
+    hooks/ppe-card/                       # card data and supplier form state
+    components/ppe-card/                  # PPE card and its metric strip
   ui/src/
-    components/ppe-pricing/               # panel, three tier values, actionable blockers
-    forms/ppe-pricing/                    # separate controlled offer and rule forms
+    components/ppe-card/                  # supplier form, prices panel
     product-detail/product-wholesale-price-label.ts # explicit PPE/Sewing states
 ```
 
-An unchanged failed request retains its UUID; edited content gets another UUID. Conflicts lock writes until explicit reload. Each editor survives refreshes of the other resource, preserving unsaved drafts. During background reads its controls are disabled; old prices are hidden. Readers and stale/error permission reads have no write controls; backend policies remain authoritative.
+The save sends the current offer version; a newer version returns 409 and the card asks to reload. Readers see the form disabled.
 
 [SDD](../../../specs/admin/products/007-ppe-pricing/README.md) · [Contract pin](../../../specs/admin/products/007-ppe-pricing/contracts/api-contract.md) · [Evidence](../../../specs/admin/products/007-ppe-pricing/verification.md) · [Scoped audit](../../../specs/admin/products/007-ppe-pricing/code-audit/audit.md).
 
@@ -63,8 +55,9 @@ An unchanged failed request retains its UUID; edited content gets another UUID. 
 ## Tests
 
 - `libs/admin/products/data-access/src/`: `api/ppe-pricing/`, `mappers/ppe-pricing/`
-- `libs/admin/products/feature/src/`: `components/ppe-pricing/`, `hooks/ppe-pricing/`
-- `libs/admin/products/model/src/`: `queries/ppe-pricing/`, `validators/ppe-pricing/`
+- `libs/admin/products/feature/src/`: `components/ppe-card/`, `hooks/ppe-pricing/`
+- `libs/admin/products/model/src/`: `queries/ppe-pricing/`, `validators/ppe-pricing/`, `queries/ppe-card/`
+- `libs/admin/products/data-access/src/mappers/ppe-card/`
 - `libs/admin/products/ui/src/product-editor/ppe/`
 
 Focused run: `npx nx test admin-products-data-access -- ppe`; `npx nx test admin-products-feature -- ppe`; `npx nx test admin-products-model -- ppe`; `npx nx test admin-products-ui -- ppe`.

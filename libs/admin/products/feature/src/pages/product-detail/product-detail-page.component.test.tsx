@@ -41,6 +41,10 @@ const pageMocks = vi.hoisted(() => ({
     void props;
     return null;
   }),
+  ppeProductCard: vi.fn((props: unknown) => {
+    void props;
+    return null;
+  }),
 }));
 
 vi.mock('../../hooks/product-detail/use-product', () => ({
@@ -49,6 +53,10 @@ vi.mock('../../hooks/product-detail/use-product', () => ({
 
 vi.mock('../../components/sewing-card/sewing-product-card', () => ({
   SewingProductCard: pageMocks.sewingProductCard,
+}));
+
+vi.mock('../../components/ppe-card/ppe-product-card', () => ({
+  PpeProductCard: pageMocks.ppeProductCard,
 }));
 
 beforeEach(() => {
@@ -60,6 +68,7 @@ beforeEach(() => {
     reload: vi.fn(),
   });
   pageMocks.sewingProductCard.mockClear();
+  pageMocks.ppeProductCard.mockClear();
 });
 
 afterEach(cleanup);
@@ -98,7 +107,7 @@ describe('ProductDetailPage', () => {
     expect(screen.queryByRole('region', { name: 'Опис' })).not.toBeInTheDocument();
   });
 
-  it('keeps the PPE page with semantic surfaces and the edit route until the PPE card', () => {
+  it('opens the PPE card (CAT-008) for a PPE product', () => {
     pageMocks.useProduct.mockReturnValue({
       product: ppeProduct,
       loading: false,
@@ -108,14 +117,9 @@ describe('ProductDetailPage', () => {
     });
     renderPage();
 
-    expect(screen.getByRole('link', { name: 'Редагувати' })).toHaveAttribute(
-      'href',
-      '/references/products/8/edit',
+    expect(pageMocks.ppeProductCard.mock.calls.at(-1)?.[0]).toEqual(
+      expect.objectContaining({ product: ppeProduct, onDeleted: expect.any(Function) }),
     );
-    for (const name of ['Основні дані', 'Фото', 'Опис', 'Інформація', 'Характеристики']) {
-      expect(screen.getByRole('region', { name })).toHaveClass('MuiCard-root');
-    }
-    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
     expect(pageMocks.sewingProductCard).not.toHaveBeenCalled();
   });
 });
