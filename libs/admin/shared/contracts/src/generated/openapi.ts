@@ -203,6 +203,76 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/reference/product-sections': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List product sections, sewing first, each type in sheet order
+     * @description Anonymous. An empty list when there are none.
+     */
+    get: operations['getProductSections'];
+    put?: never;
+    /**
+     * Add a product section
+     * @description Requires CanManageProducts. The ID is assigned by Brevi; the name must be unique.
+     */
+    post: operations['createProductSection'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/reference/product-sections/import': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Import the Calculator sheet «Типи і розділи»
+     * @description Requires CanManageProducts. Sections are matched by name (case and punctuation ignored); the row number becomes the display order. dryRun (default) returns the preview only. Otherwise nothing is saved when any row has an error. deleteMissing deletes sections that are not in the sheet. Repeating the same file changes nothing.
+     */
+    post: operations['importProductSections'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/reference/product-sections/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Edit a product section
+     * @description Requires CanManageProducts. The name stays unique; products keep their link by ID.
+     */
+    put: operations['updateProductSection'];
+    post?: never;
+    /**
+     * Delete a product section
+     * @description Requires CanManageProducts.
+     */
+    delete: operations['deleteProductSection'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/reference/ppe-markup-rules': {
     parameters: {
       query?: never;
@@ -2275,6 +2345,67 @@ export interface components {
       applied: boolean;
       parameters: components['schemas']['PricingSettingsImportSection'];
       ppeMarkupRules: components['schemas']['PricingSettingsImportSection'];
+    };
+    /** @enum {string} */
+    ProductSectionType: 'Sewing' | 'Ppe';
+    ProductSectionRow: {
+      /** Format: int32 */
+      id: number;
+      type: components['schemas']['ProductSectionType'];
+      name: string;
+      isActive: boolean;
+      comment: string | null;
+      /** Format: int32 */
+      sortOrder: number;
+    };
+    ProductSectionFields: {
+      type: components['schemas']['ProductSectionType'];
+      name: string;
+      /** @default true */
+      isActive: boolean;
+      comment?: string | null;
+      /**
+       * Format: int32
+       * @default 0
+       */
+      sortOrder: number;
+    };
+    ProductSectionImportRow: {
+      /** Format: int32 */
+      rowNumber: number;
+      /** @description Sewing or Ppe; any other value is a row error. */
+      type: string;
+      name: string;
+      isActive: boolean;
+      comment?: string | null;
+    };
+    ImportProductSectionsRequest: {
+      rows: components['schemas']['ProductSectionImportRow'][];
+      /** @default true */
+      dryRun: boolean;
+      /** @default false */
+      deleteMissing: boolean;
+    };
+    'schemas-ReferenceImportRowResult': {
+      /** Format: int32 */
+      rowNumber: number;
+      /** @description The row's product type. */
+      code: string;
+      name: string;
+      /** @enum {string} */
+      action: 'create' | 'update' | 'unchanged' | 'error';
+      changes: string[];
+      error?: string | null;
+    };
+    ProductSectionImportResult: {
+      applied: boolean;
+      created: number;
+      updated: number;
+      unchanged: number;
+      errors: number;
+      /** @description Names of deleted sections. */
+      deleted: string[];
+      rows: components['schemas']['schemas-ReferenceImportRowResult'][];
     };
     PpeMarkupRuleRow: {
       /** Format: int32 */
@@ -5082,6 +5213,192 @@ export interface operations {
         content?: never;
       };
       /** @description Parameter not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getProductSections: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Sections. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductSectionRow'][];
+        };
+      };
+    };
+  };
+  createProductSection: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ProductSectionFields'];
+      };
+    };
+    responses: {
+      /** @description The new section ID. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': number;
+        };
+      };
+      400: components['responses']['ValidationError'];
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product management permission required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  importProductSections: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ImportProductSectionsRequest'];
+      };
+    };
+    responses: {
+      /** @description Preview or result; applied tells whether anything was saved. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductSectionImportResult'];
+        };
+      };
+      400: components['responses']['ValidationError'];
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product management permission required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateProductSection: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ProductSectionFields'];
+      };
+    };
+    responses: {
+      /** @description Saved. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      400: components['responses']['ValidationError'];
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product management permission required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  deleteProductSection: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Deleted. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      400: components['responses']['ValidationError'];
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product management permission required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
       404: {
         headers: {
           [name: string]: unknown;

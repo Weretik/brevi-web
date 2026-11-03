@@ -10,7 +10,7 @@ In each feature card, “Structure diagram” shows relationships between parts,
 - Admin foundation: [shell, navigation, and session](admin/shell.md); [overview page «Цех» on demo data](admin/dashboard.md).
 - Products: [list, details, creation, and editing](admin/products/products.md); [media library](admin/products/media.md); [Sewing Articles and composition](admin/products/sewing-composition.md); [Article calculation and published prices](admin/products/sewing-pricing.md); [PPE pricing and input approval](admin/products/ppe-pricing.md).
 - Reminders: [Telegram deadline reminders: tasks, periods, chats, days off](admin/reminders.md).
-- Reference data: [«Контрагенти»: suppliers and clients from KeepinCRM](admin/references/counterparties.md); [suppliers: search, contacts, and CRUD](admin/references/suppliers.md); [fabrics and accessories](admin/references/materials.md); [operations and garment part groups](admin/references/operations.md); [pricing parameters](admin/references/pricing-parameters.md).
+- Reference data: [«Контрагенти»: suppliers and clients from KeepinCRM](admin/references/counterparties.md); [suppliers: search, contacts, and CRUD](admin/references/suppliers.md); [fabrics and accessories](admin/references/materials.md); [operations and garment part groups](admin/references/operations.md); [pricing parameters](admin/references/pricing-parameters.md); [«Типи і розділи»: product sections](admin/references/product-sections.md).
 
 ## Storefront Angular (`apps/storefront`)
 
