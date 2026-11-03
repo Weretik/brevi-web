@@ -1,8 +1,4 @@
-import {
-  isSewingPricePublished,
-  sewingBlockerReasons,
-  sewingReadyStatus,
-} from '@admin/products/model';
+import { sewingBlockerReasons } from '@admin/products/model';
 import { Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { DataGrid } from '@mui/x-data-grid';
@@ -28,7 +24,6 @@ const amount = (row: SewingArticleSummaryRow, kinds: SewingCostKind[]) =>
         .filter((cost) => kinds.includes(cost.kind))
         .reduce((sum, cost) => sum + cost.amount, 0)
     : null;
-const dateFormat = new Intl.DateTimeFormat('uk-UA', { dateStyle: 'short' });
 
 function moneyColumn(
   field: string,
@@ -55,47 +50,29 @@ const columns: GridColDef<SewingArticleSummaryRow>[] = [
     width: 120,
     cellClassName: 'sewing-mono sewing-strong',
   },
+  moneyColumn('materials', 'Матеріали', (row) => amount(row, ['materials', 'otherCosts'])),
+  moneyColumn('labour', 'Праця', (row) => amount(row, labourKinds)),
+  moneyColumn('overhead', 'Накладні', (row) => amount(row, ['overhead'])),
+  moneyColumn('fullCost', 'Собівартість', (row) => row.fullCost, true),
   {
-    field: 'status',
-    headerName: 'Статус розрахунку',
-    flex: 1,
-    minWidth: 240,
-    sortable: false,
+    ...moneyColumn('retail', '1–9 шт.', (row) => row.prices?.retail ?? null, true),
+    minWidth: 160,
+    // Only a problem is shown: the reasons replace the missing price (CAT-013).
     renderCell: ({ row }) =>
       row.calculated ? (
-        <SewingCardStatusPill label={sewingReadyStatus} tone="success" />
+        money(row.prices?.retail ?? null)
       ) : (
-        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', py: 1 }}>
+        <Box
+          sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', py: 1, justifyContent: 'flex-end' }}
+        >
           {sewingBlockerReasons(row.blockers).map((reason) => (
             <SewingCardStatusPill key={reason} label={reason} tone="warning" />
           ))}
         </Box>
       ),
   },
-  moneyColumn('materials', 'Матеріали', (row) => amount(row, ['materials', 'otherCosts'])),
-  moneyColumn('labour', 'Праця', (row) => amount(row, labourKinds)),
-  moneyColumn('overhead', 'Накладні', (row) => amount(row, ['overhead'])),
-  moneyColumn('fullCost', 'Собівартість', (row) => row.fullCost, true),
-  moneyColumn('retail', '1–9 шт.', (row) => row.prices?.retail ?? null, true),
   moneyColumn('wholesale', '10–40 шт.', (row) => row.prices?.wholesale ?? null),
   moneyColumn('largeWholesale', 'Від 41 шт.', (row) => row.prices?.largeWholesale ?? null),
-  {
-    field: 'published',
-    headerName: 'Ціна в прайсі',
-    width: 170,
-    sortable: false,
-    renderCell: ({ row }) =>
-      !row.published ? (
-        <SewingCardStatusPill label="Не опубліковано" tone="neutral" />
-      ) : isSewingPricePublished(row) || !row.calculated ? (
-        <SewingCardStatusPill
-          label={`Від ${dateFormat.format(new Date(row.published.publishedAt))}`}
-          tone="neutral"
-        />
-      ) : (
-        <SewingCardStatusPill label="Ціна змінилась" tone="warning" />
-      ),
-  },
 ];
 
 /** «Артикули» tab: every site Article with live cost and three prices, as the sheet «Прайс на сайт». */

@@ -16,7 +16,8 @@ interface Props {
   verifiedOn: string | null;
   verified: boolean;
   siteUrl: string | null;
-  status: { label: string; tone: SewingCardTone };
+  /** Only a problem; null when everything is priced. */
+  status: { label: string; tone: SewingCardTone } | null;
   canEdit: boolean;
   /** «Продовжити заповнення» in the «Нова модель» wizard while the model is not launched. */
   continueHref?: string | null;
@@ -46,13 +47,10 @@ export function SewingCardHeader(props: Props) {
           </Typography>
         )}
         <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap' }}>
-          <SewingCardStatusPill label={props.status.label} tone={props.status.tone} />
-          {props.active !== null && (
-            <SewingCardStatusPill
-              label={props.active ? 'Активна' : 'Вимкнена'}
-              tone={props.active ? 'success' : 'neutral'}
-            />
+          {props.status && (
+            <SewingCardStatusPill label={props.status.label} tone={props.status.tone} />
           )}
+          {props.active === false && <SewingCardStatusPill label="Вимкнена" tone="neutral" />}
           <SewingCardStatusPill
             label={
               props.verified

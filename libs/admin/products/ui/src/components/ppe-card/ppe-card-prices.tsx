@@ -17,7 +17,6 @@ export interface PpeCardRule {
 interface Props {
   prices: PpePriceTiers | null;
   reasons: readonly string[];
-  readyLabel: string;
   rule: PpeCardRule | null;
   insightWholesale: number | null;
   insightRetail: number | null;
@@ -36,10 +35,7 @@ export function PpeCardPrices(props: Props) {
           <Typography variant="h6" component="h2">
             Ціни
           </Typography>
-          <SewingCardStatusPill
-            label={prices ? props.readyLabel : 'Не розраховано'}
-            tone={prices ? 'success' : 'warning'}
-          />
+          {!prices && <SewingCardStatusPill label="Не розраховано" tone="warning" />}
         </Stack>
         {prices ? (
           <PpePriceTierRows prices={prices} />

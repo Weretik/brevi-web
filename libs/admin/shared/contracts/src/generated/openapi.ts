@@ -745,8 +745,8 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * List products for the «Товари» page
-     * @description Anonymous. All products of the type, sorted by code (MOD-2 before MOD-10, article 9 before 17) then name; products without a code come last. An empty list when there are none.
+     * One page of a «Товари» tab (CAT-013)
+     * @description CatalogRead. The server searches, filters, sorts and pages the rows of one type and returns them with their prices, so the list needs this single request. Prices are read, never recalculated: sewing prices are the stored published prices of each fabric variant (automatic publication keeps them current, CAT-012); PPE prices come from the current offer and rule. prices is the lowest price of each tier among the active variants. problems lists the reasons a price is missing (of the row or of an active variant) and is empty when everything is priced. sections and withoutPrice count every row of the type, for the filter chips.
      */
     get: operations['getProductOverview'];
     put?: never;
@@ -781,26 +781,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/v1/products/overview/prices': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Prices of every «Товари» row (CAT-011)
-     * @description CatalogRead. Sewing: for every Article the published (fixed) prices and the live prices calculated from today's inputs; isStale when they differ. from is the lowest published price of each tier among active Articles. status is Ready (all published and current), Stale (a published price differs from the live one; automatic publication, CAT-012, normally clears it at once), Unpublished (a calculable active Article has no published price) or Blocked (no active Article has a price or a calculable price; blockers are the calculation codes). PPE: the live price from the current offer and rule, pricesUpdatedAt is the offer date, articles is empty. Tiers are 1–9, 10–40 and from 41 pieces.
-     */
-    get: operations['getProductOverviewPrices'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   '/api/v1/products/{id}/overview': {
     parameters: {
       query?: never;
@@ -810,7 +790,11 @@ export interface paths {
       };
       cookie?: never;
     };
-    get?: never;
+    /**
+     * One «Товари» row with prices and fabric variants (CAT-013)
+     * @description CatalogRead. The same item as in the list page, for the product card.
+     */
+    get: operations['getProductOverviewItem'];
     /**
      * Replace the «Товари» page fields of a product
      * @description Requires CanManageProducts (open while temporary anonymous access is on). Every field is replaced. A PPE product needs a code (site article). The section must exist in Reference «Типи і розділи» and belong to the product type. Season is for sewing only. When isVerified is true and verifiedOn is empty, the stored date is kept or today (Kyiv) is set; when isVerified is false, the date is cleared. Only the director sets the check (an agreement while the API is anonymous, not enforced).
@@ -3240,7 +3224,28 @@ export interface components {
     };
     ReplaceProductRequest: components['schemas']['ProductWriteBase'] &
       Omit<components['schemas']['ProductTypeWrite'], 'type'>;
-    ProductOverviewRow: {
+    ProductPriceTiers: {
+      retail: number;
+      wholesale: number;
+      largeWholesale: number;
+    };
+    ProductOverviewVariant: {
+      /** Format: int64 */
+      articleId: number;
+      saleSku: string;
+      active: boolean;
+      /**
+       * Format: int32
+       * @description The variant's own fabric
+       */
+      fabricId: number | null;
+      fabricName: string | null;
+      prices: components['schemas']['ProductPriceTiers'] | null;
+      /** Format: date-time */
+      publishedAt: string | null;
+      problems: string[];
+    };
+    ProductOverviewItem: {
       /** Format: int32 */
       id: number;
       /** @enum {string} */
@@ -3265,6 +3270,47 @@ export interface components {
       quoteDescription: string | null;
       /** Format: date-time */
       updatedAtUtc: string;
+      /** @description Lowest price of each tier among the active variants (sewing) or the rule price (PPE). */
+      prices: components['schemas']['ProductPriceTiers'] | null;
+      /**
+       * Format: date-time
+       * @description Latest publication (sewing) or offer date (PPE).
+       */
+      pricesUpdatedAt: string | null;
+      /** @description Calculation codes that explain a missing price (for example MissingOperations, MissingFabric, MissingOffer, NoActiveArticle, Unpublished); empty when everything is priced. */
+      problems: string[];
+      /** @description Fabric variants of a sewing model; empty for PPE. */
+      variants: components['schemas']['ProductOverviewVariant'][];
+    };
+    ProductSectionCount: {
+      /** Format: int32 */
+      sectionId: number | null;
+      /** Format: int32 */
+      count: number;
+    };
+    ProductOverviewPage: {
+      items: components['schemas']['ProductOverviewItem'][];
+      /** Format: int32 */
+      page: number;
+      /** Format: int32 */
+      pageSize: number;
+      /**
+       * Format: int32
+       * @description Rows that match the search and filters.
+       */
+      total: number;
+      /**
+       * Format: int32
+       * @description Every row of the type.
+       */
+      all: number;
+      /** @description Rows of the type per section; sectionId null counts rows without a section. */
+      sections: components['schemas']['ProductSectionCount'][];
+      /**
+       * Format: int32
+       * @description Rows of the type without a price.
+       */
+      withoutPrice: number;
     };
     CreatePpeSupplierRequest: {
       /** Format: int32 */
@@ -3310,39 +3356,6 @@ export interface components {
       takenByProductName: string | null;
       /** @description Next free MOD-XXX for sewing; null for PPE. */
       suggestedCode: string | null;
-    };
-    ProductPriceTiers: {
-      retail: number;
-      wholesale: number;
-      largeWholesale: number;
-    };
-    ProductOverviewArticlePrices: {
-      /** Format: int64 */
-      articleId: number;
-      saleSku: string;
-      active: boolean;
-      /**
-       * Format: int32
-       * @description The Article's own fabric, else the model's first fabric; names the Article in the price list.
-       */
-      fabricId: number | null;
-      published: components['schemas']['ProductPriceTiers'] | null;
-      /** Format: date-time */
-      publishedAt: string | null;
-      live: components['schemas']['ProductPriceTiers'] | null;
-      isStale: boolean;
-      blockers: string[];
-    };
-    ProductOverviewPrices: {
-      /** Format: int32 */
-      productId: number;
-      /** @enum {string} */
-      status: 'Ready' | 'Stale' | 'Unpublished' | 'Blocked';
-      from: components['schemas']['ProductPriceTiers'] | null;
-      /** Format: date-time */
-      pricesUpdatedAt: string | null;
-      blockers: string[];
-      articles: components['schemas']['ProductOverviewArticlePrices'][];
     };
     UpdateProductOverviewRequest: {
       code?: string | null;
@@ -7689,8 +7702,18 @@ export interface operations {
   };
   getProductOverview: {
     parameters: {
-      query?: {
-        type?: 'Sewing' | 'Ppe';
+      query: {
+        type: 'Sewing' | 'Ppe';
+        /** @description Code, name, quote description, variant SKU or fabric name; case-insensitive. */
+        search?: string;
+        /** @description A section ID from /api/reference/product-sections, or none for rows without a section. */
+        section?: string;
+        withoutPrice?: boolean;
+        /** @description code is natural (MOD-2 before MOD-10, article 9 before 17; rows without a code last); price is the 1–9 pcs price, rows without a price last in both directions. Ties go by name. */
+        sort?: 'code' | 'name' | 'price' | 'updated';
+        direction?: 'asc' | 'desc';
+        page?: number;
+        pageSize?: number;
       };
       header?: never;
       path?: never;
@@ -7698,17 +7721,31 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Rows. */
+      /** @description The page. */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['ProductOverviewRow'][];
+          'application/json': components['schemas']['ProductOverviewPage'];
         };
       };
-      /** @description Unknown type. */
+      /** @description Unknown type */
       400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description CatalogRead required. */
+      403: {
         headers: {
           [name: string]: unknown;
         };
@@ -7786,27 +7823,27 @@ export interface operations {
       400: components['responses']['ValidationError'];
     };
   };
-  getProductOverviewPrices: {
+  getProductOverviewItem: {
     parameters: {
-      query: {
-        type: 'Sewing' | 'Ppe';
-      };
+      query?: never;
       header?: never;
-      path?: never;
+      path: {
+        id: number;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
-      /** @description One entry per product of the type. */
+      /** @description The row. */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['ProductOverviewPrices'][];
+          'application/json': components['schemas']['ProductOverviewItem'];
         };
       };
-      /** @description Unknown type. */
+      /** @description Invalid ID. */
       400: {
         headers: {
           [name: string]: unknown;
@@ -7822,6 +7859,13 @@ export interface operations {
       };
       /** @description CatalogRead required. */
       403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such product. */
+      404: {
         headers: {
           [name: string]: unknown;
         };

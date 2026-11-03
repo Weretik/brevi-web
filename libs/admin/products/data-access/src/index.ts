@@ -39,9 +39,9 @@ export {
 export { useGetSewingAccessQuery as useGetProductAccessQuery } from './api/sewing-access/sewing-access.api';
 export {
   useListProductOverviewQuery,
+  useGetProductOverviewItemQuery,
   useUpdateProductOverviewMutation,
 } from './api/product-overview/product-overview.api';
-export { useListProductOverviewPricesQuery } from './api/product-overview/product-overview-prices.api';
 export {
   useCreateCatalogProductMutation,
   useGetProductCodeCheckQuery,

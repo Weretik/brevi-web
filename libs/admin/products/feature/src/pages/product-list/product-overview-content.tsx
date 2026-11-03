@@ -13,12 +13,11 @@ import {
   ReferenceSearchBar,
 } from '@admin/references/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
-import { Alert, Box, Button, Paper } from '@mui/material';
-import { useMemo, useState } from 'react';
+import { Box, Button, Paper } from '@mui/material';
+import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 
 import { ProductOverviewDrawer } from '../../components/product-overview/product-overview-drawer';
-import { useProductListRows } from '../../hooks/product-overview/use-product-list-rows';
 import { useProductOverview } from '../../hooks/product-overview/use-product-overview';
 
 import type { ProductOverviewEditorMode } from '../../hooks/product-overview/use-product-overview-editor';
@@ -32,10 +31,8 @@ interface Props {
 
 /** One «Товари» tab: sewing models (sheet «Товари») or PPE (sheet «ЗІЗ»). */
 export function ProductOverviewContent({ type, tabs }: Props) {
-  const { rows, prices, fabricNames, pricesError, sections, sectionNames, loading, error, reload } =
-    useProductOverview(type);
-  const sectionIds = useMemo(() => sections.map((item) => item.id), [sections]);
-  const list = useProductListRows({ rows, prices, fabricNames, sectionIds });
+  const list = useProductOverview(type);
+  const { sections, sectionNames, loading, error, reload } = list;
   const [active, setActive] = useState<{
     mode: ProductOverviewEditorMode;
     row: ProductOverview;
@@ -79,11 +76,10 @@ export function ProductOverviewContent({ type, tabs }: Props) {
         actionMessage={actionMessage}
         onCloseActionMessage={() => setActionMessage(null)}
       />
-      {pricesError && <Alert severity="warning">{pricesError}</Alert>}
       <ReferenceSearchBar
         placeholder={
           sewing
-            ? 'Знайти модель за ID, назвою, описом або артикулом'
+            ? 'Знайти модель за ID, назвою, описом, артикулом або тканиною'
             : 'Знайти ЗІЗ за артикулом, назвою або описом'
         }
         label="Пошук товарів"
@@ -95,14 +91,14 @@ export function ProductOverviewContent({ type, tabs }: Props) {
           <ProductOverviewSectionChips
             counts={list.counts}
             sectionNames={sectionNames}
-            total={rows.length}
+            total={list.all}
             value={list.section}
             onChange={list.setSection}
             withoutPrice={list.withoutPrice}
           />
         }
-        count={list.filteredCount}
-        total={rows.length}
+        count={list.total}
+        total={list.all}
         countLabel="Кількість товарів"
         selectedCount={deletion.selectedIds.length}
         onClearSelection={deletion.clearSelection}
@@ -113,7 +109,7 @@ export function ProductOverviewContent({ type, tabs }: Props) {
           rows={list.listRows}
           sectionNames={sectionNames}
           loading={loading}
-          searching={rows.length > 0}
+          searching={list.all > 0}
           unavailable={Boolean(error)}
           selection={deletion.selection}
           onSelectionChange={deletion.setSelection}
@@ -121,6 +117,7 @@ export function ProductOverviewContent({ type, tabs }: Props) {
           onView={(row) => open('view', row)}
           onEdit={(row) => open('edit', row)}
           onDelete={(id) => deletion.requestDelete([id])}
+          server={list.server}
         />
       </Paper>
       {active && (
@@ -130,7 +127,7 @@ export function ProductOverviewContent({ type, tabs }: Props) {
           row={active.row}
           sections={sections}
           sectionNames={sectionNames}
-          prices={prices.get(active.row.id) ?? null}
+          showPrices
           onClose={() => setActive(null)}
           onSaved={() => {
             setActive(null);

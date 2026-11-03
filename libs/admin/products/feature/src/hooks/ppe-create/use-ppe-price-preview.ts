@@ -2,7 +2,7 @@ import { usePreviewPpePricesQuery } from '@admin/products/data-access';
 import { parsePpeSupplierPrice, ppeBlockerReasons } from '@admin/products/model';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
 
-import { useDebouncedValue } from './use-debounced-value';
+import { useDebouncedValue } from '../debounce/use-debounced-value';
 
 /** The three prices of a PPE product before it is saved, from the rule and the supplier price. */
 export function usePpePricePreview(ruleCode: string, supplierPrice: string, priceValid: boolean) {

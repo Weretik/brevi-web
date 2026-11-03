@@ -1,4 +1,3 @@
-import { ppeReadyStatus } from '@admin/products/model';
 import { PpeCardPrices, PpeSupplierForm, SewingCardHeader } from '@admin/products/ui';
 import { Alert, Box, Button, CircularProgress, Stack } from '@mui/material';
 import { useState } from 'react';
@@ -78,7 +77,6 @@ export function PpeProductCard({ product, onDeleted }: Props) {
           <PpeCardPrices
             prices={card.offer.prices}
             reasons={card.reasons}
-            readyLabel={ppeReadyStatus}
             rule={card.rule}
             insightWholesale={card.offer.insightWholesale}
             insightRetail={card.offer.insightRetail}

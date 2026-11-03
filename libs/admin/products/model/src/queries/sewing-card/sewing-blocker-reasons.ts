@@ -24,7 +24,6 @@ const reasons: Record<string, string> = {
   InvalidSettingPrecision: 'Немає параметрів ціноутворення',
 };
 
-export const sewingReadyStatus = 'Готово до розрахунку';
 export const sewingNoArticleReason = 'Немає артикулу';
 
 /** Distinct short reasons in the order of the blockers. */

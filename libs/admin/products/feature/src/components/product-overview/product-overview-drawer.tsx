@@ -7,7 +7,7 @@ import { ProductOverviewPriceBlock } from './product-overview-price-block';
 import { useProductOverviewEditor } from '../../hooks/product-overview/use-product-overview-editor';
 
 import type { ProductOverviewEditorMode } from '../../hooks/product-overview/use-product-overview-editor';
-import type { ProductOverview, ProductOverviewPrices } from '@admin/products/model';
+import type { ProductOverview } from '@admin/products/model';
 import type { ProductSectionOption } from '@admin/products/ui';
 
 interface Props {
@@ -19,8 +19,8 @@ interface Props {
   onSaved: () => void;
   /** False inside the card itself. */
   showCardLink?: boolean;
-  /** List prices of the row (CAT-011); the price block is shown only with them. */
-  prices?: ProductOverviewPrices | null;
+  /** The price block (CAT-011) from the row's own prices; off inside the card. */
+  showPrices?: boolean;
 }
 
 export function ProductOverviewDrawer({
@@ -31,7 +31,7 @@ export function ProductOverviewDrawer({
   onClose,
   onSaved,
   showCardLink = true,
-  prices,
+  showPrices = false,
 }: Props) {
   const editor = useProductOverviewEditor(initialMode, row, onSaved);
   const readOnly = editor.mode === 'view';
@@ -57,9 +57,7 @@ export function ProductOverviewDrawer({
         {editor.message && <Alert severity="error">{editor.message}</Alert>}
         {readOnly ? (
           <>
-            {prices !== undefined && (
-              <ProductOverviewPriceBlock row={row} prices={prices} />
-            )}
+            {showPrices && <ProductOverviewPriceBlock row={row} />}
             <ProductOverviewDetails
               row={row}
               sectionName={

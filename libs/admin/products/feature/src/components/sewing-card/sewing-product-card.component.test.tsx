@@ -144,7 +144,7 @@ beforeEach(() => {
       retail: { min: 900, max: 900 },
       unpublished: 1,
     },
-    status: { label: 'Готово 1 з 2', tone: 'warning' },
+    status: { label: 'Без ціни: 1 з 2', tone: 'warning' },
     seamstressPerMinute: 2.2,
     summaryLoading: false,
     summaryError: null,
@@ -163,14 +163,15 @@ describe('SewingProductCard', () => {
 
     expect(screen.getByRole('heading', { name: 'Костюм «Верде»' })).toBeVisible();
     expect(screen.getByText('MOD-025 · Одяг ЛІТО · Літо')).toBeVisible();
-    expect(screen.getAllByText('Готово 1 з 2').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Без ціни: 1 з 2').length).toBeGreaterThan(0);
     expect(screen.getByText('Перевірено 08.09.2026')).toBeVisible();
     expect(screen.getByRole('link', { name: 'На сайті' })).toHaveAttribute(
       'href',
       'https://brevi.com.ua/verde',
     );
     const grid = await screen.findByRole('grid', { name: 'Артикули моделі' });
-    expect(within(grid).getByText('Готово до розрахунку')).toBeInTheDocument();
+    // Only problems are marked: the priced Article shows its price, the other the reason (CAT-013).
+    expect(within(grid).queryByText('Готово до розрахунку')).not.toBeInTheDocument();
     expect(within(grid).getByText('Немає тканини')).toBeInTheDocument();
   });
 

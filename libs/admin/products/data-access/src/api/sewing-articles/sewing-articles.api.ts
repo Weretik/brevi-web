@@ -31,7 +31,7 @@ export const sewingArticlesApi = adminApi.injectEndpoints({
           : [
               sewingCompositionTag(productId),
               { type: 'Product', id: productId },
-              { type: 'Product', id: 'PRICES' },
+              { type: 'Product', id: 'LIST' },
             ],
     }),
   }),

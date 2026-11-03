@@ -52,3 +52,4 @@
 [012 Prices on the «Товари» list](012-product-list-prices/README.md) shows the three prices per model with expandable articles, the «Без ціни» filter and the side panel costs.
 
 [013 Automatic Sewing prices](013-automatic-sewing-prices/README.md) removes «Перерахувати всі», the stale marker and the manual calculate/publish buttons: prices are published by the backend.
+[014 «Товари» list from one server page](014-product-list-server-page/README.md): search, filters, sort and paging on the server with prices and fabric variants in the same request; «Відкрити повну картку» in the row; statuses only for problems.

@@ -35,8 +35,8 @@ export { parsePpeMarkupDraft } from './validators/ppe-pricing/parse-ppe-markup-d
 
 export * from './entities/product-overview/product-overview';
 export * from './queries/product-overview/product-overview-filters';
-export * from './entities/product-overview/product-overview-prices';
 export * from './queries/product-overview/product-list-rows';
+export * from './queries/product-overview/product-problem-reasons';
 export * from './queries/product-overview/product-panel-metrics';
 export * from './validators/product-overview/product-overview-validation';
 export * from './forms/product-overview/product-overview-form';

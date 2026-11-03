@@ -1,21 +1,21 @@
 import { useGetPpeSupplierOfferQuery, useGetProductAccessQuery } from '@admin/products/data-access';
-import { ppeBlockerReasons, ppeReadyStatus } from '@admin/products/model';
+import { ppeBlockerReasons } from '@admin/products/model';
 import { useListPpeMarkupRulesQuery, useListSuppliersQuery } from '@admin/references/data-access';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
 import { useMemo } from 'react';
 
-import { useProductOverview } from '../product-overview/use-product-overview';
+import { useProductOverviewRow } from '../product-overview/use-product-overview-row';
 
 import type { SewingCardTone } from '@admin/products/ui';
 
 /** Data of the PPE card: the «Товари» row, the supplier fields with live prices, suppliers and rules. */
 export function usePpeCard(productId: number) {
-  const overview = useProductOverview('Ppe');
+  const overview = useProductOverviewRow(productId, 'Ppe');
   const offer = useGetPpeSupplierOfferQuery(productId);
   const access = useGetProductAccessQuery();
   const suppliersResult = useListSuppliersQuery();
   const rulesResult = useListPpeMarkupRulesQuery();
-  const row = overview.rows.find((item) => item.id === productId) ?? null;
+  const row = overview.row;
   const suppliers = useMemo(
     () =>
       (suppliersResult.data ?? [])
@@ -28,11 +28,14 @@ export function usePpeCard(productId: number) {
   const rule = rules.find((item) => item.name === data?.ruleCode) ?? null;
   const reasons = data ? ppeBlockerReasons(data.blockers) : [];
 
-  const status: { label: string; tone: SewingCardTone } = data
+  // Only a problem gets a status; a priced product shows none (CAT-013).
+  const status: { label: string; tone: SewingCardTone } | null = data
     ? data.prices
-      ? { label: ppeReadyStatus, tone: 'success' }
+      ? null
       : { label: reasons[0] ?? 'Ціну не розраховано', tone: 'warning' }
-    : { label: offer.isError ? 'Розрахунок недоступний' : 'Розрахунок…', tone: 'neutral' };
+    : offer.isError
+      ? { label: 'Розрахунок недоступний', tone: 'warning' }
+      : null;
 
   return {
     row,

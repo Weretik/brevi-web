@@ -5,11 +5,16 @@ import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import { Box, IconButton, Tooltip } from '@mui/material';
 import { useMemo } from 'react';
 
-import { ProductArticlePriceCell, ProductModelPriceCell } from './product-price-cells';
+import { ProductModelPriceCell, ProductVariantPriceCell } from './product-price-cells';
 
 import type { ProductPriceTier } from './product-price-cells';
 import type { ProductListRow, ProductOverviewType } from '@admin/products/model';
-import type { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
+import type {
+  GridColDef,
+  GridPaginationModel,
+  GridRowSelectionModel,
+  GridSortModel,
+} from '@mui/x-data-grid';
 
 interface Props {
   type: ProductOverviewType;
@@ -24,10 +29,25 @@ interface Props {
   onView: (row: ProductListRow) => void;
   onEdit: (row: ProductListRow) => void;
   onDelete: (id: number) => void;
+  /** Server page (CAT-013): `rowCount` matching rows, page and sort models. */
+  server: {
+    rowCount: number;
+    paginationModel: GridPaginationModel;
+    onPaginationModelChange: (model: GridPaginationModel) => void;
+    sortModel: GridSortModel;
+    onSortModelChange: (model: GridSortModel) => void;
+  };
 }
 
 const tiers: ProductPriceTier[] = ['retail', 'wholesale', 'largeWholesale'];
-const isArticle = (row: ProductListRow) => row.kind === 'article';
+const isVariant = (row: ProductListRow) => row.kind === 'variant';
+
+/** Columns the server can sort by (CAT-013); the rest are not sortable. */
+export const productSortFields: Record<string, 'code' | 'name' | 'price'> = {
+  code: 'code',
+  name: 'name',
+  'price-retail': 'price',
+};
 
 function priceColumns(): GridColDef<ProductListRow>[] {
   return tiers.map((tier, index) => ({
@@ -36,15 +56,12 @@ function priceColumns(): GridColDef<ProductListRow>[] {
     width: 150,
     align: 'right',
     headerAlign: 'right',
+    sortable: tier === 'retail',
     renderCell: ({ row }) =>
-      row.kind === 'article' ? (
-        <ProductArticlePriceCell article={row.article} tier={tier} />
+      row.kind === 'variant' ? (
+        <ProductVariantPriceCell variant={row.variant} tier={tier} />
       ) : (
-        <ProductModelPriceCell
-          prices={row.prices}
-          tier={tier}
-          showsRange={row.product.type === 'Sewing' && (row.prices?.articles.length ?? 0) > 1}
-        />
+        <ProductModelPriceCell product={row.product} tier={tier} />
       ),
   }));
 }
@@ -62,14 +79,15 @@ function columnsFor(
             field: 'expand',
             headerName: '',
             width: 52,
+            sortable: false,
             disableColumnMenu: true,
             renderCell: ({ row, tabIndex }) =>
-              row.kind === 'model' && (row.prices?.articles.length ?? 0) > 0 ? (
+              row.kind === 'model' && row.product.variants.length > 0 ? (
                 <IconButton
                   size="small"
                   tabIndex={tabIndex}
                   aria-expanded={row.expanded}
-                  aria-label={`${row.expanded ? 'Згорнути' : 'Розгорнути'} артикули: ${row.name}`}
+                  aria-label={`${row.expanded ? 'Згорнути' : 'Розгорнути'} тканини: ${row.name}`}
                   onClick={(event) => {
                     event.stopPropagation();
                     onToggle(row.id);
@@ -92,10 +110,10 @@ function columnsFor(
       headerName: sewing ? 'ID моделі' : 'Артикул сайту',
       width: 120,
       cellClassName: 'reference-mono',
-      colSpan: (_value, row) => (row.kind === 'article' ? 3 : 1),
+      colSpan: (_value, row) => (row.kind === 'variant' ? 3 : 1),
       valueGetter: (_value, row) => (row.kind === 'model' ? row.product.code : row.name),
       renderCell: ({ row, value }) =>
-        row.kind === 'article' ? (
+        row.kind === 'variant' ? (
           <Box component="span" sx={{ pl: 1.5, fontFamily: 'var(--admin-font-sans, inherit)' }}>
             {row.name}
           </Box>
@@ -126,6 +144,7 @@ function columnsFor(
       headerName: sewing ? 'Категорія' : 'Розділ / категорія',
       flex: 1,
       minWidth: 150,
+      sortable: false,
       valueGetter: (_value, row) =>
         row.kind === 'model' && row.product.sectionId !== null
           ? (sectionNames.get(row.product.sectionId) ?? null)
@@ -135,14 +154,15 @@ function columnsFor(
     ...(sewing
       ? [
           {
-            field: 'articles',
-            headerName: 'Арт.',
-            width: 72,
+            field: 'variants',
+            headerName: 'Тканин',
+            width: 80,
+            sortable: false,
             align: 'right',
             headerAlign: 'right',
             cellClassName: 'reference-mono',
             valueGetter: (_value, row) =>
-              row.kind === 'model' ? (row.prices?.articles.length ?? null) : null,
+              row.kind === 'model' ? row.product.variants.length : null,
             valueFormatter: (value: number | null) => (value === null ? '' : String(value)),
           } satisfies GridColDef<ProductListRow>,
         ]
@@ -152,6 +172,7 @@ function columnsFor(
       field: 'currentSiteUrl',
       headerName: 'Сайт',
       width: 76,
+      sortable: false,
       renderCell: ({ row }) =>
         row.kind === 'model' && row.product.currentSiteUrl ? (
           <Tooltip title="Відкрити товар на сайті">
@@ -176,7 +197,7 @@ function columnsFor(
 
 /**
  * One «Товари» table (CAT-011 design B): a model per row with its lowest prices («від …»); the arrow
- * shows its Articles with their prices underneath.
+ * shows its fabric variants with their prices underneath. The server pages and sorts (CAT-013).
  */
 export function ProductOverviewGrid({ type, sectionNames, onToggle, ...props }: Props) {
   const columns = useMemo(
@@ -190,8 +211,9 @@ export function ProductOverviewGrid({ type, sectionNames, onToggle, ...props }: 
       emptyLabel="Товарів поки немає"
       notFoundLabel="Товарів не знайдено"
       menuLabel="Дії товару"
-      isDetailRow={isArticle}
-      sortable={false}
+      isDetailRow={isVariant}
+      viewLabel="Швидкий перегляд"
+      openHref={(row) => `/references/products/${row.id}`}
       {...props}
     />
   );
