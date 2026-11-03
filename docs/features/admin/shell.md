@@ -1,6 +1,6 @@
 # Admin: Shell, Navigation, and Session
 
-**Status:** implementation exists, checked 2026-11-01 (design system «Цех»).
+**Status:** implementation exists, checked 2026-11-03 (design system «Цех»; cookie sign-in, [SDD](../../specs/admin/auth/002-cookie-sign-in/README.md)).
 
 `apps/admin-react` starts React and composes providers and `AppRouter`.
 `AdminLayout` from `libs/admin/core/shell` displays the graphite sidebar, the top
@@ -11,7 +11,8 @@ while «Вийти» and app-provided profile links such as «Про BreviERP, �
 routes that are actually available. The sidebar collapses to icons on desktop (group
 flyouts, choice remembered) and opens as a drawer on phones. Look and behavior follow
 the [design system «Цех»](../../standards/admin/design-system.md).
-`libs/admin/core/auth` provides the session for API transport, while
+`libs/admin/core/auth` owns sign-in: the `/login` page, the cookie session restored
+from `GET /api/auth/session/me`, the route guards and «Немає доступу»;
 `libs/admin/shared/config` provides runtime configuration. This is the shared
 foundation for domain pages, not a separate place for their business rules.
 
@@ -22,11 +23,11 @@ flowchart LR
   App["apps/admin-react: providers"] --> Router["AppRouter"]
   Router --> Layout["AdminLayout: navigation"]
   Layout --> Outlet["Outlet: domain pages"]
-  Auth["core/auth: session or anonymous startup"] --> Transport["API transport"]
+  Login["/login: LoginPage"] --> Auth["core/auth: session store"]
+  Auth --> Guard["RequireAdminSession, RequireRole"]
+  Guard --> Layout
+  Transport["shared/api-client: cookie + X-CSRF-Token, 401 → login"] --> Auth
   Config["shared/config"] --> App
-  Config --> Auth
-  Auth --> Access["Anonymous local roles or actual server roles"]
-  Access --> Layout
 ```
 
 ## Code structure
@@ -37,7 +38,8 @@ apps/admin-react/
 ├── public/ # favicon.ico, favicon-32x32.png, apple-touch-icon.png, assets/logo/ (wordmark, mark)
 └── src/app/
     ├── router/
-    │   ├── app-router.tsx # router
+    │   ├── app-router.tsx # router provider
+    │   ├── create-admin-router.tsx # /login, session guard, Admin-only users route
     │   ├── legacy-menu.ts # groups, icons, sections
     │   └── navigation-config.ts # navigation
     ├── theme/ # palette, typography, motion, components
@@ -47,9 +49,10 @@ apps/admin-react/
 ```text
 libs/admin/core/
 ├── auth/src/
-│   ├── session/
-│   │   └── auth-session.ts # session
-│   └── index.ts # session
+│   ├── session/ # auth-session (login, logout, start), session-store, transport, roles
+│   ├── routes/ # RequireAdminSession, RequireRole, safe return path
+│   ├── pages/ # login page and its error texts, «Немає доступу»
+│   └── index.ts # public API
 └── shell/src/
     ├── layout/
     │   └── admin-layout.tsx # shell, collapse state, and Outlet
@@ -62,8 +65,11 @@ libs/admin/core/
 
 ```text
 libs/admin/shared/
-└── config/src/config/
-    └── app-config.ts # runtime configuration
+├── config/src/config/
+│   └── app-config.ts # runtime configuration
+└── api-client/src/
+    ├── csrf/csrf-token.ts # reads brevi.csrf
+    └── interceptors/ # CSRF header, 401 → end of session, logging
 ```
 
 **Where to look:** [composition](../../../apps/admin-react/src/app/app.tsx), [router](../../../apps/admin-react/src/app/router/app-router.tsx), [navigation](../../../apps/admin-react/src/app/router/navigation-config.ts), [session](../../../libs/admin/core/auth/src/index.ts), [routing architecture](../../architecture/admin/runtime/application.md), [shell specification](../../specs/admin/shell/001-react-admin-shell-theme/README.md), [design system specification](../../specs/admin/shell/002-workshop-design-system/README.md).
@@ -71,14 +77,15 @@ libs/admin/shared/
 ## Tests
 
 - `libs/admin/core/shell/src/**/*.component.test.tsx`
-- `libs/admin/core/auth/src/session/*.test.ts`
+- `libs/admin/core/auth/src/**/*.test.ts(x)` (session, transport, return path, guard, login page)
+- `libs/admin/shared/api-client/src/interceptors/auth-interceptors.integration.test.ts`
 - `apps/admin-react/src/app/**/*.test.ts(x)` (router, providers, navigation, theme)
 - E2E (run only on request): `apps/admin-react-e2e/src/admin-react.shell.spec.ts`
 
 Focused run: `npx nx test admin-core-shell`; `npx nx test admin-core-auth`; `npx nx test admin-react -- src/app`.
 
-## Temporary anonymous mode
+## Sign-in and session
 
-Both Admin environment files under apps/admin-react/src/environments currently enable auth.anonymousAccess. It normalizes through shared config; core/auth skips session transports and removes the bearer/refresh adapter. Existing navigation obtains local Admin/Manager/User roles without /me. Product Sewing read/manage access follows the same flag. Normal role mapping, login, refresh and logout remain when false.
+The session is the HttpOnly cookie `__Host-brevi.session` of `api.brevi.com.ua`; the Admin keeps no token. `initializeAdminAuth()` asks `me` before the first render; a guest goes to `/login?returnTo=…`, and after sign-in returns there (only in-app paths). A `401` from any data request ends the local session and drops cached data; a `User` account sees «Немає доступу». Requests that change data carry `X-CSRF-Token` from the `brevi.csrf` cookie. «Вийти» in the profile menu calls `POST /api/auth/cookie/logout`. Navigation hides Admin-only entries by the signed-in user's roles; Sewing access still reads roles from `me`.
 
-Key source responsibilities: auth/session/auth-session.ts owns lifecycle; auth/session/session-roles.api.ts owns navigation access; products/data-access/src/api/sewing-access/sewing-access.api.ts owns product access. These access projections do not replace real domain requests or backend permissions. Restore false in both environments, rebuild/reload and restore backend authorization as appropriate. [Task, tests and evidence](../../specs/admin/auth/001-auth-permissions-api-foundation/tasks/TS-007-temporary-anonymous.md).
+Local development: run BreviERP over HTTPS (`https://localhost:7142`); a local Admin cannot sign in against the production API.

@@ -2,17 +2,13 @@ export const environment = {
   production: true,
   enableHttpLogs: false,
 
-  auth: {
-    anonymousAccess: true,
-  },
-
   app: {
     name: 'Brevi Admin',
     version: '0.1.0',
   },
 
   api: {
-    baseUrl: 'https://brevierp-api-443622778364.europe-central2.run.app',
+    baseUrl: 'https://api.brevi.com.ua',
     timeoutMs: 15000,
   },
 

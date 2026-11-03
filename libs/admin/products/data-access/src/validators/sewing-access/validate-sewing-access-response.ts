@@ -13,5 +13,5 @@ export function validateSewingAccessResponse(value: unknown): SessionRoles {
   ensureSewingResponse(
     Array.isArray(item['roles']) && item['roles'].every((role) => typeof role === 'string'),
   );
-  return { roles: item['roles'] as string[] };
+  return { roles: item['roles'] as SessionRoles['roles'] };
 }

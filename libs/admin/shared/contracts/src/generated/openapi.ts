@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-  '/api/auth/session/login': {
+  '/api/auth/cookie/login': {
     parameters: {
       query?: never;
       header?: never;
@@ -14,17 +14,17 @@ export interface paths {
     get?: never;
     put?: never;
     /**
-     * Create an authenticated session
-     * @description Authenticates with email and password. The AuthLogin policy permits 10 requests per minute per client IP and rejects excess requests with 429. On success, the response sets the HTTP-only `kedr.rt` refresh cookie and the script-readable `kedr.csrf` cookie. Cross-origin browser clients must use credentials mode `include` so the browser stores both cookies.
+     * Sign a browser in with the session cookie
+     * @description Admin (React). Rate-limited by the AuthLogin policy. Sets the HttpOnly session cookie `__Host-brevi.session` (SameSite=Lax, sliding 7 days) and the readable `brevi.csrf` cookie. No token is returned. Five wrong passwords lock the account for 15 minutes.
      */
-    post: operations['loginSession'];
+    post: operations['loginCookieSession'];
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  '/api/auth/session/refresh': {
+  '/api/auth/cookie/logout': {
     parameters: {
       query?: never;
       header?: never;
@@ -33,31 +33,8 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /**
-     * Rotate and refresh an authenticated session
-     * @description Requires the HTTP-only `kedr.rt` cookie and a double-submit CSRF value: header `X-CSRF-Token` must exactly equal cookie `kedr.csrf`. Browser clients must use credentials mode `include`. The AuthRefresh policy permits 30 requests per minute per client IP. A successful refresh revokes the old refresh session, creates a replacement, and rotates both cookies.
-     */
-    post: operations['refreshSession'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/auth/session/logout': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * End the current session
-     * @description Requires an access token. Revokes every active refresh session for the authenticated user, updates the user's security stamp, and expires both `kedr.rt` and `kedr.csrf`. Cross-origin browser clients must use credentials mode `include` so the browser applies the Set-Cookie deletion headers.
-     */
-    post: operations['logoutSession'];
+    /** End the browser session */
+    post: operations['logoutCookieSession'];
     delete?: never;
     options?: never;
     head?: never;
@@ -72,11 +49,115 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Get the current authenticated user
-     * @description Returns the authenticated user's identifier, email, and roles. Permissions are not included in this response.
+     * Get the current user
+     * @description For a cookie session it reissues a missing CSRF cookie.
      */
     get: operations['getCurrentSession'];
     put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/admin/users': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List staff accounts
+     * @description Policy `CanManageUsers` (role Admin; the director also holds Admin). Customers are not listed. Each account shows its strongest role.
+     */
+    get: operations['getStaffAccounts'];
+    put?: never;
+    /**
+     * Create a staff account
+     * @description There is at most one director.
+     */
+    post: operations['createStaffAccount'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/admin/users/{userId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /**
+     * Delete a staff account
+     * @description Removes the account and its sessions for good. Nobody deletes their own account (400). Only the director deletes the director (403).
+     */
+    delete: operations['deleteStaffAccount'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/admin/users/{userId}/role': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Change a staff account's role
+     * @description The account's sessions pick up the new role within 5 minutes. Only the director changes their own role; an administrator gets 400. Only the director changes the director (403). There is at most one director (409).
+     */
+    put: operations['changeStaffRole'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/admin/users/{userId}/blocked': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Block or unblock a staff account
+     * @description Blocking ends browser sessions within 5 minutes. Nobody blocks their own account (400). Only the director changes the director (403).
+     */
+    put: operations['setStaffBlocked'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/admin/users/{userId}/password': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Set a new password for a staff account
+     * @description Ends the account's existing sessions. Only the director changes the director's password (403).
+     */
+    put: operations['setStaffPassword'];
     post?: never;
     delete?: never;
     options?: never;
@@ -2383,52 +2464,36 @@ export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
     SessionLoginRequest: {
-      /** @example user@example.com */
+      /** Format: email */
       email: string;
       /** Format: password */
       password: string;
     };
-    SessionTokenResponse: {
-      /** @example Bearer */
-      tokenType: string;
-      /**
-       * @description Opaque Bearer access token. This is not the refresh token.
-       * @example opaque-access-token
-       */
-      accessToken: string;
-      /**
-       * Format: int32
-       * @description Access-token lifetime in seconds.
-       * @example 900
-       */
-      expiresIn: number;
-    };
-    /** @description ASP.NET Core automatic model-validation response. */
-    ValidationProblemDetails: {
-      type?: string | null;
-      title?: string | null;
-      /** Format: int32 */
-      status?: number | null;
-      traceId?: string | null;
-      errors: {
-        [key: string]: string[];
-      };
-    };
     SessionMeResponse: {
-      /**
-       * @description String representation of the backend user identifier.
-       * @example 42
-       */
       userId: string;
-      /** @example user@example.com */
+      /** Format: email */
       email: string;
-      /**
-       * @description Current ASP.NET Core Identity role names; permissions are not returned.
-       * @example [
-       *       "User"
-       *     ]
-       */
-      roles: string[];
+      fullName: string;
+      roles: ('Director' | 'Admin' | 'Accountant' | 'Manager' | 'User')[];
+    };
+    /** @enum {string} */
+    StaffRole: 'Director' | 'Admin' | 'Accountant' | 'Manager';
+    StaffAccountResponse: {
+      /** Format: int32 */
+      id: number;
+      /** Format: email */
+      email: string;
+      fullName: string;
+      role: components['schemas']['StaffRole'];
+      isBlocked: boolean;
+    };
+    CreateStaffAccountRequest: {
+      /** Format: email */
+      email: string;
+      fullName: string;
+      role: components['schemas']['StaffRole'];
+      /** Format: password */
+      password: string;
     };
     AdminProductCategoryRow: {
       id: number;
@@ -5267,12 +5332,9 @@ export interface components {
     };
   };
   parameters: {
-    /** @description Must exactly match the `kedr.csrf` cookie value. */
+    /** @description Value of the `brevi.csrf` cookie. Required on every non-GET request made with the session cookie. */
     CsrfHeader: string;
-    /** @description HTTP-only refresh token cookie. Browser requests must include credentials; frontend code cannot read this value. */
-    RefreshCookie: string;
-    /** @description Script-readable double-submit CSRF cookie. */
-    CsrfCookie: string;
+    UserId: number;
     Page: number;
     PageSize: 10 | 20 | 50;
     /** @description One numeric token searches Product ID exactly. Otherwise, space-separated tokens perform case-insensitive partial search in Ukrainian and Russian names; every token must match at least one localized name. Slug is not searched. */
@@ -5294,7 +5356,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-  loginSession: {
+  loginCookieSession: {
     parameters: {
       query?: never;
       header?: never;
@@ -5307,41 +5369,25 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Authenticated session created and refresh/CSRF cookies issued. */
+      /** @description Signed in */
       200: {
         headers: {
-          /** @description Sets `kedr.rt` with HttpOnly, Secure, SameSite=None, Path=/api/auth/session/refresh and `kedr.csrf` with Secure, SameSite=None, Path=/. Both cookies have a default Max-Age of 14 days. */
+          /** @description Session and CSRF cookies */
           'Set-Cookie'?: string;
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['SessionTokenResponse'];
+          'application/json': components['schemas']['SessionMeResponse'];
         };
       };
-      /** @description Request JSON is malformed or required request fields are null or missing. */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/problem+json': components['schemas']['ValidationProblemDetails'];
-        };
-      };
-      /** @description Email or password is empty, invalid, or cannot be used to sign in. */
+      /** @description Invalid credentials, locked or blocked account */
       401: {
         headers: {
           [name: string]: unknown;
         };
         content?: never;
       };
-      /** @description Request content type is not supported; send JSON. */
-      415: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description AuthLogin rate limit exceeded. */
+      /** @description Login rate limit exceeded */
       429: {
         headers: {
           [name: string]: unknown;
@@ -5350,79 +5396,33 @@ export interface operations {
       };
     };
   };
-  refreshSession: {
+  logoutCookieSession: {
     parameters: {
       query?: never;
       header: {
-        /** @description Must exactly match the `kedr.csrf` cookie value. */
+        /** @description Value of the `brevi.csrf` cookie. Required on every non-GET request made with the session cookie. */
         'X-CSRF-Token': components['parameters']['CsrfHeader'];
       };
-      path?: never;
-      cookie: {
-        /** @description HTTP-only refresh token cookie. Browser requests must include credentials; frontend code cannot read this value. */
-        'kedr.rt': components['parameters']['RefreshCookie'];
-        /** @description Script-readable double-submit CSRF cookie. */
-        'kedr.csrf': components['parameters']['CsrfCookie'];
-      };
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Session refreshed and replacement refresh/CSRF cookies issued. */
-      200: {
-        headers: {
-          /** @description Rotates `kedr.rt` and `kedr.csrf` with the attributes documented by the login response. */
-          'Set-Cookie'?: string;
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['SessionTokenResponse'];
-        };
-      };
-      /** @description CSRF cookie/header is missing, blank, or does not match. */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          /** @example Invalid CSRF token. */
-          'text/plain': string;
-        };
-      };
-      /** @description Refresh cookie is missing, expired, revoked, reused, or otherwise invalid. */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description AuthRefresh rate limit exceeded. */
-      429: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  logoutSession: {
-    parameters: {
-      query?: never;
-      header?: never;
       path?: never;
       cookie?: never;
     };
     requestBody?: never;
     responses: {
-      /** @description Session ended and refresh/CSRF cookies cleared. */
+      /** @description Signed out; session and CSRF cookies expired */
       204: {
         headers: {
-          /** @description Expires `kedr.rt` at its refresh path and `kedr.csrf` at `/`. */
-          'Set-Cookie'?: string;
           [name: string]: unknown;
         };
         content?: never;
       };
-      /** @description Access token is missing or invalid, or its user can no longer sign in. */
+      /** @description Missing or invalid CSRF token */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No valid session */
       401: {
         headers: {
           [name: string]: unknown;
@@ -5440,7 +5440,7 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Current authenticated user. */
+      /** @description Current user */
       200: {
         headers: {
           [name: string]: unknown;
@@ -5449,8 +5449,327 @@ export interface operations {
           'application/json': components['schemas']['SessionMeResponse'];
         };
       };
-      /** @description Access token is missing or invalid, or its user can no longer sign in. */
+      /** @description Not signed in */
       401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getStaffAccounts: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Staff accounts ordered by email */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['StaffAccountResponse'][];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not an administrator */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createStaffAccount: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Value of the `brevi.csrf` cookie. Required on every non-GET request made with the session cookie. */
+        'X-CSRF-Token': components['parameters']['CsrfHeader'];
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateStaffAccountRequest'];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['StaffAccountResponse'];
+        };
+      };
+      /** @description Invalid email, name, role or password */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not an administrator */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Email already used, or a director already exists */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  deleteStaffAccount: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Value of the `brevi.csrf` cookie. Required on every non-GET request made with the session cookie. */
+        'X-CSRF-Token': components['parameters']['CsrfHeader'];
+      };
+      path: {
+        userId: components['parameters']['UserId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Deleted */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Own account */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not an administrator, or the account is the director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No staff account with this ID */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  changeStaffRole: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Value of the `brevi.csrf` cookie. Required on every non-GET request made with the session cookie. */
+        'X-CSRF-Token': components['parameters']['CsrfHeader'];
+      };
+      path: {
+        userId: components['parameters']['UserId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          role: components['schemas']['StaffRole'];
+        };
+      };
+    };
+    responses: {
+      /** @description Role changed */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Invalid role or own account */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not an administrator, or the account is the director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No staff account with this ID */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description A director already exists */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  setStaffBlocked: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Value of the `brevi.csrf` cookie. Required on every non-GET request made with the session cookie. */
+        'X-CSRF-Token': components['parameters']['CsrfHeader'];
+      };
+      path: {
+        userId: components['parameters']['UserId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          blocked: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description Updated */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Own account */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not an administrator, or the account is the director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No staff account with this ID */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  setStaffPassword: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Value of the `brevi.csrf` cookie. Required on every non-GET request made with the session cookie. */
+        'X-CSRF-Token': components['parameters']['CsrfHeader'];
+      };
+      path: {
+        userId: components['parameters']['UserId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: password */
+          password: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Password set */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Password too short or too weak */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not an administrator, or the account is the director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No staff account with this ID */
+      404: {
         headers: {
           [name: string]: unknown;
         };

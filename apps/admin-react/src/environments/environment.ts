@@ -2,10 +2,6 @@ export const environment = {
   production: false,
   enableHttpLogs: true,
 
-  auth: {
-    anonymousAccess: true,
-  },
-
   app: {
     name: 'Brevi Admin',
     version: '0.1.0',

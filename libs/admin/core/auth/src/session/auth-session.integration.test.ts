@@ -1,97 +1,81 @@
 import { configureApiClient, resetAdminApiState } from '@admin/shared/api-client';
-import { configureAppConfig } from '@admin/shared/config';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { initializeAdminAuth, login, logout } from './auth-session';
-import { getAccessToken, setAccessToken } from './session-state';
-import { requestAccessTokenRefresh, requestLogin, requestLogout } from './session-transport';
+import { getSessionState, setSessionState } from './session-store';
+import { requestCurrentUser, requestLogin, requestLogout } from './session-transport';
+
+import type { SessionUser } from './session-user';
 
 vi.mock('@admin/shared/api-client', () => ({
   configureApiClient: vi.fn(),
   resetAdminApiState: vi.fn(),
 }));
 vi.mock('./session-transport', () => ({
-  requestAccessTokenRefresh: vi.fn(),
+  requestCurrentUser: vi.fn(),
   requestLogin: vi.fn(),
   requestLogout: vi.fn(),
 }));
 
-describe('admin auth lifecycle', () => {
+const manager: SessionUser = {
+  id: '7',
+  email: 'manager@brevi.com.ua',
+  fullName: 'Олена',
+  roles: ['Manager'],
+};
+
+describe('admin cookie session lifecycle', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    configureAppConfig({ production: true });
-    setAccessToken(null);
+    setSessionState({ status: 'loading' });
   });
 
-  it('restores a session and configures the API adapter', async () => {
-    vi.mocked(requestAccessTokenRefresh).mockResolvedValue('restored-token');
+  it('restores the signed-in user from the session cookie', async () => {
+    vi.mocked(requestCurrentUser).mockResolvedValue(manager);
 
     await initializeAdminAuth();
 
-    expect(getAccessToken()).toBe('restored-token');
+    expect(getSessionState()).toEqual({ status: 'authenticated', user: manager });
+  });
+
+  it('starts anonymous without a session and when the API is unreachable', async () => {
+    vi.mocked(requestCurrentUser).mockResolvedValueOnce(null);
+    await initializeAdminAuth();
+    expect(getSessionState()).toEqual({ status: 'anonymous' });
+
+    vi.mocked(requestCurrentUser).mockRejectedValueOnce(new Error('offline'));
+    await initializeAdminAuth();
+    expect(getSessionState()).toEqual({ status: 'anonymous' });
+  });
+
+  it('a 401 from any API call ends the session and drops cached data', async () => {
+    vi.mocked(requestCurrentUser).mockResolvedValue(manager);
+    await initializeAdminAuth();
+
     const adapter = vi.mocked(configureApiClient).mock.calls[0]?.[0].authSession;
-    expect(await adapter?.getAccessToken()).toBe('restored-token');
-    vi.mocked(requestAccessTokenRefresh).mockResolvedValue('refreshed-token');
-    await expect(adapter?.refreshAccessToken?.()).resolves.toBe('refreshed-token');
-    expect(getAccessToken()).toBe('refreshed-token');
     await adapter?.onUnauthenticated?.();
-    expect(getAccessToken()).toBeNull();
+
+    expect(getSessionState()).toEqual({ status: 'anonymous' });
     expect(resetAdminApiState).toHaveBeenCalledOnce();
   });
 
-  it('fails closed when bootstrap refresh is unavailable', async () => {
-    setAccessToken('stale-token');
-    vi.mocked(requestAccessTokenRefresh).mockRejectedValue(new Error('unauthorized'));
+  it('keeps no token in browser storage after login', async () => {
+    vi.mocked(requestLogin).mockResolvedValue(manager);
 
-    await expect(initializeAdminAuth()).resolves.toBeUndefined();
-    expect(getAccessToken()).toBeNull();
-    expect(resetAdminApiState).toHaveBeenCalledOnce();
-  });
+    await login({ email: manager.email, password: 'secret-pass' });
 
-  it('stores login token only in memory', async () => {
-    vi.mocked(requestLogin).mockResolvedValue('login-token');
-
-    await login({ email: 'admin@brevi.test', password: 'secret' });
-
-    expect(getAccessToken()).toBe('login-token');
+    expect(getSessionState()).toEqual({ status: 'authenticated', user: manager });
     expect(window.localStorage).toHaveLength(0);
     expect(window.sessionStorage).toHaveLength(0);
   });
 
-  it('always clears the session and API cache when logout transport fails', async () => {
-    setAccessToken('active-token');
+  it('always ends the local session when logout transport fails', async () => {
+    setSessionState({ status: 'authenticated', user: manager });
     vi.mocked(requestLogout).mockRejectedValue(new Error('offline'));
 
     await expect(logout()).rejects.toThrow('offline');
 
-    expect(requestLogout).toHaveBeenCalledWith('active-token');
-    expect(getAccessToken()).toBeNull();
-    expect(resetAdminApiState).toHaveBeenCalledOnce();
-  });
-
-  it('starts anonymously without refreshing or retaining a stale bearer adapter', async () => {
-    configureAppConfig({ production: true, auth: { anonymousAccess: true } });
-    setAccessToken('stale-token');
-    await initializeAdminAuth();
-    expect(requestAccessTokenRefresh).not.toHaveBeenCalled();
-    expect(getAccessToken()).toBeNull();
-    expect(configureApiClient).toHaveBeenLastCalledWith({});
-    expect(resetAdminApiState).toHaveBeenCalledOnce();
-  });
-
-  it('does not log in or create a token while anonymous mode is enabled', async () => {
-    configureAppConfig({ production: true, auth: { anonymousAccess: true } });
-    await login({ email: 'admin@example.test', password: 'fixture-only' });
-    expect(requestLogin).not.toHaveBeenCalled();
-    expect(getAccessToken()).toBeNull();
-  });
-
-  it('clears anonymous local state without logging out the shared backend Admin', async () => {
-    configureAppConfig({ production: true, auth: { anonymousAccess: true } });
-    setAccessToken('stale-token');
-    await logout();
-    expect(requestLogout).not.toHaveBeenCalled();
-    expect(getAccessToken()).toBeNull();
+    expect(getSessionState()).toEqual({ status: 'anonymous' });
     expect(resetAdminApiState).toHaveBeenCalledOnce();
   });
 });

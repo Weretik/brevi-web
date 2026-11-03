@@ -4,10 +4,17 @@ import { join } from 'node:path';
 /** Contract slices required by current Admin consumers, grouped by canonical source. */
 const requiredOperations = {
   'identity/session.openapi.yaml': [
-    'loginSession',
-    'refreshSession',
-    'logoutSession',
+    'loginCookieSession',
+    'logoutCookieSession',
     'getCurrentSession',
+  ],
+  'identity/users.openapi.yaml': [
+    'getStaffAccounts',
+    'createStaffAccount',
+    'changeStaffRole',
+    'setStaffBlocked',
+    'setStaffPassword',
+    'deleteStaffAccount',
   ],
   'reference/suppliers.openapi.yaml': [
     'getSuppliers',
