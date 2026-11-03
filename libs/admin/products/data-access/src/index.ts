@@ -31,6 +31,7 @@ export {
   usePublishSewingCalculationMutation,
 } from './api/sewing-pricing/publications.api';
 export { useGetPublishedSewingProductsQuery } from './api/sewing-pricing/products.api';
+export { useGetSewingArticleSummaryQuery } from './api/sewing-pricing/article-summary.api';
 
 export { useGetPpeProductPricesQuery } from './api/ppe-pricing/products.api';
 export { useCreatePpeOfferVersionMutation } from './api/ppe-pricing/offers.api';

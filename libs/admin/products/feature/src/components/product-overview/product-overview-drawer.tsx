@@ -16,6 +16,8 @@ interface Props {
   sectionNames: ReadonlyMap<number, string>;
   onClose: () => void;
   onSaved: () => void;
+  /** False inside the card itself. */
+  showCardLink?: boolean;
 }
 
 export function ProductOverviewDrawer({
@@ -25,6 +27,7 @@ export function ProductOverviewDrawer({
   sectionNames,
   onClose,
   onSaved,
+  showCardLink = true,
 }: Props) {
   const editor = useProductOverviewEditor(initialMode, row, onSaved);
   const readOnly = editor.mode === 'view';
@@ -63,9 +66,11 @@ export function ProductOverviewDrawer({
             onChange={editor.change}
           />
         )}
-        <Button component={RouterLink} to={`/references/products/${row.id}`} variant="outlined">
-          Відкрити повну картку
-        </Button>
+        {showCardLink && (
+          <Button component={RouterLink} to={`/references/products/${row.id}`} variant="outlined">
+            Відкрити повну картку
+          </Button>
+        )}
       </Stack>
     </ReferenceEditorDrawer>
   );

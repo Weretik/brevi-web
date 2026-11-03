@@ -1,3 +1,4 @@
+import { translateCompositionBlockers } from '@admin/products/model';
 import { SewingCompositionEditor } from '@admin/products/ui';
 import { TextField } from '@mui/material';
 
@@ -29,20 +30,26 @@ interface Props {
   onSaveArticle: () => void;
   onCancelModel: () => void;
   onCancelArticle: () => void;
+  sections?: EditorProps['sections'];
 }
 
 export function CompositionScopeEditors(props: Props) {
+  const blockers = translateCompositionBlockers(props.composition?.blockers ?? []);
+  const sections = props.sections ?? 'all';
   if (props.scope === 'Model' && props.modelDraft) {
     return (
       <>
-        <TextField
-          label="Код моделі"
-          value={props.modelDraft.modelCode ?? ''}
-          onChange={(event) => props.onModelCodeChange(event.target.value)}
-          slotProps={{ htmlInput: { maxLength: 80 } }}
-          disabled={!props.canManage || props.saving}
-        />
+        {sections === 'all' && (
+          <TextField
+            label="Код моделі"
+            value={props.modelDraft.modelCode ?? ''}
+            onChange={(event) => props.onModelCodeChange(event.target.value)}
+            slotProps={{ htmlInput: { maxLength: 80 } }}
+            disabled={!props.canManage || props.saving}
+          />
+        )}
         <SewingCompositionEditor
+          sections={sections}
           scope="Model"
           version={props.modelDraft.version}
           materials={props.modelDraft.modelMaterials}
@@ -52,7 +59,7 @@ export function CompositionScopeEditors(props: Props) {
           dirty={props.modelDirty}
           saving={props.saving}
           errors={props.errors}
-          blockers={props.composition?.blockers}
+          blockers={blockers}
           error={props.error}
           onMaterialsChange={props.onModelMaterialsChange}
           onOperationsChange={props.onModelOperationsChange}
@@ -75,6 +82,7 @@ export function CompositionScopeEditors(props: Props) {
   return (
     <>
       <SewingCompositionEditor
+        sections={sections}
         scope="Model"
         version={props.selectedDraft.version}
         materials={viewMatches ? props.selectedDraft.modelMaterials : []}
@@ -82,7 +90,7 @@ export function CompositionScopeEditors(props: Props) {
         lookups={props.lookups}
         canManage={false}
         dirty={false}
-        blockers={props.composition.blockers}
+        blockers={blockers}
         onMaterialsChange={() => undefined}
         onOperationsChange={() => undefined}
         onSave={() => undefined}
@@ -90,6 +98,7 @@ export function CompositionScopeEditors(props: Props) {
       />
       {props.articleDraft && (
         <SewingCompositionEditor
+          sections={sections}
           scope="Article"
           articleSku={props.articleSku}
           version={props.articleDraft.version}

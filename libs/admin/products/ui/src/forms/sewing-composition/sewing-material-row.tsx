@@ -88,7 +88,12 @@ export function SewingMaterialRow({
           select
           label="Фурнітура"
           value={material.referenceId ?? ''}
-          onChange={(event) => onChange({ referenceId: Number(event.target.value) || null })}
+          onChange={(event) => {
+            const referenceId = Number(event.target.value) || null;
+            const accessory = lookups.accessories.find((item) => item.id === referenceId);
+            // Lining and padding are measured in metres, as in the reference «Фурнітура».
+            onChange({ referenceId, unit: accessory?.unit === 'м' ? 'Metre' : 'Piece' });
+          }}
           error={Boolean(error('referenceId'))}
           helperText={error('referenceId')}
           disabled={readonly}
@@ -158,6 +163,16 @@ export function SewingMaterialRow({
           </Button>
         )}
       </Stack>
+      <TextField
+        label="Коментар"
+        value={material.comment}
+        onChange={(event) => onChange({ comment: event.target.value })}
+        error={Boolean(error('comment'))}
+        helperText={error('comment')}
+        slotProps={{ htmlInput: { maxLength: 500 } }}
+        disabled={readonly}
+        size="small"
+      />
     </Stack>
   );
 }

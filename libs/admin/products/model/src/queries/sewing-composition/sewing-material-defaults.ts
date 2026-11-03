@@ -29,5 +29,6 @@ export function emptySewingMaterial(
     required: true,
     sortOrder,
     reviewed: false,
+    comment: '',
   };
 }

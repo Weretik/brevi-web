@@ -11,4 +11,6 @@ export interface SewingMaterialDraft {
   required: boolean;
   sortOrder: number;
   reviewed: boolean;
+  /** Free note, as the sheet's «Коментар»; empty when none. */
+  comment: string;
 }

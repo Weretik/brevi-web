@@ -13,6 +13,7 @@ describe('Operation draft validation', () => {
           manualMinutes: -1,
           sortOrder: 0,
           reviewed: false,
+          comment: '',
         },
       ]),
     ).toEqual({

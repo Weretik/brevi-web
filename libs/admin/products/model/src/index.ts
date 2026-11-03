@@ -38,3 +38,8 @@ export * from './entities/product-overview/product-overview';
 export * from './queries/product-overview/product-overview-filters';
 export * from './validators/product-overview/product-overview-validation';
 export * from './forms/product-overview/product-overview-form';
+
+export * from './entities/sewing-card/sewing-article-summary';
+export * from './queries/sewing-card/sewing-blocker-reasons';
+export * from './queries/sewing-card/sewing-card-totals';
+export * from './queries/sewing-card/sewing-labour-lines';

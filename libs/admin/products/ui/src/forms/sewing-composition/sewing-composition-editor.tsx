@@ -19,6 +19,7 @@ export function SewingCompositionEditor({
   saving = false,
   errors = {},
   blockers = [],
+  sections = 'all',
   error,
   onMaterialsChange,
   onOperationsChange,
@@ -71,19 +72,21 @@ export function SewingCompositionEditor({
           </ul>
         </Alert>
       )}
-      <SewingMaterialSection
-        scope={scope}
-        materials={materials}
-        lookups={lookups}
-        readonly={readonly}
-        canManage={canManage}
-        saving={saving}
-        materialError={materialError}
-        updateMaterial={updateMaterial}
-        onMaterialsChange={onMaterialsChange}
-        addMaterial={addMaterial}
-      />
-      {scope === 'Model' && (
+      {sections !== 'operations' && (
+        <SewingMaterialSection
+          scope={scope}
+          materials={materials}
+          lookups={lookups}
+          readonly={readonly}
+          canManage={canManage}
+          saving={saving}
+          materialError={materialError}
+          updateMaterial={updateMaterial}
+          onMaterialsChange={onMaterialsChange}
+          addMaterial={addMaterial}
+        />
+      )}
+      {scope === 'Model' && sections !== 'materials' && (
         <SewingOperationSection
           operations={operations}
           lookups={lookups}

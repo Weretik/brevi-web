@@ -13,6 +13,8 @@ export interface SewingCompositionEditorProps {
   saving?: boolean;
   errors?: Record<string, string>;
   blockers?: string[];
+  /** Which part to show; the sewing card shows materials and operations on separate tabs. */
+  sections?: 'all' | 'materials' | 'operations';
   error?: string | null;
   onMaterialsChange: (materials: SewingMaterialDraft[]) => void;
   onOperationsChange: (operations: SewingOperationDraft[]) => void;

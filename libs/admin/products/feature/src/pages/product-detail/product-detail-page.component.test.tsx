@@ -37,7 +37,7 @@ const product: ProductDetail = {
 
 const pageMocks = vi.hoisted(() => ({
   useProduct: vi.fn(),
-  sewingCompositionFeature: vi.fn((props: unknown) => {
+  sewingProductCard: vi.fn((props: unknown) => {
     void props;
     return null;
   }),
@@ -47,8 +47,8 @@ vi.mock('../../hooks/product-detail/use-product', () => ({
   useProduct: pageMocks.useProduct,
 }));
 
-vi.mock('../../components/sewing-composition/sewing-composition-feature', () => ({
-  SewingCompositionFeature: pageMocks.sewingCompositionFeature,
+vi.mock('../../components/sewing-card/sewing-product-card', () => ({
+  SewingProductCard: pageMocks.sewingProductCard,
 }));
 
 beforeEach(() => {
@@ -59,55 +59,46 @@ beforeEach(() => {
     notFound: false,
     reload: vi.fn(),
   });
-  pageMocks.sewingCompositionFeature.mockClear();
+  pageMocks.sewingProductCard.mockClear();
 });
 
 afterEach(cleanup);
 
-describe('ProductDetailPage', () => {
-  it('groups read-only product data into semantic surfaces and keeps the edit route', () => {
-    render(
-      <MemoryRouter initialEntries={['/references/products/8']}>
-        <Routes>
-          <Route path="/references/products/:id" element={<ProductDetailPage />} />
-        </Routes>
-      </MemoryRouter>,
-    );
+const ppeProduct: ProductDetail = {
+  ...product,
+  type: 'Ppe',
+  sewing: null,
+  ppe: {
+    supplier: { id: 1, name: 'Постачальник' },
+    basePrice: 100,
+    retailPercent: { source: 'Custom', customPercent: 5 },
+    wholesalePercent: { source: 'Custom', customPercent: 10 },
+    retailPrice: 105,
+    wholesalePrice: 110,
+  },
+};
 
-    expect(screen.getByRole('link', { name: 'Редагувати' })).toHaveAttribute(
-      'href',
-      '/references/products/8/edit',
+function renderPage() {
+  render(
+    <MemoryRouter initialEntries={['/references/products/8']}>
+      <Routes>
+        <Route path="/references/products/:id" element={<ProductDetailPage />} />
+      </Routes>
+    </MemoryRouter>,
+  );
+}
+
+describe('ProductDetailPage', () => {
+  it('opens the sewing card (CAT-007) for a sewing model', () => {
+    renderPage();
+
+    expect(pageMocks.sewingProductCard.mock.calls.at(-1)?.[0]).toEqual(
+      expect.objectContaining({ product, onDeleted: expect.any(Function) }),
     );
-    for (const name of [
-      'Основні дані',
-      'Фото',
-      'Опис',
-      'Інформація',
-      'Характеристики',
-      'Виробництво',
-    ]) {
-      expect(screen.getByRole('region', { name })).toHaveClass('MuiCard-root');
-    }
-    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
-    expect(pageMocks.sewingCompositionFeature.mock.calls.at(-1)?.[0]).toEqual(
-      expect.objectContaining({ productId: 8, onDirtyChange: expect.any(Function) }),
-    );
+    expect(screen.queryByRole('region', { name: 'Опис' })).not.toBeInTheDocument();
   });
 
-  it('does not mount sewing composition orchestration for a PPE Product', () => {
-    const ppeProduct: ProductDetail = {
-      ...product,
-      type: 'Ppe',
-      sewing: null,
-      ppe: {
-        supplier: { id: 1, name: 'Постачальник' },
-        basePrice: 100,
-        retailPercent: { source: 'Custom', customPercent: 5 },
-        wholesalePercent: { source: 'Custom', customPercent: 10 },
-        retailPrice: 105,
-        wholesalePrice: 110,
-      },
-    };
+  it('keeps the PPE page with semantic surfaces and the edit route until the PPE card', () => {
     pageMocks.useProduct.mockReturnValue({
       product: ppeProduct,
       loading: false,
@@ -115,17 +106,16 @@ describe('ProductDetailPage', () => {
       notFound: false,
       reload: vi.fn(),
     });
-    render(
-      <MemoryRouter initialEntries={['/references/products/8']}>
-        <Routes>
-          <Route path="/references/products/:id" element={<ProductDetailPage />} />
-        </Routes>
-      </MemoryRouter>,
-    );
+    renderPage();
 
-    expect(pageMocks.sewingCompositionFeature).not.toHaveBeenCalled();
-    expect(
-      screen.queryByRole('region', { name: 'Артикули та склад виробу' }),
-    ).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Редагувати' })).toHaveAttribute(
+      'href',
+      '/references/products/8/edit',
+    );
+    for (const name of ['Основні дані', 'Фото', 'Опис', 'Інформація', 'Характеристики']) {
+      expect(screen.getByRole('region', { name })).toHaveClass('MuiCard-root');
+    }
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    expect(pageMocks.sewingProductCard).not.toHaveBeenCalled();
   });
 });

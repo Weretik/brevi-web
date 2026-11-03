@@ -792,6 +792,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/products/{productId}/articles/pricing-summary': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Requires CatalogRead. Live calculation of every Article of one Sewing model at server time, for the product card (CAT-007). Nothing is saved; blocked Articles return their blockers and no prices. Also returns each Article's latest published prices. At most 200 Articles. */
+    get: operations['getSewingArticleSummary'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/products/{productId}/articles/{articleId}/pricing/calculations': {
     parameters: {
       query?: never;
@@ -3121,6 +3138,8 @@ export interface components {
       reviewedBy: string | null;
       /** Format: date-time */
       reviewedAt: string | null;
+      /** @description Free note, for example which garment part an operation belongs to. */
+      comment: string | null;
     };
     /** @description Shared effective operation line. Identity and review metadata are server-owned. */
     SewingOperation: {
@@ -3136,6 +3155,8 @@ export interface components {
       reviewedBy: string | null;
       /** Format: date-time */
       reviewedAt: string | null;
+      /** @description Free note, for example which garment part an operation belongs to. */
+      comment: string | null;
     };
     SewingComposition: {
       /** Format: int32 */
@@ -3167,6 +3188,8 @@ export interface components {
       /** Format: int32 */
       sortOrder: number;
       reviewed: boolean;
+      /** @description Free note, for example which garment part an operation belongs to. */
+      comment?: string | null;
     };
     SewingOperationInput: {
       /** Format: int32 */
@@ -3176,6 +3199,8 @@ export interface components {
       /** Format: int32 */
       sortOrder: number;
       reviewed: boolean;
+      /** @description Free note, for example which garment part an operation belongs to. */
+      comment?: string | null;
     };
     ReplaceSewingCompositionRequest: {
       modelCode: string | null;
@@ -3189,9 +3214,10 @@ export interface components {
       /** Format: int64 */
       expectedVersion: number;
     };
-    SaveSewingCalculationRequest: {
-      /** Format: uuid */
-      requestId: string;
+    SewingPricingBlocker: {
+      code: string;
+      inputKey: string | null;
+      message: string;
     };
     SewingCostBreakdown: {
       /** Format: decimal */
@@ -3227,10 +3253,37 @@ export interface components {
       /** Format: decimal */
       largeWholesale: number;
     };
-    SewingPricingBlocker: {
-      code: string;
-      inputKey: string | null;
-      message: string;
+    SewingArticlePublishedSummary: {
+      /** Format: date-time */
+      publishedAt: string;
+      prices: components['schemas']['SewingPriceTiers'];
+    };
+    SewingArticleSummaryRow: {
+      /** Format: int64 */
+      id: number;
+      saleSku: string;
+      active: boolean;
+      /** Format: int32 */
+      sortOrder: number;
+      isCalculated: boolean;
+      blockers: components['schemas']['SewingPricingBlocker'][];
+      costs: components['schemas']['SewingCostBreakdown'] | null;
+      prices: components['schemas']['SewingPriceTiers'] | null;
+      published: components['schemas']['SewingArticlePublishedSummary'] | null;
+    };
+    SewingArticleSummary: {
+      /** Format: int32 */
+      productId: number;
+      modelCode: string | null;
+      /** Format: int64 */
+      version: number;
+      /** Format: date-time */
+      calculatedAt: string;
+      articles: components['schemas']['SewingArticleSummaryRow'][];
+    };
+    SaveSewingCalculationRequest: {
+      /** Format: uuid */
+      requestId: string;
     };
     SewingArticleCalculation: {
       breakdown: components['schemas']['SewingCostBreakdown'] | null;
@@ -7221,6 +7274,56 @@ export interface operations {
         content?: never;
       };
       409: components['responses']['responses-ConflictError'];
+    };
+  };
+  getSewingArticleSummary: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        productId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Per-Article live costs, three prices and blockers. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SewingArticleSummary'];
+        };
+      };
+      /** @description Invalid Product ID. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description CatalogRead required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product not found or is not a Sewing Product. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
     };
   };
   saveSewingCalculation: {

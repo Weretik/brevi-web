@@ -23,6 +23,7 @@ describe('SewingCompositionEditor', () => {
             manualMinutes: null,
             sortOrder: 0,
             reviewed: true,
+            comment: '',
           },
         ]}
         lookups={lookups}
@@ -57,6 +58,7 @@ describe('SewingCompositionEditor', () => {
             required: true,
             sortOrder: 0,
             reviewed: true,
+            comment: '',
           },
         ]}
         operations={[
@@ -67,6 +69,7 @@ describe('SewingCompositionEditor', () => {
             manualMinutes: null,
             sortOrder: 0,
             reviewed: true,
+            comment: '',
           },
         ]}
         lookups={{
@@ -123,6 +126,7 @@ describe('SewingCompositionEditor', () => {
             required: true,
             sortOrder: 0,
             reviewed: false,
+            comment: '',
           },
         ]}
         operations={[]}
@@ -159,6 +163,7 @@ describe('SewingCompositionEditor', () => {
             required: true,
             sortOrder: 0,
             reviewed: false,
+            comment: '',
           },
         ]}
         operations={[]}
