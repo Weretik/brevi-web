@@ -1,19 +1,33 @@
 import { adminApi, toAdminApiError } from '@admin/shared/api-client';
 
 import { productErrorMessages } from './product-api.shared';
-import { mapProductMedia } from '../mappers/catalog-media.mapper';
+import { mapProductMedia, mapProductMediaPage } from '../mappers/catalog-media.mapper';
 
-import type { operations } from '@admin/shared/contracts';
+import type { ProductMedia } from '@admin/products/model';
 
-type UploadMediaResponse =
-  operations['uploadCatalogMedia']['responses'][200]['content']['application/json'];
+/** The photo library pages by 100 at most; the product editor still needs the whole list. */
+const LIBRARY_PAGE_SIZE = 100;
 
 export const productMediaApi = adminApi.injectEndpoints({
   endpoints: (build) => ({
-    listProductMedia: build.query<ReturnType<typeof mapProductMedia>, void>({
-      query: () => '/api/catalog/media',
-      transformResponse: mapProductMedia,
-      transformErrorResponse: (response) => toAdminApiError(response, productErrorMessages),
+    listProductMedia: build.query<ProductMedia[], void>({
+      async queryFn(_arg, _api, _extraOptions, baseQuery) {
+        const items: ProductMedia[] = [];
+        try {
+          for (let page = 1; ; page++) {
+            const response = await baseQuery(
+              `/api/media/files?page=${page}&pageSize=${LIBRARY_PAGE_SIZE}`,
+            );
+            if (response.error)
+              return { error: toAdminApiError(response.error, productErrorMessages) };
+            const result = mapProductMediaPage(response.data);
+            items.push(...result.items);
+            if (result.items.length === 0 || items.length >= result.total) return { data: items };
+          }
+        } catch (cause) {
+          return { error: toAdminApiError(cause, productErrorMessages) };
+        }
+      },
       providesTags: (result) => [
         { type: 'Media', id: 'LIST' },
         ...(result?.map(({ id }) => ({ type: 'Media' as const, id })) ?? []),
@@ -23,43 +37,16 @@ export const productMediaApi = adminApi.injectEndpoints({
       query: (file) => {
         const body = new FormData();
         body.set('file', file);
-        return { url: '/api/catalog/media', method: 'POST', body };
+        return { url: '/api/media/files', method: 'POST', body };
       },
-      transformResponse: (payload: unknown) => {
-        if (!payload || typeof payload !== 'object')
-          throw new Error('Некоректна відповідь завантаження.');
-        const media = payload as Record<string, unknown>;
-        if (
-          typeof media['mediaFileId'] !== 'number' ||
-          !Number.isInteger(media['mediaFileId']) ||
-          media['mediaFileId'] < 1 ||
-          typeof media['storageKey'] !== 'string' ||
-          typeof media['publicUrl'] !== 'string' ||
-          typeof media['contentType'] !== 'string' ||
-          typeof media['originalFileName'] !== 'string'
-        )
-          throw new Error('Некоректна відповідь завантаження.');
-        return (media as UploadMediaResponse).mediaFileId;
-      },
+      transformResponse: (payload: unknown) => mapProductMedia(payload).id,
       transformErrorResponse: (response) => toAdminApiError(response, productErrorMessages),
       invalidatesTags: (_result, error) => (error ? [] : [{ type: 'Media', id: 'LIST' }]),
-    }),
-    deleteProductMedia: build.mutation<void, number>({
-      query: (id) => ({ url: `/api/catalog/media/${id}`, method: 'DELETE' }),
-      transformErrorResponse: (response) => toAdminApiError(response, productErrorMessages),
-      invalidatesTags: (_result, error, id) =>
-        error
-          ? []
-          : [
-              { type: 'Media', id },
-              { type: 'Media', id: 'LIST' },
-            ],
     }),
   }),
 });
 
 export const {
-  useDeleteProductMediaMutation,
   useLazyListProductMediaQuery,
   useListProductMediaQuery,
   useUploadProductMediaMutation,

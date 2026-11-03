@@ -7,7 +7,6 @@ export * from './product-editor/product-draft.types';
 export * from './product-editor/product-validation';
 export * from './product-list/product';
 export * from './product-list/product-query';
-export * from './product-media/media-search';
 export * from './product-media/product-media';
 export * from './product-media/product-photos';
 export * from './sewing/product-fabrics';

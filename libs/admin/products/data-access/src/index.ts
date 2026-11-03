@@ -17,7 +17,6 @@ export {
   useReplaceSewingArticleCompositionMutation,
 } from './api/sewing-composition/sewing-composition.api';
 export {
-  useDeleteProductMediaMutation,
   useLazyListProductMediaQuery,
   useListProductMediaQuery,
   useUploadProductMediaMutation,

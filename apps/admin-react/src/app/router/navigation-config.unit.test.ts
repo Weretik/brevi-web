@@ -40,9 +40,10 @@ describe('legacy Admin navigation', () => {
       'Бухгалтерія',
       'Нагадування',
       'Загальні довідники',
+      'Фото',
       'Загальні звіти',
     ]);
-    expect(groups.map((group) => group.items.length)).toEqual([6, 7, 5, 4, 8, 1]);
+    expect(groups.map((group) => group.items.length)).toEqual([6, 7, 5, 4, 7, 1, 1]);
     expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(31);
     expect(groups[0].items.map((item) => item.id)).not.toContain('clients');
   });
@@ -59,14 +60,17 @@ describe('legacy Admin navigation', () => {
     expect(manager[0].items.find((item) => item.id === 'quotes')?.to).toBe('/crm/quotes');
   });
 
-  it('enables the media link only with its registered route', () => {
-    const groups = createNavigation(new Set(['/', '/references/media']));
+  it('shows the photo library as its own group with its registered route', () => {
+    const groups = createNavigation(new Set(['/', '/media']));
+    const media = groups.find((group) => group.id === 'media');
 
-    expect(groups[4].items[7]).toMatchObject({
-      id: 'media',
-      label: 'Медіа/Фото',
-      to: '/references/media',
+    expect(media).toMatchObject({ label: 'Фото', section: 'Дані' });
+    expect(media?.items[0]).toMatchObject({
+      id: 'media-library',
+      label: 'Бібліотека фото',
+      to: '/media',
     });
+    expect(groups[4].items.some((item) => item.id === 'media')).toBe(false);
   });
 
   it('enables a legacy URL only when the React route is registered', () => {

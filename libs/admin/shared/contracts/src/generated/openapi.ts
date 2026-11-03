@@ -101,25 +101,66 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/catalog/media': {
+  '/api/media/folders': {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /** List catalog media files */
-    get: operations['getCatalogMedia'];
+    /** All folders as a flat list sorted by name; the client builds the tree from parentId */
+    get: operations['getMediaFolders'];
     put?: never;
-    /** Upload a catalog image */
-    post: operations['uploadCatalogMedia'];
+    /** Create a folder at the top level or inside another folder */
+    post: operations['createMediaFolder'];
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  '/api/catalog/media/{id}': {
+  '/api/media/folders/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    /** Rename the folder and/or move it under another parent (null = top level) */
+    put: operations['updateMediaFolder'];
+    post?: never;
+    /** Delete an empty folder */
+    delete: operations['deleteMediaFolder'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/media/files': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Photos by name and/or folder, newest first, one page at a time */
+    get: operations['searchMediaFiles'];
+    put?: never;
+    /**
+     * Upload one photo into a folder
+     * @description The file is stored on the CDN first; the library row is created only after the CDN accepted it. Upload several photos with several requests.
+     */
+    post: operations['uploadMediaFile'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/media/files/move': {
     parameters: {
       query?: never;
       header?: never;
@@ -128,9 +169,30 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /** Move up to 200 photos into one folder (null = library root) */
+    post: operations['moveMediaFiles'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/media/files/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    /** One photo and the places that use it */
+    get: operations['getMediaFile'];
+    /** Rename the photo, change its default alt text or folder; the CDN URL stays the same */
+    put: operations['updateMediaFile'];
     post?: never;
-    /** Delete an unused catalog image */
-    delete: operations['deleteCatalogMedia'];
+    /** Delete an unused photo from the CDN and the library */
+    delete: operations['deleteMediaFile'];
     options?: never;
     head?: never;
     patch?: never;
@@ -2413,21 +2475,59 @@ export interface components {
       isActive: boolean;
       description?: string | null;
     };
-    MediaFileListItem: {
+    MediaFolderResponse: {
       id: number;
-      originalFileName: string;
-      publicUrl: string;
-      contentType: string;
-      storageKey: string;
-      /** @enum {string} */
-      status: 'PendingUpload' | 'Ready';
+      name: string;
+      parentId?: number | null;
+      /** @description Photos directly in this folder */
+      fileCount: number;
     };
-    UploadMediaResponse: {
-      mediaFileId: number;
-      storageKey: string;
+    MediaFolderInput: {
+      /** @description Trimmed; must not contain / or \. */
+      name: string;
+      parentId?: number | null;
+    };
+    MediaFileResponse: {
+      id: number;
+      fileName: string;
+      alt?: string | null;
+      /** @description Null for the library root. */
+      folderId?: number | null;
       publicUrl: string;
       contentType: string;
-      originalFileName: string;
+      /** Format: int64 */
+      sizeInBytes: number;
+      width?: number | null;
+      height?: number | null;
+      /** Format: date-time */
+      createdAt: string;
+    };
+    MediaFilePage: {
+      items: components['schemas']['MediaFileResponse'][];
+      total: number;
+      page: number;
+      pageSize: number;
+    };
+    MoveMediaFilesInput: {
+      fileIds: number[];
+      folderId?: number | null;
+    };
+    MediaUsageResponse: {
+      /** @description Where the photo is used, for example «Товари». */
+      area: string;
+      /** @description Id of the owner */
+      ownerId: number;
+      /** @description For example the product name. */
+      title: string;
+    };
+    MediaFileDetailResponse: {
+      file: components['schemas']['MediaFileResponse'];
+      usages: components['schemas']['MediaUsageResponse'][];
+    };
+    MediaFileInput: {
+      fileName: string;
+      alt?: string | null;
+      folderId?: number | null;
     };
     PricingParameterRow: {
       /** Format: int32 */
@@ -5461,7 +5561,7 @@ export interface operations {
       };
     };
   };
-  getCatalogMedia: {
+  getMediaFolders: {
     parameters: {
       query?: never;
       header?: never;
@@ -5470,18 +5570,201 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Media files. */
+      /** @description Folders. */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['MediaFileListItem'][];
+          'application/json': components['schemas']['MediaFolderResponse'][];
         };
+      };
+      /** @description Unauthenticated (normal mode). */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Manager or Admin role required (normal mode). */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };
-  uploadCatalogMedia: {
+  createMediaFolder: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['MediaFolderInput'];
+      };
+    };
+    responses: {
+      /** @description Created folder. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['MediaFolderResponse'];
+        };
+      };
+      /** @description Invalid name or parent id. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Parent folder not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description A sibling folder has the same name (case-insensitive) or the depth limit (8 levels) is reached. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateMediaFolder: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['MediaFolderInput'];
+      };
+    };
+    responses: {
+      /** @description Updated folder. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['MediaFolderResponse'];
+        };
+      };
+      /** @description Invalid name or parent id. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Folder or parent folder not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Duplicate sibling name */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  deleteMediaFolder: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Folder deleted. */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Folder not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The folder still has photos or subfolders. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  searchMediaFiles: {
+    parameters: {
+      query?: {
+        /** @description Omit to search the whole library. */
+        folderId?: number;
+        /** @description With folderId */
+        includeSubfolders?: boolean;
+        /** @description Part of the photo name */
+        search?: string;
+        page?: number;
+        pageSize?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description One page of photos. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['MediaFilePage'];
+        };
+      };
+      /** @description Invalid paging or search. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Folder not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  uploadMediaFile: {
     parameters: {
       query?: never;
       header?: never;
@@ -5493,24 +5776,33 @@ export interface operations {
         'multipart/form-data': {
           /**
            * Format: binary
-           * @description JPEG, PNG or WebP image up to 50 MiB.
+           * @description JPEG, PNG or WebP; the bytes must match the type. Limit from MediaUpload:MaxFileSizeBytes (15 MiB).
            */
           file: string;
+          /** @description Target folder; omit for the library root. */
+          folderId?: number;
         };
       };
     };
     responses: {
-      /** @description Uploaded media file. */
+      /** @description Uploaded photo. */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['UploadMediaResponse'];
+          'application/json': components['schemas']['MediaFileResponse'];
         };
       };
-      /** @description Invalid or unsupported image. */
+      /** @description Missing */
       400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Folder not found. */
+      404: {
         headers: {
           [name: string]: unknown;
         };
@@ -5518,7 +5810,43 @@ export interface operations {
       };
     };
   };
-  deleteCatalogMedia: {
+  moveMediaFiles: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['MoveMediaFilesInput'];
+      };
+    };
+    responses: {
+      /** @description Photos moved. */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Invalid ids. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Folder or one of the photos not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getMediaFile: {
     parameters: {
       query?: never;
       header?: never;
@@ -5529,28 +5857,90 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Media file deleted. */
-      204: {
+      /** @description Photo with usages. */
+      200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
-      };
-      /** @description Invalid media file id. */
-      400: {
-        headers: {
-          [name: string]: unknown;
+        content: {
+          'application/json': components['schemas']['MediaFileDetailResponse'];
         };
-        content?: never;
       };
-      /** @description Media file not found. */
+      /** @description Photo not found. */
       404: {
         headers: {
           [name: string]: unknown;
         };
         content?: never;
       };
-      /** @description Media file is used by one or more products. */
+    };
+  };
+  updateMediaFile: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['MediaFileInput'];
+      };
+    };
+    responses: {
+      /** @description Updated photo. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['MediaFileResponse'];
+        };
+      };
+      /** @description Invalid name */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Photo or folder not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  deleteMediaFile: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Photo deleted. */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Photo not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The photo is used, for example by a product; the message names where. */
       409: {
         headers: {
           [name: string]: unknown;

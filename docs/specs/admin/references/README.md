@@ -10,7 +10,7 @@ Each table has its own SDD under `$frontend-feature-spec`. Four old pages and th
 | 4     | `/references/garment-part-operation` | [Garment parts](004-garment-parts/README.md)                                                                            |
 | 5     | Same page, “Роботи” tab              | [Operations](005-garment-part-operations/README.md)                                                                     |
 | 6     | `/references/additional-reference`   | [Additional references](006-additional-references/README.md), replaced by [015](015-pricing-parameters-sheet/README.md) |
-| 7     | `/references/media`                  | [Media/photos](007-media/README.md)                                                                                     |
+| 7     | `/references/media` → `/media`       | [Media/photos](007-media/README.md), replaced by [photo library](../media/001-photo-library/README.md)                  |
 
 “Товари” has a separate [SDD](../products/001-products-table/README.md) because it is a menu item without a page in Angular Admin. The visual rules are [here](../table-visual-guidance.md).
 

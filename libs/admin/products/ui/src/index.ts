@@ -18,9 +18,6 @@ export { productWholesalePriceLabel } from './product-detail/product-wholesale-p
 export { SewingPricingPanel } from './components/sewing-pricing/sewing-pricing-panel';
 export * from './forms/sewing-composition/sewing-composition-editor';
 export * from './product-content/product-markdown';
-export * from './media/media-delete-dialog';
-export * from './media/media-gallery';
-export * from './media/media-upload';
 
 export * from './components/product-overview/product-overview-details';
 export * from './components/product-overview/product-overview-form';

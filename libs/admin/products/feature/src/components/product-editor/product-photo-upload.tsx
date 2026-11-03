@@ -1,3 +1,4 @@
+import { validateMediaUpload } from '@admin/media/model';
 import {
   useLazyListProductMediaQuery,
   useUploadProductMediaMutation,
@@ -5,8 +6,6 @@ import {
 import { adminApiErrorMessage } from '@admin/shared/api-client';
 import { Alert, Button, Stack } from '@mui/material';
 import { useState } from 'react';
-
-import { validateMediaFile } from '../../model/media-library/media-file-validation';
 
 import type { ProductMedia } from '@admin/products/model';
 
@@ -35,7 +34,7 @@ export function ProductPhotoUpload({ onReady }: Props) {
   }
 
   async function upload(file: File) {
-    const validationError = validateMediaFile(file);
+    const validationError = validateMediaUpload(file);
     if (validationError) {
       setError(validationError);
       return;
