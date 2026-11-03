@@ -1,5 +1,7 @@
 import { Paper, Stack, Typography } from '@mui/material';
 
+import { ppeMarkupPercent } from './ppe-markup-format';
+import { PpePriceRow, PpePriceTierRows } from './ppe-price-rows';
 import { SewingCardStatusPill } from '../sewing-card/sewing-card-status-pill';
 import { sewingPriceFormat } from '../sewing-pricing/sewing-price-format';
 
@@ -21,27 +23,6 @@ interface Props {
   insightRetail: number | null;
 }
 
-/** Markups are fractions (0.45 = 45 %), as in «Параметри ціноутворення». */
-const percent = (value: number) =>
-  `${(value * 100).toLocaleString('uk-UA', { maximumFractionDigits: 2 })} %`;
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <Stack direction="row" sx={{ justifyContent: 'space-between', gap: 2 }}>
-      <Typography component="dt" variant="body2" sx={{ color: 'text.secondary' }}>
-        {label}
-      </Typography>
-      <Typography
-        component="dd"
-        variant="body2"
-        sx={{ m: 0, fontFamily: 'var(--admin-font-mono)' }}
-      >
-        {value}
-      </Typography>
-    </Stack>
-  );
-}
-
 /** Three prices of a PPE product as in «Прайс на сайт» H–J, with the reasons when they are missing. */
 export function PpeCardPrices(props: Props) {
   const { prices, rule } = props;
@@ -61,11 +42,7 @@ export function PpeCardPrices(props: Props) {
           />
         </Stack>
         {prices ? (
-          <Stack component="dl" sx={{ m: 0, gap: 1 }}>
-            <Row label="Роздріб, від 1 шт." value={sewingPriceFormat(prices.retail)} />
-            <Row label="Опт, від 11 шт." value={sewingPriceFormat(prices.wholesale)} />
-            <Row label="Великий опт, від 41 шт." value={sewingPriceFormat(prices.largeWholesale)} />
-          </Stack>
+          <PpePriceTierRows prices={prices} />
         ) : (
           <Stack component="ul" sx={{ m: 0, pl: 2.5, gap: 0.5 }}>
             {props.reasons.map((reason) => (
@@ -77,9 +54,12 @@ export function PpeCardPrices(props: Props) {
         )}
         {rule && (
           <Stack component="dl" sx={{ m: 0, gap: 1, pt: 1, borderTop: 1, borderColor: 'divider' }}>
-            <Row label="Націнка роздріб" value={percent(rule.retailMarkup)} />
-            <Row label="Націнка опт" value={percent(rule.wholesaleMarkup)} />
-            <Row label="Націнка великий опт" value={percent(rule.largeWholesaleMarkup)} />
+            <PpePriceRow label="Націнка роздріб" value={ppeMarkupPercent(rule.retailMarkup)} />
+            <PpePriceRow label="Націнка опт" value={ppeMarkupPercent(rule.wholesaleMarkup)} />
+            <PpePriceRow
+              label="Націнка великий опт"
+              value={ppeMarkupPercent(rule.largeWholesaleMarkup)}
+            />
           </Stack>
         )}
         {rule?.priceNote && (
@@ -90,10 +70,16 @@ export function PpeCardPrices(props: Props) {
         {(props.insightWholesale !== null || props.insightRetail !== null) && (
           <Stack component="dl" sx={{ m: 0, gap: 1, pt: 1, borderTop: 1, borderColor: 'divider' }}>
             {props.insightRetail !== null && (
-              <Row label="Insight роздріб (XML)" value={sewingPriceFormat(props.insightRetail)} />
+              <PpePriceRow
+                label="Insight роздріб (XML)"
+                value={sewingPriceFormat(props.insightRetail)}
+              />
             )}
             {props.insightWholesale !== null && (
-              <Row label="Insight опт (XML)" value={sewingPriceFormat(props.insightWholesale)} />
+              <PpePriceRow
+                label="Insight опт (XML)"
+                value={sewingPriceFormat(props.insightWholesale)}
+              />
             )}
           </Stack>
         )}

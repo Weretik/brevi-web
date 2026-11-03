@@ -2,7 +2,7 @@
 
 **Status:** routes and pages implemented, checked 2026-10-16.
 
-`/references/products` is the «Товари» page ([spec 008](../../../specs/admin/products/008-products-page/README.md)): tabs «Швейна продукція» (one row per model) and «ЗІЗ» (`?tab=ppe`), section chips, search, a drawer for code, section, season, active, «Перевірено», the current site link and the quote description, and bulk deletion. Site texts, SEO and photos are not shown there; they go to the planned «Контент сайту» module. `/create`, `/:id`, and `/:id/edit` open create, detail, and edit
+`/references/products` is the «Товари» page ([spec 008](../../../specs/admin/products/008-products-page/README.md)): tabs «Швейна продукція» (one row per model) and «ЗІЗ» (`?tab=ppe`), section chips, search, a drawer for code, section, season, active, «Перевірено», the current site link and the quote description, and bulk deletion. Site texts, SEO and photos are not shown there; they go to the planned «Контент сайту» module. `/new/ppe` is the «Новий ЗІЗ» page (four blocks of the sheet instruction, debounced code check and price preview, a sticky «Готовність» / «Ціни в прайсі» / «Інструкція» panel; on success it opens the PPE card), `/new/sewing` is «Нова модель», the old `/create` redirects to the list, and `/:id` and `/:id/edit` open detail and edit
 pages. For a sewing model `/:id` is the «Цех» card ([spec 009](../../../specs/admin/products/009-sewing-product-card/README.md)): header, metrics and tabs «Артикули», «Комплектація», «Трудовитрати», «Ціни» (`?tab=`); A PPE product's `/:id` is the PPE card ([spec 010](../../../specs/admin/products/010-ppe-product-card/README.md)): supplier fields of the sheet tab «ЗІЗ» and the three prices. `products/feature` owns scenarios, local state, and loading/error/empty
 handling; `products/ui` provides presentation; `products/model` provides domain
 models; and `products/data-access` provides API endpoints, mappers, and
@@ -44,8 +44,8 @@ libs/admin/products/
 │   ├── pages/
 │   │   ├── product-detail/
 │   │   │   └── product-detail-page.tsx # details
-│   │   ├── product-editor/
-│   │   │   └── product-create-page.tsx # creation
+│   │   ├── ppe-create/
+│   │   │   └── ppe-create-page.tsx # «Новий ЗІЗ»; hooks in hooks/ppe-create/, blocks in ui forms|components/ppe-create/
 │   │   └── product-list/
 │   │       ├── products-page.tsx # «Товари» tabs
 │   │       └── product-overview-content.tsx # one table with chips and drawer
@@ -69,6 +69,7 @@ libs/admin/products/
 - `libs/admin/products/model/src/`: `product-editor/`, `ordering/`, `sewing/product-fabrics.test.ts`
 - `libs/admin/products/ui/src/`: `product-detail/`, `product-editor/`, `product-content/`
 - `libs/admin/products/model/src/queries/ppe-card/`; `libs/admin/products/data-access/src/mappers/ppe-card/`
+- «Новий ЗІЗ»: `libs/admin/products/model/src/{forms,validators,queries}/ppe-create/`; `libs/admin/products/feature/src/pages/ppe-create/`
 - E2E (run only on request): `apps/admin-react-e2e/src/products.spec.ts`
 
 Focused run: `npx nx test admin-products-model -- product-overview`; `npx nx test admin-products-feature -- product-list product-detail product-editor sewing-card ppe-card`; `npx nx test admin-products-data-access -- products.api`; `npx nx test admin-products-model -- product-editor ordering product-fabrics`; `npx nx test admin-products-ui -- product-detail product-editor product-content`; `npx nx test admin-products-model -- ppe-card`.
