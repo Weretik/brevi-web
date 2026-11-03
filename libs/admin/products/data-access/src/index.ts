@@ -39,3 +39,7 @@ export {
   useCreatePpeRuleVersionMutation,
 } from './api/ppe-pricing/rules.api';
 export { useGetSewingAccessQuery as useGetProductAccessQuery } from './api/sewing-access/sewing-access.api';
+export {
+  useListProductOverviewQuery,
+  useUpdateProductOverviewMutation,
+} from './api/product-overview/product-overview.api';

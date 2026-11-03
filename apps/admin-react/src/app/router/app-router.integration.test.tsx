@@ -242,26 +242,11 @@ describe('React Admin routing', () => {
     expect(window.location.search).toBe('?tab=groups');
   });
 
-  it('opens the product list directly with server total and an active menu link', async () => {
+  it('opens the «Товари» page directly with tabs and an active menu link', async () => {
     const user = userEvent.setup();
     vi.stubGlobal(
       'fetch',
-      vi.fn((input: RequestInfo | URL) => {
-        const url = input instanceof Request ? input.url : String(input);
-        return Promise.resolve(
-          new Response(
-            JSON.stringify(
-              url.includes('/api/v1/products')
-                ? {
-                    value: [],
-                    pagedInfo: { pageNumber: 1, pageSize: 20, totalPages: 0, totalRecords: 0 },
-                  }
-                : [],
-            ),
-            { status: 200 },
-          ),
-        );
-      }),
+      vi.fn(() => Promise.resolve(new Response(JSON.stringify([]), { status: 200 }))),
     );
     window.history.replaceState({}, '', '/references/products');
     renderApp();
@@ -272,16 +257,10 @@ describe('React Admin routing', () => {
         name: 'Товари',
       }),
     ).toHaveAttribute('href', '/references/products');
-    expect(await screen.findByText('Товарів не знайдено')).toBeVisible();
-    expectEmptyGridPagination(20);
-    const idHeader = screen.getByRole('columnheader', { name: 'ID' });
-    await user.hover(idHeader);
-    const columnMenuButton = idHeader.querySelector<HTMLButtonElement>(
-      'button[aria-haspopup="menu"]',
-    );
-    expect(columnMenuButton).toHaveAttribute('aria-label', 'Меню стовпця ID');
-    await user.click(columnMenuButton!);
-    expect(screen.getByRole('menuitem', { name: 'Сортувати за зростанням' })).toBeVisible();
+    expect(await screen.findByText('Товарів поки немає')).toBeVisible();
+    await user.click(screen.getByRole('tab', { name: 'ЗІЗ' }));
+    expect(window.location.search).toBe('?tab=ppe');
+    expect(await screen.findByRole('grid', { name: 'ЗІЗ' })).toBeVisible();
   }, 15_000);
 
   it('opens media directly inside the Brevi shell', async () => {

@@ -13,6 +13,7 @@ The Storefront currently has README files for its Nx feature libraries, but they
 - [Admin React: new product table and actions](admin/products/001-products-table/README.md)
 - [Admin React: complete administrative product scenario](admin/products/002-admin-product-scenario/README.md)
 - [Admin React: product table and separate pages](admin/products/003-products-table-pages/README.md)
+- [Admin React: «Товари» two tables from the Calculator sheet](admin/products/008-products-page/README.md) — implemented 2026-11-03.
 - [Admin React: fabric and hardware tables and pages](admin/references/008-garment-materials-pages/README.md)
 - [Admin React: operations tables and pages](admin/references/009-operations-pages/README.md)
 - [Admin React: suppliers — SDD closed, implementation partial](admin/references/010-suppliers-pages/README.md)
