@@ -3,12 +3,15 @@ import { validateMediaUpload } from '@admin/media/model';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
 import { useState } from 'react';
 
+import type { MediaFile } from '@admin/media/model';
 import type { MediaUploadFailure } from '@admin/media/ui';
 
 export interface MediaUploadResult {
   total: number;
   uploaded: number;
   failures: MediaUploadFailure[];
+  /** Photos the backend accepted, in upload order. */
+  files: MediaFile[];
 }
 
 /** Uploads several photos one after another into a folder and reports what did not go through. */
@@ -23,12 +26,13 @@ export function useMediaUploadQueue() {
     if (files.length === 0 || progress.active) return null;
     setProgress({ total: files.length, done: 0, active: true });
     const failures: MediaUploadFailure[] = [];
+    const uploaded: MediaFile[] = [];
     for (const file of files) {
       const invalid = validateMediaUpload(file);
       if (invalid) failures.push({ fileName: file.name, message: invalid });
       else {
         try {
-          await uploadMediaFile({ file, folderId }).unwrap();
+          uploaded.push(await uploadMediaFile({ file, folderId }).unwrap());
         } catch (cause) {
           failures.push({
             fileName: file.name,
@@ -39,7 +43,7 @@ export function useMediaUploadQueue() {
       setProgress((current) => ({ ...current, done: current.done + 1 }));
     }
     setProgress({ total: 0, done: 0, active: false });
-    return { total: files.length, uploaded: files.length - failures.length, failures };
+    return { total: files.length, uploaded: uploaded.length, failures, files: uploaded };
   }
 
   return { ...progress, upload };

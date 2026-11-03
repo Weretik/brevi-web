@@ -3,7 +3,6 @@ import {
   Alert,
   Button,
   FormControlLabel,
-  MenuItem,
   Stack,
   Switch,
   TextField,
@@ -19,12 +18,19 @@ interface Props {
   setDraft: Dispatch<SetStateAction<ProductDraft>>;
   errors: Record<string, string>;
   lookups: ProductLookups;
-  renderUpload: (onReady: (media: ProductMedia) => void) => ReactNode;
+  /** The «Вибрати фото» button with the photo library panel. */
+  renderPicker: (
+    alreadyAddedIds: readonly number[],
+    onPick: (media: readonly ProductMedia[]) => void,
+  ) => ReactNode;
 }
 
-export function ProductPhotoFields({ draft, setDraft, errors, lookups, renderUpload }: Props) {
-  function addPhoto(media: ProductMedia) {
-    setDraft((current) => ({ ...current, photos: addReadyPhoto(current.photos, media) }));
+export function ProductPhotoFields({ draft, setDraft, errors, lookups, renderPicker }: Props) {
+  function addPhotos(media: readonly ProductMedia[]) {
+    setDraft((current) => ({
+      ...current,
+      photos: media.reduce((photos, item) => addReadyPhoto(photos, item), current.photos),
+    }));
   }
 
   return (
@@ -124,29 +130,10 @@ export function ProductPhotoFields({ draft, setDraft, errors, lookups, renderUpl
           </Stack>
         );
       })}
-      <TextField
-        select
-        label="Додати наявне медіа"
-        value=""
-        onChange={(event) => {
-          const media = lookups.media.find((item) => item.id === Number(event.target.value));
-          if (media) addPhoto(media);
-        }}
-      >
-        <MenuItem value="">Оберіть фото</MenuItem>
-        {lookups.media
-          .filter(
-            (item) =>
-              item.status === 'Ready' &&
-              !draft.photos.some((photo) => photo.mediaFileId === item.id),
-          )
-          .map((item) => (
-            <MenuItem key={item.id} value={item.id}>
-              {item.originalFileName}
-            </MenuItem>
-          ))}
-      </TextField>
-      {renderUpload(addPhoto)}
+      {renderPicker(
+        draft.photos.map((photo) => photo.mediaFileId),
+        addPhotos,
+      )}
     </Stack>
   );
 }

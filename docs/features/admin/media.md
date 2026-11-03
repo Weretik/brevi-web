@@ -17,6 +17,8 @@ flowchart LR
   DataAccess --> Model["model: entities, tree, rules, formatting"]
   DataAccess --> API["BreviERP /api/media"]
   Products["products/data-access: product-media.api"] --> API
+  ProductCard["products/feature: product-photo-picker"] --> Picker["feature/components/picker: MediaPickerDrawer"]
+  Picker --> Hooks
 ```
 
 ## Code structure
@@ -42,12 +44,14 @@ libs/admin/media/
     pages/library/media-library-page.tsx           # composes the page
     state/media-library-url-state.ts               # ?folder=&q=&sub=0&page=
     hooks/{library,folders,files}/                 # search, selection, toasts, tree state, editors, upload queue, file drop, move, delete
+    hooks/picker/use-media-picker.ts               # picker state: own folder/search, ticks across pages, upload → ticked
+    components/picker/media-picker-drawer.tsx      # «Вибрати фото» side panel for other features
     model/media-upload-summary.ts                  # upload result → toast text and tone
     components/{library,folders,files}/            # folder panel, filters, results, upload button, side panels
     dialogs/media-delete-dialogs.tsx               # photo and folder confirmations
 ```
 
-The product editor still uses `libs/admin/products/data-access/src/api/product-media.api.ts` (all library pages for its dropdown, upload) until the «Вибрати фото» picker (stage 4).
+**«Вибрати фото» (stage 4).** `MediaPickerDrawer` (exported from `@admin/media/feature`) is the library in a wide side panel: folder tree (a folder select on narrow screens), search, ticks kept across folders and pages, upload by button or drop into the open folder (uploaded photos are ticked at once), toasts, and «Додати (N)». Photos the caller already has show ticked and are not added twice. The product card uses it through `libs/admin/products/feature/src/components/product-editor/product-photo-picker.tsx` instead of the old dropdown and single upload. The card still reads previews of attached photos from `products/data-access/src/api/product-media.api.ts` (whole library list); its `uploadProductMedia` endpoint is no longer used by the UI.
 
 **Where to look:** [route](../../../libs/admin/media/feature/src/media.routes.tsx), [page](../../../libs/admin/media/feature/src/pages/library/media-library-page.tsx), [tree](../../../libs/admin/media/model/src/mappers/media-folder-tree.ts), [API](../../../libs/admin/media/data-access/src/api/media-files.api.ts).
 
@@ -59,7 +63,8 @@ The product editor still uses `libs/admin/products/data-access/src/api/product-m
 - `libs/admin/media/ui/src/components/gallery/media-file-preview.component.test.tsx` (preview → original → note)
 - `libs/admin/media/feature/src/pages/library/media-library-page.component.test.tsx` (includes drop upload)
 - `libs/admin/media/feature/src/hooks/library/use-media-toasts.unit.test.ts`
+- `libs/admin/media/feature/src/components/picker/media-picker-drawer.component.test.tsx` (ticks, already added, folder + search, upload → ticked)
 - `libs/admin/products/data-access/src/products.api.integration.test.ts` (product editor paging and upload)
-- E2E (run only on request): `apps/admin-react-e2e/src/media.spec.ts`
+- E2E (run only on request): `apps/admin-react-e2e/src/media.spec.ts`; product photos through the picker in `apps/admin-react-e2e/src/products.spec.ts`
 
 Focused run: `npx nx run-many -t test -p admin-media-model admin-media-data-access admin-media-ui admin-media-feature`.

@@ -5,7 +5,8 @@ import { useState } from 'react';
 import type { MediaFile } from '@admin/media/model';
 
 interface Props {
-  file: Pick<MediaFile, 'publicUrl' | 'fileName' | 'alt'> & Partial<Pick<MediaFile, 'thumbnailUrl'>>;
+  file: Pick<MediaFile, 'publicUrl' | 'fileName' | 'alt'> &
+    Partial<Pick<MediaFile, 'thumbnailUrl'>>;
   /** CSS aspect ratio of the frame. */
   ratio?: string;
   /** Grid cards load the small WebP preview; the original is the fallback. */
