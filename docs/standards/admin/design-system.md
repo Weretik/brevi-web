@@ -131,6 +131,7 @@ Use these for new pages. Prefer MUI components and the theme overrides; do not r
   3. **Search row:** its own full-width 48 px field on `background.paper`, never inside the filter row. Placeholder says what it searches («Знайти тканину за кодом, назвою…»), «/» focuses it, Escape and the clear button empty it.
   4. **Filter row:** 32 px pill chips with counts («Активні 84»), the selected one inverse; extra filters (for example a supplier chip with a menu) after a thin divider. On the right, a status line: «Вибрано: N · Зняти вибір» while rows are selected, otherwise «Знайдено: N із M» while search or filters narrow the list, otherwise nothing.
   5. **Table** in an outlined paper, with the standard table height (see «Table height»).
+  6. **Side panel for a row:** «Додати…», a row click (view) and «Редагувати» open the same side panel `ReferenceEditorDrawer` (`libs/admin/references/ui/src/components/reference-editor/`): it slides in from the right edge, is full width on a phone, has a header with the title and a short line, the form in the middle, and «Скасувати» / «Зберегти» (or «Закрити» / «Редагувати» when viewing) at the bottom. After saving it closes and the list stays open. Do not use a centered dialog or a separate page for adding a row; every tab of one page («Постачальники» and «Клієнти» in «Контрагенти») adds the same way. A centered dialog is only for a confirmation («Видалити?»). A row may still open a full card page when it has much more than a form (a client, a product).
 
   There is no «Оновити» button (lists refresh after every save) and no «Усього» counter (counts live on the chips). Shared components: `libs/admin/references/ui/src/components/reference-list-controls/` and `reference-list/`.
 
@@ -138,7 +139,7 @@ Use these for new pages. Prefer MUI components and the theme overrides; do not r
 - **Stage board (kanban):** columns on `action.hover` with a colored dot, the stage name, and a count; cards on `background.paper` with a mono number and due date (overdue in `error.main`), title, client and quantity, a 4 px orange progress bar, and a percentage. Columns scroll horizontally on narrow screens. Use it for flows with stages (sewing orders, deals).
 - **Side cards:** a right column of 320–340 px on wide screens (cash balance, workload lists with thin bars); below `lg` it moves under the main content.
 - **States:** every server-data area shows loading, empty, error with «Повторити», and forbidden states per the [Admin UI rules](admin-ui.md). Empty and error messages are short and in Ukrainian.
-- **Dialogs and alerts:** dialogs 10 px radius with a 700-weight title; alerts use the tone `.light` surface, `text.primary` text, and a tone icon. Destructive confirmations use a contained `error` button.
+- **Dialogs and alerts:** dialogs (confirmations only; forms go into the side panel) 10 px radius with a 700-weight title; alerts use the tone `.light` surface, `text.primary` text, and a tone icon. Destructive confirmations use a contained `error` button.
 
 ## Checklist for a new feature
 
@@ -148,7 +149,8 @@ Use these for new pages. Prefer MUI components and the theme overrides; do not r
 4. Statuses are pills with text.
 5. Loading, empty, error, and forbidden states exist.
 6. Checked in light and dark themes, at phone, tablet, and desktop widths, with the sidebar expanded and collapsed.
-7. New routes are added to `apps/admin-react/src/app/router/legacy-menu.ts` so they appear in the sidebar and breadcrumbs.
+7. Adding and editing a list row uses the reference side panel, not a dialog or a page.
+8. New routes are added to `apps/admin-react/src/app/router/legacy-menu.ts` so they appear in the sidebar and breadcrumbs.
 
 ## Do and don't
 

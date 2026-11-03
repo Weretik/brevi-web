@@ -43,3 +43,7 @@ export * from './entities/sewing-card/sewing-article-summary';
 export * from './queries/sewing-card/sewing-blocker-reasons';
 export * from './queries/sewing-card/sewing-card-totals';
 export * from './queries/sewing-card/sewing-labour-lines';
+export * from './entities/ppe-card/ppe-supplier-offer';
+export * from './validators/ppe-card/ppe-supplier-offer-validation';
+export * from './forms/ppe-card/ppe-supplier-offer-form';
+export * from './queries/ppe-card/ppe-blocker-reasons';

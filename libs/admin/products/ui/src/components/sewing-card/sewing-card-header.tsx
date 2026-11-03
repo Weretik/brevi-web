@@ -6,6 +6,8 @@ import { SewingCardStatusPill } from './sewing-card-status-pill';
 import type { SewingCardTone } from './sewing-card-status-pill';
 
 interface Props {
+  /** Overline above the name; «Швейна продукція» by default. */
+  kindLabel?: string;
   name: string;
   code: string | null;
   sectionName: string | null;
@@ -21,7 +23,7 @@ interface Props {
   onDelete: () => void;
 }
 
-/** Page header of a sewing model card: what the sheet tab «Товари» holds for the model. */
+/** Page header of a product card: what the sheet tab «Товари» or «ЗІЗ» holds for the product. */
 export function SewingCardHeader(props: Props) {
   const line = [props.code, props.sectionName, props.season].filter(Boolean).join(' · ');
   return (
@@ -31,7 +33,7 @@ export function SewingCardHeader(props: Props) {
     >
       <Stack sx={{ gap: 1, minWidth: 0 }}>
         <Typography variant="overline" sx={{ color: 'text.secondary' }}>
-          Швейна продукція
+          {props.kindLabel ?? 'Швейна продукція'}
         </Typography>
         <Typography variant="h4" component="h1" sx={{ overflowWrap: 'anywhere' }}>
           {props.name}

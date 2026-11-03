@@ -1,9 +1,3 @@
-export * from './product-detail/product-characteristics-detail';
-export * from './product-detail/product-detail-content';
-export * from './product-detail/product-detail-gallery';
-export * from './product-detail/product-detail-header';
-export * from './product-detail/product-detail-section';
-export * from './product-detail/product-information-detail';
 export * from './product-editor/content/product-characteristic-fields';
 export * from './product-editor/content/product-characteristic-rows';
 export * from './product-editor/content/product-description-fields';
@@ -28,9 +22,6 @@ export * from './media/media-delete-dialog';
 export * from './media/media-gallery';
 export * from './media/media-upload';
 
-export { PpePricingPanel } from './components/ppe-pricing/ppe-pricing-panel';
-export { PpeOfferForm } from './forms/ppe-pricing/ppe-offer-form';
-export { PpeRuleForm } from './forms/ppe-pricing/ppe-rule-form';
 export * from './components/product-overview/product-overview-details';
 export * from './components/product-overview/product-overview-form';
 export * from './components/product-overview/product-overview-grid';
@@ -41,5 +32,7 @@ export * from './components/sewing-card/sewing-card-metric-strip';
 export * from './components/sewing-card/sewing-card-status-pill';
 export * from './components/sewing-card/sewing-article-summary-grid';
 export * from './components/sewing-card/sewing-labour-table';
+export * from './components/ppe-card/ppe-supplier-form';
+export * from './components/ppe-card/ppe-card-prices';
 export * from './components/sewing-pricing/sewing-price-format';
 export * from './forms/sewing-articles/sewing-article-create-form';

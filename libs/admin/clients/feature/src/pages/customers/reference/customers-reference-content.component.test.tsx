@@ -8,6 +8,7 @@ import { CustomersReferenceContent } from './customers-reference-content';
 const fixture = vi.hoisted(() => ({
   queries: [] as Record<string, unknown>[],
   sync: vi.fn(),
+  create: vi.fn(),
 }));
 const row = {
   publicId: '11111111-1111-4111-8111-111111111111',
@@ -43,6 +44,7 @@ vi.mock('@admin/clients/data-access', () => ({
     };
   },
   useSyncCustomersFromKeepinCrmMutation: () => [fixture.sync, { isLoading: false }],
+  useCreateCustomerMutation: () => [fixture.create, { isLoading: false }],
 }));
 
 afterEach(() => {
@@ -64,6 +66,27 @@ function renderContent(url = '/references/counterparties?tab=clients') {
 }
 
 describe('«Контрагенти → Клієнти»', () => {
+  it('adds a client in the side panel and stays on the list', async () => {
+    const user = userEvent.setup();
+    fixture.create.mockReturnValue({
+      unwrap: () => Promise.resolve({ ...row, displayName: 'ТОВ Старт' }),
+    });
+    const router = renderContent();
+
+    await user.click(screen.getByRole('button', { name: 'Додати клієнта' }));
+    const panel = screen.getByRole('dialog', { name: 'Новий клієнт' });
+    expect(panel).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Зберегти' }));
+    expect(fixture.create).not.toHaveBeenCalled();
+
+    await user.type(screen.getAllByRole('textbox')[0]!, 'ТОВ Старт');
+    await user.click(screen.getByRole('button', { name: 'Зберегти' }));
+
+    expect(await screen.findByText('Клієнта «ТОВ Старт» створено.')).toBeVisible();
+    expect(screen.queryByRole('dialog', { name: 'Новий клієнт' })).not.toBeInTheDocument();
+    expect(router.state.location.pathname).toBe('/references/counterparties');
+  });
+
   it('shows KeepinCRM clients with activity counts and opens the card on a row', async () => {
     const user = userEvent.setup();
     const router = renderContent();

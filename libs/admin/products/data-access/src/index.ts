@@ -36,6 +36,10 @@ export { useGetSewingArticleSummaryQuery } from './api/sewing-pricing/article-su
 export { useGetPpeProductPricesQuery } from './api/ppe-pricing/products.api';
 export { useCreatePpeOfferVersionMutation } from './api/ppe-pricing/offers.api';
 export {
+  useGetPpeSupplierOfferQuery,
+  useUpdatePpeSupplierOfferMutation,
+} from './api/ppe-card/ppe-supplier-offer.api';
+export {
   useGetPpePricingRuleQuery,
   useCreatePpeRuleVersionMutation,
 } from './api/ppe-pricing/rules.api';

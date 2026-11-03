@@ -1031,6 +1031,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/products/{productId}/ppe-offer': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        productId: number;
+      };
+      cookie?: never;
+    };
+    /** @description CatalogRead. The PPE product card (CAT-008): supplier fields from the sheet tab «ЗІЗ», Insight XML prices of the current offer version and the live three-tier calculation. Nothing is saved. */
+    get: operations['getPpeSupplierOffer'];
+    /** @description CanManageProducts. Replaces the supplier fields. When the supplier price or the rule changes, appends an approved offer version (source «Картка ЗІЗ», server actor/time) that keeps the Insight prices; expectedOfferVersionId must name the current version (null when none). */
+    put: operations['updatePpeSupplierOffer'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/crm/customers': {
     parameters: {
       query?: never;
@@ -3529,6 +3549,34 @@ export interface components {
       /** Format: uuid */
       requestId: string;
       values: components['schemas']['PpeOfferValues'];
+    };
+    PpeSupplierOffer: {
+      /** Format: int32 */
+      productId: number;
+      unit: string | null;
+      supplierId: number | null;
+      supplierName: string | null;
+      supplierSku: string | null;
+      supplierUrl: string | null;
+      supplierPrice: number | null;
+      allowManualPrice: boolean;
+      ruleCode: string | null;
+      insightWholesale: number | null;
+      insightRetail: number | null;
+      offerVersionId: string | null;
+      priceUpdatedAt: string | null;
+      calculation: components['schemas']['PpePriceCalculation'];
+    };
+    UpdatePpeSupplierOfferRequest: {
+      /** Format: int32 */
+      supplierId: number;
+      supplierSku?: string | null;
+      supplierUrl?: string | null;
+      supplierPrice?: number | null;
+      allowManualPrice: boolean;
+      ruleCode?: string | null;
+      unit?: string | null;
+      expectedOfferVersionId?: string | null;
     };
     CrmCustomerSummary: {
       /** Format: uuid */
@@ -7952,6 +8000,117 @@ export interface operations {
         content?: never;
       };
       /** @description Expected version changed, or request UUID reused with another actor or payload. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getPpeSupplierOffer: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        productId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Card supplier fields and calculation. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PpeSupplierOffer'];
+        };
+      };
+      /** @description Invalid Product ID. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description CatalogRead required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description PPE Product missing. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updatePpeSupplierOffer: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        productId: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdatePpeSupplierOfferRequest'];
+      };
+    };
+    responses: {
+      /** @description Saved card. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PpeSupplierOffer'];
+        };
+      };
+      /** @description Invalid fields, unknown supplier or rule. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Required policy or actor claim missing. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description PPE Product missing. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The current offer version changed. */
       409: {
         headers: {
           [name: string]: unknown;

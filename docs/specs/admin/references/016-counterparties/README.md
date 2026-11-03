@@ -7,7 +7,7 @@ Step 4 of moving the client's Calculator into Brevi. The product owner asked on 
 ## Rules
 
 - **R-01:** `/references/counterparties` holds the tabs «Постачальники» (default) and «Клієнти» (`?tab=clients`). The menu shows «Контрагенти» in «Загальні довідники». «Клієнти» and the placeholder «Постачальники» are removed from «Менеджер сервісу».
-- **R-02:** The old addresses redirect: `/references/supplier` → `/references/counterparties`, and `/crm/clients` → `/references/counterparties?tab=clients`. Client cards stay at `/crm/clients/:id` and `/crm/clients/new`, and their back button returns to the clients tab.
+- **R-02:** The old addresses redirect: `/references/supplier` → `/references/counterparties`, and `/crm/clients` → `/references/counterparties?tab=clients`. Client cards stay at `/crm/clients/:id`, and their back button returns to the clients tab. Since [products spec 010](../../products/010-ppe-product-card/README.md) «Додати клієнта» opens the reference side panel and `/crm/clients/new` redirects to the clients tab.
 - **R-03:** The clients tab follows reference pattern B: a header with «Оновити з KeepinCRM» and «Додати клієнта», a full-width search row, activity chips with server counts, then the table. Search, the activity filter and the page live in the URL and run on the server; search waits 300 ms after typing.
 - **R-04:** The table shows the name with its KeepinCRM ID, the type, the contact person, the phones and the status. Clicking a row opens the card.
 - **R-06:** Like suppliers, the clients subtitle shows «Картки оновлюються з KeepinCRM щодня. Останнє оновлення: …», the latest `keepinSyncedAt` of the listed clients. It shows the plain description until the first sync.

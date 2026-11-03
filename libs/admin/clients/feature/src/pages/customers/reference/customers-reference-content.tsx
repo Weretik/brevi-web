@@ -12,6 +12,7 @@ import { Alert, Box, Button, Paper } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { CustomerCreateDrawer } from '../../../components/customers/customer-create-drawer';
 import { customerError } from '../../../errors/customer-error';
 import { useCustomerKeepinSync } from '../../../hooks/customers/use-customer-keepin-sync';
 import { useCustomerReferenceList } from '../../../hooks/customers/use-customer-reference-list';
@@ -28,6 +29,7 @@ export function CustomersReferenceContent({ tabs }: Props) {
   const navigate = useNavigate();
   const state = useCustomerReferenceList();
   const [notice, setNotice] = useState<{ text: string; ok: boolean } | null>(null);
+  const [creating, setCreating] = useState(false);
   const { sync, syncing } = useCustomerKeepinSync((text, ok) => setNotice({ text, ok }));
   const { list } = state;
   const page = list.currentData;
@@ -66,7 +68,7 @@ export function CustomersReferenceContent({ tabs }: Props) {
             <Button
               variant="contained"
               startIcon={<AddOutlinedIcon />}
-              onClick={() => navigate('/crm/clients/new')}
+              onClick={() => setCreating(true)}
             >
               Додати клієнта
             </Button>
@@ -115,6 +117,15 @@ export function CustomersReferenceContent({ tabs }: Props) {
           onOpen={(id) => navigate(`/crm/clients/${id}`)}
         />
       </Paper>
+      {creating && (
+        <CustomerCreateDrawer
+          onClose={() => setCreating(false)}
+          onCreated={(customer) => {
+            setCreating(false);
+            setNotice({ text: `Клієнта «${customer.displayName}» створено.`, ok: true });
+          }}
+        />
+      )}
     </Box>
   );
 }
