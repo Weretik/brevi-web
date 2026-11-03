@@ -1,13 +1,12 @@
-import { MediaUploadStatus } from '@admin/media/ui';
+import { MediaDropOverlay, MediaToastStack, MediaUploadStatus } from '@admin/media/ui';
 import {
   ReferenceBulkDeleteButton,
-  ReferenceListAlerts,
   ReferencePageHeader,
   ReferenceSearchBar,
 } from '@admin/references/ui';
 import DriveFileMoveOutlinedIcon from '@mui/icons-material/DriveFileMoveOutlined';
 import { Box, Button } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { MediaFileDrawer } from '../../components/files/media-file-drawer';
 import { MediaMoveDrawer } from '../../components/files/media-move-drawer';
@@ -17,6 +16,7 @@ import { MediaFolderPanel } from '../../components/library/media-folder-panel';
 import { MediaLibraryFilters } from '../../components/library/media-library-filters';
 import { MediaUploadButton } from '../../components/library/media-upload-button';
 import { MediaDeleteDialogs } from '../../dialogs/media-delete-dialogs';
+import { useFileDrop } from '../../hooks/files/use-file-drop';
 import { useMediaFileDeletion } from '../../hooks/files/use-media-file-deletion';
 import { useMediaFileEditor } from '../../hooks/files/use-media-file-editor';
 import { useMediaMove } from '../../hooks/files/use-media-move';
@@ -26,6 +26,8 @@ import { useMediaFolderEditor } from '../../hooks/folders/use-media-folder-edito
 import { useMediaFolders } from '../../hooks/folders/use-media-folders';
 import { useMediaFileSearch } from '../../hooks/library/use-media-file-search';
 import { useMediaSelection } from '../../hooks/library/use-media-selection';
+import { useMediaToasts } from '../../hooks/library/use-media-toasts';
+import { describeMediaUpload } from '../../model/media-upload-summary';
 import { useMediaLibraryUrlState } from '../../state/media-library-url-state';
 
 import type { MediaFolderNode } from '@admin/media/model';
@@ -33,26 +35,27 @@ import type { MediaFolderAction } from '@admin/media/ui';
 
 export function MediaLibraryPage() {
   const { state, update } = useMediaLibraryUrlState();
-  const [actionMessage, setActionMessage] = useState<string | null>(null);
+  const toasts = useMediaToasts();
+  const notify = toasts.show;
   const folders = useMediaFolders(state.folderId);
   const search = useMediaFileSearch(state);
   const selection = useMediaSelection();
   const upload = useMediaUploadQueue();
-  const fileEditor = useMediaFileEditor(setActionMessage);
+  const fileEditor = useMediaFileEditor(notify);
   const move = useMediaMove((message) => {
     selection.clear();
-    setActionMessage(message);
+    notify(message);
   });
   const fileDeletion = useMediaFileDeletion((message) => {
     selection.clear();
-    setActionMessage(message);
+    notify(message);
   });
   const folderEditor = useMediaFolderEditor(folders.tree, (folder, message) => {
-    setActionMessage(message);
+    notify(message);
     navigate({ folderId: folder.id });
   });
   const folderDeletion = useMediaFolderDeletion((node, message) => {
-    setActionMessage(message);
+    notify(message);
     if (state.folderId === node.folder.id) navigate({ folderId: node.folder.parentId });
   });
 
@@ -79,8 +82,9 @@ export function MediaLibraryPage() {
     if (action === 'add-child') folderEditor.create(node.folder.id);
     else if (action === 'edit') folderEditor.edit(node);
     else if (node.totalCount > 0 || node.children.length > 0)
-      setActionMessage(
-        `Не вдалося видалити папку «${node.folder.name}»: у ній є фото або підпапки. Спочатку перемістіть їх.`,
+      toasts.show(
+        `Папку «${node.folder.name}» не можна видалити: у ній є фото або підпапки. Спочатку перемістіть їх.`,
+        'warning',
       );
     else folderDeletion.request(node);
   }
@@ -88,13 +92,25 @@ export function MediaLibraryPage() {
   async function copyUrl(url: string) {
     try {
       await navigator.clipboard.writeText(url);
-      setActionMessage('Посилання скопійовано.');
+      notify('Посилання скопійовано.');
     } catch {
-      setActionMessage('Не вдалося скопіювати посилання. Відкрийте оригінал і скопіюйте адресу.');
+      notify('Не вдалося скопіювати посилання. Відкрийте оригінал і скопіюйте адресу.');
     }
   }
 
   const place = selectedNode ? folders.pathOf(selectedNode.folder.id) : 'Уся бібліотека';
+
+  async function uploadFiles(files: File[]) {
+    if (upload.active) {
+      toasts.show('Зачекайте, попереднє завантаження ще триває.', 'warning');
+      return;
+    }
+    const result = await upload.upload(files, state.folderId);
+    if (!result) return;
+    const summary = describeMediaUpload(result);
+    toasts.show(summary.text, summary.tone);
+  }
+  const drop = useFileDrop((files) => void uploadFiles(files));
   const selectedIds = [...selection.selectedIds];
 
   return (
@@ -121,25 +137,12 @@ export function MediaLibraryPage() {
             )}
             <MediaUploadButton
               disabled={upload.active}
-              onFiles={(files) => void upload.upload(files, state.folderId)}
+              onFiles={(files) => void uploadFiles(files)}
             />
           </>
         }
       />
-      <ReferenceListAlerts
-        error={null}
-        loading={false}
-        onRetry={() => undefined}
-        actionMessage={actionMessage}
-        onCloseActionMessage={() => setActionMessage(null)}
-      />
-      <MediaUploadStatus
-        total={upload.total}
-        done={upload.done}
-        active={upload.active}
-        failures={upload.failures}
-        onClose={upload.reset}
-      />
+      <MediaUploadStatus total={upload.total} done={upload.done} active={upload.active} />
 
       <Box
         sx={{
@@ -190,8 +193,8 @@ export function MediaLibraryPage() {
                 : search.searching
                   ? 'За вашим пошуком фото не знайдено.'
                   : selectedNode
-                    ? 'У цій папці ще немає фото. Завантажте їх кнопкою «Завантажити фото».'
-                    : 'Бібліотека поки порожня.'
+                    ? 'У цій папці ще немає фото. Перетягніть їх сюди або натисніть «Завантажити фото».'
+                    : 'Бібліотека поки порожня. Перетягніть фото сюди або натисніть «Завантажити фото».'
             }
             folderLabel={
               search.searching || !selectedNode || state.includeSubfolders
@@ -215,6 +218,8 @@ export function MediaLibraryPage() {
       <MediaMoveDrawer move={move} folderOptions={folders.options} />
       <MediaFolderDrawer editor={folderEditor} />
       <MediaDeleteDialogs files={fileDeletion} folder={folderDeletion} />
+      <MediaDropOverlay open={drop.dragging} target={place} />
+      <MediaToastStack toasts={toasts.toasts} onClose={toasts.close} />
     </Box>
   );
 }

@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -126,6 +126,30 @@ describe('MediaLibraryPage', () => {
     expect(api.upload).toHaveBeenCalledTimes(1);
     expect(api.upload).toHaveBeenCalledWith({ file: a, folderId: 2 });
     expect(screen.getByText(/«b.gif» — Підтримуються лише JPEG, PNG і WebP./)).toBeInTheDocument();
+  });
+
+  it('uploads photos dropped anywhere on the page', async () => {
+    api.upload.mockResolvedValue(files[0]);
+    renderPage('/media?folder=1');
+    const photo = new File(['a'], 'drop.jpg', { type: 'image/jpeg' });
+    const dragEvent = (type: string) => {
+      const event = new Event(type, { bubbles: true, cancelable: true });
+      Object.defineProperty(event, 'dataTransfer', {
+        value: { types: ['Files'], files: [photo], dropEffect: 'none' },
+      });
+      return event;
+    };
+
+    act(() => {
+      window.dispatchEvent(dragEvent('dragenter'));
+    });
+    expect(screen.getByText('Відпустіть фото, щоб завантажити')).toBeInTheDocument();
+    act(() => {
+      window.dispatchEvent(dragEvent('drop'));
+    });
+
+    await waitFor(() => expect(api.upload).toHaveBeenCalledWith({ file: photo, folderId: 1 }));
+    expect(await screen.findByText('Завантажено фото: 1.')).toBeInTheDocument();
   });
 
   it('opens a photo with the products that use it', async () => {
