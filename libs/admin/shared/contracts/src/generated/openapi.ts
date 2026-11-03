@@ -2479,7 +2479,7 @@ export interface components {
       id: number;
       name: string;
       parentId?: number | null;
-      /** @description Photos directly in this folder */
+      /** @description Photos directly in this folder, without subfolders. */
       fileCount: number;
     };
     MediaFolderInput: {
@@ -2515,7 +2515,7 @@ export interface components {
     MediaUsageResponse: {
       /** @description Where the photo is used, for example «Товари». */
       area: string;
-      /** @description Id of the owner */
+      /** @description Id of the owner, for example the product id. */
       ownerId: number;
       /** @description For example the product name. */
       title: string;
@@ -5678,7 +5678,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Duplicate sibling name */
+      /** @description Duplicate sibling name, move into itself or its subfolder, or depth limit. */
       409: {
         headers: {
           [name: string]: unknown;
@@ -5726,9 +5726,9 @@ export interface operations {
       query?: {
         /** @description Omit to search the whole library. */
         folderId?: number;
-        /** @description With folderId */
+        /** @description With folderId, also search its subfolders. */
         includeSubfolders?: boolean;
-        /** @description Part of the photo name */
+        /** @description Part of the photo name, case-insensitive. */
         search?: string;
         page?: number;
         pageSize?: number;
@@ -5794,7 +5794,7 @@ export interface operations {
           'application/json': components['schemas']['MediaFileResponse'];
         };
       };
-      /** @description Missing */
+      /** @description Missing, too large, unsupported or fake image. */
       400: {
         headers: {
           [name: string]: unknown;
@@ -5899,7 +5899,7 @@ export interface operations {
           'application/json': components['schemas']['MediaFileResponse'];
         };
       };
-      /** @description Invalid name */
+      /** @description Invalid name, alt or folder id. */
       400: {
         headers: {
           [name: string]: unknown;

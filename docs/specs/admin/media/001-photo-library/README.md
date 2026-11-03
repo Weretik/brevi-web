@@ -58,7 +58,7 @@ page and its components under `libs/admin/products` were removed;
 - `npx nx run-many -t test lint typecheck typecheck-tests -p admin-media-model admin-media-data-access admin-media-ui admin-media-feature` — green.
 - `npx nx test admin-products-data-access`, `npx nx test admin-react -- src/app/router` — green.
 - `npx nx test admin-products-feature` — one failure, `use-product.unit.test.tsx`, fails the same way on `master`.
-- `npm run contracts:check` — snapshot `f6a486b7425e9e626a59459f0c0d2cb564baffe8`.
+- `npm run contracts:check` — snapshot `8ade8d0dbbe86666cca85df691e7d04b345ef9e5`.
 - E2E specs updated (`media.spec.ts`, `products.spec.ts`), not run.
 
 ## Next stages
