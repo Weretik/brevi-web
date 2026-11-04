@@ -26,4 +26,5 @@ The next agreed stage is captured in five separate change SDDs:
 - [Pricing parameters: Calculator sheet «Налаштування цін»](015-pricing-parameters-sheet/README.md) — implemented 2026-11-02, replaces 006 and 011;
 - [«Контрагенти»: suppliers and clients from KeepinCRM](016-counterparties/README.md) — implemented 2026-11-03;
 - [«Типи і розділи»: product sections](017-product-sections/README.md) — implemented 2026-11-03;
+- [«Імпорт цін»: PPE supplier prices](018-price-import/README.md) — stage 1 implemented 2026-11-04;
 - [Products](../products/003-products-table-pages/README.md) remains in the products domain.

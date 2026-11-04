@@ -1401,6 +1401,57 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/pricing/ppe/supplier-prices': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description CatalogRead. Sources of «Довідники» → «Імпорт цін» with logic, schedule, discount, product counts and the last run. */
+    get: operations['listPpePriceSources'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/pricing/ppe/supplier-prices/{key}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** @description RequireAdminRole (administrators and the director). Saves the discount and, optionally, the «Постачальники» row. */
+    put: operations['updatePpePriceSource'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/pricing/ppe/supplier-prices/{key}/import': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description CanManageProducts. Reads the supplier's files (Insight: 3 XML; СЕМТО: 1 PDF; each may be gzipped) and returns every product of the supplier with old and new prices. dryRun=false saves changed prices as new approved offer versions; manual-price and inactive products are skipped. Request limit 30 MB. */
+    post: operations['importPpeSupplierPrices'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/crm/customers': {
     parameters: {
       query?: never;
@@ -4269,6 +4320,95 @@ export interface components {
       ruleCode?: string | null;
       unit?: string | null;
       expectedOfferVersionId?: string | null;
+    };
+    PpePriceImportProblem: {
+      productCode: string | null;
+      productName: string | null;
+      message: string;
+    };
+    PpePriceImportRun: {
+      sourceKey: string;
+      /** @description «Файл», later «Розклад» or «Оновити зараз». */
+      trigger: string;
+      actor: string;
+      /** Format: date-time */
+      finishedAt: string;
+      /** Format: int32 */
+      checked: number;
+      /** Format: int32 */
+      changed: number;
+      /** Format: int32 */
+      unchanged: number;
+      /** Format: int32 */
+      skipped: number;
+      problems: components['schemas']['PpePriceImportProblem'][];
+    };
+    PpePriceSourceView: {
+      key: string;
+      title: string;
+      /** @enum {string} */
+      method: 'Website' | 'GoogleSheets' | 'SupplierCabinet' | 'File';
+      schedule: string;
+      logic: string;
+      discountPercent: number;
+      defaultDiscountPercent: number;
+      /** Format: int32 */
+      supplierId: number | null;
+      supplierName: string | null;
+      /** Format: int32 */
+      productCount: number;
+      /** Format: int32 */
+      manualPriceCount: number;
+      /** @enum {string} */
+      fileKind: 'None' | 'InsightYml' | 'CemtoPdf';
+      /** Format: int32 */
+      fileCount: number;
+      /** @description False until stages 2–3 connect the scheduled update. */
+      automaticUpdateConnected: boolean;
+      /** Format: date-time */
+      settingsUpdatedAt: string | null;
+      settingsUpdatedBy: string | null;
+      lastRun: components['schemas']['PpePriceImportRun'] | null;
+    };
+    PpePriceSourcesResponse: {
+      /** @description True for administrators and the director (they hold Admin). */
+      canChangeDiscounts: boolean;
+      sources: components['schemas']['PpePriceSourceView'][];
+    };
+    UpdatePpePriceSourceRequest: {
+      /** @description Up to 2 decimals. */
+      discountPercent: number;
+      /** Format: int32 */
+      supplierId?: number | null;
+    };
+    PpePriceImportRow: {
+      /** Format: int32 */
+      productId: number;
+      code: string | null;
+      name: string;
+      /** @enum {string} */
+      status: 'Changed' | 'Unchanged' | 'ManualPrice' | 'Inactive' | 'NotInFile' | 'Invalid';
+      oldPrice: number | null;
+      newPrice: number | null;
+      oldWholesale: number | null;
+      newWholesale: number | null;
+      oldRetail: number | null;
+      newRetail: number | null;
+      message: string | null;
+    };
+    PpePriceImportResult: {
+      sourceKey: string;
+      applied: boolean;
+      discountPercent: number;
+      /** Format: int32 */
+      checked: number;
+      /** Format: int32 */
+      changed: number;
+      /** Format: int32 */
+      unchanged: number;
+      /** Format: int32 */
+      skipped: number;
+      rows: components['schemas']['PpePriceImportRow'][];
     };
     CrmCustomerSummary: {
       /** Format: uuid */
@@ -10015,6 +10155,157 @@ export interface operations {
       };
       /** @description The current offer version changed. */
       409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  listPpePriceSources: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Sources. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PpePriceSourcesResponse'];
+        };
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Required policy or actor claim missing. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updatePpePriceSource: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        key: 'av-center' | '3c-market' | 'perchatka-centr' | 'insight' | 'trele' | 'cemto';
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdatePpePriceSourceRequest'];
+      };
+    };
+    responses: {
+      /** @description Saved. */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Invalid request; body lists the reasons in Ukrainian. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Required policy or actor claim missing. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unknown source. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  importPpeSupplierPrices: {
+    parameters: {
+      query?: {
+        dryRun?: boolean;
+      };
+      header?: never;
+      path: {
+        key: 'av-center' | '3c-market' | 'perchatka-centr' | 'insight' | 'trele' | 'cemto';
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'multipart/form-data': {
+          files: string[];
+        };
+      };
+    };
+    responses: {
+      /** @description Preview or applied result. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PpePriceImportResult'];
+        };
+      };
+      /** @description Invalid request; body lists the reasons in Ukrainian. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Required policy or actor claim missing. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unknown source. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Files too large. */
+      413: {
         headers: {
           [name: string]: unknown;
         };
