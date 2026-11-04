@@ -2,6 +2,7 @@ import type {
   PriceFileKind,
   PriceImportRow,
   PriceImportStatus,
+  PriceSource,
   PriceSourceMethod,
 } from '../../entities/price-import/price-source';
 
@@ -21,6 +22,11 @@ export function priceFileLabel(kind: PriceFileKind, count: number): string | nul
   return null;
 }
 
+/** Brevi reads this supplier's site, Google Sheets or cabinet itself, so «Оновити зараз» is offered. */
+export const canRefreshPriceSource = (
+  source: Pick<PriceSource, 'method' | 'automaticUpdateConnected'>,
+): boolean => source.method !== 'File' && source.automaticUpdateConnected;
+
 /** Accepted file types of the upload input. */
 export function priceFileAccept(kind: PriceFileKind): string {
   return kind === 'CemtoPdf' ? '.pdf,application/pdf' : '.xml,text/xml,application/xml';
@@ -31,7 +37,7 @@ const statusLabels: Record<PriceImportStatus, string> = {
   Unchanged: 'Без змін',
   ManualPrice: 'Ручна ціна',
   Inactive: 'Неактивний',
-  NotInFile: 'Немає у файлі',
+  NotInFile: 'Не знайдено',
   Invalid: 'Ціну не змінено',
 };
 

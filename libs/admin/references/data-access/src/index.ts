@@ -52,6 +52,10 @@ export {
 export {
   useImportPriceFilesMutation,
   useListPriceSourcesQuery,
+  useRefreshPriceSourceMutation,
   useUpdatePriceSourceMutation,
 } from './api/price-import/price-import.api';
-export type { ImportPriceFilesRequest } from './api/price-import/price-import.api';
+export type {
+  ImportPriceFilesRequest,
+  RefreshPriceSourceRequest,
+} from './api/price-import/price-import.api';

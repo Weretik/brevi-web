@@ -1452,6 +1452,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/pricing/ppe/supplier-prices/{key}/refresh': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description CanManageProducts. «Оновити зараз» for a connected website or Google Sheets source (av-center, 3c-market, perchatka-centr): reads the supplier's pages or the six 3C lists now and returns every product of the supplier with old and new prices. A page without a price or a failed page is a row problem; a 3C list that does not load fails the request with 400 and changes nothing. dryRun=false reads again and saves changed prices as new approved offer versions. File and not yet connected sources answer 400. */
+    post: operations['refreshPpeSupplierPrices'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/crm/customers': {
     parameters: {
       query?: never;
@@ -3596,7 +3613,7 @@ export interface components {
       fileKind: 'None' | 'InsightYml' | 'CemtoPdf';
       /** Format: int32 */
       fileCount: number;
-      /** @description False until stages 2–3 connect the scheduled update. */
+      /** @description The scheduled update works and «Оновити зараз» is offered (website and Google Sheets sources from stage 2; cabinet sources in stage 3). */
       automaticUpdateConnected: boolean;
       /** Format: date-time */
       settingsUpdatedAt: string | null;
@@ -8778,6 +8795,58 @@ export interface operations {
       };
       /** @description Files too large. */
       413: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  refreshPpeSupplierPrices: {
+    parameters: {
+      query?: {
+        dryRun?: boolean;
+      };
+      header?: never;
+      path: {
+        key: 'av-center' | '3c-market' | 'perchatka-centr' | 'insight' | 'trele' | 'cemto';
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Preview or applied result. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PpePriceImportResult'];
+        };
+      };
+      /** @description Invalid request; body lists the reasons in Ukrainian. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Required policy or actor claim missing. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unknown source. */
+      404: {
         headers: {
           [name: string]: unknown;
         };
