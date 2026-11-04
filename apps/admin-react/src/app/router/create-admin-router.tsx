@@ -11,7 +11,12 @@ import {
 import { createProfileRoutes, createUsersRoutes } from '@admin/users/feature';
 import { createBrowserRouter } from 'react-router-dom';
 
-import { adminRouteDefinitions, productionRoutes, tasksRoutes } from './admin-route-definitions';
+import {
+  adminRouteDefinitions,
+  productionOrderRoutes,
+  productionRoutes,
+  tasksRoutes,
+} from './admin-route-definitions';
 import { AdminRouteLayout } from './admin-route-layout';
 import { NotFoundPage } from '../pages/not-found-page';
 
@@ -32,6 +37,12 @@ const profileRoutes = createProfileRoutes({ onProfileChanged: refreshSession });
 const canWorkOnTasks = (user: SessionUser): boolean =>
   user.roles.includes('Admin') || user.roles.includes('Manager');
 
+/** «Виробничі завдання»: managers pass КП to the workshop; the head of the workshop runs them. */
+const canUseProductionOrders = (user: SessionUser): boolean =>
+  user.roles.includes('Admin') ||
+  user.roles.includes('Manager') ||
+  user.roles.includes('WorkshopChief');
+
 export function createAdminRouter() {
   return createBrowserRouter([
     { path: loginPath, element: <LoginPage /> },
@@ -46,6 +57,10 @@ export function createAdminRouter() {
         { element: <RequireRole allow={canManageUsers} />, children: tasksRoutes.admin },
         { element: <RequireRole allow={canWorkOnTasks} />, children: tasksRoutes.board },
         { element: <RequireRole allow={canManageWorkshop} />, children: productionRoutes },
+        {
+          element: <RequireRole allow={canUseProductionOrders} />,
+          children: productionOrderRoutes,
+        },
         { path: '*', element: <NotFoundPage /> },
       ],
     },

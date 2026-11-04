@@ -2331,6 +2331,136 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/production/orders': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Not deleted orders, newest number first; counts by status ignore the status filter */
+    get: operations['getProductionOrders'];
+    put?: never;
+    /** «Передати в цех»: an order from a sent КП; a repeat with the same requestId returns the same order */
+    post: operations['createProductionOrder'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/orders/quote-sources': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Sent КП «під запит» the person may pass to the workshop (Manager: own; Admin: all) */
+    get: operations['getProductionQuoteSources'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/orders/quote-sources/{quoteId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        quoteId: number;
+      };
+      cookie?: never;
+    };
+    /** The КП for the order form: sewn items, fabric variants, workshop norm and (not for managers) the sewing rate */
+    get: operations['getProductionQuoteDraft'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/orders/import': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Admin: move orders of the old «Цех»; with dryRun only a preview. A list with any wrong order saves nothing */
+    post: operations['importProductionOrders'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/orders/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    /** An order with its items; prices are hidden by role */
+    get: operations['getProductionOrder'];
+    /** Save the header and item details; every changed field goes to «Історія змін» */
+    put: operations['updateProductionOrder'];
+    post?: never;
+    /** Admin: remove the order from the lists; its history stays */
+    delete: operations['deleteProductionOrder'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/orders/{id}/history': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    /** «Історія змін», newest first */
+    get: operations['getProductionOrderHistory'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/orders/{id}/copy': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** «Копіювати»: a new «Нове» order of the person who copies, dated today */
+    post: operations['copyProductionOrder'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/reminders/non-working-days': {
     parameters: {
       query?: never;
@@ -5261,6 +5391,238 @@ export interface components {
       updatedOn?: string | null;
       /** @description Set only when the parameter is missing or has no value. */
       problem?: string | null;
+    };
+    ProductionOrderSummaryResponse: {
+      id: number;
+      number: number;
+      /** @enum {string} */
+      status: 'New' | 'Closed' | 'Cancelled';
+      clientName: string;
+      quoteId: number | null;
+      quoteNumber: string | null;
+      managerName: string;
+      /** Format: date */
+      orderDate: string;
+      itemsCount: number;
+      totalQuantity: number;
+      /** Format: date */
+      nearestDueDate: string | null;
+      isTransferred: boolean;
+      /** Format: date-time */
+      updatedAt: string;
+    };
+    ProductionOrderCounts: {
+      all: number;
+      new: number;
+      closed: number;
+      cancelled: number;
+    };
+    ProductionOrderPageResponse: {
+      items: components['schemas']['ProductionOrderSummaryResponse'][];
+      page: number;
+      pageSize: number;
+      total: number;
+      counts: components['schemas']['ProductionOrderCounts'];
+      managers: string[];
+    };
+    ItemApplicationInput: {
+      /** @enum {string} */
+      kind: 'Embroidery' | 'Print';
+      place?: string | null;
+      description?: string | null;
+      color?: string | null;
+    };
+    ProductionItemDetailsInput: {
+      quantity: number;
+      /** Format: date */
+      dueDate: string;
+      mainColor: string;
+      additionalColors: string[];
+      sizesText?: string | null;
+      technicalChanges?: string | null;
+      comment?: string | null;
+      applications: components['schemas']['ItemApplicationInput'][];
+    };
+    CreateProductionItemInput: {
+      quoteItemId: number;
+      quoteOptionId: number;
+      details: components['schemas']['ProductionItemDetailsInput'];
+    };
+    CreateProductionOrderInput: {
+      /** Format: uuid */
+      requestId: string;
+      quoteId: number;
+      clientName: string;
+      /** Format: date */
+      orderDate: string;
+      comment?: string | null;
+      /** @enum {string} */
+      priceTier: 'Retail' | 'Wholesale' | 'Large';
+      items: components['schemas']['CreateProductionItemInput'][];
+    };
+    ProductionOrderPermissions: {
+      canEdit: boolean;
+      canCopy: boolean;
+      canDelete: boolean;
+      seesSewingRate: boolean;
+      seesReportPrice: boolean;
+    };
+    ItemApplicationResponse: {
+      /** @enum {string} */
+      kind: 'Embroidery' | 'Print';
+      place: string | null;
+      description: string | null;
+      color: string | null;
+    };
+    ProductionItemResponse: {
+      id: number;
+      position: number;
+      modelCode: string | null;
+      modelName: string;
+      fabricCode: string | null;
+      fabricName: string | null;
+      quantity: number;
+      /** Format: date */
+      dueDate: string;
+      mainColor: string;
+      additionalColors: string[];
+      sizesText: string | null;
+      technicalChanges: string | null;
+      comment: string | null;
+      applications: components['schemas']['ItemApplicationResponse'][];
+      plannedFabricMeters: number | null;
+      /** @description Null for a manager. */
+      sewingRate: number | null;
+      /** @description Null for anyone but Admin and Director. */
+      reportUnitPrice: number | null;
+    };
+    ProductionOrderResponse: {
+      id: number;
+      number: number;
+      /** @enum {string} */
+      status: 'New' | 'Closed' | 'Cancelled';
+      clientName: string;
+      quoteId: number | null;
+      quoteNumber: string | null;
+      managerName: string;
+      /** Format: date */
+      orderDate: string;
+      comment: string | null;
+      /**
+       * @description Null for anyone but Admin and Director.
+       * @enum {string|null}
+       */
+      priceTier: 'Retail' | 'Wholesale' | 'Large' | null;
+      isTransferred: boolean;
+      copiedFromOrderId: number | null;
+      /** Format: date-time */
+      createdAt: string;
+      createdByName: string;
+      /** Format: date-time */
+      updatedAt: string;
+      version: number;
+      permissions: components['schemas']['ProductionOrderPermissions'];
+      items: components['schemas']['ProductionItemResponse'][];
+    };
+    ProductionQuoteSourceResponse: {
+      id: number;
+      number: string;
+      clientName: string;
+      responsibleName: string;
+      /** Format: date-time */
+      lastSentAt: string | null;
+      ordersCount: number;
+    };
+    ProductionQuoteDraftOption: {
+      optionId: number;
+      title: string;
+      fabricCode: string | null;
+      fabricName: string | null;
+      retail: number | null;
+      wholesale: number | null;
+      large: number | null;
+      /** @description Null for a manager. */
+      sewingRate: number | null;
+    };
+    ProductionQuoteDraftItem: {
+      quoteItemId: number;
+      name: string;
+      modelCode: string | null;
+      norm: components['schemas']['FabricNormInput'] | null;
+      options: components['schemas']['ProductionQuoteDraftOption'][];
+    };
+    ProductionQuoteDraftResponse: {
+      quoteId: number;
+      number: string;
+      clientName: string;
+      managerName: string;
+      items: components['schemas']['ProductionQuoteDraftItem'][];
+    };
+    ProductionItemImportRow: {
+      modelCode?: string | null;
+      modelName: string;
+      fabricCode?: string | null;
+      fabricName?: string | null;
+      sewingRate?: number | null;
+      details: components['schemas']['ProductionItemDetailsInput'];
+    };
+    ProductionOrderImportRow: {
+      legacyId: string;
+      number: number;
+      quoteNumber?: string | null;
+      clientName: string;
+      managerEmail?: string | null;
+      managerName: string;
+      /** @enum {string} */
+      status: 'New' | 'Closed' | 'Cancelled';
+      /** Format: date */
+      orderDate: string;
+      comment?: string | null;
+      items: components['schemas']['ProductionItemImportRow'][];
+    };
+    ProductionOrderImportLine: {
+      number: number;
+      clientName: string;
+      items: number;
+      /** @enum {string} */
+      action: 'created' | 'unchanged' | 'error';
+      error: string | null;
+    };
+    ProductionOrderImportResult: {
+      dryRun: boolean;
+      created: number;
+      unchanged: number;
+      errors: number;
+      lines: components['schemas']['ProductionOrderImportLine'][];
+    };
+    UpdateProductionItemInput: {
+      id: number;
+      details: components['schemas']['ProductionItemDetailsInput'];
+      /** @description Applied only for Admin and the head of the workshop; null clears it. */
+      sewingRate?: number | null;
+    };
+    UpdateProductionOrderInput: {
+      version: number;
+      clientName: string;
+      /** Format: date */
+      orderDate: string;
+      comment?: string | null;
+      items: components['schemas']['UpdateProductionItemInput'][];
+    };
+    ProductionOrderChangeResponse: {
+      id: number;
+      itemId: number | null;
+      itemName: string | null;
+      field: string;
+      before: string | null;
+      after: string | null;
+      actorName: string;
+      /** Format: date-time */
+      at: string;
+    };
+    CopyProductionOrderInput: {
+      /** Format: uuid */
+      requestId: string;
     };
     NonWorkingDayResponse: {
       /** Format: date */
@@ -12675,6 +13037,490 @@ export interface operations {
         content: {
           'application/json': components['schemas']['PayrollParameterResponse'][];
         };
+      };
+    };
+  };
+  getProductionOrders: {
+    parameters: {
+      query?: {
+        search?: string;
+        status?: 'New' | 'Closed' | 'Cancelled';
+        manager?: string;
+        dueTo?: string;
+        page?: number;
+        pageSize?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description A page of orders. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionOrderPageResponse'];
+        };
+      };
+      /** @description Unknown status or wrong page. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders). */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createProductionOrder: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateProductionOrderInput'];
+      };
+    };
+    responses: {
+      /** @description The order. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionOrderResponse'];
+        };
+      };
+      /** @description Wrong fields, an item or fabric variant not in the КП, or a variant twice. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders). */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The КП is missing or not the manager’s own. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The КП is not sent or is archived. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getProductionQuoteSources: {
+    parameters: {
+      query?: {
+        search?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description КП. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionQuoteSourceResponse'][];
+        };
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders). */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getProductionQuoteDraft: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        quoteId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The КП. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionQuoteDraftResponse'];
+        };
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders). */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description КП not found or not the manager’s own. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The КП is not sent or is archived. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  importProductionOrders: {
+    parameters: {
+      query?: {
+        dryRun?: boolean;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ProductionOrderImportRow'][];
+      };
+    };
+    responses: {
+      /** @description What was or would be moved. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionOrderImportResult'];
+        };
+      };
+      /** @description Wrong rows. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders). */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getProductionOrder: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The order. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionOrderResponse'];
+        };
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders). */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found or deleted. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateProductionOrder: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateProductionOrderInput'];
+      };
+    };
+    responses: {
+      /** @description The order. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionOrderResponse'];
+        };
+      };
+      /** @description Wrong fields or an item not in the order. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders). */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The order was changed since it was read. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  deleteProductionOrder: {
+    parameters: {
+      query?: {
+        version?: number;
+      };
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description No content. */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders). */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Stale version. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getProductionOrderHistory: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Changes. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionOrderChangeResponse'][];
+        };
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders). */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  copyProductionOrder: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CopyProductionOrderInput'];
+      };
+    };
+    responses: {
+      /** @description The copy. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionOrderResponse'];
+        };
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders). */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };

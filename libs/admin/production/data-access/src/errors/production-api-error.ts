@@ -32,3 +32,10 @@ export function toProductionApiError(response: unknown, messages: AdminApiErrorM
   const first = Object.values(error.fieldErrors)[0];
   return first ? { ...error, message: first } : error;
 }
+
+export const productionOrderErrors = {
+  ...common,
+  unauthorized: 'Ця дія вам недоступна.',
+  notFound: 'Завдання або КП не знайдено. Оновіть сторінку.',
+  conflict: 'Завдання вже змінили або КП ще не відправлене. Оновіть сторінку.',
+} satisfies AdminApiErrorMessages;

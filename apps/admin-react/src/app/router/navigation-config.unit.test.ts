@@ -95,6 +95,7 @@ describe('legacy Admin navigation', () => {
 
   it('shows the «Швейний цех» pages to the head of the workshop and Admin only', () => {
     const paths = new Set([
+      '/production/orders',
       '/production/staff',
       '/production/fabric-norms',
       '/production/payroll-rules',
@@ -104,10 +105,26 @@ describe('legacy Admin navigation', () => {
 
     expect(
       shop(['WorkshopChief'])
-        ?.items.slice(0, 3)
+        ?.items.slice(0, 4)
         .map((item) => item.to),
-    ).toEqual(['/production/staff', '/production/fabric-norms', '/production/payroll-rules']);
-    expect(shop(['Admin'])?.items[0].label).toBe('Працівники цеху');
+    ).toEqual([
+      '/production/orders',
+      '/production/staff',
+      '/production/fabric-norms',
+      '/production/payroll-rules',
+    ]);
+    expect(shop(['Admin'])?.items[1].label).toBe('Працівники цеху');
     expect(shop(['Manager'])?.items.some((item) => item.id === 'workshop-staff')).toBe(false);
+  });
+
+  it('shows «Виробничі завдання» to managers as well', () => {
+    const paths = new Set(['/production/orders']);
+    const shop = createNavigation(paths, ['Manager']).find((group) => group.id === 'sewing-shop');
+
+    expect(shop?.items[0]).toEqual({
+      id: 'production-orders',
+      label: 'Виробничі завдання',
+      to: '/production/orders',
+    });
   });
 });
