@@ -1,6 +1,6 @@
 export { TaskStatePill } from './components/status/task-state-pill';
 export { TaskMetricStrip } from './components/metrics/task-metric-strip';
-export { TaskLoadList } from './components/load/task-load-list';
+export { TaskLoadTable } from './tables/task-load-table';
 export { TaskBoard } from './components/board/task-board';
 export { TaskTodayCard } from './components/board/task-today-card';
 export { TasksTable } from './tables/tasks-table';

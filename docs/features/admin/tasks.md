@@ -4,11 +4,12 @@
 
 ## Behavior and routes
 
-| Route          | Purpose                                                                                              |
-| -------------- | ---------------------------------------------------------------------------------------------------- |
-| `/admin/tasks` | «Адміністрування › Завдання менеджерам» (Admin role): metrics, search, filter chips, table, workload |
-| `/crm/tasks`   | «Менеджер сервісу › Мої завдання» (Manager or Admin role): «На сьогодні», metrics, K2 board          |
+| Route          | Purpose                                                                                     |
+| -------------- | ------------------------------------------------------------------------------------------- |
+| `/admin/tasks` | «Адміністрування › Завдання менеджерам» (Admin role): tabs «Завдання» and «Навантаження»    |
+| `/crm/tasks`   | «Менеджер сервісу › Мої завдання» (Manager or Admin role): «На сьогодні», metrics, K2 board |
 
+- Tab «Завдання»: metrics, search, filter chips and the table on the full width; a «Менеджер: …» chip shows and clears the manager filter. Tab «Навантаження» (L3): a row per manager with open, overdue, urgent, in progress, done in 7 days, % on time in 30 days and a bar; a row click opens «Завдання» for that manager.
 - Director and Admin create, edit and delete tasks, and filter both pages by manager. On the board they see everyone's cards with avatars and can mark cards urgent by dragging.
 - A Manager sees own tasks only (the server enforces it), drags cards to «У роботі» or «Виконано», and checks steps in the side panel.
 - Both pages open the same side panel (`ReferenceEditorDrawer`): view with status, steps and history; the form for Director and Admin.
@@ -49,8 +50,8 @@ libs/admin/tasks/
     errors/                        Ukrainian API messages
   ui/src/
     components/board/              board, lane, card, «На сьогодні»
-    components/{metrics,load,status}/ metric strip, workload list, state pill
-    tables/tasks-table.tsx         server-paged table
+    components/{metrics,load,status}/ metric strip, workload bar, state pill
+    tables/                        server-paged tasks table, «Навантаження» table
     forms/                         form fields, steps editor
     details/task-details.tsx       view: status buttons, steps, history
     dialogs/task-delete-dialog.tsx
@@ -66,5 +67,5 @@ libs/admin/tasks/
 - Model: `mappers/*.unit.test.ts`, `validators/*.unit.test.ts`. Run `npx nx test admin-tasks-model`.
 - Data access: `mappers/task-input.mapper.unit.test.ts`. Run `npx nx test admin-tasks-data-access`.
 - UI: `components/board/task-board.component.test.tsx`. Run `npx nx test admin-tasks-ui`.
-- Feature: `pages/board/task-board-page.component.test.tsx` (own board for a Manager, manager filter for Admin). Run `npx nx test admin-tasks-feature`.
+- Feature: `pages/board/task-board-page.component.test.tsx` (own board for a Manager, manager filter for Admin), `pages/admin/manager-tasks-page.component.test.tsx` («Навантаження» row opens filtered «Завдання»). Run `npx nx test admin-tasks-feature`.
 - Menu, routes and tile: `apps/admin-react/src/app/router/*.test.ts(x)` and `libs/admin/core/shell/src/layout/admin-layout.component.test.tsx`. Run `npx nx test admin-react -- src/app/router` and `npx nx test admin-core-shell`.

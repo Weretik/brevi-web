@@ -16,11 +16,12 @@ Marks appear only for problems (overdue, urgent), never as an "all OK" chip.
 - «Менеджер сервісу › Мої завдання» (`/crm/tasks`, Manager or Admin role). It replaces «Завдання в роботу».
 - The «Головна» link is now the «Робочий стіл» tile (H2). Its second line shows what burns («Завдання: прострочено 2 · терміново 1») or «Що чекає сьогодні». A line under it separates it from the menu.
 
-## «Завдання менеджерам» (A1 + workload)
+## «Завдання менеджерам»
 
-Header with «Нове завдання». A metric strip: open, overdue, urgent, done in 7 days, % on time. Wide search by title, number or client. Filter chips with counts: Відкриті, Прострочені, Термінові, У роботі, Нові, Виконані. A server-paged table: number, title, manager, client, due, state.
+Header with «Нове завдання» and two tabs. The narrow workload column of the first version cut managers off, so on 2026-11-04 the owner chose L3, a separate tab.
 
-On the right is «Навантаження» with one row per manager: open count, bar overdue / urgent / in progress. A click filters the page to that manager, and a second click shows everyone again.
+- **«Завдання»** (A1): a metric strip (open, overdue, urgent, done in 7 days, % on time); wide search by title, number or client; filter chips with counts (Відкриті, Прострочені, Термінові, У роботі, Нові, Виконані); a server-paged table on the full width (number, title, manager, client, due, state). A «Менеджер: …» chip shows the manager filter, its cross clears it.
+- **«Навантаження»** (L3): one row per manager, including managers with no tasks: open, overdue (red when above zero), urgent, in progress, done in 7 days, % on time over 30 days («—» without done tasks), and a bar overdue / urgent / in progress. A row click opens «Завдання» filtered to that manager.
 
 ## «Мої завдання» (K2)
 

@@ -1,7 +1,8 @@
 import { ReferencePageHeader, ReferenceSearchBar } from '@admin/references/ui';
-import { TaskLoadList, TaskMetricStrip, TasksTable } from '@admin/tasks/ui';
+import { TaskLoadTable, TaskMetricStrip, TasksTable } from '@admin/tasks/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
-import { Alert, Box, Button } from '@mui/material';
+import { Alert, Box, Button, Chip, Tab, Tabs } from '@mui/material';
+import { useState } from 'react';
 
 import { TaskDrawer } from '../../components/editor/task-drawer';
 import { TaskListFilters } from '../../components/list/task-list-filters';
@@ -12,15 +13,19 @@ import { useTaskNotice } from '../../hooks/notice/use-task-notice';
 
 import type { TaskViewer } from '@admin/tasks/model';
 
+type PageTab = 'tasks' | 'load';
+
 /**
- * «Адміністрування › Завдання менеджерам» (A1 + workload): Director and Admin set tasks, track
- * them in the table and see each manager's load; a click on a manager filters the page.
+ * «Адміністрування › Завдання менеджерам»: tab «Завдання» (A1, table on the full width) and tab
+ * «Навантаження» (L3, a row per manager); a click on a manager opens «Завдання» filtered to them.
  */
 export default function ManagerTasksPage({ viewer }: { viewer: TaskViewer }) {
   const notice = useTaskNotice();
   const list = useTaskList();
   const editor = useTaskEditor(viewer, notice.notify);
+  const [tab, setTab] = useState<PageTab>('tasks');
   const rows = list.page?.items ?? [];
+  const selected = list.load.find((row) => row.userId === list.assigneeUserId);
 
   return (
     <Box>
@@ -38,23 +43,34 @@ export default function ManagerTasksPage({ viewer }: { viewer: TaskViewer }) {
           </Button>
         }
       />
-      <TaskMetricStrip overview={list.overview} />
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr', lg: 'minmax(0, 1fr) 300px' },
-          gap: 2,
-          alignItems: 'start',
-          mt: 2,
-        }}
-      >
-        <Box sx={{ minWidth: 0 }}>
-          <ReferenceSearchBar
-            placeholder="Знайти завдання за назвою, номером або клієнтом…"
-            label="Пошук завдань"
-            value={list.search}
-            onChange={list.setSearch}
-          />
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
+        <Tabs
+          value={tab}
+          onChange={(_, value: PageTab) => setTab(value)}
+          aria-label="Розділи сторінки"
+        >
+          <Tab value="tasks" label="Завдання" />
+          <Tab value="load" label="Навантаження" />
+        </Tabs>
+      </Box>
+      {tab === 'tasks' ? (
+        <>
+          <TaskMetricStrip overview={list.overview} />
+          <Box sx={{ mt: 2 }}>
+            <ReferenceSearchBar
+              placeholder="Знайти завдання за назвою, номером або клієнтом…"
+              label="Пошук завдань"
+              value={list.search}
+              onChange={list.setSearch}
+            />
+          </Box>
+          {list.assigneeUserId !== null && (
+            <Chip
+              label={`Менеджер: ${selected?.name ?? 'обраний'}`}
+              onDelete={() => list.setAssignee(null)}
+              sx={{ mb: 1.5, fontWeight: 600 }}
+            />
+          )}
           <TaskListFilters
             filter={list.filter}
             overview={list.overview}
@@ -83,13 +99,17 @@ export default function ManagerTasksPage({ viewer }: { viewer: TaskViewer }) {
             onPaginationModelChange={list.setPagination}
             onOpen={editor.open}
           />
-        </Box>
-        <TaskLoadList
+        </>
+      ) : (
+        <TaskLoadTable
           load={list.load}
-          selectedUserId={list.assigneeUserId}
-          onSelect={list.setAssignee}
+          loading={list.loadLoading}
+          onOpen={(userId) => {
+            list.setAssignee(userId);
+            setTab('tasks');
+          }}
         />
-      </Box>
+      )}
       <TaskDrawer editor={editor} viewer={viewer} />
       <TaskNotice message={notice.message} onClose={notice.close} />
     </Box>
