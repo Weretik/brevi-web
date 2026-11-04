@@ -4,7 +4,6 @@ import type { SewingAmountRange, SewingCardTotals } from '@admin/products/model'
 
 interface Props {
   totals: SewingCardTotals;
-  labourMinutes: number;
 }
 
 const minutes = new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 1 });
@@ -16,26 +15,36 @@ function range(value: SewingAmountRange | null) {
     : `${sewingPriceFormat(value.min)} – ${sewingPriceFormat(value.max)}`;
 }
 
-/** Figures of the model: articles ready, labour, cost and retail price ranges. */
-export function SewingCardMetrics({ totals, labourMinutes }: Props) {
+/**
+ * Figures of the model: its fabrics, labour in minutes and UAH, cost and all three price levels.
+ * Labour comes from the server calculation, as in the «Товари» side panel.
+ */
+export function SewingCardMetrics({ totals }: Props) {
   return (
     <SewingCardMetricStrip
       metrics={[
         {
-          label: 'Артикули',
-          value: `${totals.ready} з ${totals.articles}`,
-          note: 'готові до розрахунку',
-          tone: totals.articles > 0 && totals.ready === totals.articles ? 'success' : 'warning',
+          label: 'Тканини',
+          value: String(totals.articles),
+          // Only a problem gets a note (CAT-013).
+          note:
+            totals.articles === 0
+              ? 'додайте тканину'
+              : totals.ready === totals.articles
+                ? undefined
+                : `без ціни: ${totals.articles - totals.ready}`,
+          tone: totals.articles > 0 && totals.ready === totals.articles ? undefined : 'warning',
         },
-        { label: 'Трудовитрати', value: `${minutes.format(labourMinutes)} хв`, note: 'на 1 виріб' },
-        { label: 'Собівартість', value: range(totals.fullCost) },
-        { label: 'Ціна 1–9 шт.', value: range(totals.retail), note: 'з ПДВ' },
         {
-          label: 'Ціна в прайсі',
-          value: totals.unpublished ? `${totals.unpublished} змін` : 'Актуальна',
-          note: totals.unpublished ? 'нова ціна ще не опублікована' : undefined,
-          tone: totals.unpublished ? 'warning' : undefined,
+          label: 'Трудовитрати',
+          value: totals.labour === null ? '—' : sewingPriceFormat(totals.labour),
+          note:
+            totals.minutes === null ? undefined : `${minutes.format(totals.minutes)} хв на 1 виріб`,
         },
+        { label: 'Собівартість', value: range(totals.fullCost) },
+        { label: '1–9 шт.', value: range(totals.retail), note: 'з ПДВ' },
+        { label: '10–40 шт.', value: range(totals.wholesale), note: 'з ПДВ' },
+        { label: 'Від 41 шт.', value: range(totals.largeWholesale), note: 'з ПДВ' },
       ]}
     />
   );

@@ -29,7 +29,7 @@ may change without changing this rule.
 
 ## Lazy loading route features
 
-**Routing checkpoint, 2026-10-25:** `admin-route-definitions.tsx` combines public domain route configurations, `admin-route-layout.tsx` composes the shared layout/navigation, and `create-admin-router.tsx` constructs the data router. `AppRouter` owns the default router instance and `RouterProvider`; `AppProviders` owns API/session/theme providers. The data router enables feature-level `useBlocker` protection for dirty Sewing composition across browser history and SPA links. Route pages remain lazy and `AdminLayout` still owns `Outlet` and its Suspense fallback. Tests inject isolated router instances. See the [structural audit](../../../specs/admin/products/004-sewing-articles-and-composition/code-audit/audit.md).
+**Routing checkpoint, 2026-10-25:** `admin-route-definitions.tsx` combines public domain route configurations, `admin-route-layout.tsx` composes the shared layout/navigation, and `create-admin-router.tsx` constructs the data router. `AppRouter` owns the default router instance and `RouterProvider`; `AppProviders` owns API/session/theme providers. The data router allows feature-level `useBlocker` protection; the Sewing card no longer needs it because every change saves at once ([spec 016](../../../specs/admin/products/016-fabric-variants/README.md)). Route pages remain lazy and `AdminLayout` still owns `Outlet` and its Suspense fallback. Tests inject isolated router instances. See the [structural audit](../../../specs/admin/products/004-sewing-articles-and-composition/code-audit/audit.md).
 
 - Feature pages used as route entries export a default page component and are
   loaded with the short form `lazy(() => import('./pages/<page>'))` from their

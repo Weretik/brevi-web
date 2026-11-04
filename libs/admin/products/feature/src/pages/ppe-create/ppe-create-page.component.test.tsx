@@ -126,12 +126,12 @@ describe('PpeCreatePage', { timeout: 20_000 }, () => {
     renderPage();
     expect(submitButton()).toBeDisabled();
     const readiness = screen.getByRole('region', { name: 'Готовність' });
-    expect(within(readiness).getByText('0 з 7')).toBeInTheDocument();
+    expect(within(readiness).getByText('0 з 6')).toBeInTheDocument();
 
     await fillRequired(user);
 
     await waitFor(() => expect(submitButton()).toBeEnabled(), { timeout: 4000 });
-    expect(within(readiness).getByText('6 з 7')).toBeInTheDocument();
+    expect(within(readiness).getByText('6 з 6')).toBeInTheDocument();
     const prices = screen.getByRole('region', { name: 'Ціни в прайсі' });
     await waitFor(
       () => expect(within(prices).getByText('Роздріб, від 1 шт.')).toBeInTheDocument(),
@@ -152,7 +152,6 @@ describe('PpeCreatePage', { timeout: 20_000 }, () => {
       sectionId: 9,
       season: null,
       isActive: true,
-      isVerified: false,
       currentSiteUrl: null,
       quoteDescription: null,
       ppe: {

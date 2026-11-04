@@ -49,8 +49,6 @@ function cardData(update: Partial<PpeSupplierOffer> = {}, canManage = true) {
       sectionId: 9,
       season: null,
       isActive: true,
-      isVerified: true,
-      verifiedOn: '09.09.2026',
       currentSiteUrl: 'https://brevi.com.ua/odyag-vologozahysnyj/kostyum-vologozahysnyj',
       quoteDescription: null,
       updatedAtUtc: '2026-11-03T10:00:00Z',
@@ -72,9 +70,7 @@ function cardData(update: Partial<PpeSupplierOffer> = {}, canManage = true) {
       priceNote: 'Оптова ціна діє від 10 од.',
     },
     reasons: data.prices ? [] : ['Не вибрано правило ціноутворення'],
-    status: data.prices
-      ? { label: 'Готово до розрахунку', tone: 'success' }
-      : { label: 'Не вибрано правило ціноутворення', tone: 'warning' },
+    status: data.prices ? null : { label: 'Не вибрано правило ціноутворення', tone: 'warning' },
   };
 }
 
@@ -103,7 +99,7 @@ describe('PpeProductCard', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('3 · Одяг вологозахисний')).toBeInTheDocument();
     const prices = screen.getByRole('region', { name: 'Ціни' });
-    expect(within(prices).getByText('Готово до розрахунку')).toBeInTheDocument();
+    expect(within(prices).queryByText('Готово до розрахунку')).not.toBeInTheDocument();
     expect(within(prices).getByText('Роздріб, від 1 шт.')).toBeInTheDocument();
     expect(within(prices).getByText('50 %')).toBeInTheDocument();
     expect(

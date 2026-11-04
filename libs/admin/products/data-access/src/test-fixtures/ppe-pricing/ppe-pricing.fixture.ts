@@ -13,7 +13,6 @@ export const ppePricingFixture = {
       externalWholesale: null,
       source: 'test-source',
       sourceDate: '2026-10-25',
-      sourceReviewed: true,
     },
     isApproved: true,
     approvedBy: 'reviewer',

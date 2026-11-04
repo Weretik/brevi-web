@@ -1,9 +1,4 @@
-import {
-  formatIsoDate,
-  formatOperationMinutes,
-  formatUah,
-  operationLabourCost,
-} from '@admin/references/model';
+import { formatOperationMinutes, formatUah, operationLabourCost } from '@admin/references/model';
 import { Stack } from '@mui/material';
 
 import { ReferenceDetailsList } from '../reference-editor/reference-details-list';
@@ -56,11 +51,6 @@ export function GarmentPartOperationDetails({ operation, rates }: Props) {
             {
               label: 'Вартість з урахуванням збирання',
               value: cost && formatUah(cost.withAssembly),
-              mono: true,
-            },
-            {
-              label: 'Дата перевірки',
-              value: formatIsoDate(operation.normCheckedAt),
               mono: true,
             },
           ]}

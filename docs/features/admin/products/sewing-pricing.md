@@ -1,8 +1,8 @@
 # Admin: Sewing Article pricing
 
-Read-only consumer of versioned backend pricing. Open a saved Sewing Product and select an Article on «Розрахунок» or in the composition section: the panel shows the current published price and the retained calculation behind it. The backend publishes a new price after every saved input change ([spec 013](../../../specs/admin/products/013-automatic-sewing-prices/README.md)); there are no calculate or publish buttons. Imported composition is reviewed through the existing editor, never automatically.
+Read-only consumer of versioned backend pricing. Open a saved Sewing Product and select a fabric on «Розрахунок»: the panel shows the current published price and the retained calculation behind it. The backend publishes a new price after every saved input change ([spec 013](../../../specs/admin/products/013-automatic-sewing-prices/README.md)); there are no calculate or publish buttons, and no «Розраховано … · Версія складу · Налаштування» line. Imported composition is priced as it is; there is no review step.
 
-The panel shows three prices for 1–9, 10–40 and 41+ units with their date, then component costs, minutes/minute cost, full cost and composition/settings revisions. Unsaved composition changes show a hint to save. Saving a composition, an Article or a Reference price input refreshes the cached `Product` queries.
+The panel names its fabric (price per metre × metres), shows three prices for 1–9, 10–40 and 41+ units with their date, tiles «Час операцій», «Вартість хвилини», «Трудовитрати, грн», then component costs, minutes/minute cost, full cost and composition/settings revisions. Every composition change saves at once ([spec 016](../../../specs/admin/products/016-fabric-variants/README.md)), so there is no unsaved state. Saving a composition, a fabric variant or a Reference price input refreshes the cached `Product` queries.
 
 Product cards/lists use the latest published wholesale Article price (10–40 tier), with explicit loading/error/unpublished states. A page uses one bounded Product-ID batch request rather than per-row reads. Publication refreshes the relevant caches. Errors have retry actions and never revive legacy Sewing price amounts. PPE current price ownership is documented in its separate feature; nullable legacy manufacturing details are accepted.
 
@@ -10,7 +10,7 @@ Product cards/lists use the latest published wholesale Article price (10–40 ti
 
 ```mermaid
 flowchart LR
-  Composition[Article selection / saved composition] --> Feature[SewingPricingFeature]
+  Composition[Fabric selection / saved composition] --> Feature[SewingPricingFeature]
   Feature --> Controller[useSewingPricing]
   Controller --> API[RTK pricing endpoints]
   API --> Boundary[Generated types / validation / mapping]

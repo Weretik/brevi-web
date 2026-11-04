@@ -132,13 +132,6 @@ export function GarmentPartOperationForm({
             slotProps={{ htmlInput: { min: 0, max: 10000, step: 'any' } }}
             fullWidth
           />
-          <TextField
-            label="Дата перевірки"
-            type="date"
-            {...text('normCheckedAt')}
-            slotProps={{ inputLabel: { shrink: true } }}
-            fullWidth
-          />
         </Stack>
       </ReferenceFormSection>
 

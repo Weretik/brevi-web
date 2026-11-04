@@ -264,7 +264,26 @@ describe('React Admin routing', () => {
     const user = userEvent.setup();
     vi.stubGlobal(
       'fetch',
-      vi.fn(() => Promise.resolve(new Response(JSON.stringify([]), { status: 200 }))),
+      vi.fn((request: Request) =>
+        Promise.resolve(
+          new Response(
+            JSON.stringify(
+              request.url.includes('/products/overview')
+                ? {
+                    items: [],
+                    page: 1,
+                    pageSize: 25,
+                    total: 0,
+                    all: 0,
+                    withoutPrice: 0,
+                    sections: [],
+                  }
+                : [],
+            ),
+            { status: 200 },
+          ),
+        ),
+      ),
     );
     window.history.replaceState({}, '', '/references/products');
     renderApp();

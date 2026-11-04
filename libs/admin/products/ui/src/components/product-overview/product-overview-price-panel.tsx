@@ -15,12 +15,7 @@ interface Props {
 }
 
 /** Side panel block (CAT-011 design C): materials, labour, cost and price date, two per row. */
-export function ProductOverviewPricePanel({
-  metrics,
-  loading,
-  error,
-  blockers,
-}: Props) {
+export function ProductOverviewPricePanel({ metrics, loading, error, blockers }: Props) {
   return (
     <ReferenceFormSection title="Ціни і собівартість">
       {error && <Alert severity="error">{error}</Alert>}

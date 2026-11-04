@@ -14,8 +14,7 @@ export function validatePpeOffer(value: unknown): PpeOfferDto {
       nullablePpeAmount(values['externalRetail']) &&
       nullablePpeAmount(values['externalWholesale']) &&
       ppeText(values['source']) &&
-      ppeText(values['sourceDate']) &&
-      typeof values['sourceReviewed'] === 'boolean',
+      ppeText(values['sourceDate']),
   );
   return value as PpeOfferDto;
 }

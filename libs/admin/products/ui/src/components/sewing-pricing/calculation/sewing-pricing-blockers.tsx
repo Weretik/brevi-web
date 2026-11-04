@@ -3,8 +3,6 @@ import { Alert, List, ListItem } from '@mui/material';
 import type { SewingPriceCalculation } from '@admin/products/model';
 
 const messages: Record<string, string> = {
-  UnreviewedMaterial: 'Підтвердьте матеріали у складі виробу.',
-  UnreviewedOperation: 'Перевірте та підтвердьте операції у складі виробу.',
   MissingCost: 'Додайте затверджену вартість матеріалу або додаткових витрат.',
   MissingMaterialCost:
     'Перевірте наявність, активність і затверджену вартість матеріалів та додаткових витрат.',

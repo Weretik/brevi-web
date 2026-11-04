@@ -10,7 +10,6 @@ export function mapSewingOperationInput(line: SewingOperationDraft): OperationIn
     quantity: line.quantity,
     manualMinutes: line.manualMinutes,
     sortOrder: line.sortOrder,
-    reviewed: line.reviewed,
     comment: line.comment.trim() || null,
   };
 }

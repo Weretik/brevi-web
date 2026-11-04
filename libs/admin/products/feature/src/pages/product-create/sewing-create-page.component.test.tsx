@@ -11,7 +11,6 @@ const mocks = vi.hoisted(() => ({
   create: vi.fn(),
   update: vi.fn(),
   draft: vi.fn(),
-  requestModel: vi.fn(),
 }));
 
 vi.mock('@admin/products/data-access', async (importOriginal) => ({
@@ -35,9 +34,6 @@ vi.mock('@admin/references/data-access', async (importOriginal) => ({
 vi.mock('../../hooks/sewing-create/use-sewing-create-draft', () => ({
   useSewingCreateDraft: mocks.draft,
 }));
-vi.mock('../../components/sewing-composition/sewing-composition-screen', () => ({
-  SewingCompositionScreen: () => null,
-}));
 vi.mock('../../components/sewing-pricing/sewing-pricing-feature', () => ({
   SewingPricingFeature: () => null,
 }));
@@ -50,8 +46,6 @@ const row = {
   sectionId: 4,
   season: 'Літо' as const,
   isActive: false,
-  isVerified: false,
-  verifiedOn: null,
   currentSiteUrl: null,
   quoteDescription: 'Легкий костюм',
   updatedAtUtc: '2026-11-03T00:00:00Z',
@@ -73,27 +67,46 @@ function draft() {
         minutes: null,
         fullCost: null,
         retail: null,
-        unpublished: 0,
+        labour: null,
+        wholesale: null,
+        largeWholesale: null,
       },
       seamstressPerMinute: null,
     },
-    controller: {
-      queries: { articles: { data: { version: 3, modelCode: 'MOD-025', articles: [] } } },
+    model: {
       canManage: true,
-      articleCreation: { state: { isLoading: false }, error: null },
-      selection: {
-        scope: 'Model',
-        requestModel: mocks.requestModel,
-        requestArticle: vi.fn(),
-        requestCreateArticle: vi.fn(),
+      loading: false,
+      refreshing: false,
+      error: null,
+      retry: vi.fn(),
+      summary: [],
+      summaryLoaded: true,
+      variants: [],
+      materials: [],
+      operations: [],
+      modelCode: 'MOD-025',
+      version: 3,
+      draft: {
+        productId: 42,
+        modelCode: 'MOD-025',
+        version: 3,
+        modelMaterials: [],
+        operations: [],
       },
-      drafts: { dirty: false },
-      busy: false,
     },
-    labour: [],
+    writes: {
+      busy: false,
+      error: null,
+      clearError: vi.fn(),
+      saveVariant: vi.fn(),
+      deleteVariant: vi.fn(),
+      saveMaterials: vi.fn(),
+      saveOperations: vi.fn(),
+    },
+    modelCode: 'MOD-025',
     labourMinutes: 54,
     checks: [
-      { key: 'article', label: 'Немає артикула', state: 'blocking' },
+      { key: 'article', label: 'Немає тканини', state: 'blocking' },
       { key: 'labour', label: 'Немає трудовитрат', state: 'ok' },
     ],
     ready: false,
@@ -167,7 +180,7 @@ describe('SewingCreatePage («Нова модель»)', () => {
     expect(screen.getByText('Нова модель · крок 1 з 5')).toBeVisible();
     expect(screen.getByLabelText(/Код моделі/)).toHaveValue('MOD-031');
     expect(screen.getByText('Код MOD-XXX має бути унікальним.')).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: 'Артикули' })).toBeDisabled();
+    expect(screen.getByRole('tab', { name: 'Тканини' })).toBeDisabled();
 
     await user.click(screen.getByRole('button', { name: 'Далі' }));
     expect(screen.getByText('Вкажіть назву моделі.')).toBeVisible();
@@ -187,7 +200,6 @@ describe('SewingCreatePage («Нова модель»)', () => {
         name: 'Халат «Мед»',
         sectionId: 4,
         isActive: false,
-        isVerified: false,
         ppe: null,
       }),
     );
@@ -207,10 +219,12 @@ describe('SewingCreatePage («Нова модель»)', () => {
     expect(screen.getByText('MOD-025')).toBeVisible();
     expect(screen.getByText('Чернетка збережена · крок 2 з 5')).toBeVisible();
     expect(screen.getByText('Не готово до розрахунку')).toBeVisible();
-    expect(screen.getByRole('heading', { name: 'Новий артикул' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Додати тканину' })).toBeVisible();
     const checklist = screen.getByRole('list', { name: 'Що заважає розрахунку' });
-    expect(within(checklist).getByText('Немає артикула')).toBeVisible();
-    expect(screen.getByText('Кожен артикул — свій колір або тканина.')).toBeInTheDocument();
+    expect(within(checklist).getByText('Немає тканини')).toBeVisible();
+    expect(
+      screen.getByText('Кожна тканина — окремий артикул на сайті зі своїм розходом.'),
+    ).toBeInTheDocument();
 
     await user.click(screen.getByRole('tab', { name: /Модель/ }));
     expect(screen.getByRole('link', { name: 'Змінити в картці' })).toHaveAttribute(
@@ -221,11 +235,7 @@ describe('SewingCreatePage («Нова модель»)', () => {
 
     await user.click(screen.getByRole('tab', { name: /Операції/ }));
     expect(screen.getByLabelText('Адреса')).toHaveTextContent('step=4');
-    await user.click(screen.getByRole('switch', { name: 'Перевірено та підтверджено' }));
-    expect(mocks.update).toHaveBeenCalledWith({
-      id: 42,
-      body: expect.objectContaining({ isVerified: true, isActive: false, code: 'MOD-025' }),
-    });
+    expect(screen.getByRole('button', { name: 'Додати операцію' })).toBeVisible();
   });
 
   it('launches the model on the last step and opens its card', async () => {
@@ -247,8 +257,6 @@ describe('SewingCreatePage («Нова модель»)', () => {
         sectionId: 4,
         season: 'Літо',
         isActive: true,
-        isVerified: false,
-        verifiedOn: null,
         currentSiteUrl: null,
         quoteDescription: 'Легкий костюм',
       },

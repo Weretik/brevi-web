@@ -1,6 +1,6 @@
 import { useGetProductCodeCheckQuery } from '@admin/products/data-access';
 
-import { useDebouncedValue } from './use-debounced-value';
+import { useDebouncedValue } from '../debounce/use-debounced-value';
 
 import type { PpeCodeCheckState } from '@admin/products/model';
 

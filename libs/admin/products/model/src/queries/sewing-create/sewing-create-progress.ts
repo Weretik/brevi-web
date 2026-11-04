@@ -36,9 +36,8 @@ export function canOpenSewingCreateStep(step: SewingCreateStep, hasDraft: boolea
 }
 
 const materialReasons = ['Немає тканини'];
-const compositionReasons = ['Неповна комплектація', 'Комплектацію не перевірено'];
+const compositionReasons = ['Неповна комплектація'];
 const labourReasons = ['Немає трудовитрат', 'Немає часу операції'];
-const reviewReasons = ['Операції не підтверджено'];
 
 interface ChecklistInput {
   /** Live Article summary; null while it is not loaded. */
@@ -63,17 +62,11 @@ export function sewingCreateChecklist({
       ? 'ok'
       : 'blocking'
     : fromSummary(labourReasons);
-  const reviewed: SewingCreateCheckState = operations
-    ? operations.length && operations.every((operation) => operation.reviewed)
-      ? 'ok'
-      : 'blocking'
-    : fromSummary(reviewReasons);
   const states: Record<SewingCreateCheckKey, SewingCreateCheckState> = {
     article: articles === null ? 'unknown' : articles.length ? 'ok' : 'blocking',
     materials: fromSummary(materialReasons),
     composition: fromSummary(compositionReasons),
     labour,
-    reviewed,
   };
   return (Object.keys(sewingCreateCheckLabels) as SewingCreateCheckKey[]).map((key) => ({
     key,
@@ -101,7 +94,7 @@ export function sewingCreateDoneSteps({ hasDraft, checks, active }: DoneInput): 
   const done: SewingCreateStep[] = [1];
   if (ok('article')) done.push(2);
   if (ok('article', 'materials', 'composition')) done.push(3);
-  if (ok('labour', 'reviewed')) done.push(4);
+  if (ok('labour')) done.push(4);
   if (active) done.push(5);
   return done;
 }

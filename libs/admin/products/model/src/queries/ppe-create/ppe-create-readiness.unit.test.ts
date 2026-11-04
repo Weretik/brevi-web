@@ -23,26 +23,11 @@ const done = (values: PpeCreateFormValues, state: Parameters<typeof ppeCreateRea
 
 describe('ppeCreateReadiness', () => {
   it('ticks nothing for an empty form', () => {
-    expect(done(ppeCreateFormDefaults, 'idle')).toEqual([
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-    ]);
+    expect(done(ppeCreateFormDefaults, 'idle')).toEqual([false, false, false, false, false, false]);
   });
 
-  it('ticks the six required steps and leaves the manual check optional', () => {
-    const items = ppeCreateReadiness(valid, validatePpeCreate(valid), 'available');
-    expect(items.map((item) => item.done)).toEqual([true, true, true, true, true, true, false]);
-    expect(items[6]).toEqual({
-      label: 'Перевірено вручну (можна пізніше)',
-      done: false,
-      optional: true,
-    });
-    expect(done({ ...valid, isVerified: true }, 'available')[6]).toBe(true);
+  it('ticks the six required steps', () => {
+    expect(done(valid, 'available')).toEqual([true, true, true, true, true, true]);
   });
 
   it('does not tick the code step while the code is taken or not checked', () => {

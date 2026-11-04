@@ -56,7 +56,6 @@ describe('«Нова модель» step 1', () => {
       sectionId: 4,
       season: 'Літо',
       isActive: false,
-      isVerified: false,
       currentSiteUrl: null,
       quoteDescription: null,
       ppe: null,

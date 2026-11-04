@@ -5,5 +5,4 @@ export interface PpeOfferValues {
   externalWholesale: number | null;
   source: string;
   sourceDate: string;
-  sourceReviewed: boolean;
 }

@@ -964,8 +964,8 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * List products for the «Товари» page
-     * @description Anonymous. All products of the type, sorted by code (MOD-2 before MOD-10, article 9 before 17) then name; products without a code come last. An empty list when there are none.
+     * One page of a «Товари» tab (CAT-013)
+     * @description CatalogRead. The server searches, filters, sorts and pages the rows of one type and returns them with their prices, so the list needs this single request. Prices are read, never recalculated: sewing prices are the stored published prices of each fabric variant (automatic publication keeps them current, CAT-012); PPE prices come from the current offer and rule. prices is the lowest price of each tier among the active variants. problems lists the reasons a price is missing (of the row or of an active variant) and is empty when everything is priced. sections and withoutPrice count every row of the type, for the filter chips.
      */
     get: operations['getProductOverview'];
     put?: never;
@@ -1000,26 +1000,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/v1/products/overview/prices': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Prices of every «Товари» row (CAT-011)
-     * @description CatalogRead. Sewing: for every Article the published (fixed) prices and the live prices calculated from today's inputs; isStale when they differ. from is the lowest published price of each tier among active Articles. status is Ready (all published and current), Stale (a published price differs from the live one; automatic publication, CAT-012, normally clears it at once), Unpublished (a calculable active Article has no published price) or Blocked (no active Article has a price or a calculable price; blockers are the calculation codes). PPE: the live price from the current offer and rule, pricesUpdatedAt is the offer date, articles is empty. Tiers are 1–9, 10–40 and from 41 pieces.
-     */
-    get: operations['getProductOverviewPrices'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   '/api/v1/products/{id}/overview': {
     parameters: {
       query?: never;
@@ -1029,10 +1009,14 @@ export interface paths {
       };
       cookie?: never;
     };
-    get?: never;
+    /**
+     * One «Товари» row with prices and fabric variants (CAT-013)
+     * @description CatalogRead. The same item as in the list page, for the product card.
+     */
+    get: operations['getProductOverviewItem'];
     /**
      * Replace the «Товари» page fields of a product
-     * @description Requires CanManageProducts (open while temporary anonymous access is on). Every field is replaced. A PPE product needs a code (site article). The section must exist in Reference «Типи і розділи» and belong to the product type. Season is for sewing only. When isVerified is true and verifiedOn is empty, the stored date is kept or today (Kyiv) is set; when isVerified is false, the date is cleared. Only the director sets the check (an agreement while the API is anonymous, not enforced).
+     * @description Requires CanManageProducts (open while temporary anonymous access is on). Every field is replaced. A PPE product needs a code (site article). The section must exist in Reference «Типи і розділи» and belong to the product type. Season is for sewing only.
      */
     put: operations['updateProductOverview'];
     post?: never;
@@ -1053,7 +1037,7 @@ export interface paths {
     put?: never;
     /**
      * Import all products from the Calculator sheet (preview or apply)
-     * @description Requires CanManageProducts and an actor (CAT-010). One-time transfer of the tabs «Товари» (with «Прайс на сайт», «Комплектація виробів», «Трудовитрати виробів») and «ЗІЗ». A row matches a stored product by type and code (sewing model ID, PPE site article), else by the exact name of the same type; a matched product keeps its ID and slug, the rest are created (ID largest + 1, slug as in createCatalogProduct). Names are Ukrainian only; the Russian name column gets a copy. A matched sewing model gets its article list and whole composition replaced; a checked model's lines are marked reviewed by «Google-таблиця» at Kyiv midnight of verifiedOn. A PPE product gets a new offer version (source «Імпорт з таблиці») only when the supplier price, the rule or a given Insight price differs; no supplier price means no version. With deleteMissing, every product of either type that no row matches is deleted. dryRun (default true) never writes. Any problem means nothing is written; warnings (unknown rule imported as none, no supplier price or link) do not stop the import. All writes run in one database transaction.
+     * @description Requires CanManageProducts and an actor (CAT-010). One-time transfer of the tabs «Товари» (with «Прайс на сайт», «Комплектація виробів», «Трудовитрати виробів») and «ЗІЗ». A row matches a stored product by type and code (sewing model ID, PPE site article), else by the exact name of the same type; a matched product keeps its ID and slug, the rest are created (ID largest + 1, slug as in createCatalogProduct). Names are Ukrainian only; the Russian name column gets a copy. A matched sewing model gets its article list and whole composition replaced; the note «Спільна складова для всіх артикулів моделі» that the sheet repeats on shared lines is dropped. A PPE product gets a new offer version (source «Імпорт з таблиці», dated the import day) only when the supplier price, the rule or a given Insight price differs; no supplier price means no version. With deleteMissing, every product of either type that no row matches is deleted. dryRun (default true) never writes. Any problem means nothing is written; warnings (unknown rule imported as none, no supplier price or link) do not stop the import. All writes run in one database transaction.
      */
     post: operations['importSheetProducts'];
     delete?: never;
@@ -1078,8 +1062,8 @@ export interface paths {
     get: operations['listSewingArticles'];
     put?: never;
     /**
-     * Create a Sewing Product Article
-     * @description Requires CanManageProducts. Sale SKU is globally unique, trimmed and compared using ordinal case-sensitive equality; it is immutable after creation.
+     * Create a fabric variant of a Sewing Product
+     * @description Requires CanManageProducts. Creates the variant (Article) with its fabric and metres per product in one transaction (CAT-015). Sale SKU is globally unique, trimmed and compared using ordinal case-sensitive equality.
      */
     post: operations['createSewingArticle'];
     delete?: never;
@@ -1114,7 +1098,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/v1/products/{productId}/articles/{articleId}/composition': {
+  '/api/v1/products/{productId}/articles/{articleId}': {
     parameters: {
       query?: never;
       header?: never;
@@ -1126,12 +1110,16 @@ export interface paths {
     };
     get?: never;
     /**
-     * Replace Article-specific material composition
-     * @description Requires CanManageProducts. Replaces all Article-specific materials atomically. A stale expectedVersion returns 409; clients must not replay automatically and should retain the user's draft for resolution.
+     * Change a fabric variant
+     * @description Requires CanManageProducts. Changes the sale SKU, activity and the variant's fabric with metres per product (CAT-015). A stale expectedVersion returns 409.
      */
-    put: operations['replaceSewingArticleComposition'];
+    put: operations['updateSewingArticle'];
     post?: never;
-    delete?: never;
+    /**
+     * Remove a fabric variant
+     * @description Requires CanManageProducts. Removes the variant with its fabric line. A variant that already has saved prices returns 409 and can be switched off instead.
+     */
+    delete: operations['deleteSewingArticle'];
     options?: never;
     head?: never;
     patch?: never;
@@ -1144,7 +1132,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** @description Requires CatalogRead. Live calculation of every Article of one Sewing model at server time, for the product card (CAT-007). Nothing is saved; blocked Articles return their blockers and no prices. Also returns each Article's latest published prices. At most 200 Articles. */
+    /** @description Requires CatalogRead. The sewing card in one response (CAT-007, CAT-016). Live calculation of every fabric variant (Article) at server time; nothing is saved; blocked variants return their blockers and no prices. Also returns each variant's fabric with its current name and price per metre, its latest published prices, and the shared composition (materials and operations) with reference names, unit prices and norm minutes. At most 200 Articles. */
     get: operations['getSewingArticleSummary'];
     put?: never;
     post?: never;
@@ -2960,8 +2948,6 @@ export interface components {
       variant: string | null;
       /** @description No fixed norm; the time is entered per product. */
       minutesPerProduct: boolean;
-      /** Format: date */
-      normCheckedAt: string | null;
       isActive: boolean;
       notes: string | null;
     };
@@ -2975,8 +2961,6 @@ export interface components {
       variant?: string | null;
       /** @default false */
       minutesPerProduct: boolean;
-      /** Format: date */
-      normCheckedAt?: string | null;
       /** @default true */
       isActive: boolean;
       notes?: string | null;
@@ -2998,8 +2982,6 @@ export interface components {
       name: string;
       min: number;
       minutesPerProduct: boolean;
-      /** Format: date */
-      normCheckedAt?: string | null;
       isActive: boolean;
       notes?: string | null;
     };
@@ -3490,7 +3472,28 @@ export interface components {
     };
     ReplaceProductRequest: components['schemas']['ProductWriteBase'] &
       Omit<components['schemas']['ProductTypeWrite'], 'type'>;
-    ProductOverviewRow: {
+    ProductPriceTiers: {
+      retail: number;
+      wholesale: number;
+      largeWholesale: number;
+    };
+    ProductOverviewVariant: {
+      /** Format: int64 */
+      articleId: number;
+      saleSku: string;
+      active: boolean;
+      /**
+       * Format: int32
+       * @description The variant's own fabric
+       */
+      fabricId: number | null;
+      fabricName: string | null;
+      prices: components['schemas']['ProductPriceTiers'] | null;
+      /** Format: date-time */
+      publishedAt: string | null;
+      problems: string[];
+    };
+    ProductOverviewItem: {
       /** Format: int32 */
       id: number;
       /** @enum {string} */
@@ -3506,15 +3509,53 @@ export interface components {
       /** @enum {string|null} */
       season: 'Літо' | 'Зима' | null;
       isActive: boolean;
-      isVerified: boolean;
-      /** @description Check date as dd.MM.yyyy; older imported rows may hold other text. */
-      verifiedOn: string | null;
       /** @description Product page on the current public site; quotes take photos from it (temporary). */
       currentSiteUrl: string | null;
       /** @description Short description for a quote (КП). */
       quoteDescription: string | null;
       /** Format: date-time */
       updatedAtUtc: string;
+      /** @description Lowest price of each tier among the active variants (sewing) or the rule price (PPE). */
+      prices: components['schemas']['ProductPriceTiers'] | null;
+      /**
+       * Format: date-time
+       * @description Latest publication (sewing) or offer date (PPE).
+       */
+      pricesUpdatedAt: string | null;
+      /** @description Calculation codes that explain a missing price (for example MissingOperations, MissingFabric, MissingOffer, NoActiveArticle, Unpublished); empty when everything is priced. */
+      problems: string[];
+      /** @description Fabric variants of a sewing model; empty for PPE. */
+      variants: components['schemas']['ProductOverviewVariant'][];
+    };
+    ProductSectionCount: {
+      /** Format: int32 */
+      sectionId: number | null;
+      /** Format: int32 */
+      count: number;
+    };
+    ProductOverviewPage: {
+      items: components['schemas']['ProductOverviewItem'][];
+      /** Format: int32 */
+      page: number;
+      /** Format: int32 */
+      pageSize: number;
+      /**
+       * Format: int32
+       * @description Rows that match the search and filters.
+       */
+      total: number;
+      /**
+       * Format: int32
+       * @description Every row of the type.
+       */
+      all: number;
+      /** @description Rows of the type per section; sectionId null counts rows without a section. */
+      sections: components['schemas']['ProductSectionCount'][];
+      /**
+       * Format: int32
+       * @description Rows of the type without a price.
+       */
+      withoutPrice: number;
     };
     CreatePpeSupplierRequest: {
       /** Format: int32 */
@@ -3538,7 +3579,6 @@ export interface components {
       /** @enum {string|null} */
       season?: 'Літо' | 'Зима' | null;
       isActive: boolean;
-      isVerified: boolean;
       /** Format: uri */
       currentSiteUrl?: string | null;
       quoteDescription?: string | null;
@@ -3561,39 +3601,6 @@ export interface components {
       /** @description Next free MOD-XXX for sewing; null for PPE. */
       suggestedCode: string | null;
     };
-    ProductPriceTiers: {
-      retail: number;
-      wholesale: number;
-      largeWholesale: number;
-    };
-    ProductOverviewArticlePrices: {
-      /** Format: int64 */
-      articleId: number;
-      saleSku: string;
-      active: boolean;
-      /**
-       * Format: int32
-       * @description The Article's own fabric, else the model's first fabric; names the Article in the price list.
-       */
-      fabricId: number | null;
-      published: components['schemas']['ProductPriceTiers'] | null;
-      /** Format: date-time */
-      publishedAt: string | null;
-      live: components['schemas']['ProductPriceTiers'] | null;
-      isStale: boolean;
-      blockers: string[];
-    };
-    ProductOverviewPrices: {
-      /** Format: int32 */
-      productId: number;
-      /** @enum {string} */
-      status: 'Ready' | 'Stale' | 'Unpublished' | 'Blocked';
-      from: components['schemas']['ProductPriceTiers'] | null;
-      /** Format: date-time */
-      pricesUpdatedAt: string | null;
-      blockers: string[];
-      articles: components['schemas']['ProductOverviewArticlePrices'][];
-    };
     UpdateProductOverviewRequest: {
       code?: string | null;
       /** Format: int32 */
@@ -3601,8 +3608,6 @@ export interface components {
       /** @enum {string|null} */
       season?: 'Літо' | 'Зима' | null;
       isActive: boolean;
-      isVerified: boolean;
-      verifiedOn?: string | null;
       /** Format: uri */
       currentSiteUrl?: string | null;
       quoteDescription?: string | null;
@@ -3626,7 +3631,6 @@ export interface components {
        * @enum {string}
        */
       unit: 'Metre' | 'Piece';
-      isRequired: boolean;
       comment?: string | null;
     };
     SheetSewingOperationRow: {
@@ -3651,9 +3655,6 @@ export interface components {
       /** @enum {string|null} */
       season?: 'Літо' | 'Зима' | null;
       isActive: boolean;
-      isVerified: boolean;
-      /** @description dd.MM.yyyy. */
-      verifiedOn?: string | null;
       /** Format: uri */
       currentSiteUrl?: string | null;
       quoteDescription?: string | null;
@@ -3681,9 +3682,6 @@ export interface components {
       supplierPrice?: number | null;
       isActive: boolean;
       allowManualPrice: boolean;
-      isVerified: boolean;
-      /** @description dd.MM.yyyy. */
-      verifiedOn?: string | null;
       /** @description PPE rule code (the rule name); an unknown one is imported as none (warning). */
       ruleCode?: string | null;
       quoteDescription?: string | null;
@@ -3742,6 +3740,7 @@ export interface components {
       /** @description Not blocking. */
       warnings: components['schemas']['SheetImportIssue'][];
     };
+    /** @description A fabric variant of the model (CAT-015). */
     SewingArticle: {
       /** Format: int64 */
       id: number;
@@ -3751,6 +3750,13 @@ export interface components {
       active: boolean;
       /** Format: int32 */
       sortOrder: number;
+      /**
+       * Format: int32
+       * @description The variant's fabric; null when not set yet.
+       */
+      fabricId: number | null;
+      /** @description Metres of the fabric per product. */
+      fabricQuantity: number | null;
     };
     SewingArticleList: {
       /** Format: int32 */
@@ -3760,11 +3766,16 @@ export interface components {
       version: number;
       articles: components['schemas']['SewingArticle'][];
     };
+    /** @description Metres of the variant's fabric per product. */
+    FabricQuantity: number;
     CreateSewingArticleRequest: {
       saleSku: string;
       active: boolean;
       /** Format: int32 */
       sortOrder: number;
+      /** Format: int32 */
+      fabricId: number;
+      fabricQuantity: components['schemas']['FabricQuantity'];
       /**
        * Format: int64
        * @description Current model composition version used for optimistic concurrency.
@@ -3781,7 +3792,7 @@ export interface components {
      * @enum {string}
      */
     SewingMaterialUnit: 'Metre' | 'Piece' | 'Service' | 'Kilogram';
-    /** @description Effective line. Identity and review metadata are server-owned. */
+    /** @description Effective line. Identity is server-owned. */
     SewingMaterial: {
       /** Format: int64 */
       id: number;
@@ -3795,17 +3806,12 @@ export interface components {
       costCode: string | null;
       quantity: number;
       unit: components['schemas']['SewingMaterialUnit'];
-      required: boolean;
       /** Format: int32 */
       sortOrder: number;
-      reviewed: boolean;
-      reviewedBy: string | null;
-      /** Format: date-time */
-      reviewedAt: string | null;
       /** @description Free note, for example which garment part an operation belongs to. */
       comment: string | null;
     };
-    /** @description Shared effective operation line. Identity and review metadata are server-owned. */
+    /** @description Shared effective operation line. Identity is server-owned. */
     SewingOperation: {
       /** Format: int64 */
       id: number;
@@ -3815,10 +3821,6 @@ export interface components {
       manualMinutes: number | null;
       /** Format: int32 */
       sortOrder: number;
-      reviewed: boolean;
-      reviewedBy: string | null;
-      /** Format: date-time */
-      reviewedAt: string | null;
       /** @description Free note, for example which garment part an operation belongs to. */
       comment: string | null;
     };
@@ -3834,7 +3836,7 @@ export interface components {
       materials: components['schemas']['SewingMaterial'][];
       /** @description Shared effective operation lines. */
       operations: components['schemas']['SewingOperation'][];
-      /** @description Human-readable blockers for review, missing fabric/operations, or unresolved OtherCost. */
+      /** @description Human-readable blockers for missing fabric/operations or unresolved OtherCost. */
       blockers: string[];
     };
     SewingMaterialInput: {
@@ -3848,10 +3850,8 @@ export interface components {
       costCode: string | null;
       quantity: number;
       unit: components['schemas']['SewingMaterialUnit'];
-      required: boolean;
       /** Format: int32 */
       sortOrder: number;
-      reviewed: boolean;
       /** @description Free note, for example which garment part an operation belongs to. */
       comment?: string | null;
     };
@@ -3862,7 +3862,6 @@ export interface components {
       manualMinutes: number | null;
       /** Format: int32 */
       sortOrder: number;
-      reviewed: boolean;
       /** @description Free note, for example which garment part an operation belongs to. */
       comment?: string | null;
     };
@@ -3873,8 +3872,12 @@ export interface components {
       /** Format: int64 */
       expectedVersion: number;
     };
-    ReplaceSewingArticleCompositionRequest: {
-      materials: components['schemas']['SewingMaterialInput'][];
+    UpdateSewingArticleRequest: {
+      saleSku: string;
+      active: boolean;
+      /** Format: int32 */
+      fabricId: number;
+      fabricQuantity: components['schemas']['FabricQuantity'];
       /** Format: int64 */
       expectedVersion: number;
     };
@@ -3929,11 +3932,58 @@ export interface components {
       active: boolean;
       /** Format: int32 */
       sortOrder: number;
+      /** Format: int32 */
+      fabricId: number | null;
+      fabricName: string | null;
+      /**
+       * Format: decimal
+       * @description Current price of one metre of the fabric.
+       */
+      fabricPrice: number | null;
+      /** Format: decimal */
+      fabricQuantity: number | null;
       isCalculated: boolean;
       blockers: components['schemas']['SewingPricingBlocker'][];
       costs: components['schemas']['SewingCostBreakdown'] | null;
       prices: components['schemas']['SewingPriceTiers'] | null;
       published: components['schemas']['SewingArticlePublishedSummary'] | null;
+    };
+    /** @description A shared composition line. Name and unit price come from the current reference; null for other costs and unknown references. */
+    SewingCardMaterial: {
+      /** Format: int64 */
+      id: number;
+      /** @enum {string} */
+      kind: 'Fabric' | 'Accessory' | 'OtherCost';
+      /** Format: int32 */
+      referenceId: number | null;
+      costCode: string | null;
+      name: string | null;
+      /** Format: decimal */
+      unitPrice: number | null;
+      /** Format: decimal */
+      quantity: number;
+      /** @enum {string} */
+      unit: 'Metre' | 'Piece' | 'Service' | 'Kilogram';
+      /** Format: int32 */
+      sortOrder: number;
+      comment: string | null;
+    };
+    /** @description An operation of the model with the norm of the reference «Операції»; null name and norm when the reference is unknown. */
+    SewingCardOperation: {
+      /** Format: int64 */
+      id: number;
+      /** Format: int32 */
+      operationId: number;
+      name: string | null;
+      /** Format: decimal */
+      normMinutes: number | null;
+      /** Format: decimal */
+      quantity: number;
+      /** Format: decimal */
+      manualMinutes: number | null;
+      /** Format: int32 */
+      sortOrder: number;
+      comment: string | null;
     };
     SewingArticleSummary: {
       /** Format: int32 */
@@ -3944,6 +3994,8 @@ export interface components {
       /** Format: date-time */
       calculatedAt: string;
       articles: components['schemas']['SewingArticleSummaryRow'][];
+      materials: components['schemas']['SewingCardMaterial'][];
+      operations: components['schemas']['SewingCardOperation'][];
     };
     SaveSewingCalculationRequest: {
       /** Format: uuid */
@@ -3965,8 +4017,6 @@ export interface components {
       unit: 'Metre' | 'Piece' | 'Service';
       isFabric: boolean;
       isOtherCost: boolean;
-      isRequired: boolean;
-      isReviewed: boolean;
     };
     SewingPricingOperationRow: {
       /** Format: int64 */
@@ -3976,7 +4026,6 @@ export interface components {
       /** Format: decimal */
       quantity: number;
       manualMinutes: number | null;
-      isReviewed: boolean;
     };
     SewingArticlePricingSnapshot: {
       /** Format: int64 */
@@ -4136,7 +4185,6 @@ export interface components {
       externalWholesale: number | null;
       source: string;
       sourceDate: string;
-      sourceReviewed: boolean;
     };
     PpeOfferVersion: {
       /** Format: uuid */
@@ -8580,8 +8628,18 @@ export interface operations {
   };
   getProductOverview: {
     parameters: {
-      query?: {
-        type?: 'Sewing' | 'Ppe';
+      query: {
+        type: 'Sewing' | 'Ppe';
+        /** @description Code, name, quote description, variant SKU or fabric name; case-insensitive. */
+        search?: string;
+        /** @description A section ID from /api/reference/product-sections, or none for rows without a section. */
+        section?: string;
+        withoutPrice?: boolean;
+        /** @description code is natural (MOD-2 before MOD-10, article 9 before 17; rows without a code last); price is the 1–9 pcs price, rows without a price last in both directions. Ties go by name. */
+        sort?: 'code' | 'name' | 'price' | 'updated';
+        direction?: 'asc' | 'desc';
+        page?: number;
+        pageSize?: number;
       };
       header?: never;
       path?: never;
@@ -8589,17 +8647,31 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Rows. */
+      /** @description The page. */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['ProductOverviewRow'][];
+          'application/json': components['schemas']['ProductOverviewPage'];
         };
       };
-      /** @description Unknown type. */
+      /** @description Unknown type, section, sort or direction, or an invalid page. */
       400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description CatalogRead required. */
+      403: {
         headers: {
           [name: string]: unknown;
         };
@@ -8677,27 +8749,27 @@ export interface operations {
       400: components['responses']['ValidationError'];
     };
   };
-  getProductOverviewPrices: {
+  getProductOverviewItem: {
     parameters: {
-      query: {
-        type: 'Sewing' | 'Ppe';
-      };
+      query?: never;
       header?: never;
-      path?: never;
+      path: {
+        id: number;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
-      /** @description One entry per product of the type. */
+      /** @description The row. */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['ProductOverviewPrices'][];
+          'application/json': components['schemas']['ProductOverviewItem'];
         };
       };
-      /** @description Unknown type. */
+      /** @description Invalid ID. */
       400: {
         headers: {
           [name: string]: unknown;
@@ -8713,6 +8785,13 @@ export interface operations {
       };
       /** @description CatalogRead required. */
       403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such product. */
+      404: {
         headers: {
           [name: string]: unknown;
         };
@@ -9008,7 +9087,7 @@ export interface operations {
       409: components['responses']['responses-ConflictError'];
     };
   };
-  replaceSewingArticleComposition: {
+  updateSewingArticle: {
     parameters: {
       query?: never;
       header?: never;
@@ -9020,17 +9099,17 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': components['schemas']['ReplaceSewingArticleCompositionRequest'];
+        'application/json': components['schemas']['UpdateSewingArticleRequest'];
       };
     };
     responses: {
-      /** @description Updated effective composition and the new version. */
+      /** @description Changed variant. */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['SewingComposition'];
+          'application/json': components['schemas']['SewingArticle'];
         };
       };
       400: components['responses']['sewing-composition.openapi_components-responses-ValidationError'];
@@ -9048,7 +9127,53 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Product, Article or referenced entity not found. */
+      /** @description Product, Article or fabric not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['responses-ConflictError'];
+    };
+  };
+  deleteSewingArticle: {
+    parameters: {
+      query: {
+        expectedVersion: number;
+      };
+      header?: never;
+      path: {
+        productId: components['parameters']['parameters-ProductId'];
+        articleId: components['parameters']['ArticleId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Variant removed. */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      400: components['responses']['sewing-composition.openapi_components-responses-ValidationError'];
+      /** @description Access token missing or invalid. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Caller does not satisfy CanManageProducts. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product or Article not found. */
       404: {
         headers: {
           [name: string]: unknown;

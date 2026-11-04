@@ -1,6 +1,16 @@
-import type { SewingArticleCreateDraft } from '@admin/products/model';
+import type { SewingVariantInput } from '@admin/products/model';
 
 export interface CreateSewingArticleArguments {
   productId: number;
-  draft: SewingArticleCreateDraft;
+  input: SewingVariantInput;
+}
+
+export interface UpdateSewingArticleArguments extends CreateSewingArticleArguments {
+  articleId: number;
+}
+
+export interface DeleteSewingArticleArguments {
+  productId: number;
+  articleId: number;
+  expectedVersion: number;
 }

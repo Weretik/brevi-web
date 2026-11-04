@@ -11,9 +11,7 @@ export function mapSewingMaterialInput(line: SewingMaterialDraft): MaterialInput
     costCode: line.costCode,
     quantity: line.quantity,
     unit: line.unit,
-    required: line.required,
     sortOrder: line.sortOrder,
-    reviewed: line.reviewed,
     comment: line.comment.trim() || null,
   };
 }

@@ -16,7 +16,6 @@ export function mapGarmentPartOperations(
     name: row.name,
     min: row.min,
     minutesPerProduct: row.minutesPerProduct,
-    normCheckedAt: row.normCheckedAt,
     isActive: row.isActive,
     notes: row.notes,
   }));

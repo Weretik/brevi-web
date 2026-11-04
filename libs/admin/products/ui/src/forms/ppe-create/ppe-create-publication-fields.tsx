@@ -1,11 +1,11 @@
 import { ReferenceFormSection } from '@admin/references/ui';
-import { FormControlLabel, FormHelperText, Stack, Switch } from '@mui/material';
+import { FormControlLabel, Switch } from '@mui/material';
 
 import type { PpeCreateFieldsProps } from './ppe-create-fields-props';
 
 type Props = PpeCreateFieldsProps;
 
-/** Block 4 «Публікація»: whether the price list shows the product and whether its prices are checked. */
+/** Block 4 «Публікація»: whether the price list shows the product. */
 export function PpeCreatePublicationFields({ values, disabled, onChange }: Props) {
   return (
     <ReferenceFormSection title="Публікація">
@@ -19,19 +19,6 @@ export function PpeCreatePublicationFields({ values, disabled, onChange }: Props
         }
         label="Активний · показувати в прайсі"
       />
-      <Stack>
-        <FormControlLabel
-          control={
-            <Switch
-              checked={values.isVerified}
-              onChange={(event) => onChange('isVerified', event.target.checked)}
-              disabled={disabled}
-            />
-          }
-          label="Перевірено"
-        />
-        <FormHelperText sx={{ mt: 0 }}>Ставте тільки після ручної перевірки цін.</FormHelperText>
-      </Stack>
     </ReferenceFormSection>
   );
 }

@@ -27,16 +27,10 @@ export function SewingCreateDraftWizard({
   onLaunched,
 }: Props) {
   const draft = useSewingCreateDraft(productId);
-  const { card, controller } = draft;
+  const { card, writes } = draft;
   const overview = useSewingCreateOverview(card.row);
   const [active, setActive] = useState(true);
-  const dirty = controller.drafts.dirty || controller.busy;
-
-  const open = (next: SewingCreateStep) => {
-    // Operations belong to the whole model, as on the card's labour tab.
-    if (next === 4 && controller.selection.scope === 'Article') controller.selection.requestModel();
-    onStep(next);
-  };
+  const open = onStep;
   const launch = async () => {
     if (await overview.save({ isActive: active })) onLaunched();
   };
@@ -45,7 +39,7 @@ export function SewingCreateDraftWizard({
     <SewingCreateLayout
       listHref={listHref}
       name={card.row?.name ?? null}
-      code={card.row?.code ?? controller.queries.articles.data?.modelCode ?? null}
+      code={draft.modelCode}
       step={step}
       ready={draft.ready}
       stepper={{ done: draft.done, canOpen: () => true, onSelect: open }}
@@ -57,7 +51,7 @@ export function SewingCreateDraftWizard({
           ? {
               label: 'Запустити модель',
               busy: overview.saving,
-              disabled: !card.row || dirty,
+              disabled: !card.row || writes.busy,
               onClick: () => void launch(),
             }
           : {
@@ -78,10 +72,6 @@ export function SewingCreateDraftWizard({
         overview={overview}
         active={active}
         onActiveChange={setActive}
-        onOpenArticle={(articleId) => {
-          controller.selection.requestArticle(articleId);
-          onStep(3);
-        }}
       />
     </SewingCreateLayout>
   );

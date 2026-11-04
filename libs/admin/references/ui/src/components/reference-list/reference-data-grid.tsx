@@ -1,13 +1,21 @@
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
-import { Box, IconButton } from '@mui/material';
+import OpenInFullOutlinedIcon from '@mui/icons-material/OpenInFullOutlined';
+import { Box, IconButton, Tooltip } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { DataGrid } from '@mui/x-data-grid';
+import { Link as RouterLink } from 'react-router-dom';
 
 import { ReferenceGridFooter } from './reference-grid-footer';
 import { ReferenceRowMenu } from './reference-row-menu';
 import { useReferenceRowContextMenu } from '../../hooks/reference-row-actions/use-reference-row-context-menu';
 
-import type { GridColDef, GridRowSelectionModel, GridValidRowModel } from '@mui/x-data-grid';
+import type {
+  GridColDef,
+  GridPaginationModel,
+  GridRowSelectionModel,
+  GridSortModel,
+  GridValidRowModel,
+} from '@mui/x-data-grid';
 import type {} from '@mui/x-data-grid/themeAugmentation';
 
 interface ReferenceRow extends GridValidRowModel {
@@ -36,6 +44,21 @@ interface Props<Row extends ReferenceRow> {
   isDetailRow?: (row: Row) => boolean;
   /** Column sorting; off when the row order carries meaning (detail rows follow their parent). */
   sortable?: boolean;
+  /** Label of the menu's view action. */
+  viewLabel?: string;
+  /** A full page of the row: a «Відкрити повну картку» button next to «…» and in the menu. */
+  openHref?: (row: Row) => string;
+  /**
+   * Paging and sorting on the server: `rows` is the current page (with its detail rows) and
+   * `rowCount` the number of matching rows.
+   */
+  server?: {
+    rowCount: number;
+    paginationModel: GridPaginationModel;
+    onPaginationModelChange: (model: GridPaginationModel) => void;
+    sortModel: GridSortModel;
+    onSortModelChange: (model: GridSortModel) => void;
+  };
 }
 
 /**
@@ -59,6 +82,9 @@ export function ReferenceDataGrid<Row extends ReferenceRow>({
   onDelete,
   isDetailRow,
   sortable = true,
+  viewLabel,
+  openHref,
+  server,
 }: Props<Row>) {
   const theme = useTheme();
   const menuRows = isDetailRow ? rows.filter((row) => !isDetailRow(row)) : rows;
@@ -66,28 +92,45 @@ export function ReferenceDataGrid<Row extends ReferenceRow>({
   const actionsColumn: GridColDef<Row> = {
     field: 'actions',
     headerName: 'Дії',
-    width: 64,
+    width: openHref ? 104 : 64,
     align: 'center',
     sortable: false,
     filterable: false,
     disableColumnMenu: true,
     renderCell: ({ row, tabIndex }) =>
       isDetailRow?.(row) ? null : (
-        <IconButton
-          size="small"
-          aria-label={`Дії: ${row.name}`}
-          tabIndex={tabIndex}
-          aria-haspopup="menu"
-          aria-expanded={rowMenu?.row.id === row.id ? true : undefined}
-          onClick={(event) => {
-            event.stopPropagation();
-            const bounds = event.currentTarget.getBoundingClientRect();
-            openRowMenu(row, { left: bounds.right, top: bounds.bottom }, event.currentTarget);
-          }}
-          sx={{ width: 40, height: 40 }}
-        >
-          <MoreHorizOutlinedIcon fontSize="small" />
-        </IconButton>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          {openHref && (
+            <Tooltip title="Відкрити повну картку">
+              <IconButton
+                size="small"
+                component={RouterLink}
+                to={openHref(row)}
+                aria-label={`Відкрити повну картку: ${row.name}`}
+                tabIndex={tabIndex}
+                onClick={(event) => event.stopPropagation()}
+                sx={{ width: 40, height: 40 }}
+              >
+                <OpenInFullOutlinedIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
+          <IconButton
+            size="small"
+            aria-label={`Дії: ${row.name}`}
+            tabIndex={tabIndex}
+            aria-haspopup="menu"
+            aria-expanded={rowMenu?.row.id === row.id ? true : undefined}
+            onClick={(event) => {
+              event.stopPropagation();
+              const bounds = event.currentTarget.getBoundingClientRect();
+              openRowMenu(row, { left: bounds.right, top: bounds.bottom }, event.currentTarget);
+            }}
+            sx={{ width: 40, height: 40 }}
+          >
+            <MoreHorizOutlinedIcon fontSize="small" />
+          </IconButton>
+        </Box>
       ),
   };
 
@@ -123,7 +166,17 @@ export function ReferenceDataGrid<Row extends ReferenceRow>({
           rowSelectionModel={selection}
           onRowSelectionModelChange={onSelectionChange}
           pageSizeOptions={[10, 25, 50, 100]}
-          initialState={{ pagination: { paginationModel: { pageSize: 10, page: 0 } } }}
+          {...(server
+            ? {
+                paginationMode: 'server' as const,
+                sortingMode: 'server' as const,
+                rowCount: server.rowCount,
+                paginationModel: server.paginationModel,
+                onPaginationModelChange: server.onPaginationModelChange,
+                sortModel: server.sortModel,
+                onSortModelChange: server.onSortModelChange,
+              }
+            : { initialState: { pagination: { paginationModel: { pageSize: 10, page: 0 } } } })}
           slots={{ footer: ReferenceGridFooter }}
           slotProps={{ row: rowSlotProps }}
           sx={{
@@ -152,6 +205,8 @@ export function ReferenceDataGrid<Row extends ReferenceRow>({
         onView={onView}
         onEdit={onEdit}
         onDelete={onDelete}
+        viewLabel={viewLabel}
+        openHref={openHref}
       />
     </>
   );

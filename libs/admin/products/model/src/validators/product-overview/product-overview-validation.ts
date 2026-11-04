@@ -8,7 +8,6 @@ export interface ProductOverviewFormValues {
   sectionId: number | '';
   season: ProductSeason | '';
   isActive: boolean;
-  isVerified: boolean;
   currentSiteUrl: string;
   quoteDescription: string;
 }

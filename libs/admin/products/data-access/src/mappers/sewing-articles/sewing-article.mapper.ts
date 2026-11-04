@@ -10,5 +10,7 @@ export function mapSewingArticle(value: unknown): SewingArticle {
     saleSku: dto.saleSku,
     active: dto.active,
     sortOrder: dto.sortOrder,
+    fabricId: dto.fabricId,
+    fabricQuantity: dto.fabricQuantity,
   };
 }

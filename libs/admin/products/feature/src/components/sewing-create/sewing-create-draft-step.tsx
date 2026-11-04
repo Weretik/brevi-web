@@ -1,8 +1,8 @@
 import { SewingCreateModelSummary } from './sewing-create-model-summary';
-import { SewingCreateOperationsStep } from './sewing-create-operations-step';
 import { SewingCreateReviewStep } from './sewing-create-review-step';
-import { SewingCardArticlesTab } from '../sewing-card/sewing-card-articles-tab';
-import { SewingCompositionScreen } from '../sewing-composition/sewing-composition-screen';
+import { SewingLabourTab } from '../sewing-model/sewing-labour-tab';
+import { SewingMaterialsTab } from '../sewing-model/sewing-materials-tab';
+import { SewingVariantsTab } from '../sewing-model/sewing-variants-tab';
 
 import type { useSewingCreateDraft } from '../../hooks/sewing-create/use-sewing-create-draft';
 import type { useSewingCreateOverview } from '../../hooks/sewing-create/use-sewing-create-overview';
@@ -15,14 +15,11 @@ interface Props {
   overview: ReturnType<typeof useSewingCreateOverview>;
   active: boolean;
   onActiveChange: (active: boolean) => void;
-  /** An Article row opens its own materials on step 3. */
-  onOpenArticle: (articleId: number) => void;
 }
 
-/** The content of one step of a saved draft, built from the sewing card pieces. */
+/** The content of one step of a saved draft, built from the sewing card tabs. */
 export function SewingCreateDraftStep(props: Props) {
-  const { card, controller } = props.draft;
-  const version = controller.queries.articles.data?.version ?? 0;
+  const { card, model, writes } = props.draft;
   const sectionId = card.row?.sectionId;
   switch (props.step) {
     case 1:
@@ -35,52 +32,23 @@ export function SewingCreateDraftStep(props: Props) {
         />
       );
     case 2:
-      return (
-        <SewingCardArticlesTab
-          rows={card.articles}
-          loading={card.summaryLoading}
-          error={card.summaryError}
-          onRetry={card.reloadSummary}
-          canCreate={controller.canManage && Boolean(controller.queries.articles.data)}
-          version={version}
-          creating={controller.articleCreation.state.isLoading}
-          createError={controller.articleCreation.error}
-          onCreate={controller.selection.requestCreateArticle}
-          onOpen={props.onOpenArticle}
-        />
-      );
+      return <SewingVariantsTab model={model} writes={writes} />;
     case 3:
-      return (
-        <SewingCompositionScreen
-          productId={props.productId}
-          controller={controller}
-          section="materials"
-        />
-      );
+      return <SewingMaterialsTab model={model} writes={writes} />;
     case 4:
       return (
-        <SewingCreateOperationsStep
-          productId={props.productId}
-          controller={controller}
-          labour={props.draft.labour}
-          costsKnown={card.seamstressPerMinute !== null}
-          verified={card.row?.isVerified ?? false}
-          verifiedOn={card.row?.verifiedOn ?? null}
-          saving={props.overview.saving}
-          message={props.overview.message}
-          onVerifiedChange={(isVerified) => void props.overview.save({ isVerified })}
+        <SewingLabourTab
+          model={model}
+          writes={writes}
+          seamstressPerMinute={card.seamstressPerMinute}
         />
       );
     case 5:
       return (
         <SewingCreateReviewStep
           productId={props.productId}
-          articles={card.articles}
+          summary={card.articles}
           totals={card.totals}
-          labourMinutes={props.draft.labourMinutes}
-          compositionVersion={version}
-          canManage={controller.canManage}
-          dirty={controller.drafts.dirty || controller.busy}
           active={props.active}
           saving={props.overview.saving}
           message={props.overview.message}

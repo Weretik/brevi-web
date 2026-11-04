@@ -29,6 +29,10 @@ const summary = {
       saleSku: '602',
       active: true,
       sortOrder: 0,
+      fabricId: 59,
+      fabricName: 'Габардин',
+      fabricPrice: 210,
+      fabricQuantity: 2.5,
       isCalculated: true,
       blockers: [],
       costs,
@@ -40,11 +44,41 @@ const summary = {
       saleSku: '603',
       active: true,
       sortOrder: 1,
+      fabricId: null,
+      fabricName: null,
+      fabricPrice: null,
+      fabricQuantity: null,
       isCalculated: false,
       blockers: [{ code: 'MissingFabric', inputKey: null, message: 'No fabric.' }],
       costs: null,
       prices: null,
       published: null,
+    },
+  ],
+  materials: [
+    {
+      id: 1,
+      kind: 'Accessory',
+      referenceId: 10,
+      costCode: null,
+      name: 'Ґудзик',
+      unitPrice: 1.5,
+      quantity: 4,
+      unit: 'Piece',
+      sortOrder: 0,
+      comment: null,
+    },
+  ],
+  operations: [
+    {
+      id: 3,
+      operationId: 7,
+      name: 'Комір',
+      normMinutes: 7.3,
+      quantity: 2,
+      manualMinutes: null,
+      sortOrder: 0,
+      comment: null,
     },
   ],
 };
@@ -53,7 +87,11 @@ describe('sewing article summary mapper', () => {
   it('maps live costs, prices, blockers and the published price of every Article', () => {
     const result = mapSewingArticleSummary(summary, 7);
 
+    expect(result.materials[0]).toMatchObject({ name: 'Ґудзик', unitPrice: 1.5, comment: '' });
+    expect(result.operations[0]).toMatchObject({ name: 'Комір', normMinutes: 7.3 });
     expect(result.articles[0]).toMatchObject({
+      fabricName: 'Габардин',
+      fabricPrice: 210,
       saleSku: '602',
       calculated: true,
       minutes: 54,

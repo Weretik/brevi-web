@@ -1,55 +1,120 @@
-import {
-  useListProductOverviewPricesQuery,
-  useListProductOverviewQuery,
-} from '@admin/products/data-access';
-import { useListFabricsQuery, useListProductSectionsQuery } from '@admin/references/data-access';
+import { useListProductOverviewQuery } from '@admin/products/data-access';
+import { buildProductListRows, orderSectionCounts } from '@admin/products/model';
+import { productSortFields } from '@admin/products/ui';
+import { useListProductSectionsQuery } from '@admin/references/data-access';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
-import type { ProductOverviewPrices, ProductOverviewType } from '@admin/products/model';
+import { useDebouncedValue } from '../debounce/use-debounced-value';
 
-/** Rows of one «Товари» table, their prices (CAT-011) and the «Типи і розділи» sections of the type. */
+import type {
+  ProductOverviewListQuery,
+  ProductOverviewType,
+  ProductSectionFilter,
+} from '@admin/products/model';
+import type { GridPaginationModel, GridSortModel } from '@mui/x-data-grid';
+
+const firstPage: GridPaginationModel = { page: 0, pageSize: 25 };
+
+/**
+ * One «Товари» tab (CAT-013): search, section, «Без ціни», page and sort go to the server, which
+ * returns the page with published prices and fabric variants in one request.
+ */
 export function useProductOverview(type: ProductOverviewType) {
-  const products = useListProductOverviewQuery(type);
-  const pricesResult = useListProductOverviewPricesQuery(type);
-  const fabricsResult = useListFabricsQuery(undefined, { skip: type !== 'Sewing' });
+  const [search, setSearchText] = useState('');
+  const [section, setSectionFilter] = useState<ProductSectionFilter>(null);
+  const [withoutPrice, setWithoutPrice] = useState(false);
+  const [pagination, setPagination] = useState<GridPaginationModel>(firstPage);
+  const [sortModel, setSort] = useState<GridSortModel>([]);
+  const [expanded, setExpanded] = useState<ReadonlySet<number>>(new Set());
+  const debouncedSearch = useDebouncedValue(search, 300);
+
+  const sort = sortModel[0];
+  const query: ProductOverviewListQuery = {
+    type,
+    search: debouncedSearch,
+    section,
+    withoutPrice,
+    sort: (sort && productSortFields[sort.field]) ?? 'code',
+    direction: sort?.sort === 'desc' ? 'desc' : 'asc',
+    page: pagination.page + 1,
+    pageSize: pagination.pageSize,
+  };
+  const list = useListProductOverviewQuery(query);
   const sectionsResult = useListProductSectionsQuery();
+
   const sections = useMemo(
-    () => (sectionsResult.data ?? []).filter((section) => section.type === type),
+    () => (sectionsResult.data ?? []).filter((item) => item.type === type),
     [sectionsResult.data, type],
   );
   const sectionNames = useMemo(
-    () => new Map((sectionsResult.data ?? []).map((section) => [section.id, section.name])),
+    () => new Map((sectionsResult.data ?? []).map((item) => [item.id, item.name])),
     [sectionsResult.data],
   );
-  const prices = useMemo(
+  const counts = useMemo(
     () =>
-      new Map<number, ProductOverviewPrices>(
-        (pricesResult.data ?? []).map((row) => [row.productId, row]),
+      orderSectionCounts(
+        list.data?.sections ?? [],
+        sections.map((item) => item.id),
       ),
-    [pricesResult.data],
+    [list.data?.sections, sections],
   );
-  const fabricNames = useMemo(
-    () => new Map((fabricsResult.data ?? []).map((fabric) => [fabric.id, fabric.name])),
-    [fabricsResult.data],
+  const items = list.data?.items;
+  const listRows = useMemo(() => buildProductListRows(items ?? [], expanded), [items, expanded]);
+
+  const toFirstPage = () => setPagination((current) => ({ ...current, page: 0 }));
+  const toggle = useCallback(
+    (productId: number) =>
+      setExpanded((current) => {
+        const next = new Set(current);
+        if (!next.delete(productId)) next.add(productId);
+        return next;
+      }),
+    [],
   );
-  const failure = products.error ?? sectionsResult.error;
+  const failure = list.error ?? sectionsResult.error;
 
   return {
-    rows: products.data ?? [],
-    prices,
-    fabricNames,
-    pricesLoading: pricesResult.isLoading || pricesResult.isFetching,
-    pricesError: pricesResult.error
-      ? adminApiErrorMessage(pricesResult.error, 'Не вдалося завантажити ціни.')
-      : null,
+    items: items ?? [],
+    listRows,
+    toggle,
+    search,
+    setSearch: (value: string) => {
+      setSearchText(value);
+      toFirstPage();
+    },
+    section,
+    setSection: (value: ProductSectionFilter) => {
+      setSectionFilter(value);
+      toFirstPage();
+    },
+    withoutPrice: {
+      count: list.data?.withoutPrice ?? 0,
+      selected: withoutPrice,
+      onToggle: () => {
+        setWithoutPrice((value) => !value);
+        toFirstPage();
+      },
+    },
+    counts,
+    total: list.data?.total ?? 0,
+    all: list.data?.all ?? 0,
+    server: {
+      rowCount: list.data?.total ?? 0,
+      paginationModel: pagination,
+      onPaginationModelChange: setPagination,
+      sortModel,
+      onSortModelChange: (model: GridSortModel) => {
+        setSort(model);
+        toFirstPage();
+      },
+    },
     sections,
     sectionNames,
-    loading: products.isLoading || products.isFetching || sectionsResult.isLoading,
+    loading: list.isFetching || sectionsResult.isLoading,
     error: failure ? adminApiErrorMessage(failure, 'Не вдалося завантажити товари.') : null,
     reload: () => {
-      void products.refetch();
-      void pricesResult.refetch();
+      void list.refetch();
       void sectionsResult.refetch();
     },
   };

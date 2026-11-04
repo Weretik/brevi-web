@@ -19,7 +19,6 @@ export * from './queries/sewing-pricing/apply-published-sewing-price';
 export * from './entities/sewing-composition';
 export * from './queries/sewing-composition';
 export * from './mappers/sewing-composition';
-export * from './validators/sewing-composition';
 
 export type { PpePriceTiers } from './entities/ppe-pricing/ppe-price-tiers';
 export type { PpeMarkups } from './entities/ppe-pricing/ppe-markups';
@@ -35,8 +34,8 @@ export { parsePpeMarkupDraft } from './validators/ppe-pricing/parse-ppe-markup-d
 
 export * from './entities/product-overview/product-overview';
 export * from './queries/product-overview/product-overview-filters';
-export * from './entities/product-overview/product-overview-prices';
 export * from './queries/product-overview/product-list-rows';
+export * from './queries/product-overview/product-problem-reasons';
 export * from './queries/product-overview/product-panel-metrics';
 export * from './validators/product-overview/product-overview-validation';
 export * from './forms/product-overview/product-overview-form';
@@ -45,6 +44,7 @@ export * from './entities/sewing-card/sewing-article-summary';
 export * from './queries/sewing-card/sewing-blocker-reasons';
 export * from './queries/sewing-card/sewing-card-totals';
 export * from './queries/sewing-card/sewing-labour-lines';
+export * from './queries/sewing-card/sewing-material-lines';
 export * from './entities/ppe-card/ppe-supplier-offer';
 export * from './validators/ppe-card/ppe-supplier-offer-validation';
 export * from './forms/ppe-card/ppe-supplier-offer-form';
@@ -57,3 +57,8 @@ export * from './entities/sewing-create/sewing-create-step';
 export * from './forms/sewing-create/sewing-model-form';
 export * from './validators/sewing-create/sewing-model-validation';
 export * from './queries/sewing-create/sewing-create-progress';
+export * from './forms/sewing-variant/sewing-variant-form';
+export * from './validators/sewing-variant/sewing-variant-validation';
+export * from './forms/sewing-material/sewing-material-form';
+export * from './forms/sewing-operation/sewing-operation-form';
+export * from './queries/sewing-variants/sewing-variant-rows';

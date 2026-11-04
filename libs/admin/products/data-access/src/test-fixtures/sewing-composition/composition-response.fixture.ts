@@ -7,11 +7,7 @@ export const sharedMaterial = {
   costCode: null,
   quantity: 2,
   unit: 'Piece',
-  required: true,
   sortOrder: 0,
-  reviewed: true,
-  reviewedBy: 'manager-1',
-  reviewedAt: '2026-10-25T00:00:00Z',
 };
 export const compositionResponseFixture = {
   productId: 101,
@@ -38,10 +34,7 @@ export const compositionResponseFixture = {
       quantity: 2,
       manualMinutes: null,
       sortOrder: 0,
-      reviewed: false,
-      reviewedBy: null,
-      reviewedAt: null,
     },
   ],
-  blockers: ['Required operation line 3 has not been reviewed.'],
+  blockers: ['No effective fabric line is configured.'],
 };

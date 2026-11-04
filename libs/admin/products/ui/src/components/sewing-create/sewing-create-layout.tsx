@@ -72,10 +72,7 @@ export function SewingCreateLayout(props: Props) {
           direction="row"
           sx={{ gap: 1, alignItems: 'center', flexWrap: 'wrap', flexShrink: 0 }}
         >
-          <SewingCardStatusPill
-            label={props.ready ? 'Готово до розрахунку' : 'Не готово до розрахунку'}
-            tone={props.ready ? 'success' : 'warning'}
-          />
+          {!props.ready && <SewingCardStatusPill label="Не готово до розрахунку" tone="warning" />}
           <Button variant="outlined" disabled={props.exitDisabled} onClick={props.onExit}>
             Зберегти і вийти
           </Button>

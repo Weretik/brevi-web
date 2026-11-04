@@ -46,11 +46,9 @@ export const sewingCalculationFixture: SewingCalculationDto = {
           unit: 'Metre',
           isFabric: true,
           isOtherCost: false,
-          isRequired: true,
-          isReviewed: true,
         },
       ],
-      operations: [{ lineId: 2, operationId: 1, quantity: 1, manualMinutes: 10, isReviewed: true }],
+      operations: [{ lineId: 2, operationId: 1, quantity: 1, manualMinutes: 10 }],
     },
     settings: {
       id: 1,

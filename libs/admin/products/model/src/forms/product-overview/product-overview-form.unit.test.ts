@@ -13,8 +13,6 @@ const sewing: ProductOverview = {
   sectionId: 2,
   season: 'Літо',
   isActive: true,
-  isVerified: true,
-  verifiedOn: '08.09.2026',
   currentSiteUrl: 'https://brevi.com.ua/specodyag-litnij/kostyum-verde',
   quoteDescription: 'Костюм із курткою та штанами.',
   updatedAtUtc: '2026-11-03T10:00:00Z',
@@ -28,8 +26,6 @@ describe('product overview form', () => {
       sectionId: 2,
       season: 'Літо',
       isActive: true,
-      isVerified: true,
-      verifiedOn: '08.09.2026',
       currentSiteUrl: 'https://brevi.com.ua/specodyag-litnij/kostyum-verde',
       quoteDescription: 'Костюм із курткою та штанами.',
     });
@@ -40,17 +36,12 @@ describe('product overview form', () => {
       ...sewing,
       type: 'Ppe',
       code: '3',
-      isVerified: false,
-      verifiedOn: null,
     };
     const values = {
       ...createProductOverviewFormValues(ppe),
-      isVerified: true,
       season: 'Зима' as const,
     };
     expect(productOverviewBody(values, ppe)).toMatchObject({
-      isVerified: true,
-      verifiedOn: null,
       season: null,
     });
   });

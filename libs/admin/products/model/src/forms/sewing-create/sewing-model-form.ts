@@ -32,7 +32,6 @@ export function sewingModelCreateInput(values: SewingModelFormValues): CreateCat
     sectionId: Number(values.sectionId),
     season: values.season || null,
     isActive: false,
-    isVerified: false,
     currentSiteUrl: values.currentSiteUrl.trim() || null,
     quoteDescription: values.quoteDescription.trim() || null,
     ppe: null,

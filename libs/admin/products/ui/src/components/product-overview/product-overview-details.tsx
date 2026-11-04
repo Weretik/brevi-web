@@ -20,11 +20,6 @@ export function ProductOverviewDetails({ row, sectionName }: Props) {
             { label: sewing ? 'Категорія' : 'Розділ / категорія', value: sectionName },
             ...(sewing ? [{ label: 'Сезон', value: row.season }] : []),
             { label: 'Статус', value: row.isActive ? 'Активний' : 'Вимкнений' },
-            {
-              label: 'Перевірено',
-              value: row.isVerified ? (row.verifiedOn ?? 'Так') : 'Ні',
-              mono: true,
-            },
           ]}
         />
       </ReferenceFormSection>

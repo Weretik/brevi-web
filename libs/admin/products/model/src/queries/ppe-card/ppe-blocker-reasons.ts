@@ -11,8 +11,6 @@ const reasons: Record<string, string> = {
   NumericOverflow: 'Завелика ціна',
 };
 
-export const ppeReadyStatus = 'Готово до розрахунку';
-
 export function ppeBlockerReasons(codes: readonly string[]): string[] {
   return [...new Set(codes.map((code) => reasons[code] ?? 'Ціну не розраховано'))];
 }

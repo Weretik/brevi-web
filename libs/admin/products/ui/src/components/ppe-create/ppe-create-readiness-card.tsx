@@ -13,7 +13,6 @@ interface Props {
 /** «Готовність»: the sheet instruction steps, ticked from the form as the user fills it. */
 export function PpeCreateReadinessCard({ items }: Props) {
   const done = items.filter((item) => item.done).length;
-  const requiredDone = items.every((item) => item.done || item.optional);
   return (
     <Paper variant="outlined" component="section" aria-label="Готовність" sx={{ p: 2 }}>
       <Stack
@@ -25,7 +24,7 @@ export function PpeCreateReadinessCard({ items }: Props) {
         </Typography>
         <SewingCardStatusPill
           label={`${done} з ${items.length}`}
-          tone={requiredDone ? 'success' : 'warning'}
+          tone={done === items.length ? 'success' : 'warning'}
         />
       </Stack>
       <Stack component="ul" sx={{ m: 0, p: 0, listStyle: 'none', gap: 1 }}>

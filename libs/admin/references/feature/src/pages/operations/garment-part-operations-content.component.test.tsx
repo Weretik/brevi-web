@@ -56,7 +56,6 @@ describe('operations page', () => {
         name: 'Нестандартна операція',
         min: 0,
         minutesPerProduct: true,
-        normCheckedAt: null,
       }),
     ]);
     renderPage();
@@ -66,7 +65,7 @@ describe('operations page', () => {
     expect(within(row).getByText('6 хв')).toBeVisible();
     expect(await within(row).findByText(/10,67\s*грн/)).toBeVisible();
     expect(within(row).getByText(/13,34\s*грн/)).toBeVisible();
-    expect(within(row).getByText('30.08.2026')).toBeVisible();
+    expect(within(row).queryByText('30.08.2026')).not.toBeInTheDocument();
     const custom = screen.getByRole('row', { name: /OP-155/ });
     expect(within(custom).getByText('на виріб')).toBeVisible();
     expect(screen.getByRole('heading', { name: 'Операції' })).toBeVisible();
@@ -142,7 +141,6 @@ describe('operations page', () => {
       code: 'OP-001',
       min: 0,
       minutesPerProduct: true,
-      normCheckedAt: '2026-08-30',
     });
     expect(screen.getByLabelText('Поточна адреса')).toHaveTextContent(
       '/references/garment-part-operation',

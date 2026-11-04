@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { sewingBlockerReasons, translateCompositionBlockers } from './sewing-blocker-reasons';
-import { isSewingPricePublished, sewingCardTotals } from './sewing-card-totals';
+import { sewingBlockerReasons } from './sewing-blocker-reasons';
+import { sewingCardTotals } from './sewing-card-totals';
 import { sewingLabourLines } from './sewing-labour-lines';
+import { sewingMaterialLines } from './sewing-material-lines';
 
 import type { SewingArticleSummaryRow } from '../../entities/sewing-card/sewing-article-summary';
 
@@ -14,6 +15,10 @@ function row(update: Partial<SewingArticleSummaryRow>): SewingArticleSummaryRow 
     saleSku: '602',
     active: true,
     sortOrder: 0,
+    fabricId: 59,
+    fabricName: 'Габардин',
+    fabricPrice: 210,
+    fabricQuantity: 2.5,
     calculated: true,
     blockers: [],
     costs: [{ kind: 'seamstress', amount: 120 }],
@@ -31,21 +36,14 @@ describe('sewing card (CAT-007)', () => {
     expect(
       sewingBlockerReasons([
         { code: 'MissingOperations' },
-        { code: 'UnreviewedMaterial' },
-        { code: 'UnreviewedMaterial' },
+        { code: 'MissingFabric' },
+        { code: 'MissingFabric' },
         { code: 'Something' },
       ]),
-    ).toEqual(['Немає трудовитрат', 'Комплектацію не перевірено', 'Не розраховано']);
-    expect(
-      translateCompositionBlockers([
-        'Required material line 4 has not been reviewed.',
-        'Required material line 5 has not been reviewed.',
-        'No operation lines are configured.',
-      ]),
-    ).toEqual(['Не всі обов’язкові матеріали перевірені.', 'Немає трудовитрат.']);
+    ).toEqual(['Немає трудовитрат', 'Немає тканини', 'Не розраховано']);
   });
 
-  it('counts ready articles, price ranges and prices waiting for publication', () => {
+  it('counts ready articles and price ranges', () => {
     const totals = sewingCardTotals([
       row({}),
       row({ id: 2, fullCost: 520, prices: { ...tiers, retail: 950 } }),
@@ -62,11 +60,12 @@ describe('sewing card (CAT-007)', () => {
       articles: 3,
       ready: 2,
       minutes: 54,
+      labour: 120,
       fullCost: { min: 500, max: 520 },
       retail: { min: 900, max: 950 },
-      unpublished: 1,
+      wholesale: { min: 820, max: 820 },
+      largeWholesale: { min: 780, max: 780 },
     });
-    expect(isSewingPricePublished(row({ published: null }))).toBe(false);
   });
 
   it('takes manual time over the norm and spreads the seamstress pay by minutes', () => {
@@ -78,7 +77,6 @@ describe('sewing card (CAT-007)', () => {
           quantity: 2,
           manualMinutes: null,
           sortOrder: 0,
-          reviewed: true,
           comment: 'Комір',
         },
         {
@@ -87,7 +85,6 @@ describe('sewing card (CAT-007)', () => {
           quantity: 1,
           manualMinutes: 9,
           sortOrder: 1,
-          reviewed: false,
           comment: '',
         },
       ],
@@ -109,7 +106,6 @@ describe('sewing card (CAT-007)', () => {
       quantity: 1,
       manualMinutes: null,
       sortOrder: 0,
-      reviewed: false,
       comment: '',
     };
     expect(sewingLabourLines([unknown], [], null)[0]).toMatchObject({
@@ -117,5 +113,40 @@ describe('sewing card (CAT-007)', () => {
       minutes: null,
       cost: null,
     });
+  });
+
+  it('names composition lines from the card response and prices them', () => {
+    const line = {
+      id: 2,
+      kind: 'Accessory' as const,
+      referenceId: 10,
+      costCode: null,
+      name: 'Ґудзик',
+      unitPrice: 1.5,
+      quantity: 3,
+      unit: 'Piece' as const,
+      sortOrder: 1,
+      comment: '',
+    };
+    const lines = sewingMaterialLines([
+      line,
+      {
+        ...line,
+        id: 1,
+        kind: 'OtherCost',
+        referenceId: null,
+        costCode: 'Пакування',
+        name: null,
+        unitPrice: null,
+        unit: 'Service',
+        sortOrder: 0,
+      },
+    ]);
+    expect(
+      lines.map((item) => [item.key, item.kindLabel, item.name, item.unitLabel, item.total]),
+    ).toEqual([
+      ['material-1', 'Інша витрата', 'Пакування', 'послуга', null],
+      ['material-2', 'Фурнітура', 'Ґудзик', 'шт.', 4.5],
+    ]);
   });
 });

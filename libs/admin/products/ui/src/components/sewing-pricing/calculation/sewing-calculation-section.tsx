@@ -30,11 +30,6 @@ export function SewingCalculationSection(
       )}
       {calculation && (
         <>
-          <Typography variant="body2" color="text.secondary">
-            Розраховано {new Date(calculation.createdAt).toLocaleString('uk-UA')} · Версія складу{' '}
-            {calculation.compositionVersion} · Налаштування{' '}
-            {calculation.settingsRevision ?? 'не вибрано'}
-          </Typography>
           {calculation.blockers.length > 0 && (
             <SewingPricingBlockers blockers={calculation.blockers} />
           )}

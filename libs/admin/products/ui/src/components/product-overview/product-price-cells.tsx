@@ -1,29 +1,17 @@
-import { Box, Typography } from '@mui/material';
+import { productProblemReasons } from '@admin/products/model';
+import { Box, Tooltip, Typography } from '@mui/material';
 
 import { sewingPriceFormat } from '../sewing-pricing/sewing-price-format';
 
-import type {
-  ProductArticlePrices,
-  ProductOverviewPrices,
-  SewingPriceTiers,
-} from '@admin/products/model';
+import type { ProductOverview, ProductVariant, SewingPriceTiers } from '@admin/products/model';
 
 export type ProductPriceTier = keyof SewingPriceTiers;
 
 const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' };
 
-function Price({ value, prefix, muted }: { value: number; prefix?: string; muted?: boolean }) {
+function Price({ value, prefix }: { value: number; prefix?: string }) {
   return (
-    <Box
-      component="span"
-      sx={{
-        ...mono,
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 0.5,
-        color: muted ? 'text.secondary' : 'text.primary',
-      }}
-    >
+    <Box component="span" sx={{ ...mono, display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
       {prefix && (
         <Typography component="span" variant="body2" color="text.secondary">
           {prefix}
@@ -34,55 +22,62 @@ function Price({ value, prefix, muted }: { value: number; prefix?: string; muted
   );
 }
 
-const blockedLabel = (
-  <Typography component="span" variant="body2" color="warning.main">
-    Не розраховано
-  </Typography>
-);
-
-/** Lowest live price of each tier among active, calculable Articles. */
-function lowestLive(prices: ProductOverviewPrices): SewingPriceTiers | null {
-  const live = prices.articles.filter((a) => a.active && a.live).map((a) => a.live!);
-  return live.length
-    ? {
-        retail: Math.min(...live.map((x) => x.retail)),
-        wholesale: Math.min(...live.map((x) => x.wholesale)),
-        largeWholesale: Math.min(...live.map((x) => x.largeWholesale)),
-      }
-    : null;
+/** The reason instead of a price, in the 1–9 pcs column only (problems-only rule). */
+function Problem({ reasons }: { reasons: string[] }) {
+  const label = reasons[0] ?? 'Немає ціни';
+  return (
+    <Tooltip title={reasons.join(', ')}>
+      <Typography
+        component="span"
+        variant="body2"
+        color="warning.main"
+        noWrap
+        sx={{ maxWidth: '100%' }}
+      >
+        {label}
+      </Typography>
+    </Tooltip>
+  );
 }
 
 /**
- * Model row: «від …» across Articles. Prices are published automatically (CAT-012), so the published price is the
- * one shown; the live price, muted, only covers the moment before its first publication.
+ * Model row: the published price («від …» across fabric variants). Without a price the 1–9 column
+ * shows why (CAT-013); a row that has a price shows no status.
  */
 export function ProductModelPriceCell({
-  prices,
+  product,
   tier,
-  showsRange,
 }: {
-  prices: ProductOverviewPrices | null;
+  product: ProductOverview;
   tier: ProductPriceTier;
-  /** True for sewing models with more than one Article. */
-  showsRange: boolean;
 }) {
-  if (!prices) return '—';
-  const prefix = showsRange ? 'від' : undefined;
-  if (prices.from) return <Price value={prices.from[tier]} prefix={prefix} />;
-  const live = lowestLive(prices);
-  if (live) return <Price value={live[tier]} prefix={prefix} muted />;
-  return tier === 'retail' ? blockedLabel : '—';
+  if (product.prices) {
+    const prefix =
+      product.type === 'Sewing' && product.variants.filter((v) => v.active).length > 1
+        ? 'від'
+        : undefined;
+    return <Price value={product.prices[tier]} prefix={prefix} />;
+  }
+  return tier === 'retail' ? (
+    <Problem reasons={productProblemReasons(product.type, product.problems)} />
+  ) : (
+    '—'
+  );
 }
 
-/** Article row: the published price; the live one, muted, before its first publication. */
-export function ProductArticlePriceCell({
-  article,
+/** Fabric variant row: its published price, else why it has none. */
+export function ProductVariantPriceCell({
+  variant,
   tier,
 }: {
-  article: ProductArticlePrices;
+  variant: ProductVariant;
   tier: ProductPriceTier;
 }) {
-  if (article.published) return <Price value={article.published[tier]} />;
-  if (article.live) return <Price value={article.live[tier]} muted />;
-  return tier === 'retail' ? blockedLabel : '—';
+  if (variant.prices) return <Price value={variant.prices[tier]} />;
+  if (!variant.active) return tier === 'retail' ? 'Вимкнена' : '—';
+  return tier === 'retail' ? (
+    <Problem reasons={productProblemReasons('Sewing', variant.problems)} />
+  ) : (
+    '—'
+  );
 }
