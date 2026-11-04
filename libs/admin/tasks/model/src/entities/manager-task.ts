@@ -68,7 +68,7 @@ export interface TaskDetail extends TaskSummary {
   readonly createdAt: string;
 }
 
-/** Workload of one manager. */
+/** Workload of one manager («Навантаження» tab). */
 export interface TaskLoad {
   readonly userId: number;
   readonly name: string;
@@ -76,6 +76,10 @@ export interface TaskLoad {
   readonly overdue: number;
   readonly urgent: number;
   readonly inProgress: number;
+  /** Done in the last 7 days. */
+  readonly doneLastWeek: number;
+  /** Share done by the due time in the last 30 days; null when nothing was done. */
+  readonly onTimePercent: number | null;
 }
 
 export interface TaskOverview {

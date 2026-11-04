@@ -4556,6 +4556,10 @@ export interface components {
       overdue: number;
       urgent: number;
       inProgress: number;
+      /** @description Tasks of this manager done in the last 7 days. */
+      doneLastWeek: number;
+      /** @description Share of this manager's tasks done in the last 30 days by their due time; null when none were done. */
+      onTimePercent: number | null;
     };
     CrmTaskOverview: {
       open: number;
