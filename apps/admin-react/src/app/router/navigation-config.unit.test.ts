@@ -44,8 +44,8 @@ describe('legacy Admin navigation', () => {
       'Контент',
       'Загальні звіти',
     ]);
-    expect(groups.map((group) => group.items.length)).toEqual([6, 7, 5, 4, 7, 1, 2, 1]);
-    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(33);
+    expect(groups.map((group) => group.items.length)).toEqual([6, 7, 5, 4, 8, 1, 2, 1]);
+    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(34);
     expect(groups[0].items.map((item) => item.id)).not.toContain('clients');
   });
   it('shows issuer settings only for the server Admin role', () => {
