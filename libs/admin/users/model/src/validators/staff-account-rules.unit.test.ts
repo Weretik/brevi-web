@@ -10,6 +10,7 @@ describe('staff account rules', () => {
         fullName: 'Олена',
         role: 'Manager',
         password: '12345678',
+        phoneNumber: '',
       }),
     ).toEqual({});
   });
@@ -20,9 +21,10 @@ describe('staff account rules', () => {
       fullName: ' ',
       role: 'Admin',
       password: 'short',
+      phoneNumber: 'abc',
     });
 
-    expect(Object.keys(errors).sort()).toEqual(['email', 'fullName', 'password']);
+    expect(Object.keys(errors).sort()).toEqual(['email', 'fullName', 'password', 'phoneNumber']);
   });
 
   it('requires at least 8 password characters', () => {

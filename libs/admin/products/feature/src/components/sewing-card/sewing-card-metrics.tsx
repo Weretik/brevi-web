@@ -1,9 +1,9 @@
-import { SewingCardMetricStrip, sewingPriceFormat } from '@admin/products/ui';
+import { SewingCardTotals, sewingWholePriceFormat } from '@admin/products/ui';
 
-import type { SewingAmountRange, SewingCardTotals } from '@admin/products/model';
+import type { SewingAmountRange, SewingCardTotals as Totals } from '@admin/products/model';
 
 interface Props {
-  totals: SewingCardTotals;
+  totals: Totals;
 }
 
 const minutes = new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 1 });
@@ -11,18 +11,18 @@ const minutes = new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 1 });
 function range(value: SewingAmountRange | null) {
   if (!value) return '—';
   return value.min === value.max
-    ? sewingPriceFormat(value.min)
-    : `${sewingPriceFormat(value.min)} – ${sewingPriceFormat(value.max)}`;
+    ? sewingWholePriceFormat(value.min)
+    : `${sewingWholePriceFormat(value.min)} – ${sewingWholePriceFormat(value.max)}`;
 }
 
 /**
- * Figures of the model: its fabrics, labour in minutes and UAH, cost and all three price levels.
+ * Figures of the model: fabrics, labour and cost on one line, then the three price levels.
  * Labour comes from the server calculation, as in the «Товари» side panel.
  */
 export function SewingCardMetrics({ totals }: Props) {
   return (
-    <SewingCardMetricStrip
-      metrics={[
+    <SewingCardTotals
+      costs={[
         {
           label: 'Тканини',
           value: String(totals.articles),
@@ -37,14 +37,17 @@ export function SewingCardMetrics({ totals }: Props) {
         },
         {
           label: 'Трудовитрати',
-          value: totals.labour === null ? '—' : sewingPriceFormat(totals.labour),
+          value: totals.labour === null ? '—' : sewingWholePriceFormat(totals.labour),
           note:
             totals.minutes === null ? undefined : `${minutes.format(totals.minutes)} хв на 1 виріб`,
         },
         { label: 'Собівартість', value: range(totals.fullCost) },
-        { label: '1–9 шт.', value: range(totals.retail), note: 'з ПДВ' },
-        { label: '10–40 шт.', value: range(totals.wholesale), note: 'з ПДВ' },
-        { label: 'Від 41 шт.', value: range(totals.largeWholesale), note: 'з ПДВ' },
+      ]}
+      format={sewingWholePriceFormat}
+      tiers={[
+        { label: '1–9 шт.', range: totals.retail },
+        { label: '10–40 шт.', range: totals.wholesale, highlighted: true },
+        { label: 'Від 41 шт.', range: totals.largeWholesale },
       ]}
     />
   );
