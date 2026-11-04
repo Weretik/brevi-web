@@ -1,5 +1,11 @@
 import { adminApi } from '@admin/shared/api-client';
 
 export const productionBaseApi = adminApi.enhanceEndpoints({
-  addTagTypes: ['WorkshopEmployee', 'FabricNorm', 'PayrollParameter', 'ProductionOrder'],
+  addTagTypes: [
+    'WorkshopEmployee',
+    'FabricNorm',
+    'PayrollParameter',
+    'ProductionOrder',
+    'WorkshopSettings',
+  ],
 });

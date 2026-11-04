@@ -1,4 +1,10 @@
 import type { FabricNormValues } from './fabric-norm';
+import type {
+  ProductionOrderFile,
+  ProductionShipment,
+  ProductionStage,
+  ProductionTelegram,
+} from './production-tracking';
 
 export type ProductionOrderStatus = 'New' | 'Closed' | 'Cancelled';
 export type ReportPriceTier = 'Retail' | 'Wholesale' | 'Large';
@@ -46,6 +52,8 @@ export interface ProductionOrderSummary {
   /** Moved from the old «Цех». */
   isTransferred: boolean;
   updatedAt: string;
+  /** The least advanced item: the order is only as far as its slowest item. */
+  stage: ProductionStage;
 }
 
 export interface ProductionOrderCounts {
@@ -71,6 +79,13 @@ export interface ProductionOrderPermissions {
   canDelete: boolean;
   seesSewingRate: boolean;
   seesReportPrice: boolean;
+  /** Tick stages and ship: WorkshopChief and Admin on a «Нове» order. */
+  canTrack: boolean;
+  canClose: boolean;
+  canCancel: boolean;
+  canReopen: boolean;
+  canManageFiles: boolean;
+  canSendTelegram: boolean;
 }
 
 export interface ProductionItem {
@@ -93,6 +108,12 @@ export interface ProductionItem {
   sewingRate: number | null;
   /** null for anyone but Admin and Director. */
   reportUnitPrice: number | null;
+  /** Ticked stages in order. */
+  stages: ProductionStage[];
+  /** The furthest ticked stage; it colours the row. */
+  currentStage: ProductionStage;
+  shippedQuantity: number;
+  shipments: ProductionShipment[];
 }
 
 export interface ProductionOrder {
@@ -114,6 +135,9 @@ export interface ProductionOrder {
   version: number;
   permissions: ProductionOrderPermissions;
   items: ProductionItem[];
+  cancelReason: string | null;
+  files: ProductionOrderFile[];
+  telegram: ProductionTelegram;
 }
 
 /** A line of «Історія змін». */
@@ -172,6 +196,7 @@ export interface ProductionOrderListQuery {
   manager: string | null;
   /** yyyy-mm-dd: items due on or before it. */
   dueTo: string | null;
+  stage: ProductionStage | null;
   page: number;
   pageSize: number;
 }

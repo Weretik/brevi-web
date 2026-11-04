@@ -8,17 +8,22 @@ import { ReferenceDetailsList } from '@admin/references/ui';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { Box, Button, Paper, Stack, Typography } from '@mui/material';
 
+import { ProductionStagePill, productionStageTone } from '../tracking/production-stage-pill';
+
 import type { ProductionItem, ProductionOrderPermissions } from '@admin/production/model';
 import type { ReferenceDetailsItem } from '@admin/references/ui';
+import type { ReactNode } from 'react';
 
 interface Props {
   item: ProductionItem;
   permissions: ProductionOrderPermissions;
   onEdit?: () => void;
+  /** Stages, shipments and files under the details. */
+  children?: ReactNode;
 }
 
 /** One position of an order as the workshop reads it; prices only for those who see them. */
-export function ProductionItemCard({ item, permissions, onEdit }: Props) {
+export function ProductionItemCard({ item, permissions, onEdit, children }: Props) {
   const details: ReferenceDetailsItem[] = [
     { label: 'Кількість', value: `${item.quantity} шт.`, mono: true },
     { label: 'Готово до', value: formatDay(item.dueDate), mono: true },
@@ -55,7 +60,11 @@ export function ProductionItemCard({ item, permissions, onEdit }: Props) {
   return (
     <Paper
       variant="outlined"
-      sx={{ p: 2 }}
+      sx={{
+        p: 2,
+        borderLeftWidth: 4,
+        borderLeftColor: productionStageTone[item.currentStage].fg,
+      }}
       aria-label={`Позиція ${item.position}: ${item.modelName}`}
     >
       <Stack
@@ -63,9 +72,12 @@ export function ProductionItemCard({ item, permissions, onEdit }: Props) {
         sx={{ gap: 2, mb: 2, alignItems: 'flex-start', justifyContent: 'space-between' }}
       >
         <Box sx={{ minWidth: 0 }}>
-          <Typography component="h3" variant="h6">
-            {item.position}. {item.modelName}
-          </Typography>
+          <Stack direction="row" sx={{ alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+            <Typography component="h3" variant="h6">
+              {item.position}. {item.modelName}
+            </Typography>
+            <ProductionStagePill stage={item.currentStage} />
+          </Stack>
           <Typography
             variant="body2"
             color="text.secondary"
@@ -96,6 +108,7 @@ export function ProductionItemCard({ item, permissions, onEdit }: Props) {
       >
         <ReferenceDetailsList items={details} />
       </Box>
+      {children && <Stack sx={{ gap: 2, mt: 2 }}>{children}</Stack>}
     </Paper>
   );
 }
