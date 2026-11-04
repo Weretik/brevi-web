@@ -69,45 +69,16 @@ const requiredOperations = {
     'moveMediaFiles',
     'deleteMediaFile',
   ],
-  'crm/quote-drafts.openapi.yaml': [
+  'crm/quotes.openapi.yaml': [
     'getCrmQuotes',
-    'getCrmQuote',
     'createCrmQuote',
-    'saveCrmQuoteVersion',
-    'previewCrmQuotePrices',
-    'prepareCrmQuote',
-  ],
-  'crm/issuer-settings.openapi.yaml': [
-    'getCrmIssuerSettings',
-    'createCrmIssuerSettingsVersion',
-    'activateCrmIssuerSettings',
-  ],
-  'crm/introduction-templates.openapi.yaml': [
-    'getCrmIntroductionTemplates',
-    'createCrmIntroductionTemplate',
-    'getCrmIntroductionTemplate',
-    'reviseCrmIntroductionTemplate',
-    'setCrmIntroductionTemplateArchived',
-    'checkCrmIntroductionTemplate',
-    'applyCrmIntroductionTemplate',
-    'getCrmIntroductionFeaturedMapping',
-    'activateCrmIntroductionFeaturedMapping',
-  ],
-  'crm/email-templates.openapi.yaml': ['getCrmActiveEmailTemplate'],
-  'crm/quote-deliveries.openapi.yaml': [
-    'getCrmQuoteDeliveries',
-    'getCrmQuoteDelivery',
-    'enqueueCrmQuoteDelivery',
-  ],
-  'crm/production-packages.openapi.yaml': [
-    'exportCrmProductionPackage',
-    'getCrmProductionPackage',
-    'downloadCrmProductionPackage',
-  ],
-  'crm/quote-pdf.openapi.yaml': [
-    'renderCrmQuotePdf',
-    'getCrmQuotePdfArtifact',
-    'downloadCrmQuotePdfArtifact',
+    'getCrmQuote',
+    'saveCrmQuote',
+    'deleteCrmQuote',
+    'repriceCrmQuote',
+    'setCrmQuoteResponsible',
+    'searchCrmQuoteCatalog',
+    'getCrmQuoteStaff',
   ],
 };
 

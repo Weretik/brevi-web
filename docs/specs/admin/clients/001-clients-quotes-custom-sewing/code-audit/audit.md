@@ -40,7 +40,7 @@ Public aliases `@admin/clients/{model,data-access,ui,feature}`, URL, API payload
 
 Свіжі scoped перевірки пройдено: TypeScript, ESLint, Prettier, model/data-access/feature tests та docs checker. Сценарії охоплюють 409 без втрати вводу, явне відкидання dirty state, primary/deactivation каналів, приватність currentData, stable requestId і точне cache invalidation. Browser/manual acceptance не виконувалося.
 
-[Актуальна карта](../../../../../features/admin/clients-and-quotes.md), [попередні докази реалізації](../evidence/clients-frontend-2026-10-26.md). Нових R/SC або продуктового обсягу не додано.
+[Актуальна карта](../../../../../features/admin/clients.md), [попередні докази реалізації](../evidence/clients-frontend-2026-10-26.md). Нових R/SC або продуктового обсягу не додано.
 
 ### Автоматична регресія
 
@@ -84,7 +84,7 @@ The largest quote production file remains 34 nonblank lines. `reorder-quote.ts` 
 
 Architecture review: shared quote value types live in `entities`, editable graph types in `models`, transformations in `mappers`, and form checks in `validators`. Public consumers use `@admin/clients/model`; no React, HTTP, generated transport imports, browser storage or duplicated pricing formulas were introduced. Ordering preserves variant objects and saved monetary values. Ukrainian error strings remain in local rules. Network runtime validation, caching, permissions and screens are outside this model audit and remain unimplemented FE-003/FE-004 work.
 
-[Current model map](../../../../../features/admin/clients-and-quotes.md), [model audit evidence](../evidence/fe-003-model-audit-2026-10-27.md). All four findings above were closed for the independent model checkpoint. Subsequent [P2 implementation evidence](../evidence/p2-frontend-2026-10-27.md) records completion of FE-003/FE-004 local implementation and automation after the user authorized backend commit handoff.
+[Current model map](../../../../../features/admin/clients.md), [model audit evidence](../evidence/fe-003-model-audit-2026-10-27.md). All four findings above were closed for the independent model checkpoint. Subsequent [P2 implementation evidence](../evidence/p2-frontend-2026-10-27.md) records completion of FE-003/FE-004 local implementation and automation after the user authorized backend commit handoff.
 
 ## P2 delivery boundary review — 2026-10-27
 
@@ -107,7 +107,7 @@ Scope: newly implemented FE-003/004 quote boundary, editor, previews, write/retr
 
 All source paths above are relative to `libs/admin/clients/`. Public aliases, route paths, request payloads, precise cache tags and backend contract SHA remain unchanged. One tagged quote API composition is retained. Model has no React/transport dependencies; feature consumes public domain/API libraries. Additional Nx libraries would add no useful boundary for this local slice.
 
-[Execution evidence](../evidence/p2-audit-refactor-2026-10-28.md), [updated module map](../../../../../features/admin/clients-and-quotes.md). Browser/manual and deployed acceptance remain pending.
+[Execution evidence](../evidence/p2-audit-refactor-2026-10-28.md), [updated module map](../../../../../features/admin/clients.md). Browser/manual and deployed acceptance remain pending.
 
 ## FE-005 delivery boundary review — 2026-10-28
 

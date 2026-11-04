@@ -36,12 +36,12 @@ afterEach(cleanup);
 describe('Admin navigation session role', () => {
   it('hides Admin-only entries from a Manager and shows them to an Admin', () => {
     const view = render(<AdminRouteLayout user={user(['Manager'])} />);
-    expect(screen.queryByText('Реквізити та шаблон КП')).not.toBeInTheDocument();
+    expect(screen.queryByText('Налаштування КП')).not.toBeInTheDocument();
     expect(screen.queryByText('Користувачі')).not.toBeInTheDocument();
-    expect(screen.getByText('Розрахунки та КП')).toBeInTheDocument();
+    expect(screen.getByText('КП')).toBeInTheDocument();
 
     view.rerender(<AdminRouteLayout user={user(['Admin'])} />);
-    expect(screen.getByText('Реквізити та шаблон КП')).toBeInTheDocument();
+    expect(screen.getByText('Налаштування КП')).toBeInTheDocument();
     expect(screen.getByText('Користувачі')).toBeInTheDocument();
   });
 });
