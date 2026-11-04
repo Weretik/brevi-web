@@ -19,6 +19,8 @@ export interface ProductionImportResult {
   unchanged: number;
   errors: number;
   lines: ProductionImportLine[];
+  /** Extra facts of the preview, such as how the recomputed reservation differs. */
+  notes?: string[];
 }
 
 export interface FabricNormImportRow {

@@ -5,6 +5,8 @@ import {
 } from '@admin/production/ui';
 import { Box, Typography } from '@mui/material';
 
+import { ProductionItemFabricSection } from '../stock/production-item-fabric-section';
+
 import type {
   ProductionFileKind,
   ProductionItem,
@@ -23,6 +25,7 @@ interface Props {
   onCancelShipment: (shipmentId: number) => void;
   onUpload: (kind: ProductionFileKind, file: File) => void;
   onDeleteFile: (file: ProductionOrderFile) => void;
+  onMessage: (message: string) => void;
 }
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
@@ -36,7 +39,7 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-/** What the workshop does with one item: stages, shipments and its files. */
+/** What the workshop does with one item: stages, shipments, fabric and its files. */
 export function ProductionItemWork({
   order,
   item,
@@ -46,6 +49,7 @@ export function ProductionItemWork({
   onCancelShipment,
   onUpload,
   onDeleteFile,
+  onMessage,
 }: Props) {
   const { permissions } = order;
   const files = order.files.filter((file) => file.itemId === item.id);
@@ -66,6 +70,9 @@ export function ProductionItemWork({
           onShip={permissions.canTrack ? onShip : undefined}
           onCancel={permissions.canTrack ? onCancelShipment : undefined}
         />
+      </Section>
+      <Section title="Тканина">
+        <ProductionItemFabricSection orderId={order.id} item={item} onMessage={onMessage} />
       </Section>
       {(files.length > 0 || permissions.canManageFiles) && (
         <Section title="Файли">

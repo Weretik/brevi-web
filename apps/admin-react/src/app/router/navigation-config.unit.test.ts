@@ -44,8 +44,8 @@ describe('legacy Admin navigation', () => {
       'Контент',
       'Загальні звіти',
     ]);
-    expect(groups.map((group) => group.items.length)).toEqual([5, 7, 5, 4, 8, 1, 2, 1]);
-    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(33);
+    expect(groups.map((group) => group.items.length)).toEqual([5, 6, 5, 4, 8, 1, 2, 1]);
+    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(32);
     expect(groups[0].items.map((item) => item.id)).not.toContain('clients');
   });
   it('shows «Налаштування КП» only for the server Admin role', () => {
@@ -96,6 +96,7 @@ describe('legacy Admin navigation', () => {
   it('shows the «Швейний цех» pages to the head of the workshop and Admin only', () => {
     const paths = new Set([
       '/production/orders',
+      '/production/fabric-stock',
       '/production/staff',
       '/production/fabric-norms',
       '/production/payroll-rules',
@@ -105,26 +106,32 @@ describe('legacy Admin navigation', () => {
 
     expect(
       shop(['WorkshopChief'])
-        ?.items.slice(0, 4)
+        ?.items.slice(0, 5)
         .map((item) => item.to),
     ).toEqual([
       '/production/orders',
+      '/production/fabric-stock',
       '/production/staff',
       '/production/fabric-norms',
       '/production/payroll-rules',
     ]);
-    expect(shop(['Admin'])?.items[1].label).toBe('Працівники цеху');
+    expect(shop(['Admin'])?.items[2].label).toBe('Працівники цеху');
     expect(shop(['Manager'])?.items.some((item) => item.id === 'workshop-staff')).toBe(false);
   });
 
-  it('shows «Виробничі завдання» to managers as well', () => {
-    const paths = new Set(['/production/orders']);
+  it('shows «Виробничі завдання» and «Склад тканин» to managers as well', () => {
+    const paths = new Set(['/production/orders', '/production/fabric-stock']);
     const shop = createNavigation(paths, ['Manager']).find((group) => group.id === 'sewing-shop');
 
     expect(shop?.items[0]).toEqual({
       id: 'production-orders',
       label: 'Виробничі завдання',
       to: '/production/orders',
+    });
+    expect(shop?.items[1]).toEqual({
+      id: 'fabric-stock',
+      label: 'Склад тканин',
+      to: '/production/fabric-stock',
     });
   });
 });

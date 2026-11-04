@@ -120,6 +120,38 @@ vi.mock('@admin/production/data-access', () => {
     useUploadProductionOrderFileMutation: mutation(() => api.current),
     useDeleteProductionOrderFileMutation: mutation(() => api.current),
     useSendProductionOrderTelegramMutation: mutation(() => api.current),
+    useGetProductionItemFabricQuery: () => ({
+      data: {
+        orderId: 5,
+        itemId: 3,
+        orderVersion: 2,
+        fabricCode: 'FAB-1',
+        fabricName: 'Оксфорд',
+        quantity: 10,
+        hasNorm: true,
+        plan: [
+          {
+            fabricCode: 'FAB-1',
+            color: 'чорний',
+            colorKey: 'чорний',
+            planned: 15,
+            covered: 0,
+            issued: 0,
+            reserved: 15,
+            stockId: 1,
+            stockMeters: 10,
+            stockAvailable: -5,
+          },
+        ],
+        issued: 0,
+        issues: [],
+        canIssue: api.current.permissions.canTrack,
+      },
+      isLoading: false,
+    }),
+    useGetFabricStockChoicesQuery: () => ({ data: undefined, isFetching: false }),
+    useCreateFabricIssueMutation: mutation(() => undefined),
+    useReverseFabricIssueMutation: mutation(() => undefined),
   };
 });
 
@@ -197,6 +229,17 @@ describe('ProductionOrderPage', () => {
     expect(screen.getByRole('group', { name: 'Етапи: Куртка' })).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Крій' })).toBeNull();
     expect(screen.queryByRole('button', { name: /Відвантажити позицію/ })).toBeNull();
+  });
+
+  it('shows the fabric plan of an item and lets only the workshop issue it', () => {
+    api.current = api.order(false);
+    renderPage();
+    expect(screen.getByRole('table', { name: 'План тканини' })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Видати тканину' })).toBeNull();
+    cleanup();
+    api.current = api.order(true);
+    renderPage();
+    expect(screen.getByRole('button', { name: 'Видати тканину' })).toBeTruthy();
   });
 
   it('keeps a failed Telegram message on the card with its reason', () => {

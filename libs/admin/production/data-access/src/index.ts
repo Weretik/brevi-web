@@ -40,3 +40,16 @@ export {
   useSendWorkshopTelegramTestMutation,
   useUpdateWorkshopSettingsMutation,
 } from './api/workshop-settings.api';
+export {
+  useCorrectFabricStockMutation,
+  useCreateFabricIssueMutation,
+  useCreateFabricMovementMutation,
+  useGetFabricConsumptionQuery,
+  useGetFabricStockChoicesQuery,
+  useGetFabricStockLineQuery,
+  useGetFabricStockQuery,
+  useGetProductionItemFabricQuery,
+  useImportFabricStockMutation,
+  useReverseFabricIssueMutation,
+  useReverseFabricMovementMutation,
+} from './api/fabric-stock.api';
