@@ -6,17 +6,17 @@ The screens follow the client's old Calculator cabinet (owner's screenshots, 202
 
 ## Menu
 
-Group «Менеджер сервісу»: «КП» (`/crm/quotes`), «КП для знайомства» (`/crm/quote-introductions/new`, stage 4), «Налаштування КП» (`/crm/quote-settings`, Director and Admin, stage 2). The Codex items «Розрахунки та КП», «Реквізити та шаблон КП» and «Архів КП» and their screens were removed in stage 1 by the owner's decision.
+Group «Менеджер сервісу»: «КП» (`/crm/quotes`), «Налаштування КП» (`/crm/quote-settings`, Director and Admin, stage 2). The Codex items «Розрахунки та КП», «Реквізити та шаблон КП» and «Архів КП» and their screens were removed in stage 1 by the owner's decision.
 
 ## Stage 1 screens
 
 ### «КП» list (`/crm/quotes`)
 
-Reference list pattern: wide search (number, client, company), a filter «Відповідальний» for Director and Admin, table rows: number, internal client name, company, responsible, items count, updated. Button «Нове КП». A Manager sees only their own КП. Row click opens the editor.
+Reference list pattern: wide search (number, client, company), a filter «Відповідальний» for Director and Admin, table rows: number, internal client name, company, responsible, items count, updated. Button «Нове КП» opens a menu: «КП під запит» (`/crm/quotes/new`) or «КП для знайомства» (`/crm/quote-introductions/new`, stage 4; owner 2026-11-04: not a menu item). A Manager sees only their own КП. Row click opens the editor.
 
 ### «Товари та ціни» editor (`/crm/quotes/new`, `/crm/quotes/:id`)
 
-- Header: «Комерційна пропозиція / Товари та ціни», buttons «Передати розрахунок» (Director, Admin: pick a staff member), «Перерахувати за актуальними цінами» (shows old → new, then saves), «Додати товар», «Додати разовий ЗІЗ».
+- Header: «Комерційна пропозиція / Товари та ціни», buttons «Передати розрахунок» (Director, Admin: pick a staff member), «Перерахувати за актуальними цінами» (shows old → new, then saves). «Додати товар» and «Додати разовий ЗІЗ» sit in the products block: under the hint while it is empty, then as «Додати ще товар» / «Додати ще разовий ЗІЗ» under the last item (owner 2026-11-04).
 - Card «Створив(-ла) / Відповідальний(-а)».
 - Fields: «Номер КП» (read-only, «Буде присвоєно після збереження»), «Внутрішня назва клієнта / запиту» (combo with KeepinCRM clients, free text allowed; hint «Лише для менеджера»), «Ім'я отримувача», «Назва підприємства».
 - Line «N товарів у пропозиції» with the price legend до 9 шт. / 10–40 шт. / від 41 шт.

@@ -1,4 +1,3 @@
-import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import AutorenewOutlinedIcon from '@mui/icons-material/AutorenewOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import ForwardToInboxOutlinedIcon from '@mui/icons-material/ForwardToInboxOutlined';
@@ -11,12 +10,10 @@ interface Props {
   canDelete: boolean;
   onAssign: () => void;
   onReprice: () => void;
-  onAddProduct: () => void;
-  onAddOneOff: () => void;
   onDelete: () => void;
 }
 
-/** Header actions of «Товари та ціни»; «Додати товар» is the one orange action. */
+/** Header actions of «Товари та ціни»; adding products lives in the products block. */
 export function QuoteEditorActions({
   saved,
   dirty,
@@ -24,8 +21,6 @@ export function QuoteEditorActions({
   canDelete,
   onAssign,
   onReprice,
-  onAddProduct,
-  onAddOneOff,
   onDelete,
 }: Props) {
   const needsSave = !saved || dirty;
@@ -63,12 +58,6 @@ export function QuoteEditorActions({
           </Button>
         </span>
       </Tooltip>
-      <Button variant="outlined" startIcon={<AddOutlinedIcon />} onClick={onAddOneOff}>
-        Додати разовий ЗІЗ
-      </Button>
-      <Button variant="contained" startIcon={<AddOutlinedIcon />} onClick={onAddProduct}>
-        Додати товар
-      </Button>
     </>
   );
 }

@@ -66,7 +66,7 @@ describe('React Admin routing', () => {
     const navigation = screen.getByRole('navigation', { name: 'Основна навігація' });
     expect(within(navigation).queryByText('Початок')).not.toBeInTheDocument();
     const sections = [
-      ['Менеджер сервісу', ['Ліди', 'КП', 'КП для знайомства', 'Прайс', 'Мої завдання', 'Угоди']],
+      ['Менеджер сервісу', ['Ліди', 'КП', 'Прайс', 'Мої завдання', 'Угоди']],
       [
         'Швейний цех',
         [
@@ -110,7 +110,7 @@ describe('React Admin routing', () => {
         section === 'Загальні довідники'
           ? 7
           : section === 'Менеджер сервісу'
-            ? 3
+            ? 2
             : section === 'Фото'
               ? 1
               : 0,

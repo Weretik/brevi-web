@@ -3,7 +3,9 @@ import { quoteEditorPath } from '@admin/quotes/model';
 import { QuotesTable } from '@admin/quotes/ui';
 import { ReferencePageHeader, ReferenceSearchBar } from '@admin/references/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
-import { Alert, Box, Button, MenuItem, TextField } from '@mui/material';
+import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
+import { Alert, Box, Button, ListItemText, Menu, MenuItem, TextField } from '@mui/material';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useQuoteList } from '../../hooks/list/use-quote-list';
@@ -16,6 +18,11 @@ export default function QuotesPage({ actor }: { actor: QuoteActor }) {
   const list = useQuoteList();
   const staff = useGetQuoteStaffQuery(undefined, { skip: !actor.canSeeAll });
   const total = list.page?.total ?? 0;
+  const [newMenu, setNewMenu] = useState<HTMLElement | null>(null);
+  const create = (path: string) => {
+    setNewMenu(null);
+    navigate(path);
+  };
 
   return (
     <Box>
@@ -27,16 +34,36 @@ export default function QuotesPage({ actor }: { actor: QuoteActor }) {
         }
         actions={
           <>
-            <Button onClick={() => navigate('/crm/quote-introductions/new')}>
-              КП для знайомства
-            </Button>
             <Button
               variant="contained"
               startIcon={<AddOutlinedIcon />}
-              onClick={() => navigate('/crm/quotes/new')}
+              endIcon={<KeyboardArrowDownOutlinedIcon />}
+              aria-haspopup="menu"
+              aria-expanded={newMenu !== null}
+              onClick={(event) => setNewMenu(event.currentTarget)}
             >
               Нове КП
             </Button>
+            <Menu
+              anchorEl={newMenu}
+              open={newMenu !== null}
+              onClose={() => setNewMenu(null)}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+            >
+              <MenuItem onClick={() => create('/crm/quotes/new')}>
+                <ListItemText
+                  primary="КП під запит"
+                  secondary="Під заявку клієнта: товари, кількість, ціни"
+                />
+              </MenuItem>
+              <MenuItem onClick={() => create('/crm/quote-introductions/new')}>
+                <ListItemText
+                  primary="КП для знайомства"
+                  secondary="Рекламний каталог моделей для нового клієнта"
+                />
+              </MenuItem>
+            </Menu>
           </>
         }
       />

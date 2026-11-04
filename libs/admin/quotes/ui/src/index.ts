@@ -1,4 +1,5 @@
 export { QuotesTable } from './tables/quotes-table';
+export { QuoteAddItems } from './components/editor/quote-add-items';
 export { QuoteHeaderCard } from './components/editor/quote-header-card';
 export { QuoteItemCard } from './components/editor/quote-item-card';
 export { QuoteNotesCard } from './components/editor/quote-notes-card';

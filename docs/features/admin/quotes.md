@@ -6,13 +6,13 @@
 
 | Route                          | Purpose                                                                                                        |
 | ------------------------------ | -------------------------------------------------------------------------------------------------------------- |
-| `/crm/quotes`                  | List: search by number, client or company; «Відповідальний» filter for Director and Admin; «Нове КП»           |
+| `/crm/quotes`                  | List: search by number, client or company; «Відповідальний» filter for Director and Admin; «Нове КП» menu      |
 | `/crm/quotes/new`              | Empty editor; the number is given on the first save, then the URL becomes `/crm/quotes/:quoteId`               |
 | `/crm/quotes/:quoteId`         | «Товари та ціни» editor of a saved КП                                                                          |
 | `/crm/quote-introductions/new` | «КП для знайомства»: a new selection; after the first save the URL becomes `/crm/quote-introductions/:quoteId` |
 | `/crm/quote-settings`          | «Налаштування КП» (Director and Admin; others are sent to the list)                                            |
 
-- Menu «Менеджер сервісу»: «КП» links to the list; «Налаштування КП» is shown only for the Admin role (Director also holds it); «КП для знайомства» opens a new selection. The list has a «Вид» column and opens each КП in its own editor.
+- Menu «Менеджер сервісу»: «КП» links to the list; «Налаштування КП» is shown only for the Admin role (Director also holds it). «Нове КП» on the list asks which kind: «КП під запит» or «КП для знайомства». In the editor the add buttons sit in the products block («Додати ще товар» / «Додати ще разовий ЗІЗ» under the last item). The list has a «Вид» column and opens each КП in its own editor.
 - «КП для знайомства»: four steps (основа, отримувач, лист, сторінки каталогу). Each page starts with the fixed main model of its season (codes in «Налаштування КП», default «Імпульс» and «Прайм») and three more models of that season picked in «Обрати модель»; one fabric each; only the від 41 шт. price from the Catalog, never typed. A saved model keeps its price. «Зберегти як шаблон» and «Готові шаблони» share selections between all staff; applying one takes current Catalog data, and a model or fabric that is gone leaves its slot empty with the reason. Its PDF is the promotional catalogue and «Надіслати КП» starts with the chosen letter and the saved email.
 - «Сформувати КП» in the editor footer saves unsaved changes first, then downloads `КП <number>.pdf`. The server builds the PDF from the saved КП only, with the shown prices and the responsible manager's contact from the settings.
 - «Надіслати КП» (main footer action) saves unsaved changes, then opens a side panel: sender (the signed-in person's Gmail), letter variant, «Кому» (several addresses through a comma), subject and text, and the PDF name. The server sends from that Gmail with the PDF of the saved КП, then marks the КП «Надіслано» with the date; a refusal keeps the panel open with the reason and changes nothing. Without a connected Gmail the panel offers «Підключити мій Gmail».
@@ -43,7 +43,7 @@ flowchart LR
 apps/admin-react/src/app/router/
   use-quote-actor.ts                 signed-in user → QuoteActor (Admin role sees all)
   admin-route-definitions.tsx        createQuotesRoutes({ useQuoteActor })
-  legacy-menu.ts                     «КП», «КП для знайомства» (new selection), «Налаштування КП»
+  legacy-menu.ts                     «КП», «Налаштування КП»
 libs/admin/quotes/
   model/src/
     entities/                        Quote, QuoteSummary, catalogue search, reprice report, QuoteSettings, send draft and form, introduction setup and templates

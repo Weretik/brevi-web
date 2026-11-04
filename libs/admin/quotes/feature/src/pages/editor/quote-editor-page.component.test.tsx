@@ -124,6 +124,16 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe('КП editor', () => {
+  it('adds more products from the products block, not the page header', async () => {
+    renderEditor();
+    expect(await screen.findByText('КП 1-11-2026')).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Додати товар' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Додати ще товар' })).toBeVisible();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Додати ще разовий ЗІЗ' }));
+    expect(await screen.findByText('2 товари у пропозиції')).toBeVisible();
+  });
+
   it('asks a reason for a manual PPE price before saving', async () => {
     api.save.mockResolvedValue(quote);
     renderEditor();

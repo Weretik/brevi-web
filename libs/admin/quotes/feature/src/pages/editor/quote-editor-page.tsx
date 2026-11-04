@@ -1,8 +1,8 @@
 import { useDeleteQuoteMutation } from '@admin/quotes/data-access';
 import { oneOffItemDraft, quoteTierLabels, quoteTiers } from '@admin/quotes/model';
-import { QuoteHeaderCard, QuoteItemCard, QuoteNotesCard } from '@admin/quotes/ui';
+import { QuoteAddItems, QuoteHeaderCard, QuoteItemCard, QuoteNotesCard } from '@admin/quotes/ui';
 import { ReferencePageHeader } from '@admin/references/ui';
-import { Alert, Box, Button, CircularProgress, Paper, Stack, Typography } from '@mui/material';
+import { Alert, Box, Button, CircularProgress, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 
@@ -85,8 +85,6 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
             canDelete={quote?.status === 'Draft'}
             onAssign={() => setPanel({ kind: 'responsible' })}
             onReprice={() => setPanel({ kind: 'reprice' })}
-            onAddProduct={() => setPanel({ kind: 'catalog' })}
-            onAddOneOff={() => editor.addItems([oneOffItemDraft()])}
             onDelete={() => setConfirmDelete(true)}
           />
         }
@@ -143,13 +141,6 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
             Ціни: {quoteTiers.map((tier) => quoteTierLabels[tier]).join(' / ')}
           </Typography>
         </Stack>
-        {draft.items.length === 0 && (
-          <Paper variant="outlined" sx={{ p: 3, textAlign: 'center' }}>
-            <Typography color="text.secondary">
-              Додайте модель з варіантами тканини, товар ЗІЗ або разову позицію.
-            </Typography>
-          </Paper>
-        )}
         {draft.items.map((item, index) => (
           <QuoteItemCard
             key={item.key}
@@ -171,6 +162,11 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
             onRemove={() => editor.removeItem(item.key)}
           />
         ))}
+        <QuoteAddItems
+          empty={draft.items.length === 0}
+          onAddProduct={() => setPanel({ kind: 'catalog' })}
+          onAddOneOff={() => editor.addItems([oneOffItemDraft()])}
+        />
         <QuoteNotesCard
           clientComment={draft.clientComment}
           managerNote={draft.managerNote}
