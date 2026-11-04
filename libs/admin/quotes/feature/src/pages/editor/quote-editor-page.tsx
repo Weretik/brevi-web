@@ -2,6 +2,7 @@ import { useDeleteQuoteMutation } from '@admin/quotes/data-access';
 import { oneOffItemDraft, quoteTierLabels, quoteTiers } from '@admin/quotes/model';
 import { QuoteHeaderCard, QuoteItemCard, QuoteNotesCard } from '@admin/quotes/ui';
 import { ReferencePageHeader } from '@admin/references/ui';
+import PictureAsPdfOutlinedIcon from '@mui/icons-material/PictureAsPdfOutlined';
 import { Alert, Box, Button, CircularProgress, Paper, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -14,6 +15,7 @@ import { QuoteCatalogPickerDrawer } from '../../components/picker/quote-catalog-
 import { QuoteFabricPickerDrawer } from '../../components/picker/quote-fabric-picker-drawer';
 import { useClientNames } from '../../hooks/editor/use-client-names';
 import { useQuoteEditor } from '../../hooks/editor/use-quote-editor';
+import { useQuotePdf } from '../../hooks/editor/use-quote-pdf';
 
 import type { QuoteActor } from '@admin/quotes/model';
 
@@ -37,6 +39,7 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleteQuote, deleting] = useDeleteQuoteMutation();
   const { quote, draft } = editor;
+  const pdf = useQuotePdf({ quote, dirty: editor.dirty, save: editor.save });
 
   if (editor.loading)
     return (
@@ -90,6 +93,11 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
           }
         >
           {editor.saveError.message}
+        </Alert>
+      )}
+      {pdf.pdfError && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {pdf.pdfError}
         </Alert>
       )}
       <Stack sx={{ gap: 2 }}>
@@ -169,8 +177,16 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
           </Typography>
         )}
         <Button onClick={() => navigate('/crm/quotes')}>Закрити</Button>
-        <Button variant="contained" onClick={() => void editor.save()} disabled={editor.saving}>
-          {editor.saving ? 'Зберігаємо…' : 'Зберегти зміни'}
+        <Button onClick={() => void editor.save()} disabled={editor.saving || pdf.generating}>
+          {editor.saving && !pdf.generating ? 'Зберігаємо…' : 'Зберегти зміни'}
+        </Button>
+        <Button
+          variant="contained"
+          startIcon={<PictureAsPdfOutlinedIcon />}
+          onClick={() => void pdf.generate()}
+          disabled={editor.saving || pdf.generating}
+        >
+          {pdf.generating ? 'Формуємо…' : 'Сформувати КП'}
         </Button>
       </Paper>
 

@@ -59,6 +59,7 @@ const quote: Quote = {
 const api = vi.hoisted(() => ({
   save: vi.fn(),
   refetch: vi.fn(),
+  download: vi.fn(),
   mutation: (fn: (arg: unknown) => unknown) => () => [
     (arg: unknown) => ({ unwrap: () => fn(arg) }),
     { isLoading: false },
@@ -70,6 +71,7 @@ vi.mock('@admin/quotes/data-access', () => ({
   useCreateQuoteMutation: api.mutation(vi.fn()),
   useSaveQuoteMutation: api.mutation(api.save),
   useDeleteQuoteMutation: api.mutation(vi.fn()),
+  downloadQuotePdf: api.download,
 }));
 vi.mock('@admin/clients/data-access', () => ({
   useListCustomersQuery: () => ({ data: undefined }),
@@ -96,6 +98,7 @@ const typeRetail = (value: string) =>
 beforeEach(() => {
   api.save.mockReset();
   api.refetch.mockReset();
+  api.download.mockReset();
 });
 afterEach(cleanup);
 
@@ -146,5 +149,45 @@ describe('КП editor', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Оновити' }));
     await waitFor(() => expect(api.refetch).toHaveBeenCalled());
     await waitFor(() => expect(screen.getByLabelText("Ім'я отримувача")).toHaveValue(''));
+  });
+
+  it('«Сформувати КП» downloads the saved КП at once', async () => {
+    api.download.mockResolvedValue(undefined);
+    renderEditor();
+    fireEvent.click(await screen.findByRole('button', { name: 'Сформувати КП' }));
+    await waitFor(() => expect(api.download).toHaveBeenCalledWith(4, '1-11-2026'));
+    expect(api.save).not.toHaveBeenCalled();
+  });
+
+  it('«Сформувати КП» saves unsaved changes first and builds the PDF from the saved version', async () => {
+    const saved = { ...quote, version: 4 };
+    api.save.mockResolvedValue(saved);
+    api.download.mockResolvedValue(undefined);
+    renderEditor();
+    expect(await screen.findByText('КП 1-11-2026')).toBeVisible();
+    fireEvent.change(screen.getByLabelText('Коментар для клієнта'), {
+      target: { value: 'Доставка за наш рахунок' },
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Сформувати КП' }));
+    await waitFor(() => expect(api.download).toHaveBeenCalledWith(4, '1-11-2026'));
+    expect(api.save).toHaveBeenCalledTimes(1);
+    expect(api.save.mock.invocationCallOrder[0]).toBeLessThan(
+      api.download.mock.invocationCallOrder[0] ?? 0,
+    );
+  });
+
+  it('does not build the PDF when saving fails', async () => {
+    api.save.mockRejectedValue({
+      status: 409,
+      message: 'КП змінили в іншому вікні. Оновіть сторінку.',
+    });
+    renderEditor();
+    expect(await screen.findByText('КП 1-11-2026')).toBeVisible();
+    fireEvent.change(screen.getByLabelText('Коментар для клієнта'), { target: { value: 'Інше' } });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Сформувати КП' }));
+    expect(await screen.findByText('КП змінили в іншому вікні. Оновіть сторінку.')).toBeVisible();
+    expect(api.download).not.toHaveBeenCalled();
   });
 });
