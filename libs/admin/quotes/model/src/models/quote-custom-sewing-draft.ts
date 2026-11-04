@@ -8,7 +8,7 @@ export interface QuoteCustomFabricDraft {
   readonly meters: string;
 }
 
-/** An accessory or operation in the panel; `quantity` and `minutes` are typed text. */
+/** An accessory, operation, service or extra fabric in the panel; `quantity` and `minutes` are typed text. */
 export interface QuoteCustomLineDraft {
   readonly key: string;
   readonly kind: QuoteItemLineKind;
@@ -20,6 +20,8 @@ export interface QuoteCustomLineDraft {
   readonly minutes: string;
   /** The operation has no fixed norm, so minutes are required. */
   readonly needsMinutes: boolean;
+  /** The other-cost code of a service; null otherwise. */
+  readonly costCode: string | null;
 }
 
 /** The «Виріб з нуля» panel: what the manager composes before it goes into the КП. */
@@ -33,4 +35,6 @@ export interface QuoteCustomSewingDraft {
 export const quoteCustomLineKindLabels: Readonly<Record<QuoteItemLineKind, string>> = {
   Accessory: 'Фурнітура',
   Operation: 'Операції',
+  Fabric: 'Додаткові тканини',
+  Service: 'Послуги',
 };

@@ -69,6 +69,9 @@ export const quoteItemSubtitles: Readonly<Record<QuoteItemKind, string>> = {
   CustomSewing: 'Швейна продукція · виріб з нуля',
 };
 
+/** The subtitle of a Catalog model whose composition was changed in the КП. */
+export const quoteChangedModelSubtitle = 'Швейна продукція · змінений склад моделі';
+
 /** Items whose prices come from the Catalog formula and are never typed. */
 export const isSewingKind = (kind: QuoteItemKind): boolean =>
   kind === 'Sewing' || kind === 'CustomSewing';

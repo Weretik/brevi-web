@@ -55,6 +55,7 @@ export function toSaveQuoteInput(draft: QuoteDraft): Schemas['CrmSaveQuoteInput'
               referenceId: line.referenceId,
               quantity: line.quantity,
               manualMinutes: line.manualMinutes,
+              costCode: line.costCode,
             }))
           : null,
     })),

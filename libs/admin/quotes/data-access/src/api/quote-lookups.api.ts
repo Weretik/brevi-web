@@ -3,6 +3,7 @@ import { quoteLookupErrors, toQuoteApiError } from '../errors/quote-api-error';
 import {
   mapQuoteCatalogPage,
   mapQuoteCustomSewingPrice,
+  mapQuoteModelComposition,
   mapQuoteStaff,
 } from '../mappers/quote.mapper';
 
@@ -11,6 +12,7 @@ import type {
   QuoteCustomSewingPrice,
   QuoteCustomSewingPriceRequest,
   QuoteIntroSeason,
+  QuoteModelComposition,
   QuoteStaff,
 } from '@admin/quotes/model';
 
@@ -46,6 +48,12 @@ export const quoteLookupsApi = quotesBaseApi.injectEndpoints({
       transformResponse: mapQuoteCustomSewingPrice,
       transformErrorResponse: (response) => toQuoteApiError(response, quoteLookupErrors),
     }),
+    /** «Змінити склад»: the Catalog composition of a sewing model to start from. */
+    getQuoteModelComposition: build.query<QuoteModelComposition, number>({
+      query: (productId) => `/api/crm/quote-lookups/catalog/${productId}/composition`,
+      transformResponse: mapQuoteModelComposition,
+      transformErrorResponse: (response) => toQuoteApiError(response, quoteLookupErrors),
+    }),
     getQuoteStaff: build.query<QuoteStaff[], void>({
       query: () => '/api/crm/quote-lookups/staff',
       transformResponse: mapQuoteStaff,
@@ -56,6 +64,7 @@ export const quoteLookupsApi = quotesBaseApi.injectEndpoints({
 
 export const {
   useCalculateQuoteCustomSewingMutation,
+  useGetQuoteModelCompositionQuery,
   useSearchQuoteCatalogQuery,
   useGetQuoteStaffQuery,
 } = quoteLookupsApi;

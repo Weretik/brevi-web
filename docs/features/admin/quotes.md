@@ -1,6 +1,6 @@
 # «КП» — commercial proposals
 
-**State:** stages 1–4 and 5a implemented 2026-11-04 (list, «Товари та ціни» editor, «Сформувати КП» PDF, «Налаштування КП», «Надіслати КП» from each person's own Gmail, «КП для знайомства» with «Готові шаблони», «Виріб з нуля»), Admin React. Specification: [Admin «КП»](../../specs/admin/quotes/001-quotes/README.md); backend rules R-* in BreviERP `docs/sdd/specs/crm/003-quotes/README.md`. Look: [«Цех»](../../standards/admin/design-system.md).
+**State:** stages 1–4, 5a and 5b implemented 2026-11-04 (list, «Товари та ціни» editor, «Сформувати КП» PDF, «Налаштування КП», «Надіслати КП» from each person's own Gmail, «КП для знайомства» with «Готові шаблони», «Виріб з нуля», «Змінити склад» of a model), Admin React. Specification: [Admin «КП»](../../specs/admin/quotes/001-quotes/README.md); backend rules R-* in BreviERP `docs/sdd/specs/crm/003-quotes/README.md`. Look: [«Цех»](../../standards/admin/design-system.md).
 
 ## Behavior and routes
 
@@ -21,6 +21,7 @@
 - A Manager sees and opens only КП where they are responsible; the server enforces it (404 for others). Director and Admin see all, and «Передати розрахунок» hands a КП to any staff member.
 - Items: a sewing model with fabric variants, a «Виріб з нуля», a catalogue PPE, a one-off PPE. Each option has three prices (до 9 / 10–40 / від 41 шт.), each with «показати в КП». Catalog prices are taken by the server when an option is added and kept on later saves; «Перерахувати за актуальними цінами» shows old → new first and saves only on confirmation.
 - «Виріб з нуля»: a product that is not in the Catalog. Its side panel takes a name, a client description, fabrics with metres, accessories and operations with quantities (minutes for an operation without a fixed norm). The server prices each fabric by the Catalog sewing formula (`POST /api/crm/quote-lookups/custom-sewing-price`, nothing saved) a moment after every change; each fabric becomes a price row with three prices, time, labour and full cost. The КП keeps the composition and frozen prices; «Змінити склад і тканини» reopens the panel, and «Перерахувати» prices it again from current references. Nothing is added to the Catalog.
+- «Змінити склад» on a Catalog model card (`GET /api/crm/quote-lookups/catalog/{productId}/composition`) opens the same panel filled with the model's Catalog composition: the fabric of each variant already in the КП with its metres, shared accessories, «Додаткові тканини» (for example a lining) and «Послуги», and operations. Extra fabrics and services can be changed or removed but not added. «Зберегти склад» turns the item into a «Виріб з нуля» that keeps the model's code, link and season (subtitle «змінений склад моделі»); the Catalog model does not change.
 - A PPE price can be typed over the Catalog one and then needs a reason; a one-off PPE has only manual prices. A sewing price is never typed.
 - The browser checks the same rules before saving (name, prices, reason, at least one shown price above zero); the server checks them again. A 409 shows «КП змінили в іншому вікні» with «Оновити».
 - The internal name suggests KeepinCRM client names and accepts any text; it is for the manager only.
@@ -72,7 +73,7 @@ libs/admin/quotes/
     components/editor/               «Передати розрахунок», reprice panel, delete dialog
     components/settings/             picture field with the «Фото» picker
     components/sending/              «Надіслати КП» side panel
-    components/custom-sewing/        «Виріб з нуля» side panel
+    components/custom-sewing/        «Виріб з нуля» side panel; «Змінити склад» loader for a Catalog model
     components/introduction/         «Обрати модель», «Готові шаблони», «Зберегти як шаблон» side panels
     hooks/{list,editor,picker,settings,sending}/  list state; draft, save, PDF and client names; catalogue search; settings draft; send panel, Gmail connect and its return notice
     hooks/custom-sewing/             «Виріб з нуля» draft, reference choices and debounced pricing
@@ -83,8 +84,8 @@ The feature library cannot import `core/auth`, so the app passes `useQuoteActor`
 
 ## Tests
 
-- Model: `validators/quote-draft-validation.unit.test.ts`, `validators/quote-settings-validation.unit.test.ts`, `validators/quote-send-validation.unit.test.ts`, `mappers/quote-price-text.unit.test.ts`, `mappers/quote-intro-draft-mapper.unit.test.ts` (new selection, layout change, repeats, template apply, saved price), `mappers/quote-custom-sewing-mapper.unit.test.ts` («Виріб з нуля» request, rules, КП item) — `npx nx test admin-quotes-model`.
+- Model: `validators/quote-draft-validation.unit.test.ts`, `validators/quote-settings-validation.unit.test.ts`, `validators/quote-send-validation.unit.test.ts`, `mappers/quote-price-text.unit.test.ts`, `mappers/quote-intro-draft-mapper.unit.test.ts` (new selection, layout change, repeats, template apply, saved price), `mappers/quote-custom-sewing-mapper.unit.test.ts` («Виріб з нуля» request, rules, КП item, changed model) — `npx nx test admin-quotes-model`.
 - Data access: `mappers/quote-input.mapper.unit.test.ts`, `mappers/quote-settings.mapper.unit.test.ts`, `errors/quote-api-error.unit.test.ts` — `npx nx test admin-quotes-data-access`.
 - UI: `components/editor/quote-price-box.component.test.tsx` — `npx nx test admin-quotes-ui`.
-- Feature: `pages/list/quotes-page.component.test.tsx` (own-only list, responsible filter, «Нове КП» kinds), `components/custom-sewing/quote-custom-sewing-drawer.component.test.tsx` (prices the composition, adds the item), `pages/editor/quote-editor-page.component.test.tsx` (manual price needs a reason, hide a price, 409 reload, «Виріб з нуля» from the products block, «Сформувати КП» saves then downloads, «Надіслати КП» saves then sends, Gmail refusal, no recipient, no Gmail), `pages/settings/quote-settings-page.component.test.tsx` (save, field rules, 409, «Підключити Gmail»), `pages/introduction/quote-introduction-page.component.test.tsx` (summer page built and saved, template applied) — `npx nx test admin-quotes-feature`.
+- Feature: `pages/list/quotes-page.component.test.tsx` (own-only list, responsible filter, «Нове КП» kinds), `components/custom-sewing/quote-custom-sewing-drawer.component.test.tsx` (prices the composition, adds the item; «Змінити склад» starts from the Catalog composition and keeps the model), `pages/editor/quote-editor-page.component.test.tsx` (manual price needs a reason, hide a price, 409 reload, «Виріб з нуля» from the products block, «Сформувати КП» saves then downloads, «Надіслати КП» saves then sends, Gmail refusal, no recipient, no Gmail), `pages/settings/quote-settings-page.component.test.tsx` (save, field rules, 409, «Підключити Gmail»), `pages/introduction/quote-introduction-page.component.test.tsx` (summer page built and saved, template applied) — `npx nx test admin-quotes-feature`.
 - Menu and routes: `apps/admin-react/src/app/router/*.test.ts(x)` — `npx nx test admin-react -- src/app/router`.

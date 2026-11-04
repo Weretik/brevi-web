@@ -1929,6 +1929,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/crm/quote-lookups/catalog/{productId}/composition': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description «Змінити склад» (R-21): the composition of a Catalog sewing model to start a changed model from: the fabric of each variant with its metres, and the shared accessories, services, extra fabrics and operations. Nothing is saved. */
+    get: operations['getCrmQuoteModelComposition'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/crm/quote-lookups/staff': {
     parameters: {
       query?: never;
@@ -4267,12 +4284,17 @@ export interface components {
       /** @description CustomSewing only; metres of the fabric in one product. */
       fabricMeters?: number | null;
     };
-    /** @enum {string} */
-    CrmQuoteItemLineKind: 'Accessory' | 'Operation';
+    /**
+     * @description Service is a «послуга» of a Catalog model priced by its other-cost code; Fabric is an extra fabric shared by every variant (for example a lining), in metres.
+     * @enum {string}
+     */
+    CrmQuoteItemLineKind: 'Accessory' | 'Operation' | 'Service' | 'Fabric';
     CrmQuoteItemLineInput: {
       kind: components['schemas']['CrmQuoteItemLineKind'];
-      /** @description Reference garment accessory or operation. */
+      /** @description Reference garment accessory, operation or fabric (1 or more); 0 for a service. */
       referenceId: number;
+      /** @description Service only; its other-cost code. */
+      costCode?: string | null;
       quantity: number;
       /** @description Operation only; minutes of an operation without a fixed norm. */
       manualMinutes?: number | null;
@@ -4281,7 +4303,7 @@ export interface components {
       /** Format: int64 */
       id?: number | null;
       kind: components['schemas']['CrmQuoteItemKind'];
-      /** @description Required for Sewing and Ppe, null for OneOffPpe and CustomSewing. */
+      /** @description Required for Sewing and Ppe, null for OneOffPpe; for CustomSewing the model whose composition was changed, or null for a product from scratch. */
       productId?: number | null;
       /** @description OneOffPpe and CustomSewing only. */
       name?: string | null;
@@ -4337,7 +4359,10 @@ export interface components {
       /** Format: int64 */
       id: number;
       kind: components['schemas']['CrmQuoteItemLineKind'];
+      /** @description 0 for a service. */
       referenceId: number;
+      /** @description Service only. */
+      costCode?: string | null;
       /** @description Copied from the reference when the line was priced. */
       name: string;
       unit: string;
@@ -4685,9 +4710,10 @@ export interface components {
       lines: {
         kind: components['schemas']['CrmQuoteItemLineKind'];
         referenceId: number;
+        costCode?: string | null;
         name?: string | null;
         unit?: string | null;
-        /** @description Accessory price per unit or operation norm in minutes. */
+        /** @description Accessory, fabric or service price per unit, or operation norm in minutes. */
         unitValue?: number | null;
         isActive: boolean;
       }[];
@@ -4705,6 +4731,29 @@ export interface components {
         prices?: components['schemas']['CrmQuoteTierPrices'] | null;
         /** @description Why prices is null. */
         problems: string[];
+      }[];
+    };
+    CrmQuoteModelComposition: {
+      productId: number;
+      /** @description The fabric of each variant, in the Catalog order. */
+      fabrics: {
+        /** Format: int64 */
+        articleId: number;
+        fabricId: number;
+        name?: string | null;
+        meters: number;
+        isActive: boolean;
+      }[];
+      /** @description Shared accessories, extra fabrics and services, then operations, in the Catalog order. */
+      lines: {
+        kind: components['schemas']['CrmQuoteItemLineKind'];
+        referenceId: number;
+        costCode?: string | null;
+        /** @description The reference name or the service code; null when gone. */
+        name?: string | null;
+        unit: string;
+        quantity: number;
+        manualMinutes?: number | null;
       }[];
     };
     CrmQuoteStaff: {
@@ -11209,6 +11258,50 @@ export interface operations {
       };
       /** @description Admin or Manager role required. */
       403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmQuoteModelComposition: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        productId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The composition. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmQuoteModelComposition'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not a sewing model of the Catalog. */
+      404: {
         headers: {
           [name: string]: unknown;
         };

@@ -20,10 +20,11 @@ export interface QuoteCustomRow {
 interface Props {
   title: string;
   rows: readonly QuoteCustomRow[];
-  choices: readonly QuoteCustomChoice[];
-  addLabel: string;
-  loading: boolean;
-  onAdd: (choice: QuoteCustomChoice) => void;
+  /** Without choices the section only edits the rows it has (services and extra fabrics of a model). */
+  choices?: readonly QuoteCustomChoice[];
+  addLabel?: string;
+  loading?: boolean;
+  onAdd?: (choice: QuoteCustomChoice) => void;
   onQuantity: (key: string, value: string) => void;
   onMinutes?: (key: string, value: string) => void;
   onRemove: (key: string) => void;
@@ -35,7 +36,7 @@ export function QuoteCustomRows({
   rows,
   choices,
   addLabel,
-  loading,
+  loading = false,
   onAdd,
   onQuantity,
   onMinutes,
@@ -87,29 +88,31 @@ export function QuoteCustomRows({
           </Tooltip>
         </Stack>
       ))}
-      <Autocomplete
-        size="small"
-        options={choices as QuoteCustomChoice[]}
-        loading={loading}
-        value={null}
-        blurOnSelect
-        clearOnBlur
-        getOptionLabel={(choice) => choice.label}
-        renderOption={(props, choice) => (
-          <li {...props} key={choice.id}>
-            <Stack>
-              <Typography variant="body2">{choice.label}</Typography>
-              <Typography variant="caption" color="text.secondary">
-                {choice.hint}
-              </Typography>
-            </Stack>
-          </li>
-        )}
-        onChange={(_event, choice) => {
-          if (choice) onAdd(choice);
-        }}
-        renderInput={(params) => <TextField {...params} label={addLabel} />}
-      />
+      {choices && onAdd && (
+        <Autocomplete
+          size="small"
+          options={choices as QuoteCustomChoice[]}
+          loading={loading}
+          value={null}
+          blurOnSelect
+          clearOnBlur
+          getOptionLabel={(choice) => choice.label}
+          renderOption={(props, choice) => (
+            <li {...props} key={choice.id}>
+              <Stack>
+                <Typography variant="body2">{choice.label}</Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {choice.hint}
+                </Typography>
+              </Stack>
+            </li>
+          )}
+          onChange={(_event, choice) => {
+            if (choice) onAdd(choice);
+          }}
+          renderInput={(params) => <TextField {...params} label={addLabel} />}
+        />
+      )}
     </Stack>
   );
 }

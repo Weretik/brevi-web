@@ -1,9 +1,10 @@
-import { quoteItemSubtitles } from '../models/quote-draft';
+import { quoteChangedModelSubtitle, quoteItemSubtitles } from '../models/quote-draft';
 
 import type { QuoteItemLine, QuoteItemLineKind, QuoteTier } from '../entities/quote';
 import type {
   QuoteCustomSewingPrice,
   QuoteCustomSewingPriceRequest,
+  QuoteModelComposition,
 } from '../entities/quote-custom-sewing';
 import type {
   QuoteCustomFabricDraft,
@@ -29,9 +30,50 @@ export function parseCustomQuantity(text: string): number | null {
   return value > 0 && value <= 10_000 ? value : null;
 }
 
-/** The panel state: empty for a new item, else the saved composition of the item. */
-export function customSewingDraft(item?: QuoteItemDraft): QuoteCustomSewingDraft {
+/**
+ * «Змінити склад» of a Catalog model: its texts, the Catalog fabric of each variant already in the КП (all active
+ * variants when none matches) and its shared lines.
+ */
+function modelDraft(item: QuoteItemDraft, model: QuoteModelComposition): QuoteCustomSewingDraft {
+  const chosen = item.options
+    .map((option) => model.fabrics.find((x) => x.articleId === option.articleId))
+    .filter((x) => x !== undefined);
+  const fabrics = chosen.length > 0 ? chosen : model.fabrics.filter((x) => x.isActive);
+  return {
+    name: item.name,
+    description: item.description,
+    fabrics: fabrics
+      .filter((x, index) => fabrics.findIndex((y) => y.fabricId === x.fabricId) === index)
+      .map((x) => ({
+        key: nextKey('fabric'),
+        fabricId: x.fabricId,
+        name: x.name ?? 'Тканина',
+        meters: numberText(x.meters),
+      })),
+    lines: model.lines.map((line) => ({
+      key: nextKey('line'),
+      kind: line.kind,
+      referenceId: line.referenceId,
+      name: line.name ?? (line.kind === 'Operation' ? 'Операція' : 'Матеріал'),
+      unit: line.unit,
+      quantity: numberText(line.quantity),
+      minutes: numberText(line.manualMinutes),
+      needsMinutes: line.manualMinutes !== null,
+      costCode: line.costCode,
+    })),
+  };
+}
+
+/**
+ * The panel state: empty for a new item, the saved composition of a «Виріб з нуля», or the Catalog composition of a
+ * model being changed.
+ */
+export function customSewingDraft(
+  item?: QuoteItemDraft,
+  model?: QuoteModelComposition,
+): QuoteCustomSewingDraft {
   if (!item) return { name: '', description: '', fabrics: [], lines: [] };
+  if (model && item.kind === 'Sewing') return modelDraft(item, model);
   return {
     name: item.name,
     description: item.description,
@@ -52,6 +94,7 @@ export function customSewingDraft(item?: QuoteItemDraft): QuoteCustomSewingDraft
       quantity: numberText(line.quantity),
       minutes: numberText(line.manualMinutes),
       needsMinutes: line.manualMinutes !== null,
+      costCode: line.costCode,
     })),
   };
 }
@@ -81,7 +124,13 @@ export function addCustomLine(
     readonly needsMinutes: boolean;
   },
 ): QuoteCustomSewingDraft {
-  const row: QuoteCustomLineDraft = { key: nextKey('line'), ...line, quantity: '1', minutes: '' };
+  const row: QuoteCustomLineDraft = {
+    key: nextKey('line'),
+    ...line,
+    quantity: '1',
+    minutes: '',
+    costCode: null,
+  };
   return { ...draft, lines: [...draft.lines, row] };
 }
 
@@ -100,6 +149,7 @@ export function customSewingPriceRequest(
     referenceId: x.referenceId,
     quantity: amount(x.quantity),
     manualMinutes: x.needsMinutes ? amount(x.minutes) : null,
+    costCode: x.costCode,
   }));
   if (fabrics.length === 0 || !lines.some((x) => x.kind === 'Operation')) return null;
   if (fabrics.some((x) => x.meters === null)) return null;
@@ -149,10 +199,14 @@ export function customSewingItemDraft(
     unit: price.lines[index]?.unit ?? draft.lines[index].unit,
     quantity: line.quantity,
     manualMinutes: line.manualMinutes,
+    costCode: line.costCode,
   }));
+  // A changed Catalog model is a new item: its Sewing rows cannot be matched to fabric rows.
+  const same = previous?.kind === 'CustomSewing' ? previous : undefined;
+  const model = previous?.productId != null ? previous : undefined;
   const options: QuoteOptionDraft[] = request.fabrics.map((fabric, index) => {
     const priced = price.fabrics[index];
-    const saved = previous?.options.find((x) => x.fabricId === fabric.fabricId);
+    const saved = same?.options.find((x) => x.fabricId === fabric.fabricId);
     return {
       key: saved?.key ?? nextKey('option'),
       id: saved?.id ?? null,
@@ -179,16 +233,16 @@ export function customSewingItemDraft(
   });
   return {
     key: previous?.key ?? nextKey('item'),
-    id: previous?.id ?? null,
+    id: same?.id ?? null,
     kind: 'CustomSewing',
-    productId: null,
-    code: null,
+    productId: model?.productId ?? null,
+    code: model?.code ?? null,
     name: draft.name.trim(),
-    subtitle: quoteItemSubtitles.CustomSewing,
+    subtitle: model ? quoteChangedModelSubtitle : quoteItemSubtitles.CustomSewing,
     description: draft.description,
-    siteUrl: null,
+    siteUrl: model?.siteUrl ?? null,
     photoUrl: previous?.photoUrl ?? null,
-    season: null,
+    season: model?.season ?? null,
     supplierUrl: '',
     options,
     lines,

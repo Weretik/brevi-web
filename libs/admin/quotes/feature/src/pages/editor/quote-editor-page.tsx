@@ -8,6 +8,7 @@ import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-
 
 import { QuoteEditorActions } from './quote-editor-actions';
 import { QuoteEditorFooter } from './quote-editor-footer';
+import { QuoteChangeModelDrawer } from '../../components/custom-sewing/quote-change-model-drawer';
 import { QuoteCustomSewingDrawer } from '../../components/custom-sewing/quote-custom-sewing-drawer';
 import { QuoteDeleteDialog } from '../../components/editor/quote-delete-dialog';
 import { QuoteRepriceDrawer } from '../../components/editor/quote-reprice-drawer';
@@ -219,17 +220,29 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
           }}
         />
       )}
-      {panel?.kind === 'custom' && (!panel.itemKey || customItem) && (
-        <QuoteCustomSewingDrawer
+      {customItem?.kind === 'Sewing' && (
+        <QuoteChangeModelDrawer
           item={customItem}
           onClose={() => setPanel(null)}
           onDone={(next) => {
-            if (customItem) editor.updateItem(customItem.key, { ...next, key: customItem.key });
-            else editor.addItems([next]);
+            editor.updateItem(customItem.key, { ...next, key: customItem.key });
             setPanel(null);
           }}
         />
       )}
+      {panel?.kind === 'custom' &&
+        customItem?.kind !== 'Sewing' &&
+        (!panel.itemKey || customItem) && (
+          <QuoteCustomSewingDrawer
+            item={customItem}
+            onClose={() => setPanel(null)}
+            onDone={(next) => {
+              if (customItem) editor.updateItem(customItem.key, { ...next, key: customItem.key });
+              else editor.addItems([next]);
+              setPanel(null);
+            }}
+          />
+        )}
       {panel?.kind === 'responsible' && quote && (
         <QuoteResponsibleDrawer
           quote={quote}
