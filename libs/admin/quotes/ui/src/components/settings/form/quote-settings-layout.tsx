@@ -1,10 +1,9 @@
-import { quoteSettingsShortMax, quoteSettingsTextMax } from '@admin/quotes/model';
-import { Box, Card, TextField, Typography } from '@mui/material';
+import { Box, Card, Stack, Typography } from '@mui/material';
 
-import type { QuoteSettingsErrors } from '@admin/quotes/model';
+import type { QuoteSettingsErrors, QuoteSettingsSection } from '@admin/quotes/model';
 import type { ReactNode } from 'react';
 
-/** A picture field the page fills: a link plus «Вибрати з фото». */
+/** A picture field the page fills: a link plus «Фото» from the library. */
 export type QuoteImageFieldRender = (field: {
   label: string;
   value: string;
@@ -12,27 +11,82 @@ export type QuoteImageFieldRender = (field: {
   onChange: (value: string) => void;
 }) => ReactNode;
 
-export function QuoteSettingsCard({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description?: string;
+/** The page anchor of a section, used by the section list. */
+export const quoteSettingsAnchor = (id: string) => `quote-settings-${id}`;
+
+interface SectionProps {
+  section: QuoteSettingsSection;
+  changed: boolean;
+  errorCount: number;
   children: ReactNode;
-}) {
+}
+
+/** One section of the page: a title, what it is for, and a mark only when it changed or has problems. */
+export function QuoteSettingsSectionCard({ section, changed, errorCount, children }: SectionProps) {
   return (
-    <Card variant="outlined" sx={{ p: 2 }} component="section" aria-label={title}>
-      <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+    <Card
+      variant="outlined"
+      component="section"
+      id={quoteSettingsAnchor(section.id)}
+      aria-label={section.title}
+      sx={{ p: { xs: 2, md: 2.5 }, scrollMarginTop: 88 }}
+    >
+      <Stack
+        direction="row"
+        sx={{ gap: 1, alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap' }}
+      >
+        <Typography
+          variant="subtitle1"
+          component="h2"
+          sx={{ fontSize: '1.125rem', fontWeight: 700 }}
+        >
+          {section.title}
+        </Typography>
+        {errorCount > 0 ? (
+          <Typography variant="body2" color="error" sx={{ fontWeight: 600 }}>
+            {quoteSettingsProblemsLabel(errorCount)}
+          </Typography>
+        ) : changed ? (
+          <Typography variant="body2" sx={{ color: 'primary.dark', fontWeight: 600 }}>
+            Змінено
+          </Typography>
+        ) : null}
+      </Stack>
+      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, mb: 2 }}>
+        {section.description}
+      </Typography>
+      <Stack sx={{ gap: 2.5 }}>{children}</Stack>
+    </Card>
+  );
+}
+
+/** «1 помилка», «2 помилки», «5 помилок». */
+export function quoteSettingsProblemsLabel(count: number): string {
+  const tens = count % 100;
+  const ones = count % 10;
+  const word =
+    ones === 1 && tens !== 11
+      ? 'помилка'
+      : ones >= 2 && ones <= 4 && (tens < 12 || tens > 14)
+        ? 'помилки'
+        : 'помилок';
+  return `${count} ${word}`;
+}
+
+/** A named group of fields inside a section, such as «Блок унизу сторінки». */
+export function QuoteSettingsGroup({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <Box>
+      <Typography
+        variant="overline"
+        component="h3"
+        color="text.secondary"
+        sx={{ display: 'block', fontWeight: 600, lineHeight: 1.6, mb: 1 }}
+      >
         {title}
       </Typography>
-      {description && (
-        <Typography variant="body2" color="text.secondary">
-          {description}
-        </Typography>
-      )}
-      <Box sx={{ mt: 2 }}>{children}</Box>
-    </Card>
+      {children}
+    </Box>
   );
 }
 
@@ -54,48 +108,6 @@ export function QuoteSettingsGrid({
     >
       {children}
     </Box>
-  );
-}
-
-interface FieldProps {
-  label: string;
-  value: string;
-  error?: string | undefined;
-  helperText?: string;
-  required?: boolean;
-  multiline?: boolean;
-  /** Spans the whole grid row. */
-  wide?: boolean;
-  onChange: (value: string) => void;
-}
-
-export function QuoteSettingsField({
-  label,
-  value,
-  error,
-  helperText,
-  required,
-  multiline,
-  wide,
-  onChange,
-}: FieldProps) {
-  return (
-    <TextField
-      fullWidth
-      size="small"
-      label={label}
-      value={value}
-      required={required}
-      multiline={multiline}
-      minRows={multiline ? 3 : undefined}
-      error={Boolean(error)}
-      helperText={error ?? helperText}
-      onChange={(event) => onChange(event.target.value)}
-      slotProps={{
-        htmlInput: { maxLength: multiline ? quoteSettingsTextMax : quoteSettingsShortMax },
-      }}
-      sx={wide ? { gridColumn: '1 / -1' } : undefined}
-    />
   );
 }
 
