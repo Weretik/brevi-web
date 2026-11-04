@@ -2,7 +2,7 @@
 
 **Status:** implementation exists, checked 2026-11-03. [SDD](../../specs/admin/media/001-photo-library/README.md), [consumer contract](../../specs/admin/media/001-photo-library/contracts/api-contract.md).
 
-The sidebar group «Фото» opens `/media` (the old `/references/media` redirects there). The left column is the folder tree with «Усі фото» and photo counts; the right side has the search row, the chips «З підпапками» / «Лише ця папка», and a grid of photo cards with selection and pages of 48. «Завантажити фото» uploads several files into the open folder. A photo opens in the side panel with its usages and «Редагувати» (name, alt, folder); selected photos can be moved or deleted. The folder menu creates subfolders, renames, moves and deletes empty folders. Data comes from the BreviERP Media API; folders are virtual and never change CDN URLs.
+The sidebar group «Фото» opens `/media` (the old `/references/media` redirects there). The left column is the folder tree with «Усі фото» and photo counts; the right side has the search row, the chips «З підпапками» / «Лише ця папка», and a grid of photo cards with selection and pages of 48. «Завантажити фото» or dropping files anywhere on the page uploads several photos into the open folder (a full-screen drop overlay names the target folder). Results and errors show as toasts in the top right corner: green for success, yellow for warnings, red for errors; they hide by themselves. Grid cards load the small WebP preview (`thumbnailUrl`) and fall back to the original, and show the size in pixels when known. A photo opens in the side panel with its usages and «Редагувати» (name, alt, folder); selected photos can be moved or deleted. The folder menu creates subfolders, renames, moves and deletes empty folders. Data comes from the BreviERP Media API; folders are virtual and never change CDN URLs.
 
 ## Structure diagram
 
@@ -17,6 +17,8 @@ flowchart LR
   DataAccess --> Model["model: entities, tree, rules, formatting"]
   DataAccess --> API["BreviERP /api/media"]
   Products["products/data-access: product-media.api"] --> API
+  ProductCard["products/feature: product-photo-picker"] --> Picker["feature/components/picker: MediaPickerDrawer"]
+  Picker --> Hooks
 ```
 
 ## Code structure
@@ -36,17 +38,20 @@ libs/admin/media/
   ui/src/
     components/folder-tree/                        # tree, row, folder menu
     components/gallery/                            # photo grid, preview with broken-image state
-    forms/  details/  dialogs/  feedback/          # folder/photo forms, folder select, details, confirm, upload status
+    forms/  details/  dialogs/  feedback/          # folder/photo forms, folder select, details, confirm, upload progress, toasts, drop overlay
   feature/src/
     media.routes.tsx                               # /media and the old /references/media redirect
     pages/library/media-library-page.tsx           # composes the page
     state/media-library-url-state.ts               # ?folder=&q=&sub=0&page=
-    hooks/{library,folders,files}/                 # search, selection, tree state, editors, upload queue, move, delete
+    hooks/{library,folders,files}/                 # search, selection, toasts, tree state, editors, upload queue, file drop, move, delete
+    hooks/picker/use-media-picker.ts               # picker state: own folder/search, ticks across pages, upload → ticked
+    components/picker/media-picker-drawer.tsx      # «Вибрати фото» side panel for other features
+    model/media-upload-summary.ts                  # upload result → toast text and tone
     components/{library,folders,files}/            # folder panel, filters, results, upload button, side panels
     dialogs/media-delete-dialogs.tsx               # photo and folder confirmations
 ```
 
-The product editor still uses `libs/admin/products/data-access/src/api/product-media.api.ts` (all library pages for its dropdown, upload) until the «Вибрати фото» picker (stage 4).
+**«Вибрати фото» (stage 4).** `MediaPickerDrawer` (exported from `@admin/media/feature`) is the library in a wide side panel: folder tree (a folder select on narrow screens), search, ticks kept across folders and pages, upload by button or drop into the open folder (uploaded photos are ticked at once), toasts, and «Додати (N)». Photos the caller already has show ticked and are not added twice. The product card uses it through `libs/admin/products/feature/src/components/product-editor/product-photo-picker.tsx` instead of the old dropdown and single upload. The card still reads previews of attached photos from `products/data-access/src/api/product-media.api.ts` (whole library list); its `uploadProductMedia` endpoint is no longer used by the UI.
 
 **Where to look:** [route](../../../libs/admin/media/feature/src/media.routes.tsx), [page](../../../libs/admin/media/feature/src/pages/library/media-library-page.tsx), [tree](../../../libs/admin/media/model/src/mappers/media-folder-tree.ts), [API](../../../libs/admin/media/data-access/src/api/media-files.api.ts).
 
@@ -55,8 +60,11 @@ The product editor still uses `libs/admin/products/data-access/src/api/product-m
 - `libs/admin/media/model/src/mappers/media-folder-tree.test.ts`, `libs/admin/media/model/src/validators/media-validation.test.ts`
 - `libs/admin/media/data-access/src/mappers/media-file.mapper.test.ts`
 - `libs/admin/media/ui/src/components/folder-tree/media-folder-tree.component.test.tsx`
-- `libs/admin/media/feature/src/pages/library/media-library-page.component.test.tsx`
+- `libs/admin/media/ui/src/components/gallery/media-file-preview.component.test.tsx` (preview → original → note)
+- `libs/admin/media/feature/src/pages/library/media-library-page.component.test.tsx` (includes drop upload)
+- `libs/admin/media/feature/src/hooks/library/use-media-toasts.unit.test.ts`
+- `libs/admin/media/feature/src/components/picker/media-picker-drawer.component.test.tsx` (ticks, already added, folder + search, upload → ticked)
 - `libs/admin/products/data-access/src/products.api.integration.test.ts` (product editor paging and upload)
-- E2E (run only on request): `apps/admin-react-e2e/src/media.spec.ts`
+- E2E (run only on request): `apps/admin-react-e2e/src/media.spec.ts`; product photos through the picker in `apps/admin-react-e2e/src/products.spec.ts`
 
 Focused run: `npx nx run-many -t test -p admin-media-model admin-media-data-access admin-media-ui admin-media-feature`.

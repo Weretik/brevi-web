@@ -21,6 +21,8 @@ interface Props {
   readOnly: boolean;
   saving: boolean;
   saveDisabled?: boolean;
+  /** Text of the main button; «Зберегти» by default. */
+  submitLabel?: string;
   children: ReactNode;
   onClose: () => void;
   onEdit: () => void;
@@ -36,6 +38,7 @@ export function ReferenceEditorDrawer({
   readOnly,
   saving,
   saveDisabled = false,
+  submitLabel = 'Зберегти',
   children,
   onClose,
   onEdit,
@@ -115,7 +118,7 @@ export function ReferenceEditorDrawer({
               disabled={saving || saveDisabled}
             >
               {saving && <CircularProgress color="inherit" size={18} sx={{ mr: 1 }} />}
-              Зберегти
+              {submitLabel}
             </Button>
           )}
         </Stack>

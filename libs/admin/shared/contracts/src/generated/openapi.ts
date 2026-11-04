@@ -2724,9 +2724,12 @@ export interface components {
       /** @description Null for the library root. */
       folderId?: number | null;
       publicUrl: string;
+      /** @description WebP preview, longest side 480 px. Null for small or unreadable photos and for old photos until the nightly sync makes it; show publicUrl then. */
+      thumbnailUrl?: string | null;
       contentType: string;
       /** Format: int64 */
       sizeInBytes: number;
+      /** @description Pixels after the EXIF turn; null when the photo could not be read or is not processed yet. */
       width?: number | null;
       height?: number | null;
       /** Format: date-time */

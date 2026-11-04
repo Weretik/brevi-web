@@ -16,7 +16,7 @@ import { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { LegacySewingNormLockNotice } from './legacy-sewing-norm-lock-notice';
-import { ProductPhotoUpload } from './product-photo-upload';
+import { ProductPhotoPicker } from './product-photo-picker';
 import { useProductLookups } from '../../hooks/product-editor/use-product-lookups';
 
 import type { ProductDraft } from '@admin/products/model';
@@ -199,7 +199,13 @@ export function ProductEditor({
               setDraft={setDraft}
               errors={errors}
               lookups={lookups}
-              renderUpload={(onReady) => <ProductPhotoUpload onReady={onReady} />}
+              renderPicker={(alreadyAddedIds, onPick) => (
+                <ProductPhotoPicker
+                  alreadyAddedIds={alreadyAddedIds}
+                  knownIds={lookups.media.map((media) => media.id)}
+                  onPick={onPick}
+                />
+              )}
             />
           </ProductFormSection>
           <ProductFormSection

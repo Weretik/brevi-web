@@ -11,6 +11,8 @@ export interface MediaFile {
   /** Null when the photo is not in any folder. */
   folderId: number | null;
   publicUrl: string;
+  /** WebP preview (480 px); null for small photos and until the nightly sync makes it. */
+  thumbnailUrl: string | null;
   contentType: string;
   sizeInBytes: number;
   width: number | null;
