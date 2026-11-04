@@ -1,4 +1,5 @@
 import { useGetQuoteStaffQuery } from '@admin/quotes/data-access';
+import { quoteEditorPath } from '@admin/quotes/model';
 import { QuotesTable } from '@admin/quotes/ui';
 import { ReferencePageHeader, ReferenceSearchBar } from '@admin/references/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
@@ -25,13 +26,18 @@ export default function QuotesPage({ actor }: { actor: QuoteActor }) {
           actor.canSeeAll ? 'Комерційні пропозиції всіх менеджерів' : 'Ваші комерційні пропозиції'
         }
         actions={
-          <Button
-            variant="contained"
-            startIcon={<AddOutlinedIcon />}
-            onClick={() => navigate('/crm/quotes/new')}
-          >
-            Нове КП
-          </Button>
+          <>
+            <Button onClick={() => navigate('/crm/quote-introductions/new')}>
+              КП для знайомства
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<AddOutlinedIcon />}
+              onClick={() => navigate('/crm/quotes/new')}
+            >
+              Нове КП
+            </Button>
+          </>
         }
       />
       <ReferenceSearchBar
@@ -79,7 +85,7 @@ export default function QuotesPage({ actor }: { actor: QuoteActor }) {
         searching={list.narrowed}
         paginationModel={list.pagination}
         onPaginationModelChange={list.setPagination}
-        onOpen={(id) => navigate(`/crm/quotes/${id}`)}
+        onOpen={(row) => navigate(quoteEditorPath(row.kind, row.id))}
       />
     </Box>
   );

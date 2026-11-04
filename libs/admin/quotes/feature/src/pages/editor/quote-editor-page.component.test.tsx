@@ -25,6 +25,7 @@ const quote: Quote = {
   updatedAt: '2026-11-04T10:00:00Z',
   lastSentAt: null,
   version: 3,
+  introduction: null,
   items: [
     {
       id: 10,
@@ -88,6 +89,7 @@ const sendDraft = {
   gmailConfigured: true,
   fileName: 'КП 1-11-2026.pdf',
   letters: [{ name: 'Стандартний лист', subject: 'КП № 1-11-2026', body: 'Добрий день' }],
+  to: null,
 };
 vi.mock('@admin/clients/data-access', () => ({
   useListCustomersQuery: () => ({ data: undefined }),

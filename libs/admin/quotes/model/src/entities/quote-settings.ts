@@ -29,7 +29,7 @@ export interface QuoteAdvantage {
   text: string | null;
 }
 
-/** «КП для знайомства — рекламний каталог» texts (the catalog itself comes in a later stage). */
+/** «КП для знайомства — рекламний каталог» texts and the main model codes of the season pages. */
 export interface QuoteIntroductionTexts {
   logoText: string | null;
   summerTitle: string | null;
@@ -43,6 +43,10 @@ export interface QuoteIntroductionTexts {
   productButtonText: string | null;
   nextStepText: string | null;
   accentColor: string | null;
+  /** Main summer model; null means MOD-166 «Імпульс». */
+  summerMainCode: string | null;
+  /** Main winter model; null means MOD-169 «Прайм». */
+  winterMainCode: string | null;
   advantages: QuoteAdvantage[];
 }
 

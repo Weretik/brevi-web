@@ -41,6 +41,8 @@ const settings: QuoteSettings = {
     productButtonText: null,
     nextStepText: null,
     accentColor: '#E8780F',
+    summerMainCode: '',
+    winterMainCode: '',
     advantages: Array.from({ length: 5 }, (_, index) => ({
       title: `Перевага ${index}`,
       text: null,

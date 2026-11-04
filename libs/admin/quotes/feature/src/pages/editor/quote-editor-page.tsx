@@ -4,7 +4,7 @@ import { QuoteHeaderCard, QuoteItemCard, QuoteNotesCard } from '@admin/quotes/ui
 import { ReferencePageHeader } from '@admin/references/ui';
 import { Alert, Box, Button, CircularProgress, Paper, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 
 import { QuoteEditorActions } from './quote-editor-actions';
 import { QuoteEditorFooter } from './quote-editor-footer';
@@ -64,6 +64,9 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
         {editor.loadError}
       </Alert>
     );
+
+  if (quote?.kind === 'Introduction')
+    return <Navigate to={`/crm/quote-introductions/${quote.id}`} replace />;
 
   const fabricItem =
     panel?.kind === 'fabric' ? draft.items.find((item) => item.key === panel.itemKey) : undefined;

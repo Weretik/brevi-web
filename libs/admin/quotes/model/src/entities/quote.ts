@@ -1,3 +1,5 @@
+import type { QuoteIntroduction } from './quote-introduction';
+
 export type QuoteKind = 'Request' | 'Introduction';
 export type QuoteStatus = 'Draft' | 'Sent';
 export type QuoteItemKind = 'Sewing' | 'Ppe' | 'OneOffPpe';
@@ -67,11 +69,14 @@ export interface Quote {
   readonly lastSentAt: string | null;
   readonly version: number;
   readonly items: readonly QuoteItem[];
+  /** Only a «КП для знайомства» has it; its items go page by page, 4 per page. */
+  readonly introduction: QuoteIntroduction | null;
 }
 
 export interface QuoteSummary {
   readonly id: number;
   readonly number: string;
+  readonly kind: QuoteKind;
   readonly status: QuoteStatus;
   readonly internalName: string;
   readonly companyName: string | null;

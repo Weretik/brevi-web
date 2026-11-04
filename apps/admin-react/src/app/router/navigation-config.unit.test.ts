@@ -4,7 +4,7 @@ import { adminRouteDefinitions } from './admin-route-definitions';
 import { createNavigation } from './navigation-config';
 
 describe('legacy Admin navigation', () => {
-  it('links «КП» and «Налаштування КП» and keeps the later КП pages without a link', () => {
+  it('links «КП», «КП для знайомства» and «Налаштування КП»; later КП pages have no link', () => {
     const paths = new Set(adminRouteDefinitions.map((route) => route.path));
     const manager = createNavigation(paths, ['Admin']).find(
       (group) => group.id === 'service-manager',
@@ -12,7 +12,10 @@ describe('legacy Admin navigation', () => {
     expect(manager?.items.find((item) => item.id === 'quotes')?.to).toBe('/crm/quotes');
     expect(paths.has('/crm/quotes/new')).toBe(true);
     expect(paths.has('/crm/quotes/:quoteId')).toBe(true);
-    expect(manager?.items.find((item) => item.id === 'quote-introductions')?.to).toBeUndefined();
+    expect(manager?.items.find((item) => item.id === 'quote-introductions')?.to).toBe(
+      '/crm/quote-introductions/new',
+    );
+    expect(paths.has('/crm/quote-introductions/:quoteId')).toBe(true);
     expect(manager?.items.find((item) => item.id === 'quote-settings')?.to).toBe(
       '/crm/quote-settings',
     );

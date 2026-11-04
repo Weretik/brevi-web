@@ -72,6 +72,8 @@ export function quoteSettingsErrors(draft: QuoteSettingsDraft): QuoteSettingsErr
   check('introduction.accentColor', introduction.accentColor, (text) =>
     text && !colorPattern.test(text) ? 'Колір у форматі #RRGGBB.' : null,
   );
+  check('introduction.summerMainCode', introduction.summerMainCode, optional(100));
+  check('introduction.winterMainCode', introduction.winterMainCode, optional(100));
   if (introduction.advantages.length !== quoteAdvantageCount)
     errors['introduction.advantages'] = `Потрібно ${quoteAdvantageCount} переваг.`;
   introduction.advantages.forEach((advantage, index) => {

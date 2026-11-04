@@ -86,6 +86,13 @@ const requiredOperations = {
     'sendCrmQuote',
     'connectCrmMailbox',
     'disconnectCrmMailbox',
+    'createCrmQuoteIntroduction',
+    'saveCrmQuoteIntroduction',
+    'getCrmQuoteIntroductionSetup',
+    'getCrmQuoteCatalogProducts',
+    'getCrmQuoteIntroTemplates',
+    'createCrmQuoteIntroTemplate',
+    'deleteCrmQuoteIntroTemplate',
   ],
 };
 

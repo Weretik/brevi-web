@@ -13,6 +13,7 @@ const mapDraft = (value: Schemas['CrmQuoteSendDraft']): QuoteSendDraft => ({
   gmailConfigured: value.gmailConfigured,
   fileName: value.fileName,
   letters: value.letters,
+  to: value.to ?? null,
 });
 
 const settingsTag = [{ type: 'QuoteSettings' as const, id: 'SINGLE' }];

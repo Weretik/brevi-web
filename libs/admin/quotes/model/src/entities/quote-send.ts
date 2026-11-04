@@ -14,6 +14,8 @@ export interface QuoteSendDraft {
   readonly gmailConfigured: boolean;
   readonly fileName: string;
   readonly letters: readonly QuoteLetter[];
+  /** The recipient saved in an introduction; null for a КП «під запит». */
+  readonly to: string | null;
 }
 
 /** The letter the manager edits before sending. */

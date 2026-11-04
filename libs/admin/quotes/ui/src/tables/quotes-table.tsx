@@ -12,7 +12,7 @@ interface Props {
   searching: boolean;
   paginationModel: GridPaginationModel;
   onPaginationModelChange: (model: GridPaginationModel) => void;
-  onOpen: (id: number) => void;
+  onOpen: (row: QuoteSummary) => void;
 }
 
 const dateFormat = new Intl.DateTimeFormat('uk-UA', { dateStyle: 'short', timeStyle: 'short' });
@@ -20,6 +20,12 @@ const dateFormat = new Intl.DateTimeFormat('uk-UA', { dateStyle: 'short', timeSt
 const columns: GridColDef<QuoteSummary>[] = [
   { field: 'number', headerName: 'Номер', width: 120, cellClassName: 'quote-mono' },
   { field: 'internalName', headerName: 'Клієнт / запит', flex: 1.4, minWidth: 200 },
+  {
+    field: 'kind',
+    headerName: 'Вид',
+    width: 130,
+    valueGetter: (_value, row) => (row.kind === 'Introduction' ? 'Для знайомства' : 'Під запит'),
+  },
   {
     field: 'companyName',
     headerName: 'Підприємство',
@@ -78,7 +84,7 @@ export function QuotesTable({
           pageSizeOptions={[25, 50, 100]}
           paginationModel={paginationModel}
           onPaginationModelChange={onPaginationModelChange}
-          onRowClick={({ row }) => onOpen(row.id)}
+          onRowClick={({ row }) => onOpen(row)}
           localeText={{
             noRowsLabel: searching ? 'Нічого не знайдено' : 'Ще немає жодної КП',
             paginationRowsPerPage: 'Рядків на сторінці',

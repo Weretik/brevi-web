@@ -72,12 +72,20 @@ export const mapQuote = (value: Schemas['CrmQuote']): Quote => ({
   lastSentAt: value.lastSentAt ?? null,
   version: value.version,
   items: value.items.map(item),
+  introduction: value.introduction
+    ? {
+        layout: value.introduction.layout,
+        recipientEmail: value.introduction.recipientEmail ?? null,
+        letterName: value.introduction.letterName ?? null,
+      }
+    : null,
 });
 
 export const mapQuotePage = (value: Schemas['CrmQuotePage']): QuotePage => ({
   items: value.items.map((row) => ({
     id: row.id,
     number: row.number,
+    kind: row.kind,
     status: row.status,
     internalName: row.internalName,
     companyName: row.companyName ?? null,
@@ -102,7 +110,9 @@ const tierPrices = (
       }
     : null;
 
-const product = (value: Schemas['CrmQuoteCatalogProduct']): QuoteCatalogProduct => ({
+export const mapQuoteCatalogProduct = (
+  value: Schemas['CrmQuoteCatalogProduct'],
+): QuoteCatalogProduct => ({
   productId: value.productId,
   kind: value.kind,
   code: value.code ?? null,
@@ -123,7 +133,7 @@ const product = (value: Schemas['CrmQuoteCatalogProduct']): QuoteCatalogProduct 
 });
 
 export const mapQuoteCatalogPage = (value: Schemas['CrmQuoteCatalogPage']): QuoteCatalogPage => ({
-  items: value.items.map(product),
+  items: value.items.map(mapQuoteCatalogProduct),
   page: value.page,
   pageSize: value.pageSize,
   total: value.total,

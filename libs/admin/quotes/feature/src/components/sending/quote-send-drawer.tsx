@@ -1,4 +1,4 @@
-import { quoteLetterBodyMax, quoteSubjectMax } from '@admin/quotes/model';
+import { quoteEditorPath, quoteLetterBodyMax, quoteSubjectMax } from '@admin/quotes/model';
 import { ReferenceEditorDrawer } from '@admin/references/ui';
 import AttachFileOutlinedIcon from '@mui/icons-material/AttachFileOutlined';
 import {
@@ -30,7 +30,7 @@ interface Props {
  */
 export function QuoteSendDrawer({ quote, actor, onClose, onSent }: Props) {
   const send = useQuoteSend(quote, onSent);
-  const mailbox = useMailboxConnect(`/crm/quotes/${quote.id}`);
+  const mailbox = useMailboxConnect(quoteEditorPath(quote.kind, quote.id));
   const { draft, form, errors } = send;
   const ready = Boolean(draft?.gmailConfigured && draft.fromEmail);
 

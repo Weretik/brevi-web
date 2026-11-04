@@ -11,6 +11,7 @@ const page: QuotePage = {
     {
       id: 4,
       number: '1-11-2026',
+      kind: 'Introduction',
       status: 'Draft',
       internalName: 'Агро база',
       companyName: 'ТОВ Агро',
@@ -53,6 +54,7 @@ describe('КП list', () => {
     expect(screen.queryByLabelText('Відповідальний')).not.toBeInTheDocument();
     expect(staffQuery).toHaveBeenCalledWith(undefined, { skip: true });
     expect(screen.getByText('1-11-2026')).toBeInTheDocument();
+    expect(screen.getByText('Для знайомства')).toBeInTheDocument();
   });
 
   it('gives Director and Admin the responsible filter', () => {
