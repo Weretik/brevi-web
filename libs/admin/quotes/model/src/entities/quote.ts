@@ -133,7 +133,8 @@ export type QuoteEventKind =
   | 'ResponsibleChanged'
   | 'Archived'
   | 'Restored'
-  | 'Copied';
+  | 'Copied'
+  | 'Imported';
 
 /** A line of «Історія змін». */
 export interface QuoteEvent {
