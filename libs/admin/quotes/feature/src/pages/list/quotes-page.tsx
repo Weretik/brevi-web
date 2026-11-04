@@ -4,7 +4,17 @@ import { QuotesTable } from '@admin/quotes/ui';
 import { ReferencePageHeader, ReferenceSearchBar } from '@admin/references/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
-import { Alert, Box, Button, ListItemText, Menu, MenuItem, TextField } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Button,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Tab,
+  Tabs,
+  TextField,
+} from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -73,6 +83,15 @@ export default function QuotesPage({ actor }: { actor: QuoteActor }) {
           </>
         }
       />
+      <Tabs
+        value={list.archived ? 'archive' : 'work'}
+        onChange={(_event, value: string) => list.setArchived(value === 'archive')}
+        aria-label="КП в роботі або в архіві"
+        sx={{ mb: 1.5 }}
+      >
+        <Tab value="work" label="В роботі" />
+        <Tab value="archive" label="Архів" />
+      </Tabs>
       <ReferenceSearchBar
         placeholder="Знайти КП за номером, клієнтом або підприємством…"
         label="Пошук КП"
@@ -116,6 +135,7 @@ export default function QuotesPage({ actor }: { actor: QuoteActor }) {
         rowCount={total}
         loading={list.loading}
         searching={list.narrowed}
+        archive={list.archived}
         paginationModel={list.pagination}
         onPaginationModelChange={list.setPagination}
         onOpen={(row) => navigate(quoteEditorPath(row.kind, row.id))}

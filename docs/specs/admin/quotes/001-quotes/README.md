@@ -35,7 +35,7 @@ Libraries `libs/admin/quotes/{data-access,model,ui,feature}` generated with `nx 
 
 ## Stages
 
-Same numbering as the backend: 1 list + editor (done); 2 settings + PDF (done); 3 Gmail sending from each manager's own Gmail (done); 4 КП для знайомства (4 steps: layout, recipient, letter variant, catalogue pages, «Зберегти як готовий шаблон», «Готові шаблони») (done); 5a «Виріб з нуля» (done); 5b «Змінити склад» of a Catalog model (done); later history, archive; 6 import of old КП from the calculator, if it proves easy.
+Same numbering as the backend: 1 list + editor (done); 2 settings + PDF (done); 3 Gmail sending from each manager's own Gmail (done); 4 КП для знайомства (4 steps: layout, recipient, letter variant, catalogue pages, «Зберегти як готовий шаблон», «Готові шаблони») (done); 5a «Виріб з нуля» (done); 5b «Змінити склад» of a Catalog model (done); 5c history, archive, copy (done); 6 import of old КП from the calculator, if it proves easy.
 
 ## Stage 2 screens
 
@@ -68,6 +68,12 @@ Same numbering as the backend: 1 list + editor (done); 2 settings + PDF (done); 
 - A sewing model card gets «Змінити склад» next to «Додати тканину». It loads the model's Catalog composition and opens the panel titled «Змінити склад моделі»: the fabrics of the variants already in the КП with their metres, «Додаткові тканини» and «Послуги» of the model (quantity and remove only), «Фурнітура» and «Операції» with search to add more, and «Розрахунок».
 - «Зберегти склад» replaces the model in the КП with its changed composition: the card shows «Склад», the fabrics with read-only prices and «Змінити склад і тканини»; code, site link and season stay, the subtitle reads «змінений склад моделі».
 
+## Stage 5c screens
+
+- Backend rules R-22–R-24. The list gets tabs «В роботі» and «Архів» (`archived=true`).
+- The header of a saved КП gets «Ще» (both editors): «Історія змін» (side panel, newest first: what, details, who and when), «Копіювати» («Нове КП з тими ж товарами та цінами»; opens the copy with «Створено КП N — копію КП M»), «В архів» / «Повернути з архіву». Copy and archive are disabled with unsaved changes («Спочатку збережіть зміни»).
+- An archived КП shows a warning «КП в архіві з <дата> (<хто>)» with «Повернути з архіву»; «Зберегти зміни», «Надіслати КП», «Перерахувати» and «Передати розрахунок» are off.
+
 ## Tests
 
-Stage 1: list (search, own-only for a Manager), editor (add model and fabrics, hide a price, manual PPE price needs a reason, one-off PPE validation, 409 reload), picker disabled reason. Stage 2: «Сформувати КП» saves first and does not download after a failed save; settings save, field rules and 409. Stage 3: «Надіслати КП» saves first, sends and marks the КП sent; a Gmail refusal stays in the panel; no recipient blocks sending; no Gmail offers to connect it; «Підключити Gmail» opens Google and is disabled with unsaved changes; recipient and subject rules. Stage 5a: the panel prices the composition and adds the item; «Нове КП» offers «КП з нуля»; the products block opens the panel. Stage 5b: «Змінити склад» starts from the Catalog composition, a removed service leaves the price request, and the saved item keeps the model. Focused run: `npx nx test admin-quotes-feature`.
+Stage 1: list (search, own-only for a Manager), editor (add model and fabrics, hide a price, manual PPE price needs a reason, one-off PPE validation, 409 reload), picker disabled reason. Stage 2: «Сформувати КП» saves first and does not download after a failed save; settings save, field rules and 409. Stage 3: «Надіслати КП» saves first, sends and marks the КП sent; a Gmail refusal stays in the panel; no recipient blocks sending; no Gmail offers to connect it; «Підключити Gmail» opens Google and is disabled with unsaved changes; recipient and subject rules. Stage 5a: the panel prices the composition and adds the item; «Нове КП» offers «КП з нуля»; the products block opens the panel. Stage 5b: «Змінити склад» starts from the Catalog composition, a removed service leaves the price request, and the saved item keeps the model. Stage 5c: «Історія змін» panel, archive locks saving and restore unlocks it, copy opens the new КП with a notice, «Архів» tab. Focused run: `npx nx test admin-quotes-feature`.

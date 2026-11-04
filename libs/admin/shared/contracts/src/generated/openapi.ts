@@ -1715,6 +1715,82 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/crm/quotes/{id}/history': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['QuoteId'];
+      };
+      cookie?: never;
+    };
+    /** @description «Історія змін»: who created, saved, sent, repriced, passed, archived, restored or copied the КП; newest first, at most 500 lines. */
+    get: operations['getCrmQuoteHistory'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quotes/{id}/archive': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['QuoteId'];
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description «В архів»: the КП of any status leaves the working list. Save, send, reprice and passing it to another manager return 409 until it is restored; it can still be opened, printed, copied and deleted (a draft). */
+    post: operations['archiveCrmQuote'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quotes/{id}/restore': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['QuoteId'];
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description «Повернути з архіву»; the version grows. */
+    post: operations['restoreCrmQuote'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quotes/{id}/copy': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['QuoteId'];
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description «Копіювати»: a new draft with the next number, the same header, introduction and items with their saved prices. The actor becomes its author and responsible. An archived КП can be copied. */
+    post: operations['copyCrmQuote'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/crm/mailboxes/{userId}/connect': {
     parameters: {
       query?: never;
@@ -4248,6 +4324,8 @@ export interface components {
       updatedAt: string;
       /** Format: date-time */
       lastSentAt?: string | null;
+      /** Format: date-time */
+      archivedAt?: string | null;
     };
     CrmQuotePage: {
       items: components['schemas']['CrmQuoteSummary'][];
@@ -4421,6 +4499,12 @@ export interface components {
        * @description Last time Gmail accepted the КП.
        */
       lastSentAt?: string | null;
+      /**
+       * Format: date-time
+       * @description Set while the КП is in «Архів».
+       */
+      archivedAt?: string | null;
+      archivedByName?: string | null;
       version: number;
       items: components['schemas']['CrmQuoteItem'][];
       /** @description Only a «КП для знайомства» has it; its items go page by page, 4 per page. */
@@ -4479,6 +4563,28 @@ export interface components {
       subject: string;
       /** @description Plain text. */
       body: string;
+    };
+    CrmQuoteEvent: {
+      /** Format: int64 */
+      id: number;
+      /** @enum {string} */
+      kind:
+        | 'Created'
+        | 'Saved'
+        | 'Sent'
+        | 'Repriced'
+        | 'ResponsibleChanged'
+        | 'Archived'
+        | 'Restored'
+        | 'Copied';
+      /** Format: date-time */
+      at: string;
+      actor: components['schemas']['CrmQuotePerson'];
+      /** @description For example the recipients of a letter, the old and new responsible, or the source КП number. */
+      details?: string | null;
+    };
+    CrmQuoteVersionRequest: {
+      version: number;
     };
     CrmQuoteCompany: {
       name: string;
@@ -10269,6 +10375,8 @@ export interface operations {
         responsibleUserId?: number;
         page?: number;
         pageSize?: number;
+        /** @description True lists only «Архів», false (default) only КП in work. */
+        archived?: boolean;
       };
       header?: never;
       path?: never;
@@ -10716,6 +10824,190 @@ export interface operations {
         content?: never;
       };
       409: components['responses']['Conflict'];
+    };
+  };
+  getCrmQuoteHistory: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['QuoteId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description History lines. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmQuoteEvent'][];
+        };
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role and a numeric actor claim required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found or not the actor's КП. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  archiveCrmQuote: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['QuoteId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmQuoteVersionRequest'];
+      };
+    };
+    responses: {
+      /** @description Archived; the version grows. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmQuote'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role and a numeric actor claim required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['Conflict'];
+    };
+  };
+  restoreCrmQuote: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['QuoteId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmQuoteVersionRequest'];
+      };
+    };
+    responses: {
+      /** @description Back in work. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmQuote'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role and a numeric actor claim required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['Conflict'];
+    };
+  };
+  copyCrmQuote: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['QuoteId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The new КП. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmQuote'];
+        };
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role and a numeric actor claim required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
     };
   };
   connectCrmMailbox: {

@@ -95,6 +95,10 @@ const requiredOperations = {
     'getCrmQuoteIntroTemplates',
     'createCrmQuoteIntroTemplate',
     'deleteCrmQuoteIntroTemplate',
+    'getCrmQuoteHistory',
+    'archiveCrmQuote',
+    'restoreCrmQuote',
+    'copyCrmQuote',
   ],
 };
 

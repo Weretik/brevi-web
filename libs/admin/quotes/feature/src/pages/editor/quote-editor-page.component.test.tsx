@@ -24,6 +24,8 @@ const quote: Quote = {
   createdAt: '2026-11-04T10:00:00Z',
   updatedAt: '2026-11-04T10:00:00Z',
   lastSentAt: null,
+  archivedAt: null,
+  archivedByName: null,
   version: 3,
   introduction: null,
   items: [
@@ -66,6 +68,8 @@ const api = vi.hoisted(() => ({
   download: vi.fn(),
   send: vi.fn(),
   connect: vi.fn(),
+  archive: vi.fn(),
+  copy: vi.fn(),
   draft: { current: null as unknown },
   mutation: (fn: (arg: unknown) => unknown) => () => [
     (arg: unknown) => ({ unwrap: () => fn(arg) }),
@@ -84,6 +88,28 @@ vi.mock('@admin/quotes/data-access', () => ({
   useConnectMailboxMutation: api.mutation(api.connect),
   useDisconnectMailboxMutation: api.mutation(vi.fn()),
   useCalculateQuoteCustomSewingMutation: api.mutation(vi.fn()),
+  useSetQuoteArchivedMutation: api.mutation(api.archive),
+  useCopyQuoteMutation: api.mutation(api.copy),
+  useGetQuoteHistoryQuery: () => ({
+    data: [
+      {
+        id: 2,
+        kind: 'ResponsibleChanged',
+        at: '2026-11-04T12:00:00Z',
+        actor: { userId: 1, name: 'Директор' },
+        details: 'Петро → Олена',
+      },
+      {
+        id: 1,
+        kind: 'Created',
+        at: '2026-11-04T10:00:00Z',
+        actor: { userId: 2, name: 'Олена' },
+        details: null,
+      },
+    ],
+    isLoading: false,
+    isError: false,
+  }),
 }));
 
 const sendDraft = {
@@ -127,11 +153,60 @@ beforeEach(() => {
   api.download.mockReset();
   api.send.mockReset();
   api.connect.mockReset();
+  api.archive.mockReset();
+  api.copy.mockReset();
   api.draft.current = sendDraft;
 });
 afterEach(cleanup);
 
 describe('КП editor', () => {
+  it('shows «Історія змін» in the side panel', async () => {
+    renderEditor();
+    fireEvent.click(await screen.findByRole('button', { name: 'Ще' }));
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Історія змін' }));
+    const panel = await screen.findByRole('dialog', { name: 'Історія змін' });
+    expect(panel).toHaveTextContent('Передано іншому менеджеру');
+    expect(panel).toHaveTextContent('Петро → Олена');
+    expect(panel).toHaveTextContent('Створено');
+  });
+
+  it('moves the КП to the archive and locks saving until it is restored', async () => {
+    api.archive.mockImplementation(({ archived }: { archived: boolean }) =>
+      Promise.resolve({
+        ...quote,
+        version: archived ? 4 : 5,
+        archivedAt: archived ? '2026-11-04T12:00:00Z' : null,
+        archivedByName: archived ? 'Олена' : null,
+      }),
+    );
+    renderEditor();
+    fireEvent.click(await screen.findByRole('button', { name: 'Ще' }));
+    fireEvent.click(screen.getByRole('menuitem', { name: /В архів/ }));
+
+    expect(await screen.findByText(/КП в архіві з/)).toBeVisible();
+    expect(api.archive).toHaveBeenCalledWith({ id: 4, version: 3, archived: true });
+    expect(screen.getByRole('button', { name: 'Зберегти зміни' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Надіслати КП' })).toBeDisabled();
+    expect(
+      screen.queryByRole('button', { name: 'Перерахувати за актуальними цінами' }),
+    ).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Повернути з архіву' }));
+    await waitFor(() => expect(screen.queryByText(/КП в архіві з/)).not.toBeInTheDocument());
+    expect(api.archive).toHaveBeenLastCalledWith({ id: 4, version: 4, archived: false });
+    expect(screen.getByRole('button', { name: 'Зберегти зміни' })).toBeEnabled();
+  });
+
+  it('copies the КП and opens the copy', async () => {
+    api.copy.mockResolvedValue({ ...quote, id: 9, number: '2-11-2026' });
+    renderEditor();
+    fireEvent.click(await screen.findByRole('button', { name: 'Ще' }));
+    fireEvent.click(screen.getByRole('menuitem', { name: /Копіювати/ }));
+
+    expect(await screen.findByText('Створено КП 2-11-2026 — копію КП 1-11-2026.')).toBeVisible();
+    expect(api.copy).toHaveBeenCalledWith(4);
+  });
+
   it('adds more products from the products block, not the page header', async () => {
     renderEditor();
     expect(await screen.findByText('КП 1-11-2026')).toBeVisible();

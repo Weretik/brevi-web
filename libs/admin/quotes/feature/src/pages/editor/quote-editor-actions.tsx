@@ -6,6 +6,8 @@ import { Button, Tooltip } from '@mui/material';
 interface Props {
   saved: boolean;
   dirty: boolean;
+  /** An archived КП is read-only: no assigning or repricing. */
+  archived: boolean;
   canAssign: boolean;
   canDelete: boolean;
   onAssign: () => void;
@@ -17,6 +19,7 @@ interface Props {
 export function QuoteEditorActions({
   saved,
   dirty,
+  archived,
   canAssign,
   canDelete,
   onAssign,
@@ -36,7 +39,7 @@ export function QuoteEditorActions({
           Видалити
         </Button>
       )}
-      {canAssign && saved && (
+      {canAssign && saved && !archived && (
         <Button
           variant="outlined"
           startIcon={<ForwardToInboxOutlinedIcon />}
@@ -46,18 +49,20 @@ export function QuoteEditorActions({
           Передати розрахунок
         </Button>
       )}
-      <Tooltip title={needsSave ? 'Спочатку збережіть КП.' : ''}>
-        <span>
-          <Button
-            variant="outlined"
-            startIcon={<AutorenewOutlinedIcon />}
-            onClick={onReprice}
-            disabled={needsSave}
-          >
-            Перерахувати за актуальними цінами
-          </Button>
-        </span>
-      </Tooltip>
+      {!archived && (
+        <Tooltip title={needsSave ? 'Спочатку збережіть КП.' : ''}>
+          <span>
+            <Button
+              variant="outlined"
+              startIcon={<AutorenewOutlinedIcon />}
+              onClick={onReprice}
+              disabled={needsSave}
+            >
+              Перерахувати за актуальними цінами
+            </Button>
+          </span>
+        </Tooltip>
+      )}
     </>
   );
 }

@@ -1,4 +1,5 @@
 export type * from './entities/quote';
+export { quoteEventLabels } from './models/quote-history';
 export type * from './entities/quote-catalog';
 export type * from './models/quote-draft';
 export {
