@@ -1461,7 +1461,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** @description CanManageProducts. «Оновити зараз» for a connected website, Google Sheets or dealer cabinet source (av-center, 3c-market, perchatka-centr, insight, trele): reads the supplier's pages, the six 3C lists or the cabinet pages now and returns every product of the supplier with old and new prices. A page without a price or a failed page is a row problem; a 3C list that does not load, or a cabinet login that is missing or refused, fails the request with 400 and changes nothing. The cabinet changes only the dealer price. dryRun=false reads again and saves changed prices as new approved offer versions. File and not yet connected sources answer 400. */
+    /** @description CanManageProducts. «Оновити зараз» for a connected website, Google Sheets or dealer cabinet source (av-center, 3c-market, perchatka-centr, trele): reads the supplier's pages, the six 3C lists or the cabinet pages now and returns every product of the supplier with old and new prices. A page without a price or a failed page is a row problem; a 3C list that does not load, or a cabinet login that is missing or refused, fails the request with 400 and changes nothing. The cabinet changes only the dealer price. dryRun=false reads again and saves changed prices as new approved offer versions. File and not yet connected sources answer 400. */
     post: operations['refreshPpeSupplierPrices'];
     delete?: never;
     options?: never;
@@ -3997,7 +3997,7 @@ export interface components {
       fileKind: 'None' | 'InsightYml' | 'CemtoPdf';
       /** Format: int32 */
       fileCount: number;
-      /** @description The scheduled update works and «Оновити зараз» is offered (website and Google Sheets sources from stage 2, Insight and Трєле cabinets from stage 3). */
+      /** @description The scheduled update works and «Оновити зараз» is offered (website and Google Sheets sources from stage 2, the Трєле cabinet from stage 3; Insight is file-only). */
       automaticUpdateConnected: boolean;
       /** Format: date-time */
       settingsUpdatedAt: string | null;
