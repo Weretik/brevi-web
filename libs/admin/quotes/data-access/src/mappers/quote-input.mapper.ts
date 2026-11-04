@@ -1,4 +1,4 @@
-import { isSewingKind, parseQuotePrice, quoteTiers } from '@admin/quotes/model';
+import { isFixedPriceKind, parseQuotePrice, quoteTiers } from '@admin/quotes/model';
 
 import type { QuoteDraft, QuoteOptionDraft, QuotePriceDraft } from '@admin/quotes/model';
 import type { components } from '@admin/shared/contracts';
@@ -49,7 +49,7 @@ export function toSaveQuoteInput(draft: QuoteDraft): Schemas['CrmSaveQuoteInput'
       description: text(item.description),
       photoUrl: item.photoUrl,
       supplierUrl: text(item.supplierUrl),
-      options: item.options.map((option) => optionInput(option, isSewingKind(item.kind))),
+      options: item.options.map((option) => optionInput(option, isFixedPriceKind(item.kind))),
       lines:
         item.kind === 'CustomSewing'
           ? item.lines.map((line) => ({

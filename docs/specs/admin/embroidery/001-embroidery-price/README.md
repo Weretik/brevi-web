@@ -23,6 +23,11 @@ It replaces the «Ціна вишивки» page of the old calculator.brevi.com
 - Tab «Збережені» (`?tab=saved`, everyone who calculates): search by name, client or number, 25 per page, newest first; a row shows number, name and client, what is embroidered, the three unit prices, when and by whom; «Орієнтовна» marks prices that missed a rate.
 - A row opens a read-only side panel: the saved prices (copy works), the form, and for Director and Admin the cost breakdown and «Ставки на момент збереження». «Повторити розрахунок» loads the form into «Розрахунок», where it is priced with today's rates; a hoop or cost removed since then falls back to the default. Director and Admin can delete after a confirmation.
 
+## «Додати в КП» (stage 2)
+
+- In the saved side panel «Додати в КП» opens a second panel: the price for the client (Опт / Стандарт / Терміново with the saved unit price, «Стандарт» by default) and the КП «Під запит» in work (search by number or client; a Manager sees only own ones). «Додати» appends one row; a snackbar offers «Відкрити КП».
+- In the КП editor the row is «Вишивка» with its number, the level as the row title and the price in all three columns (owner's choice of 2026-11-04); the price cannot be typed, the description and «показати» ticks can.
+
 ## «Налаштування»
 
 - «Ставки»: the stitch rate is read-only here and links to «Параметри ціноутворення»; threads, hooping, program hour and tax are edited.
@@ -33,7 +38,7 @@ It replaces the «Ціна вишивки» page of the old calculator.brevi.com
 
 ## API contract
 
-Snapshot: BreviERP `docs/sdd/contracts/openapi.yaml` at commit `0fcaf1e06f9f06279805d4c4c801f7091f7a51c1` (`docs/contracts/openapi/SOURCE.json`), slice `crm/embroidery.openapi.yaml`.
+Snapshot: BreviERP `docs/sdd/contracts/openapi.yaml` at commit `a9c88f4ad7d1593c279a1b60729613d1fea6b061` (`docs/contracts/openapi/SOURCE.json`), slice `crm/embroidery.openapi.yaml`.
 
 | operationId                      | Method and path                                | Client use                                                                                              |
 | -------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
@@ -44,6 +49,7 @@ Snapshot: BreviERP `docs/sdd/contracts/openapi.yaml` at commit `0fcaf1e06f9f0627
 | `getCrmEmbroideryCalculations`   | GET `/api/crm/embroidery/calculations`         | «Збережені» page with `search`; tag `EmbroideryCalculations` LIST                                       |
 | `getCrmEmbroideryCalculation`    | GET `/api/crm/embroidery/calculations/{id}`    | side panel; `rates` and `result.cost` null for a Manager                                                |
 | `saveCrmEmbroideryCalculation`   | POST `/api/crm/embroidery/calculations`        | name, client, the priced request; invalidates LIST                                                      |
+| `addCrmQuoteEmbroidery`          | POST `/api/crm/quotes/{id}/embroidery`         | «Додати в КП»: calculation id and level; invalidates the КП, its history and the list                   |
 | `deleteCrmEmbroideryCalculation` | DELETE `/api/crm/embroidery/calculations/{id}` | Admin only, after confirmation                                                                          |
 
 Responses pass a shape check in `data-access/src/validators` before mapping. A 400 shows the server's first message.
@@ -52,7 +58,7 @@ Responses pass a shape check in `data-access/src/validators` before mapping. A 4
 
 1. «Розрахунок» and «Налаштування» — done.
 2. «Збережені» calculations — done. The old archive waits for a full export of the old table.
-3. «Додати в КП».
+3. «Додати в КП» — done.
 
 ## Code
 

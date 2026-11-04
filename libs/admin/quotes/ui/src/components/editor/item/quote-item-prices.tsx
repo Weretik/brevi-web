@@ -1,4 +1,10 @@
-import { hasManualPrice, isSewingKind, quoteTierLabels, quoteTiers } from '@admin/quotes/model';
+import {
+  hasManualPrice,
+  isFixedPriceKind,
+  isSewingKind,
+  quoteTierLabels,
+  quoteTiers,
+} from '@admin/quotes/model';
 import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
 import StarOutlinedIcon from '@mui/icons-material/StarOutlined';
 import {
@@ -36,7 +42,13 @@ interface Props {
 }
 
 const firstColumn = (item: QuoteItemDraft) =>
-  item.kind === 'Sewing' ? 'Варіант тканини' : item.kind === 'CustomSewing' ? 'Тканина' : 'Ціна';
+  item.kind === 'Sewing'
+    ? 'Варіант тканини'
+    : item.kind === 'CustomSewing'
+      ? 'Тканина'
+      : item.kind === 'Embroidery'
+        ? 'Рівень ціни'
+        : 'Ціна';
 
 /** The price rows of one item: a row per fabric (one row for a PPE), a column per quantity tier. */
 export function QuoteItemPrices({
@@ -49,6 +61,8 @@ export function QuoteItemPrices({
   onRemoveOption,
 }: Props) {
   const sewing = isSewingKind(item.kind);
+  const fixed = isFixedPriceKind(item.kind);
+  const embroidery = item.kind === 'Embroidery';
   const tierHidden = (tier: QuoteTier) => item.options.every((o) => !o.prices[tier].shown);
   const rowLabel = (option: QuoteOptionDraft) => `${itemName}, ${option.title}`;
   const manualRows = item.options.filter((option) => item.kind === 'Ppe' && hasManualPrice(option));
@@ -104,7 +118,7 @@ export function QuoteItemPrices({
                       </IconButton>
                     )}
                     <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      {sewing ? option.title : 'За одиницю'}
+                      {sewing || embroidery ? option.title : 'За одиницю'}
                     </Typography>
                     {option.isRecommended && (
                       <Typography variant="caption" sx={{ color: 'primary.dark', fontWeight: 600 }}>
@@ -123,7 +137,7 @@ export function QuoteItemPrices({
                     <QuotePriceCell
                       tier={tier}
                       price={option.prices[tier]}
-                      editable={!sewing}
+                      editable={!fixed}
                       label={rowLabel(option)}
                       onManualChange={(manual) => onTierChange(option.key, tier, { manual })}
                     />

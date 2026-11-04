@@ -57,6 +57,7 @@ const settings: QuoteSettings = {
       name: 'Ольга',
       phone: null,
       email: null,
+      mailboxEmail: null,
     },
   ],
 };

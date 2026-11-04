@@ -69,6 +69,7 @@ export const quoteItemSubtitles: Readonly<Record<QuoteItemKind, string>> = {
   Ppe: 'ЗІЗ · готовий товар',
   OneOffPpe: 'ЗІЗ · разова позиція',
   CustomSewing: 'Швейна продукція · виріб з нуля',
+  Embroidery: 'Вишивка',
 };
 
 /** The subtitle of a Catalog model whose composition was changed in the КП. */
@@ -77,3 +78,7 @@ export const quoteChangedModelSubtitle = 'Швейна продукція · з�
 /** Items whose prices come from the Catalog formula and are never typed. */
 export const isSewingKind = (kind: QuoteItemKind): boolean =>
   kind === 'Sewing' || kind === 'CustomSewing';
+
+/** Items whose prices are never typed in the КП: sewing (the Catalog formula) and embroidery (a saved calculation). */
+export const isFixedPriceKind = (kind: QuoteItemKind): boolean =>
+  isSewingKind(kind) || kind === 'Embroidery';
