@@ -100,6 +100,12 @@ const requiredOperations = {
     'restoreCrmQuote',
     'copyCrmQuote',
   ],
+  'crm/embroidery.openapi.yaml': [
+    'getCrmEmbroideryForm',
+    'calculateCrmEmbroidery',
+    'getCrmEmbroiderySettings',
+    'saveCrmEmbroiderySettings',
+  ],
 };
 
 export function hasOperationId(contract, expected) {

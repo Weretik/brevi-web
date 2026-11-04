@@ -13,6 +13,7 @@ import { createBrowserRouter } from 'react-router-dom';
 
 import {
   adminRouteDefinitions,
+  embroideryRoutes,
   productionOrderRoutes,
   productionRoutes,
   tasksRoutes,
@@ -37,6 +38,9 @@ const profileRoutes = createProfileRoutes({ onProfileChanged: refreshSession });
 const canWorkOnTasks = (user: SessionUser): boolean =>
   user.roles.includes('Admin') || user.roles.includes('Manager');
 
+/** «Ціна вишивки»: managers price embroidery; Director and Admin also edit its settings (EMB-001 R-02). */
+const canPriceEmbroidery = canWorkOnTasks;
+
 /** «Виробничі завдання»: managers pass КП to the workshop; the head of the workshop runs them. */
 const canUseProductionOrders = (user: SessionUser): boolean =>
   user.roles.includes('Admin') ||
@@ -56,6 +60,7 @@ export function createAdminRouter() {
         { element: <RequireRole allow={canManageUsers} />, children: usersRoutes },
         { element: <RequireRole allow={canManageUsers} />, children: tasksRoutes.admin },
         { element: <RequireRole allow={canWorkOnTasks} />, children: tasksRoutes.board },
+        { element: <RequireRole allow={canPriceEmbroidery} />, children: embroideryRoutes },
         { element: <RequireRole allow={canManageWorkshop} />, children: productionRoutes },
         {
           element: <RequireRole allow={canUseProductionOrders} />,

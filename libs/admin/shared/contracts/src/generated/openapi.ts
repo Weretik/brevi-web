@@ -2056,6 +2056,58 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/crm/embroidery/form': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Hoops, extra costs and the three price names for the form. No rates are returned. */
+    get: operations['getCrmEmbroideryForm'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/embroidery/calculate': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Computes the price and saves nothing. A problem that stops the price (a blank wider than the roll, an unknown hoop, no stitch rate) comes back as `error` with status 200 and no prices. `cost` and money of the cut layout are null for a Manager. */
+    post: operations['calculateCrmEmbroidery'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/embroidery/settings': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description The saved settings, or the old calculator's rates with `version` 0 before the first save. */
+    get: operations['getCrmEmbroiderySettings'];
+    /** @description Saves the whole page. `version` is the one read; a stale version is 409. */
+    put: operations['saveCrmEmbroiderySettings'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/crm/tasks': {
     parameters: {
       query?: never;
@@ -5506,6 +5558,185 @@ export interface components {
       email?: string | null;
     };
     /**
+     * @description What one unit of the rate is counted per.
+     * @enum {string}
+     */
+    CrmEmbroideryExpenseBasis: 'Stitches' | 'Hoop' | 'Unit' | 'MachineHour' | 'Order';
+    /** @enum {string} */
+    CrmEmbroideryExpenseMode: 'All' | 'ChevronOnly';
+    CrmEmbroideryForm: {
+      /** @description True for Director and Admin. */
+      seesCost: boolean;
+      hoops: {
+        id: string;
+        label: string;
+        blankWidthCm: number;
+        blankLengthCm: number;
+      }[];
+      expenses: {
+        id: string;
+        name: string;
+        basis: components['schemas']['CrmEmbroideryExpenseBasis'];
+        mode: components['schemas']['CrmEmbroideryExpenseMode'];
+        /** @description Ticked when a calculation starts. */
+        enabled: boolean;
+        /** @description False makes the price «Орієнтовна» while ticked. */
+        hasRate: boolean;
+      }[];
+      markupNames: string[];
+      /** Format: date-time */
+      settingsUpdatedAt: string | null;
+    };
+    /**
+     * @description Garment = «Вишивка на виробі», Chevron = «Шеврони».
+     * @enum {string}
+     */
+    CrmEmbroideryMode: 'Garment' | 'Chevron';
+    /** @enum {string} */
+    CrmEmbroideryProgram: 'New' | 'Adjustment' | 'Ready';
+    /**
+     * @description UsedBlanks = only the blanks used; FullCut = the whole cut length. Applies to both materials.
+     * @enum {string}
+     */
+    CrmEmbroideryMaterialMode: 'UsedBlanks' | 'FullCut';
+    CrmCalculateEmbroideryInput: {
+      mode: components['schemas']['CrmEmbroideryMode'];
+      quantity: number;
+      stitchesPerUnit: number;
+      hoopId: string;
+      /** @description Chevrons per hooping (1–500); ignored for Garment. */
+      unitsPerHoop: number;
+      stabilizerLayers: number;
+      /** @description Chevron fabric layers (1–20); ignored for Garment. */
+      fabricLayers: number;
+      program: components['schemas']['CrmEmbroideryProgram'];
+      /** @description Ignored for Ready. */
+      programMinutes: number;
+      /** @description Machine time of the whole batch. */
+      machineMinutes?: number | null;
+      materialMode: components['schemas']['CrmEmbroideryMaterialMode'];
+      /** @description Extra costs ticked (true) or unticked (false) for this calculation only, by id. */
+      expenseOverrides?: {
+        [key: string]: boolean;
+      } | null;
+    };
+    /** @enum {string} */
+    CrmEmbroideryCostKind:
+      'Stitches' | 'Threads' | 'Hooping' | 'Stabilizer' | 'Fabric' | 'Program' | 'Extra';
+    CrmEmbroideryCut: {
+      blankWidthCm: number;
+      blankLengthCm: number;
+      rollWidthCm: number;
+      blanks: number;
+      across: number;
+      rows: number;
+      produced: number;
+      spare: number;
+      sideWasteCm: number;
+      cutMetres: number;
+      blankCost: number | null;
+      wholeCost: number | null;
+      /** @description What the cost includes; null for a Manager. */
+      charged: number | null;
+    };
+    CrmEmbroideryCalculation: {
+      /** @description Ukrainian text; no prices when set. */
+      error: string | null;
+      /** @description Ticked costs without a rate (or «Час роботи машини»); the prices are «Орієнтовна». */
+      missing: string[];
+      hoopings: number;
+      fullHoopings: number;
+      lastHoopUnits: number;
+      freeInLastHoop: number;
+      prices: {
+        name: string;
+        /** @description Null for a Manager. */
+        markupPercent: number | null;
+        unit: number;
+        total: number;
+        /** @description Unit price with the ready program. */
+        repeatUnit: number;
+      }[];
+      cost: null | {
+        total: number;
+        perUnit: number;
+        rows: {
+          kind: components['schemas']['CrmEmbroideryCostKind'];
+          name: string;
+          basis: null | components['schemas']['CrmEmbroideryExpenseBasis'];
+          /** @description Thousands of stitches, hoopings, blanks, minutes of development, units, machine hours or 1. */
+          quantity: number;
+          rate: number | null;
+          amount: number;
+          perUnit: number;
+        }[];
+      };
+      stabilizer: null | components['schemas']['CrmEmbroideryCut'];
+      fabric: null | components['schemas']['CrmEmbroideryCut'];
+    };
+    CrmEmbroideryRates: {
+      threadRate: number;
+      hoopingRate: number;
+      programHourRate: number;
+      /** @description A multiplier after the markup */
+      taxPercent: number;
+    };
+    CrmEmbroideryMarkup: {
+      name: string;
+      percent: number;
+    };
+    CrmEmbroideryMaterial: {
+      pricePerMetre: number;
+      widthCm: number;
+    };
+    CrmEmbroideryHoop: {
+      id: string;
+      label: string;
+      blankWidthCm: number;
+      blankLengthCm: number;
+      /** @description Null uses the general «Клей» rate. */
+      glueRate: number | null;
+    };
+    CrmEmbroideryExpense: {
+      id: string;
+      name: string;
+      basis: components['schemas']['CrmEmbroideryExpenseBasis'];
+      /** @description Null = not set yet; 0 = free. */
+      rate: number | null;
+      enabled: boolean;
+      mode: components['schemas']['CrmEmbroideryExpenseMode'];
+    };
+    CrmEmbroiderySettings: {
+      /** @description 0 before the first save. */
+      version: number;
+      updatedByName: string | null;
+      /** Format: date-time */
+      updatedAt: string | null;
+      /** @description Read-only here; edited in «Параметри ціноутворення». */
+      stitchRate: {
+        value: number | null;
+        /** Format: date */
+        updatedOn: string | null;
+      };
+      rates: components['schemas']['CrmEmbroideryRates'];
+      markups: components['schemas']['CrmEmbroideryMarkup'][];
+      stabilizer: components['schemas']['CrmEmbroideryMaterial'];
+      fabric: components['schemas']['CrmEmbroideryMaterial'];
+      fabricIncreasePercent: number;
+      hoops: components['schemas']['CrmEmbroideryHoop'][];
+      expenses: components['schemas']['CrmEmbroideryExpense'][];
+    };
+    CrmSaveEmbroiderySettingsInput: {
+      version: number;
+      rates: components['schemas']['CrmEmbroideryRates'];
+      markups: components['schemas']['CrmEmbroideryMarkup'][];
+      stabilizer: components['schemas']['CrmEmbroideryMaterial'];
+      fabric: components['schemas']['CrmEmbroideryMaterial'];
+      fabricIncreasePercent: number;
+      hoops: components['schemas']['CrmEmbroideryHoop'][];
+      expenses: components['schemas']['CrmEmbroideryExpense'][];
+    };
+    /**
      * @default Open
      * @enum {string}
      */
@@ -6384,8 +6615,17 @@ export interface components {
         'application/json': string[];
       };
     };
-    /** @description The task was saved in another window (stale version); errors are Ukrainian strings. */
+    /** @description The settings were saved in another window; errors are Ukrainian strings. */
     'responses-Conflict': {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        'application/json': string[];
+      };
+    };
+    /** @description The task was saved in another window (stale version); errors are Ukrainian strings. */
+    'components-responses-Conflict': {
       headers: {
         [name: string]: unknown;
       };
@@ -12825,6 +13065,153 @@ export interface operations {
       };
     };
   };
+  getCrmEmbroideryForm: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The form. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmEmbroideryForm'];
+        };
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role and a numeric actor claim required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  calculateCrmEmbroidery: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmCalculateEmbroideryInput'];
+      };
+    };
+    responses: {
+      /** @description The price. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmEmbroideryCalculation'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role and a numeric actor claim required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmEmbroiderySettings: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The settings. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmEmbroiderySettings'];
+        };
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  saveCrmEmbroiderySettings: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmSaveEmbroiderySettingsInput'];
+      };
+    };
+    responses: {
+      /** @description Saved, with the new version. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmEmbroiderySettings'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['responses-Conflict'];
+    };
+  };
   getCrmTasks: {
     parameters: {
       query?: {
@@ -13105,7 +13492,7 @@ export interface operations {
         };
         content?: never;
       };
-      409: components['responses']['responses-Conflict'];
+      409: components['responses']['components-responses-Conflict'];
     };
   };
   deleteCrmTask: {
@@ -13150,7 +13537,7 @@ export interface operations {
         };
         content?: never;
       };
-      409: components['responses']['responses-Conflict'];
+      409: components['responses']['components-responses-Conflict'];
     };
   };
   changeCrmTaskStatus: {
@@ -13199,7 +13586,7 @@ export interface operations {
         };
         content?: never;
       };
-      409: components['responses']['responses-Conflict'];
+      409: components['responses']['components-responses-Conflict'];
     };
   };
   setCrmTaskUrgent: {
@@ -13248,7 +13635,7 @@ export interface operations {
         };
         content?: never;
       };
-      409: components['responses']['responses-Conflict'];
+      409: components['responses']['components-responses-Conflict'];
     };
   };
   markCrmTaskStep: {
@@ -13298,7 +13685,7 @@ export interface operations {
         };
         content?: never;
       };
-      409: components['responses']['responses-Conflict'];
+      409: components['responses']['components-responses-Conflict'];
     };
   };
   getWorkshopStaff: {
