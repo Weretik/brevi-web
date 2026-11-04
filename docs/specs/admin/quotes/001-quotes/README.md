@@ -1,22 +1,22 @@
 # Admin React: «КП» — commercial proposals
 
-**Status:** stages 1–3 implemented 2026-11-04 ([feature card](../../../../features/admin/quotes.md)); stages 4–6 planned. **Backend:** BreviERP [CRM-003 «КП»](https://github.com/Weretik/BreviERP/blob/master/docs/sdd/specs/crm/003-quotes/README.md) (rules R-*, scenarios, API), module Crm, `/api/crm/quotes`. **Design:** [«Цех»](../../../../standards/admin/design-system.md).
+**Status:** stages 1–4 implemented 2026-11-04 ([feature card](../../../../features/admin/quotes.md)); stages 5–6 planned. **Backend:** BreviERP [CRM-003 «КП»](https://github.com/Weretik/BreviERP/blob/master/docs/sdd/specs/crm/003-quotes/README.md) (rules R-*, scenarios, API), module Crm, `/api/crm/quotes`. **Design:** [«Цех»](../../../../standards/admin/design-system.md).
 
 The screens follow the client's old Calculator cabinet (owner's screenshots, 2026-11-04) in the «Цех» look. Marks appear only for problems, with the reason (no «Готово» or «у КП» success chips).
 
 ## Menu
 
-Group «Менеджер сервісу»: «КП» (`/crm/quotes`), «КП для знайомства» (stage 4), «Налаштування КП» (`/crm/quote-settings`, Director and Admin, stage 2). The Codex items «Розрахунки та КП», «Реквізити та шаблон КП» and «Архів КП» and their screens were removed in stage 1 by the owner's decision.
+Group «Менеджер сервісу»: «КП» (`/crm/quotes`), «Налаштування КП» (`/crm/quote-settings`, Director and Admin, stage 2). The Codex items «Розрахунки та КП», «Реквізити та шаблон КП» and «Архів КП» and their screens were removed in stage 1 by the owner's decision.
 
 ## Stage 1 screens
 
 ### «КП» list (`/crm/quotes`)
 
-Reference list pattern: wide search (number, client, company), a filter «Відповідальний» for Director and Admin, table rows: number, internal client name, company, responsible, items count, updated. Button «Нове КП». A Manager sees only their own КП. Row click opens the editor.
+Reference list pattern: wide search (number, client, company), a filter «Відповідальний» for Director and Admin, table rows: number, internal client name, company, responsible, items count, updated. Button «Нове КП» opens a menu: «КП під запит» (`/crm/quotes/new`) or «КП для знайомства» (`/crm/quote-introductions/new`, stage 4; owner 2026-11-04: not a menu item). A Manager sees only their own КП. Row click opens the editor.
 
 ### «Товари та ціни» editor (`/crm/quotes/new`, `/crm/quotes/:id`)
 
-- Header: «Комерційна пропозиція / Товари та ціни», buttons «Передати розрахунок» (Director, Admin: pick a staff member), «Перерахувати за актуальними цінами» (shows old → new, then saves), «Додати товар», «Додати разовий ЗІЗ».
+- Header: «Комерційна пропозиція / Товари та ціни», buttons «Передати розрахунок» (Director, Admin: pick a staff member), «Перерахувати за актуальними цінами» (shows old → new, then saves). «Додати товар» and «Додати разовий ЗІЗ» sit in the products block: under the hint while it is empty, then as «Додати ще товар» / «Додати ще разовий ЗІЗ» under the last item (owner 2026-11-04).
 - Card «Створив(-ла) / Відповідальний(-а)».
 - Fields: «Номер КП» (read-only, «Буде присвоєно після збереження»), «Внутрішня назва клієнта / запиту» (combo with KeepinCRM clients, free text allowed; hint «Лише для менеджера»), «Ім'я отримувача», «Назва підприємства».
 - Line «N товарів у пропозиції» with the price legend до 9 шт. / 10–40 шт. / від 41 шт.
@@ -48,6 +48,14 @@ Same numbering as the backend: 1 list + editor (done); 2 settings + PDF (done); 
 - Editor footer: «Сформувати КП» becomes outlined and «Надіслати КП» is the main action. It saves unsaved changes first, then opens the «Надіслати КП» side panel: «Від кого» (the signed-in person's Gmail), «Лист» (standard letter from the email template plus the letter variants), «Кому» (several addresses through a comma), «Тема», «Текст листа», and the PDF name. «Надіслати» sends from the person's own Gmail with the PDF of the saved КП attached.
 - Success closes the panel, shows «КП N надіслано.» and adds « · надіслано <date>» to the subtitle; the КП status becomes «Надіслано». A failure keeps the panel open with the server's reason; the КП stays as it was.
 - Without a connected Gmail the panel offers «Підключити мій Gmail» and «Надіслати» is disabled. While Google keys are not configured on the server the panel says sending is not on yet.
+
+## Stage 4 screens
+
+- «КП для знайомства» (`/crm/quote-introductions/new`, a saved one at `/crm/quote-introductions/:id`; the menu item opens a new selection, the list opens saved ones by kind and has a «Вид» column). Four step cards in the old calculator order: 1 «Оберіть основу добірки» (Загальне, Літній, Зимовий); 2 «Вкажіть отримувача» (client or request name for the list, email, company, contact person, internal note); 3 «Оберіть текст листа» (letter variants from the settings with their subject); 4 «Зберіть сторінки каталогу» (per page the fixed main model, then three «Обрати модель» slots; each has a fabric select and the від 41 шт. price, not editable).
+- «Обрати модель» side panel lists only the page's season; a fabric is chosen there with its price; a model already in the selection cannot be chosen again.
+- Header: «Нова добірка», «Зберегти як шаблон» (side panel with the name; needs every model and fabric), «Готові шаблони» (side panel: name, layout, author, date, models; «Застосувати», and «Видалити» for the author, Director or Admin). Applying fills the selection with current Catalog data; a model or fabric that is gone leaves the slot empty with the reason.
+- Footer as in the editor: «Зберегти зміни», «Сформувати КП» (catalogue PDF), «Надіслати КП» (the chosen letter first, «Кому» filled with the saved email).
+- «Налаштування КП» → «КП для знайомства»: the codes of the main summer and winter models (empty = MOD-166 «Імпульс» and MOD-169 «Прайм»).
 
 ## Tests
 

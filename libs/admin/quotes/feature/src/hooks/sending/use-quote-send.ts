@@ -22,6 +22,11 @@ export function useQuoteSend(quote: Quote, onSent: (quote: Quote) => void) {
     if (letter) setForm((current) => ({ ...current, subject: letter.subject, body: letter.body }));
   }, [letters, letterIndex]);
 
+  const savedTo = draft.data?.to;
+  useEffect(() => {
+    if (savedTo) setForm((current) => (current.to ? current : { ...current, to: savedTo }));
+  }, [savedTo]);
+
   const errors = useMemo(() => quoteSendErrors(form), [form]);
 
   return {

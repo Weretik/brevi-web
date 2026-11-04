@@ -1,4 +1,5 @@
 export { QuotesTable } from './tables/quotes-table';
+export { QuoteAddItems } from './components/editor/quote-add-items';
 export { QuoteHeaderCard } from './components/editor/quote-header-card';
 export { QuoteItemCard } from './components/editor/quote-item-card';
 export { QuoteNotesCard } from './components/editor/quote-notes-card';
@@ -11,3 +12,7 @@ export { QuoteLetterVariantsCard } from './components/settings/quote-letter-vari
 export { QuotePdfTextsCard } from './components/settings/quote-pdf-texts-card';
 export { QuoteStaffContactsCard } from './components/settings/quote-staff-contacts-card';
 export type { QuoteImageFieldRender } from './components/settings/quote-settings-fields';
+export { QuoteIntroLayoutStep } from './components/introduction/quote-intro-layout-step';
+export { QuoteIntroRecipientStep } from './components/introduction/quote-intro-recipient-step';
+export { QuoteIntroLetterStep } from './components/introduction/quote-intro-letter-step';
+export { QuoteIntroPagesStep } from './components/introduction/quote-intro-pages-step';

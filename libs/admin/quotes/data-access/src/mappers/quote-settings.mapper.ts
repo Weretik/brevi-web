@@ -38,6 +38,8 @@ const introductionKeys = [
   'productButtonText',
   'nextStepText',
   'accentColor',
+  'summerMainCode',
+  'winterMainCode',
 ] as const;
 
 /** Trims a field; an empty one is sent as null. */

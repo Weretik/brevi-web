@@ -34,6 +34,8 @@ const texts: { key: TextKey; label: string; wide?: boolean; multiline?: boolean 
   { key: 'productButtonText', label: 'Текст кнопки товару' },
   { key: 'assortmentLinkText', label: 'Текст посилання на асортимент' },
   { key: 'assortmentUrl', label: 'Посилання на асортимент' },
+  { key: 'summerMainCode', label: 'Головна модель — літо (код, типово MOD-166)' },
+  { key: 'winterMainCode', label: 'Головна модель — зима (код, типово MOD-169)' },
   { key: 'nextStepText', label: 'Наступний крок', wide: true, multiline: true },
 ];
 
@@ -49,7 +51,7 @@ export function QuoteIntroductionCard({
   return (
     <QuoteSettingsCard
       title="КП для знайомства — рекламний каталог"
-      description="Тексти каталогу, який надсилають новому клієнту."
+      description="Тексти каталогу, який надсилають новому клієнту, і головні моделі сторінок."
     >
       <QuoteSettingsGrid>
         {texts.map(({ key, label, wide, multiline }) => (

@@ -55,3 +55,34 @@ export {
   quoteSendErrors,
   quoteSubjectMax,
 } from './validators/quote-send-validation';
+export type * from './entities/quote-introduction';
+export type * from './models/quote-intro-draft';
+export {
+  quoteIntroCatalogSeasons,
+  quoteIntroEmailMax,
+  quoteIntroLayouts,
+  quoteIntroModelsPerPage,
+  quoteIntroSeasonLabels,
+  quoteIntroSeasons,
+  quoteIntroTemplateNameMax,
+} from './models/quote-intro-draft';
+export type { QuoteIntroMainProducts } from './mappers/quote-intro-draft-mapper';
+export {
+  applyIntroTemplate,
+  chooseIntroFabric,
+  chooseIntroModel,
+  emptyIntroDraft,
+  introProductIds,
+  introSlotPrice,
+  introToDraft,
+  mainProductsOf,
+  setIntroLayout,
+  updateIntroSlot,
+} from './mappers/quote-intro-draft-mapper';
+export {
+  quoteIntroErrors,
+  quoteIntroPageErrors,
+  quoteIntroTemplateNameError,
+} from './validators/quote-intro-validation';
+export type { QuoteIntroErrors } from './validators/quote-intro-validation';
+export { quoteEditorPath } from './models/quote-paths';

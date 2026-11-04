@@ -7,13 +7,17 @@ import type { RouteObject } from 'react-router-dom';
 const QuotesPage = lazy(() => import('./pages/list/quotes-page'));
 const QuoteEditorPage = lazy(() => import('./pages/editor/quote-editor-page'));
 const QuoteSettingsPage = lazy(() => import('./pages/settings/quote-settings-page'));
+const QuoteIntroductionPage = lazy(() => import('./pages/introduction/quote-introduction-page'));
 
 export interface QuotesRouteOptions {
   /** The signed-in staff member; the app reads it from the session. */
   useQuoteActor: () => QuoteActor;
 }
 
-/** «Менеджер сервісу → КП»: the list, the «Товари та ціни» editor and «Налаштування КП» (Director and Admin). */
+/**
+ * «Менеджер сервісу → КП»: the list, the «Товари та ціни» editor, «КП для знайомства» and «Налаштування КП»
+ * (Director and Admin).
+ */
 export function createQuotesRoutes({
   useQuoteActor,
 }: QuotesRouteOptions): (RouteObject & { path: string })[] {
@@ -22,6 +26,9 @@ export function createQuotesRoutes({
   }
   function Editor() {
     return <QuoteEditorPage actor={useQuoteActor()} />;
+  }
+  function Introduction() {
+    return <QuoteIntroductionPage actor={useQuoteActor()} />;
   }
   function Settings() {
     return useQuoteActor().canSeeAll ? (
@@ -35,5 +42,7 @@ export function createQuotesRoutes({
     { path: '/crm/quotes/new', element: <Editor /> },
     { path: '/crm/quote-settings', element: <Settings /> },
     { path: '/crm/quotes/:quoteId', element: <Editor /> },
+    { path: '/crm/quote-introductions/new', element: <Introduction /> },
+    { path: '/crm/quote-introductions/:quoteId', element: <Introduction /> },
   ];
 }

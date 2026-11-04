@@ -1805,6 +1805,113 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/crm/quote-introductions': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Creates a draft «КП для знайомства» (R-16): one page per season of the layout, the main model of the season first, then 3 more models of that season, one fabric each. Only the від 41 шт. price is shown; it comes from the Catalog. It is read, listed, sent and deleted through /api/crm/quotes. */
+    post: operations['createCrmQuoteIntroduction'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quote-introductions/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['QuoteId'];
+      };
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Saves the whole introduction; a saved model keeps its price. 409 for a stale version or a КП «під запит». */
+    put: operations['saveCrmQuoteIntroduction'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quote-intro-templates': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description «Готові шаблони», shared by all staff, newest first (R-19). Templates keep no prices. */
+    get: operations['getCrmQuoteIntroTemplates'];
+    put?: never;
+    /** @description «Зберегти як готовий шаблон»; the name is unique ignoring case, at most 200 templates. */
+    post: operations['createCrmQuoteIntroTemplate'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quote-intro-templates/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** @description The author, Director or Admin. */
+    delete: operations['deleteCrmQuoteIntroTemplate'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quote-lookups/products': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Current Catalog data of chosen products (a saved introduction or a template); unknown ids are left out. */
+    get: operations['getCrmQuoteCatalogProducts'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quote-lookups/introduction': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description The main model of each season (codes from «Налаштування КП») and the letter variants. */
+    get: operations['getCrmQuoteIntroductionSetup'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/crm/quote-lookups/staff': {
     parameters: {
       query?: never;
@@ -4143,7 +4250,7 @@ export interface components {
       /** Format: int64 */
       id?: number | null;
       kind: components['schemas']['CrmQuoteItemKind'];
-      /** @description Required for Sewing and Ppe */
+      /** @description Required for Sewing and Ppe, null for OneOffPpe. */
       productId?: number | null;
       /** @description OneOffPpe only. */
       name?: string | null;
@@ -4206,6 +4313,16 @@ export interface components {
       supplierUrl?: string | null;
       options: components['schemas']['CrmQuoteOption'][];
     };
+    /**
+     * @description General = summer and winter pages; Summer or Winter = one page.
+     * @enum {string}
+     */
+    CrmQuoteIntroLayout: 'General' | 'Summer' | 'Winter';
+    CrmQuoteIntroduction: {
+      layout: components['schemas']['CrmQuoteIntroLayout'];
+      recipientEmail?: string | null;
+      letterName?: string | null;
+    };
     CrmQuote: {
       /** Format: int64 */
       id: number;
@@ -4233,6 +4350,8 @@ export interface components {
       lastSentAt?: string | null;
       version: number;
       items: components['schemas']['CrmQuoteItem'][];
+      /** @description Only a «КП для знайомства» has it; its items go page by page, 4 per page. */
+      introduction?: components['schemas']['CrmQuoteIntroduction'] | null;
     };
     CrmQuoteTierPrices: {
       /** @description 1–9 pcs. */
@@ -4274,7 +4393,10 @@ export interface components {
       fromName: string;
       gmailConfigured: boolean;
       fileName: string;
+      /** @description For an introduction the chosen letter variant comes first. */
       letters: components['schemas']['CrmQuoteLetter'][];
+      /** @description The recipient saved in an introduction. */
+      to?: string | null;
     };
     CrmSendQuoteInput: {
       version: number;
@@ -4289,7 +4411,7 @@ export interface components {
       name: string;
       /** @description 8 digits. */
       edrpou?: string | null;
-      /** @description ІПН */
+      /** @description ІПН, 10–12 digits. */
       taxId?: string | null;
       iban?: string | null;
       address?: string | null;
@@ -4300,7 +4422,7 @@ export interface components {
       site?: string | null;
       /**
        * Format: uri
-       * @description https link (photo library); SVG
+       * @description https link (photo library); SVG, PNG or JPEG.
        */
       logoUrl?: string | null;
     };
@@ -4321,7 +4443,7 @@ export interface components {
       title: string;
       text?: string | null;
     };
-    /** @description «КП для знайомства — рекламний каталог» (used in stage 4). */
+    /** @description «КП для знайомства — рекламний каталог». */
     CrmQuoteIntroductionTexts: {
       logoText?: string | null;
       summerTitle?: string | null;
@@ -4338,6 +4460,10 @@ export interface components {
       productButtonText?: string | null;
       nextStepText?: string | null;
       accentColor?: string | null;
+      /** @description Main summer model code; null means MOD-166 «Імпульс». */
+      summerMainCode?: string | null;
+      /** @description Main winter model code; null means MOD-169 «Прайм». */
+      winterMainCode?: string | null;
       advantages: components['schemas']['CrmQuoteAdvantage'][];
     };
     CrmQuoteLetterVariant: {
@@ -4385,13 +4511,15 @@ export interface components {
       letterVariants: components['schemas']['CrmQuoteLetterVariant'][];
       staffContacts: components['schemas']['CrmQuoteStaffContactInput'][];
     };
+    /** @enum {string} */
+    CrmQuoteIntroSeason: 'Summer' | 'Winter';
     CrmQuoteCatalogVariant: {
       /** Format: int64 */
       articleId: number;
       sku: string;
       /** @description Fabric name. */
       title: string;
-      /** @description For the manager only */
+      /** @description For the manager only, fabric price and supplier. */
       fabricInfo?: string | null;
       prices?: components['schemas']['CrmQuoteTierPrices'] | null;
       /** @description Why it cannot be added; null when it can. */
@@ -4416,6 +4544,86 @@ export interface components {
       page: number;
       pageSize: number;
       total: number;
+    };
+    CrmQuoteIntroModelInput: {
+      /**
+       * Format: int64
+       * @description The saved item, so its price stays.
+       */
+      itemId?: number | null;
+      productId: number;
+      /**
+       * Format: int64
+       * @description The fabric variant.
+       */
+      articleId: number;
+    };
+    CrmQuoteIntroPageInput: {
+      season: components['schemas']['CrmQuoteIntroSeason'];
+      /** @description The main model of the season first. */
+      models: components['schemas']['CrmQuoteIntroModelInput'][];
+    };
+    CrmSaveQuoteIntroductionInput: {
+      /** @description Ignored on create. */
+      version: number;
+      internalName: string;
+      /** Format: int64 */
+      customerId?: number | null;
+      /** Format: email */
+      recipientEmail?: string | null;
+      recipientName?: string | null;
+      companyName?: string | null;
+      managerNote?: string | null;
+      layout: components['schemas']['CrmQuoteIntroLayout'];
+      letterName?: string | null;
+      /** @description One page per season of the layout, summer first; a model only once. */
+      pages: components['schemas']['CrmQuoteIntroPageInput'][];
+    };
+    CrmQuoteIntroTemplateModel: {
+      productId: number;
+      /** Format: int64 */
+      articleId: number;
+      /** @description The name when the template was saved. */
+      productName: string;
+      fabricTitle: string;
+    };
+    CrmQuoteIntroTemplatePage: {
+      season: components['schemas']['CrmQuoteIntroSeason'];
+      models: components['schemas']['CrmQuoteIntroTemplateModel'][];
+    };
+    CrmQuoteIntroTemplate: {
+      /** Format: int64 */
+      id: number;
+      name: string;
+      layout: components['schemas']['CrmQuoteIntroLayout'];
+      letterName?: string | null;
+      pages: components['schemas']['CrmQuoteIntroTemplatePage'][];
+      author: components['schemas']['CrmQuotePerson'];
+      /** Format: date-time */
+      createdAt: string;
+      /** @description The actor is the author, Director or Admin. */
+      canDelete: boolean;
+    };
+    CrmCreateQuoteIntroTemplateInput: {
+      name: string;
+      layout: components['schemas']['CrmQuoteIntroLayout'];
+      letterName?: string | null;
+      pages: components['schemas']['CrmQuoteIntroPageInput'][];
+    };
+    CrmQuoteIntroMainModel: {
+      code: string;
+      product?: components['schemas']['CrmQuoteCatalogProduct'] | null;
+      /** @description Why the page cannot be built; null when it can. */
+      problem?: string | null;
+    };
+    CrmQuoteIntroLetter: {
+      name: string;
+      subject: string;
+    };
+    CrmQuoteIntroductionSetup: {
+      summer: components['schemas']['CrmQuoteIntroMainModel'];
+      winter: components['schemas']['CrmQuoteIntroMainModel'];
+      letters: components['schemas']['CrmQuoteIntroLetter'][];
     };
     CrmQuoteStaff: {
       userId: number;
@@ -10575,6 +10783,8 @@ export interface operations {
       query: {
         kind: 'Sewing' | 'Ppe';
         search?: string;
+        /** @description Only sewing models of this season (introduction pages). */
+        season?: components['schemas']['CrmQuoteIntroSeason'];
         page?: number;
         pageSize?: number;
       };
@@ -10594,6 +10804,281 @@ export interface operations {
         };
       };
       400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createCrmQuoteIntroduction: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmSaveQuoteIntroductionInput'];
+      };
+    };
+    responses: {
+      /** @description Created. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmQuote'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['Conflict'];
+    };
+  };
+  saveCrmQuoteIntroduction: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['QuoteId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmSaveQuoteIntroductionInput'];
+      };
+    };
+    responses: {
+      /** @description Saved. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmQuote'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found or not visible to the actor. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['Conflict'];
+    };
+  };
+  getCrmQuoteIntroTemplates: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Templates. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmQuoteIntroTemplate'][];
+        };
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createCrmQuoteIntroTemplate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmCreateQuoteIntroTemplateInput'];
+      };
+    };
+    responses: {
+      /** @description Created. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmQuoteIntroTemplate'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['Conflict'];
+    };
+  };
+  deleteCrmQuoteIntroTemplate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Deleted. */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not the author, Director or Admin. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmQuoteCatalogProducts: {
+    parameters: {
+      query: {
+        ids: number[];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Products. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmQuoteCatalogProduct'][];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmQuoteIntroductionSetup: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Setup. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmQuoteIntroductionSetup'];
+        };
+      };
       /** @description Authentication required. */
       401: {
         headers: {

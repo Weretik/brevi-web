@@ -44,6 +44,8 @@ export interface QuoteIntroductionDraft {
   productButtonText: string;
   nextStepText: string;
   accentColor: string;
+  summerMainCode: string;
+  winterMainCode: string;
   advantages: QuoteAdvantageDraft[];
 }
 

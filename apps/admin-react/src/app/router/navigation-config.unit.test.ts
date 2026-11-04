@@ -4,7 +4,7 @@ import { adminRouteDefinitions } from './admin-route-definitions';
 import { createNavigation } from './navigation-config';
 
 describe('legacy Admin navigation', () => {
-  it('links «КП» and «Налаштування КП» and keeps the later КП pages without a link', () => {
+  it('links «КП» and «Налаштування КП»; later КП pages have no link', () => {
     const paths = new Set(adminRouteDefinitions.map((route) => route.path));
     const manager = createNavigation(paths, ['Admin']).find(
       (group) => group.id === 'service-manager',
@@ -12,7 +12,9 @@ describe('legacy Admin navigation', () => {
     expect(manager?.items.find((item) => item.id === 'quotes')?.to).toBe('/crm/quotes');
     expect(paths.has('/crm/quotes/new')).toBe(true);
     expect(paths.has('/crm/quotes/:quoteId')).toBe(true);
-    expect(manager?.items.find((item) => item.id === 'quote-introductions')?.to).toBeUndefined();
+    expect(manager?.items.some((item) => item.id === 'quote-introductions')).toBe(false);
+    expect(paths.has('/crm/quote-introductions/new')).toBe(true);
+    expect(paths.has('/crm/quote-introductions/:quoteId')).toBe(true);
     expect(manager?.items.find((item) => item.id === 'quote-settings')?.to).toBe(
       '/crm/quote-settings',
     );
@@ -42,8 +44,8 @@ describe('legacy Admin navigation', () => {
       'Контент',
       'Загальні звіти',
     ]);
-    expect(groups.map((group) => group.items.length)).toEqual([6, 7, 5, 4, 8, 1, 2, 1]);
-    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(34);
+    expect(groups.map((group) => group.items.length)).toEqual([5, 7, 5, 4, 8, 1, 2, 1]);
+    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(33);
     expect(groups[0].items.map((item) => item.id)).not.toContain('clients');
   });
   it('shows «Налаштування КП» only for the server Admin role', () => {
