@@ -9,21 +9,24 @@ import {
 } from '../navigation/sidebar/admin-navigation-drawers';
 import { useNavigationCollapsed } from '../navigation/sidebar/use-navigation-collapsed';
 
-import type { AdminColorMode, AdminNavigationGroup, AdminProfileLink } from '../shell.types';
+import type { AdminColorMode, AdminNavigationGroup, AdminShellUser } from '../shell.types';
 
 interface AdminLayoutProps {
   navigation: readonly AdminNavigationGroup[];
   colorMode: AdminColorMode;
   onColorModeChange: (mode: AdminColorMode) => void;
-  /** Extra links in the profile menu. */
-  profileLinks?: readonly AdminProfileLink[];
+  /** The signed-in staff member for the profile menu. */
+  user?: AdminShellUser | null;
+  /** Route of «Мій кабінет». */
+  profileHref?: string | null;
 }
 
 export function AdminLayout({
   navigation,
   colorMode,
   onColorModeChange,
-  profileLinks = [],
+  profileHref = null,
+  user = null,
 }: AdminLayoutProps) {
   const [isMobileNavigationOpen, setIsMobileNavigationOpen] = useState(false);
   const { isCollapsed, toggleCollapsed } = useNavigationCollapsed();
@@ -66,7 +69,8 @@ export function AdminLayout({
           navigation={navigation}
           onColorModeChange={onColorModeChange}
           onMenuOpen={() => setIsMobileNavigationOpen(true)}
-          profileLinks={profileLinks}
+          profileHref={profileHref}
+          user={user}
         />
         <Box component="main" sx={{ minWidth: 0 }}>
           <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3, lg: 3.5 }, py: { xs: 2.5, lg: 3.5 } }}>

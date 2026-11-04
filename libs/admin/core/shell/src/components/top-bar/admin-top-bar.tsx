@@ -9,7 +9,7 @@ import { topBarIconButtonSx } from './actions/top-bar-icon-button';
 import { TopBarSearch } from './actions/top-bar-search';
 import { AdminBreadcrumbs } from './admin-breadcrumbs';
 
-import type { AdminColorMode, AdminNavigationGroup, AdminProfileLink } from '../../shell.types';
+import type { AdminColorMode, AdminNavigationGroup, AdminShellUser } from '../../shell.types';
 import type { RefObject } from 'react';
 
 interface AdminTopBarProps {
@@ -18,7 +18,8 @@ interface AdminTopBarProps {
   navigation: readonly AdminNavigationGroup[];
   onColorModeChange: (mode: AdminColorMode) => void;
   onMenuOpen: () => void;
-  profileLinks: readonly AdminProfileLink[];
+  user: AdminShellUser | null;
+  profileHref: string | null;
 }
 
 export function AdminTopBar({
@@ -27,7 +28,8 @@ export function AdminTopBar({
   navigation,
   onColorModeChange,
   onMenuOpen,
-  profileLinks,
+  profileHref,
+  user,
 }: AdminTopBarProps) {
   return (
     <AppBar
@@ -54,7 +56,7 @@ export function AdminTopBar({
         <TopBarSearch />
         <NotificationsMenu />
         <ColorSchemeMenu mode={colorMode} onModeChange={onColorModeChange} />
-        <ProfileMenu links={profileLinks} />
+        <ProfileMenu profileHref={profileHref} user={user} />
       </Toolbar>
     </AppBar>
   );

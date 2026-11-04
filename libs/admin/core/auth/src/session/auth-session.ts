@@ -27,6 +27,15 @@ export async function logout(): Promise<void> {
   }
 }
 
+/**
+ * Re-reads the signed-in user after they change their own name, email or photo, so the header
+ * shows it. A failure leaves the current session as it is.
+ */
+export async function refreshSession(): Promise<void> {
+  const user = await requestCurrentUser();
+  setSessionState(user ? { status: 'authenticated', user } : { status: 'anonymous' });
+}
+
 /** Restores the session from the cookie; any API 401 later sends the user back to the login page. */
 export async function initializeAdminAuth(): Promise<void> {
   configureApiClient({ authSession: { onUnauthenticated: endLocalSession } });

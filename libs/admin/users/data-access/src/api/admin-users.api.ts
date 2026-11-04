@@ -1,11 +1,18 @@
 import { adminApi } from '@admin/shared/api-client';
 
 import { mapStaffAccount, mapStaffAccounts } from '../mappers/staff-account.mapper';
+import { toPhoneBody } from '../mappers/staff-profile.mapper';
 
 import type { components } from '@admin/shared/contracts';
-import type { CreateStaffAccountInput, StaffAccount, StaffRole } from '@admin/users/model';
+import type {
+  CreateStaffAccountInput,
+  StaffAccount,
+  StaffDetailsInput,
+  StaffRole,
+} from '@admin/users/model';
 
 type CreateStaffAccountBody = components['schemas']['CreateStaffAccountRequest'];
+type UpdateStaffDetailsBody = components['schemas']['UpdateStaffDetailsRequest'];
 
 const root = '/api/admin/users';
 const userUrl = (userId: number, action: string) => `${root}/${userId}/${action}`;
@@ -30,6 +37,19 @@ export const adminUsersApi = adminApi.injectEndpoints({
       }),
       transformResponse: mapStaffAccount,
       invalidatesTags: ['StaffAccount'],
+    }),
+    updateStaffDetails: build.mutation<void, { userId: number; details: StaffDetailsInput }>({
+      query: ({ userId, details }) => ({
+        url: userUrl(userId, 'details'),
+        method: 'PUT',
+        body: {
+          fullName: details.fullName.trim(),
+          email: details.email.trim(),
+          phoneNumber: toPhoneBody(details.phoneNumber),
+        } satisfies UpdateStaffDetailsBody,
+      }),
+      // The signed-in admin may edit their own row, which their profile also shows.
+      invalidatesTags: ['StaffAccount', 'StaffProfile'],
     }),
     changeStaffRole: build.mutation<void, { userId: number; role: StaffRole }>({
       query: ({ userId, role }) => ({
@@ -68,4 +88,5 @@ export const {
   useGetStaffAccountsQuery,
   useSetStaffBlockedMutation,
   useSetStaffPasswordMutation,
+  useUpdateStaffDetailsMutation,
 } = adminUsersApi;

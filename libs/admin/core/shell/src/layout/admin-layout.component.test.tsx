@@ -27,11 +27,19 @@ function renderShell(initialPath = '/', onLogout?: () => Promise<void>) {
                 },
               ]}
               onColorModeChange={onColorModeChange}
+              profileHref="/profile"
+              user={{
+                avatarUrl: null,
+                email: 'olena@brevi.com.ua',
+                fullName: 'Олена',
+                roleLabel: 'Менеджер',
+              }}
             />
           }
         >
           <Route index element={<h1>Початкова сторінка</h1>} />
           <Route path="example" element={<h1>Приклад сторінки</h1>} />
+          <Route path="profile" element={<h1>Мій кабінет</h1>} />
         </Route>
       </Routes>
     </MemoryRouter>
@@ -179,7 +187,20 @@ describe('AdminLayout', () => {
     await user.keyboard('{Escape}');
 
     await user.click(screen.getByRole('button', { name: 'Профіль' }));
-    await user.click(await screen.findByRole('menuitem', { name: 'Вийти' }));
+    const menu = await screen.findByRole('menu');
+    expect(within(menu).getByText('olena@brevi.com.ua')).toBeVisible();
+    expect(within(menu).getByText('Менеджер')).toBeVisible();
+    await user.click(within(menu).getByRole('menuitem', { name: 'Вийти' }));
     expect(onLogout).toHaveBeenCalledOnce();
+  });
+
+  it('opens «Мій кабінет» from the profile menu', async () => {
+    const user = userEvent.setup();
+    renderShell('/');
+
+    await user.click(screen.getByRole('button', { name: 'Профіль' }));
+    await user.click(await screen.findByRole('menuitem', { name: 'Мій кабінет' }));
+
+    expect(await screen.findByRole('heading', { name: 'Мій кабінет' })).toBeVisible();
   });
 });
