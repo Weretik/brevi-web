@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  embroideryValuesFromRequest,
   emptyEmbroideryCalculation,
   isEmbroideryExpenseTicked,
   needsEmbroideryMachineTime,
@@ -107,5 +108,32 @@ describe('«Розрахунок» form', () => {
       'quantity',
       'stitchesPerUnit',
     ]);
+  });
+});
+
+describe('embroideryValuesFromRequest', () => {
+  it('loads a saved form and drops hoops and costs that no longer exist', () => {
+    const values = embroideryValuesFromRequest(
+      {
+        mode: 'Chevron',
+        quantity: 120,
+        stitchesPerUnit: 8000,
+        hoopId: 'gone',
+        unitsPerHoop: 4,
+        stabilizerLayers: 2,
+        fabricLayers: 1,
+        program: 'Ready',
+        programMinutes: 0,
+        machineMinutes: null,
+        materialMode: 'FullCut',
+        expenseOverrides: { glue: false, removed: true },
+      },
+      setup,
+    );
+
+    expect(values.quantity).toBe(120);
+    expect(values.hoopId).toBe('18');
+    expect(values.programMinutes).toBe(60);
+    expect(values.expenseOverrides).toEqual({ glue: false });
   });
 });

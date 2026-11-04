@@ -4,6 +4,7 @@ import { Alert, Box, Button, CircularProgress, Tab, Tabs } from '@mui/material';
 import { useSearchParams } from 'react-router-dom';
 
 import { EmbroideryCalculationTab } from '../components/calculation/embroidery-calculation-tab';
+import { EmbroiderySavedTab } from '../components/saved/embroidery-saved-tab';
 import { EmbroideryLeaveDialog } from '../components/settings/embroidery-leave-dialog';
 import { EmbroiderySettingsTab } from '../components/settings/embroidery-settings-tab';
 import { useEmbroideryCalculation } from '../hooks/calculation/use-embroidery-calculation';
@@ -56,7 +57,7 @@ function EmbroideryPriceContent({
   const calculator = useEmbroideryCalculation(setup);
   const canEdit = viewer.canEditSettings && setup.seesCost;
   const setTab = (next: EmbroideryTab) =>
-    setSearch(next === 'settings' ? { tab: 'settings' } : {}, { replace: true });
+    setSearch(next === 'calculation' ? {} : { tab: next }, { replace: true });
   const since = dateOf(setup.settingsUpdatedAt);
 
   return (
@@ -73,23 +74,32 @@ function EmbroideryPriceContent({
           ) : null
         }
       />
-      {canEdit && (
-        <Tabs
-          value={tab}
-          onChange={(_event, next: EmbroideryTab) => setTab(next)}
-          sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}
-        >
-          <Tab value="calculation" label="Розрахунок" />
-          <Tab value="settings" label="Налаштування" />
-        </Tabs>
-      )}
+      <Tabs
+        value={tab}
+        onChange={(_event, next: EmbroideryTab) => setTab(next)}
+        sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}
+      >
+        <Tab value="calculation" label="Розрахунок" />
+        <Tab value="saved" label="Збережені" />
+        {canEdit && <Tab value="settings" label="Налаштування" />}
+      </Tabs>
       <Box hidden={tab !== 'calculation'}>
         <EmbroideryCalculationTab
           calculator={calculator}
           seesCost={setup.seesCost}
           onOpenSettings={() => setTab('settings')}
+          onOpenSaved={() => setTab('saved')}
         />
       </Box>
+      {tab === 'saved' && (
+        <EmbroiderySavedTab
+          canDelete={canEdit}
+          onRepeat={(request) => {
+            calculator.load(request);
+            setTab('calculation');
+          }}
+        />
+      )}
       {canEdit && (
         <Box hidden={tab !== 'settings'}>
           <EmbroiderySettingsArea />

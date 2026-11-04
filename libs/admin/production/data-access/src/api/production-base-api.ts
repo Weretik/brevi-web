@@ -7,5 +7,7 @@ export const productionBaseApi = adminApi.enhanceEndpoints({
     'PayrollParameter',
     'ProductionOrder',
     'WorkshopSettings',
+    'FabricStock',
+    'ItemFabric',
   ],
 });

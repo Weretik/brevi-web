@@ -8,7 +8,7 @@ import { movePhoto } from '@admin/products/model';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
 import { useState } from 'react';
 
-import type { ProductPhoto } from '@admin/products/model';
+import type { ProductCardPhoto } from '@admin/products/model';
 
 /**
  * The card tab «Фото» (CAT-018). Every change saves at once: Admin (the Director also holds Admin)
@@ -25,7 +25,7 @@ export function useProductPhotos(productId: number) {
   const canEdit = access.currentData?.canManagePhotos === true && !access.isError;
   const busy = saveState.isLoading || uploading;
 
-  async function store(next: readonly ProductPhoto[], mainMediaFileId: number | null) {
+  async function store(next: readonly ProductCardPhoto[], mainMediaFileId: number | null) {
     setMessage(null);
     try {
       await save({

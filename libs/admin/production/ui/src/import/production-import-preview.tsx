@@ -50,6 +50,11 @@ export function ProductionImportPreview({ result, keyLabel, detailLabel }: Props
         {labels.created}: {result.created} · {labels.updated}: {result.updated} · Без змін:{' '}
         {result.unchanged}
       </Typography>
+      {result.notes?.map((note) => (
+        <Alert key={note} severity="info">
+          {note}
+        </Alert>
+      ))}
       <TableContainer component={Paper} variant="outlined" sx={{ maxHeight: 420 }}>
         <Table stickyHeader size="small" aria-label="Рядки імпорту">
           <TableHead>

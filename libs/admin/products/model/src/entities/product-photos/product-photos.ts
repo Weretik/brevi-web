@@ -1,5 +1,5 @@
 /** One photo of a product card tab «Фото» (CAT-018). */
-export interface ProductPhoto {
+export interface ProductCardPhoto {
   mediaFileId: number;
   fileName: string | null;
   url: string | null;
@@ -9,13 +9,16 @@ export interface ProductPhoto {
   missing: boolean;
 }
 
+/** A new model's season; the server accepts only these. */
+export type OldSiteSeason = 'Літо' | 'Зима';
+
 /** One old product of the file «old-site-photo-import.json». */
 export interface OldSiteProduct {
   oldId: number;
   oldName: string;
   skus: string[];
   photos: { path: string; isMain: boolean }[];
-  newModel: { name: string; section: string; season: string | null } | null;
+  newModel: { name: string; section: string; season: OldSiteSeason | null } | null;
 }
 
 /** The whole file: the old-site image folder and the products. */

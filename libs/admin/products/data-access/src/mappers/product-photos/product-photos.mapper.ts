@@ -2,10 +2,10 @@ import type {
   OldSitePhotoImportReportResponse,
   ProductPhotoListResponse,
 } from '../../contracts/product-photos/product-photos.dto';
-import type { OldSitePhotoImportReport, ProductPhoto } from '@admin/products/model';
+import type { OldSitePhotoImportReport, ProductCardPhoto } from '@admin/products/model';
 
 /** Photos in display order (CAT-018). */
-export function mapProductPhotos(value: ProductPhotoListResponse): ProductPhoto[] {
+export function mapProductPhotos(value: ProductPhotoListResponse): ProductCardPhoto[] {
   return [...value.photos]
     .sort((a, b) => a.sortOrder - b.sortOrder)
     .map((photo) => ({

@@ -6,11 +6,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ProductPhotosTab } from './product-photos-tab';
 import { render } from '../../test-utils';
 
-import type { ProductPhoto } from '@admin/products/model';
+import type { ProductCardPhoto } from '@admin/products/model';
 
 const mocks = vi.hoisted(() => ({ access: vi.fn(), save: vi.fn() }));
 
-const photos: ProductPhoto[] = [
+const photos: ProductCardPhoto[] = [
   {
     mediaFileId: 10,
     fileName: 'main.jpg',

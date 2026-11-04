@@ -14,7 +14,7 @@ import type {
   ImportOldSitePhotosBody,
   SetProductPhotosBody,
 } from '../../contracts/product-photos/product-photos.dto';
-import type { OldSitePhotoImportReport, ProductPhoto } from '@admin/products/model';
+import type { OldSitePhotoImportReport, ProductCardPhoto } from '@admin/products/model';
 
 const tag = 'Product' as const;
 const photosTag = (id: number) => ({ type: tag, id: `photos-${id}` });
@@ -22,13 +22,16 @@ const photosTag = (id: number) => ({ type: tag, id: `photos-${id}` });
 /** The card tab «Фото» and the old-site photo import (CAT-018). */
 export const productPhotosApi = adminApi.injectEndpoints({
   endpoints: (build) => ({
-    getProductPhotos: build.query<ProductPhoto[], number>({
+    getProductPhotos: build.query<ProductCardPhoto[], number>({
       query: (id) => `/api/v1/products/${id}/photos`,
       transformResponse: (value: unknown) => mapProductPhotos(parseProductPhotoList(value)),
       transformErrorResponse: (error) => toAdminApiError(error, productErrorMessages),
       providesTags: (_result, _error, id) => [photosTag(id)],
     }),
-    setProductPhotos: build.mutation<ProductPhoto[], { id: number; body: SetProductPhotosBody }>({
+    setProductPhotos: build.mutation<
+      ProductCardPhoto[],
+      { id: number; body: SetProductPhotosBody }
+    >({
       query: ({ id, body }) => ({ url: `/api/v1/products/${id}/photos`, method: 'PUT', body }),
       transformResponse: (value: unknown) => mapProductPhotos(parseProductPhotoList(value)),
       transformErrorResponse: (error) => toAdminApiError(error, productErrorMessages),

@@ -47,3 +47,21 @@ export function ensureEmbroiderySettings(value: unknown): Schemas['CrmEmbroidery
     throw invalid();
   return value as Schemas['CrmEmbroiderySettings'];
 }
+
+export function ensureEmbroiderySavedPage(value: unknown): Schemas['CrmEmbroiderySavedPage'] {
+  check(value, ['items'], ['page', 'pageSize', 'total']);
+  const items = (value as { items: unknown[] }).items;
+  if (
+    items.some((item) => !isRecord(item) || !isNumber(item['id']) || !Array.isArray(item['prices']))
+  )
+    throw invalid();
+  return value as Schemas['CrmEmbroiderySavedPage'];
+}
+
+export function ensureEmbroiderySavedCalculation(
+  value: unknown,
+): Schemas['CrmEmbroiderySavedCalculation'] {
+  if (!isRecord(value) || !isRecord(value['summary']) || !isRecord(value['input'])) throw invalid();
+  ensureEmbroideryCalculation(value['result']);
+  return value as Schemas['CrmEmbroiderySavedCalculation'];
+}

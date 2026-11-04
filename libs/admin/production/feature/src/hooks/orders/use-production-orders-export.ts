@@ -3,18 +3,11 @@ import { productionOrdersCsv } from '@admin/production/model';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
 import { useState } from 'react';
 
+import { downloadCsv } from '../files/download-csv';
+
 import type { ProductionOrderListQuery, ProductionOrderSummary } from '@admin/production/model';
 
 const exportPageSize = 200;
-
-function download(text: string, fileName: string) {
-  const url = URL.createObjectURL(new Blob([text], { type: 'text/csv;charset=utf-8' }));
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = fileName;
-  link.click();
-  URL.revokeObjectURL(url);
-}
 
 /** «Експорт»: every order the filters show, as a CSV file that Excel opens. */
 export function useProductionOrdersExport(onError: (message: string) => void) {
@@ -30,7 +23,7 @@ export function useProductionOrdersExport(onError: (message: string) => void) {
         rows.push(...result.items);
         if (rows.length >= result.total || result.items.length === 0) break;
       }
-      download(productionOrdersCsv(rows), `vyrobnychi-zavdannia-${today}.csv`);
+      downloadCsv(productionOrdersCsv(rows), `vyrobnychi-zavdannia-${today}.csv`);
     } catch (error) {
       onError(adminApiErrorMessage(error, 'Не вдалося вивантажити завдання.'));
     } finally {

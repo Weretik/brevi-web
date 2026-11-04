@@ -71,9 +71,9 @@ describe('React Admin routing', () => {
         'Швейний цех',
         [
           'Виробничі завдання',
+          'Склад тканин',
           'Графік роботи',
           'Зарплата',
-          'Тканина в цеху',
           'Фурнітура в цеху',
           'Робочий час',
           'Вишивка',
@@ -110,9 +110,9 @@ describe('React Admin routing', () => {
       expect(within(list).queryAllByRole('link')).toHaveLength(
         section === 'Загальні довідники'
           ? 7
-          : section === 'Менеджер сервісу'
+          : section === 'Менеджер сервісу' || section === 'Швейний цех'
             ? 2
-            : section === 'Фото' || section === 'Швейний цех'
+            : section === 'Фото'
               ? 1
               : 0,
       );

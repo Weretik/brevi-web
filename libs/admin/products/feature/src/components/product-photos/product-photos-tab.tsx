@@ -23,7 +23,7 @@ import { useState } from 'react';
 
 import { useProductPhotos } from '../../hooks/product-photos/use-product-photos';
 
-import type { ProductPhoto } from '@admin/products/model';
+import type { ProductCardPhoto } from '@admin/products/model';
 
 interface Props {
   productId: number;
@@ -31,7 +31,7 @@ interface Props {
 }
 
 interface CardProps {
-  photo: ProductPhoto;
+  photo: ProductCardPhoto;
   index: number;
   count: number;
   name: string;

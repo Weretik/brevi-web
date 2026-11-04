@@ -29,7 +29,8 @@ function readProduct(value: unknown): OldSiteProduct | null {
     model = {
       name: newModel['name'],
       section: newModel['section'],
-      season: typeof newModel['season'] === 'string' ? newModel['season'] : null,
+      season:
+        newModel['season'] === 'Літо' || newModel['season'] === 'Зима' ? newModel['season'] : null,
     };
   }
   return {
