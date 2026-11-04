@@ -86,6 +86,9 @@ export interface Quote {
   readonly updatedAt: string;
   /** Last time Gmail accepted the КП; null for a draft. */
   readonly lastSentAt: string | null;
+  /** Set while the КП is in «Архів»: it opens read-only until restored. */
+  readonly archivedAt: string | null;
+  readonly archivedByName: string | null;
   readonly version: number;
   readonly items: readonly QuoteItem[];
   /** Only a «КП для знайомства» has it; its items go page by page, 4 per page. */
@@ -103,6 +106,7 @@ export interface QuoteSummary {
   readonly itemsCount: number;
   readonly updatedAt: string;
   readonly lastSentAt: string | null;
+  readonly archivedAt: string | null;
 }
 
 export interface QuotePage {
@@ -113,10 +117,31 @@ export interface QuotePage {
 }
 
 export interface QuoteListQuery {
+  /** True lists only «Архів», false only КП in work. */
+  readonly archived: boolean;
   readonly search: string;
   readonly responsibleUserId: number | null;
   readonly page: number;
   readonly pageSize: number;
+}
+
+export type QuoteEventKind =
+  | 'Created'
+  | 'Saved'
+  | 'Sent'
+  | 'Repriced'
+  | 'ResponsibleChanged'
+  | 'Archived'
+  | 'Restored'
+  | 'Copied';
+
+/** A line of «Історія змін». */
+export interface QuoteEvent {
+  readonly id: number;
+  readonly kind: QuoteEventKind;
+  readonly at: string;
+  readonly actor: QuotePerson;
+  readonly details: string | null;
 }
 
 /** The signed-in staff member: a Manager works with own КП; Director and Admin see all. */

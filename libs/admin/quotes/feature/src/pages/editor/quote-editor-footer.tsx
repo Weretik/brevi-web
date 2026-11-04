@@ -6,6 +6,8 @@ interface Props {
   dirty: boolean;
   saving: boolean;
   generating: boolean;
+  /** An archived КП: nothing is saved or sent until it is restored. */
+  locked?: boolean;
   onClose: () => void;
   onSave: () => void;
   onPdf: () => void;
@@ -17,6 +19,7 @@ export function QuoteEditorFooter({
   dirty,
   saving,
   generating,
+  locked = false,
   onClose,
   onSave,
   onPdf,
@@ -45,7 +48,7 @@ export function QuoteEditorFooter({
         </Typography>
       )}
       <Button onClick={onClose}>Закрити</Button>
-      <Button onClick={onSave} disabled={busy}>
+      <Button onClick={onSave} disabled={busy || locked}>
         {saving && !generating ? 'Зберігаємо…' : 'Зберегти зміни'}
       </Button>
       <Button
@@ -56,7 +59,12 @@ export function QuoteEditorFooter({
       >
         {generating ? 'Формуємо…' : 'Сформувати КП'}
       </Button>
-      <Button variant="contained" startIcon={<SendOutlinedIcon />} disabled={busy} onClick={onSend}>
+      <Button
+        variant="contained"
+        startIcon={<SendOutlinedIcon />}
+        disabled={busy || locked}
+        onClick={onSend}
+      >
         Надіслати КП
       </Button>
     </Paper>

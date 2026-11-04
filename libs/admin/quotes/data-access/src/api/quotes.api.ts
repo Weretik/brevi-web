@@ -1,15 +1,24 @@
 import { quotesBaseApi } from './quotes-base-api';
 import { quoteErrors, toQuoteApiError } from '../errors/quote-api-error';
 import { toSaveQuoteInput } from '../mappers/quote-input.mapper';
-import { mapQuote, mapQuotePage, mapQuoteRepriceReport } from '../mappers/quote.mapper';
+import {
+  mapQuote,
+  mapQuoteEvent,
+  mapQuotePage,
+  mapQuoteRepriceReport,
+} from '../mappers/quote.mapper';
 
 import type {
   Quote,
   QuoteDraft,
+  QuoteEvent,
   QuoteListQuery,
   QuotePage,
   QuoteRepriceReport,
 } from '@admin/quotes/model';
+import type { components } from '@admin/shared/contracts';
+
+type Schemas = components['schemas'];
 
 const list = [{ type: 'QuoteList' as const, id: 'LIST' }];
 const errors = (response: unknown) => toQuoteApiError(response, quoteErrors);
@@ -20,6 +29,7 @@ export const quotesApi = quotesBaseApi.injectEndpoints({
       query: (query) => ({
         url: '/api/crm/quotes',
         params: {
+          archived: query.archived || undefined,
           search: query.search.trim() || undefined,
           responsibleUserId: query.responsibleUserId ?? undefined,
           page: query.page,
@@ -83,6 +93,30 @@ export const quotesApi = quotesBaseApi.injectEndpoints({
       }),
       transformResponse: mapQuote,
       transformErrorResponse: errors,
+      invalidatesTags: (_result, error, { id }) =>
+        error ? [] : [...list, { type: 'QuoteHistory', id }],
+    }),
+    getQuoteHistory: build.query<readonly QuoteEvent[], number>({
+      query: (id) => `/api/crm/quotes/${id}/history`,
+      transformResponse: (value: Schemas['CrmQuoteEvent'][]) => value.map(mapQuoteEvent),
+      transformErrorResponse: errors,
+      providesTags: (_result, _error, id) => [{ type: 'QuoteHistory', id }],
+    }),
+    setQuoteArchived: build.mutation<Quote, { id: number; version: number; archived: boolean }>({
+      query: ({ id, version, archived }) => ({
+        url: `/api/crm/quotes/${id}/${archived ? 'archive' : 'restore'}`,
+        method: 'POST',
+        body: { version },
+      }),
+      transformResponse: mapQuote,
+      transformErrorResponse: errors,
+      invalidatesTags: (_result, error, { id }) =>
+        error ? [] : [...list, { type: 'QuoteHistory', id }],
+    }),
+    copyQuote: build.mutation<Quote, number>({
+      query: (id) => ({ url: `/api/crm/quotes/${id}/copy`, method: 'POST' }),
+      transformResponse: mapQuote,
+      transformErrorResponse: errors,
       invalidatesTags: (_result, error) => (error ? [] : list),
     }),
   }),
@@ -97,4 +131,7 @@ export const {
   useDeleteQuoteMutation,
   useRepriceQuoteMutation,
   useSetQuoteResponsibleMutation,
+  useGetQuoteHistoryQuery,
+  useSetQuoteArchivedMutation,
+  useCopyQuoteMutation,
 } = quotesApi;

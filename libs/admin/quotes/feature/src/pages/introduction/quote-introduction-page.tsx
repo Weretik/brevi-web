@@ -1,10 +1,12 @@
 import { useDeleteQuoteMutation } from '@admin/quotes/data-access';
 import { quoteIntroPageErrors } from '@admin/quotes/model';
 import {
+  QuoteArchivedNotice,
   QuoteIntroLayoutStep,
   QuoteIntroLetterStep,
   QuoteIntroPagesStep,
   QuoteIntroRecipientStep,
+  QuoteMoreMenu,
 } from '@admin/quotes/ui';
 import { ReferencePageHeader } from '@admin/references/ui';
 import { Alert, Box, Button, CircularProgress, Stack } from '@mui/material';
@@ -16,9 +18,12 @@ import { QuoteDeleteDialog } from '../../components/editor/quote-delete-dialog';
 import { QuoteIntroModelPickerDrawer } from '../../components/introduction/quote-intro-model-picker-drawer';
 import { QuoteIntroTemplateSaveDrawer } from '../../components/introduction/quote-intro-template-save-drawer';
 import { QuoteIntroTemplatesDrawer } from '../../components/introduction/quote-intro-templates-drawer';
+import { QuoteHistoryDrawer } from '../../components/lifecycle/quote-history-drawer';
 import { QuoteSendDrawer } from '../../components/sending/quote-send-drawer';
 import { useQuotePdf } from '../../hooks/editor/use-quote-pdf';
 import { useQuoteIntroductionEditor } from '../../hooks/introduction/use-quote-introduction-editor';
+import { useQuoteLifecycle } from '../../hooks/lifecycle/use-quote-lifecycle';
+import { useRouteNotice } from '../../hooks/lifecycle/use-route-notice';
 import { useGmailReturnNotice } from '../../hooks/sending/use-gmail-return-notice';
 import { QuoteEditorFooter } from '../editor/quote-editor-footer';
 
@@ -28,6 +33,7 @@ type Panel =
   | { kind: 'pick'; season: QuoteIntroSeason; slot: QuoteIntroSlotDraft }
   | { kind: 'templates' }
   | { kind: 'save-template' }
+  | { kind: 'history' }
   | { kind: 'send' };
 
 const sentLabel = (at: string | null) =>
@@ -48,6 +54,8 @@ export default function QuoteIntroductionPage({ actor }: { actor: QuoteActor }) 
   );
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleteQuote, deleting] = useDeleteQuoteMutation();
+  const lifecycle = useQuoteLifecycle(quote, editor.applyServerQuote);
+  const routeNotice = useRouteNotice();
 
   if (editor.wrongKind && id !== null) return <Navigate to={`/crm/quotes/${id}`} replace />;
   if (editor.loadError)
@@ -87,25 +95,55 @@ export default function QuoteIntroductionPage({ actor }: { actor: QuoteActor }) 
             : 'Самостійна добірка для холодного контакту: лише актуальні моделі, тканини та ціни з каталогу.'
         }
         actions={
-          <QuoteIntroductionActions
-            canDelete={quote?.status === 'Draft'}
-            onDelete={() => setConfirmDelete(true)}
-            onRestart={() => {
-              setNotice(null);
-              editor.restart();
-            }}
-            onTemplates={() => setPanel({ kind: 'templates' })}
-            onSaveTemplate={() => {
-              if (Object.keys(quoteIntroPageErrors(draft)).length > 0)
-                setNotice({
-                  severity: 'warning',
-                  text: 'Щоб зберегти шаблон, оберіть усі моделі й тканини.',
-                });
-              else setPanel({ kind: 'save-template' });
-            }}
-          />
+          <>
+            <QuoteIntroductionActions
+              canDelete={quote?.status === 'Draft'}
+              onDelete={() => setConfirmDelete(true)}
+              onRestart={() => {
+                setNotice(null);
+                editor.restart();
+              }}
+              onTemplates={() => setPanel({ kind: 'templates' })}
+              onSaveTemplate={() => {
+                if (Object.keys(quoteIntroPageErrors(draft)).length > 0)
+                  setNotice({
+                    severity: 'warning',
+                    text: 'Щоб зберегти шаблон, оберіть усі моделі й тканини.',
+                  });
+                else setPanel({ kind: 'save-template' });
+              }}
+            />
+            {quote && (
+              <QuoteMoreMenu
+                archived={lifecycle.archived}
+                dirty={editor.dirty}
+                busy={lifecycle.busy}
+                onHistory={() => setPanel({ kind: 'history' })}
+                onCopy={() => void lifecycle.copy()}
+                onArchive={(archived) => void lifecycle.setArchived(archived)}
+              />
+            )}
+          </>
         }
       />
+      {quote?.archivedAt && (
+        <QuoteArchivedNotice
+          archivedAt={quote.archivedAt}
+          archivedByName={quote.archivedByName}
+          busy={lifecycle.busy}
+          onRestore={() => void lifecycle.setArchived(false)}
+        />
+      )}
+      {lifecycle.error && (
+        <Alert severity="error" sx={{ mb: 2 }} onClose={lifecycle.clearError}>
+          {lifecycle.error}
+        </Alert>
+      )}
+      {routeNotice.notice && (
+        <Alert severity="success" sx={{ mb: 2 }} onClose={routeNotice.dismiss}>
+          {routeNotice.notice}
+        </Alert>
+      )}
       {editor.saveError && (
         <Alert
           severity="error"
@@ -159,6 +197,7 @@ export default function QuoteIntroductionPage({ actor }: { actor: QuoteActor }) 
         dirty={editor.dirty}
         saving={editor.saving}
         generating={pdf.generating}
+        locked={lifecycle.archived}
         onClose={() => navigate('/crm/quotes')}
         onSave={() => void editor.save()}
         onPdf={() => void pdf.generate()}
@@ -198,6 +237,13 @@ export default function QuoteIntroductionPage({ actor }: { actor: QuoteActor }) 
             setPanel(null);
             setNotice({ severity: 'success', text: `Шаблон «${name}» збережено.` });
           }}
+        />
+      )}
+      {panel?.kind === 'history' && quote && (
+        <QuoteHistoryDrawer
+          quoteId={quote.id}
+          number={quote.number}
+          onClose={() => setPanel(null)}
         />
       )}
       {panel?.kind === 'send' && quote && (

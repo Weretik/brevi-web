@@ -61,6 +61,9 @@ vi.mock('@admin/quotes/data-access', () => ({
   useCreateQuoteIntroductionMutation: api.mutation(api.create),
   useSaveQuoteIntroductionMutation: api.mutation(vi.fn()),
   useDeleteQuoteMutation: api.mutation(vi.fn()),
+  useSetQuoteArchivedMutation: api.mutation(vi.fn()),
+  useCopyQuoteMutation: api.mutation(vi.fn()),
+  useGetQuoteHistoryQuery: () => ({ data: [], isLoading: false, isError: false }),
   useSearchQuoteCatalogQuery: () => ({
     data: { items: [2, 3, 4].map((id) => product(id)), page: 1, pageSize: 20, total: 3 },
     isFetching: false,
@@ -143,6 +146,8 @@ describe('КП для знайомства', () => {
       createdAt: '2026-11-04T10:00:00Z',
       updatedAt: '2026-11-04T10:00:00Z',
       lastSentAt: null,
+      archivedAt: null,
+      archivedByName: null,
       version: 1,
       items: [],
       introduction: { layout: 'Summer', recipientEmail: null, letterName: null },

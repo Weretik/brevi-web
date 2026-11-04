@@ -10,6 +10,8 @@ interface Props {
   rowCount: number;
   loading: boolean;
   searching: boolean;
+  /** The «Архів» tab. */
+  archive?: boolean;
   paginationModel: GridPaginationModel;
   onPaginationModelChange: (model: GridPaginationModel) => void;
   onOpen: (row: QuoteSummary) => void;
@@ -63,6 +65,7 @@ export function QuotesTable({
   rowCount,
   loading,
   searching,
+  archive = false,
   paginationModel,
   onPaginationModelChange,
   onOpen,
@@ -86,7 +89,11 @@ export function QuotesTable({
           onPaginationModelChange={onPaginationModelChange}
           onRowClick={({ row }) => onOpen(row)}
           localeText={{
-            noRowsLabel: searching ? 'Нічого не знайдено' : 'Ще немає жодної КП',
+            noRowsLabel: searching
+              ? 'Нічого не знайдено'
+              : archive
+                ? 'В архіві немає КП'
+                : 'Ще немає жодної КП',
             paginationRowsPerPage: 'Рядків на сторінці',
           }}
           sx={{
