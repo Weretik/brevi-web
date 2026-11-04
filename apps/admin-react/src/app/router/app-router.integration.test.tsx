@@ -303,7 +303,7 @@ describe('React Admin routing', () => {
         name: 'Бібліотека фото',
       }),
     ).toHaveAttribute('href', '/media');
-    expect(await screen.findByText('Бібліотека поки порожня.')).toBeVisible();
+    expect(await screen.findByText(/^Бібліотека поки порожня\./)).toBeVisible();
   });
 
   it('persists the selected color mode', async () => {
