@@ -1,1 +1,1 @@
-export { productionRoutes } from './production.routes';
+export { createProductionOrderRoutes, productionRoutes } from './production.routes';

@@ -10,7 +10,7 @@ import {
 
 import type { FabricNormRow, FabricNormValues } from '@admin/production/model';
 
-function mapValues(value: unknown): FabricNormValues | null {
+export function mapFabricNormValues(value: unknown): FabricNormValues | null {
   if (value === null || value === undefined) return null;
   const norm = record(value, 'норма');
   return {
@@ -29,7 +29,7 @@ export function mapFabricNormRow(value: unknown): FabricNormRow {
     modelCode: nonEmptyText(row['modelCode'], 'код моделі'),
     modelName: nullableText(row['modelName'], 'назва моделі'),
     modelIsActive: boolean(row['modelIsActive'], 'стан моделі'),
-    norm: mapValues(row['norm']),
+    norm: mapFabricNormValues(row['norm']),
     twoColorsTotal: nullableNumber(row['twoColorsTotal'], 'разом два кольори'),
     threeColorsTotal: nullableNumber(row['threeColorsTotal'], 'разом три кольори'),
     updatedAt: nullableDateTime(row['updatedAt'], 'час зміни'),

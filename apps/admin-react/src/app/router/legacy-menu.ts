@@ -29,6 +29,8 @@ interface LegacyNavigationGroup {
 const admin = ['Admin'] as const;
 /** «Швейний цех»: the head of the workshop; Admin covers the director. */
 const workshop = ['Admin', 'WorkshopChief'] as const;
+/** «Виробничі завдання»: managers too, since they pass КП to the workshop. */
+const productionOrders = ['Admin', 'Manager', 'WorkshopChief'] as const;
 
 export const legacyGroups: readonly LegacyNavigationGroup[] = [
   {
@@ -56,6 +58,12 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
     section: 'Робота',
     label: 'Швейний цех',
     items: [
+      {
+        id: 'production-orders',
+        label: 'Виробничі завдання',
+        path: '/production/orders',
+        requiredRoles: productionOrders,
+      },
       {
         id: 'workshop-staff',
         label: 'Працівники цеху',

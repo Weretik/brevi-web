@@ -60,3 +60,24 @@ export function mapFabricNormImportResult(value: unknown): ProductionImportResul
     }),
   };
 }
+
+/** Moved orders shown in the shared import preview: «№ 12» and the client with its items. */
+export function mapOrderImportResult(value: unknown): ProductionImportResult {
+  const row = record(value, 'результат імпорту');
+  return {
+    dryRun: boolean(row['dryRun'], 'перегляд'),
+    created: integer(row['created'], 'додано'),
+    updated: 0,
+    unchanged: integer(row['unchanged'], 'без змін'),
+    errors: integer(row['errors'], 'помилки'),
+    lines: list(row['lines'], 'рядки імпорту').map((item) => {
+      const line = record(item, 'рядок імпорту');
+      return {
+        key: `№ ${integer(line['number'], 'номер', 1)}`,
+        detail: `${text(line['clientName'], 'клієнт')} · позицій: ${integer(line['items'], 'позицій')}`,
+        action: action(line['action']),
+        error: nullableText(line['error'], 'помилка'),
+      };
+    }),
+  };
+}
