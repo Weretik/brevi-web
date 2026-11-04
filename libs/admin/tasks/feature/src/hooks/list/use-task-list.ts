@@ -21,7 +21,7 @@ export function useTaskList() {
     page: pagination.page + 1,
     pageSize: pagination.pageSize,
   });
-  // Counts follow the selected manager; the workload list always shows everyone.
+  // Counts follow the selected manager; «Навантаження» always shows everyone.
   const overview = useGetTaskOverviewQuery({ assigneeUserId });
   const team = useGetTaskOverviewQuery({ assigneeUserId: null });
 
@@ -46,6 +46,7 @@ export function useTaskList() {
     page: query.data,
     overview: overview.data,
     load: team.data?.load ?? [],
+    loadLoading: team.isFetching,
     loading: query.isFetching,
     error: query.isError
       ? adminApiErrorMessage(query.error, 'Не вдалося завантажити завдання.')
