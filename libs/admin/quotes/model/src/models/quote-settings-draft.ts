@@ -61,6 +61,8 @@ export interface QuoteStaffContactDraft {
   name: string;
   phone: string;
   email: string;
+  /** Shown only; Gmail is connected with its own buttons, not saved with the page. */
+  mailboxEmail: string;
 }
 
 export interface QuoteSettingsDraft {
