@@ -1,6 +1,6 @@
-# Admin React: «Ціна вишивки», stage 1
+# Admin React: «Ціна вишивки», stages 1–2
 
-**Status:** stage 1 implemented 2026-11-04 ([feature card](../../../../features/admin/embroidery.md)). **Backend:** BreviERP [EMB-001 embroidery price](https://github.com/Weretik/BreviERP/blob/master/docs/sdd/specs/crm/005-embroidery-price/README.md) (formulas, rules R-*, scenarios), module Crm, `/api/crm/embroidery`. **Design:** [«Цех»](../../../../standards/admin/design-system.md); the owner picked variant A «Форма + живий підсумок» on 2026-11-04 from the [concept canvas](https://claude.ai/artifact/2pXPhQwf477xw9s4HAfNcr).
+**Status:** stages 1 and 2 («Збережені») implemented 2026-11-04 ([feature card](../../../../features/admin/embroidery.md)). **Backend:** BreviERP [EMB-001 embroidery price](https://github.com/Weretik/BreviERP/blob/master/docs/sdd/specs/crm/005-embroidery-price/README.md) (formulas, rules R-*, scenarios), module Crm, `/api/crm/embroidery`. **Design:** [«Цех»](../../../../standards/admin/design-system.md); the owner picked variant A «Форма + живий підсумок» on 2026-11-04 from the [concept canvas](https://claude.ai/artifact/2pXPhQwf477xw9s4HAfNcr).
 
 It replaces the «Ціна вишивки» page of the old calculator.brevi.com.ua. Marks appear only for problems (a rate not set, «Орієнтовна»), never as an "all OK" chip.
 
@@ -17,6 +17,12 @@ It replaces the «Ціна вишивки» page of the old calculator.brevi.com
 - Below the form for Director and Admin: «Розшифровка собівартості» and the roll layout of the stabilizer (and fabric for chevrons).
 - The price is computed on the server 300 ms after the last change, only when the form has no problems. Before quantity and stitches it says where the price will appear. A server reason (no stitch rate, blank wider than the roll) replaces the prices. Ticked costs without a rate make the prices «Орієнтовна» with their names.
 
+## «Збережені» (stage 2)
+
+- «Зберегти розрахунок» under the prices (shown once a price is on screen) opens a side panel with an optional name and client from «Контрагенти». The server prices the same form again with the current rates and freezes them; a snackbar names the number «ВШ-0042» with «До збережених».
+- Tab «Збережені» (`?tab=saved`, everyone who calculates): search by name, client or number, 25 per page, newest first; a row shows number, name and client, what is embroidered, the three unit prices, when and by whom; «Орієнтовна» marks prices that missed a rate.
+- A row opens a read-only side panel: the saved prices (copy works), the form, and for Director and Admin the cost breakdown and «Ставки на момент збереження». «Повторити розрахунок» loads the form into «Розрахунок», where it is priced with today's rates; a hoop or cost removed since then falls back to the default. Director and Admin can delete after a confirmation.
+
 ## «Налаштування»
 
 - «Ставки»: the stitch rate is read-only here and links to «Параметри ціноутворення»; threads, hooping, program hour and tax are edited.
@@ -27,21 +33,26 @@ It replaces the «Ціна вишивки» page of the old calculator.brevi.com
 
 ## API contract
 
-Snapshot: BreviERP `docs/sdd/contracts/openapi.yaml` at commit `ef91efdbbb8fd8f13d86c4a76e0a02d857383038` (`docs/contracts/openapi/SOURCE.json`), slice `crm/embroidery.openapi.yaml`.
+Snapshot: BreviERP `docs/sdd/contracts/openapi.yaml` at commit `0fcaf1e06f9f06279805d4c4c801f7091f7a51c1` (`docs/contracts/openapi/SOURCE.json`), slice `crm/embroidery.openapi.yaml`.
 
-| operationId                 | Method and path                      | Client use                                                                                              |
-| --------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------- |
-| `getCrmEmbroideryForm`      | GET `/api/crm/embroidery/form`       | hoops, costs, markup names, `seesCost`; tag `EmbroiderySettings`                                        |
-| `calculateCrmEmbroidery`    | POST `/api/crm/embroidery/calculate` | an RTK query (no side effects), cached by request; overrides only for changed ticks                     |
-| `getCrmEmbroiderySettings`  | GET `/api/crm/embroidery/settings`   | Admin only; version 0 = defaults                                                                        |
-| `saveCrmEmbroiderySettings` | PUT `/api/crm/embroidery/settings`   | whole page with `version`; 409 → «Оновити»; success invalidates the tag, so the form and prices refresh |
+| operationId                      | Method and path                                | Client use                                                                                              |
+| -------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `getCrmEmbroideryForm`           | GET `/api/crm/embroidery/form`                 | hoops, costs, markup names, `seesCost`; tag `EmbroiderySettings`                                        |
+| `calculateCrmEmbroidery`         | POST `/api/crm/embroidery/calculate`           | an RTK query (no side effects), cached by request; overrides only for changed ticks                     |
+| `getCrmEmbroiderySettings`       | GET `/api/crm/embroidery/settings`             | Admin only; version 0 = defaults                                                                        |
+| `saveCrmEmbroiderySettings`      | PUT `/api/crm/embroidery/settings`             | whole page with `version`; 409 → «Оновити»; success invalidates the tag, so the form and prices refresh |
+| `getCrmEmbroideryCalculations`   | GET `/api/crm/embroidery/calculations`         | «Збережені» page with `search`; tag `EmbroideryCalculations` LIST                                       |
+| `getCrmEmbroideryCalculation`    | GET `/api/crm/embroidery/calculations/{id}`    | side panel; `rates` and `result.cost` null for a Manager                                                |
+| `saveCrmEmbroideryCalculation`   | POST `/api/crm/embroidery/calculations`        | name, client, the priced request; invalidates LIST                                                      |
+| `deleteCrmEmbroideryCalculation` | DELETE `/api/crm/embroidery/calculations/{id}` | Admin only, after confirmation                                                                          |
 
 Responses pass a shape check in `data-access/src/validators` before mapping. A 400 shows the server's first message.
 
 ## Stages
 
 1. «Розрахунок» and «Налаштування» — done.
-2. «Збережені» calculations, «Додати в КП» — on the owner's go.
+2. «Збережені» calculations — done. The old archive waits for a full export of the old table.
+3. «Додати в КП».
 
 ## Code
 

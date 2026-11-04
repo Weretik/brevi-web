@@ -8,6 +8,7 @@ import { embroideryCalculationDelayMs } from '../hooks/calculation/use-embroider
 import type {
   EmbroideryCalculation,
   EmbroideryFormSetup,
+  EmbroiderySavedSummary,
   EmbroiderySettings,
 } from '@admin/embroidery/model';
 
@@ -70,6 +71,13 @@ const settings: EmbroiderySettings = {
 const formQuery = vi.hoisted(() => vi.fn());
 const calculateQuery = vi.hoisted(() => vi.fn());
 const save = vi.hoisted(() => vi.fn());
+const saveCalculation = vi.hoisted(() => vi.fn());
+const listQuery = vi.hoisted(() => vi.fn());
+const getQuery = vi.hoisted(() => vi.fn());
+
+vi.mock('@admin/clients/data-access', () => ({
+  useListCustomersQuery: () => ({ data: undefined }),
+}));
 
 vi.mock('@admin/embroidery/data-access', () => ({
   useGetEmbroideryFormQuery: formQuery,
@@ -81,7 +89,27 @@ vi.mock('@admin/embroidery/data-access', () => ({
     refetch: vi.fn(),
   }),
   useSaveEmbroiderySettingsMutation: () => [save, { isLoading: false }],
+  useSaveEmbroideryCalculationMutation: () => [saveCalculation, { isLoading: false }],
+  useGetEmbroideryCalculationsQuery: listQuery,
+  useGetEmbroideryCalculationQuery: getQuery,
+  useDeleteEmbroideryCalculationMutation: () => [vi.fn(), { isLoading: false }],
 }));
+
+const summary: EmbroiderySavedSummary = {
+  id: 7,
+  number: 'ВШ-0007',
+  name: 'Поло',
+  customerPublicId: null,
+  customerName: 'ТОВ «Ромашка»',
+  mode: 'Chevron',
+  quantity: 120,
+  stitchesPerUnit: 8000,
+  hoopLabel: '18 см',
+  incomplete: true,
+  prices: calculation.prices,
+  createdAt: '2026-11-04T19:52:00Z',
+  createdByName: 'Олена',
+};
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -99,6 +127,9 @@ afterEach(() => {
   formQuery.mockReset();
   calculateQuery.mockReset();
   save.mockReset();
+  saveCalculation.mockReset();
+  listQuery.mockReset();
+  getQuery.mockReset();
 });
 
 function renderPage(isAdmin: boolean, url = '/crm/embroidery') {
@@ -200,5 +231,74 @@ describe('«Ціна вишивки»', () => {
     });
     expect(save).not.toHaveBeenCalled();
     expect(screen.getByText(/Виправте:/)).toBeInTheDocument();
+  });
+
+  it('saves the priced form with a name', async () => {
+    saveCalculation.mockResolvedValue({ data: { summary } });
+    renderPage(false);
+    type('Кількість, шт', '50');
+    type('Стежків на одиницю', '10000');
+    act(() => {
+      vi.advanceTimersByTime(embroideryCalculationDelayMs);
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Зберегти розрахунок' }));
+    type('Назва', 'Поло');
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
+    });
+
+    expect(saveCalculation).toHaveBeenCalledWith({
+      name: 'Поло',
+      customerPublicId: null,
+      calculation: expect.objectContaining({ quantity: 50, stitchesPerUnit: 10_000 }),
+    });
+    expect(screen.getByText('Збережено як ВШ-0007.')).toBeInTheDocument();
+  });
+
+  it('lists saved calculations and repeats one in «Розрахунок»', () => {
+    listQuery.mockReturnValue({
+      data: { items: [summary], page: 1, pageSize: 25, total: 1 },
+      isLoading: false,
+      isFetching: false,
+      isError: false,
+    });
+    getQuery.mockReturnValue({
+      data: {
+        summary,
+        input: {
+          mode: 'Chevron',
+          quantity: 120,
+          stitchesPerUnit: 8000,
+          hoopId: '18',
+          unitsPerHoop: 4,
+          stabilizerLayers: 1,
+          fabricLayers: 1,
+          program: 'Ready',
+          programMinutes: 0,
+          machineMinutes: null,
+          materialMode: 'UsedBlanks',
+          expenseOverrides: {},
+        },
+        result: { ...calculation, missing: ['Клей'] },
+        rates: null,
+      },
+      isLoading: false,
+    });
+    renderPage(false, '/crm/embroidery?tab=saved');
+
+    const table = screen.getByRole('table', { name: 'Збережені розрахунки' });
+    expect(within(table).getByText('ВШ-0007')).toBeInTheDocument();
+    expect(within(table).getByText('Орієнтовна')).toBeInTheDocument();
+
+    fireEvent.click(within(table).getByText('Поло'));
+    expect(screen.getByText('Орієнтовна ціна.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Видалити розрахунок' })).not.toBeInTheDocument();
+    expect(screen.queryByText('Ставки на момент збереження')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Повторити розрахунок' }));
+    expect(screen.getByRole('tab', { name: 'Розрахунок', selected: true })).toBeInTheDocument();
+    expect(screen.getByLabelText('Шевронів, шт')).toHaveValue('120');
+    expect(screen.getByLabelText('Шевронів в одних п’яльцях')).toHaveValue('4');
   });
 });

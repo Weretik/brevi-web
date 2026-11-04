@@ -111,3 +111,21 @@ export function toEmbroideryCalculationRequest(
     expenseOverrides: values.expenseOverrides,
   };
 }
+
+/** «Повторити розрахунок»: a saved form back into «Розрахунок»; it is then priced with the current rates. */
+export function embroideryValuesFromRequest(
+  request: EmbroideryCalculationRequest,
+  setup: EmbroideryFormSetup,
+): EmbroideryCalculationValues {
+  const known = setup.hoops.some((hoop) => hoop.id === request.hoopId);
+  return {
+    ...request,
+    hoopId: known ? request.hoopId : emptyEmbroideryCalculation(setup).hoopId,
+    programMinutes: request.program === 'Ready' ? 60 : request.programMinutes,
+    expenseOverrides: Object.fromEntries(
+      Object.entries(request.expenseOverrides).filter(([id]) =>
+        setup.expenses.some((expense) => expense.id === id),
+      ),
+    ),
+  };
+}

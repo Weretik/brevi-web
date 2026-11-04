@@ -1,5 +1,6 @@
 import { formatEmbroideryMoney, formatEmbroideryNumber } from '@admin/embroidery/model';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import {
   Alert,
   Box,
@@ -28,6 +29,8 @@ interface Props {
   waiting: boolean;
   fetching: boolean;
   onCopy: (price: EmbroideryPrice | null) => void;
+  /** «Зберегти розрахунок»; absent where there is nothing to save. */
+  onSave?: () => void;
 }
 
 const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' };
@@ -42,6 +45,7 @@ export function EmbroideryPriceCards({
   waiting,
   fetching,
   onCopy,
+  onSave,
 }: Props) {
   const ready = !waiting && !error && prices.length > 0;
   return (
@@ -147,6 +151,17 @@ export function EmbroideryPriceCards({
             sx={{ mt: 2 }}
           >
             Копіювати ціни
+          </Button>
+        )}
+        {ready && onSave && (
+          <Button
+            variant="outlined"
+            fullWidth
+            startIcon={<SaveOutlinedIcon />}
+            onClick={onSave}
+            sx={{ mt: 1 }}
+          >
+            Зберегти розрахунок
           </Button>
         )}
       </Box>
