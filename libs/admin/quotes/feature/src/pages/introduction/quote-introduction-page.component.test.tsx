@@ -154,7 +154,7 @@ describe('КП для знайомства', () => {
     });
     renderPage();
     fireEvent.click(screen.getByRole('radio', { name: /Літній спецодяг/ }));
-    fireEvent.click(screen.getByRole('button', { name: 'Зберегти зміни' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
     expect(await screen.findByText('Вкажіть клієнта або назву запиту.')).toBeVisible();
     expect(screen.getAllByText('Оберіть модель.')).toHaveLength(3);
     expect(api.create).not.toHaveBeenCalled();
@@ -174,7 +174,7 @@ describe('КП для знайомства', () => {
     }
     expect(screen.getByText('Модель 4')).toBeVisible();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Зберегти зміни' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
     await waitFor(() => expect(api.create).toHaveBeenCalledTimes(1));
     const draft = api.create.mock.calls[0][0] as QuoteIntroDraft;
     expect(draft.layout).toBe('Summer');

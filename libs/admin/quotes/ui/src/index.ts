@@ -7,10 +7,15 @@ export type {
   QuoteCustomRow,
 } from './components/custom-sewing/quote-custom-rows';
 export { QuoteArchivedNotice } from './components/editor/quote-archived-notice';
-export { QuoteHeaderCard } from './components/editor/quote-header-card';
+export { QuoteRecipientCard, quoteRecipientAnchor } from './components/editor/quote-recipient-card';
+export { QuoteStatusPill } from './components/editor/quote-status-pill';
+export { QuoteProblemsCard } from './components/editor/summary/quote-problems-card';
+export { QuoteSendActions } from './components/editor/summary/quote-send-actions';
+export { QuoteSummaryCard } from './components/editor/summary/quote-summary-card';
+export { QuoteStartForm } from './components/start/quote-start-form';
 export { QuoteMoreMenu } from './components/editor/quote-more-menu';
 export { QuoteHistoryList } from './components/history/quote-history-list';
-export { QuoteItemCard } from './components/editor/quote-item-card';
+export { QuoteItemCard, quoteItemAnchor } from './components/editor/item/quote-item-card';
 export { QuoteNotesCard } from './components/editor/quote-notes-card';
 export { QuoteCatalogProductRow } from './components/picker/quote-catalog-product-row';
 export { QuoteRepriceReportView } from './components/reprice/quote-reprice-report-view';

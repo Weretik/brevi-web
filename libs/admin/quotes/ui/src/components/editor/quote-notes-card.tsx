@@ -1,5 +1,8 @@
 import { quoteTextMaxLength } from '@admin/quotes/model';
-import { Box, Card, TextField, Typography } from '@mui/material';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import { Box, Card, Stack, TextField, Typography } from '@mui/material';
+
+import type { ReactNode } from 'react';
 
 interface Props {
   clientComment: string;
@@ -7,50 +10,59 @@ interface Props {
   onChange: (patch: { clientComment?: string; managerNote?: string }) => void;
 }
 
-/** The comment the client reads and the note only staff see. */
+const Note = ({
+  title,
+  hint,
+  icon,
+  value,
+  onChange,
+}: {
+  title: string;
+  hint: string;
+  icon?: ReactNode;
+  value: string;
+  onChange: (value: string) => void;
+}) => (
+  <Card variant="outlined" sx={{ p: 2 }}>
+    <Stack direction="row" sx={{ gap: 0.75, alignItems: 'center' }}>
+      {icon}
+      <Typography variant="subtitle2" component="h2" sx={{ fontWeight: 700 }}>
+        {title}
+      </Typography>
+    </Stack>
+    <Typography variant="caption" color="text.secondary">
+      {hint}
+    </Typography>
+    <TextField
+      fullWidth
+      multiline
+      minRows={3}
+      size="small"
+      value={value}
+      onChange={(event) => onChange(event.target.value)}
+      slotProps={{ htmlInput: { maxLength: quoteTextMaxLength, 'aria-label': title } }}
+      sx={{ mt: 1 }}
+    />
+  </Card>
+);
+
+/** The comment the client reads and the note only staff see; plain cards, no status colours. */
 export function QuoteNotesCard({ clientComment, managerNote, onChange }: Props) {
   return (
     <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' } }}>
-      <Card variant="outlined" sx={{ p: 2, bgcolor: 'success.light' }}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-          Коментар для клієнта
-        </Typography>
-        <Typography variant="caption" color="text.secondary">
-          Клієнт побачить у КП.
-        </Typography>
-        <TextField
-          fullWidth
-          multiline
-          minRows={3}
-          size="small"
-          value={clientComment}
-          onChange={(event) => onChange({ clientComment: event.target.value })}
-          slotProps={{
-            htmlInput: { maxLength: quoteTextMaxLength, 'aria-label': 'Коментар для клієнта' },
-          }}
-          sx={{ mt: 1, bgcolor: 'background.paper' }}
-        />
-      </Card>
-      <Card variant="outlined" sx={{ p: 2, bgcolor: 'warning.light' }}>
-        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-          Нотатки менеджера до КП
-        </Typography>
-        <Typography variant="caption" color="text.secondary">
-          Клієнт цього не побачить.
-        </Typography>
-        <TextField
-          fullWidth
-          multiline
-          minRows={3}
-          size="small"
-          value={managerNote}
-          onChange={(event) => onChange({ managerNote: event.target.value })}
-          slotProps={{
-            htmlInput: { maxLength: quoteTextMaxLength, 'aria-label': 'Нотатки менеджера до КП' },
-          }}
-          sx={{ mt: 1, bgcolor: 'background.paper' }}
-        />
-      </Card>
+      <Note
+        title="Коментар для клієнта"
+        hint="Буде в КП під позиціями."
+        value={clientComment}
+        onChange={(value) => onChange({ clientComment: value })}
+      />
+      <Note
+        title="Нотатка для себе"
+        hint="Клієнт її не побачить."
+        icon={<LockOutlinedIcon sx={{ fontSize: 16 }} aria-hidden />}
+        value={managerNote}
+        onChange={(value) => onChange({ managerNote: value })}
+      />
     </Box>
   );
 }

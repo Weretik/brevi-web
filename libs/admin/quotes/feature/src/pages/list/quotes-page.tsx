@@ -3,21 +3,11 @@ import { quoteEditorPath } from '@admin/quotes/model';
 import { QuotesTable } from '@admin/quotes/ui';
 import { ReferencePageHeader, ReferenceSearchBar } from '@admin/references/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
-import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
-import {
-  Alert,
-  Box,
-  Button,
-  ListItemText,
-  Menu,
-  MenuItem,
-  Tab,
-  Tabs,
-  TextField,
-} from '@mui/material';
+import { Alert, Box, Button, MenuItem, Tab, Tabs, TextField } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { QuoteStartDrawer } from '../../components/start/quote-start-drawer';
 import { useQuoteList } from '../../hooks/list/use-quote-list';
 
 import type { QuoteActor } from '@admin/quotes/model';
@@ -28,11 +18,7 @@ export default function QuotesPage({ actor }: { actor: QuoteActor }) {
   const list = useQuoteList();
   const staff = useGetQuoteStaffQuery(undefined, { skip: !actor.canSeeAll });
   const total = list.page?.total ?? 0;
-  const [newMenu, setNewMenu] = useState<HTMLElement | null>(null);
-  const create = (path: string) => {
-    setNewMenu(null);
-    navigate(path);
-  };
+  const [starting, setStarting] = useState(false);
 
   return (
     <Box>
@@ -47,39 +33,10 @@ export default function QuotesPage({ actor }: { actor: QuoteActor }) {
             <Button
               variant="contained"
               startIcon={<AddOutlinedIcon />}
-              endIcon={<KeyboardArrowDownOutlinedIcon />}
-              aria-haspopup="menu"
-              aria-expanded={newMenu !== null}
-              onClick={(event) => setNewMenu(event.currentTarget)}
+              onClick={() => setStarting(true)}
             >
               Нове КП
             </Button>
-            <Menu
-              anchorEl={newMenu}
-              open={newMenu !== null}
-              onClose={() => setNewMenu(null)}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-            >
-              <MenuItem onClick={() => create('/crm/quotes/new')}>
-                <ListItemText
-                  primary="КП під запит"
-                  secondary="Під заявку клієнта: товари, кількість, ціни"
-                />
-              </MenuItem>
-              <MenuItem onClick={() => create('/crm/quotes/new?custom=1')}>
-                <ListItemText
-                  primary="КП з нуля (новий виріб)"
-                  secondary="Виріб, якого немає в каталозі: тканина, фурнітура, операції"
-                />
-              </MenuItem>
-              <MenuItem onClick={() => create('/crm/quote-introductions/new')}>
-                <ListItemText
-                  primary="КП для знайомства"
-                  secondary="Рекламний каталог моделей для нового клієнта"
-                />
-              </MenuItem>
-            </Menu>
           </>
         }
       />
@@ -140,6 +97,7 @@ export default function QuotesPage({ actor }: { actor: QuoteActor }) {
         onPaginationModelChange={list.setPagination}
         onOpen={(row) => navigate(quoteEditorPath(row.kind, row.id))}
       />
+      {starting && <QuoteStartDrawer onClose={() => setStarting(false)} />}
     </Box>
   );
 }
