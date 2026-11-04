@@ -2108,6 +2108,44 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/crm/embroidery/calculations': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description «Збережені», newest first. `search` matches the name, the client name or the number («ВШ-0042», «вш42», «42»). */
+    get: operations['getCrmEmbroideryCalculations'];
+    put?: never;
+    /** @description «Зберегти розрахунок». The server prices the form with the rates in force now, freezes those rates with the record and never recalculates it. An «Орієнтовна» price (`incomplete`) can be saved; a price that failed (`error`), an unknown or hidden client is 400. The name is trimmed and cut to 120 characters. */
+    post: operations['saveCrmEmbroideryCalculation'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/embroidery/calculations/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    /** @description One saved calculation as it was saved. `result.cost` and `rates` are null for a Manager. */
+    get: operations['getCrmEmbroideryCalculation'];
+    put?: never;
+    post?: never;
+    /** @description Removes a saved calculation for good. */
+    delete: operations['deleteCrmEmbroideryCalculation'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/crm/tasks': {
     parameters: {
       query?: never;
@@ -5935,6 +5973,63 @@ export interface components {
       fabricIncreasePercent: number;
       hoops: components['schemas']['CrmEmbroideryHoop'][];
       expenses: components['schemas']['CrmEmbroideryExpense'][];
+    };
+    CrmEmbroiderySavedPrice: {
+      name: string;
+      unit: number;
+      total: number;
+      repeatUnit: number;
+    };
+    CrmEmbroiderySavedSummary: {
+      /** Format: int64 */
+      id: number;
+      /** @description «ВШ-0042»; not stored. */
+      number: string;
+      /** @description Empty means «Без назви». */
+      name: string;
+      /** Format: uuid */
+      customerPublicId: string | null;
+      /** @description The client name at the time of saving. */
+      customerName: string | null;
+      mode: components['schemas']['CrmEmbroideryMode'];
+      quantity: number;
+      stitchesPerUnit: number;
+      /** @description The hoop name from the frozen settings. */
+      hoopLabel: string;
+      /** @description Some ticked costs had no rate; the prices were «Орієнтовна». */
+      incomplete: boolean;
+      prices: components['schemas']['CrmEmbroiderySavedPrice'][];
+      /** Format: date-time */
+      createdAt: string;
+      createdByName: string;
+    };
+    CrmEmbroiderySavedPage: {
+      items: components['schemas']['CrmEmbroiderySavedSummary'][];
+      page: number;
+      pageSize: number;
+      total: number;
+    };
+    CrmSaveEmbroideryCalculationInput: {
+      /** @description Trimmed and cut to 120; empty is «Без назви». */
+      name?: string | null;
+      /**
+       * Format: uuid
+       * @description An active client of «Клієнти».
+       */
+      customerPublicId?: string | null;
+      calculation: components['schemas']['CrmCalculateEmbroideryInput'];
+    };
+    CrmEmbroiderySavedCalculation: {
+      summary: components['schemas']['CrmEmbroiderySavedSummary'];
+      input: components['schemas']['CrmCalculateEmbroideryInput'];
+      result: components['schemas']['CrmEmbroideryCalculation'];
+      /** @description The rates frozen at saving; null for a Manager. */
+      rates: null | {
+        /** @description «Оплата вишивки за 1000 стібків» at saving. */
+        stitchRate: number;
+        rates: components['schemas']['CrmEmbroideryRates'];
+        markups: components['schemas']['CrmEmbroideryMarkup'][];
+      };
     };
     /**
      * @default Open
@@ -13706,6 +13801,168 @@ export interface operations {
         content?: never;
       };
       409: components['responses']['responses-Conflict'];
+    };
+  };
+  getCrmEmbroideryCalculations: {
+    parameters: {
+      query?: {
+        search?: string;
+        page?: number;
+        pageSize?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description A page of saved calculations. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmEmbroiderySavedPage'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role and a numeric actor claim required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  saveCrmEmbroideryCalculation: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmSaveEmbroideryCalculationInput'];
+      };
+    };
+    responses: {
+      /** @description The saved calculation. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmEmbroiderySavedCalculation'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role and a numeric actor claim required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmEmbroideryCalculation: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The saved calculation. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmEmbroiderySavedCalculation'];
+        };
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role and a numeric actor claim required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  deleteCrmEmbroideryCalculation: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Deleted. */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
     };
   };
   getCrmTasks: {

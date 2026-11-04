@@ -1,5 +1,6 @@
 import { useCalculateEmbroideryQuery } from '@admin/embroidery/data-access';
 import {
+  embroideryValuesFromRequest,
   emptyEmbroideryCalculation,
   needsEmbroideryMachineTime,
   tickEmbroideryExpense,
@@ -66,6 +67,8 @@ export function useEmbroideryCalculation(setup: EmbroideryFormSetup) {
     /** Quantity or stitches are still empty. */
     waiting,
     calculation: sent ? (result.data ?? null) : null,
+    /** The request behind the shown price, for «Зберегти розрахунок»; null while typing. */
+    priced: sent && !result.isFetching && key === JSON.stringify(sent) ? sent : null,
     fetching: Boolean(sent) && (result.isFetching || key !== JSON.stringify(sent)),
     requestError: result.isError
       ? ((result.error as { message?: string } | undefined)?.message ??
@@ -77,5 +80,8 @@ export function useEmbroideryCalculation(setup: EmbroideryFormSetup) {
     tick: (expense: EmbroideryFormExpense, ticked: boolean) =>
       setValues((current) => tickEmbroideryExpense(current, expense, ticked)),
     clear: () => setValues(emptyEmbroideryCalculation(setup)),
+    /** «Повторити розрахунок»: the saved form, priced again with the current rates. */
+    load: (request: EmbroideryCalculationRequest) =>
+      setValues(embroideryValuesFromRequest(request, setup)),
   };
 }

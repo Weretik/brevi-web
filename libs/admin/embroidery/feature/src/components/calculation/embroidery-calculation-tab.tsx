@@ -1,4 +1,4 @@
-import { embroideryPriceText, formatEmbroideryMoney } from '@admin/embroidery/model';
+import { formatEmbroideryMoney } from '@admin/embroidery/model';
 import {
   EmbroideryBreakdownTable,
   EmbroideryCostCard,
@@ -12,34 +12,32 @@ import {
 import { Alert, Box, Button, Link, Snackbar, Stack, useMediaQuery, useTheme } from '@mui/material';
 import { useState } from 'react';
 
+import { useEmbroideryCopy } from '../../hooks/calculation/use-embroidery-copy';
+import { EmbroiderySaveDrawer } from '../saved/embroidery-save-drawer';
+
 import type { useEmbroideryCalculation } from '../../hooks/calculation/use-embroidery-calculation';
-import type { EmbroideryPrice } from '@admin/embroidery/model';
 
 interface Props {
   calculator: ReturnType<typeof useEmbroideryCalculation>;
   seesCost: boolean;
   onOpenSettings: () => void;
+  onOpenSaved: () => void;
 }
 
 /** Variant A: the form on the left, the live prices in a sticky right column, the details below the form. */
-export function EmbroideryCalculationTab({ calculator, seesCost, onOpenSettings }: Props) {
+export function EmbroideryCalculationTab({
+  calculator,
+  seesCost,
+  onOpenSettings,
+  onOpenSaved,
+}: Props) {
   const { values, errors, calculation } = calculator;
-  const [copied, setCopied] = useState<string | null>(null);
+  const copier = useEmbroideryCopy();
+  const [saving, setSaving] = useState(false);
+  const [savedNumber, setSavedNumber] = useState<string | null>(null);
   const wide = useMediaQuery(useTheme().breakpoints.up('lg'));
   const rows = calculation?.cost?.rows ?? [];
   const program = rows.find((row) => row.kind === 'Program');
-
-  const copy = async (price: EmbroideryPrice | null) => {
-    const quantity = values.quantity ?? 0;
-    const prices = price ? [price] : (calculation?.prices ?? []);
-    const text = prices.map((item) => embroideryPriceText(item, quantity)).join('\n');
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(price ? `Ціну «${price.name}» скопійовано.` : 'Ціни скопійовано.');
-    } catch {
-      setCopied('Не вдалося скопіювати. Виділіть ціну вручну.');
-    }
-  };
 
   const prices = (
     <Stack sx={{ gap: 2 }}>
@@ -71,7 +69,10 @@ export function EmbroideryCalculationTab({ calculator, seesCost, onOpenSettings 
           }
           waiting={calculator.waiting}
           fetching={calculator.fetching}
-          onCopy={(price) => void copy(price)}
+          onCopy={(price) =>
+            void copier.copy(calculation?.prices ?? [], price, values.quantity ?? 0)
+          }
+          onSave={calculator.priced ? () => setSaving(true) : undefined}
         />
       )}
       {calculation?.cost && <EmbroideryCostCard cost={calculation.cost} />}
@@ -126,11 +127,32 @@ export function EmbroideryCalculationTab({ calculator, seesCost, onOpenSettings 
       </Stack>
       {wide && <Box sx={{ position: 'sticky', top: 88 }}>{prices}</Box>}
       <Snackbar
-        open={copied !== null}
+        open={copier.message !== null}
         autoHideDuration={3000}
-        onClose={() => setCopied(null)}
-        message={copied}
+        onClose={copier.close}
+        message={copier.message}
       />
+      <Snackbar
+        open={savedNumber !== null}
+        autoHideDuration={6000}
+        onClose={() => setSavedNumber(null)}
+        message={`Збережено як ${savedNumber ?? ''}.`}
+        action={
+          <Button color="inherit" size="small" onClick={onOpenSaved}>
+            До збережених
+          </Button>
+        }
+      />
+      {saving && calculator.priced && (
+        <EmbroiderySaveDrawer
+          request={calculator.priced}
+          onClose={() => setSaving(false)}
+          onSaved={(summary) => {
+            setSaving(false);
+            setSavedNumber(summary.number);
+          }}
+        />
+      )}
     </Box>
   );
 }
