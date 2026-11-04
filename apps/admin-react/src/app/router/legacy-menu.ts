@@ -37,7 +37,7 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
       { id: 'quote-introductions', label: 'КП для знайомства' },
       { id: 'quote-settings', label: 'Налаштування КП', requiredRole: 'Admin' },
       { id: 'price-list', label: 'Прайс' },
-      { id: 'tasks', label: 'Завдання в роботу' },
+      { id: 'tasks', label: 'Мої завдання', path: '/crm/tasks' },
       { id: 'deals', label: 'Угоди' },
     ],
   },
@@ -138,6 +138,14 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
     icon: ManageAccountsOutlinedIcon,
     section: 'Дані',
     label: 'Адміністрування',
-    items: [{ id: 'users', label: 'Користувачі', path: '/admin/users', requiredRole: 'Admin' }],
+    items: [
+      { id: 'users', label: 'Користувачі', path: '/admin/users', requiredRole: 'Admin' },
+      {
+        id: 'manager-tasks',
+        label: 'Завдання менеджерам',
+        path: '/admin/tasks',
+        requiredRole: 'Admin',
+      },
+    ],
   },
 ];

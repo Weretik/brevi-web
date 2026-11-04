@@ -2,21 +2,29 @@ import { sessionRoleLabel } from '@admin/core/auth';
 import { AdminLayout } from '@admin/core/shell';
 import { profilePath, usersPath } from '@admin/users/feature';
 
-import { adminRouteDefinitions } from './admin-route-definitions';
+import { adminRouteDefinitions, tasksRoutes } from './admin-route-definitions';
 import { createNavigation } from './navigation-config';
+import { useHomeHint } from './use-home-hint';
 import { useAdminColorMode } from '../providers/color-mode-provider';
 
 import type { SessionUser } from '@admin/core/auth';
 
-const registeredPaths = new Set([...adminRouteDefinitions.map((route) => route.path), usersPath]);
+const registeredPaths = new Set([
+  ...[...adminRouteDefinitions, ...tasksRoutes.admin, ...tasksRoutes.board].map(
+    (route) => route.path,
+  ),
+  usersPath,
+]);
 
 export function AdminRouteLayout({ user }: { user: SessionUser }) {
   const { colorMode, changeColorMode } = useAdminColorMode();
   const navigation = createNavigation(registeredPaths, user.roles);
+  const homeHint = useHomeHint(user);
 
   return (
     <AdminLayout
       colorMode={colorMode}
+      homeHint={homeHint}
       navigation={navigation}
       onColorModeChange={changeColorMode}
       profileHref={profilePath}

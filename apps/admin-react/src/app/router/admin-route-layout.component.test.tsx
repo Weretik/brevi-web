@@ -27,6 +27,7 @@ vi.mock('@admin/core/shell', () => ({
     </nav>
   ),
 }));
+vi.mock('./use-home-hint', () => ({ useHomeHint: () => null }));
 vi.mock('../providers/color-mode-provider', () => ({
   useAdminColorMode: () => ({ colorMode: 'light', changeColorMode: vi.fn() }),
 }));

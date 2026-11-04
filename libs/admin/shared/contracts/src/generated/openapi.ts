@@ -1692,6 +1692,153 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/crm/tasks': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description A page of tasks. Not done: overdue first, then urgent, then by due time. `Done`: newest completion first. Search matches the number («ЗД-0142», «142»), title, client and manager name. */
+    get: operations['getCrmTasks'];
+    put?: never;
+    /** @description Director or Admin gives a new task to an active Manager. `version` must be 0. */
+    post: operations['createCrmTask'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/tasks/board': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description «Мої завдання» kanban: every open task and those done in the last 7 days (at most 500 cards). Open cards come first (urgent, then by due time), done ones newest first; the Admin groups them by `lane`. */
+    get: operations['getCrmTaskBoard'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/tasks/overview': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Counts for the metric strip and filter chips (narrowed by `assigneeUserId` for Admin) and the workload of each active Manager (always all of them for Admin, only the actor for a Manager). */
+    get: operations['getCrmTaskOverview'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/tasks/assignees': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Active users with the Manager role, by name; for the assignee picker and the manager filter. */
+    get: operations['getCrmTaskAssignees'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/tasks/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['TaskId'];
+      };
+      cookie?: never;
+    };
+    get: operations['getCrmTask'];
+    /** @description Director or Admin saves the side panel. Steps are replaced (new ids). `version` is the loaded one. */
+    put: operations['editCrmTask'];
+    post?: never;
+    /** @description Director or Admin deletes the task with its steps and history. */
+    delete: operations['deleteCrmTask'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/tasks/{id}/status': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['TaskId'];
+      };
+      cookie?: never;
+    };
+    get?: never;
+    /** @description The assignee or Admin moves the task. `Done` sets `completedAt`; leaving `Done` clears it. The same status changes nothing. */
+    put: operations['changeCrmTaskStatus'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/tasks/{id}/urgent': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['TaskId'];
+      };
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Director or Admin drags a card into or out of «Терміново». */
+    put: operations['setCrmTaskUrgent'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/tasks/{id}/steps/{stepId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['TaskId'];
+        stepId: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    /** @description The assignee or Admin ticks or unticks one step. */
+    put: operations['markCrmTaskStep'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/reminders/non-working-days': {
     parameters: {
       query?: never;
@@ -4016,6 +4163,170 @@ export interface components {
       name: string;
       email?: string | null;
     };
+    /**
+     * @default Open
+     * @enum {string}
+     */
+    CrmTaskListFilter: 'Open' | 'Overdue' | 'Urgent' | 'New' | 'InProgress' | 'Done';
+    /** @enum {string} */
+    CrmTaskStatus: 'New' | 'InProgress' | 'Done';
+    /**
+     * @description Kanban column. Overdue = not done and past due; Urgent = not done, not overdue, marked urgent.
+     * @enum {string}
+     */
+    CrmTaskLane: 'Overdue' | 'Urgent' | 'Active' | 'Done';
+    CrmTaskPerson: {
+      userId: number;
+      name: string;
+    };
+    CrmTaskSummary: {
+      /** Format: int64 */
+      id: number;
+      /**
+       * @description «ЗД-0142»
+       * @example ЗД-0142
+       */
+      number: string;
+      title: string;
+      status: components['schemas']['CrmTaskStatus'];
+      lane: components['schemas']['CrmTaskLane'];
+      isUrgent: boolean;
+      isOverdue: boolean;
+      /** Format: date-time */
+      dueAt: string;
+      assignee: components['schemas']['CrmTaskPerson'];
+      customerName: string | null;
+      stepsTotal: number;
+      stepsDone: number;
+      /** Format: date-time */
+      completedAt: string | null;
+      /** Format: date-time */
+      updatedAt: string;
+      version: number;
+    };
+    CrmTaskPage: {
+      items: components['schemas']['CrmTaskSummary'][];
+      page: number;
+      pageSize: number;
+      total: number;
+    };
+    CrmTaskStepInput: {
+      text: string;
+      isDone: boolean;
+    };
+    CrmSaveTaskInput: {
+      /** @description 0 for a new task; the loaded version when editing. */
+      version: number;
+      title: string;
+      description?: string | null;
+      assigneeUserId: number;
+      /** Format: date-time */
+      dueAt: string;
+      isUrgent: boolean;
+      /**
+       * Format: uuid
+       * @description An active Crm client.
+       */
+      customerPublicId?: string | null;
+      steps?: components['schemas']['CrmTaskStepInput'][] | null;
+    };
+    CrmTaskStep: {
+      /** Format: int64 */
+      id: number;
+      position: number;
+      text: string;
+      isDone: boolean;
+    };
+    /** @enum {string} */
+    CrmTaskEventKind:
+      | 'Created'
+      | 'Edited'
+      | 'Reassigned'
+      | 'DueChanged'
+      | 'StatusChanged'
+      | 'UrgentChanged'
+      | 'StepChecked'
+      | 'StepUnchecked';
+    CrmTaskEvent: {
+      kind: components['schemas']['CrmTaskEventKind'];
+      by: components['schemas']['CrmTaskPerson'];
+      /** Format: date-time */
+      at: string;
+      /** @description Reassigned: new manager name; DueChanged: new due time (ISO 8601); StatusChanged: new status; UrgentChanged: `true` or `false`; StepChecked/StepUnchecked: step text. */
+      details: string | null;
+    };
+    CrmTask: {
+      /** Format: int64 */
+      id: number;
+      number: string;
+      title: string;
+      description: string | null;
+      status: components['schemas']['CrmTaskStatus'];
+      lane: components['schemas']['CrmTaskLane'];
+      isUrgent: boolean;
+      isOverdue: boolean;
+      /** Format: date-time */
+      dueAt: string;
+      assignee: components['schemas']['CrmTaskPerson'];
+      author: components['schemas']['CrmTaskPerson'];
+      /** Format: uuid */
+      customerPublicId: string | null;
+      customerName: string | null;
+      steps: components['schemas']['CrmTaskStep'][];
+      history: components['schemas']['CrmTaskEvent'][];
+      /** Format: date-time */
+      completedAt: string | null;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+      version: number;
+    };
+    CrmTaskBoard: {
+      items: components['schemas']['CrmTaskSummary'][];
+      /**
+       * Format: date-time
+       * @description Server time the lanes were computed at.
+       */
+      at: string;
+    };
+    CrmTaskLoad: {
+      userId: number;
+      name: string;
+      open: number;
+      overdue: number;
+      urgent: number;
+      inProgress: number;
+    };
+    CrmTaskOverview: {
+      open: number;
+      overdue: number;
+      urgent: number;
+      new: number;
+      inProgress: number;
+      done: number;
+      doneLastWeek: number;
+      /** @description Share of tasks done in the last 30 days by their due time; null when none were done. */
+      onTimePercent: number | null;
+      load: components['schemas']['CrmTaskLoad'][];
+    };
+    CrmTaskAssignee: {
+      userId: number;
+      name: string;
+      email: string | null;
+    };
+    CrmChangeTaskStatusRequest: {
+      version: number;
+      status: components['schemas']['CrmTaskStatus'];
+    };
+    CrmSetTaskUrgentRequest: {
+      version: number;
+      isUrgent: boolean;
+    };
+    CrmMarkTaskStepRequest: {
+      version: number;
+      isDone: boolean;
+    };
     NonWorkingDayResponse: {
       /** Format: date */
       date?: string;
@@ -4215,6 +4526,15 @@ export interface components {
         'application/json': string[];
       };
     };
+    /** @description The task was saved in another window (stale version); errors are Ukrainian strings. */
+    'responses-Conflict': {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        'application/json': string[];
+      };
+    };
   };
   parameters: {
     /** @description Value of the `brevi.csrf` cookie. Required on every non-GET request made with the session cookie. */
@@ -4233,6 +4553,9 @@ export interface components {
     'parameters-ProductId': number;
     ArticleId: number;
     QuoteId: number;
+    /** @description Admin only; ignored for a Manager. */
+    AssigneeUserId: number;
+    TaskId: number;
   };
   requestBodies: never;
   headers: never;
@@ -9730,6 +10053,482 @@ export interface operations {
         };
         content?: never;
       };
+    };
+  };
+  getCrmTasks: {
+    parameters: {
+      query?: {
+        search?: string;
+        filter?: components['schemas']['CrmTaskListFilter'];
+        /** @description Admin only; ignored for a Manager. */
+        assigneeUserId?: components['parameters']['AssigneeUserId'];
+        page?: number;
+        pageSize?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description One page. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmTaskPage'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role and a numeric actor claim required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createCrmTask: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmSaveTaskInput'];
+      };
+    };
+    responses: {
+      /** @description Created with status `New`. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmTask'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmTaskBoard: {
+    parameters: {
+      query?: {
+        /** @description Admin only; ignored for a Manager. */
+        assigneeUserId?: components['parameters']['AssigneeUserId'];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The cards. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmTaskBoard'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmTaskOverview: {
+    parameters: {
+      query?: {
+        /** @description Admin only; ignored for a Manager. */
+        assigneeUserId?: components['parameters']['AssigneeUserId'];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Counts and workload. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmTaskOverview'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmTaskAssignees: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Managers. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmTaskAssignee'][];
+        };
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmTask: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['TaskId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The task with steps and history (newest first). */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmTask'];
+        };
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found or not visible to the actor. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  editCrmTask: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['TaskId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmSaveTaskInput'];
+      };
+    };
+    responses: {
+      /** @description Saved; `version` is incremented. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmTask'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['responses-Conflict'];
+    };
+  };
+  deleteCrmTask: {
+    parameters: {
+      query: {
+        version: number;
+      };
+      header?: never;
+      path: {
+        id: components['parameters']['TaskId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Deleted. */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['responses-Conflict'];
+    };
+  };
+  changeCrmTaskStatus: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['TaskId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmChangeTaskStatusRequest'];
+      };
+    };
+    responses: {
+      /** @description The task after the change. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmTask'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found or not visible to the actor. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['responses-Conflict'];
+    };
+  };
+  setCrmTaskUrgent: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['TaskId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmSetTaskUrgentRequest'];
+      };
+    };
+    responses: {
+      /** @description The task after the change. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmTask'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['responses-Conflict'];
+    };
+  };
+  markCrmTaskStep: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['TaskId'];
+        stepId: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmMarkTaskStepRequest'];
+      };
+    };
+    responses: {
+      /** @description The task after the change. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmTask'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Task or step not found or not visible to the actor. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['responses-Conflict'];
     };
   };
   getReminderNonWorkingDays: {

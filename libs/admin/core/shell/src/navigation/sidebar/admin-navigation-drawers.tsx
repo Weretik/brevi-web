@@ -11,6 +11,7 @@ interface AdminNavigationDrawersProps {
   isCollapsed: boolean;
   isMobileOpen: boolean;
   navigation: readonly AdminNavigationGroup[];
+  homeHint?: string | null;
   onMobileClose: () => void;
   onToggleCollapsed: () => void;
 }
@@ -19,6 +20,7 @@ export function AdminNavigationDrawers({
   isCollapsed,
   isMobileOpen,
   navigation,
+  homeHint = null,
   onMobileClose,
   onToggleCollapsed,
 }: AdminNavigationDrawersProps) {
@@ -49,6 +51,7 @@ export function AdminNavigationDrawers({
         <AdminNavigationPanel
           collapsed={isCollapsed}
           groups={navigation}
+          homeHint={homeHint}
           mobile={false}
           onToggleCollapsed={onToggleCollapsed}
         />
@@ -71,6 +74,7 @@ export function AdminNavigationDrawers({
         <AdminNavigationPanel
           collapsed={false}
           groups={navigation}
+          homeHint={homeHint}
           mobile
           onNavigate={onMobileClose}
         />

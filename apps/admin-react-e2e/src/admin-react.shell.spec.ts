@@ -12,7 +12,9 @@ test('mobile menu opens by keyboard and closes with visible focus', async ({ pag
   await page.setViewportSize({ width: 320, height: 720 });
   await page.goto('/');
 
-  await expect(page.getByRole('navigation', { name: 'Розташування' })).toContainText('Головна');
+  await expect(page.getByRole('navigation', { name: 'Розташування' })).toContainText(
+    'Робочий стіл',
+  );
   const menuButton = page.getByRole('button', { name: 'Відкрити меню навігації' });
   await menuButton.focus();
   await page.keyboard.press('Enter');

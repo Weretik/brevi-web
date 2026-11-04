@@ -2,7 +2,7 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { Breadcrumbs, Typography } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 
-import { homeLabel } from '../../navigation/menu/admin-navigation';
+import { homeLabel } from '../../navigation/menu/admin-home-tile';
 import { findCurrentEntry } from '../../navigation/menu/navigation-route';
 
 import type { AdminNavigationGroup } from '../../shell.types';

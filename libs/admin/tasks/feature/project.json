@@ -1,0 +1,31 @@
+{
+  "name": "admin-tasks-feature",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/admin/tasks/feature/src",
+  "projectType": "library",
+  "tags": ["scope:admin", "domain:tasks", "type:feature"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": { "command": "eslint .", "cwd": "libs/admin/tasks/feature" }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit -p tsconfig.lib.json",
+        "cwd": "libs/admin/tasks/feature"
+      }
+    },
+    "typecheck-tests": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit -p tsconfig.spec.json",
+        "cwd": "libs/admin/tasks/feature"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": { "command": "vitest run", "cwd": "libs/admin/tasks/feature" }
+    }
+  }
+}

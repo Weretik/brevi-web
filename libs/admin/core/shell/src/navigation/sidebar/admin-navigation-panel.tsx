@@ -13,6 +13,7 @@ interface AdminNavigationPanelProps {
   collapsed: boolean;
   groups: readonly AdminNavigationGroup[];
   mobile: boolean;
+  homeHint?: string | null;
   onNavigate?: () => void;
   onToggleCollapsed?: () => void;
 }
@@ -21,6 +22,7 @@ export function AdminNavigationPanel({
   collapsed,
   groups,
   mobile,
+  homeHint = null,
   onNavigate,
   onToggleCollapsed,
 }: AdminNavigationPanelProps) {
@@ -59,6 +61,7 @@ export function AdminNavigationPanel({
         ariaLabel={mobile ? 'Мобільна навігація' : 'Основна навігація'}
         collapsed={collapsed}
         groups={groups}
+        homeHint={homeHint}
         listPrefix={mobile ? 'mobile' : 'desktop'}
         onNavigate={onNavigate}
       />

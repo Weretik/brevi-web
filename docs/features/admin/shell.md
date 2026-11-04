@@ -59,7 +59,7 @@ libs/admin/core/
     ├── components/top-bar/ # top bar and breadcrumbs; actions/ search, notifications, theme, profile
     └── navigation/
         ├── navigation-palette.ts # palette.navigation type
-        ├── menu/ # home link, groups, items, collapsed flyout, route matching
+        ├── menu/ # «Робочий стіл» tile, groups, items, collapsed flyout, route matching
         └── sidebar/ # drawers, panel, logo (wordmark or mark when collapsed), collapse hook
 ```
 
