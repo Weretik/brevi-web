@@ -10,6 +10,7 @@ const user = (roles: SessionRole[]): SessionUser => ({
   email: 'staff@brevi.com.ua',
   fullName: 'Олена',
   roles,
+  avatarUrl: null,
 });
 vi.mock('@admin/core/shell', () => ({
   AdminLayout: ({

@@ -2,11 +2,12 @@ import {
   canManageUsers,
   LoginPage,
   loginPath,
+  refreshSession,
   RequireAdminSession,
   RequireRole,
   useAdminSession,
 } from '@admin/core/auth';
-import { createUsersRoutes } from '@admin/users/feature';
+import { createProfileRoutes, createUsersRoutes } from '@admin/users/feature';
 import { createBrowserRouter } from 'react-router-dom';
 
 import { adminRouteDefinitions } from './admin-route-definitions';
@@ -23,6 +24,7 @@ function useSignedInStaff(): StaffActor {
 }
 
 const usersRoutes = createUsersRoutes({ useStaffActor: useSignedInStaff });
+const profileRoutes = createProfileRoutes({ onProfileChanged: refreshSession });
 
 export function createAdminRouter() {
   return createBrowserRouter([
@@ -33,6 +35,7 @@ export function createAdminRouter() {
       ),
       children: [
         ...adminRouteDefinitions,
+        ...profileRoutes,
         { element: <RequireRole allow={canManageUsers} />, children: usersRoutes },
         { path: '*', element: <NotFoundPage /> },
       ],

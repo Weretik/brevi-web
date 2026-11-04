@@ -31,7 +31,7 @@ describe('legacy Admin navigation', () => {
       '/reminders/non-working-days',
     ]);
   });
-  it('keeps 26 shared entries in the original five sections and adds reminders for Manager', () => {
+  it('keeps the shared entries in their sections, with reminders and site content', () => {
     const groups = createNavigation(new Set(['/']));
 
     expect(groups.map((group) => group.label)).toEqual([
@@ -41,10 +41,11 @@ describe('legacy Admin navigation', () => {
       'Нагадування',
       'Загальні довідники',
       'Фото',
+      'Контент',
       'Загальні звіти',
     ]);
-    expect(groups.map((group) => group.items.length)).toEqual([6, 7, 5, 4, 7, 1, 1]);
-    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(31);
+    expect(groups.map((group) => group.items.length)).toEqual([6, 7, 5, 4, 7, 1, 2, 1]);
+    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(33);
     expect(groups[0].items.map((item) => item.id)).not.toContain('clients');
   });
   it('shows issuer settings only for the server Admin role', () => {

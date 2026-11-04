@@ -8,6 +8,8 @@ const row = {
   fullName: 'Олена',
   role: 'Manager',
   isBlocked: false,
+  avatarUrl: 'https://cdn.brevi.test/avatars/3/a.webp',
+  phoneNumber: null,
 };
 
 describe('staff account mapper', () => {

@@ -10,6 +10,8 @@ const account = (id: number, role: StaffAccount['role']): StaffAccount => ({
   fullName: '',
   role,
   isBlocked: false,
+  avatarUrl: null,
+  phoneNumber: null,
 });
 
 const admin = { id: 1, isDirector: false };
@@ -33,6 +35,7 @@ describe('getStaffAccountPermissions', () => {
     expect(getStaffAccountPermissions(account(2, 'Director'), admin, true)).toEqual({
       roleChoices: [],
       canSetPassword: false,
+      canEditDetails: false,
       canBlock: false,
       canDelete: false,
     });

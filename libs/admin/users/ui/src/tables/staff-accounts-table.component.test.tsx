@@ -6,13 +6,23 @@ import { StaffAccountsTable } from './staff-accounts-table';
 import type { StaffAccount } from '@admin/users/model';
 
 const accounts: StaffAccount[] = [
-  { id: 1, email: 'admin@brevi.com.ua', fullName: 'Адмін', role: 'Admin', isBlocked: false },
+  {
+    id: 1,
+    email: 'admin@brevi.com.ua',
+    fullName: 'Адмін',
+    role: 'Admin',
+    isBlocked: false,
+    avatarUrl: null,
+    phoneNumber: null,
+  },
   {
     id: 3,
     email: 'director@brevi.com.ua',
     fullName: 'Директор',
     role: 'Director',
     isBlocked: false,
+    avatarUrl: null,
+    phoneNumber: null,
   },
   {
     id: 2,
@@ -20,6 +30,8 @@ const accounts: StaffAccount[] = [
     fullName: 'Олена',
     role: 'Manager',
     isBlocked: true,
+    avatarUrl: null,
+    phoneNumber: '+380 50 123 45 67',
   },
 ];
 
@@ -42,6 +54,9 @@ describe('StaffAccountsTable', () => {
     const managerRow = screen.getByText('manager@brevi.com.ua').closest('tr') as HTMLElement;
     expect(within(managerRow).getByText('Менеджер')).toBeTruthy();
     expect(within(managerRow).getByText('Заблокований')).toBeTruthy();
+    expect(within(managerRow).getByText('+380 50 123 45 67')).toBeTruthy();
+    // No photo: the first letter of the name.
+    expect(within(managerRow).getByText('О')).toBeTruthy();
   });
 
   it('does not let the admin change their role, block or delete themselves', () => {
@@ -49,6 +64,7 @@ describe('StaffAccountsTable', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Дії для admin@brevi.com.ua' }));
 
     expect(screen.getByRole('menuitem', { name: 'Встановити новий пароль' })).toBeTruthy();
+    expect(screen.getByRole('menuitem', { name: 'Змінити дані' })).toBeTruthy();
     expect(screen.queryByRole('menuitem', { name: /Зробити/ })).toBeNull();
     expect(screen.queryByRole('menuitem', { name: 'Заблокувати' })).toBeNull();
     expect(screen.queryByRole('menuitem', { name: 'Видалити' })).toBeNull();

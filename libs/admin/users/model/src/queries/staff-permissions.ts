@@ -11,6 +11,8 @@ export interface StaffActor {
 export interface StaffAccountPermissions {
   roleChoices: readonly StaffRole[];
   canSetPassword: boolean;
+  /** Name, email and phone. */
+  canEditDetails: boolean;
   canBlock: boolean;
   canDelete: boolean;
 }
@@ -38,6 +40,7 @@ export const getStaffAccountPermissions = (
         )
       : [],
     canSetPassword: canChange,
+    canEditDetails: canChange,
     canBlock: canChange && !isSelf,
     canDelete: canChange && !isSelf,
   };

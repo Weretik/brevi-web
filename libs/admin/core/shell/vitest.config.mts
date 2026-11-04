@@ -5,6 +5,7 @@ export default defineConfig({
   root: import.meta.dirname,
   cacheDir: '../../../../node_modules/.vite/libs/admin/core/shell-tests',
   plugins: [react()],
+  resolve: { tsconfigPaths: true },
   test: {
     name: 'admin-core-shell',
     environment: 'jsdom',

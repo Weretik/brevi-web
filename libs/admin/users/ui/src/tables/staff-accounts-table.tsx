@@ -1,7 +1,9 @@
+import { UserAvatar } from '@admin/shared/ui';
 import { getStaffAccountPermissions, hasDirector, staffRoleLabels } from '@admin/users/model';
 import {
   Alert,
   Button,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -52,6 +54,7 @@ export function StaffAccountsTable({
           <TableRow>
             <TableCell>Імʼя</TableCell>
             <TableCell>Email</TableCell>
+            <TableCell>Телефон</TableCell>
             <TableCell>Роль</TableCell>
             <TableCell>Статус</TableCell>
             <TableCell align="right">
@@ -64,7 +67,7 @@ export function StaffAccountsTable({
         <TableBody>
           {!loading && accounts.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={5}>Користувачів ще немає.</TableCell>
+              <TableCell colSpan={6}>Користувачів ще немає.</TableCell>
             </TableRow>
           ) : null}
           {accounts.map((account) => {
@@ -73,15 +76,25 @@ export function StaffAccountsTable({
             return (
               <TableRow hover key={account.id}>
                 <TableCell>
-                  {account.fullName || '—'}
-                  {isCurrentUser ? (
-                    <Typography color="text.secondary" component="span" variant="body2">
-                      {' '}
-                      (ви)
-                    </Typography>
-                  ) : null}
+                  <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
+                    <UserAvatar
+                      avatarUrl={account.avatarUrl}
+                      email={account.email}
+                      name={account.fullName}
+                    />
+                    <span>
+                      {account.fullName || '—'}
+                      {isCurrentUser ? (
+                        <Typography color="text.secondary" component="span" variant="body2">
+                          {' '}
+                          (ви)
+                        </Typography>
+                      ) : null}
+                    </span>
+                  </Stack>
                 </TableCell>
                 <TableCell>{account.email}</TableCell>
+                <TableCell sx={{ whiteSpace: 'nowrap' }}>{account.phoneNumber ?? '—'}</TableCell>
                 <TableCell>{staffRoleLabels[account.role]}</TableCell>
                 <TableCell>
                   <StaffStatusPill blocked={account.isBlocked} />

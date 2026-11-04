@@ -17,6 +17,7 @@ const toSessionUser = (response: SessionUserResponse): SessionUser => ({
   email: response.email,
   fullName: response.fullName,
   roles: response.roles,
+  avatarUrl: response.avatarUrl ?? null,
 });
 
 /** Signs in with the HttpOnly session cookie. Throws an axios error on 401 or 429. */

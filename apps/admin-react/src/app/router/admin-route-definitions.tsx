@@ -1,4 +1,5 @@
 import { clientsRoutes } from '@admin/clients/feature';
+import { contentRoutes } from '@admin/content/feature';
 import { dashboardRoutes } from '@admin/dashboard/feature';
 import { mediaRoutes } from '@admin/media/feature';
 import { productsRoutes } from '@admin/products/feature';
@@ -18,4 +19,5 @@ export const adminRouteDefinitions = [
   ...productsRoutes,
   ...remindersRoutes,
   ...mediaRoutes,
+  ...contentRoutes,
 ];
