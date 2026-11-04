@@ -1,4 +1,5 @@
 import { productionOrderStatusLabels } from '../entities/production-order';
+import { productionStageLabels } from '../entities/production-tracking';
 import { formatDay } from '../mappers/format-production';
 
 import type { ProductionOrderSummary } from '../entities/production-order';
@@ -6,6 +7,7 @@ import type { ProductionOrderSummary } from '../entities/production-order';
 const columns: [string, (row: ProductionOrderSummary) => string | number][] = [
   ['Номер', (row) => row.number],
   ['Статус', (row) => productionOrderStatusLabels[row.status]],
+  ['Етап', (row) => productionStageLabels[row.stage]],
   ['Клієнт', (row) => row.clientName],
   ['КП', (row) => row.quoteNumber ?? ''],
   ['Менеджер', (row) => row.managerName],

@@ -11,7 +11,7 @@ In each feature card, “Structure diagram” shows relationships between parts,
 - Staff accounts: [sign-in users «Користувачі» (Admin only)](admin/users.md); [«Мій кабінет» and the profile menu](admin/profile.md).
 - Site content: [«Контент»: privacy and terms](admin/content.md).
 - Products: [«Товари» tables, details, creation, and editing](admin/products/products.md); [Sewing fabrics and composition](admin/products/sewing-composition.md); [Article calculation and published prices](admin/products/sewing-pricing.md); [PPE pricing and input approval](admin/products/ppe-pricing.md).
-- Sewing workshop: [«Швейний цех»: «Виробничі завдання», «Працівники цеху», «Норми витрати тканини», «Правила зарплати»](admin/production.md).
+- Sewing workshop: [«Швейний цех»: «Виробничі завдання» (етапи, відвантаження, файли, Telegram), «Працівники цеху», «Норми витрати тканини», «Правила зарплати», «Налаштування цеху»](admin/production.md).
 - Photos: [«Фото»: photo library with folders, search, upload and usages](admin/media.md).
 - Reminders: [Telegram deadline reminders: tasks, periods, chats, days off](admin/reminders.md).
 - Reference data: [«Контрагенти»: suppliers and clients from KeepinCRM](admin/references/counterparties.md); [suppliers: search, contacts, and CRUD](admin/references/suppliers.md); [fabrics and accessories](admin/references/materials.md); [operations and garment part groups](admin/references/operations.md); [pricing parameters](admin/references/pricing-parameters.md); [«Типи і розділи»: product sections](admin/references/product-sections.md); [«Імпорт цін»: PPE supplier prices](admin/references/price-import.md).

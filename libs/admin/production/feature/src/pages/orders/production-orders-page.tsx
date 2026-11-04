@@ -1,5 +1,13 @@
-import { useImportProductionOrdersMutation } from '@admin/production/data-access';
-import { parseProductionOrderImportFile } from '@admin/production/model';
+import {
+  useImportProductionOrdersMutation,
+  useImportProductionProgressMutation,
+} from '@admin/production/data-access';
+import {
+  parseProductionOrderImportFile,
+  parseProductionProgressImportFile,
+  productionStageLabels,
+  productionStages,
+} from '@admin/production/model';
 import { ProductionOrderChips, ProductionOrdersGrid } from '@admin/production/ui';
 import {
   ReferenceFilterRow,
@@ -18,7 +26,7 @@ import { ProductionImportDrawer } from '../../components/import/production-impor
 import { useProductionOrders } from '../../hooks/orders/use-production-orders';
 import { useProductionOrdersExport } from '../../hooks/orders/use-production-orders-export';
 
-import type { ProductionOrderActor } from '@admin/production/model';
+import type { ProductionOrderActor, ProductionStage } from '@admin/production/model';
 
 interface Props {
   useOrderActor: () => ProductionOrderActor;
@@ -30,9 +38,10 @@ export function ProductionOrdersPage({ useOrderActor }: Props) {
   const navigate = useNavigate();
   const list = useProductionOrders();
   const [message, setMessage] = useState<string | null>(null);
-  const [importing, setImporting] = useState(false);
+  const [importing, setImporting] = useState<'orders' | 'progress' | null>(null);
   const exporter = useProductionOrdersExport(setMessage);
   const [importOrders] = useImportProductionOrdersMutation();
+  const [importProgress] = useImportProductionProgressMutation();
   const page = list.page;
 
   return (
@@ -52,13 +61,22 @@ export function ProductionOrdersPage({ useOrderActor }: Props) {
               Експорт
             </Button>
             {actor.canImport && (
-              <Button
-                variant="outlined"
-                startIcon={<UploadFileOutlinedIcon />}
-                onClick={() => setImporting(true)}
-              >
-                Імпорт
-              </Button>
+              <>
+                <Button
+                  variant="outlined"
+                  startIcon={<UploadFileOutlinedIcon />}
+                  onClick={() => setImporting('orders')}
+                >
+                  Імпорт
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<UploadFileOutlinedIcon />}
+                  onClick={() => setImporting('progress')}
+                >
+                  Імпорт етапів
+                </Button>
+              </>
             )}
             {actor.canCreate && (
               <Button
@@ -95,6 +113,23 @@ export function ProductionOrdersPage({ useOrderActor }: Props) {
               onStatusChange={list.setStatus}
               onOverdueChange={list.setOverdue}
             />
+            <TextField
+              select
+              size="small"
+              label="Етап"
+              value={list.stage ?? ''}
+              sx={{ minWidth: 200 }}
+              onChange={(event) =>
+                list.setStage((event.target.value || null) as ProductionStage | null)
+              }
+            >
+              <MenuItem value="">Усі</MenuItem>
+              {productionStages.map((stage) => (
+                <MenuItem key={stage} value={stage}>
+                  {productionStageLabels[stage]}
+                </MenuItem>
+              ))}
+            </TextField>
             {page && page.managers.length > 1 && (
               <TextField
                 select
@@ -132,7 +167,18 @@ export function ProductionOrdersPage({ useOrderActor }: Props) {
           onOpen={(row) => navigate(`/production/orders/${row.id}`)}
         />
       </Paper>
-      {importing && (
+      {importing === 'progress' && (
+        <ProductionImportDrawer
+          title="Імпорт етапів"
+          description="Файл production-progress.json зі старого «Цеху»: етапи позицій, посилання на файли і відмітки Telegram. Спершу перевіримо, потім збережемо."
+          keyLabel="Завдання"
+          detailLabel="Що зміниться"
+          parse={parseProductionProgressImportFile}
+          send={(rows, dryRun) => importProgress({ rows, dryRun }).unwrap()}
+          onClose={() => setImporting(null)}
+        />
+      )}
+      {importing === 'orders' && (
         <ProductionImportDrawer
           title="Імпорт завдань"
           description="Файл production-orders.json зі старого «Цеху». Спершу перевіримо, потім збережемо."
@@ -140,7 +186,7 @@ export function ProductionOrdersPage({ useOrderActor }: Props) {
           detailLabel="Клієнт"
           parse={parseProductionOrderImportFile}
           send={(rows, dryRun) => importOrders({ rows, dryRun }).unwrap()}
-          onClose={() => setImporting(false)}
+          onClose={() => setImporting(null)}
         />
       )}
     </Box>

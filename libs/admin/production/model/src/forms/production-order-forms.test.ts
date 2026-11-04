@@ -8,10 +8,18 @@ import {
   updateOrderBody,
   validateCreateOrder,
 } from './production-order-form';
+import {
+  createShipmentFormValues,
+  shipmentBody,
+  validateShipment,
+} from './production-shipment-form';
+import { validateWorkshopSettings, workshopSettingsBody } from './workshop-settings-form';
+import { toggleStage } from '../entities/production-tracking';
 import { productionOrdersCsv } from '../queries/production-orders-csv';
 import { parseProductionOrderImportFile } from '../validators/production-order-import-file';
 
 import type {
+  ProductionItem,
   ProductionOrder,
   ProductionOrderSummary,
   ProductionQuoteDraft,
@@ -124,7 +132,11 @@ describe('production order forms', () => {
       plannedFabricMeters: 7.5,
       sewingRate: null,
       reportUnitPrice: null,
-    };
+      stages: ['New'],
+      currentStage: 'New',
+      shippedQuantity: 0,
+      shipments: [],
+    } satisfies ProductionItem;
     const order = {
       version: 4,
       items: [item],
@@ -162,10 +174,11 @@ describe('production order forms', () => {
       nearestDueDate: null,
       isTransferred: false,
       updatedAt: '2026-11-04T10:00:00Z',
+      stage: 'Cutting',
     };
     const csv = productionOrdersCsv([row]);
     expect(csv.startsWith('﻿Номер;Статус;')).toBe(true);
-    expect(csv).toContain('5;Нове;"ТОВ ""Ромашка""; філія";КП-7;');
+    expect(csv).toContain('5;Нове;Крій;"ТОВ ""Ромашка""; філія";КП-7;');
     expect(csv.endsWith('\r\n')).toBe(true);
   });
 
@@ -180,5 +193,39 @@ describe('production order forms', () => {
     );
     expect(ok.error).toBeNull();
     expect(ok.rows).toHaveLength(1);
+  });
+});
+
+describe('production tracking forms', () => {
+  it('keeps ticked stages in workshop order and falls back to «Нове»', () => {
+    expect(toggleStage(['Sewing'], 'FabricAvailable')).toEqual(['FabricAvailable', 'Sewing']);
+    expect(toggleStage(['Sewing'], 'Sewing')).toEqual(['New']);
+  });
+
+  it('never ships more than is left', () => {
+    const values = createShipmentFormValues(6, '2026-11-05');
+    expect(validateShipment(values, 6)).toEqual({});
+    expect(validateShipment({ ...values, quantity: '7' }, 6).quantity).toBe(
+      'Залишилось відвантажити 6 шт.',
+    );
+    expect(shipmentBody({ ...values, comment: ' ' }, 3)).toEqual({
+      version: 3,
+      quantity: 6,
+      shippedOn: '2026-11-05',
+      comment: null,
+    });
+  });
+
+  it('needs a group to turn sending on and a whole topic number', () => {
+    expect(
+      validateWorkshopSettings({ telegramEnabled: true, chatId: '', threadId: '' }).chatId,
+    ).toBeTruthy();
+    expect(
+      validateWorkshopSettings({ telegramEnabled: false, chatId: '-100', threadId: '1.5' })
+        .threadId,
+    ).toBeTruthy();
+    expect(
+      workshopSettingsBody({ telegramEnabled: true, chatId: '-100', threadId: '434' }),
+    ).toEqual({ telegramEnabled: true, telegramChatId: -100, telegramThreadId: 434 });
   });
 });

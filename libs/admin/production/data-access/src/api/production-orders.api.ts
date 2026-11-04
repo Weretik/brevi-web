@@ -45,6 +45,7 @@ function listParams(query: ProductionOrderListQuery) {
     ...(query.status ? { status: query.status } : {}),
     ...(query.manager ? { manager: query.manager } : {}),
     ...(query.dueTo ? { dueTo: query.dueTo } : {}),
+    ...(query.stage ? { stage: query.stage } : {}),
   };
 }
 

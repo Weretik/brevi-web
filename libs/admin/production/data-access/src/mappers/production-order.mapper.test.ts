@@ -25,6 +25,34 @@ const order = {
     canDelete: false,
     seesSewingRate: false,
     seesReportPrice: false,
+    canTrack: false,
+    canClose: false,
+    canCancel: true,
+    canReopen: false,
+    canManageFiles: true,
+    canSendTelegram: false,
+  },
+  cancelReason: null,
+  files: [
+    {
+      id: 9,
+      itemId: 3,
+      kind: 'Sizes',
+      name: 'Розміри.pdf',
+      contentType: 'application/pdf',
+      bytes: 1200,
+      url: 'https://drive.google.com/file/d/abc',
+      isOldLink: true,
+      createdByName: 'Олена',
+      createdAt: '2026-10-10T09:00:00Z',
+    },
+  ],
+  telegram: {
+    status: 'Sent',
+    sentAt: '2026-10-10T09:05:00Z',
+    sentByName: 'Старий «Цех»',
+    error: null,
+    ready: false,
   },
   items: [
     {
@@ -45,6 +73,19 @@ const order = {
       plannedFabricMeters: 17,
       sewingRate: null,
       reportUnitPrice: null,
+      stages: ['FabricAvailable', 'Cutting'],
+      currentStage: 'Cutting',
+      shippedQuantity: 4,
+      shipments: [
+        {
+          id: 1,
+          quantity: 4,
+          shippedOn: '2026-11-05',
+          comment: null,
+          createdByName: 'Начальник',
+          createdAt: '2026-11-05T09:00:00Z',
+        },
+      ],
     },
   ],
 };
@@ -58,6 +99,20 @@ describe('production order mappers', () => {
       applications: [{ kind: 'Embroidery', place: 'груди' }],
     });
     expect(mapped.isTransferred).toBe(true);
+  });
+
+  it('maps stages, shipments, files and the Telegram mark', () => {
+    const mapped = mapProductionOrder(order);
+    expect(mapped.items[0]).toMatchObject({
+      currentStage: 'Cutting',
+      shippedQuantity: 4,
+      shipments: [{ quantity: 4, shippedOn: '2026-11-05' }],
+    });
+    expect(mapped.files[0]).toMatchObject({ kind: 'Sizes', isOldLink: true, itemId: 3 });
+    expect(mapped.telegram.status).toBe('Sent');
+    expect(() =>
+      mapProductionOrder({ ...order, items: [{ ...order.items[0], currentStage: 'Done' }] }),
+    ).toThrow('поточний етап');
   });
 
   it('rejects an unknown status or date', () => {

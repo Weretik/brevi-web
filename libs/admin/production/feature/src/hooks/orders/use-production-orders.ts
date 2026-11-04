@@ -5,7 +5,11 @@ import { useState } from 'react';
 
 import { useDebouncedValue } from '../requests/use-debounced-value';
 
-import type { ProductionOrderListQuery, ProductionOrderStatus } from '@admin/production/model';
+import type {
+  ProductionOrderListQuery,
+  ProductionOrderStatus,
+  ProductionStage,
+} from '@admin/production/model';
 import type { GridPaginationModel } from '@mui/x-data-grid';
 
 const yesterday = (today: string) => {
@@ -14,13 +18,14 @@ const yesterday = (today: string) => {
   return todayIso(date);
 };
 
-/** «Виробничі завдання» list: search, status and «Прострочені» filters, server pages. */
+/** «Виробничі завдання» list: search, status, «Прострочені», manager and stage filters, server pages. */
 export function useProductionOrders() {
   const today = todayIso();
   const [search, setSearchValue] = useState('');
   const [status, setStatusValue] = useState<ProductionOrderStatus | null>(null);
   const [overdue, setOverdueValue] = useState(false);
   const [manager, setManagerValue] = useState<string | null>(null);
+  const [stage, setStageValue] = useState<ProductionStage | null>(null);
   const [pagination, setPagination] = useState<GridPaginationModel>({ page: 0, pageSize: 50 });
   const debouncedSearch = useDebouncedValue(search);
 
@@ -30,6 +35,7 @@ export function useProductionOrders() {
     status: overdue ? 'New' : status,
     manager,
     dueTo: overdue ? yesterday(today) : null,
+    stage,
     page: pagination.page + 1,
     pageSize: pagination.pageSize,
   };
@@ -43,6 +49,7 @@ export function useProductionOrders() {
     status,
     overdue,
     manager,
+    stage,
     pagination,
     page: result.data ?? null,
     loading: result.isLoading || result.isFetching,
@@ -66,6 +73,10 @@ export function useProductionOrders() {
     },
     setManager: (value: string | null) => {
       setManagerValue(value);
+      firstPage();
+    },
+    setStage: (value: ProductionStage | null) => {
+      setStageValue(value);
       firstPage();
     },
   };

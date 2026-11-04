@@ -90,6 +90,12 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         path: '/production/payroll-rules',
         requiredRoles: workshop,
       },
+      {
+        id: 'workshop-settings',
+        label: 'Налаштування цеху',
+        path: '/production/settings',
+        requiredRoles: workshop,
+      },
       { id: 'schedule', label: 'Графік роботи' },
       { id: 'salary', label: 'Зарплата' },
       { id: 'fabric-stock', label: 'Тканина в цеху' },
