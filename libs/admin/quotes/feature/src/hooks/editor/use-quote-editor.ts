@@ -39,10 +39,11 @@ export function useQuoteEditor(id: number | null) {
   const errors = useMemo(() => quoteDraftErrors(draft.draft), [draft.draft]);
   const hasErrors = Object.keys(errors).length > 0;
 
-  const save = async () => {
+  /** Saves the draft; returns the saved КП, or null when it has problems or the server refused it. */
+  const save = async (): Promise<Quote | null> => {
     setShowErrors(true);
     setSaveError(null);
-    if (hasErrors) return;
+    if (hasErrors) return null;
     try {
       const saved =
         quote === null
@@ -53,12 +54,14 @@ export function useQuoteEditor(id: number | null) {
       setShowErrors(false);
       setSavedAt(Date.now());
       if (id === null) navigate(`/crm/quotes/${saved.id}`, { replace: true });
+      return saved;
     } catch (error) {
       const status = (error as { status?: number }).status;
       setSaveError({
         message: messageOf(error, 'Не вдалося зберегти КП.'),
         stale: status === 409 && quote !== null,
       });
+      return null;
     }
   };
 

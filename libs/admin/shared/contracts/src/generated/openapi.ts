@@ -1452,6 +1452,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/pricing/ppe/supplier-prices/{key}/refresh': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description CanManageProducts. «Оновити зараз» for a connected website or Google Sheets source (av-center, 3c-market, perchatka-centr): reads the supplier's pages or the six 3C lists now and returns every product of the supplier with old and new prices. A page without a price or a failed page is a row problem; a 3C list that does not load fails the request with 400 and changes nothing. dryRun=false reads again and saves changed prices as new approved offer versions. File and not yet connected sources answer 400. */
+    post: operations['refreshPpeSupplierPrices'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/crm/customers': {
     parameters: {
       query?: never;
@@ -1603,6 +1620,25 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/crm/quotes/{id}/pdf': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['QuoteId'];
+      };
+      cookie?: never;
+    };
+    /** @description «Сформувати КП». The PDF of the saved КП with the current settings; only shown items, variants and prices, client texts, the responsible manager's КП contact and the requisites (R-14). */
+    get: operations['getCrmQuotePdf'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/crm/quotes/{id}/reprice': {
     parameters: {
       query?: never;
@@ -1634,6 +1670,24 @@ export interface paths {
     get?: never;
     /** @description Admin (Director) gives the КП to themselves or another active manager. */
     put: operations['setCrmQuoteResponsible'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quote-settings': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description «Налаштування КП» (R-13). Before the first save returns the defaults with version 0. Has a contact row for every active staff member; an unsaved contact shows the account name, phone and email. */
+    get: operations['getCrmQuoteSettings'];
+    /** @description Saves the whole page with the version that was loaded. */
+    put: operations['saveCrmQuoteSettings'];
     post?: never;
     delete?: never;
     options?: never;
@@ -3596,7 +3650,7 @@ export interface components {
       fileKind: 'None' | 'InsightYml' | 'CemtoPdf';
       /** Format: int32 */
       fileCount: number;
-      /** @description False until stages 2–3 connect the scheduled update. */
+      /** @description The scheduled update works and «Оновити зараз» is offered (website and Google Sheets sources from stage 2; cabinet sources in stage 3). */
       automaticUpdateConnected: boolean;
       /** Format: date-time */
       settingsUpdatedAt: string | null;
@@ -3961,6 +4015,104 @@ export interface components {
       version: number;
       changes: components['schemas']['CrmQuoteRepriceChange'][];
       unavailable: components['schemas']['CrmQuoteRepriceProblem'][];
+    };
+    CrmQuoteCompany: {
+      name: string;
+      /** @description 8 digits. */
+      edrpou?: string | null;
+      /** @description ІПН */
+      taxId?: string | null;
+      iban?: string | null;
+      address?: string | null;
+      phone?: string | null;
+      /** Format: email */
+      email?: string | null;
+      /** Format: uri */
+      site?: string | null;
+      /**
+       * Format: uri
+       * @description https link (photo library); SVG
+       */
+      logoUrl?: string | null;
+    };
+    /** @description Marks: {quoteNumber}, {managerName}, {managerPhone}, {managerEmail}, {site}. */
+    CrmQuoteEmailTemplate: {
+      subject: string;
+      body: string;
+    };
+    CrmQuotePdfTexts: {
+      title: string;
+      vatNotice?: string | null;
+      ctaTitle?: string | null;
+      ctaText?: string | null;
+      /** @description Marks: {managerName}, {managerPhone}, {managerEmail}. */
+      ctaContactTemplate?: string | null;
+    };
+    CrmQuoteAdvantage: {
+      title: string;
+      text?: string | null;
+    };
+    /** @description «КП для знайомства — рекламний каталог» (used in stage 4). */
+    CrmQuoteIntroductionTexts: {
+      logoText?: string | null;
+      summerTitle?: string | null;
+      winterTitle?: string | null;
+      subtitle?: string | null;
+      /** Format: uri */
+      summerBannerUrl?: string | null;
+      /** Format: uri */
+      winterBannerUrl?: string | null;
+      modelsTitle?: string | null;
+      assortmentLinkText?: string | null;
+      /** Format: uri */
+      assortmentUrl?: string | null;
+      productButtonText?: string | null;
+      nextStepText?: string | null;
+      accentColor?: string | null;
+      advantages: components['schemas']['CrmQuoteAdvantage'][];
+    };
+    CrmQuoteLetterVariant: {
+      name: string;
+      subject: string;
+      body: string;
+    };
+    CrmQuoteStaffContact: {
+      userId: number;
+      accountName: string;
+      accountEmail?: string | null;
+      /** @description Name shown to the client. */
+      name: string;
+      phone?: string | null;
+      email?: string | null;
+    };
+    CrmQuoteSettings: {
+      /** @description 0 before the first save. */
+      version: number;
+      updatedByName?: string | null;
+      /** Format: date-time */
+      updatedAt?: string | null;
+      company: components['schemas']['CrmQuoteCompany'];
+      email: components['schemas']['CrmQuoteEmailTemplate'];
+      pdf: components['schemas']['CrmQuotePdfTexts'];
+      introduction: components['schemas']['CrmQuoteIntroductionTexts'];
+      letterVariants: components['schemas']['CrmQuoteLetterVariant'][];
+      staffContacts: components['schemas']['CrmQuoteStaffContact'][];
+    };
+    CrmQuoteStaffContactInput: {
+      userId: number;
+      name: string;
+      phone?: string | null;
+      /** Format: email */
+      email?: string | null;
+    };
+    CrmSaveQuoteSettingsInput: {
+      version: number;
+      company: components['schemas']['CrmQuoteCompany'];
+      email: components['schemas']['CrmQuoteEmailTemplate'];
+      pdf: components['schemas']['CrmQuotePdfTexts'];
+      introduction: components['schemas']['CrmQuoteIntroductionTexts'];
+      letterVariants: components['schemas']['CrmQuoteLetterVariant'][];
+      staffContacts: components['schemas']['CrmQuoteStaffContactInput'][];
     };
     CrmQuoteCatalogVariant: {
       /** Format: int64 */
@@ -8785,6 +8937,58 @@ export interface operations {
       };
     };
   };
+  refreshPpeSupplierPrices: {
+    parameters: {
+      query?: {
+        dryRun?: boolean;
+      };
+      header?: never;
+      path: {
+        key: 'av-center' | '3c-market' | 'perchatka-centr' | 'insight' | 'trele' | 'cemto';
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Preview or applied result. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PpePriceImportResult'];
+        };
+      };
+      /** @description Invalid request; body lists the reasons in Ukrainian. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Required policy or actor claim missing. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unknown source. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   getCrmCustomers: {
     parameters: {
       query?: {
@@ -9485,6 +9689,49 @@ export interface operations {
       409: components['responses']['Conflict'];
     };
   };
+  getCrmQuotePdf: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['QuoteId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description PDF file, `Content-Disposition` attachment named «КП <number>.pdf»; not cached. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/pdf': string;
+        };
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found or not visible to the actor. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   repriceCrmQuote: {
     parameters: {
       query?: never;
@@ -9581,6 +9828,80 @@ export interface operations {
       };
       /** @description Not found. */
       404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['Conflict'];
+    };
+  };
+  getCrmQuoteSettings: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Settings. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmQuoteSettings'];
+        };
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required (the Director also holds it). */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  saveCrmQuoteSettings: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmSaveQuoteSettingsInput'];
+      };
+    };
+    responses: {
+      /** @description Saved; version is incremented. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmQuoteSettings'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required (the Director also holds it). */
+      403: {
         headers: {
           [name: string]: unknown;
         };

@@ -151,6 +151,8 @@ paths:
     $ref: ./catalog/ppe-supplier-prices.openapi.yaml#/paths/~1api~1v1~1pricing~1ppe~1supplier-prices~1{key}
   /api/v1/pricing/ppe/supplier-prices/{key}/import:
     $ref: ./catalog/ppe-supplier-prices.openapi.yaml#/paths/~1api~1v1~1pricing~1ppe~1supplier-prices~1{key}~1import
+  /api/v1/pricing/ppe/supplier-prices/{key}/refresh:
+    $ref: ./catalog/ppe-supplier-prices.openapi.yaml#/paths/~1api~1v1~1pricing~1ppe~1supplier-prices~1{key}~1refresh
   /api/crm/customers:
     $ref: ./crm/clients-quotes.openapi.yaml#/paths/~1api~1crm~1customers
   /api/crm/customers/keepin-sync:
@@ -167,10 +169,14 @@ paths:
     $ref: ./crm/quotes.openapi.yaml#/paths/~1api~1crm~1quotes
   /api/crm/quotes/{id}:
     $ref: ./crm/quotes.openapi.yaml#/paths/~1api~1crm~1quotes~1{id}
+  /api/crm/quotes/{id}/pdf:
+    $ref: ./crm/quotes.openapi.yaml#/paths/~1api~1crm~1quotes~1{id}~1pdf
   /api/crm/quotes/{id}/reprice:
     $ref: ./crm/quotes.openapi.yaml#/paths/~1api~1crm~1quotes~1{id}~1reprice
   /api/crm/quotes/{id}/responsible:
     $ref: ./crm/quotes.openapi.yaml#/paths/~1api~1crm~1quotes~1{id}~1responsible
+  /api/crm/quote-settings:
+    $ref: ./crm/quotes.openapi.yaml#/paths/~1api~1crm~1quote-settings
   /api/crm/quote-lookups/catalog:
     $ref: ./crm/quotes.openapi.yaml#/paths/~1api~1crm~1quote-lookups~1catalog
   /api/crm/quote-lookups/staff:

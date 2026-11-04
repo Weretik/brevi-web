@@ -79,6 +79,9 @@ const requiredOperations = {
     'setCrmQuoteResponsible',
     'searchCrmQuoteCatalog',
     'getCrmQuoteStaff',
+    'getCrmQuotePdf',
+    'getCrmQuoteSettings',
+    'saveCrmQuoteSettings',
   ],
 };
 

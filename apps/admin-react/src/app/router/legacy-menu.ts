@@ -35,7 +35,12 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
       { id: 'leads', label: 'Ліди' },
       { id: 'quotes', label: 'КП', path: '/crm/quotes' },
       { id: 'quote-introductions', label: 'КП для знайомства' },
-      { id: 'quote-settings', label: 'Налаштування КП', requiredRole: 'Admin' },
+      {
+        id: 'quote-settings',
+        label: 'Налаштування КП',
+        path: '/crm/quote-settings',
+        requiredRole: 'Admin',
+      },
       { id: 'price-list', label: 'Прайс' },
       { id: 'tasks', label: 'Завдання в роботу' },
       { id: 'deals', label: 'Угоди' },
