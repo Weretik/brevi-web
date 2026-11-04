@@ -49,7 +49,7 @@ const importRow = (overrides: Record<string, unknown>) => ({
 
 function stubApi(canChangeDiscounts: boolean) {
   const fetcher = vi.fn().mockImplementation(async (path: string, init?: RequestInit) => {
-    if (path.includes('/import')) {
+    if (path.includes('/import') || path.includes('/refresh')) {
       const applied = path.includes('dryRun=false');
       return {
         ok: true,
@@ -89,6 +89,8 @@ function stubApi(canChangeDiscounts: boolean) {
             fileCount: 0,
             discountPercent: 20,
             defaultDiscountPercent: 20,
+            supplierName: 'АВ-Центр',
+            automaticUpdateConnected: true,
           }),
         ],
       }),
@@ -139,6 +141,29 @@ describe('price import page', () => {
     ).toBe(true);
   });
 
+  it('refreshes a website supplier now: preview, then apply', async () => {
+    const user = userEvent.setup();
+    const fetcher = stubApi(false);
+    openPage();
+
+    await user.click(await screen.findByRole('row', { name: /АВ-Центр/ }));
+    const panel = await screen.findByRole('dialog', { name: 'АВ-Центр' });
+    expect(within(panel).queryByLabelText('Файли прайсу АВ-Центр')).toBeNull();
+    expect(within(panel).queryByText(/ще не підключено/)).toBeNull();
+
+    await user.click(within(panel).getByRole('button', { name: 'Перевірити' }));
+    expect(await within(panel).findByRole('row', { name: /1003/ })).toBeVisible();
+    expect(
+      fetcher.mock.calls.some(([path]) => String(path).includes('/av-center/refresh?dryRun=true')),
+    ).toBe(true);
+
+    await user.click(within(panel).getByRole('button', { name: 'Застосувати (1)' }));
+    expect(await screen.findByText('Ціни «АВ-Центр» оновлено: змінено 1.')).toBeVisible();
+    expect(
+      fetcher.mock.calls.some(([path]) => String(path).includes('/av-center/refresh?dryRun=false')),
+    ).toBe(true);
+  });
+
   it('lets an administrator change a discount', async () => {
     const user = userEvent.setup();
     const fetcher = stubApi(true);
@@ -146,7 +171,6 @@ describe('price import page', () => {
 
     await user.click(await screen.findByRole('row', { name: /АВ-Центр/ }));
     const panel = await screen.findByRole('dialog', { name: 'АВ-Центр' });
-    expect(within(panel).getByText(/ще не підключено/)).toBeVisible();
     await user.click(within(panel).getByRole('button', { name: 'Змінити знижку' }));
     const input = within(panel).getByLabelText(/Знижка від ціни постачальника/);
     await user.clear(input);

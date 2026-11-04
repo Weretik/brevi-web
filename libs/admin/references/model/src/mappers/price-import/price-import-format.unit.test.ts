@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  canRefreshPriceSource,
   formatDiscount,
   isPriceImportProblem,
   priceFileLabel,
@@ -28,6 +29,17 @@ const row = (code: string, status: PriceImportRow['status']): PriceImportRow => 
 });
 
 describe('price import format', () => {
+  it('offers «Оновити зараз» only for connected non-file sources', () => {
+    expect(canRefreshPriceSource({ method: 'Website', automaticUpdateConnected: true })).toBe(true);
+    expect(canRefreshPriceSource({ method: 'GoogleSheets', automaticUpdateConnected: true })).toBe(
+      true,
+    );
+    expect(
+      canRefreshPriceSource({ method: 'SupplierCabinet', automaticUpdateConnected: false }),
+    ).toBe(false);
+    expect(canRefreshPriceSource({ method: 'File', automaticUpdateConnected: true })).toBe(false);
+  });
+
   it('puts changes and problems first', () => {
     const sorted = sortPriceImportRows([
       row('3', 'Unchanged'),
