@@ -2,6 +2,7 @@ export * from './entities/embroidery-codes';
 export * from './entities/embroidery-form-setup';
 export * from './entities/embroidery-calculation';
 export * from './entities/embroidery-settings';
+export * from './entities/embroidery-saved';
 export * from './forms/embroidery-calculation-form';
 export * from './forms/embroidery-settings-form';
 export * from './validators/embroidery-calculation-validation';

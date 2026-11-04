@@ -25,3 +25,18 @@ export function embroideryPriceText(
 ): string {
   return `Вишивка, ${price.name.toLowerCase()}: ${formatEmbroideryMoney(price.unit)} грн за 1 шт, ${formatEmbroideryNumber(quantity)} шт — ${formatEmbroideryMoney(price.total)} грн.`;
 }
+
+const dateTime = new Intl.DateTimeFormat('uk-UA', {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+  timeZone: 'Europe/Kyiv',
+});
+
+/** «04.11.2026, 21:52» in Kyiv time. */
+export const formatEmbroideryDateTime = (iso: string): string => dateTime.format(new Date(iso));
+
+/** The saved name, or «Без назви». */
+export const embroiderySavedTitle = (name: string): string => name.trim() || 'Без назви';
