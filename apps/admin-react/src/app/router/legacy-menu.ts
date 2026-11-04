@@ -27,6 +27,8 @@ interface LegacyNavigationGroup {
 }
 
 const admin = ['Admin'] as const;
+/** «Ціна вишивки»: managers price it; Admin covers the director. */
+const embroideryPrice = ['Admin', 'Manager'] as const;
 /** «Швейний цех»: the head of the workshop; Admin covers the director. */
 const workshop = ['Admin', 'WorkshopChief'] as const;
 /** «Виробничі завдання»: managers too, since they pass КП to the workshop. */
@@ -46,6 +48,12 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         label: 'Налаштування КП',
         path: '/crm/quote-settings',
         requiredRoles: admin,
+      },
+      {
+        id: 'embroidery-price',
+        label: 'Ціна вишивки',
+        path: '/crm/embroidery',
+        requiredRoles: embroideryPrice,
       },
       { id: 'price-list', label: 'Прайс' },
       { id: 'tasks', label: 'Мої завдання', path: '/crm/tasks' },
