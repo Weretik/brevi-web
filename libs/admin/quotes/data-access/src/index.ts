@@ -1,11 +1,14 @@
 export {
+  useCopyQuoteMutation,
   useCreateQuoteMutation,
   useDeleteQuoteMutation,
+  useGetQuoteHistoryQuery,
   useGetQuoteQuery,
   useLazyGetQuoteQuery,
   useListQuotesQuery,
   useRepriceQuoteMutation,
   useSaveQuoteMutation,
+  useSetQuoteArchivedMutation,
   useSetQuoteResponsibleMutation,
 } from './api/quotes.api';
 export {

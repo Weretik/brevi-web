@@ -20,6 +20,7 @@ const page: QuotePage = {
       itemsCount: 3,
       updatedAt: '2026-11-04T10:00:00Z',
       lastSentAt: null,
+      archivedAt: null,
     },
   ],
   page: 1,
@@ -28,15 +29,20 @@ const page: QuotePage = {
 };
 
 const staffQuery = vi.hoisted(() => vi.fn());
+const listQuery = vi.hoisted(() => vi.fn());
 
 vi.mock('@admin/quotes/data-access', () => ({
-  useListQuotesQuery: () => ({ data: page, isFetching: false, isError: false, refetch: vi.fn() }),
+  useListQuotesQuery: (query: unknown) => {
+    listQuery(query);
+    return { data: page, isFetching: false, isError: false, refetch: vi.fn() };
+  },
   useGetQuoteStaffQuery: staffQuery,
 }));
 
 afterEach(() => {
   cleanup();
   staffQuery.mockReset();
+  listQuery.mockReset();
 });
 
 function renderList(canSeeAll: boolean) {
@@ -53,6 +59,16 @@ function renderList(canSeeAll: boolean) {
 }
 
 describe('КП list', () => {
+  it('lists КП in work by default and the archive on its own tab', async () => {
+    const user = userEvent.setup();
+    renderList(false);
+    expect(listQuery).toHaveBeenLastCalledWith(expect.objectContaining({ archived: false }));
+    await user.click(screen.getByRole('tab', { name: 'Архів' }));
+    expect(listQuery).toHaveBeenLastCalledWith(
+      expect.objectContaining({ archived: true, page: 1 }),
+    );
+  });
+
   it('shows a Manager only their own КП without the responsible filter', () => {
     renderList(false);
     expect(screen.getByText('Ваші комерційні пропозиції')).toBeVisible();

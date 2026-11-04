@@ -1,6 +1,13 @@
 import { useDeleteQuoteMutation } from '@admin/quotes/data-access';
 import { oneOffItemDraft, quoteTierLabels, quoteTiers } from '@admin/quotes/model';
-import { QuoteAddItems, QuoteHeaderCard, QuoteItemCard, QuoteNotesCard } from '@admin/quotes/ui';
+import {
+  QuoteAddItems,
+  QuoteArchivedNotice,
+  QuoteHeaderCard,
+  QuoteItemCard,
+  QuoteMoreMenu,
+  QuoteNotesCard,
+} from '@admin/quotes/ui';
 import { ReferencePageHeader } from '@admin/references/ui';
 import { Alert, Box, Button, CircularProgress, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
@@ -13,12 +20,15 @@ import { QuoteCustomSewingDrawer } from '../../components/custom-sewing/quote-cu
 import { QuoteDeleteDialog } from '../../components/editor/quote-delete-dialog';
 import { QuoteRepriceDrawer } from '../../components/editor/quote-reprice-drawer';
 import { QuoteResponsibleDrawer } from '../../components/editor/quote-responsible-drawer';
+import { QuoteHistoryDrawer } from '../../components/lifecycle/quote-history-drawer';
 import { QuoteCatalogPickerDrawer } from '../../components/picker/quote-catalog-picker-drawer';
 import { QuoteFabricPickerDrawer } from '../../components/picker/quote-fabric-picker-drawer';
 import { QuoteSendDrawer } from '../../components/sending/quote-send-drawer';
 import { useClientNames } from '../../hooks/editor/use-client-names';
 import { useQuoteEditor } from '../../hooks/editor/use-quote-editor';
 import { useQuotePdf } from '../../hooks/editor/use-quote-pdf';
+import { useQuoteLifecycle } from '../../hooks/lifecycle/use-quote-lifecycle';
+import { useRouteNotice } from '../../hooks/lifecycle/use-route-notice';
 import { useGmailReturnNotice } from '../../hooks/sending/use-gmail-return-notice';
 
 import type { QuoteActor } from '@admin/quotes/model';
@@ -29,6 +39,7 @@ type Panel =
   | { kind: 'custom'; itemKey?: string }
   | { kind: 'responsible' }
   | { kind: 'reprice' }
+  | { kind: 'history' }
   | { kind: 'send' };
 
 const countLabel = (count: number) =>
@@ -55,6 +66,8 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
   const pdf = useQuotePdf({ quote, dirty: editor.dirty, save: editor.save });
   const gmail = useGmailReturnNotice();
   const [sentNotice, setSentNotice] = useState<string | null>(null);
+  const lifecycle = useQuoteLifecycle(quote, editor.applyServerQuote);
+  const routeNotice = useRouteNotice();
 
   if (editor.loading)
     return (
@@ -89,17 +102,48 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
         title="Товари та ціни"
         subtitle={quote ? `КП ${quote.number}${sentLabel(quote.lastSentAt)}` : 'Нове КП'}
         actions={
-          <QuoteEditorActions
-            saved={quote !== null}
-            dirty={editor.dirty}
-            canAssign={actor.canSeeAll}
-            canDelete={quote?.status === 'Draft'}
-            onAssign={() => setPanel({ kind: 'responsible' })}
-            onReprice={() => setPanel({ kind: 'reprice' })}
-            onDelete={() => setConfirmDelete(true)}
-          />
+          <>
+            <QuoteEditorActions
+              saved={quote !== null}
+              dirty={editor.dirty}
+              archived={lifecycle.archived}
+              canAssign={actor.canSeeAll}
+              canDelete={quote?.status === 'Draft'}
+              onAssign={() => setPanel({ kind: 'responsible' })}
+              onReprice={() => setPanel({ kind: 'reprice' })}
+              onDelete={() => setConfirmDelete(true)}
+            />
+            {quote && (
+              <QuoteMoreMenu
+                archived={lifecycle.archived}
+                dirty={editor.dirty}
+                busy={lifecycle.busy}
+                onHistory={() => setPanel({ kind: 'history' })}
+                onCopy={() => void lifecycle.copy()}
+                onArchive={(archived) => void lifecycle.setArchived(archived)}
+              />
+            )}
+          </>
         }
       />
+      {quote?.archivedAt && (
+        <QuoteArchivedNotice
+          archivedAt={quote.archivedAt}
+          archivedByName={quote.archivedByName}
+          busy={lifecycle.busy}
+          onRestore={() => void lifecycle.setArchived(false)}
+        />
+      )}
+      {lifecycle.error && (
+        <Alert severity="error" sx={{ mb: 2 }} onClose={lifecycle.clearError}>
+          {lifecycle.error}
+        </Alert>
+      )}
+      {routeNotice.notice && (
+        <Alert severity="success" sx={{ mb: 2 }} onClose={routeNotice.dismiss}>
+          {routeNotice.notice}
+        </Alert>
+      )}
       {editor.saveError && (
         <Alert
           severity="error"
@@ -191,6 +235,7 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
         dirty={editor.dirty}
         saving={editor.saving}
         generating={pdf.generating}
+        locked={lifecycle.archived}
         onClose={() => navigate('/crm/quotes')}
         onSave={() => void editor.save()}
         onPdf={() => void pdf.generate()}
@@ -263,6 +308,13 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
             setPanel(null);
             void editor.reload();
           }}
+        />
+      )}
+      {panel?.kind === 'history' && quote && (
+        <QuoteHistoryDrawer
+          quoteId={quote.id}
+          number={quote.number}
+          onClose={() => setPanel(null)}
         />
       )}
       {panel?.kind === 'send' && quote && (

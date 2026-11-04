@@ -3,6 +3,7 @@ import type {
   QuoteCatalogPage,
   QuoteCatalogProduct,
   QuoteCustomSewingPrice,
+  QuoteEvent,
   QuoteItem,
   QuoteModelComposition,
   QuoteOption,
@@ -82,6 +83,8 @@ export const mapQuote = (value: Schemas['CrmQuote']): Quote => ({
   createdAt: value.createdAt,
   updatedAt: value.updatedAt,
   lastSentAt: value.lastSentAt ?? null,
+  archivedAt: value.archivedAt ?? null,
+  archivedByName: value.archivedByName ?? null,
   version: value.version,
   items: value.items.map(item),
   introduction: value.introduction
@@ -91,6 +94,14 @@ export const mapQuote = (value: Schemas['CrmQuote']): Quote => ({
         letterName: value.introduction.letterName ?? null,
       }
     : null,
+});
+
+export const mapQuoteEvent = (value: Schemas['CrmQuoteEvent']): QuoteEvent => ({
+  id: value.id,
+  kind: value.kind,
+  at: value.at,
+  actor: value.actor,
+  details: value.details ?? null,
 });
 
 export const mapQuotePage = (value: Schemas['CrmQuotePage']): QuotePage => ({
@@ -105,6 +116,7 @@ export const mapQuotePage = (value: Schemas['CrmQuotePage']): QuotePage => ({
     itemsCount: row.itemsCount,
     updatedAt: row.updatedAt,
     lastSentAt: row.lastSentAt ?? null,
+    archivedAt: row.archivedAt ?? null,
   })),
   page: value.page,
   pageSize: value.pageSize,

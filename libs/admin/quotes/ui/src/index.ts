@@ -6,7 +6,10 @@ export type {
   QuoteCustomChoice,
   QuoteCustomRow,
 } from './components/custom-sewing/quote-custom-rows';
+export { QuoteArchivedNotice } from './components/editor/quote-archived-notice';
 export { QuoteHeaderCard } from './components/editor/quote-header-card';
+export { QuoteMoreMenu } from './components/editor/quote-more-menu';
+export { QuoteHistoryList } from './components/history/quote-history-list';
 export { QuoteItemCard } from './components/editor/quote-item-card';
 export { QuoteNotesCard } from './components/editor/quote-notes-card';
 export { QuoteCatalogProductRow } from './components/picker/quote-catalog-product-row';
