@@ -72,6 +72,8 @@ export function AdminNavigation({
           overflowX: 'hidden',
           overflowY: 'auto',
           pb: 2,
+          // Space between the logo and «Головна», so the first item does not merge with the logo.
+          pt: 1.5,
           px: 1.5,
           scrollbarColor: `${thumb} ${nav.background}`,
           scrollbarWidth: 'thin',
