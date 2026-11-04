@@ -1,3 +1,4 @@
+import { unknownQuoteMarks } from '../mappers/quote-template-marks';
 import { quoteAdvantageCount, quoteMaxLetterVariants } from '../models/quote-settings-draft';
 
 import type { QuoteSettingsDraft } from '../models/quote-settings-draft';
@@ -35,6 +36,18 @@ export function quoteSettingsErrors(draft: QuoteSettingsDraft): QuoteSettingsErr
     text.length > max ? `Не більше ${max} символів.` : null;
   const email = (text: string) =>
     text && !emailPattern.test(text) ? 'Невірна адреса пошти.' : null;
+  /** A typo in a mark reaches the client as it is, so it is an error. */
+  const marks =
+    (rule: (text: string) => string | null) =>
+    (text: string): string | null => {
+      const unknown = unknownQuoteMarks(text);
+      return (
+        rule(text) ??
+        (unknown.length > 0
+          ? `Невідома мітка ${unknown.join(', ')}. Вставте мітку кнопкою під полем.`
+          : null)
+      );
+    };
   const url = (text: string) =>
     !text
       ? null
@@ -59,12 +72,13 @@ export function quoteSettingsErrors(draft: QuoteSettingsDraft): QuoteSettingsErr
   check('company.site', company.site, url);
   check('company.logoUrl', company.logoUrl, url);
 
-  check('email.subject', draft.email.subject, required(quoteSettingsShortMax));
-  check('email.body', draft.email.body, required(quoteSettingsTextMax));
+  check('email.subject', draft.email.subject, marks(required(quoteSettingsShortMax)));
+  check('email.body', draft.email.body, marks(required(quoteSettingsTextMax)));
 
   check('pdf.title', pdf.title, required(quoteSettingsShortMax));
-  for (const key of ['vatNotice', 'ctaTitle', 'ctaText', 'ctaContactTemplate'] as const)
+  for (const key of ['vatNotice', 'ctaTitle', 'ctaText'] as const)
     check(`pdf.${key}`, pdf[key], optional(quoteSettingsTextMax));
+  check('pdf.ctaContactTemplate', pdf.ctaContactTemplate, marks(optional(quoteSettingsTextMax)));
 
   check('introduction.summerBannerUrl', introduction.summerBannerUrl, url);
   check('introduction.winterBannerUrl', introduction.winterBannerUrl, url);
@@ -85,8 +99,8 @@ export function quoteSettingsErrors(draft: QuoteSettingsDraft): QuoteSettingsErr
     errors['letterVariants'] = `Не більше ${quoteMaxLetterVariants} варіантів листа.`;
   for (const variant of draft.letterVariants) {
     check(`letter:${variant.key}.name`, variant.name, required(quoteSettingsShortMax));
-    check(`letter:${variant.key}.subject`, variant.subject, required(quoteSettingsShortMax));
-    check(`letter:${variant.key}.body`, variant.body, required(quoteSettingsTextMax));
+    check(`letter:${variant.key}.subject`, variant.subject, marks(required(quoteSettingsShortMax)));
+    check(`letter:${variant.key}.body`, variant.body, marks(required(quoteSettingsTextMax)));
   }
 
   for (const contact of draft.staffContacts) {

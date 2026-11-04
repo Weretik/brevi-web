@@ -54,8 +54,23 @@ export type * from './models/quote-settings-draft';
 export {
   quoteAdvantageCount,
   quoteMaxLetterVariants,
+  quoteTemplateMarkLabels,
   quoteTemplateMarks,
 } from './models/quote-settings-draft';
+export {
+  quoteSettingsChangedSections,
+  quoteSettingsErrorCounts,
+  quoteSettingsSectionOf,
+  quoteSettingsSections,
+} from './models/quote-settings-sections';
+export type {
+  QuoteSettingsSection,
+  QuoteSettingsSectionId,
+} from './models/quote-settings-sections';
+export { fillQuoteMarks, unknownQuoteMarks } from './mappers/quote-template-marks';
+export type { QuoteTemplatePart } from './mappers/quote-template-marks';
+export { quoteSettingsPreviewSample } from './mappers/quote-settings-preview';
+export type { QuoteSettingsPreviewSample } from './mappers/quote-settings-preview';
 export {
   emptyLetterVariantDraft,
   quoteSettingsToDraft,
