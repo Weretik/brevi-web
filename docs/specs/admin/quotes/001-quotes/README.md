@@ -1,6 +1,6 @@
 # Admin React: «КП» — commercial proposals
 
-**Status:** stages 1–2 implemented 2026-11-04 ([feature card](../../../../features/admin/quotes.md)); stages 3–6 planned. **Backend:** BreviERP [CRM-003 «КП»](https://github.com/Weretik/BreviERP/blob/master/docs/sdd/specs/crm/003-quotes/README.md) (rules R-*, scenarios, API), module Crm, `/api/crm/quotes`. **Design:** [«Цех»](../../../../standards/admin/design-system.md).
+**Status:** stages 1–3 implemented 2026-11-04 ([feature card](../../../../features/admin/quotes.md)); stages 4–6 planned. **Backend:** BreviERP [CRM-003 «КП»](https://github.com/Weretik/BreviERP/blob/master/docs/sdd/specs/crm/003-quotes/README.md) (rules R-*, scenarios, API), module Crm, `/api/crm/quotes`. **Design:** [«Цех»](../../../../standards/admin/design-system.md).
 
 The screens follow the client's old Calculator cabinet (owner's screenshots, 2026-11-04) in the «Цех» look. Marks appear only for problems, with the reason (no «Готово» or «у КП» success chips).
 
@@ -35,13 +35,20 @@ Libraries `libs/admin/quotes/{data-access,model,ui,feature}` generated with `nx 
 
 ## Stages
 
-Same numbering as the backend: 1 list + editor (done); 2 settings + PDF (done); 3 Gmail sending from each manager's own Gmail; 4 КП для знайомства (4 steps: layout, recipient, letter variant, catalogue pages, «Зберегти як готовий шаблон», «Готові шаблони»); 5 composition editing, model from scratch, history, archive; 6 import of old КП from the calculator, if it proves easy.
+Same numbering as the backend: 1 list + editor (done); 2 settings + PDF (done); 3 Gmail sending from each manager's own Gmail (done); 4 КП для знайомства (4 steps: layout, recipient, letter variant, catalogue pages, «Зберегти як готовий шаблон», «Готові шаблони»); 5 composition editing, model from scratch, history, archive; 6 import of old КП from the calculator, if it proves easy.
 
 ## Stage 2 screens
 
 - «Налаштування КП» cards: «Реквізити та контакти Brevi» (with logo), «Контакти менеджерів у КП» (one row per staff member: account, then name, phone and email the client sees), «Лист, що надсилається з КП» (subject, body, marks), «Тексти PDF», «КП для знайомства — рекламний каталог» (texts, summer and winter banners, accent colour, five «Переваги»), «Варіанти листа» (add and remove, up to 10). One «Зберегти зміни» saves the whole page; version 0 shows the defaults until the first save.
 - There was no old PDF sample, so the PDF layout is new: Brevi header, title and number, items with photo and the shown prices only, comment, VAT note, call to action with the manager's contact, requisites in the footer.
 
+## Stage 3 screens
+
+- «Контакти менеджерів у КП» gets a «Gmail для надсилання» column: the connected address and «Відключити», or «Підключити Gmail». The button opens Google in the same tab; Google returns to the page with `?gmail=connected` or `?gmail=error&reason=…`, shown as a notice. With unsaved changes on the page the button is disabled with «Спочатку збережіть зміни на сторінці.». Director connects anyone, a manager only themselves (the server enforces it).
+- Editor footer: «Сформувати КП» becomes outlined and «Надіслати КП» is the main action. It saves unsaved changes first, then opens the «Надіслати КП» side panel: «Від кого» (the signed-in person's Gmail), «Лист» (standard letter from the email template plus the letter variants), «Кому» (several addresses through a comma), «Тема», «Текст листа», and the PDF name. «Надіслати» sends from the person's own Gmail with the PDF of the saved КП attached.
+- Success closes the panel, shows «КП N надіслано.» and adds « · надіслано <date>» to the subtitle; the КП status becomes «Надіслано». A failure keeps the panel open with the server's reason; the КП stays as it was.
+- Without a connected Gmail the panel offers «Підключити мій Gmail» and «Надіслати» is disabled. While Google keys are not configured on the server the panel says sending is not on yet.
+
 ## Tests
 
-Stage 1: list (search, own-only for a Manager), editor (add model and fabrics, hide a price, manual PPE price needs a reason, one-off PPE validation, 409 reload), picker disabled reason. Stage 2: «Сформувати КП» saves first and does not download after a failed save; settings save, field rules and 409. Focused run: `npx nx test admin-quotes-feature`.
+Stage 1: list (search, own-only for a Manager), editor (add model and fabrics, hide a price, manual PPE price needs a reason, one-off PPE validation, 409 reload), picker disabled reason. Stage 2: «Сформувати КП» saves first and does not download after a failed save; settings save, field rules and 409. Stage 3: «Надіслати КП» saves first, sends and marks the КП sent; a Gmail refusal stays in the panel; no recipient blocks sending; no Gmail offers to connect it; «Підключити Gmail» opens Google and is disabled with unsaved changes; recipient and subject rules. Focused run: `npx nx test admin-quotes-feature`.

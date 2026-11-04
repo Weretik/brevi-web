@@ -72,6 +72,7 @@ export function mapQuoteSettings(value: Schemas['CrmQuoteSettings']): QuoteSetti
       name: contact.name,
       phone: contact.phone ?? null,
       email: contact.email ?? null,
+      mailboxEmail: contact.mailboxEmail ?? null,
     })),
   };
 }

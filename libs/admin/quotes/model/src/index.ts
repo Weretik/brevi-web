@@ -47,3 +47,11 @@ export {
   quoteSettingsUrlMax,
 } from './validators/quote-settings-validation';
 export type { QuoteSettingsErrors } from './validators/quote-settings-validation';
+export type * from './entities/quote-send';
+export {
+  parseQuoteRecipients,
+  quoteLetterBodyMax,
+  quoteMaxRecipients,
+  quoteSendErrors,
+  quoteSubjectMax,
+} from './validators/quote-send-validation';

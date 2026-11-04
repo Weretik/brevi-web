@@ -60,6 +60,8 @@ export interface QuoteStaffContact {
   name: string;
   phone: string | null;
   email: string | null;
+  /** The connected Gmail КП are sent from; null until connected. */
+  mailboxEmail: string | null;
 }
 
 /** «Налаштування КП»; version 0 means nothing was saved yet and the defaults are shown. */

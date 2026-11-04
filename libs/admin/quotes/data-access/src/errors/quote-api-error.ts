@@ -21,3 +21,18 @@ export function toQuoteApiError(response: unknown, messages: AdminApiErrorMessag
   const first = Object.values(error.fieldErrors)[0];
   return first ? { ...error, message: first } : error;
 }
+
+const sendErrors = {
+  unauthorized:
+    'Підключити чи відключити Gmail іншого співробітника може лише директор або адміністратор.',
+  notFound: 'КП не знайдено або воно передане іншому менеджеру.',
+  fallback: 'Не вдалося надіслати. Спробуйте ще раз.',
+} satisfies AdminApiErrorMessages;
+
+/** Sending and Gmail: a 409 carries the server's reason (no Gmail, Gmail refused, stale КП), shown as it is. */
+export function toQuoteSendApiError(response: unknown) {
+  const error = toQuoteApiError(response, sendErrors);
+  if (error.status !== 409) return error;
+  const server = (response as { message?: string } | undefined)?.message?.trim();
+  return { ...error, message: server || quoteErrors.conflict };
+}

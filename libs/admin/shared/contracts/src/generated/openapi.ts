@@ -1677,6 +1677,99 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/crm/quotes/{id}/send-draft': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['QuoteId'];
+      };
+      cookie?: never;
+    };
+    /** @description «Надіслати КП» (R-15): the signed-in person's connected Gmail (null until connected), whether Gmail is configured on the server, the PDF file name, and the letters (template from the settings first, then the letter variants) with {quoteNumber}, {managerName}, {managerPhone}, {managerEmail}, {site} filled with the sender's КП contact. */
+    get: operations['getCrmQuoteSendDraft'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quotes/{id}/send': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['QuoteId'];
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Sends the PDF of the saved КП of exactly `version` from the signed-in person's Gmail. On success the КП becomes Sent with `lastSentAt` and its version grows; it can be edited and sent again. Any failure (no Gmail, Gmail refused, stale version) leaves the КП as it was and returns 409 with the reason. */
+    post: operations['sendCrmQuote'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/mailboxes/{userId}/connect': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        userId: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description «Підключити Gmail»: the Google consent address (openid, email and gmail.send only). Admin (Director) for any staff member, a Manager only for themselves. The Admin opens it in the same tab; Google returns to `google-callback`, which redirects to `returnPath` with `gmail=connected` or `gmail=error&reason=…`. */
+    post: operations['connectCrmMailbox'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/mailboxes/{userId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        userId: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** @description Forgets the connected Gmail (Admin for anyone, a Manager for themselves). */
+    delete: operations['disconnectCrmMailbox'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/mailboxes/google-callback': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Google OAuth callback, anonymous; the signed state carries the staff member. Stores the Gmail address and the encrypted refresh token, then redirects to the Admin. Not called by the Admin code. */
+    get: operations['crmMailboxGoogleCallback'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/crm/quote-settings': {
     parameters: {
       query?: never;
@@ -4012,6 +4105,8 @@ export interface components {
       itemsCount: number;
       /** Format: date-time */
       updatedAt: string;
+      /** Format: date-time */
+      lastSentAt?: string | null;
     };
     CrmQuotePage: {
       items: components['schemas']['CrmQuoteSummary'][];
@@ -4131,6 +4226,11 @@ export interface components {
       createdAt: string;
       /** Format: date-time */
       updatedAt: string;
+      /**
+       * Format: date-time
+       * @description Last time Gmail accepted the КП.
+       */
+      lastSentAt?: string | null;
       version: number;
       items: components['schemas']['CrmQuoteItem'][];
     };
@@ -4162,6 +4262,28 @@ export interface components {
       version: number;
       changes: components['schemas']['CrmQuoteRepriceChange'][];
       unavailable: components['schemas']['CrmQuoteRepriceProblem'][];
+    };
+    CrmQuoteLetter: {
+      name: string;
+      subject: string;
+      body: string;
+    };
+    CrmQuoteSendDraft: {
+      /** Format: email */
+      fromEmail?: string | null;
+      fromName: string;
+      gmailConfigured: boolean;
+      fileName: string;
+      letters: components['schemas']['CrmQuoteLetter'][];
+    };
+    CrmSendQuoteInput: {
+      version: number;
+      /** @description 1 to 10 addresses separated by commas, semicolons or spaces. */
+      to: string;
+      /** @description One line. */
+      subject: string;
+      /** @description Plain text. */
+      body: string;
     };
     CrmQuoteCompany: {
       name: string;
@@ -4231,6 +4353,8 @@ export interface components {
       name: string;
       phone?: string | null;
       email?: string | null;
+      /** @description Connected Gmail КП are sent from; null until connected. */
+      mailboxEmail?: string | null;
     };
     CrmQuoteSettings: {
       /** @description 0 before the first save. */
@@ -10157,6 +10281,215 @@ export interface operations {
         content?: never;
       };
       409: components['responses']['Conflict'];
+    };
+  };
+  getCrmQuoteSendDraft: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['QuoteId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Draft. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmQuoteSendDraft'];
+        };
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found or not visible to the actor. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  sendCrmQuote: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['QuoteId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmSendQuoteInput'];
+      };
+    };
+    responses: {
+      /** @description Sent. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmQuote'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found or not visible to the actor. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['Conflict'];
+    };
+  };
+  connectCrmMailbox: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        userId: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description An Admin path under /crm/. */
+          returnPath: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Consent address. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** Format: uri */
+            consentUrl: string;
+          };
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Only for yourself unless Admin. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Staff member not found or blocked. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Gmail is not configured on the server; errors are Ukrainian strings. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  disconnectCrmMailbox: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        userId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Disconnected or was not connected. */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Only for yourself unless Admin. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  crmMailboxGoogleCallback: {
+    parameters: {
+      query?: {
+        code?: string;
+        state?: string;
+        error?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Back to the Admin with gmail=connected or gmail=error&reason=expired|denied|google|twice. */
+      302: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
     };
   };
   getCrmQuoteSettings: {

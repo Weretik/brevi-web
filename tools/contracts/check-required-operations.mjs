@@ -82,6 +82,10 @@ const requiredOperations = {
     'getCrmQuotePdf',
     'getCrmQuoteSettings',
     'saveCrmQuoteSettings',
+    'getCrmQuoteSendDraft',
+    'sendCrmQuote',
+    'connectCrmMailbox',
+    'disconnectCrmMailbox',
   ],
 };
 

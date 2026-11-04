@@ -56,11 +56,17 @@ const settings: QuoteSettings = {
       name: 'Ольга',
       phone: null,
       email: null,
+      mailboxEmail: null,
     },
   ],
 };
 
-const api = vi.hoisted(() => ({ save: vi.fn(), refetch: vi.fn() }));
+const api = vi.hoisted(() => ({
+  save: vi.fn(),
+  refetch: vi.fn(),
+  connect: vi.fn(),
+  disconnect: vi.fn(),
+}));
 
 vi.mock('@admin/quotes/data-access', () => ({
   useGetQuoteSettingsQuery: () => ({
@@ -71,6 +77,14 @@ vi.mock('@admin/quotes/data-access', () => ({
   }),
   useSaveQuoteSettingsMutation: () => [
     (draft: unknown) => ({ unwrap: () => api.save(draft) }),
+    { isLoading: false },
+  ],
+  useConnectMailboxMutation: () => [
+    (args: unknown) => ({ unwrap: () => api.connect(args) }),
+    { isLoading: false },
+  ],
+  useDisconnectMailboxMutation: () => [
+    (userId: unknown) => ({ unwrap: () => api.disconnect(userId) }),
     { isLoading: false },
   ],
 }));
@@ -88,6 +102,8 @@ const section = (name: string) => within(screen.getByRole('region', { name }));
 beforeEach(() => {
   api.save.mockReset();
   api.refetch.mockReset();
+  api.connect.mockReset();
+  api.disconnect.mockReset();
 });
 afterEach(cleanup);
 
@@ -138,5 +154,28 @@ describe('«Налаштування КП»', () => {
     ).toBeVisible();
     fireEvent.click(screen.getByRole('button', { name: 'Оновити' }));
     await waitFor(() => expect(api.refetch).toHaveBeenCalledTimes(1));
+  });
+
+  it('opens the Google page for the person whose Gmail is connected', async () => {
+    const assign = vi.fn();
+    vi.stubGlobal('location', { ...window.location, assign, search: '' });
+    api.connect.mockResolvedValue('https://accounts.google.com/o/oauth2/v2/auth?x=1');
+    renderPage();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Підключити Gmail: Оля' }));
+
+    await waitFor(() =>
+      expect(assign).toHaveBeenCalledWith('https://accounts.google.com/o/oauth2/v2/auth?x=1'),
+    );
+    expect(api.connect).toHaveBeenCalledWith({ userId: 7, returnPath: '/crm/quote-settings' });
+    vi.unstubAllGlobals();
+  });
+
+  it('asks to save the page before connecting Gmail', () => {
+    renderPage();
+    fireEvent.change(screen.getByLabelText(/Тема листа/), { target: { value: 'Нова тема' } });
+
+    expect(screen.getByRole('button', { name: 'Підключити Gmail: Оля' })).toBeDisabled();
+    expect(screen.getByText('Спочатку збережіть зміни на сторінці.')).toBeVisible();
   });
 });
