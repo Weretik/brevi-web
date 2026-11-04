@@ -54,6 +54,8 @@ export interface ProductOverview {
   problems: string[];
   /** Fabric variants of a sewing model; empty for PPE. */
   variants: ProductVariant[];
+  /** Preview of the main visible photo (CAT-018); the photo quotes use. */
+  mainPhotoUrl: string | null;
 }
 
 /** One page of a «Товари» tab from the server. */
@@ -69,6 +71,8 @@ export interface ProductOverviewPage {
   sections: { sectionId: number | null; count: number }[];
   /** Rows of the type without a price. */
   withoutPrice: number;
+  /** Switched-off rows of the type. */
+  inactive: number;
 }
 
 export type ProductOverviewSort = 'code' | 'name' | 'price' | 'updated';
@@ -79,6 +83,8 @@ export interface ProductOverviewListQuery {
   search: string;
   section: number | 'none' | null;
   withoutPrice: boolean;
+  /** true: only active rows, false: only switched-off rows, null: both. */
+  active: boolean | null;
   sort: ProductOverviewSort;
   direction: 'asc' | 'desc';
   /** 1-based. */

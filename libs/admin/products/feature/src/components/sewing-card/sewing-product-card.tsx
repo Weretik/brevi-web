@@ -1,10 +1,11 @@
 import { isSewingCreateReady, sewingVariantRows } from '@admin/products/model';
 import { SewingCardHeader } from '@admin/products/ui';
-import { Box, Stack, Tab, Tabs } from '@mui/material';
+import { Alert, Box, Stack, Tab, Tabs } from '@mui/material';
 import { useState } from 'react';
 
 import { SewingCardMetrics } from './sewing-card-metrics';
 import { SewingCardPricingTab } from './sewing-card-pricing-tab';
+import { useProductActiveSwitch } from '../../hooks/product-overview/use-product-active-switch';
 import {
   sewingCardTabLabels,
   sewingCardTabs,
@@ -13,6 +14,7 @@ import {
 import { useSewingModelCard } from '../../hooks/sewing-model/use-sewing-model-card';
 import { ProductDeleteDialog } from '../product-deletion/product-delete-dialog';
 import { ProductOverviewDrawer } from '../product-overview/product-overview-drawer';
+import { ProductPhotosTab } from '../product-photos/product-photos-tab';
 import { SewingLabourTab } from '../sewing-model/sewing-labour-tab';
 import { SewingMaterialsTab } from '../sewing-model/sewing-materials-tab';
 import { SewingVariantsTab } from '../sewing-model/sewing-variants-tab';
@@ -33,6 +35,8 @@ export function SewingProductCard({ product, onDeleted }: Props) {
   const { tab, setTab } = useSewingCardTab();
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [activeError, setActiveError] = useState<string | null>(null);
+  const activeSwitch = useProductActiveSwitch(setActiveError);
   const [pricingArticleId, setPricingArticleId] = useState<number | null>(null);
   const launched =
     card.row?.isActive !== false && (!card.summaryLoaded || isSewingCreateReady(card.articles));
@@ -56,7 +60,23 @@ export function SewingProductCard({ product, onDeleted }: Props) {
         deleteDisabled={writes.busy}
         onEdit={() => setEditing(true)}
         onDelete={() => setDeleting(true)}
+        activeSwitch={
+          card.row && model.canManage
+            ? {
+                saving: activeSwitch.savingId !== null,
+                onChange: (active) => {
+                  setActiveError(null);
+                  if (card.row) activeSwitch.change(card.row, active);
+                },
+              }
+            : undefined
+        }
       />
+      {activeError && (
+        <Alert severity="error" onClose={() => setActiveError(null)}>
+          {activeError}
+        </Alert>
+      )}
       <SewingCardMetrics totals={card.totals} />
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs
@@ -87,6 +107,9 @@ export function SewingProductCard({ product, onDeleted }: Props) {
           articleId={pricingArticleId}
           onSelect={setPricingArticleId}
         />
+      )}
+      {tab === 'photos' && (
+        <ProductPhotosTab productId={product.id} productName={card.row?.name ?? product.name} />
       )}
       {editing && card.row && (
         <ProductOverviewDrawer

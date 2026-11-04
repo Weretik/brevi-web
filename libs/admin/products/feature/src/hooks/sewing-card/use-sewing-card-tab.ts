@@ -1,6 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 
-export const sewingCardTabs = ['fabrics', 'materials', 'labour', 'pricing'] as const;
+export const sewingCardTabs = ['fabrics', 'materials', 'labour', 'pricing', 'photos'] as const;
 export type SewingCardTab = (typeof sewingCardTabs)[number];
 
 export const sewingCardTabLabels: Record<SewingCardTab, string> = {
@@ -8,6 +8,7 @@ export const sewingCardTabLabels: Record<SewingCardTab, string> = {
   materials: 'Комплектація',
   labour: 'Трудовитрати',
   pricing: 'Розрахунок',
+  photos: 'Фото',
 };
 
 /** The open tab of the sewing card, kept in `?tab=` like other «Цех» pages. */

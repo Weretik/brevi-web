@@ -1,14 +1,15 @@
 import { productPriceTierLabels } from '@admin/products/model';
-import { ReferenceDataGrid, ReferenceStatusPill } from '@admin/references/ui';
+import { ReferenceDataGrid } from '@admin/references/ui';
 import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
+import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
-import { Box, IconButton, Tooltip } from '@mui/material';
+import { Avatar, Box, IconButton, Switch, Tooltip } from '@mui/material';
 import { useMemo } from 'react';
 
 import { ProductModelPriceCell, ProductVariantPriceCell } from './product-price-cells';
 
 import type { ProductPriceTier } from './product-price-cells';
-import type { ProductListRow, ProductOverviewType } from '@admin/products/model';
+import type { ProductListRow, ProductOverview, ProductOverviewType } from '@admin/products/model';
 import type {
   GridColDef,
   GridPaginationModel,
@@ -29,6 +30,10 @@ interface Props {
   onView: (row: ProductListRow) => void;
   onEdit: (row: ProductListRow) => void;
   onDelete: (id: number) => void;
+  /** Switch «Активний» (CAT-018); without it the switch is read-only. */
+  onActiveChange?: (product: ProductOverview, active: boolean) => void;
+  /** The product whose switch is saving. */
+  activeSavingId?: number | null;
   /** Server page (CAT-013): `rowCount` matching rows, page and sort models. */
   server: {
     rowCount: number;
@@ -66,10 +71,60 @@ function priceColumns(): GridColDef<ProductListRow>[] {
   }));
 }
 
+interface ActiveSwitch {
+  onChange?: (product: ProductOverview, active: boolean) => void;
+  savingId?: number | null;
+}
+
+function photoColumn(): GridColDef<ProductListRow> {
+  return {
+    field: 'photo',
+    headerName: 'Фото',
+    width: 64,
+    sortable: false,
+    disableColumnMenu: true,
+    renderCell: ({ row }) =>
+      row.kind === 'model' ? (
+        <Avatar
+          variant="rounded"
+          src={row.product.mainPhotoUrl ?? undefined}
+          alt={row.product.mainPhotoUrl ? row.name : undefined}
+          aria-label={row.product.mainPhotoUrl ? undefined : 'Без фото'}
+          sx={{ width: 40, height: 40, bgcolor: 'action.hover', color: 'text.disabled' }}
+        >
+          <ImageOutlinedIcon fontSize="small" />
+        </Avatar>
+      ) : null,
+  };
+}
+
+function activeColumn({ onChange, savingId }: ActiveSwitch): GridColDef<ProductListRow> {
+  return {
+    field: 'isActive',
+    headerName: 'Активний',
+    width: 96,
+    sortable: false,
+    disableColumnMenu: true,
+    renderCell: ({ row, tabIndex }) =>
+      row.kind === 'model' ? (
+        <Switch
+          size="small"
+          checked={row.product.isActive}
+          disabled={!onChange || savingId === row.id}
+          tabIndex={tabIndex}
+          slotProps={{ input: { 'aria-label': `Активний: ${row.name}` } }}
+          onClick={(event) => event.stopPropagation()}
+          onChange={(_event, checked) => onChange?.(row.product, checked)}
+        />
+      ) : null,
+  };
+}
+
 function columnsFor(
   type: ProductOverviewType,
   sectionNames: ReadonlyMap<number, string>,
   onToggle: (productId: number) => void,
+  active: ActiveSwitch,
 ): GridColDef<ProductListRow>[] {
   const sewing = type === 'Sewing';
   return [
@@ -105,6 +160,7 @@ function columnsFor(
           } satisfies GridColDef<ProductListRow>,
         ]
       : []),
+    photoColumn(),
     {
       field: 'code',
       headerName: sewing ? 'ID моделі' : 'Артикул сайту',
@@ -129,13 +185,15 @@ function columnsFor(
       cellClassName: 'reference-strong',
       renderCell: ({ row }) =>
         row.kind === 'model' ? (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
-            <Box component="span" sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {row.name}
-            </Box>
-            {!row.product.isActive && (
-              <ReferenceStatusPill active={false} activeLabel="" inactiveLabel="Вимкнений" />
-            )}
+          <Box
+            component="span"
+            sx={{
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              color: row.product.isActive ? undefined : 'text.secondary',
+            }}
+          >
+            {row.name}
           </Box>
         ) : null,
     },
@@ -168,6 +226,7 @@ function columnsFor(
         ]
       : []),
     ...priceColumns(),
+    activeColumn(active),
     {
       field: 'currentSiteUrl',
       headerName: 'Сайт',
@@ -199,10 +258,21 @@ function columnsFor(
  * One «Товари» table (CAT-011 design B): a model per row with its lowest prices («від …»); the arrow
  * shows its fabric variants with their prices underneath. The server pages and sorts (CAT-013).
  */
-export function ProductOverviewGrid({ type, sectionNames, onToggle, ...props }: Props) {
+export function ProductOverviewGrid({
+  type,
+  sectionNames,
+  onToggle,
+  onActiveChange,
+  activeSavingId,
+  ...props
+}: Props) {
   const columns = useMemo(
-    () => columnsFor(type, sectionNames, onToggle),
-    [type, sectionNames, onToggle],
+    () =>
+      columnsFor(type, sectionNames, onToggle, {
+        onChange: onActiveChange,
+        savingId: activeSavingId,
+      }),
+    [type, sectionNames, onToggle, onActiveChange, activeSavingId],
   );
   return (
     <ReferenceDataGrid

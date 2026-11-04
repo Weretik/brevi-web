@@ -1,4 +1,4 @@
-import { useDeleteProductMutation } from '@admin/products/data-access';
+import { useDeleteProductMutation, useGetProductAccessQuery } from '@admin/products/data-access';
 import {
   ProductOverviewDeleteDialog,
   ProductOverviewGrid,
@@ -13,11 +13,14 @@ import {
   ReferenceSearchBar,
 } from '@admin/references/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import PhotoLibraryOutlinedIcon from '@mui/icons-material/PhotoLibraryOutlined';
 import { Box, Button, Paper } from '@mui/material';
 import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 
 import { ProductOverviewDrawer } from '../../components/product-overview/product-overview-drawer';
+import { OldSitePhotoImportDrawer } from '../../components/product-photos/old-site-photo-import-drawer';
+import { useProductActiveSwitch } from '../../hooks/product-overview/use-product-active-switch';
 import { useProductOverview } from '../../hooks/product-overview/use-product-overview';
 
 import type { ProductOverviewEditorMode } from '../../hooks/product-overview/use-product-overview-editor';
@@ -39,6 +42,11 @@ export function ProductOverviewContent({ type, tabs }: Props) {
   } | null>(null);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const [deleteProduct] = useDeleteProductMutation();
+  const activeSwitch = useProductActiveSwitch(setActionMessage);
+  const access = useGetProductAccessQuery();
+  const canManage = access.currentData?.canManage === true;
+  const canImportPhotos = access.currentData?.canManagePhotos === true;
+  const [importing, setImporting] = useState(false);
   const deletion = useReferenceDeletion((id) => deleteProduct(id).unwrap(), setActionMessage);
   const open = (mode: ProductOverviewEditorMode, row: ProductListRow) => {
     if (row.kind === 'model') setActive({ mode, row: row.product });
@@ -49,7 +57,7 @@ export function ProductOverviewContent({ type, tabs }: Props) {
     <Box sx={{ minWidth: 0 }}>
       <ReferencePageHeader
         title="Товари"
-        subtitle="Швейна продукція — одна модель в рядку, ЗІЗ — один артикул сайту. Тексти і фото сайту згодом будуть у «Контенті сайту»"
+        subtitle="Швейна продукція — одна модель в рядку, ЗІЗ — один артикул сайту. Головне фото товару показується тут і в КП"
         actions={
           <>
             <ReferenceBulkDeleteButton
@@ -57,6 +65,15 @@ export function ProductOverviewContent({ type, tabs }: Props) {
               disabled={deletion.deleting || loading}
               onDelete={() => deletion.requestDelete(deletion.selectedIds)}
             />
+            {canImportPhotos && sewing && (
+              <Button
+                variant="outlined"
+                startIcon={<PhotoLibraryOutlinedIcon />}
+                onClick={() => setImporting(true)}
+              >
+                Імпорт зі старого сайту
+              </Button>
+            )}
             <Button
               variant="contained"
               startIcon={<AddOutlinedIcon />}
@@ -95,6 +112,7 @@ export function ProductOverviewContent({ type, tabs }: Props) {
             value={list.section}
             onChange={list.setSection}
             withoutPrice={list.withoutPrice}
+            activity={list.activity}
           />
         }
         count={list.total}
@@ -117,6 +135,8 @@ export function ProductOverviewContent({ type, tabs }: Props) {
           onView={(row) => open('view', row)}
           onEdit={(row) => open('edit', row)}
           onDelete={(id) => deletion.requestDelete([id])}
+          onActiveChange={canManage ? activeSwitch.change : undefined}
+          activeSavingId={activeSwitch.savingId}
           server={list.server}
         />
       </Paper>
@@ -135,6 +155,7 @@ export function ProductOverviewContent({ type, tabs }: Props) {
           }}
         />
       )}
+      {importing && <OldSitePhotoImportDrawer onClose={() => setImporting(false)} />}
       <ProductOverviewDeleteDialog
         ids={deletion.pendingDeleteIds}
         deleting={deletion.deleting}
