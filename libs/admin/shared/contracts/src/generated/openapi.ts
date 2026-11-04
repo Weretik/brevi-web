@@ -2644,6 +2644,7 @@ export interface components {
       role: components['schemas']['StaffRole'];
       /** Format: password */
       password: string;
+      /** @description Optional, 7-15 digits */
       phoneNumber?: string | null;
     };
     UpdateStaffDetailsRequest: {
@@ -5773,7 +5774,7 @@ export interface operations {
           'application/json': components['schemas']['StaffAccountResponse'];
         };
       };
-      /** @description Invalid email, name, role or password */
+      /** @description Invalid email, name, role, password or phone */
       400: {
         headers: {
           [name: string]: unknown;
