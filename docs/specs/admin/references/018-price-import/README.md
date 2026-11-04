@@ -32,3 +32,7 @@ The client's Apps Scripts updated PPE supplier prices in the sheet «ЗІЗ». T
 
 - No new screen: the backend marks Insight and Трєле connected, so the existing «Оновити зараз» section appears for them (R-07); its text now says «Не чекаючи розкладу».
 - `npx nx test admin-references-model -- price-import` and `admin-references-feature -- price-import` pass; contract synchronized with BreviERP `053ee0c`.
+
+## Change 2026-11-04 (owner)
+
+- Insight is updated only from its three XML files: the backend no longer marks it connected, so its panel shows only the file upload, without «Оновити зараз». Трєле and the website and Google Sheets sources update only on Monday at 09:00 (the `brevierp-sync` job runs Mon–Fri 09:00 Kyiv). No Admin code change; contract synchronized with BreviERP `9cee053`.

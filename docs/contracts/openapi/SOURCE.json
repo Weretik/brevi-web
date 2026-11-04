@@ -1,8 +1,8 @@
 {
   "repository": "https://github.com/Weretik/BreviERP",
-  "commit": "053ee0c9fa6f2e5db337ed8206e8bd9a33aa70a1",
+  "commit": "9cee05375dc58319d79ca80ce238f196f9dc0180",
   "sourcePath": "docs/sdd/contracts/openapi.yaml",
-  "syncedAt": "2026-11-04T13:02:51.635Z",
-  "command": "npm run contracts:sync -- <backend-checkout> 053ee0c9fa6f2e5db337ed8206e8bd9a33aa70a1",
-  "sha256": "8f59e7b853c7aa3c163d492ba63e801d5bf66f55225561bfa615f8260f9889ef"
+  "syncedAt": "2026-11-04T14:47:42.609Z",
+  "command": "npm run contracts:sync -- <backend-checkout> 9cee05375dc58319d79ca80ce238f196f9dc0180",
+  "sha256": "12ad587fc8b0dc504647e7811180b2069dfea8b7dc66e4b401bd8543d1792308"
 }
