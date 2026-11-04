@@ -55,6 +55,7 @@ const quote: Quote = {
           manualAt: null,
           pricesTakenAt: null,
           fabricMeters: null,
+          fabrics: [],
         },
       ],
       lines: [],

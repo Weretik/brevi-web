@@ -15,11 +15,17 @@ export { quoteCustomLineKindLabels } from './models/quote-custom-sewing-draft';
 export {
   addCustomFabric,
   addCustomLine,
+  addCustomVariant,
   customSewingDraft,
   customSewingErrors,
   customSewingItemDraft,
   customSewingPriceRequest,
   parseCustomQuantity,
+  pricedOptionDraft,
+  recommendCustomVariant,
+  removeCustomFabric,
+  removeCustomVariant,
+  setCustomFabricMeters,
 } from './mappers/quote-custom-sewing-mapper';
 export {
   catalogItemDraft,

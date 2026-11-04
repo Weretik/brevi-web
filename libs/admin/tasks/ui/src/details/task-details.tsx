@@ -1,16 +1,28 @@
 import { UserAvatar } from '@admin/shared/ui';
 import { describeTaskEvent, formatTaskDue, formatTaskMoment } from '@admin/tasks/model';
-import { Box, Button, Checkbox, Divider, Stack, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Checkbox,
+  Divider,
+  MenuItem,
+  Stack,
+  TextField,
+  Typography,
+} from '@mui/material';
 
 import { TaskStatePill } from '../components/status/task-state-pill';
 
-import type { TaskDetail } from '@admin/tasks/model';
+import type { TaskAssignee, TaskDetail } from '@admin/tasks/model';
 
 interface Props {
   task: TaskDetail;
   busy: boolean;
   onStatus: (status: 'InProgress' | 'Done') => void;
   onStep: (stepId: number, isDone: boolean) => void;
+  /** Director and Admin: the managers the task can be given to. */
+  assignees?: readonly TaskAssignee[];
+  onReassign?: (assigneeUserId: number) => void;
 }
 
 const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' };
@@ -27,7 +39,7 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
 }
 
 /** Read view of the side panel: the manager works here — status buttons and steps (R-07, R-10). */
-export function TaskDetails({ task, busy, onStatus, onStep }: Props) {
+export function TaskDetails({ task, busy, onStatus, onStep, assignees, onReassign }: Props) {
   const now = new Date();
   return (
     <Stack sx={{ gap: 2 }}>
@@ -61,10 +73,32 @@ export function TaskDetails({ task, busy, onStatus, onStep }: Props) {
 
       <Box>
         <Row label="Менеджер">
-          <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
-            <UserAvatar name={task.assignee.name} size={24} />
-            {task.assignee.name}
-          </Stack>
+          {onReassign && assignees && assignees.length > 0 ? (
+            <TextField
+              select
+              size="small"
+              label="Виконавець"
+              value={task.assignee.userId}
+              disabled={busy}
+              onChange={(event) => onReassign(Number(event.target.value))}
+              helperText="Оберіть іншого менеджера, щоб передати завдання."
+              sx={{ minWidth: 240 }}
+            >
+              {!assignees.some((x) => x.userId === task.assignee.userId) && (
+                <MenuItem value={task.assignee.userId}>{task.assignee.name}</MenuItem>
+              )}
+              {assignees.map((assignee) => (
+                <MenuItem key={assignee.userId} value={assignee.userId}>
+                  {assignee.name}
+                </MenuItem>
+              ))}
+            </TextField>
+          ) : (
+            <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
+              <UserAvatar name={task.assignee.name} size={24} />
+              {task.assignee.name}
+            </Stack>
+          )}
         </Row>
         <Row label="Термін">
           <Box component="span" sx={{ ...mono, color: task.isOverdue ? 'error.main' : 'inherit' }}>

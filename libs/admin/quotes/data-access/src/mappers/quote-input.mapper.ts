@@ -24,8 +24,10 @@ const optionInput = (option: QuoteOptionDraft, sewing: boolean): Schemas['CrmQuo
     wholesale,
     large,
     manualReason: text(option.manualReason),
-    fabricId: option.fabricId,
-    fabricMeters: option.fabricMeters,
+    fabrics:
+      option.fabrics.length > 0
+        ? option.fabrics.map(({ fabricId, meters }) => ({ fabricId, meters }))
+        : null,
   };
 };
 

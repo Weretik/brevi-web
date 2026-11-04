@@ -19,6 +19,8 @@ export interface QuoteCustomRow {
 
 interface Props {
   title: string;
+  /** The title only names the section for screen readers (a variant card shows its own heading). */
+  hideTitle?: boolean;
   rows: readonly QuoteCustomRow[];
   /** Without choices the section only edits the rows it has (services and extra fabrics of a model). */
   choices?: readonly QuoteCustomChoice[];
@@ -33,6 +35,7 @@ interface Props {
 /** «Тканини», «Фурнітура» or «Операції» of a «Виріб з нуля»: chosen rows and a search to add one more. */
 export function QuoteCustomRows({
   title,
+  hideTitle = false,
   rows,
   choices,
   addLabel,
@@ -44,9 +47,11 @@ export function QuoteCustomRows({
 }: Props) {
   return (
     <Stack component="section" aria-label={title} sx={{ gap: 1 }}>
-      <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-        {title}
-      </Typography>
+      {!hideTitle && (
+        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+          {title}
+        </Typography>
+      )}
       {rows.map((row) => (
         <Stack
           key={row.key}

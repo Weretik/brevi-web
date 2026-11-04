@@ -2,6 +2,7 @@ export { QuotesTable } from './tables/quotes-table';
 export { QuoteAddItems } from './components/editor/quote-add-items';
 export { QuoteCustomPriceSummary } from './components/custom-sewing/quote-custom-price-summary';
 export { QuoteCustomRows } from './components/custom-sewing/quote-custom-rows';
+export { QuoteCustomVariantCard } from './components/custom-sewing/quote-custom-variant-card';
 export type {
   QuoteCustomChoice,
   QuoteCustomRow,

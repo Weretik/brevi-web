@@ -65,6 +65,9 @@ export function TaskDrawer({ editor, viewer }: Props) {
                   busy={editor.busy}
                   onStatus={editor.setStatus}
                   onStep={editor.setStep}
+                  {...(viewer.isAdmin
+                    ? { assignees: editor.assignees, onReassign: editor.reassign }
+                    : {})}
                 />
                 {viewer.isAdmin && (
                   <Button

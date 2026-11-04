@@ -33,7 +33,8 @@ export function useTaskEditor(viewer: TaskViewer, notify: (message: string) => v
   const taskId = mode && mode.kind !== 'create' ? mode.id : null;
   const detail = useGetTaskQuery(taskId ?? 0, { skip: taskId === null });
   const editing = mode !== null && mode.kind !== 'view';
-  const assignees = useGetTaskAssigneesQuery(undefined, { skip: !viewer.isAdmin || !editing });
+  // Director and Admin also pick another manager in the read view (R-13).
+  const assignees = useGetTaskAssigneesQuery(undefined, { skip: !viewer.isAdmin || mode === null });
   const customers = useTaskCustomers(editing);
 
   const [createTask, createState] = useCreateTaskMutation();
@@ -77,7 +78,7 @@ export function useTaskEditor(viewer: TaskViewer, notify: (message: string) => v
     customers: customers.options,
     searchCustomers: customers.search,
     saving: createState.isLoading || editState.isLoading,
-    busy: statusState.isLoading || stepState.isLoading,
+    busy: statusState.isLoading || stepState.isLoading || editState.isLoading,
     deleting: deleteState.isLoading,
     confirmingDelete,
     open: (id: number) => reset({ kind: 'view', id }),
@@ -119,6 +120,19 @@ export function useTaskEditor(viewer: TaskViewer, notify: (message: string) => v
         () => markStep({ id: task.id, stepId, version: task.version, isDone }).unwrap(),
         null,
       ),
+    /** «Передати іншому менеджеру» right from the read view; everything else stays as saved. */
+    reassign: (assigneeUserId: number) => {
+      if (!task || assigneeUserId === task.assignee.userId) return;
+      const name = assignees.data?.find((x) => x.userId === assigneeUserId)?.name ?? 'менеджеру';
+      void run(
+        () =>
+          editTask({
+            id: task.id,
+            values: { ...taskFormFromDetail(task), assigneeUserId },
+          }).unwrap(),
+        `Завдання ${task.number} передано: ${name}`,
+      );
+    },
     askDelete: () => setConfirmingDelete(true),
     cancelDelete: () => setConfirmingDelete(false),
     confirmDelete: async () => {
