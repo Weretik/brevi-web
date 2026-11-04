@@ -56,7 +56,6 @@ export function QuotePriceCell({ tier, price, editable, label, onManualChange }:
                 </Typography>
               </InputAdornment>
             ) : undefined,
-            endAdornment: <InputAdornment position="end">₴</InputAdornment>,
           },
         }}
         sx={{

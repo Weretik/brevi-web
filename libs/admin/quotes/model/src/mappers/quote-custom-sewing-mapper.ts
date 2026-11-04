@@ -4,12 +4,14 @@ import type { QuoteItemLine, QuoteItemLineKind, QuoteTier } from '../entities/qu
 import type {
   QuoteCustomSewingPrice,
   QuoteCustomSewingPriceRequest,
+  QuoteCustomSewingVariantPrice,
   QuoteModelComposition,
 } from '../entities/quote-custom-sewing';
 import type {
   QuoteCustomFabricDraft,
   QuoteCustomLineDraft,
   QuoteCustomSewingDraft,
+  QuoteCustomVariantDraft,
 } from '../models/quote-custom-sewing-draft';
 import type { QuoteItemDraft, QuoteOptionDraft } from '../models/quote-draft';
 
@@ -30,8 +32,26 @@ export function parseCustomQuantity(text: string): number | null {
   return value > 0 && value <= 10_000 ? value : null;
 }
 
+const fabricDraft = (
+  fabricId: number,
+  name: string,
+  meters: number | null,
+): QuoteCustomFabricDraft => ({
+  key: nextKey('fabric'),
+  fabricId,
+  name,
+  meters: numberText(meters),
+});
+
+/** A new variant without fabrics yet. */
+const emptyVariant = (): QuoteCustomVariantDraft => ({
+  key: nextKey('option'),
+  isRecommended: false,
+  fabrics: [],
+});
+
 /**
- * «Змінити склад» of a Catalog model: its texts, the Catalog fabric of each variant already in the КП (all active
+ * «Змінити склад» of a Catalog model: its texts, one variant per Catalog fabric already in the КП (all active
  * variants when none matches) and its shared lines.
  */
 function modelDraft(item: QuoteItemDraft, model: QuoteModelComposition): QuoteCustomSewingDraft {
@@ -42,13 +62,12 @@ function modelDraft(item: QuoteItemDraft, model: QuoteModelComposition): QuoteCu
   return {
     name: item.name,
     description: item.description,
-    fabrics: fabrics
+    variants: fabrics
       .filter((x, index) => fabrics.findIndex((y) => y.fabricId === x.fabricId) === index)
       .map((x) => ({
-        key: nextKey('fabric'),
-        fabricId: x.fabricId,
-        name: x.name ?? 'Тканина',
-        meters: numberText(x.meters),
+        key: nextKey('option'),
+        isRecommended: item.options.some((o) => o.articleId === x.articleId && o.isRecommended),
+        fabrics: [fabricDraft(x.fabricId, x.name ?? 'Тканина', x.meters)],
       })),
     lines: model.lines.map((line) => ({
       key: nextKey('line'),
@@ -72,18 +91,17 @@ export function customSewingDraft(
   item?: QuoteItemDraft,
   model?: QuoteModelComposition,
 ): QuoteCustomSewingDraft {
-  if (!item) return { name: '', description: '', fabrics: [], lines: [] };
+  if (!item) return { name: '', description: '', variants: [emptyVariant()], lines: [] };
   if (model && item.kind === 'Sewing') return modelDraft(item, model);
   return {
     name: item.name,
     description: item.description,
-    fabrics: item.options
-      .filter((option) => option.fabricId !== null)
+    variants: item.options
+      .filter((option) => option.fabrics.length > 0)
       .map((option) => ({
-        key: nextKey('fabric'),
-        fabricId: option.fabricId!,
-        name: option.title,
-        meters: numberText(option.fabricMeters),
+        key: option.key,
+        isRecommended: option.isRecommended,
+        fabrics: option.fabrics.map((x) => fabricDraft(x.fabricId, x.name, x.meters)),
       })),
     lines: item.lines.map((line) => ({
       key: nextKey('line'),
@@ -99,19 +117,75 @@ export function customSewingDraft(
   };
 }
 
+const mapVariant = (
+  draft: QuoteCustomSewingDraft,
+  key: string,
+  change: (variant: QuoteCustomVariantDraft) => QuoteCustomVariantDraft,
+): QuoteCustomSewingDraft => ({
+  ...draft,
+  variants: draft.variants.map((x) => (x.key === key ? change(x) : x)),
+});
+
+/** One more variant; it starts empty, the manager adds its fabrics. */
+export function addCustomVariant(draft: QuoteCustomSewingDraft): QuoteCustomSewingDraft {
+  return { ...draft, variants: [...draft.variants, emptyVariant()] };
+}
+
+export function removeCustomVariant(
+  draft: QuoteCustomSewingDraft,
+  key: string,
+): QuoteCustomSewingDraft {
+  return { ...draft, variants: draft.variants.filter((x) => x.key !== key) };
+}
+
+/** One recommended variant; choosing it again clears the mark. */
+export function recommendCustomVariant(
+  draft: QuoteCustomSewingDraft,
+  key: string,
+): QuoteCustomSewingDraft {
+  return {
+    ...draft,
+    variants: draft.variants.map((x) => ({
+      ...x,
+      isRecommended: x.key === key ? !x.isRecommended : false,
+    })),
+  };
+}
+
+/** A fabric into one variant; the same fabric twice in a variant is ignored. */
 export function addCustomFabric(
   draft: QuoteCustomSewingDraft,
+  variantKey: string,
   fabric: { readonly id: number; readonly name: string },
 ): QuoteCustomSewingDraft {
-  if (draft.fabrics.some((x) => x.fabricId === fabric.id)) return draft;
-  const meters = draft.fabrics.at(-1)?.meters ?? '';
-  const row: QuoteCustomFabricDraft = {
-    key: nextKey('fabric'),
-    fabricId: fabric.id,
-    name: fabric.name,
-    meters,
-  };
-  return { ...draft, fabrics: [...draft.fabrics, row] };
+  return mapVariant(draft, variantKey, (variant) =>
+    variant.fabrics.some((x) => x.fabricId === fabric.id)
+      ? variant
+      : { ...variant, fabrics: [...variant.fabrics, fabricDraft(fabric.id, fabric.name, null)] },
+  );
+}
+
+export function setCustomFabricMeters(
+  draft: QuoteCustomSewingDraft,
+  variantKey: string,
+  fabricKey: string,
+  meters: string,
+): QuoteCustomSewingDraft {
+  return mapVariant(draft, variantKey, (variant) => ({
+    ...variant,
+    fabrics: variant.fabrics.map((x) => (x.key === fabricKey ? { ...x, meters } : x)),
+  }));
+}
+
+export function removeCustomFabric(
+  draft: QuoteCustomSewingDraft,
+  variantKey: string,
+  fabricKey: string,
+): QuoteCustomSewingDraft {
+  return mapVariant(draft, variantKey, (variant) => ({
+    ...variant,
+    fabrics: variant.fabrics.filter((x) => x.key !== fabricKey),
+  }));
 }
 
 export function addCustomLine(
@@ -136,14 +210,20 @@ export function addCustomLine(
 
 const amount = parseCustomQuantity;
 
+/** «fabricId:metres|…» of a variant, to find two variants with the same fabrics. */
+const variantSignature = (fabrics: readonly QuoteCustomFabricDraft[]) =>
+  fabrics.map((x) => `${x.fabricId}:${parseCustomQuantity(x.meters)}`).join('|');
+
 /**
- * What the server prices; null while something is not filled in (a fabric without metres, a quantity, minutes,
- * no fabric or no operation).
+ * What the server prices; null while something is not filled in (a variant without fabrics, a fabric without
+ * metres, a quantity, minutes or no operation).
  */
 export function customSewingPriceRequest(
   draft: QuoteCustomSewingDraft,
 ): QuoteCustomSewingPriceRequest | null {
-  const fabrics = draft.fabrics.map((x) => ({ fabricId: x.fabricId, meters: amount(x.meters) }));
+  const variants = draft.variants.map((variant) =>
+    variant.fabrics.map((x) => ({ fabricId: x.fabricId, meters: amount(x.meters) })),
+  );
   const lines = draft.lines.map((x) => ({
     kind: x.kind,
     referenceId: x.referenceId,
@@ -151,8 +231,9 @@ export function customSewingPriceRequest(
     manualMinutes: x.needsMinutes ? amount(x.minutes) : null,
     costCode: x.costCode,
   }));
-  if (fabrics.length === 0 || !lines.some((x) => x.kind === 'Operation')) return null;
-  if (fabrics.some((x) => x.meters === null)) return null;
+  if (variants.length === 0 || !lines.some((x) => x.kind === 'Operation')) return null;
+  if (variants.some((fabrics) => fabrics.length === 0 || fabrics.some((x) => x.meters === null)))
+    return null;
   if (
     lines.some(
       (x, index) =>
@@ -161,7 +242,9 @@ export function customSewingPriceRequest(
   )
     return null;
   return {
-    fabrics: fabrics.map((x) => ({ fabricId: x.fabricId, meters: x.meters! })),
+    variants: variants.map((fabrics) => ({
+      fabrics: fabrics.map((x) => ({ fabricId: x.fabricId, meters: x.meters! })),
+    })),
     lines: lines.map((x) => ({ ...x, quantity: x.quantity! })),
   };
 }
@@ -170,9 +253,16 @@ export function customSewingPriceRequest(
 export function customSewingErrors(draft: QuoteCustomSewingDraft): readonly string[] {
   const errors: string[] = [];
   if (!draft.name.trim()) errors.push('Вкажіть назву виробу.');
-  if (draft.fabrics.length === 0) errors.push('Додайте хоча б одну тканину.');
-  if (draft.fabrics.some((x) => amount(x.meters) === null))
+  if (draft.variants.length === 0) errors.push('Додайте хоча б один варіант.');
+  if (draft.variants.some((x) => x.fabrics.length === 0))
+    errors.push('Додайте тканину в кожен варіант.');
+  if (draft.variants.some((x) => x.fabrics.some((fabric) => amount(fabric.meters) === null)))
     errors.push('Вкажіть метраж кожної тканини.');
+  const signatures = draft.variants
+    .filter((x) => x.fabrics.length > 0)
+    .map((x) => variantSignature(x.fabrics));
+  if (new Set(signatures).size !== signatures.length)
+    errors.push('Два варіанти мають однакові тканини й метраж.');
   if (!draft.lines.some((x) => x.kind === 'Operation'))
     errors.push('Додайте хоча б одну операцію.');
   if (draft.lines.some((x) => amount(x.quantity) === null))
@@ -180,6 +270,61 @@ export function customSewingErrors(draft: QuoteCustomSewingDraft): readonly stri
   if (draft.lines.some((x) => x.needsMinutes && amount(x.minutes) === null))
     errors.push('Вкажіть хвилини операцій без норми.');
   return errors;
+}
+
+/** «1,25 м на виріб» or «Саржа 1,2 м + Грета 0,5 м на виріб». */
+const fabricInfoOf = (fabrics: readonly { name: string; meters: number }[]) =>
+  fabrics.length === 1
+    ? `${numberText(fabrics[0].meters)} м на виріб`
+    : `${fabrics.map((x) => `${x.name} ${numberText(x.meters)} м`).join(' + ')} на виріб`;
+
+/**
+ * A КП row priced by the formula: a «Виріб з нуля» variant or a model row in another fabric. Prices shown here
+ * come from the preview; the server prices it again on save.
+ */
+export function pricedOptionDraft(
+  priced: QuoteCustomSewingVariantPrice | undefined,
+  fabrics: readonly { fabricId: number; name: string; meters: number }[],
+  row: {
+    key?: string;
+    id?: number | null;
+    isRecommended?: boolean;
+    saved?: QuoteOptionDraft;
+  } = {},
+): QuoteOptionDraft {
+  const named = fabrics.map((x, index) => ({
+    fabricId: x.fabricId,
+    name: priced?.fabrics[index]?.name ?? x.name,
+    meters: x.meters,
+  }));
+  return {
+    key: row.key ?? nextKey('option'),
+    id: row.id ?? null,
+    articleId: null,
+    title: priced?.title ?? named.map((x) => x.name).join(' + '),
+    details:
+      named.length === 1
+        ? (priced?.fabrics[0]?.details ?? null)
+        : priced?.fabrics
+            .filter((x) => x.details)
+            .map((x) => `${x.name}: ${x.details}`)
+            .join('; ') || null,
+    fabricInfo: fabricInfoOf(named),
+    isRecommended: row.isRecommended ?? false,
+    prices: Object.fromEntries(
+      tiers.map((tier) => [
+        tier,
+        {
+          source: priced?.prices?.[tier] ?? null,
+          manual: '',
+          shown: row.saved?.prices[tier].shown ?? true,
+        },
+      ]),
+    ) as QuoteOptionDraft['prices'],
+    manualReason: '',
+    manualBy: null,
+    fabrics: named,
+  };
 }
 
 /**
@@ -204,32 +349,19 @@ export function customSewingItemDraft(
   // A changed Catalog model is a new item: its Sewing rows cannot be matched to fabric rows.
   const same = previous?.kind === 'CustomSewing' ? previous : undefined;
   const model = previous?.productId != null ? previous : undefined;
-  const options: QuoteOptionDraft[] = request.fabrics.map((fabric, index) => {
-    const priced = price.fabrics[index];
-    const saved = same?.options.find((x) => x.fabricId === fabric.fabricId);
-    return {
-      key: saved?.key ?? nextKey('option'),
-      id: saved?.id ?? null,
-      articleId: null,
-      title: priced?.name ?? draft.fabrics[index].name,
-      details: priced?.details ?? null,
-      fabricInfo: `${numberText(fabric.meters)} м на виріб`,
-      isRecommended: saved?.isRecommended ?? false,
-      prices: Object.fromEntries(
-        tiers.map((tier) => [
-          tier,
-          {
-            source: priced?.prices?.[tier] ?? null,
-            manual: '',
-            shown: saved?.prices[tier].shown ?? true,
-          },
-        ]),
-      ) as QuoteOptionDraft['prices'],
-      manualReason: '',
-      manualBy: null,
-      fabricId: fabric.fabricId,
-      fabricMeters: fabric.meters,
-    };
+  const options: QuoteOptionDraft[] = request.variants.map((variant, index) => {
+    const own = draft.variants[index];
+    const saved = same?.options.find((x) => x.key === own.key);
+    return pricedOptionDraft(
+      price.variants[index],
+      variant.fabrics.map((x, at) => ({ ...x, name: own.fabrics[at]?.name ?? 'Тканина' })),
+      {
+        key: saved?.key ?? own.key,
+        id: saved?.id ?? null,
+        isRecommended: own.isRecommended,
+        saved,
+      },
+    );
   });
   return {
     key: previous?.key ?? nextKey('item'),

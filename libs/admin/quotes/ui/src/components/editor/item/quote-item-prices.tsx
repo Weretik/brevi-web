@@ -1,7 +1,10 @@
 import { hasManualPrice, isSewingKind, quoteTierLabels, quoteTiers } from '@admin/quotes/model';
+import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
+import StarOutlinedIcon from '@mui/icons-material/StarOutlined';
 import {
   Alert,
   Box,
+  IconButton,
   Stack,
   Table,
   TableBody,
@@ -76,13 +79,36 @@ export function QuoteItemPrices({
             {item.options.map((option) => (
               <TableRow key={option.key}>
                 <TableCell>
-                  <Stack direction="row" sx={{ gap: 1, alignItems: 'baseline', flexWrap: 'wrap' }}>
+                  <Stack direction="row" sx={{ gap: 0.5, alignItems: 'center', flexWrap: 'wrap' }}>
+                    {sewing && (
+                      <IconButton
+                        size="small"
+                        aria-pressed={option.isRecommended}
+                        aria-label={
+                          option.isRecommended
+                            ? `Не рекомендувати: ${rowLabel(option)}`
+                            : `Рекомендувати клієнту: ${rowLabel(option)}`
+                        }
+                        title={option.isRecommended ? 'Не рекомендувати' : 'Рекомендувати клієнту'}
+                        onClick={() => onRecommend(option.key)}
+                        sx={{
+                          ml: -0.75,
+                          color: option.isRecommended ? 'primary.dark' : 'text.disabled',
+                        }}
+                      >
+                        {option.isRecommended ? (
+                          <StarOutlinedIcon fontSize="small" />
+                        ) : (
+                          <StarBorderOutlinedIcon fontSize="small" />
+                        )}
+                      </IconButton>
+                    )}
                     <Typography variant="body2" sx={{ fontWeight: 600 }}>
                       {sewing ? option.title : 'За одиницю'}
                     </Typography>
                     {option.isRecommended && (
                       <Typography variant="caption" sx={{ color: 'primary.dark', fontWeight: 600 }}>
-                        ★ рекомендуємо
+                        рекомендуємо
                       </Typography>
                     )}
                   </Stack>
@@ -107,10 +133,8 @@ export function QuoteItemPrices({
                   <QuoteOptionMenu
                     option={option}
                     label={rowLabel(option)}
-                    canRecommend={item.kind === 'Sewing'}
                     canRemove={item.kind === 'Sewing' && item.options.length > 1}
                     onShownChange={(tier, shown) => onTierChange(option.key, tier, { shown })}
-                    onRecommend={() => onRecommend(option.key)}
                     onRemove={() => onRemoveOption(option.key)}
                   />
                 </TableCell>

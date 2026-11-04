@@ -35,7 +35,7 @@ export const quoteLookupsApi = quotesBaseApi.injectEndpoints({
       transformResponse: mapQuoteCatalogPage,
       transformErrorResponse: (response) => toQuoteApiError(response, quoteLookupErrors),
     }),
-    /** «Виріб з нуля»: the price of each fabric by the Catalog formula; nothing is saved. */
+    /** «Виріб з нуля» or a model in another fabric: the price of each variant by the Catalog formula; nothing is saved. */
     calculateQuoteCustomSewing: build.mutation<
       QuoteCustomSewingPrice,
       QuoteCustomSewingPriceRequest

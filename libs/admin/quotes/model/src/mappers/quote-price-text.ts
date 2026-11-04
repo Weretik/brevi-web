@@ -3,9 +3,9 @@ const formatter = new Intl.NumberFormat('uk-UA', {
   maximumFractionDigits: 2,
 });
 
-/** «1 364,17 ₴»; a missing price is «—». */
+/** «1 364,17» (the КП shows prices without a currency sign, they are in UAH); a missing price is «—». */
 export function formatQuotePrice(value: number | null | undefined): string {
-  return value === null || value === undefined ? '—' : `${formatter.format(value)} ₴`;
+  return value === null || value === undefined ? '—' : formatter.format(value);
 }
 
 /** Reads a typed price («1 364,5» or «1364.50»); null when the text is not a price. */

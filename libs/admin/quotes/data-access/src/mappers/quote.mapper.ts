@@ -41,6 +41,11 @@ const option = (value: Schemas['CrmQuoteOption']): QuoteOption => ({
   manualAt: value.manualAt ?? null,
   pricesTakenAt: value.pricesTakenAt ?? null,
   fabricMeters: value.fabricMeters ?? null,
+  fabrics: value.fabrics.map((fabric) => ({
+    fabricId: fabric.fabricId,
+    name: fabric.name,
+    meters: fabric.meters,
+  })),
 });
 
 const item = (value: Schemas['CrmQuoteItem']): QuoteItem => ({
@@ -197,23 +202,26 @@ export const mapQuoteCustomSewingPrice = (
     isActive: line.isActive,
     costCode: line.costCode ?? null,
   })),
-  fabrics: value.fabrics.map((fabric) => ({
-    fabricId: fabric.fabricId,
-    meters: fabric.meters,
-    name: fabric.name ?? null,
-    details: fabric.details ?? null,
-    pricePerMeter: fabric.pricePerMeter ?? null,
-    minutes: fabric.minutes ?? null,
-    laborCost: fabric.laborCost ?? null,
-    fullCost: fabric.fullCost ?? null,
-    prices: fabric.prices
+  variants: value.variants.map((variant) => ({
+    title: variant.title ?? null,
+    fabrics: variant.fabrics.map((fabric) => ({
+      fabricId: fabric.fabricId,
+      meters: fabric.meters,
+      name: fabric.name ?? null,
+      details: fabric.details ?? null,
+      pricePerMeter: fabric.pricePerMeter ?? null,
+    })),
+    minutes: variant.minutes ?? null,
+    laborCost: variant.laborCost ?? null,
+    fullCost: variant.fullCost ?? null,
+    prices: variant.prices
       ? {
-          retail: fabric.prices.retail ?? null,
-          wholesale: fabric.prices.wholesale ?? null,
-          large: fabric.prices.large ?? null,
+          retail: variant.prices.retail ?? null,
+          wholesale: variant.prices.wholesale ?? null,
+          large: variant.prices.large ?? null,
         }
       : null,
-    problems: fabric.problems,
+    problems: variant.problems,
   })),
 });
 

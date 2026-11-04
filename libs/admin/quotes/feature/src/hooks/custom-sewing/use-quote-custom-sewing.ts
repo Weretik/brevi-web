@@ -2,10 +2,15 @@ import { useCalculateQuoteCustomSewingMutation } from '@admin/quotes/data-access
 import {
   addCustomFabric,
   addCustomLine,
+  addCustomVariant,
   customSewingDraft,
   customSewingErrors,
   customSewingItemDraft,
   customSewingPriceRequest,
+  recommendCustomVariant,
+  removeCustomFabric,
+  removeCustomVariant,
+  setCustomFabricMeters,
 } from '@admin/quotes/model';
 import {
   useListFabricsQuery,
@@ -60,13 +65,13 @@ export function useQuoteCustomSewing(item?: QuoteItemDraft, model?: QuoteModelCo
 
   const price = result && result.key === requestKey ? result.price : null;
   const missing = customSewingErrors(draft);
-  const priced = price !== null && price.fabrics.every((fabric) => fabric.prices !== null);
+  const priced = price !== null && price.variants.every((variant) => variant.prices !== null);
 
   const choices = useMemo(() => {
-    const usedFabrics = new Set(draft.fabrics.map((x) => x.fabricId));
     return {
+      /** All active fabrics; the panel leaves out the ones a variant already has. */
       fabrics: (fabrics.data ?? [])
-        .filter((x) => x.isActive && !usedFabrics.has(x.id))
+        .filter((x) => x.isActive)
         .map<QuoteCustomChoice>((x) => ({
           id: x.id,
           label: x.name,
@@ -87,7 +92,7 @@ export function useQuoteCustomSewing(item?: QuoteItemDraft, model?: QuoteModelCo
           hint: x.minutesPerProduct ? 'час вказується для виробу' : `${money.format(x.min)} хв`,
         })),
     };
-  }, [draft.fabrics, fabrics.data, accessories.data, operations.data]);
+  }, [fabrics.data, accessories.data, operations.data]);
 
   const operationById = useMemo(
     () => new Map((operations.data ?? []).map((x) => [x.id, x])),
@@ -110,18 +115,19 @@ export function useQuoteCustomSewing(item?: QuoteItemDraft, model?: QuoteModelCo
     canAdd: missing.length === 0 && priced && !calculation.isLoading,
     change: (patch: Partial<Pick<QuoteCustomSewingDraft, 'name' | 'description'>>) =>
       setDraft((current) => ({ ...current, ...patch })),
-    addFabric: (choice: QuoteCustomChoice) =>
-      setDraft((current) => addCustomFabric(current, { id: choice.id, name: choice.label })),
-    setMeters: (key: string, meters: string) =>
-      setDraft((current) => ({
-        ...current,
-        fabrics: current.fabrics.map((x) => (x.key === key ? { ...x, meters } : x)),
-      })),
-    removeFabric: (key: string) =>
-      setDraft((current) => ({
-        ...current,
-        fabrics: current.fabrics.filter((x) => x.key !== key),
-      })),
+    addVariant: () => setDraft(addCustomVariant),
+    removeVariant: (variantKey: string) =>
+      setDraft((current) => removeCustomVariant(current, variantKey)),
+    recommend: (variantKey: string) =>
+      setDraft((current) => recommendCustomVariant(current, variantKey)),
+    addFabric: (variantKey: string, choice: QuoteCustomChoice) =>
+      setDraft((current) =>
+        addCustomFabric(current, variantKey, { id: choice.id, name: choice.label }),
+      ),
+    setMeters: (variantKey: string, fabricKey: string, meters: string) =>
+      setDraft((current) => setCustomFabricMeters(current, variantKey, fabricKey, meters)),
+    removeFabric: (variantKey: string, fabricKey: string) =>
+      setDraft((current) => removeCustomFabric(current, variantKey, fabricKey)),
     addAccessory: (choice: QuoteCustomChoice) =>
       setDraft((current) =>
         addCustomLine(current, {

@@ -11,23 +11,13 @@ interface Props {
   option: QuoteOptionDraft;
   /** Row name for screen readers, «Імпульс, Грета 210». */
   label: string;
-  canRecommend: boolean;
   canRemove: boolean;
   onShownChange: (tier: QuoteTier, shown: boolean) => void;
-  onRecommend: () => void;
   onRemove: () => void;
 }
 
-/** The menu of one price row: recommend it, hide one of its prices, remove it. */
-export function QuoteOptionMenu({
-  option,
-  label,
-  canRecommend,
-  canRemove,
-  onShownChange,
-  onRecommend,
-  onRemove,
-}: Props) {
+/** The menu of one price row: hide one of its prices, remove it. */
+export function QuoteOptionMenu({ option, label, canRemove, onShownChange, onRemove }: Props) {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const close = () => setAnchor(null);
   return (
@@ -42,17 +32,6 @@ export function QuoteOptionMenu({
         <MoreHorizOutlinedIcon fontSize="small" />
       </IconButton>
       <Menu anchorEl={anchor} open={anchor !== null} onClose={close}>
-        {canRecommend && (
-          <MenuItem
-            onClick={() => {
-              close();
-              onRecommend();
-            }}
-          >
-            {option.isRecommended ? 'Не рекомендувати' : 'Рекомендувати клієнту'}
-          </MenuItem>
-        )}
-        {canRecommend && <Divider />}
         {quoteTiers.map((tier) => {
           const shown = option.prices[tier].shown;
           return (

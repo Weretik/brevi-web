@@ -51,8 +51,7 @@ function optionDraft(option: QuoteOption): QuoteOptionDraft {
     }),
     manualReason: option.manualReason ?? '',
     manualBy: option.manualByName,
-    fabricId: option.fabricId,
-    fabricMeters: option.fabricMeters,
+    fabrics: option.fabrics,
   };
 }
 
@@ -111,8 +110,7 @@ export function variantOptionDraft(
     prices: tiers((tier) => catalogPrice(variant.prices?.[tier] ?? null)),
     manualReason: '',
     manualBy: null,
-    fabricId: null,
-    fabricMeters: null,
+    fabrics: [],
   };
 }
 
@@ -138,8 +136,7 @@ export function catalogItemDraft(
             prices: tiers((tier) => catalogPrice(product.prices?.[tier] ?? null)),
             manualReason: '',
             manualBy: null,
-            fabricId: null,
-            fabricMeters: null,
+            fabrics: [],
           },
         ];
   return {
@@ -187,8 +184,7 @@ export function oneOffItemDraft(): QuoteItemDraft {
         prices: tiers(() => ({ source: null, manual: '', shown: true })),
         manualReason: '',
         manualBy: null,
-        fabricId: null,
-        fabricMeters: null,
+        fabrics: [],
       },
     ],
     lines: [],

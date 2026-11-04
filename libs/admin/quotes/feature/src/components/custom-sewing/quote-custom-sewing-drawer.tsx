@@ -1,6 +1,7 @@
-import { QuoteCustomPriceSummary, QuoteCustomRows } from '@admin/quotes/ui';
+import { QuoteCustomPriceSummary, QuoteCustomRows, QuoteCustomVariantCard } from '@admin/quotes/ui';
 import { ReferenceEditorDrawer } from '@admin/references/ui';
-import { Alert, Divider, Stack, TextField } from '@mui/material';
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import { Alert, Button, Divider, Stack, TextField, Typography } from '@mui/material';
 
 import { useQuoteCustomSewing } from '../../hooks/custom-sewing/use-quote-custom-sewing';
 
@@ -19,10 +20,8 @@ interface Props {
   onDone: (item: QuoteItemDraft) => void;
 }
 
-/**
- * «Виріб з нуля»: a product that is not in the Catalog, composed from fabrics, accessories and operations and
- * priced by the same formula as the Catalog. Nothing is added to the Catalog.
- */
+const maxVariants = 20;
+
 const rowsOf = (
   lines: readonly QuoteCustomLineDraft[],
   kind: 'Fabric' | 'Service',
@@ -32,6 +31,10 @@ const rowsOf = (
     .filter((x) => x.kind === kind)
     .map((x) => ({ key: x.key, name: x.name, quantity: x.quantity, quantityLabel: label }));
 
+/**
+ * «Виріб з нуля»: a product that is not in the Catalog. Each variant is its own set of fabrics; accessories, services
+ * and operations are shared. Every variant is priced by the Catalog formula; nothing is added to the Catalog.
+ */
 export function QuoteCustomSewingDrawer({ item, model, onClose, onDone }: Props) {
   const panel = useQuoteCustomSewing(item, model);
   const { draft } = panel;
@@ -45,8 +48,8 @@ export function QuoteCustomSewingDrawer({ item, model, onClose, onDone }: Props)
       title={changingModel ? 'Змінити склад моделі' : item ? 'Склад виробу з нуля' : 'Виріб з нуля'}
       description={
         changingModel
-          ? 'Склад моделі з каталогу: змініть тканини, фурнітуру чи операції. Ціну рахує система за формулою каталогу; модель у каталозі не змінюється.'
-          : 'Тканини, фурнітура й операції з довідників. Ціну рахує система за формулою каталогу; в каталог виріб не потрапляє.'
+          ? 'Склад моделі з каталогу: змініть варіанти тканин, фурнітуру чи операції. Ціну рахує система за формулою каталогу; модель у каталозі не змінюється.'
+          : 'Кожен варіант — свій набір тканин (їх вартість додається). Фурнітура й операції спільні для всіх варіантів. Ціну рахує система за формулою каталогу.'
       }
       formId="quote-custom-sewing-form"
       paperWidth={720}
@@ -82,21 +85,41 @@ export function QuoteCustomSewingDrawer({ item, model, onClose, onDone }: Props)
           slotProps={{ htmlInput: { maxLength: 4000 } }}
         />
         <Divider />
-        <QuoteCustomRows
-          title="Тканини"
-          rows={draft.fabrics.map((x) => ({
-            key: x.key,
-            name: x.name,
-            quantity: x.meters,
-            quantityLabel: 'Метрів',
-          }))}
-          choices={panel.choices.fabrics}
-          addLabel="Додати тканину"
-          loading={panel.loadingReferences}
-          onAdd={panel.addFabric}
-          onQuantity={panel.setMeters}
-          onRemove={panel.removeFabric}
-        />
+        <Stack component="section" aria-label="Варіанти" sx={{ gap: 1.5 }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+            Варіанти тканин
+          </Typography>
+          {draft.variants.map((variant, index) => (
+            <QuoteCustomVariantCard
+              key={variant.key}
+              index={index}
+              variant={variant}
+              choices={panel.choices.fabrics}
+              loading={panel.loadingReferences}
+              price={panel.price?.variants[index] ?? null}
+              canRemove={draft.variants.length > 1}
+              onRecommend={() => panel.recommend(variant.key)}
+              onRemove={() => panel.removeVariant(variant.key)}
+              onAddFabric={(choice) => panel.addFabric(variant.key, choice)}
+              onMeters={(fabricKey, meters) => panel.setMeters(variant.key, fabricKey, meters)}
+              onRemoveFabric={(fabricKey) => panel.removeFabric(variant.key, fabricKey)}
+            />
+          ))}
+          {draft.variants.length < maxVariants && (
+            <Button
+              variant="outlined"
+              startIcon={<AddOutlinedIcon />}
+              onClick={panel.addVariant}
+              sx={{ alignSelf: 'flex-start' }}
+            >
+              Додати варіант
+            </Button>
+          )}
+        </Stack>
+        <Divider />
+        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+          Спільне для всіх варіантів
+        </Typography>
         {extraFabrics.length > 0 && (
           <QuoteCustomRows
             title="Додаткові тканини"
@@ -149,9 +172,7 @@ export function QuoteCustomSewingDrawer({ item, model, onClose, onDone }: Props)
           onMinutes={(key, minutes) => panel.setLine(key, { minutes })}
           onRemove={panel.removeLine}
         />
-        <Divider />
         <QuoteCustomPriceSummary
-          price={panel.price}
           calculating={panel.calculating}
           missing={panel.missing}
           error={panel.error}

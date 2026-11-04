@@ -23,13 +23,12 @@ const price: QuoteCustomSewingPrice = {
       costCode: null,
     },
   ],
-  fabrics: [
+  variants: [
     {
-      fabricId: 3,
-      meters: 1.5,
-      name: 'Саржа',
-      details: 'Саржа 240 г/м²',
-      pricePerMeter: 100,
+      title: 'Саржа',
+      fabrics: [
+        { fabricId: 3, meters: 1.5, name: 'Саржа', details: 'Саржа 240 г/м²', pricePerMeter: 100 },
+      ],
       minutes: 12,
       laborCost: 60,
       fullCost: 210,
@@ -100,9 +99,9 @@ describe('«Виріб з нуля» panel', () => {
     await user.type(screen.getByLabelText('Метрів: Саржа'), '1,5');
     await choose(user, 'Додати операцію', /Пошив/);
 
-    expect(await screen.findByText(/^420(,00)? ₴$/, {}, { timeout: 2000 })).toBeVisible();
+    expect(await screen.findByText(/^420(,00)?$/, {}, { timeout: 2000 })).toBeVisible();
     expect(api.calculate).toHaveBeenLastCalledWith({
-      fabrics: [{ fabricId: 3, meters: 1.5 }],
+      variants: [{ fabrics: [{ fabricId: 3, meters: 1.5 }] }],
       lines: [
         { kind: 'Operation', referenceId: 5, quantity: 1, manualMinutes: null, costCode: null },
       ],
@@ -113,7 +112,10 @@ describe('«Виріб з нуля» panel', () => {
     const item = onDone.mock.calls[0][0];
     expect(item).toMatchObject({ kind: 'CustomSewing', name: 'Куртка охоронця', productId: null });
     expect(item.options).toHaveLength(1);
-    expect(item.options[0]).toMatchObject({ fabricId: 3, fabricMeters: 1.5, title: 'Саржа' });
+    expect(item.options[0]).toMatchObject({
+      fabrics: [{ fabricId: 3, name: 'Саржа', meters: 1.5 }],
+      title: 'Саржа',
+    });
     expect(item.lines).toEqual([
       {
         kind: 'Operation',
@@ -192,9 +194,9 @@ describe('«Виріб з нуля» panel', () => {
     expect(screen.getByLabelText('Разів: Вишивка')).toHaveValue('1');
     await user.click(screen.getByRole('button', { name: 'Прибрати: Вишивка' }));
 
-    expect(await screen.findByText(/^420(,00)? ₴$/, {}, { timeout: 2000 })).toBeVisible();
+    expect(await screen.findByText(/^420(,00)?$/, {}, { timeout: 2000 })).toBeVisible();
     expect(api.calculate).toHaveBeenLastCalledWith({
-      fabrics: [{ fabricId: 3, meters: 1.5 }],
+      variants: [{ fabrics: [{ fabricId: 3, meters: 1.5 }] }],
       lines: [
         { kind: 'Operation', referenceId: 5, quantity: 1, manualMinutes: null, costCode: null },
       ],

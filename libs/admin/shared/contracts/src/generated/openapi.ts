@@ -2014,7 +2014,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** @description «Виріб з нуля» (R-20): prices each fabric with the chosen accessories and operations by the Catalog sewing formula and the current settings and reference prices. Nothing is saved; a fabric that cannot be priced lists its problems. */
+    /** @description «Виріб з нуля» (R-20, R-26) or a model row in another fabric (R-27): prices each variant, the sum of its fabrics with the shared accessories and operations, by the Catalog sewing formula and the current settings and reference prices. Nothing is saved; a variant that cannot be priced lists its problems. */
     post: operations['calculateCrmQuoteCustomSewing'];
     delete?: never;
     options?: never;
@@ -4911,6 +4911,12 @@ export interface components {
       /** @description PPE and one-off PPE only; null keeps the Catalog price. */
       manual?: number | null;
     };
+    CrmQuoteOptionFabricInput: {
+      fabricId: number;
+      meters: number;
+    };
+    /** @description Different fabrics; their costs are summed in the variant's price. */
+    CrmQuoteOptionFabrics: components['schemas']['CrmQuoteOptionFabricInput'][];
     CrmQuoteOptionInput: {
       /**
        * Format: int64
@@ -4928,10 +4934,8 @@ export interface components {
       large: components['schemas']['CrmQuotePriceInput'];
       /** @description Required when a PPE price differs from the Catalog. */
       manualReason?: string | null;
-      /** @description CustomSewing only; the fabric of the row. */
-      fabricId?: number | null;
-      /** @description CustomSewing only; metres of the fabric in one product. */
-      fabricMeters?: number | null;
+      /** @description CustomSewing: the fabrics of the variant (R-26). Sewing: one fabric from the Reference for a row in another fabric, with articleId null (R-27). Null for a Catalog variant and a PPE. */
+      fabrics?: components['schemas']['CrmQuoteOptionFabrics'] | null;
     };
     /**
      * @description Service is a «послуга» of a Catalog model priced by its other-cost code; Fabric is an extra fabric shared by every variant (for example a lining), in metres.
@@ -5001,8 +5005,14 @@ export interface components {
       manualAt?: string | null;
       /** Format: date-time */
       pricesTakenAt?: string | null;
-      /** @description CustomSewing only. */
+      /** @description Metres of the first fabric. */
       fabricMeters?: number | null;
+      /** @description The fabrics of a «Виріб з нуля» variant or of a model row in another fabric; empty otherwise. */
+      fabrics: {
+        fabricId: number;
+        name: string;
+        meters: number;
+      }[];
     };
     CrmQuoteItemLine: {
       /** Format: int64 */
@@ -5495,9 +5505,8 @@ export interface components {
       letters: components['schemas']['CrmQuoteIntroLetter'][];
     };
     CrmQuoteCustomSewingPriceInput: {
-      fabrics: {
-        fabricId: number;
-        meters: number;
+      variants: {
+        fabrics: components['schemas']['CrmQuoteOptionFabrics'];
       }[];
       lines: components['schemas']['CrmQuoteItemLineInput'][];
     };
@@ -5513,13 +5522,17 @@ export interface components {
         unitValue?: number | null;
         isActive: boolean;
       }[];
-      fabrics: {
-        fabricId: number;
-        meters: number;
-        name?: string | null;
-        /** @description The client text of the fabric. */
-        details?: string | null;
-        pricePerMeter?: number | null;
+      variants: {
+        /** @description The fabric names joined by « + »; null when a fabric is gone from the Reference. */
+        title?: string | null;
+        fabrics: {
+          fabricId: number;
+          meters: number;
+          name?: string | null;
+          /** @description The client text of the fabric. */
+          details?: string | null;
+          pricePerMeter?: number | null;
+        }[];
         minutes?: number | null;
         /** @description Minutes × cost of a minute, UAH. */
         laborCost?: number | null;
@@ -12961,7 +12974,7 @@ export interface operations {
       };
     };
     responses: {
-      /** @description Line names and the price of each fabric, in the order given. */
+      /** @description Line names and the price of each variant, in the order given. */
       200: {
         headers: {
           [name: string]: unknown;

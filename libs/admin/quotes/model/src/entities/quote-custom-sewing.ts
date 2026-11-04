@@ -13,13 +13,20 @@ export interface QuoteCustomSewingLineInfo {
   readonly costCode: string | null;
 }
 
-/** The price of one fabric of a «Виріб з нуля» by the Catalog formula, or why there is none. */
-export interface QuoteCustomSewingFabricPrice {
+/** One fabric of a priced variant with its Reference data; `name` is null when the row is gone. */
+export interface QuoteCustomSewingFabricInfo {
   readonly fabricId: number;
   readonly meters: number;
   readonly name: string | null;
   readonly details: string | null;
   readonly pricePerMeter: number | null;
+}
+
+/** The price of one variant (its fabrics summed with the shared lines) by the Catalog formula, or why there is none. */
+export interface QuoteCustomSewingVariantPrice {
+  /** The fabric names joined by « + »; null when a fabric is gone. */
+  readonly title: string | null;
+  readonly fabrics: readonly QuoteCustomSewingFabricInfo[];
   readonly minutes: number | null;
   /** Minutes × cost of a minute, UAH. */
   readonly laborCost: number | null;
@@ -30,11 +37,13 @@ export interface QuoteCustomSewingFabricPrice {
 
 export interface QuoteCustomSewingPrice {
   readonly lines: readonly QuoteCustomSewingLineInfo[];
-  readonly fabrics: readonly QuoteCustomSewingFabricPrice[];
+  readonly variants: readonly QuoteCustomSewingVariantPrice[];
 }
 
 export interface QuoteCustomSewingPriceRequest {
-  readonly fabrics: readonly { readonly fabricId: number; readonly meters: number }[];
+  readonly variants: readonly {
+    readonly fabrics: readonly { readonly fabricId: number; readonly meters: number }[];
+  }[];
   readonly lines: readonly {
     readonly kind: QuoteItemLineKind;
     readonly referenceId: number;

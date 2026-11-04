@@ -35,8 +35,17 @@ export interface QuoteOption {
   readonly manualByName: string | null;
   readonly manualAt: string | null;
   readonly pricesTakenAt: string | null;
-  /** Metres of the fabric in one «Виріб з нуля»; null for other items. */
+  /** Metres of the first fabric; null for a Catalog variant and a PPE. */
   readonly fabricMeters: number | null;
+  /** The fabrics of a «Виріб з нуля» variant or of a model row in another fabric; empty otherwise. */
+  readonly fabrics: readonly QuoteOptionFabric[];
+}
+
+/** One fabric of a variant with its metres in one product. */
+export interface QuoteOptionFabric {
+  readonly fabricId: number;
+  readonly name: string;
+  readonly meters: number;
 }
 
 /** An accessory or operation of a «Виріб з нуля»; name and unit are copied when it was priced. */

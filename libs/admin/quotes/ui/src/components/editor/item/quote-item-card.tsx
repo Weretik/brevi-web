@@ -56,7 +56,7 @@ const kindLabel = (item: QuoteItemDraft) => {
   return item.kind === 'Ppe' ? 'ЗІЗ' : 'Разовий ЗІЗ';
 };
 
-/** A compact КП item: header, the price table, and description on demand. */
+/** A compact КП item: header, the price table and the description, always open for editing. */
 export function QuoteItemCard({
   item,
   position,
@@ -78,7 +78,7 @@ export function QuoteItemCard({
   const custom = item.kind === 'CustomSewing';
   const ppe = item.kind === 'Ppe' || oneOff;
   const label = oneOff ? item.name || 'Разова позиція' : item.name;
-  const [details, setDetails] = useState(oneOff && !item.name);
+  const [supplier, setSupplier] = useState(false);
   const meta = [item.season, item.code].filter(Boolean).join(' · ');
   return (
     <Card
@@ -187,6 +187,24 @@ export function QuoteItemCard({
         onRemoveOption={onRemoveOption}
       />
 
+      <Box sx={{ px: 2, pt: 1.5 }}>
+        <TextField
+          fullWidth
+          multiline
+          minRows={2}
+          size="small"
+          label="Опис позиції у КП"
+          placeholder="Короткий опис для клієнта: що це за виріб, для кого, переваги"
+          value={item.description}
+          onChange={(event) => onChange({ description: event.target.value })}
+          helperText={
+            oneOff || custom
+              ? 'Бачить клієнт у КП.'
+              : 'Підтягується з «Короткого опису для КП» у товарі. Зміна діє лише в цьому КП.'
+          }
+          slotProps={{ htmlInput: { maxLength: quoteTextMaxLength } }}
+        />
+      </Box>
       <Stack direction="row" sx={{ gap: 1, alignItems: 'center', flexWrap: 'wrap', px: 1, py: 1 }}>
         {item.kind === 'Sewing' && (
           <Button startIcon={<AddOutlinedIcon />} onClick={onAddFabric}>
@@ -198,41 +216,19 @@ export function QuoteItemCard({
             Змінити склад
           </Button>
         )}
-        {!details && item.description && (
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            noWrap
-            sx={{ flex: '1 1 240px', minWidth: 0, px: 1 }}
+        {ppe && (
+          <Button
+            onClick={() => setSupplier((open) => !open)}
+            aria-expanded={supplier}
+            sx={{ ml: 'auto' }}
           >
-            Опис для клієнта: {item.description}
-          </Typography>
+            {supplier ? 'Сховати посилання' : 'Посилання на постачальника'}
+          </Button>
         )}
-        <Button
-          onClick={() => setDetails((open) => !open)}
-          aria-expanded={details}
-          sx={{ ml: 'auto' }}
-        >
-          {details ? 'Згорнути' : item.description ? 'Змінити опис' : 'Додати опис'}
-          {ppe && !details ? ' і посилання' : ''}
-        </Button>
       </Stack>
-      <Collapse in={details} unmountOnExit>
-        <Stack sx={{ gap: 1.5, px: 2, pb: 2 }}>
-          <TextField
-            fullWidth
-            multiline
-            minRows={2}
-            size="small"
-            label="Опис для клієнта"
-            value={item.description}
-            onChange={(event) => onChange({ description: event.target.value })}
-            helperText={
-              oneOff || custom ? undefined : 'Підтягується з каталогу. Зміна діє лише в цьому КП.'
-            }
-            slotProps={{ htmlInput: { maxLength: quoteTextMaxLength } }}
-          />
-          {ppe && (
+      {ppe && (
+        <Collapse in={supplier} unmountOnExit>
+          <Box sx={{ px: 2, pb: 2 }}>
             <TextField
               fullWidth
               size="small"
@@ -242,9 +238,9 @@ export function QuoteItemCard({
               helperText="Бачите лише ви."
               slotProps={{ htmlInput: { maxLength: 1000 } }}
             />
-          )}
-        </Stack>
-      </Collapse>
+          </Box>
+        </Collapse>
+      )}
       {itemError && (
         <Alert severity="warning" sx={{ m: 2, mt: 0 }}>
           {itemError}

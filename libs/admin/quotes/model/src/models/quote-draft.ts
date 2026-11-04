@@ -1,4 +1,4 @@
-import type { QuoteItemKind, QuoteItemLine, QuoteTier } from '../entities/quote';
+import type { QuoteItemKind, QuoteItemLine, QuoteOptionFabric, QuoteTier } from '../entities/quote';
 
 /** One editable price box; `manual` is the typed text, empty for the Catalog price. */
 export interface QuotePriceDraft {
@@ -20,9 +20,11 @@ export interface QuoteOptionDraft {
   readonly manualReason: string;
   /** Who set the saved manual price and when, for the hint under the row. */
   readonly manualBy: string | null;
-  /** The fabric and its metres of a «Виріб з нуля» row; null for other items. */
-  readonly fabricId: number | null;
-  readonly fabricMeters: number | null;
+  /**
+   * The fabrics with metres of a «Виріб з нуля» variant, or the one Reference fabric of a model row in another
+   * fabric; empty for a Catalog variant and a PPE.
+   */
+  readonly fabrics: readonly QuoteOptionFabric[];
 }
 
 export interface QuoteItemDraft {

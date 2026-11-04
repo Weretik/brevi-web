@@ -3,11 +3,13 @@ import { describe, expect, it } from 'vitest';
 import {
   addCustomFabric,
   addCustomLine,
+  addCustomVariant,
   customSewingDraft,
   customSewingErrors,
   customSewingItemDraft,
   customSewingPriceRequest,
   parseCustomQuantity,
+  recommendCustomVariant,
 } from './quote-custom-sewing-mapper';
 import { catalogItemDraft } from './quote-draft-mapper';
 
@@ -18,8 +20,14 @@ import type {
 
 const composed = () => {
   let draft = { ...customSewingDraft(), name: 'Фартух з логотипом' };
-  draft = addCustomFabric(draft, { id: 5, name: 'Саржа' });
-  draft = { ...draft, fabrics: draft.fabrics.map((x) => ({ ...x, meters: '1,25' })) };
+  draft = addCustomFabric(draft, draft.variants[0].key, { id: 5, name: 'Саржа' });
+  draft = {
+    ...draft,
+    variants: draft.variants.map((v) => ({
+      ...v,
+      fabrics: v.fabrics.map((x) => ({ ...x, meters: '1,25' })),
+    })),
+  };
   draft = addCustomLine(draft, {
     kind: 'Accessory',
     referenceId: 30,
@@ -57,13 +65,12 @@ const price: QuoteCustomSewingPrice = {
       costCode: null,
     },
   ],
-  fabrics: [
+  variants: [
     {
-      fabricId: 5,
-      meters: 1.25,
-      name: 'Саржа',
-      details: '65% поліестер',
-      pricePerMeter: 200,
+      title: 'Саржа',
+      fabrics: [
+        { fabricId: 5, meters: 1.25, name: 'Саржа', details: '65% поліестер', pricePerMeter: 200 },
+      ],
       minutes: 12,
       laborCost: 60,
       fullCost: 400,
@@ -91,7 +98,7 @@ describe('«Виріб з нуля» panel', () => {
       lines: draft.lines.map((x) => (x.needsMinutes ? { ...x, minutes: '12' } : x)),
     };
     expect(customSewingPriceRequest(filled)).toEqual({
-      fabrics: [{ fabricId: 5, meters: 1.25 }],
+      variants: [{ fabrics: [{ fabricId: 5, meters: 1.25 }] }],
       lines: [
         { kind: 'Accessory', referenceId: 30, quantity: 1, manualMinutes: null, costCode: null },
         { kind: 'Operation', referenceId: 155, quantity: 1, manualMinutes: 12, costCode: null },
@@ -112,15 +119,14 @@ describe('«Виріб з нуля» panel', () => {
     expect(item.kind).toBe('CustomSewing');
     expect(item.options[0]).toMatchObject({
       title: 'Саржа',
-      fabricId: 5,
-      fabricMeters: 1.25,
+      fabrics: [{ fabricId: 5, name: 'Саржа', meters: 1.25 }],
       fabricInfo: '1,25 м на виріб',
     });
     expect(item.options[0].prices.retail.source).toBe(800);
     expect(item.lines.map((x) => x.name)).toEqual(['Ґудзик', 'Нестандартна операція']);
 
     const again = customSewingDraft(item);
-    expect(again.fabrics[0].meters).toBe('1,25');
+    expect(again.variants[0].fabrics[0].meters).toBe('1,25');
     expect(again.lines[1]).toMatchObject({ minutes: '12', needsMinutes: true });
   });
 
@@ -181,7 +187,9 @@ describe('«Виріб з нуля» panel', () => {
 
     const draft = customSewingDraft(model, composition);
     expect(draft.name).toBe('Костюм «Імпульс»');
-    expect(draft.fabrics.map((x) => [x.fabricId, x.meters])).toEqual([[5, '1,5']]);
+    expect(draft.variants.map((v) => v.fabrics.map((x) => [x.fabricId, x.meters]))).toEqual([
+      [[5, '1,5']],
+    ]);
     const request = customSewingPriceRequest(draft)!;
     expect(request.lines[0]).toEqual({
       kind: 'Service',
@@ -191,12 +199,7 @@ describe('«Виріб з нуля» panel', () => {
       costCode: 'Вишивка',
     });
 
-    const item = customSewingItemDraft(
-      draft,
-      request,
-      { ...price, fabrics: [{ ...price.fabrics[0], fabricId: 5 }] },
-      model,
-    );
+    const item = customSewingItemDraft(draft, request, price, model);
     expect(item).toMatchObject({
       key: model.key,
       id: null,
@@ -207,5 +210,64 @@ describe('«Виріб з нуля» panel', () => {
       photoUrl: 'https://cdn/impuls.jpg',
     });
     expect(item.options[0].id).toBeNull();
+  });
+
+  it('sums the fabrics of a variant and marks one variant as recommended', () => {
+    let draft = composed();
+    draft = {
+      ...draft,
+      lines: draft.lines.map((x) => (x.needsMinutes ? { ...x, minutes: '12' } : x)),
+    };
+    draft = addCustomVariant(draft);
+    const second = draft.variants[1].key;
+    draft = addCustomFabric(draft, second, { id: 5, name: 'Саржа' });
+    draft = addCustomFabric(draft, second, { id: 6, name: 'Сітка' });
+    draft = addCustomFabric(draft, second, { id: 6, name: 'Сітка' });
+    expect(customSewingErrors(draft)).toEqual(['Вкажіть метраж кожної тканини.']);
+
+    draft = {
+      ...draft,
+      variants: draft.variants.map((v) =>
+        v.key === second
+          ? { ...v, fabrics: v.fabrics.map((x, i) => ({ ...x, meters: i === 0 ? '1,25' : '0,3' })) }
+          : v,
+      ),
+    };
+    draft = recommendCustomVariant(draft, second);
+    const request = customSewingPriceRequest(draft)!;
+    expect(request.variants).toEqual([
+      { fabrics: [{ fabricId: 5, meters: 1.25 }] },
+      {
+        fabrics: [
+          { fabricId: 5, meters: 1.25 },
+          { fabricId: 6, meters: 0.3 },
+        ],
+      },
+    ]);
+
+    const item = customSewingItemDraft(draft, request, {
+      ...price,
+      variants: [price.variants[0], { ...price.variants[0], title: 'Саржа + Сітка' }],
+    });
+    expect(item.options[1]).toMatchObject({
+      title: 'Саржа + Сітка',
+      isRecommended: true,
+      fabricInfo: 'Саржа 1,25 м + Сітка 0,3 м на виріб',
+    });
+    expect(item.options[0].isRecommended).toBe(false);
+  });
+
+  it('does not allow two variants with the same fabrics', () => {
+    let draft = composed();
+    draft = addCustomVariant(draft);
+    draft = addCustomFabric(draft, draft.variants[1].key, { id: 5, name: 'Саржа' });
+    draft = {
+      ...draft,
+      variants: draft.variants.map((v) => ({
+        ...v,
+        fabrics: v.fabrics.map((x) => ({ ...x, meters: '1,25' })),
+      })),
+    };
+    expect(customSewingErrors(draft)).toContain('Два варіанти мають однакові тканини й метраж.');
   });
 });
