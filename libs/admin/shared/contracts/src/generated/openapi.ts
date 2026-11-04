@@ -194,7 +194,7 @@ export interface paths {
     };
     /**
      * The signed-in staff member's profile («Мій кабінет»)
-     * @description Policy `OwnProfile` (Accountant, Manager, Admin; the director also holds Admin).
+     * @description Policy `OwnProfile` (Accountant, Manager, WorkshopChief, Admin; the director also holds Admin).
      */
     get: operations['getMyProfile'];
     put?: never;
@@ -2110,6 +2110,151 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/production/staff': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Workers sorted by name; archived ones only with includeArchived */
+    get: operations['getWorkshopStaff'];
+    put?: never;
+    /** Add a worker */
+    post: operations['createWorkshopEmployee'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/staff/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    /** Change the name or position of a worker */
+    put: operations['updateWorkshopEmployee'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/staff/{id}/active': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    /** Archive a worker who left (isActive false) or return them to the list */
+    put: operations['setWorkshopEmployeeActive'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/staff/import': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Add workers from a list (up to 500); a worker with the same active name gets the new position */
+    post: operations['importWorkshopStaff'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/fabric-norms': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Every Catalog sewing model by code with its norm (null when not set), then norms whose model is no longer in Catalog */
+    get: operations['getFabricNorms'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/fabric-norms/{modelCode}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Catalog model code, for example MOD-025 (case-insensitive). */
+        modelCode: string;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    /** Create or replace the norm of a Catalog sewing model */
+    put: operations['saveFabricNorm'];
+    post?: never;
+    /** Delete the norm */
+    delete: operations['deleteFabricNorm'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/fabric-norms/import': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Load norms from a list (up to 1000); nothing is saved while a row has an error */
+    post: operations['importFabricNorms'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/payroll-parameters': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Payroll coefficients read from «Параметри ціноутворення» (edited there, not here) */
+    get: operations['getPayrollParameters'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/reminders/non-working-days': {
     parameters: {
       query?: never;
@@ -2333,7 +2478,7 @@ export interface components {
       /** Format: email */
       email: string;
       fullName: string;
-      roles: ('Director' | 'Admin' | 'Accountant' | 'Manager' | 'User')[];
+      roles: ('Director' | 'Admin' | 'Accountant' | 'Manager' | 'WorkshopChief' | 'User')[];
       /**
        * Format: uri
        * @description Profile photo on the CDN; null shows the initial and a color
@@ -2341,7 +2486,7 @@ export interface components {
       avatarUrl: string | null;
     };
     /** @enum {string} */
-    StaffRole: 'Director' | 'Admin' | 'Accountant' | 'Manager';
+    StaffRole: 'Director' | 'Admin' | 'Accountant' | 'Manager' | 'WorkshopChief';
     StaffAccountResponse: {
       /** Format: int32 */
       id: number;
@@ -4928,6 +5073,88 @@ export interface components {
     CrmMarkTaskStepRequest: {
       version: number;
       isDone: boolean;
+    };
+    WorkshopEmployeeResponse: {
+      id: number;
+      fullName: string;
+      position: string;
+      /** @description false = archived (left the workshop). */
+      isActive: boolean;
+      /** Format: date-time */
+      updatedAt: string;
+    };
+    WorkshopEmployeeInput: {
+      /** @description Extra spaces are removed. */
+      fullName: string;
+      /** @description For example «Швачка», «Закрійник», «Майстер цеху». */
+      position: string;
+    };
+    WorkshopStaffImportResult: {
+      dryRun: boolean;
+      created: number;
+      updated: number;
+      unchanged: number;
+      lines: {
+        fullName: string;
+        position: string;
+        /** @enum {string} */
+        action: 'created' | 'updated' | 'unchanged';
+      }[];
+    };
+    /** @description Planned fabric per item in metres (up to 3 decimals, 0 < value ≤ 100). One colour, or two colours (main + additional), or three colours (main + two additional). At least one value; an additional value needs its main value. */
+    FabricNormInput: {
+      oneColor?: number | null;
+      twoColorsMain?: number | null;
+      twoColorsAdditional?: number | null;
+      threeColorsMain?: number | null;
+      threeColorsAdditional1?: number | null;
+      threeColorsAdditional2?: number | null;
+    };
+    FabricNormRowResponse: {
+      modelCode: string;
+      /** @description Null when the model is no longer in Catalog. */
+      modelName?: string | null;
+      modelIsActive: boolean;
+      norm?: components['schemas']['FabricNormInput'] | null;
+      /** @description Main + additional, when two-colour values are set. */
+      twoColorsTotal?: number | null;
+      threeColorsTotal?: number | null;
+      /** Format: date-time */
+      updatedAt?: string | null;
+      /** @description Set only when something is wrong, for example the model is gone from Catalog. */
+      problem?: string | null;
+    };
+    FabricNormImportRow: {
+      modelCode: string;
+      norm: components['schemas']['FabricNormInput'];
+    };
+    FabricNormImportResult: {
+      dryRun: boolean;
+      created: number;
+      updated: number;
+      unchanged: number;
+      errors: number;
+      lines: {
+        modelCode: string;
+        modelName?: string | null;
+        /** @enum {string} */
+        action: 'created' | 'updated' | 'unchanged' | 'error';
+        error?: string | null;
+      }[];
+    };
+    PayrollParameterResponse: {
+      /** @description Code in «Параметри ціноутворення», for example SHOP_MANAGER_RATE. */
+      code: string;
+      /** @description What the workshop uses it for. */
+      purpose: string;
+      /** @description Name in «Параметри ціноутворення»; null when the parameter is missing. */
+      name?: string | null;
+      value?: number | null;
+      unit?: string | null;
+      /** Format: date */
+      updatedOn?: string | null;
+      /** @description Set only when the parameter is missing or has no value. */
+      problem?: string | null;
     };
     NonWorkingDayResponse: {
       /** Format: date */
@@ -11817,6 +12044,346 @@ export interface operations {
         content?: never;
       };
       409: components['responses']['responses-Conflict'];
+    };
+  };
+  getWorkshopStaff: {
+    parameters: {
+      query?: {
+        includeArchived?: boolean;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Workers. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['WorkshopEmployeeResponse'][];
+        };
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description WorkshopChief or Admin role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createWorkshopEmployee: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['WorkshopEmployeeInput'];
+      };
+    };
+    responses: {
+      /** @description Added worker. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['WorkshopEmployeeResponse'];
+        };
+      };
+      /** @description Empty or too long name or position. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description An active worker already has this name (ignoring case and extra spaces). */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateWorkshopEmployee: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['WorkshopEmployeeInput'];
+      };
+    };
+    responses: {
+      /** @description Updated worker. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['WorkshopEmployeeResponse'];
+        };
+      };
+      /** @description Empty or too long name or position. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Worker not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Another active worker has this name. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  setWorkshopEmployeeActive: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          isActive: boolean;
+        };
+      };
+    };
+    responses: {
+      /** @description Worker with the new state. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['WorkshopEmployeeResponse'];
+        };
+      };
+      /** @description Worker not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Returning would duplicate the name of an active worker. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  importWorkshopStaff: {
+    parameters: {
+      query?: {
+        /** @description true only shows what would change. */
+        dryRun?: boolean;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['WorkshopEmployeeInput'][];
+      };
+    };
+    responses: {
+      /** @description What was (or would be) added or updated. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['WorkshopStaffImportResult'];
+        };
+      };
+      /** @description Empty list, more than 500 rows, empty fields or a name repeated in the list. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getFabricNorms: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Rows. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FabricNormRowResponse'][];
+        };
+      };
+    };
+  };
+  saveFabricNorm: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Catalog model code, for example MOD-025 (case-insensitive). */
+        modelCode: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FabricNormInput'];
+      };
+    };
+    responses: {
+      /** @description Saved row. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FabricNormRowResponse'];
+        };
+      };
+      /** @description Empty norm, a value outside 0–100 m or with more than 3 decimals, or an additional fabric without its main fabric. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The model is not a Catalog sewing model. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  deleteFabricNorm: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Catalog model code, for example MOD-025 (case-insensitive). */
+        modelCode: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Deleted. */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The model has no norm. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  importFabricNorms: {
+    parameters: {
+      query?: {
+        /** @description true only shows what would change. */
+        dryRun?: boolean;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FabricNormImportRow'][];
+      };
+    };
+    responses: {
+      /** @description Lines per row. When errors > 0 nothing was saved, also without dryRun. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FabricNormImportResult'];
+        };
+      };
+      /** @description Empty list, more than 1000 rows, a repeated model code or an invalid norm. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getPayrollParameters: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description One row per coefficient the workshop pays by, in a fixed order. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PayrollParameterResponse'][];
+        };
+      };
     };
   };
   getReminderNonWorkingDays: {

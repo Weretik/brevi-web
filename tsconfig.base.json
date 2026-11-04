@@ -70,7 +70,11 @@
       "@admin/tasks/model": ["libs/admin/tasks/model/src/index.ts"],
       "@admin/tasks/data-access": ["libs/admin/tasks/data-access/src/index.ts"],
       "@admin/tasks/ui": ["libs/admin/tasks/ui/src/index.ts"],
-      "@admin/tasks/feature": ["libs/admin/tasks/feature/src/index.ts"]
+      "@admin/tasks/feature": ["libs/admin/tasks/feature/src/index.ts"],
+      "@admin/production/model": ["libs/admin/production/model/src/index.ts"],
+      "@admin/production/data-access": ["libs/admin/production/data-access/src/index.ts"],
+      "@admin/production/ui": ["libs/admin/production/ui/src/index.ts"],
+      "@admin/production/feature": ["libs/admin/production/feature/src/index.ts"]
     }
   }
 }

@@ -1,0 +1,11 @@
+export { WorkshopStaffGrid } from './staff/workshop-staff-grid';
+export { WorkshopEmployeeForm } from './staff/workshop-employee-form';
+export { WorkshopEmployeeDetails } from './staff/workshop-employee-details';
+export { WorkshopStaffChips } from './staff/workshop-staff-chips';
+export { FabricNormsGrid } from './norms/fabric-norms-grid';
+export { FabricNormFilterChips } from './norms/fabric-norm-filter-chips';
+export { FabricNormForm } from './norms/fabric-norm-form';
+export { FabricNormDetails } from './norms/fabric-norm-details';
+export { PayrollParametersTable } from './payroll/payroll-parameters-table';
+export { ProductionImportPreview } from './import/production-import-preview';
+export { ProductionConfirmDialog } from './dialogs/production-confirm-dialog';

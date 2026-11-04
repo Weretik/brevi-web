@@ -92,4 +92,22 @@ describe('legacy Admin navigation', () => {
       createNavigation(paths, ['Manager']).some((group) => group.id === 'administration'),
     ).toBe(false);
   });
+
+  it('shows the «Швейний цех» pages to the head of the workshop and Admin only', () => {
+    const paths = new Set([
+      '/production/staff',
+      '/production/fabric-norms',
+      '/production/payroll-rules',
+    ]);
+    const shop = (roles: string[]) =>
+      createNavigation(paths, roles).find((group) => group.id === 'sewing-shop');
+
+    expect(
+      shop(['WorkshopChief'])
+        ?.items.slice(0, 3)
+        .map((item) => item.to),
+    ).toEqual(['/production/staff', '/production/fabric-norms', '/production/payroll-rules']);
+    expect(shop(['Admin'])?.items[0].label).toBe('Працівники цеху');
+    expect(shop(['Manager'])?.items.some((item) => item.id === 'workshop-staff')).toBe(false);
+  });
 });

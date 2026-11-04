@@ -1,5 +1,5 @@
 /** Director is the single owner account; the server also gives it Admin. */
-export type StaffRole = 'Director' | 'Admin' | 'Accountant' | 'Manager';
+export type StaffRole = 'Director' | 'Admin' | 'Accountant' | 'Manager' | 'WorkshopChief';
 
 export interface StaffAccount {
   id: number;
@@ -27,11 +27,18 @@ export interface CreateStaffAccountInput {
   phoneNumber: string;
 }
 
-export const staffRoles: readonly StaffRole[] = ['Manager', 'Accountant', 'Admin', 'Director'];
+export const staffRoles: readonly StaffRole[] = [
+  'Manager',
+  'WorkshopChief',
+  'Accountant',
+  'Admin',
+  'Director',
+];
 
 export const staffRoleLabels: Record<StaffRole, string> = {
   Director: 'Директор',
   Admin: 'Адміністратор',
   Accountant: 'Бухгалтер',
   Manager: 'Менеджер',
+  WorkshopChief: 'Начальник цеху',
 };

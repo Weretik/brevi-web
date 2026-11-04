@@ -13,7 +13,9 @@ export function createNavigation(
       icon: group.icon,
       section: group.section,
       items: group.items
-        .filter((item) => !item.requiredRole || roles.includes(item.requiredRole))
+        .filter(
+          (item) => !item.requiredRoles || item.requiredRoles.some((role) => roles.includes(role)),
+        )
         .map((item) => ({
           id: item.id,
           label: item.label,

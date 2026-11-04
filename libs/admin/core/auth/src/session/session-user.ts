@@ -1,5 +1,6 @@
 /** The director also holds Admin. */
-export type SessionRole = 'Director' | 'Admin' | 'Accountant' | 'Manager' | 'User';
+export type SessionRole =
+  'Director' | 'Admin' | 'Accountant' | 'Manager' | 'WorkshopChief' | 'User';
 
 export interface SessionUser {
   id: string;
@@ -11,18 +12,29 @@ export interface SessionUser {
 }
 
 /** Admin works only for staff; a customer account signed in here sees "no access". */
-const staffRoles: readonly SessionRole[] = ['Director', 'Admin', 'Accountant', 'Manager'];
+const staffRoles: readonly SessionRole[] = [
+  'Director',
+  'Admin',
+  'Accountant',
+  'Manager',
+  'WorkshopChief',
+];
 
 export const isStaff = (user: SessionUser): boolean =>
   user.roles.some((role) => staffRoles.includes(role));
 
 export const canManageUsers = (user: SessionUser): boolean => user.roles.includes('Admin');
 
+/** «Швейний цех»: the head of the workshop; Admin and the director (who also holds Admin). */
+export const canManageWorkshop = (user: SessionUser): boolean =>
+  user.roles.includes('Admin') || user.roles.includes('WorkshopChief');
+
 const roleLabels: Record<Exclude<SessionRole, 'User'>, string> = {
   Director: 'Директор',
   Admin: 'Адміністратор',
   Accountant: 'Бухгалтер',
   Manager: 'Менеджер',
+  WorkshopChief: 'Начальник цеху',
 };
 
 /** The strongest staff role in Ukrainian, for the header menu. */
