@@ -1,8 +1,8 @@
 # 018 — «Імпорт цін»: PPE supplier prices
 
-**Status:** stage 1 implemented 2026-11-04. **Backend:** BreviERP CAT-017 (`api/v1/pricing/ppe/supplier-prices`).
+**Status:** stages 1–2 implemented 2026-11-04. **Backend:** BreviERP CAT-017 (`api/v1/pricing/ppe/supplier-prices`).
 
-The client's Apps Scripts updated PPE supplier prices in the sheet «ЗІЗ». This page shows each supplier source, its update logic, schedule and discount, and updates file suppliers (Insight XML, СЕМТО PDF) with a preview first. Scheduled site and dealer cabinet updates come in stages 2–3 on the backend; the page already lists them.
+The client's Apps Scripts updated PPE supplier prices in the sheet «ЗІЗ». This page shows each supplier source, its update logic, schedule and discount, and updates file suppliers (Insight XML, СЕМТО PDF) with a preview first. Stage 2 adds «Оновити зараз» for the website and Google Sheets suppliers that the backend now updates every Monday; dealer cabinets (Insight, Трєле) come in stage 3.
 
 ## Rules
 
@@ -14,9 +14,16 @@ The client's Apps Scripts updated PPE supplier prices in the sheet «ЗІЗ». T
 | R-04 | A file source has «Оновити з файлу»: choose exactly its files (Insight 3 XML, СЕМТО 1 PDF), «Перевірити» shows every product of the supplier with old and new prices (Insight also wholesale and retail), changes and problems first, with the reason; nothing is saved. «Застосувати (N)» sends the same files again with `dryRun=false`. |
 | R-05 | Files are gzipped in the browser before upload so three 17 MB Insight lists fit the API request limit.                                                                                                                                                                                                                                     |
 | R-06 | After applying, product prices in «Товари» are refetched (`Product` tag).                                                                                                                                                                                                                                                                  |
+| R-07 | Stage 2: a connected website or Google Sheets source (`method` not `File` and `automaticUpdateConnected`) with a supplier has «Оновити зараз»: «Перевірити» calls `refreshPpeSupplierPrices` with `dryRun=true` and shows the same preview; «Застосувати (N)» calls it with `dryRun=false`, which reads the supplier again and saves.      |
 
 ## Verification 2026-11-04
 
 - `npx nx test admin-references-model -- price-import`: 3 passed; `admin-references-data-access -- price-import`: 2 passed; `admin-references-feature -- price-import`: 2 passed; `admin-react -- navigation app-router`: 17 passed; `admin-references-ui -- reference-editor`: 1 passed.
 - Typecheck and lint for the references libraries, `admin-shared-api-client` and `admin-react`: pass.
 - Contract synchronized with BreviERP `b2f94e0`; `npm run contracts:check` passes.
+
+## Verification 2026-11-04, stage 2
+
+- `npx nx test admin-references-model -- price-import`: 4 passed; `admin-references-feature -- price-import`: 3 passed.
+- Typecheck and lint for `admin-references-model`, `admin-references-data-access`, `admin-references-feature`: pass.
+- Contract synchronized with BreviERP `2ad6150`; `npm run contracts:check` passes.

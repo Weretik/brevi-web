@@ -30,6 +30,12 @@ export interface ImportPriceFilesRequest {
   dryRun: boolean;
 }
 
+export interface RefreshPriceSourceRequest {
+  key: string;
+  /** True shows what changes; false reads the supplier again and saves the changed prices. */
+  dryRun: boolean;
+}
+
 export const priceImportApi = adminApi.injectEndpoints({
   endpoints: (build) => ({
     listPriceSources: build.query<PriceSourceList, void>({
@@ -67,11 +73,23 @@ export const priceImportApi = adminApi.injectEndpoints({
       invalidatesTags: (result, error) =>
         error || !result?.applied ? [] : [productPricesTag, { type: tag, id: 'LIST' }],
     }),
+    refreshPriceSource: build.mutation<PriceImportResult, RefreshPriceSourceRequest>({
+      query: ({ key, dryRun }) => ({
+        url: `${base}/${encodeURIComponent(key)}/refresh`,
+        method: 'POST',
+        params: { dryRun },
+      }),
+      transformResponse: (value: unknown) => mapPriceImportResult(parsePriceImportResponse(value)),
+      transformErrorResponse: (error) => toAdminApiError(error, priceImportErrors),
+      invalidatesTags: (result, error) =>
+        error || !result?.applied ? [] : [productPricesTag, { type: tag, id: 'LIST' }],
+    }),
   }),
 });
 
 export const {
   useImportPriceFilesMutation,
   useListPriceSourcesQuery,
+  useRefreshPriceSourceMutation,
   useUpdatePriceSourceMutation,
 } = priceImportApi;
