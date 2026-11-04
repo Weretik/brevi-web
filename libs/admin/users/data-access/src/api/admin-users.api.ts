@@ -33,6 +33,7 @@ export const adminUsersApi = adminApi.injectEndpoints({
           fullName: input.fullName.trim(),
           role: input.role,
           password: input.password,
+          phoneNumber: toPhoneBody(input.phoneNumber),
         } satisfies CreateStaffAccountBody,
       }),
       transformResponse: mapStaffAccount,

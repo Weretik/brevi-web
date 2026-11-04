@@ -2644,6 +2644,7 @@ export interface components {
       role: components['schemas']['StaffRole'];
       /** Format: password */
       password: string;
+      phoneNumber?: string | null;
     };
     UpdateStaffDetailsRequest: {
       fullName: string;

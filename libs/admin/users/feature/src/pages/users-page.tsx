@@ -42,7 +42,7 @@ export default function UsersPage({ actor }: UsersPageProps) {
           </Typography>
         </div>
         <Button onClick={actions.openCreate} startIcon={<AddIcon />} variant="contained">
-          Додати користувача
+          Створити
         </Button>
       </Stack>
       <Card sx={{ overflow: 'hidden' }} variant="outlined">

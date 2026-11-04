@@ -39,6 +39,7 @@ describe('CreateStaffPanel', () => {
 
     fireEvent.change(screen.getByLabelText(/Імʼя/), { target: { value: 'Іван' } });
     fireEvent.change(screen.getByLabelText(/Email/), { target: { value: 'ivan@brevi.com.ua' } });
+    fireEvent.change(screen.getByLabelText('Телефон'), { target: { value: '+380 50 123 45 67' } });
     fireEvent.change(screen.getByLabelText(/Пароль/), { target: { value: 'password-1' } });
     fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Роль' }));
     fireEvent.click(screen.getByRole('option', { name: 'Адміністратор' }));
@@ -50,6 +51,7 @@ describe('CreateStaffPanel', () => {
         fullName: 'Іван',
         role: 'Admin',
         password: 'password-1',
+        phoneNumber: '+380 50 123 45 67',
       }),
     );
     await waitFor(() => expect(onClose).toHaveBeenCalled());

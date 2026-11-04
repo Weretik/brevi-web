@@ -24,6 +24,7 @@ export interface CreateStaffAccountInput {
   fullName: string;
   role: StaffRole;
   password: string;
+  phoneNumber: string;
 }
 
 export const staffRoles: readonly StaffRole[] = ['Manager', 'Accountant', 'Admin', 'Director'];

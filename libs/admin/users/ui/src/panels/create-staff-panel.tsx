@@ -16,6 +16,7 @@ const emptyInput: CreateStaffAccountInput = {
   fullName: '',
   role: 'Manager',
   password: '',
+  phoneNumber: '',
 };
 
 interface CreateStaffPanelProps {
@@ -90,6 +91,15 @@ export function CreateStaffPanel({
           required
           type="email"
           value={input.email}
+        />
+        <TextField
+          autoComplete="off"
+          error={Boolean(fieldErrors.phoneNumber)}
+          helperText={fieldErrors.phoneNumber ?? 'Необовʼязково, наприклад +380 50 123 45 67.'}
+          label="Телефон"
+          onChange={(event) => update({ phoneNumber: event.target.value })}
+          type="tel"
+          value={input.phoneNumber}
         />
         <TextField
           label="Роль"

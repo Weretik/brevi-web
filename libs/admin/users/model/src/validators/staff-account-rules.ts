@@ -1,3 +1,5 @@
+import { validatePhoneNumber } from './profile-rules';
+
 import type { CreateStaffAccountInput } from '../entities/staff-account';
 
 /** Matches the server rule for staff passwords. */
@@ -23,6 +25,11 @@ export const validateStaffAccountInput = (
 
   if (!input.fullName.trim()) {
     errors.fullName = 'Вкажіть імʼя.';
+  }
+
+  const phoneError = validatePhoneNumber(input.phoneNumber);
+  if (phoneError) {
+    errors.phoneNumber = phoneError;
   }
 
   const passwordError = validateStaffPassword(input.password);
