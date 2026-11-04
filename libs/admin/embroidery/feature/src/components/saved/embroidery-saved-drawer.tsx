@@ -9,6 +9,7 @@ import {
   EmbroiderySavedSummaryView,
 } from '@admin/embroidery/ui';
 import { ReferenceEditorDrawer } from '@admin/references/ui';
+import PostAddOutlinedIcon from '@mui/icons-material/PostAddOutlined';
 import {
   Alert,
   Box,
@@ -23,7 +24,9 @@ import {
   Stack,
 } from '@mui/material';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
+import { EmbroideryAddToQuoteDrawer } from './embroidery-add-to-quote-drawer';
 import { useEmbroideryCopy } from '../../hooks/calculation/use-embroidery-copy';
 
 import type { EmbroideryCalculationRequest } from '@admin/embroidery/model';
@@ -41,6 +44,9 @@ export function EmbroiderySavedDrawer({ id, canDelete, onClose, onRepeat }: Prop
   const [remove, removing] = useDeleteEmbroideryCalculationMutation();
   const [confirming, setConfirming] = useState(false);
   const copier = useEmbroideryCopy();
+  const navigate = useNavigate();
+  const [adding, setAdding] = useState(false);
+  const [addedTo, setAddedTo] = useState<{ id: number; number: string } | null>(null);
   const saved = query.data;
 
   const confirmDelete = async () => {
@@ -91,6 +97,17 @@ export function EmbroiderySavedDrawer({ id, canDelete, onClose, onRepeat }: Prop
                 'Не вдалося видалити розрахунок.'}
             </Alert>
           )}
+          {saved.result.prices.length > 0 && (
+            <Box>
+              <Button
+                variant="outlined"
+                startIcon={<PostAddOutlinedIcon />}
+                onClick={() => setAdding(true)}
+              >
+                Додати в КП
+              </Button>
+            </Box>
+          )}
           <EmbroideryPriceCards
             prices={saved.result.prices}
             quantity={saved.input.quantity}
@@ -124,6 +141,31 @@ export function EmbroiderySavedDrawer({ id, canDelete, onClose, onRepeat }: Prop
           </Button>
         </DialogActions>
       </Dialog>
+      {adding && saved && (
+        <EmbroideryAddToQuoteDrawer
+          summary={saved.summary}
+          onClose={() => setAdding(false)}
+          onAdded={(quote) => {
+            setAdding(false);
+            setAddedTo(quote);
+          }}
+        />
+      )}
+      <Snackbar
+        open={addedTo !== null}
+        autoHideDuration={8000}
+        onClose={() => setAddedTo(null)}
+        message={`Вишивку додано в ${addedTo?.number ?? 'КП'}.`}
+        action={
+          <Button
+            color="inherit"
+            size="small"
+            onClick={() => addedTo && navigate(`/crm/quotes/${addedTo.id}`)}
+          >
+            Відкрити КП
+          </Button>
+        }
+      />
       <Snackbar
         open={copier.message !== null}
         autoHideDuration={3000}

@@ -56,6 +56,7 @@ export const quoteItemAnchor = (key: string) => `quote-item-${key}`;
 const kindLabel = (item: QuoteItemDraft) => {
   if (item.kind === 'Sewing') return 'Модель';
   if (item.kind === 'CustomSewing') return item.productId ? 'Змінена модель' : 'Новий виріб';
+  if (item.kind === 'Embroidery') return 'Вишивка';
   return item.kind === 'Ppe' ? 'ЗІЗ' : 'Разовий ЗІЗ';
 };
 
@@ -83,7 +84,10 @@ export function QuoteItemCard({
   const ppe = item.kind === 'Ppe' || oneOff;
   const label = oneOff ? item.name || 'Разова позиція' : item.name;
   const [supplier, setSupplier] = useState(false);
-  const meta = [item.season, item.code].filter(Boolean).join(' · ');
+  const meta =
+    item.kind === 'Embroidery'
+      ? (item.subtitle ?? '')
+      : [item.season, item.code].filter(Boolean).join(' · ');
   const changePhoto = item.productId !== null && onChangePhoto ? onChangePhoto : undefined;
   return (
     <Card
@@ -192,7 +196,7 @@ export function QuoteItemCard({
           value={item.description}
           onChange={(event) => onChange({ description: event.target.value })}
           helperText={
-            oneOff || custom
+            oneOff || custom || item.kind === 'Embroidery'
               ? 'Бачить клієнт у КП.'
               : 'Підтягується з «Короткого опису для КП» у товарі. Зміна діє лише в цьому КП.'
           }

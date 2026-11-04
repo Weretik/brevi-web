@@ -1,4 +1,5 @@
 export {
+  useAddQuoteEmbroideryMutation,
   useCopyQuoteMutation,
   useCreateQuoteMutation,
   useDeleteQuoteMutation,

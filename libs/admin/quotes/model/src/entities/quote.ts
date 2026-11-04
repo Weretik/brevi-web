@@ -2,7 +2,7 @@ import type { QuoteIntroduction } from './quote-introduction';
 
 export type QuoteKind = 'Request' | 'Introduction';
 export type QuoteStatus = 'Draft' | 'Sent';
-export type QuoteItemKind = 'Sewing' | 'Ppe' | 'OneOffPpe' | 'CustomSewing';
+export type QuoteItemKind = 'Sewing' | 'Ppe' | 'OneOffPpe' | 'CustomSewing' | 'Embroidery';
 /** `Service` is a «послуга» of a Catalog model (by its code); `Fabric` an extra shared fabric such as a lining. */
 export type QuoteItemLineKind = 'Accessory' | 'Operation' | 'Service' | 'Fabric';
 
@@ -143,7 +143,8 @@ export type QuoteEventKind =
   | 'Archived'
   | 'Restored'
   | 'Copied'
-  | 'Imported';
+  | 'Imported'
+  | 'EmbroideryAdded';
 
 /** A line of «Історія змін». */
 export interface QuoteEvent {

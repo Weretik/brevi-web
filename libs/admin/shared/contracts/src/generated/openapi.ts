@@ -1837,6 +1837,25 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/crm/quotes/{id}/embroidery': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['QuoteId'];
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description «Додати в КП» from «Ціна вишивки» (EMB-001 R-12): appends a saved embroidery calculation as one `Embroidery` item at the end. Its one row is titled with the chosen level, and that level's saved unit price stands, shown, in all three tiers; it is never repriced. No version is needed: the call only adds, and raises the version. A Manager adds only to own КП (404 otherwise); an archived КП or an introduction is 409; an unknown calculation or level is 400. */
+    post: operations['addCrmQuoteEmbroidery'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/crm/mailboxes/{userId}/connect': {
     parameters: {
       query?: never;
@@ -5271,7 +5290,7 @@ export interface components {
       total: number;
     };
     /** @enum {string} */
-    CrmQuoteItemKind: 'Sewing' | 'Ppe' | 'OneOffPpe' | 'CustomSewing';
+    CrmQuoteItemKind: 'Sewing' | 'Ppe' | 'OneOffPpe' | 'CustomSewing' | 'Embroidery';
     CrmQuotePriceInput: {
       shown: boolean;
       /** @description PPE and one-off PPE only; null keeps the Catalog price. */
@@ -5410,6 +5429,11 @@ export interface components {
       options: components['schemas']['CrmQuoteOption'][];
       /** @description Accessories and operations of a CustomSewing item; empty for other items. */
       lines: components['schemas']['CrmQuoteItemLine'][];
+      /**
+       * Format: int64
+       * @description The saved «Ціна вишивки» calculation of an Embroidery item; null for other items. The editor sends an Embroidery item back by its id with one row and no manual prices: only the description and the «показати» ticks change. A new Embroidery item in the editor is 400.
+       */
+      embroideryCalculationId?: number | null;
     };
     /**
      * @description General = summer and winter pages; Summer or Winter = one page.
@@ -5524,7 +5548,8 @@ export interface components {
         | 'Archived'
         | 'Restored'
         | 'Copied'
-        | 'Imported';
+        | 'Imported'
+        | 'EmbroideryAdded';
       /** Format: date-time */
       at: string;
       actor: components['schemas']['CrmQuotePerson'];
@@ -13288,6 +13313,60 @@ export interface operations {
         };
         content?: never;
       };
+    };
+  };
+  addCrmQuoteEmbroidery: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['QuoteId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: int64 */
+          calculationId: number;
+          /** @description «Опт» */
+          level: string;
+        };
+      };
+    };
+    responses: {
+      /** @description The КП with the new item. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmQuote'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role and a numeric actor claim required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['Conflict'];
     };
   };
   connectCrmMailbox: {
