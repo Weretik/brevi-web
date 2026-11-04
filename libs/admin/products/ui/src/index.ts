@@ -15,6 +15,7 @@ export * from './product-editor/sewing/sewing-operation-fields';
 export * from './product-editor/sewing/sewing-product-fields';
 export { productWholesalePriceLabel } from './product-detail/product-wholesale-price-label';
 export { SewingPricingPanel } from './components/sewing-pricing/sewing-pricing-panel';
+export type { SewingPricingFabric } from './components/sewing-pricing/sewing-pricing-panel-props';
 export * from './product-content/product-markdown';
 
 export * from './components/product-overview/product-overview-details';

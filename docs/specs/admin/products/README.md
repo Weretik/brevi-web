@@ -55,3 +55,4 @@
 [014 «Товари» list from one server page](014-product-list-server-page/README.md): search, filters, sort and paging on the server with prices and fabric variants in the same request; «Відкрити повну картку» in the row; statuses only for problems.
 [015 Remove review marks](015-remove-review-marks/README.md): no «Перевірено», «Обов’язковий», «Ціна в прайсі» or «Розраховано …» line; marks only for problems.
 [016 Fabric variants](016-fabric-variants/README.md): fabric per variant, one shared composition, «Тканини»/«Комплектація»/«Трудовитрати» tables with side panels, immediate save.
+[017 Sewing card in one request](017-sewing-card-one-request/README.md): one card response, labour in UAH, all three prices in the header, the fabric on «Розрахунок».

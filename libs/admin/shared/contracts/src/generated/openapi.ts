@@ -994,7 +994,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** @description Requires CatalogRead. Live calculation of every Article of one Sewing model at server time, for the product card (CAT-007). Nothing is saved; blocked Articles return their blockers and no prices. Also returns each Article's latest published prices. At most 200 Articles. */
+    /** @description Requires CatalogRead. The sewing card in one response (CAT-007, CAT-016). Live calculation of every fabric variant (Article) at server time; nothing is saved; blocked variants return their blockers and no prices. Also returns each variant's fabric with its current name and price per metre, its latest published prices, and the shared composition (materials and operations) with reference names, unit prices and norm minutes. At most 200 Articles. */
     get: operations['getSewingArticleSummary'];
     put?: never;
     post?: never;
@@ -3747,11 +3747,58 @@ export interface components {
       active: boolean;
       /** Format: int32 */
       sortOrder: number;
+      /** Format: int32 */
+      fabricId: number | null;
+      fabricName: string | null;
+      /**
+       * Format: decimal
+       * @description Current price of one metre of the fabric.
+       */
+      fabricPrice: number | null;
+      /** Format: decimal */
+      fabricQuantity: number | null;
       isCalculated: boolean;
       blockers: components['schemas']['SewingPricingBlocker'][];
       costs: components['schemas']['SewingCostBreakdown'] | null;
       prices: components['schemas']['SewingPriceTiers'] | null;
       published: components['schemas']['SewingArticlePublishedSummary'] | null;
+    };
+    /** @description A shared composition line. Name and unit price come from the current reference; null for other costs and unknown references. */
+    SewingCardMaterial: {
+      /** Format: int64 */
+      id: number;
+      /** @enum {string} */
+      kind: 'Fabric' | 'Accessory' | 'OtherCost';
+      /** Format: int32 */
+      referenceId: number | null;
+      costCode: string | null;
+      name: string | null;
+      /** Format: decimal */
+      unitPrice: number | null;
+      /** Format: decimal */
+      quantity: number;
+      /** @enum {string} */
+      unit: 'Metre' | 'Piece' | 'Service' | 'Kilogram';
+      /** Format: int32 */
+      sortOrder: number;
+      comment: string | null;
+    };
+    /** @description An operation of the model with the norm of the reference «Операції»; null name and norm when the reference is unknown. */
+    SewingCardOperation: {
+      /** Format: int64 */
+      id: number;
+      /** Format: int32 */
+      operationId: number;
+      name: string | null;
+      /** Format: decimal */
+      normMinutes: number | null;
+      /** Format: decimal */
+      quantity: number;
+      /** Format: decimal */
+      manualMinutes: number | null;
+      /** Format: int32 */
+      sortOrder: number;
+      comment: string | null;
     };
     SewingArticleSummary: {
       /** Format: int32 */
@@ -3762,6 +3809,8 @@ export interface components {
       /** Format: date-time */
       calculatedAt: string;
       articles: components['schemas']['SewingArticleSummaryRow'][];
+      materials: components['schemas']['SewingCardMaterial'][];
+      operations: components['schemas']['SewingCardOperation'][];
     };
     SaveSewingCalculationRequest: {
       /** Format: uuid */

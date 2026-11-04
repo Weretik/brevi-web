@@ -8,14 +8,13 @@ import { ReferenceEditorDrawer } from '@admin/references/ui';
 import { Alert, Stack } from '@mui/material';
 import { useState } from 'react';
 
+import { useSewingReferenceOptions } from '../../hooks/sewing-model/use-sewing-reference-options';
+
 import type { SewingMaterialDraft } from '@admin/products/model';
-import type { Fabric, GarmentAccessory } from '@admin/references/model';
 
 interface Props {
   material: SewingMaterialDraft | null;
   materials: readonly SewingMaterialDraft[];
-  fabrics: readonly Fabric[];
-  accessories: readonly GarmentAccessory[];
   readOnly: boolean;
   saving: boolean;
   error: string | null;
@@ -27,6 +26,7 @@ interface Props {
 /** Right side panel of one line of «Комплектація»; saving replaces the shared composition. */
 export function SewingMaterialDrawer(props: Props) {
   const { material, materials } = props;
+  const references = useSewingReferenceOptions('fabrics', 'accessories');
   const [values, setValues] = useState(() => createSewingMaterialFormValues(material));
   const [errors, setErrors] = useState<ReturnType<typeof validateSewingMaterialForm>>({});
 
@@ -59,12 +59,15 @@ export function SewingMaterialDrawer(props: Props) {
       onSubmit={submit}
     >
       <Stack sx={{ gap: 2 }}>
-        {props.error && <Alert severity="error">{props.error}</Alert>}
+        {(props.error ?? references.error) && (
+          <Alert severity="error">{props.error ?? references.error}</Alert>
+        )}
         <SewingMaterialForm
           values={values}
           errors={errors}
-          fabrics={props.fabrics}
-          accessories={props.accessories}
+          fabrics={references.fabrics}
+          accessories={references.accessories}
+          loading={references.loading}
           readOnly={props.readOnly}
           disabled={props.saving}
           onChange={setValues}

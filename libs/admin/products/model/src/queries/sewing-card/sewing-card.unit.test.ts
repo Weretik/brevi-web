@@ -15,6 +15,10 @@ function row(update: Partial<SewingArticleSummaryRow>): SewingArticleSummaryRow 
     saleSku: '602',
     active: true,
     sortOrder: 0,
+    fabricId: 59,
+    fabricName: 'Габардин',
+    fabricPrice: 210,
+    fabricQuantity: 2.5,
     calculated: true,
     blockers: [],
     costs: [{ kind: 'seamstress', amount: 120 }],
@@ -56,8 +60,11 @@ describe('sewing card (CAT-007)', () => {
       articles: 3,
       ready: 2,
       minutes: 54,
+      labour: 120,
       fullCost: { min: 500, max: 520 },
       retail: { min: 900, max: 950 },
+      wholesale: { min: 820, max: 820 },
+      largeWholesale: { min: 780, max: 780 },
     });
   });
 
@@ -108,28 +115,38 @@ describe('sewing card (CAT-007)', () => {
     });
   });
 
-  it('names composition lines from the references and prices them', () => {
+  it('names composition lines from the card response and prices them', () => {
     const line = {
-      clientId: 'a',
+      id: 2,
       kind: 'Accessory' as const,
       referenceId: 10,
       costCode: null,
+      name: 'Ґудзик',
+      unitPrice: 1.5,
       quantity: 3,
       unit: 'Piece' as const,
-      sortOrder: 0,
+      sortOrder: 1,
       comment: '',
     };
-    const lines = sewingMaterialLines(
-      [
-        line,
-        { ...line, clientId: 'b', kind: 'OtherCost', referenceId: null, costCode: 'Пакування' },
-      ],
-      [],
-      [{ id: 10, name: 'Ґудзик', price: 1.5 }],
-    );
-    expect(lines.map((item) => [item.kindLabel, item.name, item.unitLabel, item.total])).toEqual([
-      ['Фурнітура', 'Ґудзик', 'шт.', 4.5],
-      ['Інша витрата', 'Пакування', 'шт.', null],
+    const lines = sewingMaterialLines([
+      line,
+      {
+        ...line,
+        id: 1,
+        kind: 'OtherCost',
+        referenceId: null,
+        costCode: 'Пакування',
+        name: null,
+        unitPrice: null,
+        unit: 'Service',
+        sortOrder: 0,
+      },
+    ]);
+    expect(
+      lines.map((item) => [item.key, item.kindLabel, item.name, item.unitLabel, item.total]),
+    ).toEqual([
+      ['material-1', 'Інша витрата', 'Пакування', 'послуга', null],
+      ['material-2', 'Фурнітура', 'Ґудзик', 'шт.', 4.5],
     ]);
   });
 });

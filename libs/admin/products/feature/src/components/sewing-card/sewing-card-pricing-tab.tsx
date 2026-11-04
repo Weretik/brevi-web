@@ -44,6 +44,15 @@ export function SewingCardPricingTab(props: Props) {
         key={`${props.productId}:${selected.id}`}
         productId={props.productId}
         articleId={selected.id}
+        fabric={
+          selected.fabricName
+            ? {
+                name: selected.fabricName,
+                pricePerMetre: selected.fabricPrice,
+                metres: selected.fabricQuantity,
+              }
+            : null
+        }
       />
     </Stack>
   );

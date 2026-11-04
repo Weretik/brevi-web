@@ -21,7 +21,7 @@ export function SewingMaterialsTab({ model, writes }: Props) {
   const state = <SewingModelState model={model} label="Завантаження комплектації" />;
   if (model.error || !model.draft) return state;
   const materials = model.draft.modelMaterials;
-  const rows = sewingMaterialLines(materials, model.fabrics, model.accessories);
+  const rows = sewingMaterialLines(model.materials);
   const open = lines.panel;
   const material =
     open && open.key !== 'new'
@@ -67,8 +67,6 @@ export function SewingMaterialsTab({ model, writes }: Props) {
           key={`${open.key}:${open.readOnly}`}
           material={material}
           materials={materials}
-          fabrics={model.fabrics}
-          accessories={model.accessories}
           readOnly={open.readOnly || !model.canManage}
           saving={writes.busy}
           error={writes.error}

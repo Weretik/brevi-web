@@ -23,7 +23,12 @@ export function SewingLabourTab({ model, writes, seamstressPerMinute }: Props) {
   const state = <SewingModelState model={model} label="Завантаження трудовитрат" />;
   if (model.error || !model.draft) return state;
   const operations = model.draft.operations;
-  const rows = sewingLabourLines(operations, model.operations, seamstressPerMinute);
+  const norms = model.operations.map((line) => ({
+    id: line.operationId,
+    name: line.name ?? `Операція ${line.operationId}`,
+    min: line.normMinutes,
+  }));
+  const rows = sewingLabourLines(operations, norms, seamstressPerMinute);
   const open = lines.panel;
   const operation =
     open && open.key !== 'new'
@@ -70,7 +75,6 @@ export function SewingLabourTab({ model, writes, seamstressPerMinute }: Props) {
           key={`${open.key}:${open.readOnly}`}
           operation={operation}
           operations={operations}
-          references={model.operations}
           readOnly={open.readOnly || !model.canManage}
           saving={writes.busy}
           error={writes.error}

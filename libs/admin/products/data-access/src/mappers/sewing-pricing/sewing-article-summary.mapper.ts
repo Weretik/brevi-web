@@ -27,6 +27,10 @@ export function mapSewingArticleSummary(value: unknown, productId: number): Sewi
       saleSku: row.saleSku,
       active: row.active,
       sortOrder: row.sortOrder,
+      fabricId: row.fabricId,
+      fabricName: row.fabricName,
+      fabricPrice: row.fabricPrice,
+      fabricQuantity: row.fabricQuantity,
       calculated: row.isCalculated,
       blockers: row.blockers.map((item) => ({ code: item.code, inputKey: item.inputKey })),
       costs: row.costs ? costKinds.map((kind) => ({ kind, amount: row.costs![kind] })) : [],
@@ -51,5 +55,7 @@ export function mapSewingArticleSummary(value: unknown, productId: number): Sewi
           }
         : null,
     })),
+    materials: dto.materials.map((line) => ({ ...line, comment: line.comment ?? '' })),
+    operations: dto.operations.map((line) => ({ ...line, comment: line.comment ?? '' })),
   };
 }

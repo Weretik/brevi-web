@@ -32,16 +32,7 @@ export function SewingCreateDraftStep(props: Props) {
         />
       );
     case 2:
-      return (
-        <SewingVariantsTab
-          model={model}
-          writes={writes}
-          summary={card.articles}
-          summaryLoading={card.summaryLoading}
-          summaryError={card.summaryError}
-          onRetrySummary={card.reloadSummary}
-        />
-      );
+      return <SewingVariantsTab model={model} writes={writes} />;
     case 3:
       return <SewingMaterialsTab model={model} writes={writes} />;
     case 4:
@@ -56,10 +47,8 @@ export function SewingCreateDraftStep(props: Props) {
       return (
         <SewingCreateReviewStep
           productId={props.productId}
-          model={model}
           summary={card.articles}
           totals={card.totals}
-          labourMinutes={props.draft.labourMinutes}
           active={props.active}
           saving={props.overview.saving}
           message={props.overview.message}

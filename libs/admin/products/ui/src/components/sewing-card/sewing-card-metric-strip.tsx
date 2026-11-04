@@ -20,20 +20,19 @@ export function SewingCardMetricStrip({ metrics }: Props) {
       sx={{
         m: 0,
         display: 'grid',
-        gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: `repeat(${metrics.length}, 1fr)` },
+        gridTemplateColumns: {
+          xs: 'repeat(2, 1fr)',
+          md: `repeat(${Math.min(metrics.length, 3)}, 1fr)`,
+          lg: `repeat(${metrics.length}, 1fr)`,
+        },
+        // 1px gaps over the divider colour draw the cell borders at every column count.
+        gap: '1px',
+        bgcolor: 'divider',
         overflow: 'hidden',
       }}
     >
-      {metrics.map((metric, index) => (
-        <Box
-          key={metric.label}
-          sx={{
-            p: 2,
-            borderLeft: { xs: index % 2 ? 1 : 0, md: index ? 1 : 0 },
-            borderTop: { xs: index > 1 ? 1 : 0, md: 0 },
-            borderColor: 'divider',
-          }}
-        >
+      {metrics.map((metric) => (
+        <Box key={metric.label} sx={{ p: 2, bgcolor: 'background.paper', minWidth: 0 }}>
           <Typography variant="overline" component="dt" sx={{ color: 'text.secondary' }}>
             {metric.label}
           </Typography>
@@ -43,7 +42,7 @@ export function SewingCardMetricStrip({ metrics }: Props) {
               m: 0,
               fontFamily: 'var(--admin-font-mono)',
               fontVariantNumeric: 'tabular-nums',
-              fontSize: 22,
+              fontSize: 20,
               fontWeight: 600,
             }}
           >

@@ -1,7 +1,7 @@
 import { sewingVariantRows } from '@admin/products/model';
 import { SewingLineDeleteDialog, SewingVariantsGrid } from '@admin/products/ui';
 import AddIcon from '@mui/icons-material/Add';
-import { Alert, Button, Stack } from '@mui/material';
+import { Button, Stack } from '@mui/material';
 
 import { SewingModelState } from './sewing-model-state';
 import { SewingVariantDrawer } from './sewing-variant-drawer';
@@ -9,21 +9,16 @@ import { useSewingLinePanel } from '../../hooks/sewing-model/use-sewing-line-pan
 
 import type { SewingModel } from '../../hooks/sewing-model/use-sewing-model';
 import type { SewingModelWrites } from '../../hooks/sewing-model/use-sewing-model-writes';
-import type { SewingArticleSummaryRow } from '@admin/products/model';
 
 interface Props {
   model: SewingModel;
   writes: SewingModelWrites;
-  summary: SewingArticleSummaryRow[];
-  summaryLoading: boolean;
-  summaryError: string | null;
-  onRetrySummary: () => void;
 }
 
 /** «Тканини»: every fabric of the model with its live cost and prices; add or change in a panel. */
-export function SewingVariantsTab({ model, writes, summary, ...props }: Props) {
+export function SewingVariantsTab({ model, writes }: Props) {
   const lines = useSewingLinePanel<number>();
-  const rows = sewingVariantRows(model.variants, summary, model.fabrics);
+  const rows = sewingVariantRows(model.summary);
   const open = lines.panel;
   const variant =
     open && open.key !== 'new'
@@ -34,11 +29,6 @@ export function SewingVariantsTab({ model, writes, summary, ...props }: Props) {
   if (model.error) return <SewingModelState model={model} label="Завантаження тканин" />;
   return (
     <Stack sx={{ gap: 2 }}>
-      {props.summaryError && (
-        <Alert severity="error" action={<Button onClick={props.onRetrySummary}>Повторити</Button>}>
-          {props.summaryError}
-        </Alert>
-      )}
       {model.canManage && (
         <Stack direction="row" sx={{ justifyContent: 'flex-end' }}>
           <Button
@@ -56,7 +46,7 @@ export function SewingVariantsTab({ model, writes, summary, ...props }: Props) {
       )}
       <SewingVariantsGrid
         rows={rows}
-        loading={model.loading || props.summaryLoading}
+        loading={model.loading || model.refreshing}
         canManage={model.canManage}
         onOpen={(row) => {
           writes.clearError();
@@ -76,7 +66,6 @@ export function SewingVariantsTab({ model, writes, summary, ...props }: Props) {
           key={`${open.key}:${open.readOnly}`}
           variant={variant}
           variants={model.variants}
-          fabrics={model.fabrics}
           version={model.version}
           readOnly={open.readOnly || !model.canManage}
           saving={writes.busy}

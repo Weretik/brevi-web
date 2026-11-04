@@ -5,15 +5,12 @@ import { useState } from 'react';
 import { SewingCardMetrics } from '../sewing-card/sewing-card-metrics';
 import { SewingCardPricingTab } from '../sewing-card/sewing-card-pricing-tab';
 
-import type { SewingModel } from '../../hooks/sewing-model/use-sewing-model';
 import type { SewingArticleSummaryRow, SewingCardTotals } from '@admin/products/model';
 
 interface Props {
   productId: number;
-  model: SewingModel;
   summary: SewingArticleSummaryRow[];
   totals: SewingCardTotals;
-  labourMinutes: number;
   active: boolean;
   saving: boolean;
   message: string | null;
@@ -25,13 +22,13 @@ export function SewingCreateReviewStep(props: Props) {
   const [articleId, setArticleId] = useState<number | null>(null);
   return (
     <Stack sx={{ gap: 2 }}>
-      <SewingCardMetrics totals={props.totals} labourMinutes={props.labourMinutes} />
+      <SewingCardMetrics totals={props.totals} />
       <Alert severity="warning">
         Кожна ціна має бути вища за повну собівартість, перевірте назву і тканину.
       </Alert>
       <SewingCardPricingTab
         productId={props.productId}
-        variants={sewingVariantRows(props.model.variants, props.summary, props.model.fabrics)}
+        variants={sewingVariantRows(props.summary)}
         articleId={articleId}
         onSelect={setArticleId}
       />

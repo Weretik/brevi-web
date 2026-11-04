@@ -29,7 +29,7 @@ interface Props {
  * «Комплектація виробів» and «Трудовитрати виробів» in one place. Every change saves at once.
  */
 export function SewingProductCard({ product, onDeleted }: Props) {
-  const { card, model, writes, modelCode, labourMinutes } = useSewingModelCard(product.id);
+  const { card, model, writes, modelCode } = useSewingModelCard(product.id);
   const { tab, setTab } = useSewingCardTab();
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -57,7 +57,7 @@ export function SewingProductCard({ product, onDeleted }: Props) {
         onEdit={() => setEditing(true)}
         onDelete={() => setDeleting(true)}
       />
-      <SewingCardMetrics totals={card.totals} labourMinutes={labourMinutes} />
+      <SewingCardMetrics totals={card.totals} />
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs
           value={tab}
@@ -71,16 +71,7 @@ export function SewingProductCard({ product, onDeleted }: Props) {
           ))}
         </Tabs>
       </Box>
-      {tab === 'fabrics' && (
-        <SewingVariantsTab
-          model={model}
-          writes={writes}
-          summary={card.articles}
-          summaryLoading={card.summaryLoading}
-          summaryError={card.summaryError}
-          onRetrySummary={card.reloadSummary}
-        />
-      )}
+      {tab === 'fabrics' && <SewingVariantsTab model={model} writes={writes} />}
       {tab === 'materials' && <SewingMaterialsTab model={model} writes={writes} />}
       {tab === 'labour' && (
         <SewingLabourTab
@@ -92,7 +83,7 @@ export function SewingProductCard({ product, onDeleted }: Props) {
       {tab === 'pricing' && (
         <SewingCardPricingTab
           productId={product.id}
-          variants={sewingVariantRows(model.variants, card.articles, model.fabrics)}
+          variants={sewingVariantRows(model.summary)}
           articleId={pricingArticleId}
           onSelect={setPricingArticleId}
         />

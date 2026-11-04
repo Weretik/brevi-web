@@ -1,14 +1,5 @@
-import type {
-  SewingMaterialDraft,
-  SewingMaterialKind,
-  SewingMaterialUnit,
-} from '../../entities/sewing-composition';
-
-interface PricedLookup {
-  id: number;
-  name: string;
-  price: number;
-}
+import type { SewingCardMaterial } from '../../entities/sewing-card/sewing-article-summary';
+import type { SewingMaterialKind, SewingMaterialUnit } from '../../entities/sewing-composition';
 
 /** One row of «Комплектація», as the sheet «Комплектація виробів». */
 export interface SewingMaterialLine {
@@ -38,32 +29,28 @@ export const sewingMaterialUnitLabels: Record<SewingMaterialUnit, string> = {
   Kilogram: 'кг',
 };
 
-/** Rows of the shared composition with reference names and prices. */
+/** Draft key of a saved shared line; the side panel edits the draft line with the same key. */
+export const sewingMaterialKey = (id: number) => `material-${id}`;
+export const sewingOperationKey = (id: number) => `operation-${id}`;
+
+/** Rows of the shared composition with the reference names and prices from the card response. */
 export function sewingMaterialLines(
-  materials: readonly SewingMaterialDraft[],
-  fabrics: readonly PricedLookup[],
-  accessories: readonly PricedLookup[],
+  materials: readonly SewingCardMaterial[],
 ): SewingMaterialLine[] {
-  return materials.map((material) => {
-    const source = material.kind === 'Fabric' ? fabrics : accessories;
-    const lookup =
-      material.kind === 'OtherCost'
-        ? undefined
-        : source.find((item) => item.id === material.referenceId);
-    const price = lookup?.price ?? null;
-    return {
-      key: material.clientId,
+  return [...materials]
+    .sort((left, right) => left.sortOrder - right.sortOrder || left.id - right.id)
+    .map((material) => ({
+      key: sewingMaterialKey(material.id),
       kind: material.kind,
       kindLabel: sewingMaterialKindLabels[material.kind],
       name:
         material.kind === 'OtherCost'
           ? (material.costCode ?? '—')
-          : (lookup?.name ?? `${sewingMaterialKindLabels[material.kind]} ${material.referenceId}`),
+          : (material.name ?? `${sewingMaterialKindLabels[material.kind]} ${material.referenceId}`),
       quantity: material.quantity,
       unitLabel: sewingMaterialUnitLabels[material.unit],
-      price,
-      total: price === null ? null : price * material.quantity,
+      price: material.unitPrice,
+      total: material.unitPrice === null ? null : material.unitPrice * material.quantity,
       comment: material.comment,
-    };
-  });
+    }));
 }

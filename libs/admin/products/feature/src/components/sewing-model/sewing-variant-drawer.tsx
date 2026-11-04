@@ -8,13 +8,13 @@ import { ReferenceEditorDrawer } from '@admin/references/ui';
 import { Alert, Stack } from '@mui/material';
 import { useState } from 'react';
 
+import { useSewingReferenceOptions } from '../../hooks/sewing-model/use-sewing-reference-options';
+
 import type { SewingArticle, SewingVariantInput } from '@admin/products/model';
-import type { Fabric } from '@admin/references/model';
 
 interface Props {
   variant: SewingArticle | null;
   variants: readonly SewingArticle[];
-  fabrics: readonly Fabric[];
   version: number;
   readOnly: boolean;
   saving: boolean;
@@ -27,6 +27,7 @@ interface Props {
 /** Right side panel of one fabric of the model: view, add and change (CAT-015). */
 export function SewingVariantDrawer(props: Props) {
   const { variant, variants } = props;
+  const references = useSewingReferenceOptions('fabrics');
   const [values, setValues] = useState(() => createSewingVariantFormValues(variant, variants));
   const [errors, setErrors] = useState<ReturnType<typeof validateSewingVariant>>({});
   const others = variants.filter((item) => item.id !== variant?.id);
@@ -60,11 +61,14 @@ export function SewingVariantDrawer(props: Props) {
       onSubmit={submit}
     >
       <Stack sx={{ gap: 2 }}>
-        {props.error && <Alert severity="error">{props.error}</Alert>}
+        {(props.error ?? references.error) && (
+          <Alert severity="error">{props.error ?? references.error}</Alert>
+        )}
         <SewingVariantForm
           values={values}
           errors={errors}
-          fabrics={props.fabrics}
+          fabrics={references.fabrics}
+          loading={references.loading}
           readOnly={props.readOnly}
           disabled={props.saving}
           onChange={setValues}

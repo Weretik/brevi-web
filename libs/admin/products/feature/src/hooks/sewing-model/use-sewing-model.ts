@@ -1,69 +1,55 @@
 import {
   useGetSewingAccessQuery,
-  useGetSewingCompositionQuery,
-  useListSewingArticlesQuery,
+  useGetSewingArticleSummaryQuery,
 } from '@admin/products/data-access';
-import { sewingCompositionToDraft } from '@admin/products/model';
-import {
-  useListFabricsQuery,
-  useListGarmentAccessoriesQuery,
-  useListGarmentPartOperationsQuery,
-} from '@admin/references/data-access';
+import { sewingCardToDraft, sewingVariantsFromSummary } from '@admin/products/model';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
 import { useMemo } from 'react';
 
 /**
- * One sewing model as the card edits it (CAT-015): its fabric variants, the shared composition
- * (accessories, other costs and operations) and the references they point at.
+ * One sewing model as the card edits it (CAT-015, CAT-016): its fabric variants with live prices
+ * and the shared composition (accessories, other costs and operations) with reference names, all
+ * from one response. Full reference lists load only in a side panel (`useSewingReferenceOptions`).
  */
 export function useSewingModel(productId: number) {
   const access = useGetSewingAccessQuery();
   const canRead = access.data?.canRead === true;
-  const skip = { skip: !canRead };
-  const fabrics = useListFabricsQuery(undefined, skip);
-  const accessories = useListGarmentAccessoriesQuery(undefined, skip);
-  const operations = useListGarmentPartOperationsQuery(undefined, skip);
-  const variants = useListSewingArticlesQuery(productId, skip);
-  const composition = useGetSewingCompositionQuery({ productId, articleId: null }, skip);
-  const draft = useMemo(
-    () => (composition.data ? sewingCompositionToDraft(composition.data) : null),
-    [composition.data],
+  const card = useGetSewingArticleSummaryQuery(productId, { skip: !canRead });
+  const data = card.data;
+  const draft = useMemo(() => (data ? sewingCardToDraft(data) : null), [data]);
+  const variants = useMemo(
+    () => (data ? sewingVariantsFromSummary(productId, data.articles) : []),
+    [data, productId],
   );
-  const lookupsFailed = fabrics.isError || accessories.isError || operations.isError;
 
   const error = access.isError
     ? adminApiErrorMessage(access.error, 'Не вдалося перевірити доступ до складу.')
     : access.data && !canRead
       ? 'Немає права переглядати склад цього товару.'
-      : variants.isError
-        ? adminApiErrorMessage(variants.error, 'Не вдалося завантажити тканини моделі.')
-        : composition.isError
-          ? adminApiErrorMessage(composition.error, 'Не вдалося завантажити склад моделі.')
-          : lookupsFailed
-            ? 'Не вдалося завантажити довідники тканин, фурнітури або операцій.'
-            : null;
+      : card.isError
+        ? adminApiErrorMessage(card.error, 'Не вдалося завантажити модель.')
+        : null;
 
   return {
     canManage: access.data?.canManage === true,
-    loading: access.isLoading || variants.isLoading || composition.isLoading,
+    loading: access.isLoading || card.isLoading,
+    /** A save is being followed by a fresh calculation. */
+    refreshing: card.isFetching,
     error,
     retry: () => {
       void access.refetch();
-      if (!canRead) return;
-      void variants.refetch();
-      void composition.refetch();
-      void fabrics.refetch();
-      void accessories.refetch();
-      void operations.refetch();
+      if (canRead) void card.refetch();
     },
-    variants: variants.data?.articles ?? [],
-    modelCode: variants.data?.modelCode ?? draft?.modelCode ?? null,
+    /** Live price of every variant with its fabric; empty until loaded. */
+    summary: data?.articles ?? [],
+    summaryLoaded: Boolean(data),
+    materials: data?.materials ?? [],
+    operations: data?.operations ?? [],
+    variants,
+    modelCode: data?.modelCode ?? null,
     /** Version of the model composition; every write sends it back. */
-    version: draft?.version ?? variants.data?.version ?? 0,
+    version: data?.version ?? 0,
     draft,
-    fabrics: fabrics.data ?? [],
-    accessories: accessories.data ?? [],
-    operations: operations.data ?? [],
   };
 }
 

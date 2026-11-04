@@ -1,6 +1,6 @@
 # Admin: Sewing fabrics and composition
 
-**Implemented code:** 2026-10-25, reworked 2026-11-04. **Surface:** sewing model card at `/references/products/:id` and «Нова модель» steps 2–4. Specifications: [original](../../../specs/admin/products/004-sewing-articles-and-composition/implementation.md), [review marks removed](../../../specs/admin/products/015-remove-review-marks/README.md), [fabric variants](../../../specs/admin/products/016-fabric-variants/README.md).
+**Implemented code:** 2026-10-25, reworked 2026-11-04. **Surface:** sewing model card at `/references/products/:id` and «Нова модель» steps 2–4. Specifications: [original](../../../specs/admin/products/004-sewing-articles-and-composition/implementation.md), [review marks removed](../../../specs/admin/products/015-remove-review-marks/README.md), [fabric variants](../../../specs/admin/products/016-fabric-variants/README.md), [one request](../../../specs/admin/products/017-sewing-card-one-request/README.md).
 
 A sewing model has fabric variants and one shared composition. A variant is a fabric with its metres per product, a sale SKU on the site and «Продається». Accessories, other costs and operations belong to the whole model. A variant's price is the shared part plus its fabric; the backend recalculates and publishes it after every change.
 
@@ -9,7 +9,7 @@ The card tabs are «Тканини» (one row per fabric with live cost and thre
 ```text
 libs/admin/products/
 ├── feature/src/
-│   ├── hooks/sewing-model/                     # model queries, writes, side-panel state, card hook
+│   ├── hooks/sewing-model/                     # card response, writes, side-panel state, lazy reference options
 │   ├── components/sewing-model/                # «Тканини», «Комплектація», «Трудовитрати» tabs and their drawers
 │   ├── components/sewing-card/                 # card shell, metrics, «Розрахунок» tab
 │   └── hooks/product-editor/use-legacy-sewing-norm-lock.ts # legacy norm policy
@@ -35,7 +35,7 @@ libs/admin/products/
 ```mermaid
 flowchart LR
     Card[Sewing card / «Нова модель»] --> Hook[useSewingModelCard]
-    Hook --> Model[useSewingModel: variants, composition, references]
+    Hook --> Model[useSewingModel: one card response]
     Hook --> Writes[useSewingModelWrites]
     Card --> Tabs[Tabs + side panels]
     Tabs --> UI[Tables and forms]
@@ -45,7 +45,7 @@ flowchart LR
     Contract[Pinned OpenAPI / generated operations] --> Data
 ```
 
-Every write sends the composition version; a 409 asks to refresh. Saving the composition sends the model code from «Товари», so it never restores an old code. Session roles enable editing controls; server-side Catalog policies enforce access. See [Product feature](products.md) and [calculation and published prices](sewing-pricing.md).
+The card reads one response (`getSewingArticleSummary`: variants with fabric names and live prices, shared lines with reference names); reference lists load only inside a side panel (`useSewingReferenceOptions`). Labour in the header comes from the server calculation. Every write sends the composition version; a 409 asks to refresh. Saving the composition sends the model code from «Товари», so it never restores an old code. Session roles enable editing controls; server-side Catalog policies enforce access. See [Product feature](products.md) and [calculation and published prices](sewing-pricing.md).
 
 ## Tests
 

@@ -10,6 +10,8 @@ interface Props {
   operations: readonly GarmentPartOperation[];
   readOnly: boolean;
   disabled: boolean;
+  /** The reference list is still loading. */
+  loading?: boolean;
   onChange: (values: SewingOperationFormValues) => void;
 }
 
@@ -27,6 +29,7 @@ export function SewingOperationForm({
   operations,
   readOnly,
   disabled,
+  loading = false,
   onChange,
 }: Props) {
   const options = operations.filter((item) => item.isActive || item.id === values.operationId);
@@ -48,6 +51,8 @@ export function SewingOperationForm({
           onChange={(_event, option) => onChange({ ...values, operationId: option?.id ?? null })}
           readOnly={readOnly}
           disabled={disabled}
+          loading={loading}
+          loadingText="Завантаження…"
           noOptionsText="Операцію не знайдено"
           renderInput={(params) => (
             <TextField

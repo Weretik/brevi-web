@@ -50,30 +50,64 @@ vi.mock('../../hooks/sewing-card/use-sewing-card', () => ({ useSewingCard: mocks
 vi.mock('../sewing-pricing/sewing-pricing-feature', () => ({
   SewingPricingFeature: mocks.pricing,
 }));
+const summary = () => [
+  article(11, '602', { sortOrder: 0, fabricId: 59, fabricName: 'Габардин бежевий' }),
+  article(12, '603', {
+    sortOrder: 1,
+    active: false,
+    fabricId: 60,
+    fabricName: 'Габардин чорний',
+    calculated: false,
+    prices: null,
+    fullCost: null,
+    costs: [],
+    blockers: [{ code: 'MissingFabric', inputKey: null }],
+  }),
+];
+const variant = (row: SewingArticleSummaryRow) => ({
+  id: row.id,
+  productId: 42,
+  saleSku: row.saleSku,
+  active: row.active,
+  sortOrder: row.sortOrder,
+  fabricId: row.fabricId,
+  fabricQuantity: row.fabricQuantity,
+});
+
 vi.mock('../../hooks/sewing-model/use-sewing-model', () => ({
   useSewingModel: () => ({
     canManage: true,
     loading: false,
+    refreshing: false,
     error: null,
     retry: vi.fn(),
-    variants: [
+    summary: summary(),
+    summaryLoaded: true,
+    variants: summary().map(variant),
+    materials: [
       {
-        id: 11,
-        productId: 42,
-        saleSku: '602',
-        active: true,
+        id: 1,
+        kind: 'Accessory',
+        referenceId: 10,
+        costCode: null,
+        name: 'Ґудзик',
+        unitPrice: 1.5,
+        quantity: 4,
+        unit: 'Piece',
         sortOrder: 0,
-        fabricId: 59,
-        fabricQuantity: 2.5,
+        comment: '',
       },
+    ],
+    operations: [
       {
-        id: 12,
-        productId: 42,
-        saleSku: '603',
-        active: false,
-        sortOrder: 1,
-        fabricId: 60,
-        fabricQuantity: 2.5,
+        id: 1,
+        operationId: 7,
+        name: 'Комір: Стійка',
+        normMinutes: 7.3,
+        quantity: 2,
+        manualMinutes: null,
+        sortOrder: 0,
+        comment: 'Комір',
       },
     ],
     modelCode: 'MOD-025',
@@ -85,6 +119,12 @@ vi.mock('../../hooks/sewing-model/use-sewing-model', () => ({
       modelMaterials: [accessory],
       operations: [operation],
     },
+  }),
+}));
+vi.mock('../../hooks/sewing-model/use-sewing-reference-options', () => ({
+  useSewingReferenceOptions: () => ({
+    loading: false,
+    error: null,
     fabrics: [
       fabric(59, 'Габардин бежевий', 'FAB-001'),
       fabric(60, 'Габардин чорний', 'FAB-002'),
@@ -135,6 +175,10 @@ const article = (id: number, saleSku: string, update: Partial<SewingArticleSumma
     saleSku,
     active: true,
     sortOrder: id,
+    fabricId: null,
+    fabricName: null,
+    fabricPrice: 210,
+    fabricQuantity: 2.5,
     calculated: true,
     blockers: [],
     costs: [{ kind: 'seamstress', amount: 110 }],
@@ -186,22 +230,16 @@ beforeEach(() => {
     sections: [],
     sectionNames: new Map([[1, 'Одяг ЛІТО']]),
     reloadOverview: vi.fn(),
-    articles: [
-      article(11, '602'),
-      article(12, '603', {
-        calculated: false,
-        prices: null,
-        fullCost: null,
-        costs: [],
-        blockers: [{ code: 'MissingFabric', inputKey: null }],
-      }),
-    ],
+    articles: summary(),
     totals: {
       articles: 2,
       ready: 1,
       minutes: 50,
+      labour: 110,
       fullCost: { min: 500, max: 500 },
       retail: { min: 900, max: 900 },
+      wholesale: { min: 820, max: 820 },
+      largeWholesale: { min: 780, max: 780 },
     },
     status: { label: 'Без ціни: 1 з 2', tone: 'warning' },
     seamstressPerMinute: 2.2,
@@ -234,6 +272,10 @@ describe('SewingProductCard', () => {
     expect(screen.getByText('MOD-025 · Одяг ЛІТО · Літо')).toBeVisible();
     expect(screen.getAllByText('Без ціни: 1 з 2').length).toBeGreaterThan(0);
     expect(screen.getByRole('tab', { name: 'Тканини' })).toHaveAttribute('aria-selected', 'true');
+    // Labour in minutes and UAH, and every price level (client items 1, 3).
+    expect(screen.getByText('50 хв на 1 виріб')).toBeInTheDocument();
+    for (const label of ['1–9 шт.', '10–40 шт.', 'Від 41 шт.'])
+      expect(screen.getAllByText(label).length).toBeGreaterThan(0);
     const grid = await screen.findByRole('grid', { name: 'Тканини моделі' });
     expect(within(grid).getByText('Габардин бежевий')).toBeInTheDocument();
     expect(within(grid).getByText('Габардин чорний')).toBeInTheDocument();
@@ -331,7 +373,11 @@ describe('SewingProductCard', () => {
     expect(screen.getByLabelText('Адреса')).toHaveTextContent('?tab=pricing');
     await user.click(screen.getByRole('button', { name: 'Габардин чорний' }));
     expect(mocks.pricing.mock.calls.at(-1)?.[0]).toEqual(
-      expect.objectContaining({ productId: 42, articleId: 12 }),
+      expect.objectContaining({
+        productId: 42,
+        articleId: 12,
+        fabric: { name: 'Габардин чорний', pricePerMetre: 210, metres: 2.5 },
+      }),
     );
   });
 

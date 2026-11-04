@@ -7,6 +7,8 @@ import type { SewingAmountRange } from '../sewing-card/sewing-card-totals';
 export interface SewingPanelMetrics {
   materials: SewingAmountRange | null;
   minutes: number | null;
+  /** Labour pay per product, UAH. */
+  labour: number | null;
   fullCost: SewingAmountRange | null;
 }
 
@@ -21,6 +23,7 @@ export function sewingPanelMetrics(rows: readonly SewingArticleSummaryRow[]): Se
       ? { min: Math.min(...materials), max: Math.max(...materials) }
       : null,
     minutes: totals.minutes,
+    labour: totals.labour,
     fullCost: totals.fullCost,
   };
 }

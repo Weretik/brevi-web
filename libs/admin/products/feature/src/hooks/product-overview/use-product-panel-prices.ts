@@ -40,7 +40,11 @@ export function useProductPanelPrices(row: ProductOverview) {
       { label: 'Матеріали', value: range(figures.materials) },
       {
         label: 'Трудовитрати',
-        value: figures.minutes === null ? '—' : `${minutes.format(figures.minutes)} хв`,
+        // Minutes and UAH together (client item 1).
+        value:
+          figures.minutes === null
+            ? '—'
+            : `${minutes.format(figures.minutes)} хв · ${money(figures.labour)}`,
       },
       { label: 'Собівартість', value: range(figures.fullCost) },
       { label: 'Ціни оновлено', value: day(row.pricesUpdatedAt) },

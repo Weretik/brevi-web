@@ -20,6 +20,8 @@ interface Props {
   accessories: readonly GarmentAccessory[];
   readOnly: boolean;
   disabled: boolean;
+  /** The reference list is still loading. */
+  loading?: boolean;
   onChange: (values: SewingMaterialFormValues) => void;
 }
 
@@ -45,6 +47,7 @@ export function SewingMaterialForm({
   accessories,
   readOnly,
   disabled,
+  loading = false,
   onChange,
 }: Props) {
   const source: readonly Option[] = values.kind === 'Fabric' ? fabrics : accessories;
@@ -97,6 +100,8 @@ export function SewingMaterialForm({
             }
             readOnly={readOnly}
             disabled={disabled}
+            loading={loading}
+            loadingText="Завантаження…"
             noOptionsText="Нічого не знайдено"
             renderInput={(params) => (
               <TextField

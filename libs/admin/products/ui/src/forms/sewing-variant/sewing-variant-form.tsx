@@ -10,6 +10,8 @@ interface Props {
   fabrics: readonly Fabric[];
   readOnly: boolean;
   disabled: boolean;
+  /** The reference list is still loading. */
+  loading?: boolean;
   onChange: (values: SewingVariantFormValues) => void;
 }
 
@@ -25,6 +27,7 @@ export function SewingVariantForm({
   fabrics,
   readOnly,
   disabled,
+  loading = false,
   onChange,
 }: Props) {
   const options = fabrics.filter((fabric) => fabric.isActive || fabric.id === values.fabricId);
@@ -41,6 +44,8 @@ export function SewingVariantForm({
           onChange={(_event, fabric) => onChange({ ...values, fabricId: fabric?.id ?? null })}
           readOnly={readOnly}
           disabled={disabled}
+          loading={loading}
+          loadingText="Завантаження…"
           noOptionsText="Тканину не знайдено"
           renderInput={(params) => (
             <TextField

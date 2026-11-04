@@ -8,13 +8,13 @@ import { ReferenceEditorDrawer } from '@admin/references/ui';
 import { Alert, Stack } from '@mui/material';
 import { useState } from 'react';
 
+import { useSewingReferenceOptions } from '../../hooks/sewing-model/use-sewing-reference-options';
+
 import type { SewingOperationDraft } from '@admin/products/model';
-import type { GarmentPartOperation } from '@admin/references/model';
 
 interface Props {
   operation: SewingOperationDraft | null;
   operations: readonly SewingOperationDraft[];
-  references: readonly GarmentPartOperation[];
   readOnly: boolean;
   saving: boolean;
   error: string | null;
@@ -26,6 +26,7 @@ interface Props {
 /** Right side panel of one line of «Трудовитрати»; saving replaces the shared operations. */
 export function SewingOperationDrawer(props: Props) {
   const { operation, operations } = props;
+  const references = useSewingReferenceOptions('operations');
   const [values, setValues] = useState(() => createSewingOperationFormValues(operation));
   const [errors, setErrors] = useState<ReturnType<typeof validateSewingOperationForm>>({});
 
@@ -58,11 +59,14 @@ export function SewingOperationDrawer(props: Props) {
       onSubmit={submit}
     >
       <Stack sx={{ gap: 2 }}>
-        {props.error && <Alert severity="error">{props.error}</Alert>}
+        {(props.error ?? references.error) && (
+          <Alert severity="error">{props.error ?? references.error}</Alert>
+        )}
         <SewingOperationForm
           values={values}
           errors={errors}
-          operations={props.references}
+          operations={references.operations}
+          loading={references.loading}
           readOnly={props.readOnly}
           disabled={props.saving}
           onChange={setValues}
