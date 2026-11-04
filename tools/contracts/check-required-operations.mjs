@@ -99,6 +99,7 @@ const requiredOperations = {
     'archiveCrmQuote',
     'restoreCrmQuote',
     'copyCrmQuote',
+    'addCrmQuoteEmbroidery',
   ],
   'crm/embroidery.openapi.yaml': [
     'getCrmEmbroideryForm',

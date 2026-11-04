@@ -75,6 +75,21 @@ const saveCalculation = vi.hoisted(() => vi.fn());
 const listQuery = vi.hoisted(() => vi.fn());
 const getQuery = vi.hoisted(() => vi.fn());
 
+const addToQuote = vi.hoisted(() => vi.fn());
+
+vi.mock('@admin/quotes/data-access', () => ({
+  useListQuotesQuery: () => ({
+    data: {
+      items: [
+        { id: 31, number: 'КП-2026-11-0031', kind: 'Request', internalName: 'ТОВ «Агро»' },
+        { id: 32, number: 'КП-2026-11-0032', kind: 'Introduction', internalName: 'Знайомство' },
+      ],
+    },
+    isFetching: false,
+  }),
+  useAddQuoteEmbroideryMutation: () => [addToQuote, { isLoading: false }],
+}));
+
 vi.mock('@admin/clients/data-access', () => ({
   useListCustomersQuery: () => ({ data: undefined }),
 }));
@@ -130,6 +145,7 @@ afterEach(() => {
   saveCalculation.mockReset();
   listQuery.mockReset();
   getQuery.mockReset();
+  addToQuote.mockReset();
 });
 
 function renderPage(isAdmin: boolean, url = '/crm/embroidery') {
@@ -300,5 +316,52 @@ describe('«Ціна вишивки»', () => {
     expect(screen.getByRole('tab', { name: 'Розрахунок', selected: true })).toBeInTheDocument();
     expect(screen.getByLabelText('Шевронів, шт')).toHaveValue('120');
     expect(screen.getByLabelText('Шевронів в одних п’яльцях')).toHaveValue('4');
+  });
+
+  it('adds a saved calculation to a КП with the chosen price', async () => {
+    addToQuote.mockResolvedValue({ data: { id: 31, number: 'КП-2026-11-0031' } });
+    listQuery.mockReturnValue({
+      data: { items: [summary], page: 1, pageSize: 25, total: 1 },
+      isLoading: false,
+      isFetching: false,
+      isError: false,
+    });
+    getQuery.mockReturnValue({
+      data: {
+        summary,
+        input: {
+          mode: 'Chevron',
+          quantity: 120,
+          stitchesPerUnit: 8000,
+          hoopId: '18',
+          unitsPerHoop: 4,
+          stabilizerLayers: 1,
+          fabricLayers: 1,
+          program: 'Ready',
+          programMinutes: 0,
+          machineMinutes: null,
+          materialMode: 'UsedBlanks',
+          expenseOverrides: {},
+        },
+        result: calculation,
+        rates: null,
+      },
+      isLoading: false,
+    });
+    renderPage(false, '/crm/embroidery?tab=saved');
+    fireEvent.click(within(screen.getByRole('table')).getByText('Поло'));
+    fireEvent.click(screen.getByRole('button', { name: 'Додати в КП' }));
+
+    expect(screen.getByRole('radio', { name: /Стандарт — 96,83/ })).toBeChecked();
+    fireEvent.click(screen.getByRole('radio', { name: /Терміново/ }));
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'КП' }));
+    expect(screen.queryByText(/Знайомство/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByText('КП-2026-11-0031 · ТОВ «Агро»'));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Додати' }));
+    });
+
+    expect(addToQuote).toHaveBeenCalledWith({ id: 31, calculationId: 7, level: 'Терміново' });
+    expect(screen.getByText('Вишивку додано в КП-2026-11-0031.')).toBeInTheDocument();
   });
 });

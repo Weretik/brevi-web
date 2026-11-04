@@ -11,4 +11,5 @@ export const quoteEventLabels: Readonly<Record<QuoteEventKind, string>> = {
   Restored: 'Повернуто з архіву',
   Copied: 'Створено копією',
   Imported: 'Перенесено з калькулятора',
+  EmbroideryAdded: 'Додано вишивку',
 };

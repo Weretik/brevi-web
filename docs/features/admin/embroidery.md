@@ -12,7 +12,7 @@
 
 - The form on the left, live prices on the right; the server computes prices 300 ms after the last change, so a Manager never receives rates or cost.
 - Director and Admin also see the cost card, «Розшифровка собівартості», material sums and the roll layout.
-- «Зберегти розрахунок» stores the priced form with frozen rates and an optional client; «Збережені» lists them, a row opens a read-only side panel with «Повторити розрахунок» (Admin also deletes).
+- «Зберегти розрахунок» stores the priced form with frozen rates and an optional client; «Збережені» lists them, a row opens a read-only side panel with «Повторити розрахунок» (Admin also deletes). «Додати в КП» from that panel appends a row to a chosen КП with one saved price in all three columns.
 - «Налаштування» is saved whole with a version (409 → «Оновити»); hoops and extra costs open in `ReferenceEditorDrawer`; the stitch rate comes from «Параметри ціноутворення».
 
 ## Structure diagram
@@ -50,7 +50,7 @@ libs/admin/embroidery/
     forms/                          number field, form card
     forms/calculation/              «Що вишиваємо», «Програма», «Як рахувати флізелін», «Додаткові витрати»
     forms/settings/                 «Ставки», «Націнки», «Матеріали», hoop and cost forms
-    forms/saved/                    name and client form
+    forms/saved/                    name and client form, «Додати в КП» form
     components/saved/               saved form facts and frozen rates
     components/calculation/         price cards, cost card, roll layout, cost row text
     components/settings/            sticky save bar
@@ -60,9 +60,9 @@ libs/admin/embroidery/
     pages/embroidery-price-page.tsx header, tabs, keeps both tabs mounted
     components/calculation/         «Розрахунок» layout and copy
     components/settings/            «Налаштування» tab, row side panel, leave dialog
-    components/saved/               «Збережені» tab, save panel, saved side panel
+    components/saved/               «Збережені» tab, save panel, saved side panel, «Додати в КП» panel
     hooks/calculation/              form state, debounce, calculate query, copy
-    hooks/saved/                    client search for the save panel
+    hooks/saved/                    client and КП search for the panels
     hooks/settings/                 settings editor, leave guard
     model/embroidery-viewer.ts      viewer, tab from ?tab=
 ```
@@ -72,5 +72,5 @@ libs/admin/embroidery/
 - Model: `forms/*.unit.test.ts`, `mappers/embroidery-format.unit.test.ts`. Run `npx nx test admin-embroidery-model`.
 - Data access: `mappers/embroidery.mapper.unit.test.ts` (no overrides, Manager without cost, shape check, empty rate vs 0), `mappers/embroidery-saved.mapper.unit.test.ts`. Run `npx nx test admin-embroidery-data-access`.
 - UI: number field, price cards, cost row text. Run `npx nx test admin-embroidery-ui`.
-- Feature: `pages/embroidery-price-page.component.test.tsx` (Manager calculates without the tab, chevron fields, «Орієнтовна», save with 409 «Оновити», no save with problems, «Зберегти розрахунок», «Збережені» and «Повторити»). Run `npx nx test admin-embroidery-feature`.
+- Feature: `pages/embroidery-price-page.component.test.tsx` (Manager calculates without the tab, chevron fields, «Орієнтовна», save with 409 «Оновити», no save with problems, «Зберегти розрахунок», «Збережені», «Повторити» and «Додати в КП»). Run `npx nx test admin-embroidery-feature`.
 - Menu and routes: `apps/admin-react/src/app/router/*.test.ts(x)`. Run `npx nx test admin-react -- src/app/router`.
