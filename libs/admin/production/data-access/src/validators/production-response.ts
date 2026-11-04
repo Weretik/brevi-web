@@ -55,3 +55,15 @@ export function nullableNumber(value: unknown, what = 'число'): number | nu
 export function nullableDateTime(value: unknown, what = 'час'): string | null {
   return value === null || value === undefined ? null : dateTime(value, what);
 }
+
+export function oneOf<T extends string>(value: unknown, allowed: readonly T[], what: string): T {
+  if (typeof value !== 'string' || !allowed.includes(value as T)) throw invalid(what);
+  return value as T;
+}
+
+/** A calendar day yyyy-mm-dd. */
+export function day(value: unknown, what: string): string {
+  const result = text(value, what);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(result)) throw invalid(what);
+  return result;
+}

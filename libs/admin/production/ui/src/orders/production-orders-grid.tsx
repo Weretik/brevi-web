@@ -3,6 +3,7 @@ import { Box, Paper, Typography } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 
 import { ProductionOrderStatusPill } from './production-order-status';
+import { ProductionStagePill } from '../tracking/production-stage-pill';
 
 import type { ProductionOrderSummary } from '@admin/production/model';
 import type { GridColDef, GridPaginationModel } from '@mui/x-data-grid';
@@ -35,6 +36,12 @@ const columns = (today: string): GridColDef<ProductionOrderSummary>[] => [
     headerName: 'Статус',
     width: 130,
     renderCell: ({ row }) => <ProductionOrderStatusPill status={row.status} />,
+  },
+  {
+    field: 'stage',
+    headerName: 'Етап',
+    width: 200,
+    renderCell: ({ row }) => <ProductionStagePill stage={row.stage} />,
   },
   {
     field: 'clientName',

@@ -1,7 +1,15 @@
 import { mapFabricNormValues } from './fabric-norm.mapper';
 import {
+  mapOrderFile,
+  mapShipment,
+  mapTelegram,
+  stage,
+  stages,
+} from './production-tracking.mapper';
+import {
   boolean,
   dateTime,
+  day,
   integer,
   list,
   nonEmptyText,
@@ -9,6 +17,7 @@ import {
   nullableInteger,
   nullableNumber,
   nullableText,
+  oneOf,
   record,
   text,
 } from '../validators/production-response';
@@ -26,21 +35,8 @@ import type {
   ReportPriceTier,
 } from '@admin/production/model';
 
-const invalid = (what: string) => new Error(`Некоректна відповідь цеху: ${what}.`);
-
-function oneOf<T extends string>(value: unknown, allowed: readonly T[], what: string): T {
-  if (typeof value !== 'string' || !allowed.includes(value as T)) throw invalid(what);
-  return value as T;
-}
-
 const statuses = ['New', 'Closed', 'Cancelled'] as const satisfies readonly ProductionOrderStatus[];
 const tiers = ['Retail', 'Wholesale', 'Large'] as const satisfies readonly ReportPriceTier[];
-
-function day(value: unknown, what: string): string {
-  const result = text(value, what);
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(result)) throw invalid(what);
-  return result;
-}
 
 const nullableDay = (value: unknown, what: string) =>
   value === null || value === undefined ? null : day(value, what);
@@ -73,6 +69,7 @@ export function mapProductionOrderSummary(value: unknown): ProductionOrderSummar
     nearestDueDate: nullableDay(row['nearestDueDate'], 'готово до'),
     isTransferred: boolean(row['isTransferred'], 'перенесено'),
     updatedAt: dateTime(row['updatedAt'], 'час зміни'),
+    stage: stage(row['stage'], 'етап завдання'),
   };
 }
 
@@ -114,6 +111,10 @@ function mapItem(value: unknown): ProductionItem {
     plannedFabricMeters: nullableNumber(row['plannedFabricMeters'], 'плановий розхід'),
     sewingRate: nullableNumber(row['sewingRate'], 'розцінка'),
     reportUnitPrice: nullableNumber(row['reportUnitPrice'], 'ціна для звіту'),
+    stages: stages(row['stages']),
+    currentStage: stage(row['currentStage'], 'поточний етап'),
+    shippedQuantity: integer(row['shippedQuantity'], 'відвантажено'),
+    shipments: list(row['shipments'], 'відвантаження').map(mapShipment),
   };
 }
 
@@ -144,8 +145,17 @@ export function mapProductionOrder(value: unknown): ProductionOrder {
       canDelete: boolean(permissions['canDelete'], 'право видаляти'),
       seesSewingRate: boolean(permissions['seesSewingRate'], 'право бачити розцінку'),
       seesReportPrice: boolean(permissions['seesReportPrice'], 'право бачити ціну'),
+      canTrack: boolean(permissions['canTrack'], 'право відмічати етапи'),
+      canClose: boolean(permissions['canClose'], 'право закрити'),
+      canCancel: boolean(permissions['canCancel'], 'право скасувати'),
+      canReopen: boolean(permissions['canReopen'], 'право повернути в роботу'),
+      canManageFiles: boolean(permissions['canManageFiles'], 'право змінювати файли'),
+      canSendTelegram: boolean(permissions['canSendTelegram'], 'право надіслати в цех'),
     },
     items: list(row['items'], 'позиції').map(mapItem),
+    cancelReason: nullableText(row['cancelReason'], 'причина скасування'),
+    files: list(row['files'], 'файли').map(mapOrderFile),
+    telegram: mapTelegram(row['telegram']),
   };
 }
 

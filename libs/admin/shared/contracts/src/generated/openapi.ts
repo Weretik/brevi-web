@@ -1846,6 +1846,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/crm/quote-import': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description One-time transfer of КП from the old calculator (R-25). dryRun=true only returns the report. Otherwise every new КП is saved in one transaction with its calculator number, people, dates, status, prices and history plus an «Imported» line. A КП transferred before is skipped, so the same file can be sent again; a number a new Brevi КП already has gets the next free number of that month. Items are linked to the Catalog and Reference by code; what cannot be linked is transferred as it is and named in warnings. */
+    post: operations['importCrmQuotes'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/crm/quote-settings': {
     parameters: {
       query?: never;
@@ -2455,6 +2472,233 @@ export interface paths {
     put?: never;
     /** «Копіювати»: a new «Нове» order of the person who copies, dated today */
     post: operations['copyProductionOrder'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/orders/{id}/items/{itemId}/stages': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+        itemId: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    /** Tick the stages of an item; the furthest one colours the row */
+    put: operations['setProductionItemStages'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/orders/{id}/items/{itemId}/shipments': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+        itemId: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** «Відвантажити» part of an item; a full shipment ticks «Фактично відвантажено» */
+    post: operations['createProductionShipment'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/orders/{id}/shipments/{shipmentId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+        shipmentId: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Cancel a shipment recorded by mistake */
+    delete: operations['cancelProductionShipment'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/orders/{id}/close': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** «Закрити»: every item is shipped in full */
+    post: operations['closeProductionOrder'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/orders/{id}/cancel': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** «Скасувати» with a reason */
+    post: operations['cancelProductionOrder'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/orders/{id}/reopen': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Admin: «Повернути в роботу» a closed or cancelled order */
+    post: operations['reopenProductionOrder'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/orders/{id}/files': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Upload a file of the order or of one item to the CDN (up to 20 MB, any type) */
+    post: operations['uploadProductionOrderFile'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/orders/{id}/files/{fileId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+        fileId: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Remove a file; a CDN file is deleted too */
+    delete: operations['deleteProductionOrderFile'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/orders/{id}/telegram': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** «Надіслати в цех»: the one message to the workshop group; never sent twice, a failure is shown on the card and can be retried */
+    post: operations['sendProductionOrderTelegram'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/orders/progress-import': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Admin: move stages, file links and Telegram marks of the old «Цех»; dryRun only shows them; any error saves nothing */
+    post: operations['importProductionProgress'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/settings': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** «Налаштування цеху»: the workshop group and topic */
+    get: operations['getWorkshopSettings'];
+    /** Choose the group and topic, turn sending on or off */
+    put: operations['updateWorkshopSettings'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/settings/telegram-test': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Send a test line to the chosen group and topic */
+    post: operations['sendWorkshopTelegramTest'];
     delete?: never;
     options?: never;
     head?: never;
@@ -4851,7 +5095,8 @@ export interface components {
         | 'ResponsibleChanged'
         | 'Archived'
         | 'Restored'
-        | 'Copied';
+        | 'Copied'
+        | 'Imported';
       /** Format: date-time */
       at: string;
       actor: components['schemas']['CrmQuotePerson'];
@@ -4860,6 +5105,124 @@ export interface components {
     };
     CrmQuoteVersionRequest: {
       version: number;
+    };
+    CrmImportPerson: {
+      /** @description Found among Brevi staff by e-mail. */
+      email?: string | null;
+      name: string;
+    };
+    CrmImportPrice: {
+      source?: number | null;
+      manual?: number | null;
+      shown: boolean;
+    };
+    CrmImportOption: {
+      /** @description Reference fabric `FAB-…` of a sewing row. */
+      fabricCode?: string | null;
+      /** @description Metres in one «Виріб з нуля». */
+      fabricMeters?: number | null;
+      title: string;
+      details?: string | null;
+      isRecommended?: boolean;
+      prices: {
+        retail: components['schemas']['CrmImportPrice'];
+        wholesale: components['schemas']['CrmImportPrice'];
+        large: components['schemas']['CrmImportPrice'];
+      };
+      manualReason?: string | null;
+      manualByEmail?: string | null;
+      manualByName?: string | null;
+      /** Format: date-time */
+      manualAt?: string | null;
+    };
+    CrmImportItem: {
+      kind: components['schemas']['CrmQuoteItemKind'];
+      /** @description Catalog code `MOD-…` or PPE site article; required for Sewing and Ppe. */
+      code?: string | null;
+      name: string;
+      description?: string | null;
+      siteUrl?: string | null;
+      /** @description Kept only when it starts with https://. */
+      photoUrl?: string | null;
+      season?: string | null;
+      supplierUrl?: string | null;
+      options: components['schemas']['CrmImportOption'][];
+      /** @description The composition of a «Виріб з нуля» by Reference codes. */
+      lines?:
+        | {
+            /** @enum {string} */
+            kind: 'Fabric' | 'Accessory' | 'Operation';
+            /** @description `FAB-…`, `FUR-…` or `OP-…`. */
+            code: string;
+            quantity: number;
+          }[]
+        | null;
+    };
+    CrmImportQuote: {
+      sourceId?: string | null;
+      /** @description Calculator number n-month-year. */
+      number: string;
+      kind: components['schemas']['CrmQuoteKind'];
+      status: components['schemas']['CrmQuoteStatus'];
+      internalName: string;
+      recipientName?: string | null;
+      companyName?: string | null;
+      clientComment?: string | null;
+      managerNote?: string | null;
+      /** @description Linked to the Brevi customer with this KeepinCRM id. */
+      keepinClientId?: string | null;
+      author: components['schemas']['CrmImportPerson'];
+      responsible: components['schemas']['CrmImportPerson'];
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+      /** Format: date-time */
+      lastSentAt?: string | null;
+      introduction?: {
+        layout: components['schemas']['CrmQuoteIntroLayout'];
+        recipientEmail?: string | null;
+      } | null;
+      items: components['schemas']['CrmImportItem'][];
+      events?:
+        | {
+            /** @enum {string} */
+            kind: 'Sent' | 'ResponsibleChanged';
+            /** Format: date-time */
+            at: string;
+            actor: components['schemas']['CrmImportPerson'];
+            details?: string | null;
+          }[]
+        | null;
+    };
+    CrmImportQuotesInput: {
+      dryRun: boolean;
+      /** @description Numbers must not repeat. */
+      quotes: components['schemas']['CrmImportQuote'][];
+    };
+    CrmQuoteImportReport: {
+      dryRun: boolean;
+      applied: boolean;
+      total: number;
+      /** @description КП that are (or would be) added. */
+      created: number;
+      requests: number;
+      introductions: number;
+      items: number;
+      /** @description Calculator numbers transferred before; skipped. */
+      alreadyImported: string[];
+      renumbered: {
+        from: string;
+        to: string;
+      }[];
+      /** @description Calculator users not found among staff; their КП go to the person who imports. */
+      unknownPeople: components['schemas']['CrmImportPerson'][];
+      /** @description Transferred anyway with the calculator prices; «Перерахувати» cannot update the named rows. */
+      warnings: {
+        number: string;
+        item?: string | null;
+        message: string;
+      }[];
     };
     CrmQuoteCompany: {
       name: string;
@@ -5410,6 +5773,20 @@ export interface components {
       isTransferred: boolean;
       /** Format: date-time */
       updatedAt: string;
+      /**
+       * @description The least advanced item stage: the order is only as far as its slowest item.
+       * @enum {string}
+       */
+      stage:
+        | 'New'
+        | 'FabricOrdered'
+        | 'FabricAvailable'
+        | 'Cutting'
+        | 'Application'
+        | 'Sewing'
+        | 'Ready'
+        | 'Shipped'
+        | 'Complete';
     };
     ProductionOrderCounts: {
       all: number;
@@ -5466,6 +5843,18 @@ export interface components {
       canDelete: boolean;
       seesSewingRate: boolean;
       seesReportPrice: boolean;
+      /** @description Tick stages and ship: WorkshopChief and Admin on a «Нове» order. */
+      canTrack: boolean;
+      /** @description «Закрити»: everything is shipped. */
+      canClose: boolean;
+      /** @description «Скасувати» with a reason. */
+      canCancel: boolean;
+      /** @description «Повернути в роботу»: Admin on a closed or cancelled order. */
+      canReopen: boolean;
+      /** @description Add and delete files. */
+      canManageFiles: boolean;
+      /** @description «Надіслати в цех»: not sent yet and the group is set. */
+      canSendTelegram: boolean;
     };
     ItemApplicationResponse: {
       /** @enum {string} */
@@ -5473,6 +5862,16 @@ export interface components {
       place: string | null;
       description: string | null;
       color: string | null;
+    };
+    ProductionShipmentResponse: {
+      id: number;
+      quantity: number;
+      /** Format: date */
+      shippedOn: string;
+      comment: string | null;
+      createdByName: string;
+      /** Format: date-time */
+      createdAt: string;
     };
     ProductionItemResponse: {
       id: number;
@@ -5495,6 +5894,61 @@ export interface components {
       sewingRate: number | null;
       /** @description Null for anyone but Admin and Director. */
       reportUnitPrice: number | null;
+      /** @description Ticked stages in order. */
+      stages: (
+        | 'New'
+        | 'FabricOrdered'
+        | 'FabricAvailable'
+        | 'Cutting'
+        | 'Application'
+        | 'Sewing'
+        | 'Ready'
+        | 'Shipped'
+        | 'Complete'
+      )[];
+      /**
+       * @description The furthest ticked stage; it colours the row.
+       * @enum {string}
+       */
+      currentStage:
+        | 'New'
+        | 'FabricOrdered'
+        | 'FabricAvailable'
+        | 'Cutting'
+        | 'Application'
+        | 'Sewing'
+        | 'Ready'
+        | 'Shipped'
+        | 'Complete';
+      shippedQuantity: number;
+      shipments: components['schemas']['ProductionShipmentResponse'][];
+    };
+    ProductionFileResponse: {
+      id: number;
+      /** @description Null for a file of the whole order. */
+      itemId: number | null;
+      /** @enum {string} */
+      kind: 'Sizes' | 'Application' | 'Extra' | 'Photo';
+      name: string;
+      contentType: string;
+      bytes: number;
+      url: string;
+      /** @description A Google Drive link moved from the old «Цех». */
+      isOldLink: boolean;
+      createdByName: string;
+      /** Format: date-time */
+      createdAt: string;
+    };
+    ProductionTelegramResponse: {
+      /** @enum {string} */
+      status: 'NotSent' | 'Sending' | 'Sent' | 'Failed';
+      /** Format: date-time */
+      sentAt: string | null;
+      sentByName: string | null;
+      /** @description Why the last send failed. */
+      error: string | null;
+      /** @description The workshop group is set and sending is on. */
+      ready: boolean;
     };
     ProductionOrderResponse: {
       id: number;
@@ -5523,6 +5977,9 @@ export interface components {
       version: number;
       permissions: components['schemas']['ProductionOrderPermissions'];
       items: components['schemas']['ProductionItemResponse'][];
+      cancelReason: string | null;
+      files: components['schemas']['ProductionFileResponse'][];
+      telegram: components['schemas']['ProductionTelegramResponse'];
     };
     ProductionQuoteSourceResponse: {
       id: number;
@@ -5623,6 +6080,110 @@ export interface components {
     CopyProductionOrderInput: {
       /** Format: uuid */
       requestId: string;
+    };
+    SetProductionItemStagesInput: {
+      version: number;
+      /** @description Ticked stages; empty means «Нове». */
+      stages: (
+        | 'New'
+        | 'FabricOrdered'
+        | 'FabricAvailable'
+        | 'Cutting'
+        | 'Application'
+        | 'Sewing'
+        | 'Ready'
+        | 'Shipped'
+        | 'Complete'
+      )[];
+    };
+    CreateProductionShipmentInput: {
+      version: number;
+      quantity: number;
+      /** Format: date */
+      shippedOn: string;
+      comment: string | null;
+    };
+    ProductionOrderVersionInput: {
+      version: number;
+    };
+    CancelProductionOrderInput: {
+      version: number;
+      reason: string;
+    };
+    ProductionItemProgressImportRow: {
+      position: number;
+      stages: (
+        | 'New'
+        | 'FabricOrdered'
+        | 'FabricAvailable'
+        | 'Cutting'
+        | 'Application'
+        | 'Sewing'
+        | 'Ready'
+        | 'Shipped'
+        | 'Complete'
+      )[];
+    };
+    ProductionFileImportRow: {
+      position: number | null;
+      /** @enum {string} */
+      kind: 'Sizes' | 'Application' | 'Extra' | 'Photo';
+      name: string;
+      contentType: string;
+      bytes: number;
+      url: string;
+      /** Format: date-time */
+      createdAt: string;
+      createdByName?: string | null;
+    };
+    ProductionProgressImportRow: {
+      legacyId: string;
+      items: components['schemas']['ProductionItemProgressImportRow'][];
+      files: components['schemas']['ProductionFileImportRow'][];
+      telegramSent: boolean;
+      /** Format: date-time */
+      telegramSentAt?: string | null;
+    };
+    ProductionProgressImportLine: {
+      number: number | null;
+      legacyId: string;
+      stages: number;
+      files: number;
+      /** @enum {string} */
+      action: 'updated' | 'unchanged' | 'error';
+      error: string | null;
+    };
+    ProductionProgressImportResult: {
+      dryRun: boolean;
+      updated: number;
+      unchanged: number;
+      errors: number;
+      lines: components['schemas']['ProductionProgressImportLine'][];
+    };
+    WorkshopTelegramChatResponse: {
+      /** Format: int64 */
+      chatId: number;
+      title: string;
+    };
+    WorkshopSettingsResponse: {
+      telegramEnabled: boolean;
+      /** Format: int64 */
+      telegramChatId: number | null;
+      telegramThreadId: number | null;
+      /** @description The server has the bot token. */
+      botConfigured: boolean;
+      /** @description Groups the Brevi bot is in. */
+      chats: components['schemas']['WorkshopTelegramChatResponse'][];
+      updatedByName: string | null;
+      /** Format: date-time */
+      updatedAt: string | null;
+    };
+    WorkshopSettingsInput: {
+      telegramEnabled: boolean;
+      /** Format: int64 */
+      telegramChatId: number | null;
+      /** @description A topic of a group with topics; null posts to the main chat. */
+      telegramThreadId: number | null;
     };
     NonWorkingDayResponse: {
       /** Format: date */
@@ -11716,6 +12277,46 @@ export interface operations {
       };
     };
   };
+  importCrmQuotes: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmImportQuotesInput'];
+      };
+    };
+    responses: {
+      /** @description Report; applied is true when the КП were saved. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmQuoteImportReport'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role and a numeric actor claim required (the Director also holds Admin). */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['Conflict'];
+    };
+  };
   getCrmQuoteSettings: {
     parameters: {
       query?: never;
@@ -13047,6 +13648,17 @@ export interface operations {
         status?: 'New' | 'Closed' | 'Cancelled';
         manager?: string;
         dueTo?: string;
+        /** @description Orders whose least advanced item is at this stage. */
+        stage?:
+          | 'New'
+          | 'FabricOrdered'
+          | 'FabricAvailable'
+          | 'Cutting'
+          | 'Application'
+          | 'Sewing'
+          | 'Ready'
+          | 'Shipped'
+          | 'Complete';
         page?: number;
         pageSize?: number;
       };
@@ -13517,6 +14129,693 @@ export interface operations {
       };
       /** @description Not found. */
       404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  setProductionItemStages: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+        itemId: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SetProductionItemStagesInput'];
+      };
+    };
+    responses: {
+      /** @description The order. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionOrderResponse'];
+        };
+      };
+      /** @description Wrong fields. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders); the person may not make this change. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The order or item is missing. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The order was changed since it was read, or the change is not allowed now. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createProductionShipment: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+        itemId: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateProductionShipmentInput'];
+      };
+    };
+    responses: {
+      /** @description The order. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionOrderResponse'];
+        };
+      };
+      /** @description Wrong fields. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders); the person may not make this change. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The order or item is missing. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Stale version, or more than is left to ship. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  cancelProductionShipment: {
+    parameters: {
+      query: {
+        version: number;
+      };
+      header?: never;
+      path: {
+        id: number;
+        shipmentId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The order. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionOrderResponse'];
+        };
+      };
+      /** @description Wrong fields. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders); the person may not make this change. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The order or item is missing. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The order was changed since it was read, or the change is not allowed now. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  closeProductionOrder: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ProductionOrderVersionInput'];
+      };
+    };
+    responses: {
+      /** @description The order. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionOrderResponse'];
+        };
+      };
+      /** @description Wrong fields. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders); the person may not make this change. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The order or item is missing. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The order was changed since it was read, or the change is not allowed now. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  cancelProductionOrder: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CancelProductionOrderInput'];
+      };
+    };
+    responses: {
+      /** @description The order. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionOrderResponse'];
+        };
+      };
+      /** @description Wrong fields. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders); the person may not make this change. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The order or item is missing. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The order was changed since it was read, or the change is not allowed now. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  reopenProductionOrder: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ProductionOrderVersionInput'];
+      };
+    };
+    responses: {
+      /** @description The order. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionOrderResponse'];
+        };
+      };
+      /** @description Wrong fields. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders); the person may not make this change. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The order or item is missing. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The order was changed since it was read, or the change is not allowed now. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  uploadProductionOrderFile: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'multipart/form-data': {
+          /** Format: binary */
+          file: string;
+          /** @enum {string} */
+          kind: 'Sizes' | 'Application' | 'Extra' | 'Photo';
+          /** @description Empty for the whole order. */
+          itemId?: number | null;
+        };
+      };
+    };
+    responses: {
+      /** @description The order. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionOrderResponse'];
+        };
+      };
+      /** @description No file, empty, too large or an unknown kind. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders); the person may not make this change. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The order or item is missing. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  deleteProductionOrderFile: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+        fileId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The order. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionOrderResponse'];
+        };
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders); the person may not make this change. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The order or file is missing. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  sendProductionOrderTelegram: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The order. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionOrderResponse'];
+        };
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders); the person may not make this change. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Already sent or being sent, or the workshop group is not set. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  importProductionProgress: {
+    parameters: {
+      query?: {
+        dryRun?: boolean;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ProductionProgressImportRow'][];
+      };
+    };
+    responses: {
+      /** @description What changed or would change. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionProgressImportResult'];
+        };
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders); the person may not make this change. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getWorkshopSettings: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The settings with the groups the bot is in. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['WorkshopSettingsResponse'];
+        };
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Only WorkshopChief or Admin manage the workshop settings. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateWorkshopSettings: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['WorkshopSettingsInput'];
+      };
+    };
+    responses: {
+      /** @description The settings with the groups the bot is in. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['WorkshopSettingsResponse'];
+        };
+      };
+      /** @description Sending on without a group. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Only WorkshopChief or Admin manage the workshop settings. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  sendWorkshopTelegramTest: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Sent. */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Only WorkshopChief or Admin manage the workshop settings. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No bot token or no group. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Telegram refused; the reason is in the error. */
+      500: {
         headers: {
           [name: string]: unknown;
         };

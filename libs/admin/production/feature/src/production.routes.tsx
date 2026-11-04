@@ -5,6 +5,7 @@ import type { ProductionOrderActor } from '@admin/production/model';
 const WorkshopStaffPage = lazy(() => import('./pages/staff/workshop-staff-page'));
 const FabricNormsPage = lazy(() => import('./pages/norms/fabric-norms-page'));
 const PayrollRulesPage = lazy(() => import('./pages/payroll/payroll-rules-page'));
+const WorkshopSettingsPage = lazy(() => import('./pages/settings/workshop-settings-page'));
 const ProductionOrdersPage = lazy(() => import('./pages/orders/production-orders-page'));
 const ProductionOrderCreatePage = lazy(() => import('./pages/orders/production-order-create-page'));
 const ProductionOrderPage = lazy(() => import('./pages/orders/production-order-page'));
@@ -14,6 +15,7 @@ export const productionRoutes = [
   { path: '/production/staff', element: <WorkshopStaffPage /> },
   { path: '/production/fabric-norms', element: <FabricNormsPage /> },
   { path: '/production/payroll-rules', element: <PayrollRulesPage /> },
+  { path: '/production/settings', element: <WorkshopSettingsPage /> },
 ];
 
 interface ProductionOrderRouteOptions {

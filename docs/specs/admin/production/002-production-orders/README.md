@@ -1,6 +1,6 @@
 # Admin «Швейний цех», stage 2: «Виробничі завдання»
 
-**Status:** implemented 2026-11-04. Backend: BreviERP PRD-002 (`docs/sdd/specs/production/002-production-orders`). Stage 3 adds stages of work, shipments, files and Telegram.
+**Status:** implemented 2026-11-04. Backend: BreviERP PRD-002 (`docs/sdd/specs/production/002-production-orders`). Stages of work, shipments, files and Telegram: [stage 3](../003-order-tracking/README.md).
 
 ## Scenarios
 
