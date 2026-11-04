@@ -17,8 +17,9 @@ export function PriceRefresh({ source, onApplied }: Props) {
   return (
     <ReferenceFormSection title="Оновити зараз">
       <Typography variant="body2" color="text.secondary">
-        Не чекаючи понеділка: прочитаємо ціни постачальника й покажемо, що зміниться. Записуємо лише
-        після «Застосувати». Сайт може відповідати до хвилини.
+        Не чекаючи розкладу: прочитаємо ціни постачальника (сайт, таблиці або кабінет дилера) й
+        покажемо, що зміниться. Записуємо лише після «Застосувати». Сайт може відповідати до
+        хвилини.
       </Typography>
       {refresh.message && <Alert severity="error">{refresh.message}</Alert>}
       {refresh.preview && <PriceImportPreview result={refresh.preview} showTiers={false} />}

@@ -1,8 +1,8 @@
 # 018 — «Імпорт цін»: PPE supplier prices
 
-**Status:** stages 1–2 implemented 2026-11-04. **Backend:** BreviERP CAT-017 (`api/v1/pricing/ppe/supplier-prices`).
+**Status:** stages 1–3 implemented 2026-11-04. **Backend:** BreviERP CAT-017 (`api/v1/pricing/ppe/supplier-prices`).
 
-The client's Apps Scripts updated PPE supplier prices in the sheet «ЗІЗ». This page shows each supplier source, its update logic, schedule and discount, and updates file suppliers (Insight XML, СЕМТО PDF) with a preview first. Stage 2 adds «Оновити зараз» for the website and Google Sheets suppliers that the backend now updates every Monday; dealer cabinets (Insight, Трєле) come in stage 3.
+The client's Apps Scripts updated PPE supplier prices in the sheet «ЗІЗ». This page shows each supplier source, its update logic, schedule and discount, and updates file suppliers (Insight XML, СЕМТО PDF) with a preview first. Stage 2 adds «Оновити зараз» for the website and Google Sheets suppliers that the backend updates every Monday; stage 3 offers it for the Insight and Трєле dealer cabinets, updated daily (Insight keeps its XML upload too).
 
 ## Rules
 
@@ -27,3 +27,8 @@ The client's Apps Scripts updated PPE supplier prices in the sheet «ЗІЗ». T
 - `npx nx test admin-references-model -- price-import`: 4 passed; `admin-references-feature -- price-import`: 3 passed.
 - Typecheck and lint for `admin-references-model`, `admin-references-data-access`, `admin-references-feature`: pass.
 - Contract synchronized with BreviERP `01abf10`; `npm run contracts:check` passes.
+
+## Verification 2026-11-04, stage 3
+
+- No new screen: the backend marks Insight and Трєле connected, so the existing «Оновити зараз» section appears for them (R-07); its text now says «Не чекаючи розкладу».
+- `npx nx test admin-references-model -- price-import` and `admin-references-feature -- price-import` pass; contract synchronized with BreviERP `182a468`.
