@@ -50,10 +50,10 @@ Save/reprice/transfer/archive invalidates точний detail/version/list scope
 
 Зберігати requestId для повтору одного логічного payload; змінений payload — нова дія. expectedRevision читається з detail і не підвищується у браузері. 409 показує compare/reload без втрати форми; 422 прив'язується до поля/blocker; 401 — чинний auth flow; 403/404 — захищена сторінка. Dirty navigation guard використовує підтримуваний data router (`useBlocker` за чинним патерном), не глобальне перехоплення всіх переходів. Невідомий результат запису уточнюється повтором того ж requestId, не подвійним створенням.
 
-Усі рядки й accessible names українською, компоненти/тема MUI існуючі. Порожній список не є помилкою. Під час реалізації додати актуальну коротку карту `docs/features/admin/clients-and-quotes.md` з реальними routes/files/diagram та індекс; planned-файли цього SDD не видавати за implemented.
+Усі рядки й accessible names українською, компоненти/тема MUI існуючі. Порожній список не є помилкою. Під час реалізації додати актуальну коротку карту `docs/features/admin/clients.md` з реальними routes/files/diagram та індекс; planned-файли цього SDD не видавати за implemented.
 
 ## Поточна реалізація клієнтів
 
-Фактичні customer, P2 та P3 paths описано в [implemented feature map](../../../../../features/admin/clients-and-quotes.md). History, lifecycle writes і reprice мають окремі scenario hooks; copy/transfer/archive — окремі діалоги. Custom/document paths — target design. Generated DTO доступні лише data-access; model/UI не виконують HTTP. Access loss очищає protected admin API cache; звичайні записи інвалідують точний корінь і список.
+Фактичні customer, P2 та P3 paths описано в [implemented feature map](../../../../../features/admin/clients.md). History, lifecycle writes і reprice мають окремі scenario hooks; copy/transfer/archive — окремі діалоги. Custom/document paths — target design. Generated DTO доступні лише data-access; model/UI не виконують HTTP. Access loss очищає protected admin API cache; звичайні записи інвалідують точний корінь і список.
 
 [Структурний аудит](../code-audit/audit.md) уточнює поточний client slice: сторінки/діалоги компонують UI, hooks керують формою й мутаціями; API query/customer/contact/merge builders збираються одним endpoint registration. Public aliases, контракт та URL не змінено.

@@ -21,6 +21,10 @@ const customer: CustomerDetail = {
   updatedAt: '2026-10-26T12:00:00Z',
   canEdit: true,
   canMerge: false,
+  keepinCrmId: null,
+  contactName: null,
+  phones: [],
+  keepinSyncedAt: null,
   externalIdentities: [],
   contacts: [
     {

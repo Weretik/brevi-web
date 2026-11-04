@@ -146,7 +146,7 @@ Sync/generate/check passed from a clean temporary detached checkout. Current quo
 
 ## Historical P2 details
 
-Repository: `https://github.com/Weretik/BreviERP.git`; canonical source: `docs/sdd/contracts/crm/quote-drafts.openapi.yaml`. [Snapshot](../../../../../contracts/openapi/backend/crm/quote-drafts.openapi.yaml) and generated types were synchronized from a clean temporary checkout of the locally authorized commit, then the checkout was removed. The original backend checkout retains the unrelated Product pricing index edit. No push ran.
+Repository: `https://github.com/Weretik/BreviERP.git`; canonical source: `docs/sdd/contracts/crm/quote-drafts.openapi.yaml`. The snapshot (removed 2026-11-04) and generated types were synchronized from a clean temporary checkout of the locally authorized commit, then the checkout was removed. The original backend checkout retains the unrelated Product pricing index edit. No push ran.
 
 | operationId           | Path                                      | Full backend commit                        |
 | --------------------- | ----------------------------------------- | ------------------------------------------ |
