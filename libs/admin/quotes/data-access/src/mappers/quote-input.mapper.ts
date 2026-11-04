@@ -1,4 +1,4 @@
-import { parseQuotePrice, quoteTiers } from '@admin/quotes/model';
+import { isSewingKind, parseQuotePrice, quoteTiers } from '@admin/quotes/model';
 
 import type { QuoteDraft, QuoteOptionDraft, QuotePriceDraft } from '@admin/quotes/model';
 import type { components } from '@admin/shared/contracts';
@@ -24,6 +24,8 @@ const optionInput = (option: QuoteOptionDraft, sewing: boolean): Schemas['CrmQuo
     wholesale,
     large,
     manualReason: text(option.manualReason),
+    fabricId: option.fabricId,
+    fabricMeters: option.fabricMeters,
   };
 };
 
@@ -41,11 +43,20 @@ export function toSaveQuoteInput(draft: QuoteDraft): Schemas['CrmSaveQuoteInput'
       id: item.id,
       kind: item.kind,
       productId: item.productId,
-      name: item.kind === 'OneOffPpe' ? item.name.trim() : null,
+      name: item.kind === 'OneOffPpe' || item.kind === 'CustomSewing' ? item.name.trim() : null,
       description: text(item.description),
       photoUrl: item.photoUrl,
       supplierUrl: text(item.supplierUrl),
-      options: item.options.map((option) => optionInput(option, item.kind === 'Sewing')),
+      options: item.options.map((option) => optionInput(option, isSewingKind(item.kind))),
+      lines:
+        item.kind === 'CustomSewing'
+          ? item.lines.map((line) => ({
+              kind: line.kind,
+              referenceId: line.referenceId,
+              quantity: line.quantity,
+              manualMinutes: line.manualMinutes,
+            }))
+          : null,
     })),
   };
 }

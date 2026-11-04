@@ -1912,6 +1912,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/crm/quote-lookups/custom-sewing-price': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description «Виріб з нуля» (R-20): prices each fabric with the chosen accessories and operations by the Catalog sewing formula and the current settings and reference prices. Nothing is saved; a fabric that cannot be priced lists its problems. */
+    post: operations['calculateCrmQuoteCustomSewing'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/crm/quote-lookups/staff': {
     parameters: {
       query?: never;
@@ -4222,7 +4239,7 @@ export interface components {
       total: number;
     };
     /** @enum {string} */
-    CrmQuoteItemKind: 'Sewing' | 'Ppe' | 'OneOffPpe';
+    CrmQuoteItemKind: 'Sewing' | 'Ppe' | 'OneOffPpe' | 'CustomSewing';
     CrmQuotePriceInput: {
       shown: boolean;
       /** @description PPE and one-off PPE only; null keeps the Catalog price. */
@@ -4245,19 +4262,35 @@ export interface components {
       large: components['schemas']['CrmQuotePriceInput'];
       /** @description Required when a PPE price differs from the Catalog. */
       manualReason?: string | null;
+      /** @description CustomSewing only; the fabric of the row. */
+      fabricId?: number | null;
+      /** @description CustomSewing only; metres of the fabric in one product. */
+      fabricMeters?: number | null;
+    };
+    /** @enum {string} */
+    CrmQuoteItemLineKind: 'Accessory' | 'Operation';
+    CrmQuoteItemLineInput: {
+      kind: components['schemas']['CrmQuoteItemLineKind'];
+      /** @description Reference garment accessory or operation. */
+      referenceId: number;
+      quantity: number;
+      /** @description Operation only; minutes of an operation without a fixed norm. */
+      manualMinutes?: number | null;
     };
     CrmQuoteItemInput: {
       /** Format: int64 */
       id?: number | null;
       kind: components['schemas']['CrmQuoteItemKind'];
-      /** @description Required for Sewing and Ppe, null for OneOffPpe. */
+      /** @description Required for Sewing and Ppe, null for OneOffPpe and CustomSewing. */
       productId?: number | null;
-      /** @description OneOffPpe only. */
+      /** @description OneOffPpe and CustomSewing only. */
       name?: string | null;
       description?: string | null;
       photoUrl?: string | null;
       supplierUrl?: string | null;
       options: components['schemas']['CrmQuoteOptionInput'][];
+      /** @description CustomSewing only (needs at least one operation); prices come from the server. */
+      lines?: components['schemas']['CrmQuoteItemLineInput'][] | null;
     };
     CrmSaveQuoteInput: {
       /** @description The loaded version; ignored on create. */
@@ -4297,6 +4330,19 @@ export interface components {
       manualAt?: string | null;
       /** Format: date-time */
       pricesTakenAt?: string | null;
+      /** @description CustomSewing only. */
+      fabricMeters?: number | null;
+    };
+    CrmQuoteItemLine: {
+      /** Format: int64 */
+      id: number;
+      kind: components['schemas']['CrmQuoteItemLineKind'];
+      referenceId: number;
+      /** @description Copied from the reference when the line was priced. */
+      name: string;
+      unit: string;
+      quantity: number;
+      manualMinutes?: number | null;
     };
     CrmQuoteItem: {
       /** Format: int64 */
@@ -4312,6 +4358,8 @@ export interface components {
       season?: string | null;
       supplierUrl?: string | null;
       options: components['schemas']['CrmQuoteOption'][];
+      /** @description Accessories and operations of a CustomSewing item; empty for other items. */
+      lines: components['schemas']['CrmQuoteItemLine'][];
     };
     /**
      * @description General = summer and winter pages; Summer or Winter = one page.
@@ -4624,6 +4672,40 @@ export interface components {
       summer: components['schemas']['CrmQuoteIntroMainModel'];
       winter: components['schemas']['CrmQuoteIntroMainModel'];
       letters: components['schemas']['CrmQuoteIntroLetter'][];
+    };
+    CrmQuoteCustomSewingPriceInput: {
+      fabrics: {
+        fabricId: number;
+        meters: number;
+      }[];
+      lines: components['schemas']['CrmQuoteItemLineInput'][];
+    };
+    CrmQuoteCustomSewingPrice: {
+      /** @description The reference data of each requested line; name is null when the row is gone. */
+      lines: {
+        kind: components['schemas']['CrmQuoteItemLineKind'];
+        referenceId: number;
+        name?: string | null;
+        unit?: string | null;
+        /** @description Accessory price per unit or operation norm in minutes. */
+        unitValue?: number | null;
+        isActive: boolean;
+      }[];
+      fabrics: {
+        fabricId: number;
+        meters: number;
+        name?: string | null;
+        /** @description The client text of the fabric. */
+        details?: string | null;
+        pricePerMeter?: number | null;
+        minutes?: number | null;
+        /** @description Minutes × cost of a minute, UAH. */
+        laborCost?: number | null;
+        fullCost?: number | null;
+        prices?: components['schemas']['CrmQuoteTierPrices'] | null;
+        /** @description Why prices is null. */
+        problems: string[];
+      }[];
     };
     CrmQuoteStaff: {
       userId: number;
@@ -11079,6 +11161,45 @@ export interface operations {
           'application/json': components['schemas']['CrmQuoteIntroductionSetup'];
         };
       };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  calculateCrmQuoteCustomSewing: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmQuoteCustomSewingPriceInput'];
+      };
+    };
+    responses: {
+      /** @description Line names and the price of each fabric, in the order given. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmQuoteCustomSewingPrice'];
+        };
+      };
+      400: components['responses']['Invalid'];
       /** @description Authentication required. */
       401: {
         headers: {

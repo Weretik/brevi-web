@@ -1,8 +1,18 @@
 import { quotesBaseApi } from './quotes-base-api';
 import { quoteLookupErrors, toQuoteApiError } from '../errors/quote-api-error';
-import { mapQuoteCatalogPage, mapQuoteStaff } from '../mappers/quote.mapper';
+import {
+  mapQuoteCatalogPage,
+  mapQuoteCustomSewingPrice,
+  mapQuoteStaff,
+} from '../mappers/quote.mapper';
 
-import type { QuoteCatalogPage, QuoteIntroSeason, QuoteStaff } from '@admin/quotes/model';
+import type {
+  QuoteCatalogPage,
+  QuoteCustomSewingPrice,
+  QuoteCustomSewingPriceRequest,
+  QuoteIntroSeason,
+  QuoteStaff,
+} from '@admin/quotes/model';
 
 export interface QuoteCatalogQuery {
   readonly kind: 'Sewing' | 'Ppe';
@@ -23,6 +33,19 @@ export const quoteLookupsApi = quotesBaseApi.injectEndpoints({
       transformResponse: mapQuoteCatalogPage,
       transformErrorResponse: (response) => toQuoteApiError(response, quoteLookupErrors),
     }),
+    /** «Виріб з нуля»: the price of each fabric by the Catalog formula; nothing is saved. */
+    calculateQuoteCustomSewing: build.mutation<
+      QuoteCustomSewingPrice,
+      QuoteCustomSewingPriceRequest
+    >({
+      query: (body) => ({
+        url: '/api/crm/quote-lookups/custom-sewing-price',
+        method: 'POST',
+        body,
+      }),
+      transformResponse: mapQuoteCustomSewingPrice,
+      transformErrorResponse: (response) => toQuoteApiError(response, quoteLookupErrors),
+    }),
     getQuoteStaff: build.query<QuoteStaff[], void>({
       query: () => '/api/crm/quote-lookups/staff',
       transformResponse: mapQuoteStaff,
@@ -31,4 +54,8 @@ export const quoteLookupsApi = quotesBaseApi.injectEndpoints({
   }),
 });
 
-export const { useSearchQuoteCatalogQuery, useGetQuoteStaffQuery } = quoteLookupsApi;
+export const {
+  useCalculateQuoteCustomSewingMutation,
+  useSearchQuoteCatalogQuery,
+  useGetQuoteStaffQuery,
+} = quoteLookupsApi;

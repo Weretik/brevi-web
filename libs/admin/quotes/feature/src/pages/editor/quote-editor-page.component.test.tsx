@@ -52,8 +52,10 @@ const quote: Quote = {
           manualByName: null,
           manualAt: null,
           pricesTakenAt: null,
+          fabricMeters: null,
         },
       ],
+      lines: [],
     },
   ],
 };
@@ -81,6 +83,7 @@ vi.mock('@admin/quotes/data-access', () => ({
   useSendQuoteMutation: api.mutation(api.send),
   useConnectMailboxMutation: api.mutation(api.connect),
   useDisconnectMailboxMutation: api.mutation(vi.fn()),
+  useCalculateQuoteCustomSewingMutation: api.mutation(vi.fn()),
 }));
 
 const sendDraft = {
@@ -91,6 +94,11 @@ const sendDraft = {
   letters: [{ name: 'Стандартний лист', subject: 'КП № 1-11-2026', body: 'Добрий день' }],
   to: null,
 };
+vi.mock('@admin/references/data-access', () => ({
+  useListFabricsQuery: () => ({ data: [], isLoading: false, isError: false }),
+  useListGarmentAccessoriesQuery: () => ({ data: [], isLoading: false, isError: false }),
+  useListGarmentPartOperationsQuery: () => ({ data: [], isLoading: false, isError: false }),
+}));
 vi.mock('@admin/clients/data-access', () => ({
   useListCustomersQuery: () => ({ data: undefined }),
 }));
@@ -132,6 +140,12 @@ describe('КП editor', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Додати ще разовий ЗІЗ' }));
     expect(await screen.findByText('2 товари у пропозиції')).toBeVisible();
+  });
+
+  it('opens the «Виріб з нуля» panel from the products block', async () => {
+    renderEditor();
+    fireEvent.click(await screen.findByRole('button', { name: 'Додати ще виріб з нуля' }));
+    expect(await screen.findByRole('dialog', { name: 'Виріб з нуля' })).toBeVisible();
   });
 
   it('asks a reason for a manual PPE price before saving', async () => {

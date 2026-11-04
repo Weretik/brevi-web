@@ -35,7 +35,7 @@ Libraries `libs/admin/quotes/{data-access,model,ui,feature}` generated with `nx 
 
 ## Stages
 
-Same numbering as the backend: 1 list + editor (done); 2 settings + PDF (done); 3 Gmail sending from each manager's own Gmail (done); 4 КП для знайомства (4 steps: layout, recipient, letter variant, catalogue pages, «Зберегти як готовий шаблон», «Готові шаблони»); 5 composition editing, model from scratch, history, archive; 6 import of old КП from the calculator, if it proves easy.
+Same numbering as the backend: 1 list + editor (done); 2 settings + PDF (done); 3 Gmail sending from each manager's own Gmail (done); 4 КП для знайомства (4 steps: layout, recipient, letter variant, catalogue pages, «Зберегти як готовий шаблон», «Готові шаблони») (done); 5a «Виріб з нуля» (done); 5b «Змінити склад» of a Catalog model; later history, archive; 6 import of old КП from the calculator, if it proves easy.
 
 ## Stage 2 screens
 
@@ -57,6 +57,12 @@ Same numbering as the backend: 1 list + editor (done); 2 settings + PDF (done); 
 - Footer as in the editor: «Зберегти зміни», «Сформувати КП» (catalogue PDF), «Надіслати КП» (the chosen letter first, «Кому» filled with the saved email).
 - «Налаштування КП» → «КП для знайомства»: the codes of the main summer and winter models (empty = MOD-166 «Імпульс» and MOD-169 «Прайм»).
 
+## Stage 5a screens
+
+- «Нове КП» menu gets «КП з нуля (новий виріб)»: it opens a new editor (`/crm/quotes/new?custom=1`) with the «Виріб з нуля» side panel open. In the products block «Додати виріб з нуля» (later «Додати ще виріб з нуля») opens the same panel.
+- The panel (ReferenceEditorDrawer, 720 px): «Назва виробу», «Опис для клієнта», then «Тканини» (metres each), «Фурнітура» (quantity in its unit), «Операції» (how many times; «Хвилин» for an operation without a fixed norm), each with a search from the references. «Розрахунок» shows per fabric the three prices, time, labour and full cost, or the first missing thing / the server's reason. «Додати в КП» is enabled only when every fabric is priced.
+- The item card shows «Склад» (accessories and operations with quantities), «Тканини» with read-only prices and «Змінити склад і тканини», which reopens the panel with «Зберегти склад».
+
 ## Tests
 
-Stage 1: list (search, own-only for a Manager), editor (add model and fabrics, hide a price, manual PPE price needs a reason, one-off PPE validation, 409 reload), picker disabled reason. Stage 2: «Сформувати КП» saves first and does not download after a failed save; settings save, field rules and 409. Stage 3: «Надіслати КП» saves first, sends and marks the КП sent; a Gmail refusal stays in the panel; no recipient blocks sending; no Gmail offers to connect it; «Підключити Gmail» opens Google and is disabled with unsaved changes; recipient and subject rules. Focused run: `npx nx test admin-quotes-feature`.
+Stage 1: list (search, own-only for a Manager), editor (add model and fabrics, hide a price, manual PPE price needs a reason, one-off PPE validation, 409 reload), picker disabled reason. Stage 2: «Сформувати КП» saves first and does not download after a failed save; settings save, field rules and 409. Stage 3: «Надіслати КП» saves first, sends and marks the КП sent; a Gmail refusal stays in the panel; no recipient blocks sending; no Gmail offers to connect it; «Підключити Gmail» opens Google and is disabled with unsaved changes; recipient and subject rules. Stage 5a: the panel prices the composition and adds the item; «Нове КП» offers «КП з нуля»; the products block opens the panel. Focused run: `npx nx test admin-quotes-feature`.

@@ -57,6 +57,12 @@ export default function QuotesPage({ actor }: { actor: QuoteActor }) {
                   secondary="Під заявку клієнта: товари, кількість, ціни"
                 />
               </MenuItem>
+              <MenuItem onClick={() => create('/crm/quotes/new?custom=1')}>
+                <ListItemText
+                  primary="КП з нуля (новий виріб)"
+                  secondary="Виріб, якого немає в каталозі: тканина, фурнітура, операції"
+                />
+              </MenuItem>
               <MenuItem onClick={() => create('/crm/quote-introductions/new')}>
                 <ListItemText
                   primary="КП для знайомства"

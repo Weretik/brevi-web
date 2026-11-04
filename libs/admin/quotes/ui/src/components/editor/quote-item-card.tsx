@@ -3,6 +3,7 @@ import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
 import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import {
   Alert,
@@ -17,6 +18,7 @@ import {
   Typography,
 } from '@mui/material';
 
+import { QuoteCustomComposition } from './quote-custom-composition';
 import { QuoteOptionRow } from './quote-option-row';
 
 import type { QuoteItemDraft, QuoteOptionDraft, QuoteTier } from '@admin/quotes/model';
@@ -41,11 +43,13 @@ interface Props {
   onRecommend: (optionKey: string) => void;
   onRemoveOption: (optionKey: string) => void;
   onAddFabric: () => void;
+  /** «Змінити склад» of a «Виріб з нуля». */
+  onEditComposition: () => void;
   onMove: (offset: -1 | 1) => void;
   onRemove: () => void;
 }
 
-/** «Позиція 01»: a model with fabric variants, a PPE, or a one-off PPE with its prices. */
+/** «Позиція 01»: a model with fabric variants, a «Виріб з нуля», a PPE, or a one-off PPE with its prices. */
 export function QuoteItemCard({
   item,
   position,
@@ -59,10 +63,12 @@ export function QuoteItemCard({
   onRecommend,
   onRemoveOption,
   onAddFabric,
+  onEditComposition,
   onMove,
   onRemove,
 }: Props) {
   const oneOff = item.kind === 'OneOffPpe';
+  const custom = item.kind === 'CustomSewing';
   const label = oneOff ? item.name || 'Разова позиція' : item.name;
   return (
     <Card variant="outlined" sx={{ p: 2 }} aria-label={`Позиція ${position}: ${label}`}>
@@ -161,11 +167,11 @@ export function QuoteItemCard({
         label="Опис позиції у КП"
         value={item.description}
         onChange={(event) => onChange({ description: event.target.value })}
-        helperText={oneOff ? ' ' : 'Підтягується з каталогу. Зміна діє лише в цьому КП.'}
+        helperText={oneOff || custom ? ' ' : 'Підтягується з каталогу. Зміна діє лише в цьому КП.'}
         slotProps={{ htmlInput: { maxLength: quoteTextMaxLength } }}
         sx={{ mt: 2 }}
       />
-      {item.kind !== 'Sewing' && (
+      {(item.kind === 'Ppe' || oneOff) && (
         <TextField
           fullWidth
           size="small"
@@ -178,9 +184,10 @@ export function QuoteItemCard({
         />
       )}
 
-      {item.kind === 'Sewing' && (
+      {custom && <QuoteCustomComposition lines={item.lines} />}
+      {(item.kind === 'Sewing' || custom) && (
         <Typography variant="subtitle2" sx={{ mt: 2, fontWeight: 700 }}>
-          Варіанти тканини
+          {custom ? 'Тканини' : 'Варіанти тканини'}
         </Typography>
       )}
       {item.options.map((option) => (
@@ -202,6 +209,11 @@ export function QuoteItemCard({
       {item.kind === 'Sewing' && (
         <Button startIcon={<AddOutlinedIcon />} onClick={onAddFabric} sx={{ mt: 1.5 }}>
           Додати тканину
+        </Button>
+      )}
+      {custom && (
+        <Button startIcon={<EditOutlinedIcon />} onClick={onEditComposition} sx={{ mt: 1.5 }}>
+          Змінити склад і тканини
         </Button>
       )}
       {itemError && (

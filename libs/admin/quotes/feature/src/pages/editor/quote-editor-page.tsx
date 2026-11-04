@@ -4,10 +4,11 @@ import { QuoteAddItems, QuoteHeaderCard, QuoteItemCard, QuoteNotesCard } from '@
 import { ReferencePageHeader } from '@admin/references/ui';
 import { Alert, Box, Button, CircularProgress, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
 import { QuoteEditorActions } from './quote-editor-actions';
 import { QuoteEditorFooter } from './quote-editor-footer';
+import { QuoteCustomSewingDrawer } from '../../components/custom-sewing/quote-custom-sewing-drawer';
 import { QuoteDeleteDialog } from '../../components/editor/quote-delete-dialog';
 import { QuoteRepriceDrawer } from '../../components/editor/quote-reprice-drawer';
 import { QuoteResponsibleDrawer } from '../../components/editor/quote-responsible-drawer';
@@ -24,6 +25,7 @@ import type { QuoteActor } from '@admin/quotes/model';
 type Panel =
   | { kind: 'catalog' }
   | { kind: 'fabric'; itemKey: string }
+  | { kind: 'custom'; itemKey?: string }
   | { kind: 'responsible' }
   | { kind: 'reprice' }
   | { kind: 'send' };
@@ -39,9 +41,13 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
   const params = useParams();
   const id = params['quoteId'] ? Number(params['quoteId']) : null;
   const navigate = useNavigate();
+  const [search] = useSearchParams();
   const editor = useQuoteEditor(id);
   const clients = useClientNames();
-  const [panel, setPanel] = useState<Panel | null>(null);
+  // «КП з нуля» from the list opens a new КП with the «Виріб з нуля» panel.
+  const [panel, setPanel] = useState<Panel | null>(() =>
+    id === null && search.get('custom') === '1' ? { kind: 'custom' } : null,
+  );
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleteQuote, deleting] = useDeleteQuoteMutation();
   const { quote, draft } = editor;
@@ -70,6 +76,10 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
 
   const fabricItem =
     panel?.kind === 'fabric' ? draft.items.find((item) => item.key === panel.itemKey) : undefined;
+  const customItem =
+    panel?.kind === 'custom' && panel.itemKey
+      ? draft.items.find((item) => item.key === panel.itemKey)
+      : undefined;
 
   return (
     <Box sx={{ pb: 10 }}>
@@ -158,6 +168,7 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
             onRecommend={(optionKey) => editor.recommend(item.key, optionKey)}
             onRemoveOption={(optionKey) => editor.removeOption(item.key, optionKey)}
             onAddFabric={() => setPanel({ kind: 'fabric', itemKey: item.key })}
+            onEditComposition={() => setPanel({ kind: 'custom', itemKey: item.key })}
             onMove={(offset) => editor.moveItem(item.key, offset)}
             onRemove={() => editor.removeItem(item.key)}
           />
@@ -166,6 +177,7 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
           empty={draft.items.length === 0}
           onAddProduct={() => setPanel({ kind: 'catalog' })}
           onAddOneOff={() => editor.addItems([oneOffItemDraft()])}
+          onAddCustom={() => setPanel({ kind: 'custom' })}
         />
         <QuoteNotesCard
           clientComment={draft.clientComment}
@@ -203,6 +215,17 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
           onClose={() => setPanel(null)}
           onAdd={(options) => {
             editor.addOptions(fabricItem.key, options);
+            setPanel(null);
+          }}
+        />
+      )}
+      {panel?.kind === 'custom' && (!panel.itemKey || customItem) && (
+        <QuoteCustomSewingDrawer
+          item={customItem}
+          onClose={() => setPanel(null)}
+          onDone={(next) => {
+            if (customItem) editor.updateItem(customItem.key, { ...next, key: customItem.key });
+            else editor.addItems([next]);
             setPanel(null);
           }}
         />
