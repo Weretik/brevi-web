@@ -10,10 +10,11 @@ import {
 import { createProfileRoutes, createUsersRoutes } from '@admin/users/feature';
 import { createBrowserRouter } from 'react-router-dom';
 
-import { adminRouteDefinitions } from './admin-route-definitions';
+import { adminRouteDefinitions, tasksRoutes } from './admin-route-definitions';
 import { AdminRouteLayout } from './admin-route-layout';
 import { NotFoundPage } from '../pages/not-found-page';
 
+import type { SessionUser } from '@admin/core/auth';
 import type { StaffActor } from '@admin/users/model';
 
 function useSignedInStaff(): StaffActor {
@@ -26,6 +27,10 @@ function useSignedInStaff(): StaffActor {
 const usersRoutes = createUsersRoutes({ useStaffActor: useSignedInStaff });
 const profileRoutes = createProfileRoutes({ onProfileChanged: refreshSession });
 
+/** Manager tasks belong to managers; Director and Admin manage them (TSK-001 R-01, R-02). */
+const canWorkOnTasks = (user: SessionUser): boolean =>
+  user.roles.includes('Admin') || user.roles.includes('Manager');
+
 export function createAdminRouter() {
   return createBrowserRouter([
     { path: loginPath, element: <LoginPage /> },
@@ -37,6 +42,8 @@ export function createAdminRouter() {
         ...adminRouteDefinitions,
         ...profileRoutes,
         { element: <RequireRole allow={canManageUsers} />, children: usersRoutes },
+        { element: <RequireRole allow={canManageUsers} />, children: tasksRoutes.admin },
+        { element: <RequireRole allow={canWorkOnTasks} />, children: tasksRoutes.board },
         { path: '*', element: <NotFoundPage /> },
       ],
     },

@@ -19,6 +19,8 @@ interface AdminLayoutProps {
   user?: AdminShellUser | null;
   /** Route of «Мій кабінет». */
   profileHref?: string | null;
+  /** Second line of the «Робочий стіл» tile, e.g. «Сьогодні · 3 завдання горять». */
+  homeHint?: string | null;
 }
 
 export function AdminLayout({
@@ -27,6 +29,7 @@ export function AdminLayout({
   onColorModeChange,
   profileHref = null,
   user = null,
+  homeHint = null,
 }: AdminLayoutProps) {
   const [isMobileNavigationOpen, setIsMobileNavigationOpen] = useState(false);
   const { isCollapsed, toggleCollapsed } = useNavigationCollapsed();
@@ -46,6 +49,7 @@ export function AdminLayout({
     <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
       <AdminNavigationDrawers
         isCollapsed={isCollapsed}
+        homeHint={homeHint}
         isMobileOpen={isMobileNavigationOpen}
         navigation={navigation}
         onMobileClose={closeMobileNavigation}

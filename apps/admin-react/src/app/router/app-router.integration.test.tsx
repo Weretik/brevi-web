@@ -66,10 +66,7 @@ describe('React Admin routing', () => {
     const navigation = screen.getByRole('navigation', { name: 'Основна навігація' });
     expect(within(navigation).queryByText('Початок')).not.toBeInTheDocument();
     const sections = [
-      [
-        'Менеджер сервісу',
-        ['Ліди', 'КП', 'КП для знайомства', 'Прайс', 'Завдання в роботу', 'Угоди'],
-      ],
+      ['Менеджер сервісу', ['Ліди', 'КП', 'КП для знайомства', 'Прайс', 'Мої завдання', 'Угоди']],
       [
         'Швейний цех',
         [
@@ -112,9 +109,11 @@ describe('React Admin routing', () => {
       expect(within(list).queryAllByRole('link')).toHaveLength(
         section === 'Загальні довідники'
           ? 7
-          : section === 'Менеджер сервісу' || section === 'Фото'
-            ? 1
-            : 0,
+          : section === 'Менеджер сервісу'
+            ? 2
+            : section === 'Фото'
+              ? 1
+              : 0,
       );
     }
   });
@@ -155,13 +154,16 @@ describe('React Admin routing', () => {
 
   // Includes the first lazy-loaded reference module and grid on a cold worker.
   it('sends the old suppliers URL to «Контрагенти» inside the Brevi shell', async () => {
+    // A new body per request: the shell also asks for the task overview of «Робочий стіл».
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockResolvedValue(
-        new Response(JSON.stringify([]), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json' },
-        }),
+      vi.fn().mockImplementation(() =>
+        Promise.resolve(
+          new Response(JSON.stringify([]), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          }),
+        ),
       ),
     );
     window.history.replaceState({}, '', '/references/supplier');
