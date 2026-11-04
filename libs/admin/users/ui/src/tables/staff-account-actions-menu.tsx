@@ -10,6 +10,7 @@ export type StaffAccountAction =
   | { type: 'changeRole'; role: StaffRole }
   | { type: 'setBlocked'; blocked: boolean }
   | { type: 'setPassword' }
+  | { type: 'editDetails' }
   | { type: 'delete' };
 
 interface StaffAccountActionsMenuProps {
@@ -29,6 +30,7 @@ export function StaffAccountActionsMenu({
   const hasActions =
     permissions.roleChoices.length > 0 ||
     permissions.canSetPassword ||
+    permissions.canEditDetails ||
     permissions.canBlock ||
     permissions.canDelete;
 
@@ -56,6 +58,9 @@ export function StaffAccountActionsMenu({
         onClose={() => setAnchorElement(null)}
         open={Boolean(anchorElement)}
       >
+        {permissions.canEditDetails ? (
+          <MenuItem onClick={() => run({ type: 'editDetails' })}>Змінити дані</MenuItem>
+        ) : null}
         {permissions.roleChoices.map((role) => (
           <MenuItem key={role} onClick={() => run({ type: 'changeRole', role })}>
             Зробити: {staffRoleLabels[role].toLowerCase()}

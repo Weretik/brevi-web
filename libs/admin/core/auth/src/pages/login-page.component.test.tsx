@@ -27,11 +27,34 @@ const renderLogin = () =>
 
 const fillAndSubmit = () => {
   fireEvent.change(screen.getByLabelText(/Email/), { target: { value: 'm@brevi.com.ua' } });
-  fireEvent.change(screen.getByLabelText(/Пароль/), { target: { value: 'secret-pass' } });
+  fireEvent.change(screen.getByLabelText(/^Пароль/), { target: { value: 'secret-pass' } });
   fireEvent.click(screen.getByRole('button', { name: 'Увійти' }));
 };
 
 describe('LoginPage', () => {
+  it('says where the user signs in and lets them see the password', () => {
+    renderLogin();
+
+    expect(screen.getByRole('heading', { name: 'Вхід у Brevi Office' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Конфіденційність' }).getAttribute('href')).toBe(
+      '/brevi-erp/privacy.html',
+    );
+
+    const password = screen.getByLabelText(/^Пароль/);
+    expect(password.getAttribute('type')).toBe('password');
+    fireEvent.click(screen.getByRole('button', { name: 'Показати пароль' }));
+    expect(password.getAttribute('type')).toBe('text');
+  });
+
+  it('warns when Caps Lock is on', () => {
+    renderLogin();
+    const password = screen.getByLabelText(/^Пароль/);
+
+    fireEvent.keyUp(password, { key: 'CapsLock', modifierCapsLock: true });
+
+    expect(screen.getByText('Увімкнено Caps Lock')).toBeTruthy();
+  });
+
   beforeEach(() => {
     setSessionState({ status: 'anonymous' });
     loginMock.mockReset();
@@ -43,6 +66,7 @@ describe('LoginPage', () => {
       email: 'm@brevi.com.ua',
       fullName: 'M',
       roles: ['Manager'],
+      avatarUrl: null,
     });
     renderLogin();
     fillAndSubmit();

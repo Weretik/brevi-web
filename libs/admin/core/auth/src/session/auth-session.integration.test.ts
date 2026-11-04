@@ -22,6 +22,7 @@ const manager: SessionUser = {
   email: 'manager@brevi.com.ua',
   fullName: 'Олена',
   roles: ['Manager'],
+  avatarUrl: null,
 };
 
 describe('admin cookie session lifecycle', () => {

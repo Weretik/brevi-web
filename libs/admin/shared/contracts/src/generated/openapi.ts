@@ -145,6 +145,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/admin/users/{userId}/details': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Change a staff account's name, email and phone
+     * @description A new email ends the account's sessions within 5 minutes. Empty phone clears it. Only the director changes the director (403).
+     */
+    put: operations['updateStaffDetails'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/admin/users/{userId}/password': {
     parameters: {
       query?: never;
@@ -158,6 +178,124 @@ export interface paths {
      * @description Ends the account's existing sessions. Only the director changes the director's password (403).
      */
     put: operations['setStaffPassword'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/profile': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * The signed-in staff member's profile («Мій кабінет»)
+     * @description Policy `OwnProfile` (Accountant, Manager, Admin; the director also holds Admin).
+     */
+    get: operations['getMyProfile'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/profile/name': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Change own name */
+    put: operations['changeMyName'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/profile/phone': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Change own phone number (administrators)
+     * @description Empty or null clears it. 7 to 15 digits, optionally a leading +, spaces, dashes or brackets.
+     */
+    put: operations['changeMyPhone'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/profile/avatar': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Upload own photo
+     * @description JPEG, PNG or WebP up to 2 MB, at least 128×128 px. The server crops the centre square and stores a 256×256 WebP under a new name, then deletes the previous file.
+     */
+    put: operations['uploadMyAvatar'];
+    post?: never;
+    /** Remove own photo */
+    delete: operations['removeMyAvatar'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/profile/email': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Change own email (administrators)
+     * @description Needs the current password; a wrong one counts towards lockout. Other sessions end; this browser stays signed in.
+     */
+    put: operations['changeMyEmail'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/profile/password': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Change own password (administrators)
+     * @description Needs the current password; a wrong one counts towards lockout. Other sessions end; this browser stays signed in.
+     */
+    put: operations['changeMyPassword'];
     post?: never;
     delete?: never;
     options?: never;
@@ -2491,6 +2629,11 @@ export interface components {
       email: string;
       fullName: string;
       roles: ('Director' | 'Admin' | 'Accountant' | 'Manager' | 'User')[];
+      /**
+       * Format: uri
+       * @description Profile photo on the CDN; null shows the initial and a color
+       */
+      avatarUrl: string | null;
     };
     /** @enum {string} */
     StaffRole: 'Director' | 'Admin' | 'Accountant' | 'Manager';
@@ -2502,6 +2645,9 @@ export interface components {
       fullName: string;
       role: components['schemas']['StaffRole'];
       isBlocked: boolean;
+      /** Format: uri */
+      avatarUrl: string | null;
+      phoneNumber: string | null;
     };
     CreateStaffAccountRequest: {
       /** Format: email */
@@ -2510,6 +2656,42 @@ export interface components {
       role: components['schemas']['StaffRole'];
       /** Format: password */
       password: string;
+    };
+    UpdateStaffDetailsRequest: {
+      fullName: string;
+      /** Format: email */
+      email: string;
+      phoneNumber?: string | null;
+    };
+    ProfileResponse: {
+      /** Format: int32 */
+      id: number;
+      /** Format: email */
+      email: string;
+      fullName: string;
+      role: components['schemas']['StaffRole'];
+      /** Format: uri */
+      avatarUrl: string | null;
+      phoneNumber: string | null;
+    };
+    ChangeNameRequest: {
+      fullName: string;
+    };
+    ChangePhoneRequest: {
+      phoneNumber: string | null;
+    };
+    AvatarResponse: {
+      /** Format: uri */
+      avatarUrl: string;
+    };
+    ChangeOwnEmailRequest: {
+      /** Format: email */
+      email: string;
+      currentPassword: string;
+    };
+    ChangeOwnPasswordRequest: {
+      currentPassword: string;
+      newPassword: string;
     };
     AdminProductCategoryRow: {
       id: number;
@@ -5744,6 +5926,68 @@ export interface operations {
       };
     };
   };
+  updateStaffDetails: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Value of the `brevi.csrf` cookie. Required on every non-GET request made with the session cookie. */
+        'X-CSRF-Token': components['parameters']['CsrfHeader'];
+      };
+      path: {
+        userId: components['parameters']['UserId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateStaffDetailsRequest'];
+      };
+    };
+    responses: {
+      /** @description Changed */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Invalid name, email or phone */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not an administrator, or the account is the director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No staff account with this ID */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Email already used */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   setStaffPassword: {
     parameters: {
       query?: never;
@@ -5795,6 +6039,331 @@ export interface operations {
       };
       /** @description No staff account with this ID */
       404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getMyProfile: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Profile */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProfileResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not a staff account */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  changeMyName: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Value of the `brevi.csrf` cookie. Required on every non-GET request made with the session cookie. */
+        'X-CSRF-Token': components['parameters']['CsrfHeader'];
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ChangeNameRequest'];
+      };
+    };
+    responses: {
+      /** @description Name changed */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Empty or longer than 100 characters */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not a staff account */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  changeMyPhone: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Value of the `brevi.csrf` cookie. Required on every non-GET request made with the session cookie. */
+        'X-CSRF-Token': components['parameters']['CsrfHeader'];
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ChangePhoneRequest'];
+      };
+    };
+    responses: {
+      /** @description Phone changed */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not a phone number */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not an administrator */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  uploadMyAvatar: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Value of the `brevi.csrf` cookie. Required on every non-GET request made with the session cookie. */
+        'X-CSRF-Token': components['parameters']['CsrfHeader'];
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'multipart/form-data': {
+          /** Format: binary */
+          file: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Stored */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AvatarResponse'];
+        };
+      };
+      /** @description Not an image, too small, or too many pixels (error on field "file") */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not a staff account */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Larger than 2 MB */
+      413: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Photo storage is not configured */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  removeMyAvatar: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Value of the `brevi.csrf` cookie. Required on every non-GET request made with the session cookie. */
+        'X-CSRF-Token': components['parameters']['CsrfHeader'];
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Removed (also when there was none) */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not a staff account */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  changeMyEmail: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Value of the `brevi.csrf` cookie. Required on every non-GET request made with the session cookie. */
+        'X-CSRF-Token': components['parameters']['CsrfHeader'];
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ChangeOwnEmailRequest'];
+      };
+    };
+    responses: {
+      /** @description Email changed */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Invalid email, or wrong current password (field "currentPassword") */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not an administrator */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Email already used */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  changeMyPassword: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Value of the `brevi.csrf` cookie. Required on every non-GET request made with the session cookie. */
+        'X-CSRF-Token': components['parameters']['CsrfHeader'];
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ChangeOwnPasswordRequest'];
+      };
+    };
+    responses: {
+      /** @description Password changed */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description New password shorter than 8 characters, or wrong current password (field "currentPassword") */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not an administrator */
+      403: {
         headers: {
           [name: string]: unknown;
         };

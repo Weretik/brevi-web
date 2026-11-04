@@ -12,6 +12,7 @@ const staff = (roles: SessionUser['roles']): SessionUser => ({
   email: 'staff@brevi.com.ua',
   fullName: 'Олена',
   roles,
+  avatarUrl: null,
 });
 
 function LoginProbe() {

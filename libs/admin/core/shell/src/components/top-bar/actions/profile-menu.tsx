@@ -1,22 +1,28 @@
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { UserAvatar } from '@admin/shared/ui';
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import LogoutIcon from '@mui/icons-material/Logout';
-import PersonOutlineIcon from '@mui/icons-material/PersonOutlined';
-import { Avatar, IconButton, ListItemIcon, Menu, MenuItem, Tooltip } from '@mui/material';
+import { Divider, IconButton, ListItemIcon, Menu, MenuItem, Tooltip } from '@mui/material';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
+import { ProfileCard } from './profile-card';
 import { useAdminShellLogout } from '../../../providers/admin-shell-session-provider';
 
-import type { AdminProfileLink } from '../../../shell.types';
+import type { AdminShellUser } from '../../../shell.types';
 
 interface ProfileMenuProps {
-  links: readonly AdminProfileLink[];
+  user: AdminShellUser | null;
+  /** Route of «Мій кабінет». */
+  profileHref: string | null;
 }
 
-/** Profile avatar with the session actions available to the shell. */
-export function ProfileMenu({ links }: ProfileMenuProps) {
+/** The signed-in person's photo; opens who they are, «Мій кабінет» and «Вийти». */
+export function ProfileMenu({ profileHref, user }: ProfileMenuProps) {
   const [anchorElement, setAnchorElement] = useState<HTMLElement | null>(null);
   const logout = useAdminShellLogout();
+  const navigate = useNavigate();
   const isOpen = Boolean(anchorElement);
+  const close = () => setAnchorElement(null);
 
   return (
     <>
@@ -27,48 +33,44 @@ export function ProfileMenu({ links }: ProfileMenuProps) {
           aria-haspopup="menu"
           aria-label="Профіль"
           onClick={(event) => setAnchorElement(event.currentTarget)}
-          sx={{ p: 0 }}
+          sx={{ p: 0.25 }}
         >
-          <Avatar
-            sx={{
-              bgcolor: 'primary.light',
-              border: 1,
-              borderColor: 'divider',
-              color: 'primary.dark',
-              height: 40,
-              width: 40,
-            }}
-          >
-            <PersonOutlineIcon fontSize="small" />
-          </Avatar>
+          <UserAvatar
+            avatarUrl={user?.avatarUrl}
+            email={user?.email}
+            name={user?.fullName ?? ''}
+            size={36}
+          />
         </IconButton>
       </Tooltip>
       <Menu
         anchorEl={anchorElement}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         id="admin-profile-menu"
-        onClose={() => setAnchorElement(null)}
+        onClose={close}
         open={isOpen}
+        slotProps={{ paper: { sx: { maxWidth: 320, minWidth: 260 } } }}
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
       >
-        <MenuItem disabled>Профіль скоро з'явиться</MenuItem>
-        {links.map((link) => (
+        {user ? <ProfileCard user={user} /> : null}
+        {user ? <Divider /> : null}
+        {profileHref ? (
           <MenuItem
-            component="a"
-            href={link.href}
-            key={link.href}
-            onClick={() => setAnchorElement(null)}
+            onClick={() => {
+              close();
+              void navigate(profileHref);
+            }}
           >
             <ListItemIcon>
-              <InfoOutlinedIcon fontSize="small" />
+              <AccountCircleOutlinedIcon fontSize="small" />
             </ListItemIcon>
-            {link.label}
+            Мій кабінет
           </MenuItem>
-        ))}
+        ) : null}
         {logout ? (
           <MenuItem
             onClick={() => {
-              setAnchorElement(null);
+              close();
               void logout();
             }}
           >

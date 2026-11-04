@@ -7,6 +7,16 @@ export interface StaffAccount {
   fullName: string;
   role: StaffRole;
   isBlocked: boolean;
+  /** Photo on the CDN; null shows the first letter of the name. */
+  avatarUrl: string | null;
+  phoneNumber: string | null;
+}
+
+/** What an administrator or the director changes in someone's account from the users page. */
+export interface StaffDetailsInput {
+  fullName: string;
+  email: string;
+  phoneNumber: string;
 }
 
 export interface CreateStaffAccountInput {

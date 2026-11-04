@@ -1,4 +1,5 @@
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
+import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import ContentCutOutlinedIcon from '@mui/icons-material/ContentCutOutlined';
 import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
 import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
@@ -118,6 +119,16 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
     section: 'Дані',
     label: 'Фото',
     items: [{ id: 'media-library', label: 'Бібліотека фото', path: '/media' }],
+  },
+  {
+    id: 'content',
+    icon: ArticleOutlinedIcon,
+    section: 'Дані',
+    label: 'Контент',
+    items: [
+      { id: 'site-pages', label: 'Сторінки сайту' },
+      { id: 'legal', label: 'Конфіденційність та умови', path: '/content/legal' },
+    ],
   },
   {
     id: 'general-reports',

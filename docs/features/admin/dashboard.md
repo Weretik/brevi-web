@@ -2,7 +2,7 @@
 
 **Status:** implementation exists on demo data, checked 2026-11-01.
 
-The root route `/` shows «Огляд виробництва» in the [design system «Цех»](../../standards/admin/design-system.md): a metric strip, the workshop board by production stage, recent quotes, the workshop cash box, and seamstress load. There is no dashboard API yet, so every value comes from local demo data and the page carries a «Демо-дані» label. «Новий розрахунок», «Клієнти», and «Усі КП» link to real pages. The «Про BreviERP, конфіденційність та умови» link moved from the old start page to the profile menu in the top bar.
+The root route `/` shows «Огляд виробництва» in the [design system «Цех»](../../standards/admin/design-system.md): a metric strip, the workshop board by production stage, recent quotes, the workshop cash box, and seamstress load. There is no dashboard API yet, so every value comes from local demo data and the page carries a «Демо-дані» label. «Новий розрахунок», «Клієнти», and «Усі КП» link to real pages. The BreviERP description, privacy and terms are in the sidebar group [«Контент»](content.md).
 
 ## Structure diagram
 

@@ -5,6 +5,7 @@ import {
   CreateStaffPanel,
   SetPasswordPanel,
   StaffAccountsTable,
+  StaffDetailsPanel,
 } from '@admin/users/ui';
 import AddIcon from '@mui/icons-material/Add';
 import { Alert, Button, Card, Snackbar, Stack, Typography } from '@mui/material';
@@ -68,6 +69,14 @@ export default function UsersPage({ actor }: UsersPageProps) {
         onClose={actions.closeDialogs}
         onSubmit={actions.submitPassword}
         submitting={actions.settingPassword}
+      />
+      <StaffDetailsPanel
+        account={actions.detailsTarget}
+        error={actions.error}
+        key={actions.detailsTarget?.id ?? 'closed'}
+        onClose={actions.closeDialogs}
+        onSubmit={actions.submitDetails}
+        submitting={actions.updatingDetails}
       />
       <ConfirmActionDialog
         confirmLabel={actions.confirmation?.confirmLabel ?? ''}

@@ -8,7 +8,8 @@ In each feature card, “Structure diagram” shows relationships between parts,
 
 - Clients: [клієнти, КП, history/lifecycle, приватний custom editor, файли, шаблони листів, ручні результати надсилання і сезонні добірки](admin/clients-and-quotes.md).
 - Admin foundation: [shell, navigation, and session](admin/shell.md); [overview page «Цех» on demo data](admin/dashboard.md).
-- Staff accounts: [sign-in users «Користувачі» (Admin only)](admin/users.md).
+- Staff accounts: [sign-in users «Користувачі» (Admin only)](admin/users.md); [«Мій кабінет» and the profile menu](admin/profile.md).
+- Site content: [«Контент»: privacy and terms](admin/content.md).
 - Products: [«Товари» tables, details, creation, and editing](admin/products/products.md); [Sewing Articles and composition](admin/products/sewing-composition.md); [Article calculation and published prices](admin/products/sewing-pricing.md); [PPE pricing and input approval](admin/products/ppe-pricing.md).
 - Photos: [«Фото»: photo library with folders, search, upload and usages](admin/media.md).
 - Reminders: [Telegram deadline reminders: tasks, periods, chats, days off](admin/reminders.md).

@@ -1,13 +1,13 @@
 # Admin: Shell, Navigation, and Session
 
-**Status:** implementation exists, checked 2026-11-03 (design system «Цех»; cookie sign-in, [SDD](../../specs/admin/auth/002-cookie-sign-in/README.md)).
+**Status:** implementation exists, checked 2026-11-04 (design system «Цех»; cookie sign-in, [SDD](../../specs/admin/auth/002-cookie-sign-in/README.md)).
 
 `apps/admin-react` starts React and composes providers and `AppRouter`.
 `AdminLayout` from `libs/admin/core/shell` displays the graphite sidebar, the top
 bar (breadcrumbs, search, notifications, theme menu, and profile menu), and `Outlet`;
-search, notifications, and the profile entry are placeholders until a backend exists,
-while «Вийти» and app-provided profile links such as «Про BreviERP, конфіденційність
-та умови» work; the list of items depends on
+search and notifications are placeholders until a backend exists; the profile menu
+shows the signed-in person and opens «Мій кабінет» or «Вийти» ([profile](profile.md));
+the list of items depends on
 routes that are actually available. The sidebar collapses to icons on desktop (group
 flyouts, choice remembered) and opens as a drawer on phones. Look and behavior follow
 the [design system «Цех»](../../standards/admin/design-system.md).
