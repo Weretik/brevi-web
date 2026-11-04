@@ -48,6 +48,10 @@ interface Props<Row extends ReferenceRow> {
   viewLabel?: string;
   /** A full page of the row: a «Відкрити повну картку» button next to «…» and in the menu. */
   openHref?: (row: Row) => string;
+  /** Label of the menu's delete action; «Видалити» by default. */
+  deleteLabel?: string;
+  /** Checkbox column and selected count; off for lists without bulk actions. */
+  selectable?: boolean;
   /**
    * Paging and sorting on the server: `rows` is the current page (with its detail rows) and
    * `rowCount` the number of matching rows.
@@ -84,6 +88,8 @@ export function ReferenceDataGrid<Row extends ReferenceRow>({
   sortable = true,
   viewLabel,
   openHref,
+  deleteLabel,
+  selectable = true,
   server,
 }: Props<Row>) {
   const theme = useTheme();
@@ -159,7 +165,7 @@ export function ReferenceDataGrid<Row extends ReferenceRow>({
                 ? notFoundLabel
                 : emptyLabel,
           }}
-          checkboxSelection
+          checkboxSelection={selectable}
           disableRowSelectionOnClick
           disableRowSelectionExcludeModel
           keepNonExistentRowsSelected
@@ -177,7 +183,7 @@ export function ReferenceDataGrid<Row extends ReferenceRow>({
                 onSortModelChange: server.onSortModelChange,
               }
             : { initialState: { pagination: { paginationModel: { pageSize: 10, page: 0 } } } })}
-          slots={{ footer: ReferenceGridFooter }}
+          slots={selectable ? { footer: ReferenceGridFooter } : undefined}
           slotProps={{ row: rowSlotProps }}
           sx={{
             minWidth: 0,
@@ -207,6 +213,7 @@ export function ReferenceDataGrid<Row extends ReferenceRow>({
         onDelete={onDelete}
         viewLabel={viewLabel}
         openHref={openHref}
+        deleteLabel={deleteLabel}
       />
     </>
   );

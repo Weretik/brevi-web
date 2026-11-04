@@ -23,6 +23,8 @@ interface Props<Row extends MenuRow> {
   viewLabel?: string;
   /** Adds «Відкрити повну картку» that opens this page. */
   openHref?: (row: Row) => string;
+  /** «Видалити» by default; e.g. «В архів» when the row is archived instead. */
+  deleteLabel?: string;
 }
 
 /** Row actions of «Цех» reference grids: view, open the full page (optional), edit, delete. */
@@ -36,6 +38,7 @@ export function ReferenceRowMenu<Row extends MenuRow>({
   onDelete,
   viewLabel = 'Переглянути',
   openHref,
+  deleteLabel = 'Видалити',
 }: Props<Row>) {
   function run(action: (value: Row) => void) {
     onClose(false);
@@ -75,7 +78,7 @@ export function ReferenceRowMenu<Row extends MenuRow>({
         <ListItemIcon sx={{ color: 'inherit' }}>
           <DeleteOutlineIcon fontSize="small" />
         </ListItemIcon>
-        Видалити
+        {deleteLabel}
       </MenuItem>
     </Menu>
   );

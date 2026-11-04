@@ -2,7 +2,7 @@ import { sessionRoleLabel } from '@admin/core/auth';
 import { AdminLayout } from '@admin/core/shell';
 import { profilePath, usersPath } from '@admin/users/feature';
 
-import { adminRouteDefinitions, tasksRoutes } from './admin-route-definitions';
+import { adminRouteDefinitions, productionRoutes, tasksRoutes } from './admin-route-definitions';
 import { createNavigation } from './navigation-config';
 import { useHomeHint } from './use-home-hint';
 import { useAdminColorMode } from '../providers/color-mode-provider';
@@ -10,9 +10,12 @@ import { useAdminColorMode } from '../providers/color-mode-provider';
 import type { SessionUser } from '@admin/core/auth';
 
 const registeredPaths = new Set([
-  ...[...adminRouteDefinitions, ...tasksRoutes.admin, ...tasksRoutes.board].map(
-    (route) => route.path,
-  ),
+  ...[
+    ...adminRouteDefinitions,
+    ...tasksRoutes.admin,
+    ...tasksRoutes.board,
+    ...productionRoutes,
+  ].map((route) => route.path),
   usersPath,
 ]);
 

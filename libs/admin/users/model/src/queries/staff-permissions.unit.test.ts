@@ -21,7 +21,7 @@ describe('getStaffAccountPermissions', () => {
   it('lets an admin change a manager but not make a second director', () => {
     const permissions = getStaffAccountPermissions(account(3, 'Manager'), admin, true);
 
-    expect(permissions.roleChoices).toEqual(['Accountant', 'Admin']);
+    expect(permissions.roleChoices).toEqual(['WorkshopChief', 'Accountant', 'Admin']);
     expect(permissions.canBlock && permissions.canDelete && permissions.canSetPassword).toBe(true);
   });
 
@@ -44,7 +44,7 @@ describe('getStaffAccountPermissions', () => {
   it('lets the director change their own role and password but not block or delete themselves', () => {
     const permissions = getStaffAccountPermissions(account(2, 'Director'), director, true);
 
-    expect(permissions.roleChoices).toEqual(['Manager', 'Accountant', 'Admin']);
+    expect(permissions.roleChoices).toEqual(['Manager', 'WorkshopChief', 'Accountant', 'Admin']);
     expect(permissions.canSetPassword).toBe(true);
     expect(permissions.canBlock || permissions.canDelete).toBe(false);
   });

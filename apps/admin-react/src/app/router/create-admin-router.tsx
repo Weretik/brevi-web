@@ -1,5 +1,6 @@
 import {
   canManageUsers,
+  canManageWorkshop,
   LoginPage,
   loginPath,
   refreshSession,
@@ -10,7 +11,7 @@ import {
 import { createProfileRoutes, createUsersRoutes } from '@admin/users/feature';
 import { createBrowserRouter } from 'react-router-dom';
 
-import { adminRouteDefinitions, tasksRoutes } from './admin-route-definitions';
+import { adminRouteDefinitions, productionRoutes, tasksRoutes } from './admin-route-definitions';
 import { AdminRouteLayout } from './admin-route-layout';
 import { NotFoundPage } from '../pages/not-found-page';
 
@@ -44,6 +45,7 @@ export function createAdminRouter() {
         { element: <RequireRole allow={canManageUsers} />, children: usersRoutes },
         { element: <RequireRole allow={canManageUsers} />, children: tasksRoutes.admin },
         { element: <RequireRole allow={canWorkOnTasks} />, children: tasksRoutes.board },
+        { element: <RequireRole allow={canManageWorkshop} />, children: productionRoutes },
         { path: '*', element: <NotFoundPage /> },
       ],
     },

@@ -14,7 +14,8 @@ interface LegacyNavigationItem {
   id: string;
   label: string;
   path?: string;
-  requiredRole?: 'Admin';
+  /** Shown only to a user with one of these server roles. */
+  requiredRoles?: readonly string[];
 }
 
 interface LegacyNavigationGroup {
@@ -24,6 +25,10 @@ interface LegacyNavigationGroup {
   section: 'Робота' | 'Дані';
   items: readonly LegacyNavigationItem[];
 }
+
+const admin = ['Admin'] as const;
+/** «Швейний цех»: the head of the workshop; Admin covers the director. */
+const workshop = ['Admin', 'WorkshopChief'] as const;
 
 export const legacyGroups: readonly LegacyNavigationGroup[] = [
   {
@@ -38,7 +43,7 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         id: 'quote-settings',
         label: 'Налаштування КП',
         path: '/crm/quote-settings',
-        requiredRole: 'Admin',
+        requiredRoles: admin,
       },
       { id: 'price-list', label: 'Прайс' },
       { id: 'tasks', label: 'Мої завдання', path: '/crm/tasks' },
@@ -51,6 +56,24 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
     section: 'Робота',
     label: 'Швейний цех',
     items: [
+      {
+        id: 'workshop-staff',
+        label: 'Працівники цеху',
+        path: '/production/staff',
+        requiredRoles: workshop,
+      },
+      {
+        id: 'fabric-norms',
+        label: 'Норми витрати тканини',
+        path: '/production/fabric-norms',
+        requiredRoles: workshop,
+      },
+      {
+        id: 'payroll-rules',
+        label: 'Правила зарплати',
+        path: '/production/payroll-rules',
+        requiredRoles: workshop,
+      },
       { id: 'schedule', label: 'Графік роботи' },
       { id: 'salary', label: 'Зарплата' },
       { id: 'fabric-stock', label: 'Тканина в цеху' },
@@ -143,12 +166,12 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
     section: 'Дані',
     label: 'Адміністрування',
     items: [
-      { id: 'users', label: 'Користувачі', path: '/admin/users', requiredRole: 'Admin' },
+      { id: 'users', label: 'Користувачі', path: '/admin/users', requiredRoles: admin },
       {
         id: 'manager-tasks',
         label: 'Завдання менеджерам',
         path: '/admin/tasks',
-        requiredRole: 'Admin',
+        requiredRoles: admin,
       },
     ],
   },
