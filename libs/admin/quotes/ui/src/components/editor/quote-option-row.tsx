@@ -1,4 +1,4 @@
-import { hasManualPrice, quoteTiers } from '@admin/quotes/model';
+import { isSewingKind, hasManualPrice, quoteTiers } from '@admin/quotes/model';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
 import StarOutlinedIcon from '@mui/icons-material/StarOutlined';
@@ -32,7 +32,7 @@ export function QuoteOptionRow({
   onRecommend,
   onRemove,
 }: Props) {
-  const sewing = kind === 'Sewing';
+  const sewing = isSewingKind(kind);
   const manual = kind === 'Ppe' && hasManualPrice(option);
   return (
     <Box sx={{ borderTop: 1, borderColor: 'divider', pt: 1.5, mt: 1.5 }}>

@@ -8,7 +8,11 @@ export {
   useSaveQuoteMutation,
   useSetQuoteResponsibleMutation,
 } from './api/quotes.api';
-export { useGetQuoteStaffQuery, useSearchQuoteCatalogQuery } from './api/quote-lookups.api';
+export {
+  useCalculateQuoteCustomSewingMutation,
+  useGetQuoteStaffQuery,
+  useSearchQuoteCatalogQuery,
+} from './api/quote-lookups.api';
 export type { QuoteCatalogQuery } from './api/quote-lookups.api';
 export { toSaveQuoteInput } from './mappers/quote-input.mapper';
 export { useGetQuoteSettingsQuery, useSaveQuoteSettingsMutation } from './api/quote-settings.api';

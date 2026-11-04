@@ -90,6 +90,7 @@ const requiredOperations = {
     'saveCrmQuoteIntroduction',
     'getCrmQuoteIntroductionSetup',
     'getCrmQuoteCatalogProducts',
+    'calculateCrmQuoteCustomSewing',
     'getCrmQuoteIntroTemplates',
     'createCrmQuoteIntroTemplate',
     'deleteCrmQuoteIntroTemplate',

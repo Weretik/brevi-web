@@ -74,6 +74,7 @@ describe('КП list', () => {
     renderList(false);
     await user.click(screen.getByRole('button', { name: 'Нове КП' }));
     expect(screen.getByRole('menuitem', { name: /КП під запит/ })).toBeVisible();
+    expect(screen.getByRole('menuitem', { name: /КП з нуля \(новий виріб\)/ })).toBeVisible();
     await user.click(screen.getByRole('menuitem', { name: /КП для знайомства/ }));
     expect(screen.getByText('introduction editor')).toBeInTheDocument();
   });

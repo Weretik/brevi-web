@@ -2,7 +2,8 @@ import type { QuoteIntroduction } from './quote-introduction';
 
 export type QuoteKind = 'Request' | 'Introduction';
 export type QuoteStatus = 'Draft' | 'Sent';
-export type QuoteItemKind = 'Sewing' | 'Ppe' | 'OneOffPpe';
+export type QuoteItemKind = 'Sewing' | 'Ppe' | 'OneOffPpe' | 'CustomSewing';
+export type QuoteItemLineKind = 'Accessory' | 'Operation';
 
 /** The three quantity tiers of every price row: до 9, 10–40 and від 41 шт. */
 export type QuoteTier = 'retail' | 'wholesale' | 'large';
@@ -33,6 +34,19 @@ export interface QuoteOption {
   readonly manualByName: string | null;
   readonly manualAt: string | null;
   readonly pricesTakenAt: string | null;
+  /** Metres of the fabric in one «Виріб з нуля»; null for other items. */
+  readonly fabricMeters: number | null;
+}
+
+/** An accessory or operation of a «Виріб з нуля»; name and unit are copied when it was priced. */
+export interface QuoteItemLine {
+  readonly kind: QuoteItemLineKind;
+  readonly referenceId: number;
+  readonly name: string;
+  readonly unit: string;
+  readonly quantity: number;
+  /** Minutes of an operation without a fixed norm. */
+  readonly manualMinutes: number | null;
 }
 
 export interface QuoteItem {
@@ -48,6 +62,8 @@ export interface QuoteItem {
   readonly season: string | null;
   readonly supplierUrl: string | null;
   readonly options: readonly QuoteOption[];
+  /** Accessories and operations of a «Виріб з нуля»; empty for other items. */
+  readonly lines: readonly QuoteItemLine[];
 }
 
 export interface Quote {

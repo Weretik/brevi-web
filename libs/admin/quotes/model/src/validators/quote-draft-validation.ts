@@ -44,6 +44,7 @@ function optionError(item: QuoteItemDraft, option: QuoteOptionDraft): string | n
 
 function itemError(item: QuoteItemDraft): string | null {
   if (item.kind === 'OneOffPpe' && !item.name.trim()) return 'Вкажіть назву разової позиції.';
+  if (item.kind === 'CustomSewing' && !item.name.trim()) return 'Вкажіть назву виробу з нуля.';
   if (item.options.length === 0) return 'Додайте хоча б один варіант тканини.';
   if (item.description.length > quoteTextMaxLength) return 'Опис задовгий.';
   const shows = item.options.some((option) =>

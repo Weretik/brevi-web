@@ -2,6 +2,7 @@ import type {
   Quote,
   QuoteCatalogPage,
   QuoteCatalogProduct,
+  QuoteCustomSewingPrice,
   QuoteItem,
   QuoteOption,
   QuotePage,
@@ -37,6 +38,7 @@ const option = (value: Schemas['CrmQuoteOption']): QuoteOption => ({
   manualByName: value.manualByName ?? null,
   manualAt: value.manualAt ?? null,
   pricesTakenAt: value.pricesTakenAt ?? null,
+  fabricMeters: value.fabricMeters ?? null,
 });
 
 const item = (value: Schemas['CrmQuoteItem']): QuoteItem => ({
@@ -52,6 +54,14 @@ const item = (value: Schemas['CrmQuoteItem']): QuoteItem => ({
   season: value.season ?? null,
   supplierUrl: value.supplierUrl ?? null,
   options: value.options.map(option),
+  lines: value.lines.map((line) => ({
+    kind: line.kind,
+    referenceId: line.referenceId,
+    name: line.name,
+    unit: line.unit,
+    quantity: line.quantity,
+    manualMinutes: line.manualMinutes ?? null,
+  })),
 });
 
 export const mapQuote = (value: Schemas['CrmQuote']): Quote => ({
@@ -160,3 +170,34 @@ export const mapQuoteStaff = (value: Schemas['CrmQuoteStaff'][]): QuoteStaff[] =
     name: member.name,
     email: member.email ?? null,
   }));
+
+export const mapQuoteCustomSewingPrice = (
+  value: Schemas['CrmQuoteCustomSewingPrice'],
+): QuoteCustomSewingPrice => ({
+  lines: value.lines.map((line) => ({
+    kind: line.kind,
+    referenceId: line.referenceId,
+    name: line.name ?? null,
+    unit: line.unit ?? null,
+    unitValue: line.unitValue ?? null,
+    isActive: line.isActive,
+  })),
+  fabrics: value.fabrics.map((fabric) => ({
+    fabricId: fabric.fabricId,
+    meters: fabric.meters,
+    name: fabric.name ?? null,
+    details: fabric.details ?? null,
+    pricePerMeter: fabric.pricePerMeter ?? null,
+    minutes: fabric.minutes ?? null,
+    laborCost: fabric.laborCost ?? null,
+    fullCost: fabric.fullCost ?? null,
+    prices: fabric.prices
+      ? {
+          retail: fabric.prices.retail ?? null,
+          wholesale: fabric.prices.wholesale ?? null,
+          large: fabric.prices.large ?? null,
+        }
+      : null,
+    problems: fabric.problems,
+  })),
+});

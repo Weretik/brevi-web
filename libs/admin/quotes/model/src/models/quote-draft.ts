@@ -1,4 +1,4 @@
-import type { QuoteItemKind, QuoteTier } from '../entities/quote';
+import type { QuoteItemKind, QuoteItemLine, QuoteTier } from '../entities/quote';
 
 /** One editable price box; `manual` is the typed text, empty for the Catalog price. */
 export interface QuotePriceDraft {
@@ -20,6 +20,9 @@ export interface QuoteOptionDraft {
   readonly manualReason: string;
   /** Who set the saved manual price and when, for the hint under the row. */
   readonly manualBy: string | null;
+  /** The fabric and its metres of a «Виріб з нуля» row; null for other items. */
+  readonly fabricId: number | null;
+  readonly fabricMeters: number | null;
 }
 
 export interface QuoteItemDraft {
@@ -36,6 +39,8 @@ export interface QuoteItemDraft {
   readonly season: string | null;
   readonly supplierUrl: string;
   readonly options: readonly QuoteOptionDraft[];
+  /** Accessories and operations of a «Виріб з нуля», changed only in its composition panel. */
+  readonly lines: readonly QuoteItemLine[];
 }
 
 export interface QuoteDraft {
@@ -61,4 +66,9 @@ export const quoteItemSubtitles: Readonly<Record<QuoteItemKind, string>> = {
   Sewing: 'Швейна продукція · готові варіанти тканини',
   Ppe: 'ЗІЗ · готовий товар',
   OneOffPpe: 'ЗІЗ · разова позиція',
+  CustomSewing: 'Швейна продукція · виріб з нуля',
 };
+
+/** Items whose prices come from the Catalog formula and are never typed. */
+export const isSewingKind = (kind: QuoteItemKind): boolean =>
+  kind === 'Sewing' || kind === 'CustomSewing';

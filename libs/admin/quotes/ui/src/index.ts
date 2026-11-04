@@ -1,5 +1,11 @@
 export { QuotesTable } from './tables/quotes-table';
 export { QuoteAddItems } from './components/editor/quote-add-items';
+export { QuoteCustomPriceSummary } from './components/custom-sewing/quote-custom-price-summary';
+export { QuoteCustomRows } from './components/custom-sewing/quote-custom-rows';
+export type {
+  QuoteCustomChoice,
+  QuoteCustomRow,
+} from './components/custom-sewing/quote-custom-rows';
 export { QuoteHeaderCard } from './components/editor/quote-header-card';
 export { QuoteItemCard } from './components/editor/quote-item-card';
 export { QuoteNotesCard } from './components/editor/quote-notes-card';

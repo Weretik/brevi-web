@@ -1,7 +1,24 @@
 export type * from './entities/quote';
 export type * from './entities/quote-catalog';
 export type * from './models/quote-draft';
-export { quoteItemSubtitles, quoteTierLabels, quoteTiers } from './models/quote-draft';
+export {
+  isSewingKind,
+  quoteItemSubtitles,
+  quoteTierLabels,
+  quoteTiers,
+} from './models/quote-draft';
+export type * from './entities/quote-custom-sewing';
+export type * from './models/quote-custom-sewing-draft';
+export { quoteCustomLineKindLabels } from './models/quote-custom-sewing-draft';
+export {
+  addCustomFabric,
+  addCustomLine,
+  customSewingDraft,
+  customSewingErrors,
+  customSewingItemDraft,
+  customSewingPriceRequest,
+  parseCustomQuantity,
+} from './mappers/quote-custom-sewing-mapper';
 export {
   catalogItemDraft,
   emptyQuoteDraft,
