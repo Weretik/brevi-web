@@ -4,6 +4,7 @@ import {
   useDeleteStaffAccountMutation,
   useSetStaffBlockedMutation,
   useSetStaffPasswordMutation,
+  useUpdateStaffDetailsMutation,
 } from '@admin/users/data-access';
 import { useState } from 'react';
 
@@ -11,7 +12,7 @@ import { describeConfirmation } from './staff-action-confirmation';
 import { getStaffErrorMessage } from '../errors/staff-error-message';
 
 import type { PendingConfirmation } from './staff-action-confirmation';
-import type { CreateStaffAccountInput, StaffAccount } from '@admin/users/model';
+import type { CreateStaffAccountInput, StaffAccount, StaffDetailsInput } from '@admin/users/model';
 import type { StaffAccountAction } from '@admin/users/ui';
 
 /** Dialog state and mutations of the users page; each dialog shows its own server error. */
@@ -21,15 +22,18 @@ export function useStaffAccountActions(onSuccess: (message: string) => void) {
   const [setBlocked, setBlockedState] = useSetStaffBlockedMutation();
   const [setPassword, setPasswordState] = useSetStaffPasswordMutation();
   const [deleteStaff, deleteState] = useDeleteStaffAccountMutation();
+  const [updateDetails, updateDetailsState] = useUpdateStaffDetailsMutation();
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [passwordTarget, setPasswordTarget] = useState<StaffAccount | null>(null);
+  const [detailsTarget, setDetailsTarget] = useState<StaffAccount | null>(null);
   const [confirmation, setConfirmation] = useState<PendingConfirmation | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const closeDialogs = () => {
     setIsCreateOpen(false);
     setPasswordTarget(null);
+    setDetailsTarget(null);
     setConfirmation(null);
     setError(null);
   };
@@ -43,6 +47,8 @@ export function useStaffAccountActions(onSuccess: (message: string) => void) {
     setError(null);
     if (action.type === 'setPassword') {
       setPasswordTarget(account);
+    } else if (action.type === 'editDetails') {
+      setDetailsTarget(account);
     } else {
       setConfirmation(describeConfirmation(account, action));
     }
@@ -70,6 +76,20 @@ export function useStaffAccountActions(onSuccess: (message: string) => void) {
       return true;
     } catch (passwordError) {
       setError(getStaffErrorMessage(passwordError));
+      return false;
+    }
+  };
+
+  const submitDetails = async (details: StaffDetailsInput): Promise<boolean> => {
+    if (!detailsTarget) return false;
+
+    try {
+      await updateDetails({ userId: detailsTarget.id, details }).unwrap();
+      setError(null);
+      onSuccess('Дані користувача збережено.');
+      return true;
+    } catch (detailsError) {
+      setError(getStaffErrorMessage(detailsError));
       return false;
     }
   };
@@ -102,6 +122,7 @@ export function useStaffAccountActions(onSuccess: (message: string) => void) {
     confirmation,
     confirming: changeRoleState.isLoading || setBlockedState.isLoading || deleteState.isLoading,
     creating: createState.isLoading,
+    detailsTarget,
     error,
     isCreateOpen,
     openCreate,
@@ -109,6 +130,8 @@ export function useStaffAccountActions(onSuccess: (message: string) => void) {
     settingPassword: setPasswordState.isLoading,
     startAction,
     submitCreate,
+    submitDetails,
+    updatingDetails: updateDetailsState.isLoading,
     submitPassword,
   };
 }

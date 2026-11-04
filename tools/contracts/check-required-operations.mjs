@@ -15,6 +15,16 @@ const requiredOperations = {
     'setStaffBlocked',
     'setStaffPassword',
     'deleteStaffAccount',
+    'updateStaffDetails',
+  ],
+  'identity/profile.openapi.yaml': [
+    'getMyProfile',
+    'changeMyName',
+    'changeMyPhone',
+    'uploadMyAvatar',
+    'removeMyAvatar',
+    'changeMyEmail',
+    'changeMyPassword',
   ],
   'reference/suppliers.openapi.yaml': [
     'getSuppliers',

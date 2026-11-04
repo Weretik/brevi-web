@@ -1,4 +1,4 @@
-import { formatMediaFileSize } from '@admin/media/model';
+import { formatMediaDimensions, formatMediaFileSize } from '@admin/media/model';
 import { Box, Card, CardActionArea, Checkbox, Typography } from '@mui/material';
 
 import { MediaFilePreview } from './media-file-preview';
@@ -43,6 +43,7 @@ export function MediaFileGrid({
       {files.map((file) => {
         const selected = selectedIds.has(file.id);
         const folder = folderLabel?.(file);
+        const dimensions = formatMediaDimensions(file.width, file.height);
         return (
           <Card
             component="li"
@@ -70,7 +71,7 @@ export function MediaFileGrid({
               }}
             />
             <CardActionArea onClick={() => onOpen(file)} aria-label={`Відкрити «${file.fileName}»`}>
-              <MediaFilePreview file={file} ratio="1 / 1" />
+              <MediaFilePreview file={file} ratio="1 / 1" preferThumbnail />
               <Box sx={{ px: 1.25, py: 1 }}>
                 <Typography variant="body2" noWrap title={file.fileName} sx={{ fontWeight: 600 }}>
                   {file.fileName}
@@ -84,6 +85,7 @@ export function MediaFileGrid({
                     }}
                   >
                     {formatMediaFileSize(file.sizeInBytes)}
+                    {dimensions ? ` · ${dimensions}` : ''}
                   </Box>
                   {folder ? ` · ${folder}` : ''}
                 </Typography>

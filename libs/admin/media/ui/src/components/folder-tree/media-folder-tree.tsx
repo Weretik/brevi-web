@@ -19,7 +19,8 @@ interface Props {
   totalCount: number | null;
   onSelect: (id: number | null) => void;
   onToggle: (id: number) => void;
-  onAction: (action: MediaFolderAction, node: MediaFolderNode) => void;
+  /** Without it the tree only selects folders, as in the photo picker. */
+  onAction?: (action: MediaFolderAction, node: MediaFolderNode) => void;
 }
 
 /** Folder tree of the photo library: «Усі фото», then folders with their photo counts. */
@@ -61,7 +62,7 @@ export function MediaFolderTree({
                   </IconButton>
                 ) : null
               }
-              menu={<MediaFolderMenu node={node} onAction={onAction} />}
+              menu={onAction ? <MediaFolderMenu node={node} onAction={onAction} /> : undefined}
               onClick={() => onSelect(node.folder.id)}
             />
             {hasChildren && expanded && renderNodes(node.children)}

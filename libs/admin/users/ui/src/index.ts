@@ -1,5 +1,14 @@
 export { ConfirmActionDialog } from './dialogs/confirm-action-dialog';
+export { ChangeEmailPanel } from './panels/change-email-panel';
+export type { OwnEmailChange } from './panels/change-email-panel';
+export { ChangePasswordPanel } from './panels/change-password-panel';
+export type { OwnPasswordChange } from './panels/change-password-panel';
 export { CreateStaffPanel } from './panels/create-staff-panel';
+export { EditTextPanel } from './panels/edit-text-panel';
 export { SetPasswordPanel } from './panels/set-password-panel';
+export { StaffDetailsPanel } from './panels/staff-details-panel';
+export { ProfileDetailsCard } from './profile/profile-details-card';
+export type { ProfileField } from './profile/profile-details-card';
+export { ProfilePhotoCard } from './profile/profile-photo-card';
 export { StaffAccountsTable } from './tables/staff-accounts-table';
 export type { StaffAccountAction } from './tables/staff-account-actions-menu';

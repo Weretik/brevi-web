@@ -13,7 +13,13 @@ vi.mock('@admin/core/auth', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@admin/core/auth')>()),
   // A signed-in manager; the session guard itself is tested in the auth library.
   RequireAdminSession: ({ children }: { children: (user: SessionUser) => ReactNode }) =>
-    children({ id: '2', email: 'manager@brevi.com.ua', fullName: 'Олена', roles: ['Manager'] }),
+    children({
+      id: '2',
+      email: 'manager@brevi.com.ua',
+      fullName: 'Олена',
+      roles: ['Manager'],
+      avatarUrl: null,
+    }),
   useGetAdminSessionRolesQuery: () => ({
     currentData: ['Manager'],
     isSuccess: true,
@@ -114,7 +120,7 @@ describe('React Admin routing', () => {
     }
   });
 
-  it('shows the demo overview with the BreviERP link moved to the profile menu', async () => {
+  it('shows the demo overview and the signed-in person in the profile menu', async () => {
     const user = userEvent.setup();
     window.history.replaceState({}, '', '/');
     renderApp();
@@ -123,11 +129,11 @@ describe('React Admin routing', () => {
       await screen.findByRole('heading', { name: 'Огляд виробництва' }, { timeout: 5000 }),
     ).toBeVisible();
     expect(screen.getByText('Демо-дані')).toBeVisible();
-    expect(screen.queryByRole('link', { name: /Про BreviERP/ })).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Профіль' }));
-    expect(
-      await screen.findByRole('menuitem', { name: 'Про BreviERP, конфіденційність та умови' }),
-    ).toHaveAttribute('href', '/brevi-erp/index.html');
+    const menu = await screen.findByRole('menu');
+    expect(within(menu).getByText('manager@brevi.com.ua')).toBeVisible();
+    expect(within(menu).getByText('Менеджер')).toBeVisible();
+    expect(within(menu).getByRole('menuitem', { name: 'Мій кабінет' })).toBeVisible();
     await user.keyboard('{Escape}');
     expect(
       within(screen.getByRole('navigation', { name: 'Основна навігація' })).queryByRole('link', {
@@ -322,7 +328,7 @@ describe('React Admin routing', () => {
         name: 'Бібліотека фото',
       }),
     ).toHaveAttribute('href', '/media');
-    expect(await screen.findByText('Бібліотека поки порожня.')).toBeVisible();
+    expect(await screen.findByText(/^Бібліотека поки порожня\./)).toBeVisible();
   });
 
   it('persists the selected color mode', async () => {

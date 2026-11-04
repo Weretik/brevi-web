@@ -433,19 +433,28 @@ test('library photos can be attached and reordered', async ({ page }) => {
     submitted = route.request().postDataJSON() as Record<string, unknown>;
     return route.fulfill({ status: 500 });
   });
+  await page.route('**/api/media/folders**', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([{ id: 1, name: 'Товари', parentId: null, fileCount: 2 }]),
+    }),
+  );
   await page.goto('/references/products/create');
-  const mediaSelect = page.getByRole('combobox', { name: 'Додати наявне медіа' });
-  await mediaSelect.click();
-  await expect(page.getByRole('option', { name: 'first.png' })).toBeVisible();
-  await page.getByRole('option', { name: 'first.png' }).click();
+  await page.getByRole('button', { name: 'Вибрати фото' }).click();
+  let picker = page.getByRole('dialog', { name: 'Вибрати фото' });
+  await picker.getByRole('checkbox', { name: 'Вибрати «first.png»' }).check();
+  await picker.getByRole('checkbox', { name: 'Вибрати «third.png»' }).check();
+  await picker.getByRole('button', { name: 'Додати (2)' }).click();
   await expect(page.getByRole('img', { name: 'first.png' })).toBeVisible();
-  await mediaSelect.click();
-  await expect(page.getByRole('option', { name: 'first.png' })).toHaveCount(0);
-  await page.getByRole('option', { name: 'third.png' }).click();
   await page.getByRole('button', { name: 'Вгору' }).last().click();
-  await page
+  await page.getByRole('button', { name: 'Вибрати фото' }).click();
+  picker = page.getByRole('dialog', { name: 'Вибрати фото' });
+  await expect(picker.getByRole('checkbox', { name: 'Вибрати «first.png»' })).toBeChecked();
+  await picker
     .locator('input[type="file"]')
     .setInputFiles({ name: 'fourth.png', mimeType: 'image/png', buffer: Buffer.from([1, 2, 3]) });
+  await picker.getByRole('button', { name: 'Додати (1)' }).click();
   await expect(page.getByRole('img', { name: 'fourth.png' })).toBeVisible();
   await page.getByRole('spinbutton', { name: 'ID товару' }).fill('21');
   await page.getByRole('textbox', { name: 'Назва українською' }).fill('Товар');
@@ -560,6 +569,7 @@ function libraryPhoto(id: number, fileName: string) {
     alt: null,
     folderId: 1,
     publicUrl: `/${fileName}`,
+    thumbnailUrl: null,
     contentType: 'image/png',
     sizeInBytes: 3,
     width: null,

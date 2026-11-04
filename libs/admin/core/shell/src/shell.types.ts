@@ -9,10 +9,13 @@ export interface AdminNavigationItem {
   to?: string;
 }
 
-/** A link in the profile menu, for example legal or about pages outside the SPA. */
-export interface AdminProfileLink {
-  label: string;
-  href: string;
+/** The signed-in staff member as the header shows them; the app maps it from the session. */
+export interface AdminShellUser {
+  email: string;
+  fullName: string;
+  /** Role in Ukrainian, for example «Адміністратор». */
+  roleLabel: string;
+  avatarUrl: string | null;
 }
 
 export interface AdminNavigationGroup {

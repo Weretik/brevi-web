@@ -36,6 +36,7 @@ describe('cookie session transport', () => {
       email: 'admin@brevi.com.ua',
       fullName: 'Адміністратор',
       roles: ['Admin'],
+      avatarUrl: null,
     });
     expect(post).toHaveBeenCalledWith(
       'http://localhost/api/auth/cookie/login',

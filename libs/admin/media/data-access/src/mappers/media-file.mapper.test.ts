@@ -10,6 +10,7 @@ const file = {
   alt: null,
   folderId: 1,
   publicUrl: 'https://brevi-media.cdn.express/library/original/a.jpg',
+  thumbnailUrl: 'https://brevi-media.cdn.express/library/thumbs/a.webp',
   contentType: 'image/jpeg',
   sizeInBytes: 2048,
   width: null,
@@ -28,6 +29,15 @@ describe('media mappers', () => {
         usages: [{ area: 'Товари', ownerId: 7, title: 'Сумка' }],
       }).usages,
     ).toEqual([{ area: 'Товари', ownerId: 7, title: 'Сумка' }]);
+  });
+
+  it('accepts an old response without a preview', () => {
+    const old: Record<string, unknown> = { ...file };
+    delete old['thumbnailUrl'];
+    expect(mapMediaFilePage({ items: [old], total: 1, page: 1, pageSize: 48 }).items[0]).toEqual({
+      ...file,
+      thumbnailUrl: null,
+    });
   });
 
   it('rejects a broken response', () => {

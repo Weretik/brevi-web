@@ -60,7 +60,9 @@
       "@admin/users/model": ["libs/admin/users/model/src/index.ts"],
       "@admin/users/data-access": ["libs/admin/users/data-access/src/index.ts"],
       "@admin/users/ui": ["libs/admin/users/ui/src/index.ts"],
-      "@admin/users/feature": ["libs/admin/users/feature/src/index.ts"]
+      "@admin/users/feature": ["libs/admin/users/feature/src/index.ts"],
+      "@admin/content/feature": ["libs/admin/content/feature/src/index.ts"],
+      "@admin/shared/ui": ["libs/admin/shared/ui/src/index.ts"]
     }
   }
 }
