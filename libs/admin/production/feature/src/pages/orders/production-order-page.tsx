@@ -144,6 +144,7 @@ export function ProductionOrderPage() {
                 onCancelShipment={(shipmentId) => void tracking.cancel(shipmentId)}
                 onUpload={(kind, file) => void files.add(item.id, kind, file)}
                 onDeleteFile={files.requestDelete}
+                onMessage={setMessage}
               />
             </ProductionItemCard>
           ))}
