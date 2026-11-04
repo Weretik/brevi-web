@@ -9,7 +9,7 @@ models; and `products/data-access` provides API endpoints, mappers, and
 response validation. The route file lazy-loads pages; `AppRouter` imports only
 `productsRoutes`.
 
-Saved Sewing Products also expose the [Article and composition editor](sewing-composition.md) through a separate API/draft boundary. Base Product saves preserve the new records; PPE pricing uses its separate versioned input workflow.
+Saved Sewing Products also expose the [fabrics and composition tables](sewing-composition.md) through a separate API boundary. Base Product saves preserve the new records; PPE pricing uses its separate versioned input workflow.
 
 [Article pricing](sewing-pricing.md) adds explicit calculation/publication beside the selected Article. Product cards/lists display published Sewing wholesale prices through one bounded page projection, with loading/error/unpublished states and no legacy price fallback. PPE uses only its current versioned pricing endpoint.
 

@@ -32,7 +32,7 @@ const calculation: SewingPriceCalculation = {
   prices: { retail: 310, wholesale: 264, largeWholesale: 250 },
   blockers: [],
 };
-const props = { productId: 42, articleId: 501, dirty: false };
+const props = { productId: 42, articleId: 501 };
 const published = {
   id: 'p',
   productId: 42,
@@ -66,7 +66,11 @@ afterEach(cleanup);
 
 describe('Article price (published automatically)', () => {
   it('shows the published tiers and the breakdown of their calculation, without write buttons', () => {
-    mocks.getPublished.mockReturnValue({ currentData: published, isFetching: false, refetch: vi.fn() });
+    mocks.getPublished.mockReturnValue({
+      currentData: published,
+      isFetching: false,
+      refetch: vi.fn(),
+    });
     render(<SewingPricingFeature {...props} />);
     expect(screen.getByText('Повна собівартість')).toBeTruthy();
     expect(screen.getByText('Роздріб · 1–9 шт.')).toBeTruthy();
@@ -82,12 +86,9 @@ describe('Article price (published automatically)', () => {
 
   it('explains a missing price and does not load a calculation', () => {
     render(<SewingPricingFeature {...props} />);
-    expect(screen.getByText('Ціни ще немає: перевірте, чи заповнений склад артикула.')).toBeTruthy();
+    expect(
+      screen.getByText('Ціни ще немає: перевірте тканину, комплектацію і трудовитрати.'),
+    ).toBeTruthy();
     expect(mocks.getCalculation).toHaveBeenCalledWith(expect.anything(), { skip: true });
-  });
-
-  it('asks to save unsaved composition changes', () => {
-    render(<SewingPricingFeature {...props} dirty />);
-    expect(screen.getByText('Збережіть зміни складу, щоб ціна перерахувалася.')).toBeTruthy();
   });
 });

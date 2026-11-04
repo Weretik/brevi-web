@@ -1,8 +1,4 @@
-import type {
-  SewingMaterialDraft,
-  SewingMaterialKind,
-  SewingMaterialUnit,
-} from '../../entities/sewing-composition';
+import type { SewingMaterialKind, SewingMaterialUnit } from '../../entities/sewing-composition';
 
 export function materialUnitForKind(kind: SewingMaterialKind): SewingMaterialUnit {
   switch (kind) {
@@ -13,20 +9,4 @@ export function materialUnitForKind(kind: SewingMaterialKind): SewingMaterialUni
     case 'OtherCost':
       return 'Service';
   }
-}
-export function emptySewingMaterial(
-  kind: SewingMaterialKind,
-  clientId: string,
-  sortOrder: number,
-): SewingMaterialDraft {
-  return {
-    clientId,
-    kind,
-    referenceId: null,
-    costCode: null,
-    quantity: 1,
-    unit: materialUnitForKind(kind),
-    sortOrder,
-    comment: '',
-  };
 }

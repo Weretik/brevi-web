@@ -1,67 +1,56 @@
-# Admin: Sewing Articles and composition
+# Admin: Sewing fabrics and composition
 
-**Implemented code:** 2026-10-25. **Surface:** saved Sewing Product detail at `/references/products/:id`. [Specification and evidence](../../../specs/admin/products/004-sewing-articles-and-composition/implementation.md).
+**Implemented code:** 2026-10-25, reworked 2026-11-04. **Surface:** sewing model card at `/references/products/:id` and «Нова модель» steps 2–4. Specifications: [original](../../../specs/admin/products/004-sewing-articles-and-composition/implementation.md), [review marks removed](../../../specs/admin/products/015-remove-review-marks/README.md), [fabric variants](../../../specs/admin/products/016-fabric-variants/README.md).
 
-An authorized user views Articles, common materials/operations, selected-Article materials and calculation-readiness blockers. Managers and administrators can create a sale SKU and save norms; lines have no review or required marks ([spec 015](../../../specs/admin/products/015-remove-review-marks/README.md)). Effective composition is displayed with explicit scope; shared lines are never duplicated into Article-specific writes. Price publication is not part of this screen.
+A sewing model has fabric variants and one shared composition. A variant is a fabric with its metres per product, a sale SKU on the site and «Продається». Accessories, other costs and operations belong to the whole model. A variant's price is the shared part plus its fabric; the backend recalculates and publishes it after every change.
+
+The card tabs are «Тканини» (one row per fabric with live cost and three prices), «Комплектація» and «Трудовитрати». Each is a table; a row opens the right side panel (`ReferenceEditorDrawer`) for view, «Редагувати» for edit, and «Додати …» for a new line. Every save goes to the server at once: there are no drafts, scopes or unsaved-changes dialogs. Only problems are marked: a missing price with its reason and a switched-off fabric. Managers and administrators edit; others only view.
 
 ```text
 libs/admin/products/
 ├── feature/src/
-│   ├── components/sewing-composition/          # thin public entry, screen composition, scope editors, feedback and dialogs
-│   ├── hooks/sewing-composition/               # controller and named queries/drafts/writes/selection/navigation owners
-│   ├── hooks/product-editor/use-legacy-sewing-norm-lock.ts # legacy norm policy
-│   └── model/sewing-composition/               # scope/pending-transition contracts and error translation
+│   ├── hooks/sewing-model/                     # model queries, writes, side-panel state, card hook
+│   ├── components/sewing-model/                # «Тканини», «Комплектація», «Трудовитрати» tabs and their drawers
+│   ├── components/sewing-card/                 # card shell, metrics, «Розрахунок» tab
+│   └── hooks/product-editor/use-legacy-sewing-norm-lock.ts # legacy norm policy
 ├── model/src/
-│   ├── entities/sewing-articles/               # one Article contract per file
-│   ├── entities/sewing-composition/            # one composition/line contract per file
-│   ├── queries/sewing-composition/             # defaults and editable-draft comparison
-│   ├── mappers/sewing-composition/             # scoped drafts and pure material/operation review invalidation
-│   └── validators/sewing-composition/          # material, operation and lookup-reference validation
+│   ├── entities/sewing-articles/               # variant and its write input
+│   ├── entities/sewing-composition/            # shared composition and line contracts
+│   ├── forms/{sewing-variant,sewing-material,sewing-operation}/ # side-panel values and conversion
+│   ├── validators/sewing-variant/              # fabric, metres and SKU rules
+│   ├── queries/sewing-variants/                # variant rows with fabric names and live prices
+│   ├── queries/sewing-card/                    # labour and material lines, blocker reasons, totals
+│   └── mappers/sewing-composition/             # composition view to the shared draft
 ├── ui/src/
-│   ├── components/sewing-articles/             # Article list
-│   ├── forms/sewing-articles/                  # Article panel and separate creation form
-│   ├── forms/sewing-composition/               # presentation, private props, sections and rows
-│   └── hooks/sewing-composition/               # local form errors, temporary keys and actions
+│   ├── components/sewing-card/                 # variants grid, materials and labour tables, row actions, delete dialog
+│   └── forms/{sewing-variant,sewing-material,sewing-operation}/ # side-panel fields
 └── data-access/src/
     ├── api/sewing-access/                      # session capability query
-    ├── api/sewing-articles/                    # Article list/create endpoints
-    ├── api/sewing-composition/                 # composition endpoints, cache tags and error normalization
-    ├── contracts/{sewing-articles,sewing-composition}/ # aliases to generated operation DTOs
-    ├── models/                                # private technical request/capability contracts
+    ├── api/sewing-articles/                    # variant list, create, update, delete
+    ├── api/sewing-composition/                 # shared composition read/replace, cache tags, errors
     ├── mappers/{sewing-access,sewing-articles,sewing-composition}/ # request and response conversion
     └── validators/{sewing-access,sewing-articles,sewing-composition}/ # runtime response validation
 ```
 
 ```mermaid
 flowchart LR
-    Router[Data router / navigation blocker] --> Detail[Product detail]
-    Detail --> Feature[Sewing composition feature]
-    Feature --> Controller[Composition controller hook]
-    Controller --> Draft[Scoped application draft]
-    Feature --> Screen[Screen composition]
-    Screen --> UI[Articles and composition controls]
-    Controller --> Data[Sewing API hooks]
-    UI --> Rules[Pure model updates and validation]
-    Data --> Mapper[Runtime validation]
+    Card[Sewing card / «Нова модель»] --> Hook[useSewingModelCard]
+    Hook --> Model[useSewingModel: variants, composition, references]
+    Hook --> Writes[useSewingModelWrites]
+    Card --> Tabs[Tabs + side panels]
+    Tabs --> UI[Tables and forms]
+    UI --> Rules[Pure form values and validation]
+    Writes --> Data[Sewing API hooks]
     Data --> Backend[Versioned backend operations]
     Contract[Pinned OpenAPI / generated operations] --> Data
 ```
 
-Session roles enable editing controls; server-side Catalog policies enforce access. Optimistic versions prevent stale saves. The composition screen remains conservative about OtherCost readiness; price calculation/publication is not integrated into this screen. See [API dependency](../../../specs/admin/products/004-sewing-articles-and-composition/contracts/api-contract.md) and [Product feature](products.md).
-
-Dirty composition blocks browser-history and SPA navigation through the data router; explicit confirmation controls leave/stay. Tab/window close has a separate unload warning. The [application routing document](../../../architecture/admin/runtime/application.md) describes the composition root change; domain route ownership and lazy page boundaries remain in place.
-
-The [responsibility audit](../../../specs/admin/products/004-sewing-articles-and-composition/code-audit/audit.md) records why these files were split or kept and the focused verification. The [structural remediation](../../../specs/admin/products/005-sewing-composition-structure/README.md) owns the dependency-ordered work; the original product specification still owns behavior.
-
-The [controller/form follow-up](../../../specs/admin/products/005-sewing-composition-structure/follow-up.md) records the subsequent split and keep decisions.
-
-Selecting an Article also opens its [calculation and publication panel](sewing-pricing.md). Unsaved composition disables pricing writes; backend publication revalidates the saved inputs.
+Every write sends the composition version; a 409 asks to refresh. Saving the composition sends the model code from «Товари», so it never restores an old code. Session roles enable editing controls; server-side Catalog policies enforce access. See [Product feature](products.md) and [calculation and published prices](sewing-pricing.md).
 
 ## Tests
 
 - `libs/admin/products/data-access/src/`: `api/sewing-articles/`, `api/sewing-composition/`, `mappers/sewing-articles/`, `mappers/sewing-composition/`, `mappers/sewing-access/`
-- `libs/admin/products/feature/src/components/sewing-composition/`
-- `libs/admin/products/model/src/`: `mappers/sewing-composition/`, `queries/sewing-composition/`, `validators/sewing-composition/`
-- `libs/admin/products/ui/src/forms/`: `sewing-articles/`, `sewing-composition/`
+- `libs/admin/products/feature/src/components/sewing-card/sewing-product-card.component.test.tsx`, `pages/product-create/sewing-create-page.component.test.tsx`
+- `libs/admin/products/model/src/`: `forms/sewing-variant/`, `forms/sewing-material/`, `queries/sewing-card/`, `mappers/sewing-composition/`
 
-Focused run: `npx nx test admin-products-data-access -- sewing-articles sewing-composition sewing-access`; `npx nx test admin-products-feature -- sewing-composition`; `npx nx test admin-products-model -- sewing-composition`; `npx nx test admin-products-ui -- sewing-articles sewing-composition`.
+Focused run: `npx nx test admin-products-data-access -- sewing-articles sewing-composition sewing-access`; `npx nx test admin-products-feature -- sewing-card product-create`; `npx nx test admin-products-model -- sewing-variant sewing-material sewing-card sewing-composition`.

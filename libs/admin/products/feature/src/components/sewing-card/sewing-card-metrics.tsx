@@ -16,15 +16,21 @@ function range(value: SewingAmountRange | null) {
     : `${sewingPriceFormat(value.min)} – ${sewingPriceFormat(value.max)}`;
 }
 
-/** Figures of the model: articles ready, labour, cost and retail price ranges. */
+/** Figures of the model: its fabrics, labour, cost and retail price ranges. */
 export function SewingCardMetrics({ totals, labourMinutes }: Props) {
   return (
     <SewingCardMetricStrip
       metrics={[
         {
-          label: 'Артикули',
-          value: `${totals.ready} з ${totals.articles}`,
-          note: 'готові до розрахунку',
+          label: 'Тканини',
+          value: String(totals.articles),
+          // Only a problem gets a note (CAT-013).
+          note:
+            totals.articles === 0
+              ? 'додайте тканину'
+              : totals.ready === totals.articles
+                ? undefined
+                : `без ціни: ${totals.articles - totals.ready}`,
           tone: totals.articles > 0 && totals.ready === totals.articles ? undefined : 'warning',
         },
         { label: 'Трудовитрати', value: `${minutes.format(labourMinutes)} хв`, note: 'на 1 виріб' },

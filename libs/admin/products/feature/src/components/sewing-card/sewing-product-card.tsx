@@ -1,22 +1,21 @@
-import { isSewingCreateReady } from '@admin/products/model';
-import { SewingCardHeader, SewingLabourTable } from '@admin/products/ui';
-import { Alert, Box, Stack, Tab, Tabs } from '@mui/material';
+import { isSewingCreateReady, sewingVariantRows } from '@admin/products/model';
+import { SewingCardHeader } from '@admin/products/ui';
+import { Box, Stack, Tab, Tabs } from '@mui/material';
 import { useState } from 'react';
 
-import { SewingCardArticlesTab } from './sewing-card-articles-tab';
 import { SewingCardMetrics } from './sewing-card-metrics';
 import { SewingCardPricingTab } from './sewing-card-pricing-tab';
-import { useSewingCard } from '../../hooks/sewing-card/use-sewing-card';
-import { useSewingCardComposition } from '../../hooks/sewing-card/use-sewing-card-composition';
 import {
   sewingCardTabLabels,
   sewingCardTabs,
   useSewingCardTab,
 } from '../../hooks/sewing-card/use-sewing-card-tab';
-import { useSewingCompositionController } from '../../hooks/sewing-composition/use-sewing-composition-controller';
+import { useSewingModelCard } from '../../hooks/sewing-model/use-sewing-model-card';
 import { ProductDeleteDialog } from '../product-deletion/product-delete-dialog';
 import { ProductOverviewDrawer } from '../product-overview/product-overview-drawer';
-import { SewingCompositionScreen } from '../sewing-composition/sewing-composition-screen';
+import { SewingLabourTab } from '../sewing-model/sewing-labour-tab';
+import { SewingMaterialsTab } from '../sewing-model/sewing-materials-tab';
+import { SewingVariantsTab } from '../sewing-model/sewing-variants-tab';
 
 import type { ProductDetail } from '@admin/products/model';
 
@@ -26,24 +25,15 @@ interface Props {
 }
 
 /**
- * Card of one sewing model (CAT-007): the sheet tabs «Товари», «Прайс на сайт», «Комплектація
- * виробів» and «Трудовитрати виробів» in one place. Site texts and photos are not shown here.
+ * Card of one sewing model (CAT-007, CAT-015): the sheet tabs «Прайс на сайт» (one row per fabric),
+ * «Комплектація виробів» and «Трудовитрати виробів» in one place. Every change saves at once.
  */
 export function SewingProductCard({ product, onDeleted }: Props) {
-  const card = useSewingCard(product.id);
-  const controller = useSewingCompositionController(product.id);
+  const { card, model, writes, modelCode, labourMinutes } = useSewingModelCard(product.id);
   const { tab, setTab } = useSewingCardTab();
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [pricingArticleId, setPricingArticleId] = useState<number | null>(null);
-  const { drafts, selection, queries } = controller;
-  const code = card.row?.code ?? null;
-  const { labour, labourMinutes } = useSewingCardComposition(
-    controller,
-    code,
-    Boolean(card.row),
-    card.seamstressPerMinute,
-  );
   const launched =
     card.row?.isActive !== false && (!card.summaryLoaded || isSewingCreateReady(card.articles));
   const sectionName =
@@ -53,34 +43,25 @@ export function SewingProductCard({ product, onDeleted }: Props) {
     <Stack sx={{ gap: 2 }}>
       <SewingCardHeader
         name={card.row?.name ?? product.name}
-        code={code ?? queries.articles.data?.modelCode ?? null}
+        code={modelCode}
         sectionName={sectionName}
         season={card.row?.season ?? null}
         active={card.row?.isActive ?? null}
         siteUrl={card.row?.currentSiteUrl ?? null}
         status={card.status}
-        canEdit={Boolean(card.row) && controller.canManage}
+        canEdit={Boolean(card.row) && model.canManage}
         continueHref={
           card.row && !launched ? `/references/products/new/sewing?id=${product.id}&step=2` : null
         }
-        deleteDisabled={drafts.dirty || controller.busy}
+        deleteDisabled={writes.busy}
         onEdit={() => setEditing(true)}
         onDelete={() => setDeleting(true)}
       />
       <SewingCardMetrics totals={card.totals} labourMinutes={labourMinutes} />
-      {drafts.dirty && (
-        <Alert severity="warning">
-          Є незбережені зміни складу. Збережіть або скасуйте їх, щоб перейти зі сторінки.
-        </Alert>
-      )}
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs
           value={tab}
-          onChange={(_, value: typeof tab) => {
-            // Operations belong to the whole model, so the labour tab edits the shared composition.
-            if (value === 'labour' && selection.scope === 'Article') selection.requestModel();
-            setTab(value);
-          }}
+          onChange={(_, value: typeof tab) => setTab(value)}
           variant="scrollable"
           allowScrollButtonsMobile
           aria-label="Розділи картки"
@@ -90,46 +71,29 @@ export function SewingProductCard({ product, onDeleted }: Props) {
           ))}
         </Tabs>
       </Box>
-      {tab === 'articles' && (
-        <SewingCardArticlesTab
-          rows={card.articles}
-          loading={card.summaryLoading}
-          error={card.summaryError}
-          onRetry={card.reloadSummary}
-          canCreate={controller.canManage && Boolean(queries.articles.data)}
-          version={queries.articles.data?.version ?? 0}
-          creating={controller.articleCreation.state.isLoading}
-          createError={controller.articleCreation.error}
-          onCreate={selection.requestCreateArticle}
-          onOpen={(articleId) => {
-            setPricingArticleId(articleId);
-            setTab('pricing');
-          }}
+      {tab === 'fabrics' && (
+        <SewingVariantsTab
+          model={model}
+          writes={writes}
+          summary={card.articles}
+          summaryLoading={card.summaryLoading}
+          summaryError={card.summaryError}
+          onRetrySummary={card.reloadSummary}
         />
       )}
-      {tab === 'materials' && (
-        <SewingCompositionScreen
-          productId={product.id}
-          controller={controller}
-          section="materials"
-        />
-      )}
+      {tab === 'materials' && <SewingMaterialsTab model={model} writes={writes} />}
       {tab === 'labour' && (
-        <Stack sx={{ gap: 2 }}>
-          <SewingLabourTable lines={labour} costsKnown={card.seamstressPerMinute !== null} />
-          <SewingCompositionScreen
-            productId={product.id}
-            controller={controller}
-            section="operations"
-          />
-        </Stack>
+        <SewingLabourTab
+          model={model}
+          writes={writes}
+          seamstressPerMinute={card.seamstressPerMinute}
+        />
       )}
       {tab === 'pricing' && (
         <SewingCardPricingTab
           productId={product.id}
-          articles={card.articles}
+          variants={sewingVariantRows(model.variants, card.articles, model.fabrics)}
           articleId={pricingArticleId}
-          dirty={drafts.dirty || controller.busy}
           onSelect={setPricingArticleId}
         />
       )}

@@ -33,9 +33,11 @@ export function SewingPublicationSection(
         </>
       ) : (
         !props.publicationLoading &&
-        !props.publicationError && <Alert severity="info">
-            Ціни ще немає: перевірте, чи заповнений склад артикула.
+        !props.publicationError && (
+          <Alert severity="info">
+            Ціни ще немає: перевірте тканину, комплектацію і трудовитрати.
           </Alert>
+        )
       )}
     </>
   );

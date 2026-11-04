@@ -10,11 +10,12 @@ export { useGetSewingAccessQuery } from './api/sewing-access/sewing-access.api';
 export {
   useListSewingArticlesQuery,
   useCreateSewingArticleMutation,
+  useUpdateSewingArticleMutation,
+  useDeleteSewingArticleMutation,
 } from './api/sewing-articles/sewing-articles.api';
 export {
   useGetSewingCompositionQuery,
   useReplaceSewingCompositionMutation,
-  useReplaceSewingArticleCompositionMutation,
 } from './api/sewing-composition/sewing-composition.api';
 export {
   useLazyListProductMediaQuery,

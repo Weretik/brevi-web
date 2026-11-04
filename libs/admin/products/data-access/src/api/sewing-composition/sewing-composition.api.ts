@@ -2,7 +2,6 @@ import { adminApi } from '@admin/shared/api-client';
 
 import { sewingCompositionTag } from './sewing-composition.cache';
 import { sewingCompositionError } from './sewing-composition.errors';
-import { mapReplaceSewingArticleCompositionRequest } from '../../mappers/sewing-composition/replace-sewing-article-composition-request.mapper';
 import { mapReplaceSewingCompositionRequest } from '../../mappers/sewing-composition/replace-sewing-composition-request.mapper';
 import { mapSewingComposition } from '../../mappers/sewing-composition/sewing-composition.mapper';
 
@@ -35,27 +34,7 @@ export const sewingCompositionApi = adminApi.injectEndpoints({
               { type: 'Product', id: 'LIST' },
             ],
     }),
-    replaceSewingArticleComposition: build.mutation<SewingCompositionView, SewingCompositionDraft>({
-      query: (draft) => ({
-        url: `/api/v1/products/${draft.productId}/articles/${draft.articleId}/composition`,
-        method: 'PUT',
-        body: mapReplaceSewingArticleCompositionRequest(draft),
-      }),
-      transformResponse: mapSewingComposition,
-      transformErrorResponse: sewingCompositionError,
-      invalidatesTags: (_result, error, { productId }) =>
-        error
-          ? []
-          : [
-              sewingCompositionTag(productId),
-              { type: 'Product', id: productId },
-              { type: 'Product', id: 'LIST' },
-            ],
-    }),
   }),
 });
-export const {
-  useGetSewingCompositionQuery,
-  useReplaceSewingCompositionMutation,
-  useReplaceSewingArticleCompositionMutation,
-} = sewingCompositionApi;
+export const { useGetSewingCompositionQuery, useReplaceSewingCompositionMutation } =
+  sewingCompositionApi;

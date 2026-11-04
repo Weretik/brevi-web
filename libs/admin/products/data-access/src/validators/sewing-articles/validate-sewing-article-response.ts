@@ -1,5 +1,10 @@
 import { record } from '../response-validation';
-import { ensureSewingResponse, sewingResponseInteger } from '../sewing-response-values';
+import {
+  ensureSewingResponse,
+  sewingResponseInteger,
+  sewingResponseNullableId,
+  sewingResponsePositive,
+} from '../sewing-response-values';
 
 import type { SewingArticleDto } from '../../contracts/sewing-articles/sewing-article.dto';
 
@@ -12,7 +17,9 @@ export function validateSewingArticleResponse(value: unknown): SewingArticleDto 
       item['saleSku'].trim().length > 0 &&
       item['saleSku'].length <= 80 &&
       typeof item['active'] === 'boolean' &&
-      sewingResponseInteger(item['sortOrder']),
+      sewingResponseInteger(item['sortOrder']) &&
+      sewingResponseNullableId(item['fabricId']) &&
+      (item['fabricQuantity'] === null || sewingResponsePositive(item['fabricQuantity'])),
   );
   return item as unknown as SewingArticleDto;
 }

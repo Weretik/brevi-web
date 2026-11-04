@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { sewingBlockerReasons, translateCompositionBlockers } from './sewing-blocker-reasons';
+import { sewingBlockerReasons } from './sewing-blocker-reasons';
 import { sewingCardTotals } from './sewing-card-totals';
 import { sewingLabourLines } from './sewing-labour-lines';
+import { sewingMaterialLines } from './sewing-material-lines';
 
 import type { SewingArticleSummaryRow } from '../../entities/sewing-card/sewing-article-summary';
 
@@ -36,13 +37,6 @@ describe('sewing card (CAT-007)', () => {
         { code: 'Something' },
       ]),
     ).toEqual(['Немає трудовитрат', 'Немає тканини', 'Не розраховано']);
-    expect(
-      translateCompositionBlockers([
-        'No effective fabric line is configured.',
-        'No effective fabric line is configured.',
-        'No operation lines are configured.',
-      ]),
-    ).toEqual(['Немає тканини.', 'Немає трудовитрат.']);
   });
 
   it('counts ready articles and price ranges', () => {
@@ -112,5 +106,30 @@ describe('sewing card (CAT-007)', () => {
       minutes: null,
       cost: null,
     });
+  });
+
+  it('names composition lines from the references and prices them', () => {
+    const line = {
+      clientId: 'a',
+      kind: 'Accessory' as const,
+      referenceId: 10,
+      costCode: null,
+      quantity: 3,
+      unit: 'Piece' as const,
+      sortOrder: 0,
+      comment: '',
+    };
+    const lines = sewingMaterialLines(
+      [
+        line,
+        { ...line, clientId: 'b', kind: 'OtherCost', referenceId: null, costCode: 'Пакування' },
+      ],
+      [],
+      [{ id: 10, name: 'Ґудзик', price: 1.5 }],
+    );
+    expect(lines.map((item) => [item.kindLabel, item.name, item.unitLabel, item.total])).toEqual([
+      ['Фурнітура', 'Ґудзик', 'шт.', 4.5],
+      ['Інша витрата', 'Пакування', 'шт.', null],
+    ]);
   });
 });

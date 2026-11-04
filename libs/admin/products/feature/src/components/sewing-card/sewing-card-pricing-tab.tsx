@@ -1,42 +1,42 @@
+import { sewingVariantLabel } from '@admin/products/model';
 import { ReferenceFilterChip } from '@admin/references/ui';
 import { Stack, Typography } from '@mui/material';
 
 import { SewingPricingFeature } from '../sewing-pricing/sewing-pricing-feature';
 
-import type { SewingArticleSummaryRow } from '@admin/products/model';
+import type { SewingVariantRow } from '@admin/products/model';
 
 interface Props {
   productId: number;
-  articles: SewingArticleSummaryRow[];
+  variants: SewingVariantRow[];
   articleId: number | null;
-  dirty: boolean;
   onSelect: (articleId: number) => void;
 }
 
-/** «Розрахунок»: the price of one Article and its cost breakdown; prices are published automatically. */
+/** «Розрахунок»: the price of one fabric and its cost breakdown; prices are published automatically. */
 export function SewingCardPricingTab(props: Props) {
-  if (!props.articles.length)
+  if (!props.variants.length)
     return (
       <Typography sx={{ color: 'text.secondary' }}>
-        Немає артикулу. Додайте його на вкладці «Артикули».
+        Немає тканини. Додайте її на вкладці «Тканини».
       </Typography>
     );
   const selected =
-    props.articles.find((article) => article.id === props.articleId) ?? props.articles[0];
+    props.variants.find((variant) => variant.id === props.articleId) ?? props.variants[0];
   return (
     <Stack sx={{ gap: 2 }}>
       <Stack
         role="group"
-        aria-label="Артикул для розрахунку"
+        aria-label="Тканина для розрахунку"
         direction="row"
         sx={{ gap: 1, flexWrap: 'wrap' }}
       >
-        {props.articles.map((article) => (
+        {props.variants.map((variant) => (
           <ReferenceFilterChip
-            key={article.id}
-            label={`Артикул ${article.saleSku}`}
-            selected={article.id === selected.id}
-            onClick={() => props.onSelect(article.id)}
+            key={variant.id}
+            label={sewingVariantLabel(variant)}
+            selected={variant.id === selected.id}
+            onClick={() => props.onSelect(variant.id)}
           />
         ))}
       </Stack>
@@ -44,7 +44,6 @@ export function SewingCardPricingTab(props: Props) {
         key={`${props.productId}:${selected.id}`}
         productId={props.productId}
         articleId={selected.id}
-        dirty={props.dirty}
       />
     </Stack>
   );

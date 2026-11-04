@@ -45,7 +45,6 @@ export function useIntroductionCatalogPickers(editor: ReturnType<typeof useIntro
     .map((row) => ({
       articleId: row.id,
       label: row.saleSku,
-      description: row.readiness?.blockers.join(', '),
     }));
   const readError = (failure: unknown, fallback: string) => (failure ? fallback : undefined);
 

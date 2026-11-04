@@ -17,14 +17,14 @@ export const sewingCreateStepInfo: Record<SewingCreateStep, SewingCreateStepInfo
     instruction: 'Код MOD-XXX має бути унікальним.',
   },
   2: {
-    title: 'Артикули',
+    title: 'Тканини',
     hint: '',
-    instruction: 'Кожен артикул — свій колір або тканина.',
+    instruction: 'Кожна тканина — окремий артикул на сайті зі своїм розходом.',
   },
   3: {
-    title: 'Матеріали',
+    title: 'Комплектація',
     hint: '',
-    instruction: 'Спільні матеріали для всіх артикулів; окремо — тільки якщо норма інша.',
+    instruction: 'Фурнітура та інші витрати спільні для всіх тканин моделі.',
   },
   4: {
     title: 'Операції',
@@ -53,8 +53,8 @@ export interface SewingCreateCheck {
 }
 
 export const sewingCreateCheckLabels: Record<SewingCreateCheckKey, string> = {
-  article: 'Немає артикула',
-  materials: 'Немає тканини / фурнітури',
+  article: 'Немає тканини',
+  materials: 'Тканину не вказано',
   composition: 'Неповна комплектація',
   labour: 'Немає трудовитрат',
 };

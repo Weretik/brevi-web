@@ -1,5 +1,5 @@
 import { useGetSewingArticleSummaryQuery } from '@admin/products/data-access';
-import { sewingCardTotals, sewingNoArticleReason } from '@admin/products/model';
+import { sewingCardTotals, sewingNoVariantReason } from '@admin/products/model';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
 import { useMemo } from 'react';
 
@@ -22,7 +22,7 @@ export function useSewingCard(productId: number) {
   // Only a problem gets a status; a fully priced model shows none (CAT-013).
   const status: { label: string; tone: SewingCardTone } | null = summary.data
     ? totals.articles === 0
-      ? { label: sewingNoArticleReason, tone: 'warning' }
+      ? { label: sewingNoVariantReason, tone: 'warning' }
       : totals.ready === totals.articles
         ? null
         : {

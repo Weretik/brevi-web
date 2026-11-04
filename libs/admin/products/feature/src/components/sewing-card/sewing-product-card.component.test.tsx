@@ -14,53 +14,116 @@ const mocks = vi.hoisted(() => ({
     void props;
     return null;
   }),
-  screen: vi.fn((props: unknown) => {
-    void props;
-    return null;
-  }),
-  requestModel: vi.fn(),
+  saveVariant: vi.fn(),
+  deleteVariant: vi.fn(),
+  saveMaterials: vi.fn(),
+  saveOperations: vi.fn(),
 }));
+
+const operation = {
+  clientId: 'operation-1',
+  operationId: 7,
+  quantity: 2,
+  manualMinutes: null,
+  sortOrder: 0,
+  comment: 'Комір',
+};
+const accessory = {
+  clientId: 'material-1',
+  kind: 'Accessory' as const,
+  referenceId: 10,
+  costCode: null,
+  quantity: 4,
+  unit: 'Piece' as const,
+  sortOrder: 0,
+  comment: '',
+};
+const fabric = (id: number, name: string, code: string) => ({
+  id,
+  name,
+  code,
+  price: 200,
+  isActive: true,
+});
 
 vi.mock('../../hooks/sewing-card/use-sewing-card', () => ({ useSewingCard: mocks.card }));
 vi.mock('../sewing-pricing/sewing-pricing-feature', () => ({
   SewingPricingFeature: mocks.pricing,
 }));
-vi.mock('../sewing-composition/sewing-composition-screen', () => ({
-  SewingCompositionScreen: mocks.screen,
-}));
-vi.mock('../../hooks/sewing-composition/use-sewing-composition-controller', () => ({
-  useSewingCompositionController: () => ({
-    drafts: {
-      modelDraft: {
-        modelCode: 'MOD-025',
-        version: 3,
-        modelMaterials: [],
-        articleMaterials: [],
-        operations: [
-          {
-            clientId: 'a',
-            operationId: 7,
-            quantity: 2,
-            manualMinutes: null,
-            sortOrder: 0,
-            comment: 'Комір',
-          },
-        ],
-      },
-      setModelDraft: vi.fn(),
-      setModelBaseline: vi.fn(),
-      dirty: false,
-    },
-    selection: {
-      scope: 'Article',
-      requestModel: mocks.requestModel,
-      requestCreateArticle: vi.fn(),
-    },
-    queries: { articles: { data: { version: 3, modelCode: 'MOD-025', articles: [] } } },
-    sewingLookups: { operations: [{ id: 7, name: 'Комір: Стійка', min: 7.3 }] },
+vi.mock('../../hooks/sewing-model/use-sewing-model', () => ({
+  useSewingModel: () => ({
     canManage: true,
+    loading: false,
+    error: null,
+    retry: vi.fn(),
+    variants: [
+      {
+        id: 11,
+        productId: 42,
+        saleSku: '602',
+        active: true,
+        sortOrder: 0,
+        fabricId: 59,
+        fabricQuantity: 2.5,
+      },
+      {
+        id: 12,
+        productId: 42,
+        saleSku: '603',
+        active: false,
+        sortOrder: 1,
+        fabricId: 60,
+        fabricQuantity: 2.5,
+      },
+    ],
+    modelCode: 'MOD-025',
+    version: 3,
+    draft: {
+      productId: 42,
+      modelCode: 'MOD-025',
+      version: 3,
+      modelMaterials: [accessory],
+      operations: [operation],
+    },
+    fabrics: [
+      fabric(59, 'Габардин бежевий', 'FAB-001'),
+      fabric(60, 'Габардин чорний', 'FAB-002'),
+      fabric(61, 'Льон', 'FAB-003'),
+    ],
+    accessories: [
+      { id: 10, name: 'Ґудзик', code: 'FUR-001', price: 1.5, unit: 'шт.', isActive: true },
+    ],
+    operations: [
+      {
+        id: 7,
+        code: 'OP-007',
+        garmentPartName: 'Комір',
+        name: 'Комір: Стійка',
+        min: 7.3,
+        minutesPerProduct: false,
+        isActive: true,
+      },
+      {
+        id: 8,
+        code: 'OP-008',
+        garmentPartName: 'Застібка',
+        name: 'Петля',
+        min: 1,
+        minutesPerProduct: false,
+        isActive: true,
+      },
+    ],
+  }),
+}));
+vi.mock('../../hooks/sewing-model/use-sewing-model-writes', () => ({
+  useSewingModelWrites: () => ({
     busy: false,
-    articleCreation: { state: { isLoading: false }, error: null },
+    error: null,
+    clearError: vi.fn(),
+    saveVariant: mocks.saveVariant,
+    deleteVariant: mocks.deleteVariant,
+    saveMaterials: mocks.saveMaterials,
+    saveOperations: mocks.saveOperations,
   }),
 }));
 
@@ -139,7 +202,6 @@ beforeEach(() => {
       minutes: 50,
       fullCost: { min: 500, max: 500 },
       retail: { min: 900, max: 900 },
-      unpublished: 1,
     },
     status: { label: 'Без ціни: 1 з 2', tone: 'warning' },
     seamstressPerMinute: 2.2,
@@ -155,49 +217,121 @@ afterEach(() => {
 });
 
 describe('SewingProductCard', () => {
-  it('shows the model fields, its status and every Article with the sheet reason', async () => {
+  beforeEach(() => {
+    for (const save of [
+      mocks.saveVariant,
+      mocks.deleteVariant,
+      mocks.saveMaterials,
+      mocks.saveOperations,
+    ])
+      save.mockResolvedValue(true);
+  });
+
+  it('shows the model, one row per fabric and only the problems', async () => {
     renderCard();
 
     expect(screen.getByRole('heading', { name: 'Костюм «Верде»' })).toBeVisible();
     expect(screen.getByText('MOD-025 · Одяг ЛІТО · Літо')).toBeVisible();
     expect(screen.getAllByText('Без ціни: 1 з 2').length).toBeGreaterThan(0);
-    expect(screen.queryByText(/Перевірено/)).not.toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'На сайті' })).toHaveAttribute(
-      'href',
-      'https://brevi.com.ua/verde',
-    );
-    const grid = await screen.findByRole('grid', { name: 'Артикули моделі' });
-    // Only problems are marked: the priced Article shows its price, the other the reason (CAT-013).
-    expect(within(grid).queryByText('Готово до розрахунку')).not.toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Тканини' })).toHaveAttribute('aria-selected', 'true');
+    const grid = await screen.findByRole('grid', { name: 'Тканини моделі' });
+    expect(within(grid).getByText('Габардин бежевий')).toBeInTheDocument();
+    expect(within(grid).getByText('Габардин чорний')).toBeInTheDocument();
+    // Only problems are marked: a switched-off fabric and the reason of a missing price (CAT-013).
+    expect(within(grid).getByText('Вимкнена')).toBeInTheDocument();
     expect(within(grid).getByText('Немає тканини')).toBeInTheDocument();
+    expect(within(grid).queryByText('Активна')).not.toBeInTheDocument();
   });
 
-  it('opens the calculation of a clicked Article and keeps the tab in the address', async () => {
+  it('opens a fabric in the side panel and saves the change at once', async () => {
     const user = userEvent.setup();
     renderCard();
 
-    await user.click(await screen.findByText('603'));
+    await user.click(await screen.findByText('Габардин бежевий'));
+    const panel = screen.getByRole('dialog', { name: 'Тканина моделі' });
+    expect(within(panel).getByLabelText(/Розхід на 1 виріб/)).toHaveValue('2,5');
+    await user.click(within(panel).getByRole('button', { name: 'Редагувати' }));
+    const editor = screen.getByRole('dialog', { name: 'Тканина моделі' });
+    await user.clear(within(editor).getByLabelText(/Розхід на 1 виріб/));
+    await user.type(within(editor).getByLabelText(/Розхід на 1 виріб/), '2,75');
+    await user.click(within(editor).getByRole('button', { name: 'Зберегти' }));
 
-    expect(screen.getByRole('tab', { name: 'Розрахунок' })).toHaveAttribute(
-      'aria-selected',
-      'true',
-    );
-    expect(screen.getByLabelText('Адреса')).toHaveTextContent('?tab=pricing');
-    expect(mocks.pricing.mock.calls.at(-1)?.[0]).toEqual(
-      expect.objectContaining({ productId: 42, articleId: 12 }),
+    expect(mocks.saveVariant).toHaveBeenCalledWith(11, {
+      saleSku: '602',
+      active: true,
+      sortOrder: 0,
+      fabricId: 59,
+      fabricQuantity: 2.75,
+      expectedVersion: 3,
+    });
+  });
+
+  it('adds a fabric with the metres of the other fabrics and checks its SKU', async () => {
+    const user = userEvent.setup();
+    renderCard();
+
+    await user.click(screen.getByRole('button', { name: 'Додати тканину' }));
+    const panel = screen.getByRole('dialog', { name: 'Нова тканина' });
+    expect(within(panel).getByLabelText(/Розхід на 1 виріб/)).toHaveValue('2,5');
+    await user.click(within(panel).getByRole('combobox', { name: /Тканина/ }));
+    await user.click(screen.getByRole('option', { name: 'Льон · FAB-003' }));
+    await user.type(within(panel).getByLabelText(/Артикул/), '602');
+    await user.click(within(panel).getByRole('button', { name: 'Зберегти' }));
+    expect(within(panel).getByText('Такий артикул уже є в моделі.')).toBeInTheDocument();
+    expect(mocks.saveVariant).not.toHaveBeenCalled();
+
+    await user.clear(within(panel).getByLabelText(/Артикул/));
+    await user.type(within(panel).getByLabelText(/Артикул/), '604');
+    await user.click(within(panel).getByRole('button', { name: 'Зберегти' }));
+    expect(mocks.saveVariant).toHaveBeenCalledWith(
+      null,
+      expect.objectContaining({ fabricId: 61, saleSku: '604', sortOrder: 2, fabricQuantity: 2.5 }),
     );
   });
 
-  it('shows labour time and pay and edits operations on the shared model composition', async () => {
+  it('keeps the shared accessories in a table and deletes a line after confirmation', async () => {
+    const user = userEvent.setup();
+    renderCard('?tab=materials');
+
+    const table = screen.getByRole('table', { name: 'Комплектація моделі' });
+    expect(within(table).getByText('Ґудзик')).toBeInTheDocument();
+    await user.click(within(table).getByRole('button', { name: 'Видалити: Ґудзик' }));
+    await user.click(
+      within(screen.getByRole('dialog', { name: 'Видалити «Ґудзик»?' })).getByRole('button', {
+        name: 'Видалити',
+      }),
+    );
+    expect(mocks.saveMaterials).toHaveBeenCalledWith([]);
+  });
+
+  it('shows labour time and pay and adds an operation in the side panel', async () => {
+    const user = userEvent.setup();
     renderCard();
-    await userEvent.setup().click(screen.getByRole('tab', { name: 'Трудовитрати' }));
+    await user.click(screen.getByRole('tab', { name: 'Трудовитрати' }));
 
     const table = screen.getByRole('table', { name: 'Трудовитрати моделі' });
     expect(within(table).getByText('Комір: Стійка')).toBeInTheDocument();
     expect(within(table).getAllByText('14,6')).toHaveLength(2);
-    expect(mocks.requestModel).toHaveBeenCalled();
-    expect(mocks.screen.mock.calls.at(-1)?.[0]).toEqual(
-      expect.objectContaining({ productId: 42, section: 'operations' }),
+
+    await user.click(screen.getByRole('button', { name: 'Додати операцію' }));
+    const panel = screen.getByRole('dialog', { name: 'Нова операція' });
+    await user.click(within(panel).getByRole('combobox', { name: /Операція/ }));
+    await user.click(screen.getByRole('option', { name: 'OP-008 · Застібка · Петля' }));
+    await user.click(within(panel).getByRole('button', { name: 'Зберегти' }));
+    expect(mocks.saveOperations).toHaveBeenCalledWith([
+      operation,
+      expect.objectContaining({ operationId: 8, quantity: 1, manualMinutes: null }),
+    ]);
+  });
+
+  it('names the fabrics on «Розрахунок» and keeps the tab in the address', async () => {
+    const user = userEvent.setup();
+    renderCard();
+    await user.click(screen.getByRole('tab', { name: 'Розрахунок' }));
+    expect(screen.getByLabelText('Адреса')).toHaveTextContent('?tab=pricing');
+    await user.click(screen.getByRole('button', { name: 'Габардин чорний' }));
+    expect(mocks.pricing.mock.calls.at(-1)?.[0]).toEqual(
+      expect.objectContaining({ productId: 42, articleId: 12 }),
     );
   });
 

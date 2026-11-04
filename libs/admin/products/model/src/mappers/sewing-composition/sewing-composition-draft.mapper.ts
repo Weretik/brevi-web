@@ -8,14 +8,10 @@ import type {
 export function sewingCompositionToDraft(view: SewingCompositionView): SewingCompositionDraft {
   return {
     productId: view.productId,
-    articleId: view.articleId,
     modelCode: view.modelCode,
     version: view.version,
     modelMaterials: view.materials
       .filter((material) => material.scope === 'Model')
-      .map(toMaterialDraft),
-    articleMaterials: view.materials
-      .filter((material) => material.scope === 'Article')
       .map(toMaterialDraft),
     operations: view.operations.map(toOperationDraft),
   };

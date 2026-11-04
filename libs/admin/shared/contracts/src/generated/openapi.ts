@@ -924,8 +924,8 @@ export interface paths {
     get: operations['listSewingArticles'];
     put?: never;
     /**
-     * Create a Sewing Product Article
-     * @description Requires CanManageProducts. Sale SKU is globally unique, trimmed and compared using ordinal case-sensitive equality; it is immutable after creation.
+     * Create a fabric variant of a Sewing Product
+     * @description Requires CanManageProducts. Creates the variant (Article) with its fabric and metres per product in one transaction (CAT-015). Sale SKU is globally unique, trimmed and compared using ordinal case-sensitive equality.
      */
     post: operations['createSewingArticle'];
     delete?: never;
@@ -960,7 +960,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/v1/products/{productId}/articles/{articleId}/composition': {
+  '/api/v1/products/{productId}/articles/{articleId}': {
     parameters: {
       query?: never;
       header?: never;
@@ -972,12 +972,16 @@ export interface paths {
     };
     get?: never;
     /**
-     * Replace Article-specific material composition
-     * @description Requires CanManageProducts. Replaces all Article-specific materials atomically. A stale expectedVersion returns 409; clients must not replay automatically and should retain the user's draft for resolution.
+     * Change a fabric variant
+     * @description Requires CanManageProducts. Changes the sale SKU, activity and the variant's fabric with metres per product (CAT-015). A stale expectedVersion returns 409.
      */
-    put: operations['replaceSewingArticleComposition'];
+    put: operations['updateSewingArticle'];
     post?: never;
-    delete?: never;
+    /**
+     * Remove a fabric variant
+     * @description Requires CanManageProducts. Removes the variant with its fabric line. A variant that already has saved prices returns 409 and can be switched off instead.
+     */
+    delete: operations['deleteSewingArticle'];
     options?: never;
     head?: never;
     patch?: never;
@@ -3551,6 +3555,7 @@ export interface components {
       /** @description Not blocking. */
       warnings: components['schemas']['SheetImportIssue'][];
     };
+    /** @description A fabric variant of the model (CAT-015). */
     SewingArticle: {
       /** Format: int64 */
       id: number;
@@ -3560,6 +3565,13 @@ export interface components {
       active: boolean;
       /** Format: int32 */
       sortOrder: number;
+      /**
+       * Format: int32
+       * @description The variant's fabric; null when not set yet.
+       */
+      fabricId: number | null;
+      /** @description Metres of the fabric per product. */
+      fabricQuantity: number | null;
     };
     SewingArticleList: {
       /** Format: int32 */
@@ -3569,11 +3581,16 @@ export interface components {
       version: number;
       articles: components['schemas']['SewingArticle'][];
     };
+    /** @description Metres of the variant's fabric per product. */
+    FabricQuantity: number;
     CreateSewingArticleRequest: {
       saleSku: string;
       active: boolean;
       /** Format: int32 */
       sortOrder: number;
+      /** Format: int32 */
+      fabricId: number;
+      fabricQuantity: components['schemas']['FabricQuantity'];
       /**
        * Format: int64
        * @description Current model composition version used for optimistic concurrency.
@@ -3670,8 +3687,12 @@ export interface components {
       /** Format: int64 */
       expectedVersion: number;
     };
-    ReplaceSewingArticleCompositionRequest: {
-      materials: components['schemas']['SewingMaterialInput'][];
+    UpdateSewingArticleRequest: {
+      saleSku: string;
+      active: boolean;
+      /** Format: int32 */
+      fabricId: number;
+      fabricQuantity: components['schemas']['FabricQuantity'];
       /** Format: int64 */
       expectedVersion: number;
     };
@@ -8445,7 +8466,7 @@ export interface operations {
       409: components['responses']['responses-ConflictError'];
     };
   };
-  replaceSewingArticleComposition: {
+  updateSewingArticle: {
     parameters: {
       query?: never;
       header?: never;
@@ -8457,17 +8478,17 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': components['schemas']['ReplaceSewingArticleCompositionRequest'];
+        'application/json': components['schemas']['UpdateSewingArticleRequest'];
       };
     };
     responses: {
-      /** @description Updated effective composition and the new version. */
+      /** @description Changed variant. */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['SewingComposition'];
+          'application/json': components['schemas']['SewingArticle'];
         };
       };
       400: components['responses']['sewing-composition.openapi_components-responses-ValidationError'];
@@ -8485,7 +8506,53 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Product, Article or referenced entity not found. */
+      /** @description Product, Article or fabric not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['responses-ConflictError'];
+    };
+  };
+  deleteSewingArticle: {
+    parameters: {
+      query: {
+        expectedVersion: number;
+      };
+      header?: never;
+      path: {
+        productId: components['parameters']['parameters-ProductId'];
+        articleId: components['parameters']['ArticleId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Variant removed. */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      400: components['responses']['sewing-composition.openapi_components-responses-ValidationError'];
+      /** @description Access token missing or invalid. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Caller does not satisfy CanManageProducts. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product or Article not found. */
       404: {
         headers: {
           [name: string]: unknown;

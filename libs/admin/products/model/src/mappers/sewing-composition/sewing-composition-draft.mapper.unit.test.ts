@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { sewingCompositionToDraft } from './sewing-composition-draft.mapper';
 
 describe('Effective composition draft mapping', () => {
-  it('splits effective shared and Article material lines without copying either scope', () => {
+  it('keeps only the shared materials: a variant fabric is edited on «Тканини»', () => {
     const draft = sewingCompositionToDraft({
       productId: 42,
       articleId: 501,
@@ -46,10 +46,7 @@ describe('Effective composition draft mapping', () => {
     });
 
     expect(draft.modelMaterials.map((item) => item.referenceId)).toEqual([7]);
-    expect(draft.articleMaterials.map((item) => item.referenceId)).toEqual([9]);
-    expect(draft.modelMaterials).toHaveLength(1);
-    expect(draft.articleMaterials).toHaveLength(1);
+    expect(draft.modelMaterials[0]?.clientId).toBe('material-1');
     expect(draft.operations).toHaveLength(1);
-    expect(draft.articleMaterials[0]?.clientId).toBe('material-2');
   });
 });
