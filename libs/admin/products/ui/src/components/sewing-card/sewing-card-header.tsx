@@ -1,5 +1,5 @@
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
-import { Button, Stack, Typography } from '@mui/material';
+import { Button, FormControlLabel, Stack, Switch, Typography } from '@mui/material';
 
 import { SewingCardStatusPill } from './sewing-card-status-pill';
 
@@ -22,6 +22,8 @@ interface Props {
   deleteDisabled: boolean;
   onEdit: () => void;
   onDelete: () => void;
+  /** Switch «Активний» (CAT-018) for staff who manage products; otherwise only «Вимкнена» is shown. */
+  activeSwitch?: { saving: boolean; onChange: (active: boolean) => void };
 }
 
 /** Page header of a product card: what the sheet tab «Товари» or «ЗІЗ» holds for the product. */
@@ -48,10 +50,24 @@ export function SewingCardHeader(props: Props) {
           {props.status && (
             <SewingCardStatusPill label={props.status.label} tone={props.status.tone} />
           )}
-          {props.active === false && <SewingCardStatusPill label="Вимкнена" tone="neutral" />}
+          {props.active === false && !props.activeSwitch && (
+            <SewingCardStatusPill label="Вимкнена" tone="neutral" />
+          )}
         </Stack>
       </Stack>
-      <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap', flexShrink: 0 }}>
+      <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap', flexShrink: 0, alignItems: 'center' }}>
+        {props.activeSwitch && props.active !== null && (
+          <FormControlLabel
+            label="Активний"
+            control={
+              <Switch
+                checked={props.active}
+                disabled={props.activeSwitch.saving}
+                onChange={(_event, checked) => props.activeSwitch?.onChange(checked)}
+              />
+            }
+          />
+        )}
         {props.siteUrl && (
           <Button
             variant="outlined"

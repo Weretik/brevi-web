@@ -3,6 +3,7 @@ import { QuoteCustomSewingDrawer } from '../../components/custom-sewing/quote-cu
 import { QuoteRepriceDrawer } from '../../components/editor/quote-reprice-drawer';
 import { QuoteResponsibleDrawer } from '../../components/editor/quote-responsible-drawer';
 import { QuoteHistoryDrawer } from '../../components/lifecycle/quote-history-drawer';
+import { QuotePhotoPickerDrawer } from '../../components/photo/quote-photo-picker-drawer';
 import { QuoteCatalogPickerDrawer } from '../../components/picker/quote-catalog-picker-drawer';
 import { QuoteFabricPickerDrawer } from '../../components/picker/quote-fabric-picker-drawer';
 import { QuoteSendDrawer } from '../../components/sending/quote-send-drawer';
@@ -14,6 +15,7 @@ export type QuoteEditorPanel =
   | { kind: 'catalog' }
   | { kind: 'fabric'; itemKey: string }
   | { kind: 'custom'; itemKey?: string }
+  | { kind: 'photo'; itemKey: string }
   | { kind: 'responsible' }
   | { kind: 'reprice' }
   | { kind: 'history' }
@@ -84,6 +86,17 @@ export function QuoteEditorPanels({ panel, editor, actor, onClose, onHandedOver,
           }}
         />
       );
+    case 'photo':
+      return item ? (
+        <QuotePhotoPickerDrawer
+          item={item}
+          onClose={onClose}
+          onDone={(photoUrl) => {
+            editor.updateItem(item.key, { photoUrl });
+            onClose();
+          }}
+        />
+      ) : null;
     case 'responsible':
       return quote ? (
         <QuoteResponsibleDrawer

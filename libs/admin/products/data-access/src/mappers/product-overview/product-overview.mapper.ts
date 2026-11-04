@@ -41,6 +41,7 @@ export function mapProductOverviewItem(row: ProductOverviewItemResponse): Produc
       publishedAt: variant.publishedAt ?? null,
       problems: variant.problems,
     })),
+    mainPhotoUrl: row.mainPhotoUrl ?? null,
   };
 }
 
@@ -56,6 +57,7 @@ export function mapProductOverviewPage(value: ProductOverviewPageResponse): Prod
       count: item.count,
     })),
     withoutPrice: value.withoutPrice,
+    inactive: value.inactive ?? 0,
   };
 }
 
@@ -66,6 +68,7 @@ export function productOverviewSearchParams(query: ProductOverviewListQuery): st
   if (search) params.set('search', search);
   if (query.section !== null) params.set('section', String(query.section));
   if (query.withoutPrice) params.set('withoutPrice', 'true');
+  if (query.active !== null) params.set('active', String(query.active));
   if (query.sort !== 'code') params.set('sort', query.sort);
   if (query.direction !== 'asc') params.set('direction', query.direction);
   params.set('page', String(query.page));

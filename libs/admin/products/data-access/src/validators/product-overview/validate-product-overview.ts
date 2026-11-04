@@ -47,7 +47,8 @@ function validItem(value: unknown): boolean {
     optionalTiers(row['prices']) &&
     optionalDate(row['pricesUpdatedAt']) &&
     isCodes(row['problems']) &&
-    entries(row['variants'], validVariant)
+    entries(row['variants'], validVariant) &&
+    (row['mainPhotoUrl'] === undefined || isText(row['mainPhotoUrl']))
   );
 }
 
@@ -65,6 +66,7 @@ export function parseProductOverviewPage(value: unknown): ProductOverviewPageRes
     !isCount(page['total']) ||
     !isCount(page['all']) ||
     !isCount(page['withoutPrice']) ||
+    (page['inactive'] !== undefined && !isCount(page['inactive'])) ||
     !entries(page['sections'], (item) => {
       const count = record(item);
       return isSectionId(count['sectionId']) && isCount(count['count']);

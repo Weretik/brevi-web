@@ -7,5 +7,7 @@ export function mapSewingAccess(value: unknown): SewingAccess {
   return {
     canRead: roles.some((role) => ['Admin', 'Manager', 'User'].includes(role)),
     canManage: roles.some((role) => ['Admin', 'Manager'].includes(role)),
+    /** Product photos and the old-site import (CAT-018): Admin; the Director also holds Admin. */
+    canManagePhotos: roles.includes('Admin'),
   };
 }

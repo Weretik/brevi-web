@@ -4,6 +4,7 @@ import {
   mapQuoteCatalogPage,
   mapQuoteCustomSewingPrice,
   mapQuoteModelComposition,
+  mapQuoteProductPhotos,
   mapQuoteStaff,
 } from '../mappers/quote.mapper';
 
@@ -13,6 +14,7 @@ import type {
   QuoteCustomSewingPriceRequest,
   QuoteIntroSeason,
   QuoteModelComposition,
+  QuoteProductPhoto,
   QuoteStaff,
 } from '@admin/quotes/model';
 
@@ -54,6 +56,12 @@ export const quoteLookupsApi = quotesBaseApi.injectEndpoints({
       transformResponse: mapQuoteModelComposition,
       transformErrorResponse: (response) => toQuoteApiError(response, quoteLookupErrors),
     }),
+    /** «Змінити фото»: the photos of the product's card tab «Фото», main first. */
+    getQuoteProductPhotos: build.query<QuoteProductPhoto[], number>({
+      query: (productId) => `/api/v1/products/${productId}/photos`,
+      transformResponse: mapQuoteProductPhotos,
+      transformErrorResponse: (response) => toQuoteApiError(response, quoteLookupErrors),
+    }),
     getQuoteStaff: build.query<QuoteStaff[], void>({
       query: () => '/api/crm/quote-lookups/staff',
       transformResponse: mapQuoteStaff,
@@ -65,6 +73,7 @@ export const quoteLookupsApi = quotesBaseApi.injectEndpoints({
 export const {
   useCalculateQuoteCustomSewingMutation,
   useGetQuoteModelCompositionQuery,
+  useGetQuoteProductPhotosQuery,
   useSearchQuoteCatalogQuery,
   useGetQuoteStaffQuery,
 } = quoteLookupsApi;

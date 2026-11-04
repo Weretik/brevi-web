@@ -32,6 +32,7 @@ const row = {
   pricesUpdatedAt: '2026-11-03T10:00:00Z',
   problems: [],
   variants: [variant],
+  mainPhotoUrl: 'https://cdn.example.test/thumbs/7.webp',
 };
 
 const page = {
@@ -42,6 +43,7 @@ const page = {
   all: 124,
   sections: [{ sectionId: null, count: 3 }],
   withoutPrice: 0,
+  inactive: 5,
 };
 
 describe('product overview response', () => {
@@ -64,13 +66,14 @@ describe('product overview response', () => {
         search: '  602 ',
         section: 'none',
         withoutPrice: true,
+        active: false,
         sort: 'price',
         direction: 'desc',
         page: 2,
         pageSize: 25,
       }),
     ).toBe(
-      'type=Sewing&search=602&section=none&withoutPrice=true&sort=price&direction=desc&page=2&pageSize=25',
+      'type=Sewing&search=602&section=none&withoutPrice=true&active=false&sort=price&direction=desc&page=2&pageSize=25',
     );
     expect(
       productOverviewSearchParams({
@@ -78,6 +81,7 @@ describe('product overview response', () => {
         search: '',
         section: null,
         withoutPrice: false,
+        active: null,
         sort: 'code',
         direction: 'asc',
         page: 1,

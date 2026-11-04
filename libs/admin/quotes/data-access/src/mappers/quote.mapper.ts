@@ -9,6 +9,7 @@ import type {
   QuoteOption,
   QuotePage,
   QuotePrice,
+  QuoteProductPhoto,
   QuoteRepriceReport,
   QuoteStaff,
   QuoteTierPrices,
@@ -246,3 +247,18 @@ export const mapQuoteModelComposition = (
     manualMinutes: line.manualMinutes ?? null,
   })),
 });
+
+/** The product photos a КП item can show; files missing from the library are left out. */
+export const mapQuoteProductPhotos = (value: Schemas['ProductPhotoList']): QuoteProductPhoto[] =>
+  value.photos.flatMap((photo) =>
+    !photo.missing && photo.url
+      ? [
+          {
+            mediaFileId: photo.mediaFileId,
+            url: photo.url,
+            thumbnailUrl: photo.thumbnailUrl ?? null,
+            isMain: photo.isMain,
+          },
+        ]
+      : [],
+  );

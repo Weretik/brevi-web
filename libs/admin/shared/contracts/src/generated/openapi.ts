@@ -1046,6 +1046,52 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/products/{id}/photos': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    /**
+     * Photos of a product in display order
+     * @description CatalogRead. Every staff member who reads the catalogue sees the photos.
+     */
+    get: operations['getProductPhotos'];
+    /**
+     * Saves the photos of a product
+     * @description Admin only (the Director also holds Admin). The product gets exactly these library photos in this order; photos that stay keep their alt text and visibility. mainMediaFileId null keeps the current main photo or makes the first one main.
+     */
+    put: operations['setProductPhotos'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/v1/products/old-site-photo-import': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Photos and missing sewing models from the old site
+     * @description Admin only. A product is found by an old-site SKU (article SKUs of a sewing model, the site article of PPE) or by newModel name; a missing sewing model with newModel is created switched off. Photos are downloaded from baseUrl + path into the Media folder «Старий сайт» (old subfolders kept) and added after the product's own photos; the old main photo becomes main only for a product without photos. dryRun reports and changes nothing; a real run takes at most 20 products, so the admin page sends the file in parts. A repeat adds nothing twice.
+     */
+    post: operations['importOldSitePhotos'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/products/{productId}/articles': {
     parameters: {
       query?: never;
@@ -4136,6 +4182,8 @@ export interface components {
       problems: string[];
       /** @description Fabric variants of a sewing model; empty for PPE. */
       variants: components['schemas']['ProductOverviewVariant'][];
+      /** @description Preview (or the full photo when there is no preview) of the main visible product photo (CAT-018); null without photos. */
+      mainPhotoUrl: string | null;
     };
     ProductSectionCount: {
       /** Format: int32 */
@@ -4166,6 +4214,11 @@ export interface components {
        * @description Rows of the type without a price.
        */
       withoutPrice: number;
+      /**
+       * Format: int32
+       * @description Switched-off rows of the type (CAT-018).
+       */
+      inactive: number;
     };
     CreatePpeSupplierRequest: {
       /** Format: int32 */
@@ -4349,6 +4402,94 @@ export interface components {
       problems: components['schemas']['SheetImportIssue'][];
       /** @description Not blocking. */
       warnings: components['schemas']['SheetImportIssue'][];
+    };
+    ProductPhotoItem: {
+      /** Format: int32 */
+      mediaFileId: number;
+      fileName: string | null;
+      url: string | null;
+      thumbnailUrl: string | null;
+      isMain: boolean;
+      /** Format: int32 */
+      sortOrder: number;
+      /** @description The library no longer has the file; then the URLs are null. */
+      missing: boolean;
+    };
+    ProductPhotoList: {
+      /** Format: int32 */
+      productId: number;
+      photos: components['schemas']['ProductPhotoItem'][];
+    };
+    SetProductPhotosRequest: {
+      mediaFileIds: number[];
+      /** Format: int32 */
+      mainMediaFileId: number | null;
+    };
+    OldSitePhoto: {
+      path: string;
+      isMain: boolean;
+    };
+    OldSiteNewModel: {
+      name: string;
+      /** @description Name of a sewing section of «Типи і розділи». */
+      section: string;
+      /** @enum {string|null} */
+      season: 'Літо' | 'Зима' | null;
+    };
+    OldSiteProduct: {
+      /** Format: int32 */
+      oldId: number;
+      oldName: string;
+      skus: string[];
+      photos: components['schemas']['OldSitePhoto'][];
+      newModel: components['schemas']['OldSiteNewModel'] | null;
+    };
+    ImportOldSitePhotosRequest: {
+      dryRun: boolean;
+      /** @description https address of the old image folder, ending with /. */
+      baseUrl: string;
+      products: components['schemas']['OldSiteProduct'][];
+    };
+    OldSitePhotoImportLine: {
+      /** Format: int32 */
+      oldId: number;
+      oldName: string;
+      /** @enum {string} */
+      status: 'Found' | 'Create' | 'Created' | 'NotFound';
+      /** Format: int32 */
+      productId: number | null;
+      productName: string | null;
+      /** Format: int32 */
+      photosToAdd: number;
+      /** Format: int32 */
+      photosAdded: number;
+      errors: string[];
+    };
+    OldSitePhotoImportReport: {
+      dryRun: boolean;
+      /** Format: int32 */
+      products: number;
+      /** Format: int32 */
+      found: number;
+      /**
+       * Format: int32
+       * @description Dry run only.
+       */
+      modelsToCreate: number;
+      /** Format: int32 */
+      modelsCreated: number;
+      /** Format: int32 */
+      notFound: number;
+      /**
+       * Format: int32
+       * @description Files of this request not yet in the library.
+       */
+      filesToDownload: number;
+      /** Format: int32 */
+      filesDownloaded: number;
+      /** Format: int32 */
+      photosAdded: number;
+      lines: components['schemas']['OldSitePhotoImportLine'][];
     };
     /** @description A fabric variant of the model (CAT-015). */
     SewingArticle: {
@@ -10301,6 +10442,8 @@ export interface operations {
         /** @description A section ID from /api/reference/product-sections, or none for rows without a section. */
         section?: string;
         withoutPrice?: boolean;
+        /** @description true shows only active rows, false only switched-off rows (CAT-018); omitted shows both. */
+        active?: boolean;
         /** @description code is natural (MOD-2 before MOD-10, article 9 before 17; rows without a code last); price is the 1–9 pcs price, rows without a price last in both directions. Ties go by name. */
         sort?: 'code' | 'name' | 'price' | 'updated';
         direction?: 'asc' | 'desc';
@@ -10557,6 +10700,162 @@ export interface operations {
       };
       /** @description The database rejected the write (changed meanwhile); nothing is saved. */
       409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getProductPhotos: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The photos. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductPhotoList'];
+        };
+      };
+      /** @description Invalid id. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description CatalogRead required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  setProductPhotos: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SetProductPhotosRequest'];
+      };
+    };
+    responses: {
+      /** @description The saved photos. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductPhotoList'];
+        };
+      };
+      /** @description More than 60 photos, a repeated photo, or a main photo outside the list. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Product not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description A photo is not in the Media library. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  importOldSitePhotos: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ImportOldSitePhotosRequest'];
+      };
+    };
+    responses: {
+      /** @description The report. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['OldSitePhotoImportReport'];
+        };
+      };
+      /** @description Invalid file, more than 20 products in a real run, or baseUrl not https. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin required. */
+      403: {
         headers: {
           [name: string]: unknown;
         };

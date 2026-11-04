@@ -17,13 +17,14 @@ import type { GridPaginationModel, GridSortModel } from '@mui/x-data-grid';
 const firstPage: GridPaginationModel = { page: 0, pageSize: 25 };
 
 /**
- * One «Товари» tab (CAT-013): search, section, «Без ціни», page and sort go to the server, which
+ * One «Товари» tab (CAT-013): search, section, «Активні»/«Вимкнені» (CAT-018), «Без ціни», page and sort go to the server, which
  * returns the page with published prices and fabric variants in one request.
  */
 export function useProductOverview(type: ProductOverviewType) {
   const [search, setSearchText] = useState('');
   const [section, setSectionFilter] = useState<ProductSectionFilter>(null);
   const [withoutPrice, setWithoutPrice] = useState(false);
+  const [active, setActiveFilter] = useState<boolean | null>(null);
   const [pagination, setPagination] = useState<GridPaginationModel>(firstPage);
   const [sortModel, setSort] = useState<GridSortModel>([]);
   const [expanded, setExpanded] = useState<ReadonlySet<number>>(new Set());
@@ -35,6 +36,7 @@ export function useProductOverview(type: ProductOverviewType) {
     search: debouncedSearch,
     section,
     withoutPrice,
+    active,
     sort: (sort && productSortFields[sort.field]) ?? 'code',
     direction: sort?.sort === 'desc' ? 'desc' : 'asc',
     page: pagination.page + 1,
@@ -93,6 +95,14 @@ export function useProductOverview(type: ProductOverviewType) {
       selected: withoutPrice,
       onToggle: () => {
         setWithoutPrice((value) => !value);
+        toFirstPage();
+      },
+    },
+    activity: {
+      value: active,
+      inactive: list.data?.inactive ?? 0,
+      onChange: (value: boolean | null) => {
+        setActiveFilter(value);
         toFirstPage();
       },
     },

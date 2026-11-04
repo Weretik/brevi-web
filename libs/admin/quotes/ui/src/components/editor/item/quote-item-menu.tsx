@@ -1,6 +1,7 @@
 import ArrowDownwardOutlinedIcon from '@mui/icons-material/ArrowDownwardOutlined';
 import ArrowUpwardOutlinedIcon from '@mui/icons-material/ArrowUpwardOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import { Divider, IconButton, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
 import { useState } from 'react';
@@ -11,10 +12,12 @@ interface Props {
   isLast: boolean;
   onMove: (offset: -1 | 1) => void;
   onRemove: () => void;
+  /** «Змінити фото»; hidden without a Catalog product. */
+  onChangePhoto?: () => void;
 }
 
-/** «⋯» of an item: move it up or down in the КП, or remove it. */
-export function QuoteItemMenu({ label, isFirst, isLast, onMove, onRemove }: Props) {
+/** «⋯» of an item: change its photo, move it up or down in the КП, or remove it. */
+export function QuoteItemMenu({ label, isFirst, isLast, onMove, onRemove, onChangePhoto }: Props) {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const pick = (action: () => void) => () => {
     setAnchor(null);
@@ -37,6 +40,15 @@ export function QuoteItemMenu({ label, isFirst, isLast, onMove, onRemove }: Prop
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
+        {onChangePhoto && (
+          <MenuItem onClick={pick(onChangePhoto)}>
+            <ListItemIcon>
+              <ImageOutlinedIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText primary="Змінити фото" />
+          </MenuItem>
+        )}
+        {onChangePhoto && <Divider />}
         <MenuItem disabled={isFirst} onClick={pick(() => onMove(-1))}>
           <ListItemIcon>
             <ArrowUpwardOutlinedIcon fontSize="small" />

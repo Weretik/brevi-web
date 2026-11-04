@@ -1,12 +1,14 @@
 import { PpeCardPrices, PpeSupplierForm, SewingCardHeader } from '@admin/products/ui';
-import { Alert, Box, Button, CircularProgress, Stack } from '@mui/material';
+import { Alert, Box, Button, CircularProgress, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 
 import { PpeCardMetrics } from './ppe-card-metrics';
 import { usePpeCard } from '../../hooks/ppe-card/use-ppe-card';
 import { usePpeSupplierForm } from '../../hooks/ppe-card/use-ppe-supplier-form';
+import { useProductActiveSwitch } from '../../hooks/product-overview/use-product-active-switch';
 import { ProductDeleteDialog } from '../product-deletion/product-delete-dialog';
 import { ProductOverviewDrawer } from '../product-overview/product-overview-drawer';
+import { ProductPhotosTab } from '../product-photos/product-photos-tab';
 
 import type { ProductDetail } from '@admin/products/model';
 
@@ -17,13 +19,15 @@ interface Props {
 
 /**
  * Card of one PPE product (CAT-008): what the sheet tab «ЗІЗ» holds for it and its three prices
- * from «Прайс на сайт». Site texts and photos are not shown here.
+ * from «Прайс на сайт», and its photos (CAT-018). Site texts are not shown here.
  */
 export function PpeProductCard({ product, onDeleted }: Props) {
   const card = usePpeCard(product.id);
   const form = usePpeSupplierForm(card.offer);
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [activeError, setActiveError] = useState<string | null>(null);
+  const activeSwitch = useProductActiveSwitch(setActiveError);
   const sectionName =
     card.row?.sectionId == null ? null : (card.sectionNames.get(card.row.sectionId) ?? null);
 
@@ -42,7 +46,23 @@ export function PpeProductCard({ product, onDeleted }: Props) {
         deleteDisabled={form.dirty || form.saving}
         onEdit={() => setEditing(true)}
         onDelete={() => setDeleting(true)}
+        activeSwitch={
+          card.row && card.canManage
+            ? {
+                saving: activeSwitch.savingId !== null,
+                onChange: (active) => {
+                  setActiveError(null);
+                  if (card.row) activeSwitch.change(card.row, active);
+                },
+              }
+            : undefined
+        }
       />
+      {activeError && (
+        <Alert severity="error" onClose={() => setActiveError(null)}>
+          {activeError}
+        </Alert>
+      )}
       <PpeCardMetrics offer={card.offer} />
       {card.offerLoading && <CircularProgress aria-label="Завантаження постачальника" />}
       {card.offerError && (
@@ -81,6 +101,12 @@ export function PpeProductCard({ product, onDeleted }: Props) {
           />
         </Box>
       )}
+      <Stack component="section" aria-labelledby="ppe-photos-title" sx={{ gap: 1.5 }}>
+        <Typography id="ppe-photos-title" variant="h6" component="h2">
+          Фото
+        </Typography>
+        <ProductPhotosTab productId={product.id} productName={card.row?.name ?? product.name} />
+      </Stack>
       {editing && card.row && (
         <ProductOverviewDrawer
           mode="edit"
