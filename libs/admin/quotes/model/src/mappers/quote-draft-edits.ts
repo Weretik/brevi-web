@@ -89,3 +89,17 @@ export function removeQuoteOption(
     options: item.options.filter((option) => option.key !== optionKey),
   }));
 }
+
+/** Shows or hides one quantity tier in every price row of the КП, the КП-level switch. */
+export function setQuoteTierShown(draft: QuoteDraft, tier: QuoteTier, shown: boolean): QuoteDraft {
+  return {
+    ...draft,
+    items: draft.items.map((item) => ({
+      ...item,
+      options: item.options.map((option) => ({
+        ...option,
+        prices: { ...option.prices, [tier]: { ...option.prices[tier], shown } },
+      })),
+    })),
+  };
+}

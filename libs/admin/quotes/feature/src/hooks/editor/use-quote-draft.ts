@@ -5,6 +5,7 @@ import {
   removeQuoteItem,
   removeQuoteOption,
   setQuoteTier,
+  setQuoteTierShown,
   updateQuoteItem,
   updateQuoteOption,
 } from '@admin/quotes/model';
@@ -40,6 +41,9 @@ export function useQuoteDraft(initial: QuoteDraft) {
       tier: QuoteTier,
       patch: { shown?: boolean; manual?: string },
     ) => setDraft((current) => setQuoteTier(current, itemKey, optionKey, tier, patch)),
+    /** The КП-level switch: one tier in every price row. */
+    setTierShown: (tier: QuoteTier, shown: boolean) =>
+      setDraft((current) => setQuoteTierShown(current, tier, shown)),
     updateOption: (
       itemKey: string,
       optionKey: string,

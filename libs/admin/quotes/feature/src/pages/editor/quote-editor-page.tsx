@@ -1,63 +1,68 @@
 import { useDeleteQuoteMutation } from '@admin/quotes/data-access';
-import { oneOffItemDraft, quoteTierLabels, quoteTiers } from '@admin/quotes/model';
+import { oneOffItemDraft } from '@admin/quotes/model';
 import {
   QuoteAddItems,
-  QuoteArchivedNotice,
-  QuoteHeaderCard,
   QuoteItemCard,
-  QuoteMoreMenu,
   QuoteNotesCard,
+  QuoteRecipientCard,
+  QuoteSendActions,
+  quoteItemAnchor,
+  quoteRecipientAnchor,
 } from '@admin/quotes/ui';
-import { ReferencePageHeader } from '@admin/references/ui';
-import { Alert, Box, Button, CircularProgress, Stack, Typography } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  Stack,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material';
 import { useState } from 'react';
 import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 
-import { QuoteEditorActions } from './quote-editor-actions';
-import { QuoteEditorFooter } from './quote-editor-footer';
-import { QuoteChangeModelDrawer } from '../../components/custom-sewing/quote-change-model-drawer';
-import { QuoteCustomSewingDrawer } from '../../components/custom-sewing/quote-custom-sewing-drawer';
+import { QuoteEditorAside } from './quote-editor-aside';
+import { QuoteEditorHeader } from './quote-editor-header';
+import { QuoteEditorNotices } from './quote-editor-notices';
+import { QuoteEditorPanels } from './quote-editor-panels';
 import { QuoteDeleteDialog } from '../../components/editor/quote-delete-dialog';
-import { QuoteRepriceDrawer } from '../../components/editor/quote-reprice-drawer';
-import { QuoteResponsibleDrawer } from '../../components/editor/quote-responsible-drawer';
-import { QuoteHistoryDrawer } from '../../components/lifecycle/quote-history-drawer';
-import { QuoteCatalogPickerDrawer } from '../../components/picker/quote-catalog-picker-drawer';
-import { QuoteFabricPickerDrawer } from '../../components/picker/quote-fabric-picker-drawer';
-import { QuoteSendDrawer } from '../../components/sending/quote-send-drawer';
-import { useClientNames } from '../../hooks/editor/use-client-names';
+import { useClientSuggestions } from '../../hooks/clients/use-client-suggestions';
 import { useQuoteEditor } from '../../hooks/editor/use-quote-editor';
 import { useQuotePdf } from '../../hooks/editor/use-quote-pdf';
 import { useQuoteLifecycle } from '../../hooks/lifecycle/use-quote-lifecycle';
 import { useRouteNotice } from '../../hooks/lifecycle/use-route-notice';
 import { useGmailReturnNotice } from '../../hooks/sending/use-gmail-return-notice';
+import { useQuoteStartPrefill } from '../../hooks/start/use-quote-start-prefill';
 
+import type { QuoteEditorPanel } from './quote-editor-panels';
 import type { QuoteActor } from '@admin/quotes/model';
 
-type Panel =
-  | { kind: 'catalog' }
-  | { kind: 'fabric'; itemKey: string }
-  | { kind: 'custom'; itemKey?: string }
-  | { kind: 'responsible' }
-  | { kind: 'reprice' }
-  | { kind: 'history' }
-  | { kind: 'send' };
+const addItemsAnchor = 'quote-add-items';
 
-const countLabel = (count: number) =>
-  `${count} ${count % 10 === 1 && count % 100 !== 11 ? 'товар' : count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 10 || count % 100 >= 20) ? 'товари' : 'товарів'} у пропозиції`;
+const scrollTo = (target: string) => {
+  const id =
+    target === 'header'
+      ? quoteRecipientAnchor
+      : target === 'items'
+        ? addItemsAnchor
+        : quoteItemAnchor(target);
+  document.getElementById(id)?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+};
 
-const sentLabel = (at: string | null) =>
-  at ? ` · надіслано ${new Date(at).toLocaleDateString('uk-UA')}` : '';
-
-/** «Комерційна пропозиція / Товари та ціни»: a new КП (`/crm/quotes/new`) or a saved one. */
+/** A КП «під запит»: who it is for, its items with prices, and a right column with the summary and actions. */
 export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
   const params = useParams();
   const id = params['quoteId'] ? Number(params['quoteId']) : null;
   const navigate = useNavigate();
   const [search] = useSearchParams();
-  const editor = useQuoteEditor(id);
-  const clients = useClientNames();
-  // «КП з нуля» from the list opens a new КП with the «Виріб з нуля» panel.
-  const [panel, setPanel] = useState<Panel | null>(() =>
+  const prefill = useQuoteStartPrefill();
+  const editor = useQuoteEditor(id, prefill);
+  const clients = useClientSuggestions();
+  const theme = useTheme();
+  const wide = useMediaQuery(theme.breakpoints.up('lg'));
+  // An old «КП з нуля» link opens a new КП with the «Новий виріб» panel.
+  const [panel, setPanel] = useState<QuoteEditorPanel | null>(() =>
     id === null && search.get('custom') === '1' ? { kind: 'custom' } : null,
   );
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -84,251 +89,134 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
         {editor.loadError}
       </Alert>
     );
-
   if (quote?.kind === 'Introduction')
     return <Navigate to={`/crm/quote-introductions/${quote.id}`} replace />;
 
-  const fabricItem =
-    panel?.kind === 'fabric' ? draft.items.find((item) => item.key === panel.itemKey) : undefined;
-  const customItem =
-    panel?.kind === 'custom' && panel.itemKey
-      ? draft.items.find((item) => item.key === panel.itemKey)
-      : undefined;
+  const actions = {
+    dirty: editor.dirty,
+    saving: editor.saving,
+    generating: pdf.generating,
+    locked: lifecycle.archived,
+    onSave: () => void editor.save(),
+    onPdf: () => void pdf.generate(),
+    onSend: async () => {
+      setSentNotice(null);
+      const saved = quote && !editor.dirty ? quote : await editor.save();
+      if (saved) setPanel({ kind: 'send' });
+    },
+  };
 
   return (
-    <Box sx={{ pb: 10 }}>
-      <ReferencePageHeader
-        overline="Комерційна пропозиція"
-        title="Товари та ціни"
-        subtitle={quote ? `КП ${quote.number}${sentLabel(quote.lastSentAt)}` : 'Нове КП'}
-        actions={
-          <>
-            <QuoteEditorActions
-              saved={quote !== null}
-              dirty={editor.dirty}
-              archived={lifecycle.archived}
-              canAssign={actor.canSeeAll}
-              canDelete={quote?.status === 'Draft'}
-              onAssign={() => setPanel({ kind: 'responsible' })}
-              onReprice={() => setPanel({ kind: 'reprice' })}
-              onDelete={() => setConfirmDelete(true)}
-            />
-            {quote && (
-              <QuoteMoreMenu
-                archived={lifecycle.archived}
-                dirty={editor.dirty}
-                busy={lifecycle.busy}
-                onHistory={() => setPanel({ kind: 'history' })}
-                onCopy={() => void lifecycle.copy()}
-                onArchive={(archived) => void lifecycle.setArchived(archived)}
-              />
-            )}
-          </>
-        }
-      />
-      {quote?.archivedAt && (
-        <QuoteArchivedNotice
-          archivedAt={quote.archivedAt}
-          archivedByName={quote.archivedByName}
-          busy={lifecycle.busy}
-          onRestore={() => void lifecycle.setArchived(false)}
-        />
-      )}
-      {lifecycle.error && (
-        <Alert severity="error" sx={{ mb: 2 }} onClose={lifecycle.clearError}>
-          {lifecycle.error}
-        </Alert>
-      )}
-      {routeNotice.notice && (
-        <Alert severity="success" sx={{ mb: 2 }} onClose={routeNotice.dismiss}>
-          {routeNotice.notice}
-        </Alert>
-      )}
-      {editor.saveError && (
-        <Alert
-          severity="error"
-          sx={{ mb: 2 }}
-          action={
-            editor.saveError.stale ? (
-              <Button color="inherit" onClick={() => void editor.reload()}>
-                Оновити
-              </Button>
-            ) : undefined
-          }
-        >
-          {editor.saveError.message}
-        </Alert>
-      )}
-      {gmail.notice && (
-        <Alert severity={gmail.notice.severity} sx={{ mb: 2 }} onClose={gmail.dismiss}>
-          {gmail.notice.text}
-        </Alert>
-      )}
-      {sentNotice && (
-        <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSentNotice(null)}>
-          {sentNotice}
-        </Alert>
-      )}
-      {pdf.pdfError && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {pdf.pdfError}
-        </Alert>
-      )}
-      <Stack sx={{ gap: 2 }}>
-        <QuoteHeaderCard
-          number={quote?.number ?? null}
-          author={quote?.author ?? null}
-          responsible={quote?.responsible ?? null}
-          draft={draft}
-          clientNames={clients.names}
-          headerError={editor.errors['header']}
-          onChange={editor.change}
-          onClientSearch={clients.search}
-        />
-        <Stack
-          direction={{ xs: 'column', sm: 'row' }}
-          sx={{ justifyContent: 'space-between', gap: 1 }}
-        >
-          <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-            {countLabel(draft.items.length)}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Ціни: {quoteTiers.map((tier) => quoteTierLabels[tier]).join(' / ')}
-          </Typography>
-        </Stack>
-        {draft.items.map((item, index) => (
-          <QuoteItemCard
-            key={item.key}
-            item={item}
-            position={index + 1}
-            isFirst={index === 0}
-            isLast={index === draft.items.length - 1}
-            itemError={editor.errors[`item:${item.key}`]}
-            optionErrors={editor.errors}
-            onChange={(patch) => editor.updateItem(item.key, patch)}
-            onTierChange={(optionKey, tier, patch) =>
-              editor.setTier(item.key, optionKey, tier, patch)
-            }
-            onOptionChange={(optionKey, change) => editor.updateOption(item.key, optionKey, change)}
-            onRecommend={(optionKey) => editor.recommend(item.key, optionKey)}
-            onRemoveOption={(optionKey) => editor.removeOption(item.key, optionKey)}
-            onAddFabric={() => setPanel({ kind: 'fabric', itemKey: item.key })}
-            onEditComposition={() => setPanel({ kind: 'custom', itemKey: item.key })}
-            onMove={(offset) => editor.moveItem(item.key, offset)}
-            onRemove={() => editor.removeItem(item.key)}
-          />
-        ))}
-        <QuoteAddItems
-          empty={draft.items.length === 0}
-          onAddProduct={() => setPanel({ kind: 'catalog' })}
-          onAddOneOff={() => editor.addItems([oneOffItemDraft()])}
-          onAddCustom={() => setPanel({ kind: 'custom' })}
-        />
-        <QuoteNotesCard
-          clientComment={draft.clientComment}
-          managerNote={draft.managerNote}
-          onChange={editor.change}
-        />
-      </Stack>
-
-      <QuoteEditorFooter
+    <Box sx={{ pb: wide ? 4 : 10 }}>
+      <QuoteEditorHeader
+        quote={quote}
+        name={draft.internalName}
         dirty={editor.dirty}
-        saving={editor.saving}
-        generating={pdf.generating}
-        locked={lifecycle.archived}
-        onClose={() => navigate('/crm/quotes')}
-        onSave={() => void editor.save()}
-        onPdf={() => void pdf.generate()}
-        onSend={async () => {
-          setSentNotice(null);
-          const saved = quote && !editor.dirty ? quote : await editor.save();
-          if (saved) setPanel({ kind: 'send' });
-        }}
+        archived={lifecycle.archived}
+        busy={lifecycle.busy}
+        canAssign={actor.canSeeAll}
+        onHistory={() => setPanel({ kind: 'history' })}
+        onCopy={() => void lifecycle.copy()}
+        onArchive={(archived) => void lifecycle.setArchived(archived)}
+        onAssign={() => setPanel({ kind: 'responsible' })}
+        onReprice={() => setPanel({ kind: 'reprice' })}
+        onDelete={() => setConfirmDelete(true)}
+      />
+      <QuoteEditorNotices
+        quote={quote}
+        lifecycle={lifecycle}
+        routeNotice={routeNotice}
+        saveError={editor.saveError}
+        onReload={() => void editor.reload()}
+        gmail={gmail}
+        sentNotice={sentNotice}
+        onSentNoticeClose={() => setSentNotice(null)}
+        pdfError={pdf.pdfError}
       />
 
-      {panel?.kind === 'catalog' && (
-        <QuoteCatalogPickerDrawer
-          onClose={() => setPanel(null)}
-          onAdd={(items) => {
-            editor.addItems(items);
-            setPanel(null);
-          }}
-        />
-      )}
-      {fabricItem && (
-        <QuoteFabricPickerDrawer
-          item={fabricItem}
-          onClose={() => setPanel(null)}
-          onAdd={(options) => {
-            editor.addOptions(fabricItem.key, options);
-            setPanel(null);
-          }}
-        />
-      )}
-      {customItem?.kind === 'Sewing' && (
-        <QuoteChangeModelDrawer
-          item={customItem}
-          onClose={() => setPanel(null)}
-          onDone={(next) => {
-            editor.updateItem(customItem.key, { ...next, key: customItem.key });
-            setPanel(null);
-          }}
-        />
-      )}
-      {panel?.kind === 'custom' &&
-        customItem?.kind !== 'Sewing' &&
-        (!panel.itemKey || customItem) && (
-          <QuoteCustomSewingDrawer
-            item={customItem}
-            onClose={() => setPanel(null)}
-            onDone={(next) => {
-              if (customItem) editor.updateItem(customItem.key, { ...next, key: customItem.key });
-              else editor.addItems([next]);
-              setPanel(null);
-            }}
+      <Box
+        sx={{
+          display: 'grid',
+          gap: 2.5,
+          alignItems: 'start',
+          gridTemplateColumns: { xs: 'minmax(0, 1fr)', lg: 'minmax(0, 1fr) 340px' },
+        }}
+      >
+        <Stack sx={{ gap: 2, minWidth: 0 }}>
+          <QuoteRecipientCard
+            draft={draft}
+            clients={clients.clients}
+            headerError={editor.errors['header']}
+            onChange={editor.change}
+            onClientSearch={clients.search}
           />
-        )}
-      {panel?.kind === 'responsible' && quote && (
-        <QuoteResponsibleDrawer
-          quote={quote}
-          onClose={() => setPanel(null)}
-          onDone={(next) => {
-            setPanel(null);
-            if (actor.canSeeAll || next.responsible.userId === actor.userId)
-              editor.applyServerQuote(next);
-            else navigate('/crm/quotes');
-          }}
-        />
-      )}
-      {panel?.kind === 'reprice' && quote && (
-        <QuoteRepriceDrawer
-          quote={quote}
-          onClose={() => setPanel(null)}
-          onApplied={() => {
-            setPanel(null);
-            void editor.reload();
-          }}
-        />
-      )}
-      {panel?.kind === 'history' && quote && (
-        <QuoteHistoryDrawer
-          quoteId={quote.id}
-          number={quote.number}
-          onClose={() => setPanel(null)}
-        />
-      )}
-      {panel?.kind === 'send' && quote && (
-        <QuoteSendDrawer
-          quote={quote}
-          actor={actor}
-          onClose={() => setPanel(null)}
-          onSent={(next) => {
-            setPanel(null);
-            editor.applyServerQuote(next);
-            setSentNotice(`КП ${next.number} надіслано.`);
-          }}
-        />
-      )}
+          <Typography variant="h5" component="h2" sx={{ mt: 1 }}>
+            Позиції{' '}
+            <Box
+              component="span"
+              sx={{ fontFamily: 'var(--admin-font-mono)', color: 'text.secondary' }}
+            >
+              {draft.items.length}
+            </Box>
+          </Typography>
+          {draft.items.map((item, index) => (
+            <QuoteItemCard
+              key={item.key}
+              item={item}
+              position={index + 1}
+              isFirst={index === 0}
+              isLast={index === draft.items.length - 1}
+              itemError={editor.errors[`item:${item.key}`]}
+              optionErrors={editor.errors}
+              onChange={(patch) => editor.updateItem(item.key, patch)}
+              onTierChange={(optionKey, tier, patch) =>
+                editor.setTier(item.key, optionKey, tier, patch)
+              }
+              onOptionChange={(optionKey, change) =>
+                editor.updateOption(item.key, optionKey, change)
+              }
+              onRecommend={(optionKey) => editor.recommend(item.key, optionKey)}
+              onRemoveOption={(optionKey) => editor.removeOption(item.key, optionKey)}
+              onAddFabric={() => setPanel({ kind: 'fabric', itemKey: item.key })}
+              onEditComposition={() => setPanel({ kind: 'custom', itemKey: item.key })}
+              onMove={(offset) => editor.moveItem(item.key, offset)}
+              onRemove={() => editor.removeItem(item.key)}
+            />
+          ))}
+          <Box id={addItemsAnchor} sx={{ scrollMarginTop: 96 }}>
+            <QuoteAddItems
+              empty={draft.items.length === 0}
+              onAddProduct={() => setPanel({ kind: 'catalog' })}
+              onAddOneOff={() => editor.addItems([oneOffItemDraft()])}
+              onAddCustom={() => setPanel({ kind: 'custom' })}
+            />
+          </Box>
+          <QuoteNotesCard
+            clientComment={draft.clientComment}
+            managerNote={draft.managerNote}
+            onChange={editor.change}
+          />
+        </Stack>
+        <Box sx={{ position: { lg: 'sticky' }, top: { lg: 88 } }}>
+          <QuoteEditorAside
+            draft={draft}
+            withActions={wide}
+            onTierShown={editor.setTierShown}
+            onGo={scrollTo}
+            {...actions}
+          />
+        </Box>
+      </Box>
+      {!wide && <QuoteSendActions layout="bar" {...actions} />}
+
+      <QuoteEditorPanels
+        panel={panel}
+        editor={editor}
+        actor={actor}
+        onClose={() => setPanel(null)}
+        onHandedOver={() => navigate('/crm/quotes')}
+        onSent={(next) => setSentNotice(`КП ${next.number} надіслано.`)}
+      />
       {confirmDelete && quote && (
         <QuoteDeleteDialog
           number={quote.number}

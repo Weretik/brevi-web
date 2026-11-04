@@ -162,8 +162,7 @@ afterEach(cleanup);
 describe('КП editor', () => {
   it('shows «Історія змін» in the side panel', async () => {
     renderEditor();
-    fireEvent.click(await screen.findByRole('button', { name: 'Ще' }));
-    fireEvent.click(screen.getByRole('menuitem', { name: 'Історія змін' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Історія' }));
     const panel = await screen.findByRole('dialog', { name: 'Історія змін' });
     expect(panel).toHaveTextContent('Передано іншому менеджеру');
     expect(panel).toHaveTextContent('Петро → Олена');
@@ -185,16 +184,13 @@ describe('КП editor', () => {
 
     expect(await screen.findByText(/КП в архіві з/)).toBeVisible();
     expect(api.archive).toHaveBeenCalledWith({ id: 4, version: 3, archived: true });
-    expect(screen.getByRole('button', { name: 'Зберегти зміни' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Зберегти' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Надіслати КП' })).toBeDisabled();
-    expect(
-      screen.queryByRole('button', { name: 'Перерахувати за актуальними цінами' }),
-    ).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Повернути з архіву' }));
     await waitFor(() => expect(screen.queryByText(/КП в архіві з/)).not.toBeInTheDocument());
     expect(api.archive).toHaveBeenLastCalledWith({ id: 4, version: 4, archived: false });
-    expect(screen.getByRole('button', { name: 'Зберегти зміни' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Зберегти' })).toBeEnabled();
   });
 
   it('copies the КП and opens the copy', async () => {
@@ -207,19 +203,24 @@ describe('КП editor', () => {
     expect(api.copy).toHaveBeenCalledWith(4);
   });
 
-  it('adds more products from the products block, not the page header', async () => {
+  it('shows the client as the title, with the number and the status', async () => {
     renderEditor();
-    expect(await screen.findByText('КП 1-11-2026')).toBeVisible();
-    expect(screen.queryByRole('button', { name: 'Додати товар' })).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Додати ще товар' })).toBeVisible();
-
-    fireEvent.click(screen.getByRole('button', { name: 'Додати ще разовий ЗІЗ' }));
-    expect(await screen.findByText('2 товари у пропозиції')).toBeVisible();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Агро база' })).toBeVisible();
+    expect(screen.getByText('КП 1-11-2026')).toBeVisible();
+    expect(screen.getByText('Чернетка')).toBeVisible();
   });
 
-  it('opens the «Виріб з нуля» panel from the products block', async () => {
+  it('adds a one-off PPE from the «Додати позицію» tiles and names the problem', async () => {
     renderEditor();
-    fireEvent.click(await screen.findByRole('button', { name: 'Додати ще виріб з нуля' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Разовий товар ЗІЗ' }));
+    expect(await screen.findByLabelText('Позиція 2: Разова позиція')).toBeVisible();
+    const problems = screen.getByLabelText('Перед надсиланням');
+    expect(problems).toHaveTextContent('02 Без назви: Вкажіть назву разової позиції.');
+  });
+
+  it('opens the «Виріб з нуля» panel from the «Новий виріб» tile', async () => {
+    renderEditor();
+    fireEvent.click(await screen.findByRole('button', { name: 'Новий виріб' }));
     expect(await screen.findByRole('dialog', { name: 'Виріб з нуля' })).toBeVisible();
   });
 
@@ -229,14 +230,14 @@ describe('КП editor', () => {
     expect(await screen.findByText('КП 1-11-2026')).toBeVisible();
 
     typeRetail('95');
-    fireEvent.click(screen.getByRole('button', { name: 'Зберегти зміни' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
     expect(await screen.findByText('Вкажіть причину ручної ціни.')).toBeVisible();
     expect(api.save).not.toHaveBeenCalled();
 
     fireEvent.change(screen.getByLabelText(/Причина ручної ціни/), {
       target: { value: 'Знижка' },
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Зберегти зміни' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
     await waitFor(() => expect(api.save).toHaveBeenCalledTimes(1));
     const sent = api.save.mock.calls[0][0] as { id: number; draft: QuoteDraft };
     expect(sent.id).toBe(4);
@@ -246,11 +247,27 @@ describe('КП editor', () => {
   it('hides a price from the client', async () => {
     api.save.mockResolvedValue(quote);
     renderEditor();
-    fireEvent.click(await screen.findByLabelText('Показати в КП: Рукавиці, Ціна, до 9 шт.'));
-    fireEvent.click(screen.getByRole('button', { name: 'Зберегти зміни' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Дії з рядком: Рукавиці, Ціна' }));
+    fireEvent.click(screen.getByRole('menuitemcheckbox', { name: 'Показати в КП: до 9 шт.' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
     await waitFor(() => expect(api.save).toHaveBeenCalledTimes(1));
     const sent = api.save.mock.calls[0][0] as { draft: QuoteDraft };
     expect(sent.draft.items[0].options[0].prices.retail.shown).toBe(false);
+  });
+
+  it('hides one quantity tier in the whole КП with the «Підсумок» switch', async () => {
+    api.save.mockResolvedValue(quote);
+    renderEditor();
+    const summary = await screen.findByLabelText('Підсумок');
+    expect(summary).toHaveTextContent('Цін у КП3');
+    fireEvent.click(screen.getByRole('switch', { name: 'Показувати ціни від 41 шт.' }));
+    expect(summary).toHaveTextContent('Цін у КП2');
+    expect(screen.getByText('від 41 шт. · не в КП')).toBeVisible();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
+    await waitFor(() => expect(api.save).toHaveBeenCalledTimes(1));
+    const sent = api.save.mock.calls[0][0] as { draft: QuoteDraft };
+    expect(sent.draft.items[0].options[0].prices.large.shown).toBe(false);
   });
 
   it('offers to reload when the КП was saved in another window', async () => {
@@ -260,26 +277,26 @@ describe('КП editor', () => {
     });
     api.refetch.mockResolvedValue({ data: quote });
     renderEditor();
-    fireEvent.change(await screen.findByLabelText("Ім'я отримувача"), {
+    fireEvent.change(await screen.findByLabelText('Отримувач'), {
       target: { value: 'Петро' },
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Зберегти зміни' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
     expect(await screen.findByText('КП змінили в іншому вікні. Оновіть сторінку.')).toBeVisible();
 
     fireEvent.click(screen.getByRole('button', { name: 'Оновити' }));
     await waitFor(() => expect(api.refetch).toHaveBeenCalled());
-    await waitFor(() => expect(screen.getByLabelText("Ім'я отримувача")).toHaveValue(''));
+    await waitFor(() => expect(screen.getByLabelText('Отримувач')).toHaveValue(''));
   });
 
-  it('«Сформувати КП» downloads the saved КП at once', async () => {
+  it('«Переглянути PDF» downloads the saved КП at once', async () => {
     api.download.mockResolvedValue(undefined);
     renderEditor();
-    fireEvent.click(await screen.findByRole('button', { name: 'Сформувати КП' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Переглянути PDF' }));
     await waitFor(() => expect(api.download).toHaveBeenCalledWith(4, '1-11-2026'));
     expect(api.save).not.toHaveBeenCalled();
   });
 
-  it('«Сформувати КП» saves unsaved changes first and builds the PDF from the saved version', async () => {
+  it('«Переглянути PDF» saves unsaved changes first and builds the PDF from the saved version', async () => {
     const saved = { ...quote, version: 4 };
     api.save.mockResolvedValue(saved);
     api.download.mockResolvedValue(undefined);
@@ -289,7 +306,7 @@ describe('КП editor', () => {
       target: { value: 'Доставка за наш рахунок' },
     });
 
-    fireEvent.click(screen.getByRole('button', { name: 'Сформувати КП' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Переглянути PDF' }));
     await waitFor(() => expect(api.download).toHaveBeenCalledWith(4, '1-11-2026'));
     expect(api.save).toHaveBeenCalledTimes(1);
     expect(api.save.mock.invocationCallOrder[0]).toBeLessThan(
@@ -306,7 +323,7 @@ describe('КП editor', () => {
     expect(await screen.findByText('КП 1-11-2026')).toBeVisible();
     fireEvent.change(screen.getByLabelText('Коментар для клієнта'), { target: { value: 'Інше' } });
 
-    fireEvent.click(screen.getByRole('button', { name: 'Сформувати КП' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Переглянути PDF' }));
     expect(await screen.findByText('КП змінили в іншому вікні. Оновіть сторінку.')).toBeVisible();
     expect(api.download).not.toHaveBeenCalled();
   });

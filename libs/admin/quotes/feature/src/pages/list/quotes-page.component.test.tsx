@@ -1,6 +1,6 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import QuotesPage from './quotes-page';
@@ -39,6 +39,28 @@ vi.mock('@admin/quotes/data-access', () => ({
   useGetQuoteStaffQuery: staffQuery,
 }));
 
+vi.mock('@admin/clients/data-access', () => ({
+  useListCustomersQuery: (_query: unknown, options: { skip: boolean }) => ({
+    data: options.skip
+      ? undefined
+      : {
+          rows: [
+            {
+              displayName: 'Агроресурс',
+              legalName: 'ТОВ «Агроресурс»',
+              contactName: 'Марина',
+              kind: 'organization',
+            },
+          ],
+        },
+  }),
+}));
+
+function Opened({ name }: { name: string }) {
+  const state = useLocation().state as { prefill?: unknown } | null;
+  return <p>{`${name} ${JSON.stringify(state?.prefill ?? null)}`}</p>;
+}
+
 afterEach(() => {
   cleanup();
   staffQuery.mockReset();
@@ -51,8 +73,11 @@ function renderList(canSeeAll: boolean) {
     <MemoryRouter initialEntries={['/crm/quotes']}>
       <Routes>
         <Route path="/crm/quotes" element={<QuotesPage actor={{ userId: 2, canSeeAll }} />} />
-        <Route path="/crm/quotes/new" element={<p>request editor</p>} />
-        <Route path="/crm/quote-introductions/new" element={<p>introduction editor</p>} />
+        <Route path="/crm/quotes/new" element={<Opened name="request editor" />} />
+        <Route
+          path="/crm/quote-introductions/new"
+          element={<Opened name="introduction editor" />}
+        />
       </Routes>
     </MemoryRouter>,
   );
@@ -85,13 +110,38 @@ describe('КП list', () => {
     expect(staffQuery).toHaveBeenCalledWith(undefined, { skip: false });
   });
 
-  it('«Нове КП» offers both kinds and opens the chosen editor', async () => {
+  it('«Нове КП» asks for the client, then opens the editor with it filled in', async () => {
     const user = userEvent.setup();
     renderList(false);
     await user.click(screen.getByRole('button', { name: 'Нове КП' }));
-    expect(screen.getByRole('menuitem', { name: /КП під запит/ })).toBeVisible();
-    expect(screen.getByRole('menuitem', { name: /КП з нуля \(новий виріб\)/ })).toBeVisible();
-    await user.click(screen.getByRole('menuitem', { name: /КП для знайомства/ }));
-    expect(screen.getByText('introduction editor')).toBeInTheDocument();
+    const panel = screen.getByRole('dialog', { name: 'Нове КП' });
+    expect(screen.getByRole('radio', { name: /КП під запит/ })).toBeChecked();
+    expect(panel).not.toHaveTextContent('КП з нуля');
+
+    await user.click(screen.getByRole('button', { name: 'Створити КП' }));
+    expect(screen.getByText('Вкажіть клієнта або назву запиту.')).toBeVisible();
+
+    await user.type(screen.getByRole('combobox', { name: /Клієнт або запит/ }), 'Агро');
+    await user.click(await screen.findByRole('option', { name: /Агроресурс/ }));
+    await user.click(screen.getByRole('button', { name: 'Створити КП' }));
+    expect(
+      screen.getByText(
+        'request editor {"internalName":"Агроресурс","companyName":"ТОВ «Агроресурс»","recipientName":"Марина"}',
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it('«Нове КП» opens «КП для знайомства» with a typed name', async () => {
+    const user = userEvent.setup();
+    renderList(false);
+    await user.click(screen.getByRole('button', { name: 'Нове КП' }));
+    await user.type(screen.getByRole('combobox', { name: /Клієнт або запит/ }), 'Новий клієнт');
+    await user.click(screen.getByRole('radio', { name: /КП для знайомства/ }));
+    await user.click(screen.getByRole('button', { name: 'Створити КП' }));
+    expect(
+      screen.getByText(
+        'introduction editor {"internalName":"Новий клієнт","companyName":"","recipientName":""}',
+      ),
+    ).toBeInTheDocument();
   });
 });

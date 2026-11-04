@@ -30,6 +30,7 @@ import type {
   QuoteIntroLayout,
   QuoteIntroSlotDraft,
   QuoteIntroTemplate,
+  QuoteStartPrefill,
 } from '@admin/quotes/model';
 
 const messageOf = (error: unknown, fallback: string) =>
@@ -42,7 +43,10 @@ const snapshot = (draft: QuoteIntroDraft | null) =>
  * «КП для знайомства»: starts a new selection from the setup or loads a saved one, keeps the draft and saves it
  * whole. A 409 is a stale version or a page rule the server checked (shown as it is).
  */
-export function useQuoteIntroductionEditor(id: number | null) {
+export function useQuoteIntroductionEditor(
+  id: number | null,
+  prefill: QuoteStartPrefill | null = null,
+) {
   const navigate = useNavigate();
   const setup = useGetQuoteIntroductionSetupQuery();
   const loaded = useGetQuoteQuery(id ?? 0, { skip: id === null });
@@ -64,7 +68,8 @@ export function useQuoteIntroductionEditor(id: number | null) {
   };
 
   useEffect(() => {
-    if (id === null && setup.data && draft === null) start(emptyIntroDraft(setup.data), null);
+    if (id === null && setup.data && draft === null)
+      start({ ...emptyIntroDraft(setup.data), ...prefill }, null);
   }, [id, setup.data]);
 
   useEffect(() => {

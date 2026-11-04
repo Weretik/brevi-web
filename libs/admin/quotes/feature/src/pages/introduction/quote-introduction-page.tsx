@@ -7,6 +7,7 @@ import {
   QuoteIntroPagesStep,
   QuoteIntroRecipientStep,
   QuoteMoreMenu,
+  QuoteSendActions,
 } from '@admin/quotes/ui';
 import { ReferencePageHeader } from '@admin/references/ui';
 import { Alert, Box, Button, CircularProgress, Stack } from '@mui/material';
@@ -25,7 +26,7 @@ import { useQuoteIntroductionEditor } from '../../hooks/introduction/use-quote-i
 import { useQuoteLifecycle } from '../../hooks/lifecycle/use-quote-lifecycle';
 import { useRouteNotice } from '../../hooks/lifecycle/use-route-notice';
 import { useGmailReturnNotice } from '../../hooks/sending/use-gmail-return-notice';
-import { QuoteEditorFooter } from '../editor/quote-editor-footer';
+import { useQuoteStartPrefill } from '../../hooks/start/use-quote-start-prefill';
 
 import type { QuoteActor, QuoteIntroSeason, QuoteIntroSlotDraft } from '@admin/quotes/model';
 
@@ -44,7 +45,8 @@ export default function QuoteIntroductionPage({ actor }: { actor: QuoteActor }) 
   const params = useParams();
   const id = params['quoteId'] ? Number(params['quoteId']) : null;
   const navigate = useNavigate();
-  const editor = useQuoteIntroductionEditor(id);
+  const prefill = useQuoteStartPrefill();
+  const editor = useQuoteIntroductionEditor(id, prefill);
   const { quote, draft, setup } = editor;
   const pdf = useQuotePdf({ quote, dirty: editor.dirty, save: editor.save });
   const gmail = useGmailReturnNotice();
@@ -97,8 +99,6 @@ export default function QuoteIntroductionPage({ actor }: { actor: QuoteActor }) 
         actions={
           <>
             <QuoteIntroductionActions
-              canDelete={quote?.status === 'Draft'}
-              onDelete={() => setConfirmDelete(true)}
               onRestart={() => {
                 setNotice(null);
                 editor.restart();
@@ -121,6 +121,7 @@ export default function QuoteIntroductionPage({ actor }: { actor: QuoteActor }) 
                 onHistory={() => setPanel({ kind: 'history' })}
                 onCopy={() => void lifecycle.copy()}
                 onArchive={(archived) => void lifecycle.setArchived(archived)}
+                onDelete={quote.status === 'Draft' ? () => setConfirmDelete(true) : undefined}
               />
             )}
           </>
@@ -193,12 +194,12 @@ export default function QuoteIntroductionPage({ actor }: { actor: QuoteActor }) 
         />
       </Stack>
 
-      <QuoteEditorFooter
+      <QuoteSendActions
+        layout="bar"
         dirty={editor.dirty}
         saving={editor.saving}
         generating={pdf.generating}
         locked={lifecycle.archived}
-        onClose={() => navigate('/crm/quotes')}
         onSave={() => void editor.save()}
         onPdf={() => void pdf.generate()}
         onSend={async () => {

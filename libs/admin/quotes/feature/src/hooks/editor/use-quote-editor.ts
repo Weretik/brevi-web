@@ -9,16 +9,16 @@ import { useNavigate } from 'react-router-dom';
 
 import { useQuoteDraft } from './use-quote-draft';
 
-import type { Quote } from '@admin/quotes/model';
+import type { Quote, QuoteStartPrefill } from '@admin/quotes/model';
 
 const messageOf = (error: unknown, fallback: string) =>
   (error as { message?: string } | undefined)?.message ?? fallback;
 
 /**
- * The «Товари та ціни» editor: loads a КП (or starts a new one), keeps the draft, saves it whole.
+ * The КП «під запит» editor: loads a КП (or starts a new one, filled from «Нове КП»), keeps the draft, saves it whole.
  * A 409 means someone saved a newer version; the page offers «Оновити».
  */
-export function useQuoteEditor(id: number | null) {
+export function useQuoteEditor(id: number | null, prefill: QuoteStartPrefill | null = null) {
   const navigate = useNavigate();
   const loaded = useGetQuoteQuery(id ?? 0, { skip: id === null });
   const [createQuote, creating] = useCreateQuoteMutation();
@@ -27,7 +27,7 @@ export function useQuoteEditor(id: number | null) {
   const [showErrors, setShowErrors] = useState(false);
   const [saveError, setSaveError] = useState<{ message: string; stale: boolean } | null>(null);
   const [savedAt, setSavedAt] = useState<number | null>(null);
-  const draft = useQuoteDraft(emptyQuoteDraft());
+  const draft = useQuoteDraft({ ...emptyQuoteDraft(), ...(id === null ? prefill : null) });
   const { reset } = draft;
 
   useEffect(() => {

@@ -35,6 +35,7 @@ export {
   removeQuoteItem,
   removeQuoteOption,
   setQuoteTier,
+  setQuoteTierShown,
   updateQuoteItem,
   updateQuoteOption,
 } from './mappers/quote-draft-edits';
@@ -105,3 +106,11 @@ export {
 } from './validators/quote-intro-validation';
 export type { QuoteIntroErrors } from './validators/quote-intro-validation';
 export { quoteEditorPath } from './models/quote-paths';
+export type * from './models/quote-start';
+export { quoteStartPaths, quoteStartPrefillOf, readQuoteStartPrefill } from './models/quote-start';
+export {
+  quoteDraftProblems,
+  quoteDraftSummary,
+  quoteTierVisibility,
+} from './validators/quote-draft-problems';
+export type { QuoteDraftProblem, QuoteTierVisibility } from './validators/quote-draft-problems';
