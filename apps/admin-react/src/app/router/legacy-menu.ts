@@ -73,6 +73,12 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         requiredRoles: productionOrders,
       },
       {
+        id: 'fabric-stock',
+        label: 'Склад тканин',
+        path: '/production/fabric-stock',
+        requiredRoles: productionOrders,
+      },
+      {
         id: 'workshop-staff',
         label: 'Працівники цеху',
         path: '/production/staff',
@@ -98,7 +104,6 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
       },
       { id: 'schedule', label: 'Графік роботи' },
       { id: 'salary', label: 'Зарплата' },
-      { id: 'fabric-stock', label: 'Тканина в цеху' },
       { id: 'furnitura-stock', label: 'Фурнітура в цеху' },
       { id: 'work-time', label: 'Робочий час' },
       { id: 'embroidery', label: 'Вишивка' },

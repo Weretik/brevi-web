@@ -2722,6 +2722,193 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/production/fabric-stock': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Stock lines with reservation and available; planned pairs the stock never held come with a null id */
+    get: operations['getFabricStock'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/fabric-stock/choices': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Fabrics with a FAB- code and active suppliers for the stock forms */
+    get: operations['getFabricStockChoices'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/fabric-stock/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Card of a line: movements newest first and the items holding it */
+    get: operations['getFabricStockLine'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/fabric-stock/movements': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** «Початковий залишок» or «Прихід»; a new fabric and colour opens its line */
+    post: operations['createFabricMovement'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/fabric-stock/{id}/correction': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** «Коригування» to the counted metres, with a reason */
+    post: operations['correctFabricStock'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/fabric-stock/{id}/movements/{movementId}/reverse': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** «Сторно» of an opening, receipt or correction */
+    post: operations['reverseFabricMovement'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/fabric-stock/consumption': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** «Зведення витрати»: received, issued and corrected per line by operation date */
+    get: operations['getFabricConsumption'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/fabric-stock/import': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Moves the stock of the old «Цех» (Admin); nothing is saved unless every row is fine */
+    post: operations['importFabricStock'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/orders/{id}/items/{itemId}/fabric': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Tab «Тканина»: plan by colour, issues and whether the person may issue */
+    get: operations['getProductionItemFabric'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/orders/{id}/items/{itemId}/fabric-issues': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** «Видати»: one package of planned, replacement and additional lines */
+    post: operations['createFabricIssue'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/orders/{id}/fabric-issues/{issueId}/reverse': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** «Сторно видачі»: every line returns to the stock and the plan is reserved again */
+    post: operations['reverseFabricIssue'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/production/settings': {
     parameters: {
       query?: never;
@@ -6403,6 +6590,302 @@ export interface components {
       unchanged: number;
       errors: number;
       lines: components['schemas']['ProductionProgressImportLine'][];
+    };
+    FabricStockRowResponse: {
+      /** @description Null for a fabric and colour open orders plan but the stock never held. */
+      id: number | null;
+      fabricId: number | null;
+      fabricCode: string;
+      fabricName: string;
+      color: string;
+      /** @description Balance; may be negative. */
+      meters: number;
+      /** @description Plan of «Нове» orders not yet covered by issues. */
+      reserved: number;
+      /** @description Balance − reserved. */
+      available: number;
+      /** @description UAH per metre of «Тканини»; null without the right to see the value. */
+      price: number | null;
+      value: number | null;
+      /** @description 0 for a line that does not exist yet. */
+      version: number;
+      /** Format: date-time */
+      updatedAt: string | null;
+    };
+    FabricStockTotals: {
+      meters: number;
+      reserved: number;
+      lines: number;
+      /** @description Lines whose available is below zero. */
+      short: number;
+      value: number | null;
+    };
+    FabricStockPermissions: {
+      /** @description Receipts, corrections, reversals and issues: WorkshopChief and Admin. */
+      canMove: boolean;
+      /** @description The value in UAH: WorkshopChief and Admin. */
+      seesValue: boolean;
+    };
+    FabricStockListResponse: {
+      rows: components['schemas']['FabricStockRowResponse'][];
+      totals: components['schemas']['FabricStockTotals'];
+      permissions: components['schemas']['FabricStockPermissions'];
+    };
+    FabricStockFabricChoice: {
+      id: number;
+      code: string;
+      name: string;
+    };
+    FabricStockSupplierChoice: {
+      id: number;
+      name: string;
+    };
+    FabricStockChoicesResponse: {
+      fabrics: components['schemas']['FabricStockFabricChoice'][];
+      /** @description Active suppliers; empty for people who cannot move stock. */
+      suppliers: components['schemas']['FabricStockSupplierChoice'][];
+    };
+    FabricMovementResponse: {
+      id: number;
+      /** @enum {string} */
+      kind: 'Opening' | 'Receipt' | 'Issue' | 'Adjustment' | 'Reversal';
+      metersBefore: number;
+      delta: number;
+      metersAfter: number;
+      /** Format: date */
+      operationDate: string;
+      note: string | null;
+      supplierId: number | null;
+      supplierName: string | null;
+      document: string | null;
+      orderId: number | null;
+      orderNumber: number | null;
+      modelName: string | null;
+      /** @description The movement a «Сторно» takes back. */
+      reversesMovementId: number | null;
+      isReversed: boolean;
+      /** @description An opening, receipt or correction not yet taken back, for those who may move stock. */
+      canReverse: boolean;
+      createdByName: string;
+      /** Format: date-time */
+      createdAt: string;
+    };
+    FabricReservationResponse: {
+      orderId: number;
+      orderNumber: number;
+      itemId: number;
+      modelName: string;
+      planned: number;
+      covered: number;
+      reserved: number;
+    };
+    FabricStockLineResponse: {
+      line: components['schemas']['FabricStockRowResponse'];
+      movements: components['schemas']['FabricMovementResponse'][];
+      reservations: components['schemas']['FabricReservationResponse'][];
+      permissions: components['schemas']['FabricStockPermissions'];
+    };
+    CreateFabricMovementInput: {
+      /**
+       * @description Opening only as the first movement of a line.
+       * @enum {string}
+       */
+      kind: 'Opening' | 'Receipt';
+      fabricId: number;
+      color: string;
+      meters: number;
+      /** Format: date */
+      operationDate: string;
+      supplierId: number | null;
+      document: string | null;
+      note: string | null;
+      /** @description The line version; null when the fabric and colour are new. */
+      version: number | null;
+    };
+    CorrectFabricStockInput: {
+      version: number;
+      countedMeters: number;
+      /** Format: date */
+      operationDate: string;
+      note: string;
+    };
+    ReverseFabricMovementInput: {
+      version: number;
+      note: string;
+    };
+    FabricConsumptionRowResponse: {
+      stockId: number;
+      fabricCode: string;
+      fabricName: string;
+      color: string;
+      received: number;
+      issued: number;
+      corrected: number;
+      issuedValue: number | null;
+    };
+    FabricConsumptionResponse: {
+      /** Format: date */
+      from: string;
+      /** Format: date */
+      to: string;
+      rows: components['schemas']['FabricConsumptionRowResponse'][];
+      received: number;
+      issued: number;
+      issuedValue: number | null;
+    };
+    FabricMovementImportRow: {
+      legacyId: string;
+      /** @enum {string} */
+      kind: 'Opening' | 'Receipt' | 'Issue' | 'Adjustment' | 'Reversal';
+      metersBefore: number;
+      delta: number;
+      metersAfter: number;
+      /** Format: date */
+      operationDate: string;
+      /** Format: date-time */
+      at: string;
+      supplier: string | null;
+      document: string | null;
+      note: string | null;
+      actorEmail: string | null;
+      orderLegacyId: string | null;
+      position: number | null;
+    };
+    FabricStockImportRow: {
+      legacyId: string;
+      fabricCode: string;
+      color: string;
+      meters: number;
+      movements: components['schemas']['FabricMovementImportRow'][];
+    };
+    FabricIssueLineImportRow: {
+      /** @enum {string} */
+      purpose: 'Planned' | 'Replacement' | 'Additional';
+      planFabricCode: string | null;
+      planColor: string | null;
+      plannedMeters: number | null;
+      movementLegacyId: string;
+      coveredMeters: number;
+    };
+    FabricIssueImportRow: {
+      legacyId: string;
+      orderLegacyId: string;
+      position: number;
+      /** Format: date */
+      issuedOn: string;
+      /** Format: date-time */
+      at: string;
+      actorEmail: string | null;
+      note: string | null;
+      lines: components['schemas']['FabricIssueLineImportRow'][];
+    };
+    FabricReservationImportRow: {
+      fabricCode: string;
+      color: string;
+      meters: number;
+    };
+    FabricStockImportInput: {
+      stocks: components['schemas']['FabricStockImportRow'][];
+      issues: components['schemas']['FabricIssueImportRow'][];
+      oldReservations: components['schemas']['FabricReservationImportRow'][];
+    };
+    FabricStockImportLine: {
+      fabricCode: string;
+      color: string;
+      movements: number;
+      /** @enum {string} */
+      action: 'created' | 'unchanged' | 'error';
+      error: string | null;
+    };
+    FabricStockImportResult: {
+      dryRun: boolean;
+      created: number;
+      unchanged: number;
+      errors: number;
+      movements: number;
+      issues: number;
+      /** @description Fabric and colour pairs whose recomputed reservation differs from the old app. */
+      reservationDifferences: number;
+      lines: components['schemas']['FabricStockImportLine'][];
+      issueErrors: string[];
+    };
+    FabricPlanPartResponse: {
+      fabricCode: string;
+      color: string;
+      colorKey: string;
+      /** @description Norm part × quantity. */
+      planned: number;
+      /** @description What issues covered of the part. */
+      covered: number;
+      /** @description Metres of planned and replacement lines for the part. */
+      issued: number;
+      /** @description Still held for this item; 0 unless the order is «Нове». */
+      reserved: number;
+      stockId: number | null;
+      stockMeters: number;
+      stockAvailable: number;
+    };
+    FabricIssueLineResponse: {
+      id: number;
+      /** @enum {string} */
+      purpose: 'Planned' | 'Replacement' | 'Additional';
+      planColorKey: string | null;
+      plannedMeters: number | null;
+      stockId: number;
+      fabricCode: string;
+      fabricName: string;
+      color: string;
+      meters: number;
+      coveredMeters: number;
+    };
+    FabricIssueResponse: {
+      id: number;
+      /** Format: date */
+      issuedOn: string;
+      note: string | null;
+      createdByName: string;
+      /** Format: date-time */
+      createdAt: string;
+      isReversed: boolean;
+      /** Format: date-time */
+      reversedAt: string | null;
+      reversedByName: string | null;
+      reverseReason: string | null;
+      lines: components['schemas']['FabricIssueLineResponse'][];
+    };
+    ProductionItemFabricResponse: {
+      orderId: number;
+      itemId: number;
+      orderVersion: number;
+      fabricCode: string | null;
+      fabricName: string | null;
+      quantity: number;
+      hasNorm: boolean;
+      plan: components['schemas']['FabricPlanPartResponse'][];
+      issued: number;
+      issues: components['schemas']['FabricIssueResponse'][];
+      /** @description WorkshopChief and Admin on a «Нове» order. */
+      canIssue: boolean;
+    };
+    FabricIssueLineInput: {
+      /** @enum {string} */
+      purpose: 'Planned' | 'Replacement' | 'Additional';
+      /** @description The planned colour a planned or replacement line stands for; null for additional. */
+      planColorKey: string | null;
+      fabricId: number;
+      color: string;
+      meters: number;
+    };
+    CreateFabricIssueInput: {
+      orderVersion: number;
+      /** Format: date */
+      issuedOn: string;
+      note: string | null;
+      lines: components['schemas']['FabricIssueLineInput'][];
+    };
+    ReverseFabricIssueInput: {
+      orderVersion: number;
+      reason: string;
     };
     WorkshopTelegramChatResponse: {
       /** Format: int64 */
@@ -15091,6 +15574,569 @@ export interface operations {
       };
       /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders); the person may not make this change. */
       403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getFabricStock: {
+    parameters: {
+      query?: {
+        /** @description Code, fabric or colour. */
+        search?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FabricStockListResponse'];
+        };
+      };
+      /** @description Invalid */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getFabricStockChoices: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FabricStockChoicesResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getFabricStockLine: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FabricStockLineResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such line */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createFabricMovement: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateFabricMovementInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FabricStockLineResponse'];
+        };
+      };
+      /** @description Invalid, or the fabric has no FAB- code */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such fabric or supplier */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Stale version or opening not first */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  correctFabricStock: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CorrectFabricStockInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FabricStockLineResponse'];
+        };
+      };
+      /** @description Invalid or nothing to correct */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such line */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Stale version */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  reverseFabricMovement: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+        movementId: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ReverseFabricMovementInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FabricStockLineResponse'];
+        };
+      };
+      /** @description Invalid */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such line or movement */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Stale, already reversed, or an issue */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getFabricConsumption: {
+    parameters: {
+      query: {
+        from: string;
+        to: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FabricConsumptionResponse'];
+        };
+      };
+      /** @description Invalid period */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  importFabricStock: {
+    parameters: {
+      query?: {
+        /** @description Only check and show. */
+        dryRun?: boolean;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FabricStockImportInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FabricStockImportResult'];
+        };
+      };
+      /** @description Invalid file */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getProductionItemFabric: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+        itemId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionItemFabricResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such order or item */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createFabricIssue: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+        itemId: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateFabricIssueInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionItemFabricResponse'];
+        };
+      };
+      /** @description Invalid line */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such order, item or fabric */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Stale order or stock */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  reverseFabricIssue: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+        issueId: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ReverseFabricIssueInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionItemFabricResponse'];
+        };
+      };
+      /** @description Invalid */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such issue */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Stale or already reversed */
+      409: {
         headers: {
           [name: string]: unknown;
         };

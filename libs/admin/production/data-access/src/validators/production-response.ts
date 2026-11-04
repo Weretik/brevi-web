@@ -46,6 +46,12 @@ export function boolean(value: unknown, what = 'ознака'): boolean {
   return value;
 }
 
+/** A finite number, negative allowed (stock balances may go below zero). */
+export function decimal(value: unknown, what = 'число'): number {
+  if (typeof value !== 'number' || !Number.isFinite(value)) throw invalid(what);
+  return value;
+}
+
 export function nullableNumber(value: unknown, what = 'число'): number | null {
   if (value === null || value === undefined) return null;
   if (typeof value !== 'number' || !Number.isFinite(value)) throw invalid(what);

@@ -39,3 +39,10 @@ export const productionOrderErrors = {
   notFound: 'Завдання або КП не знайдено. Оновіть сторінку.',
   conflict: 'Завдання вже змінили або КП ще не відправлене. Оновіть сторінку.',
 } satisfies AdminApiErrorMessages;
+
+export const fabricStockErrors = {
+  ...common,
+  unauthorized: 'Рух складу записує начальник цеху або адміністратор.',
+  notFound: 'Рядок складу, тканину чи постачальника не знайдено. Оновіть сторінку.',
+  conflict: 'Склад або завдання вже змінили. Оновіть сторінку.',
+} satisfies AdminApiErrorMessages;
