@@ -10,4 +10,5 @@ export const quoteEventLabels: Readonly<Record<QuoteEventKind, string>> = {
   Archived: 'Перенесено в архів',
   Restored: 'Повернуто з архіву',
   Copied: 'Створено копією',
+  Imported: 'Перенесено з калькулятора',
 };
