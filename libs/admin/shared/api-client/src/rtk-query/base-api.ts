@@ -8,6 +8,7 @@ export const adminApi = createApi({
   tagTypes: [
     'PricingParameter',
     'PpeMarkupRule',
+    'PriceSource',
     'Fabric',
     'GarmentAccessory',
     'GarmentPart',

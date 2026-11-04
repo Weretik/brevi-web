@@ -33,3 +33,6 @@ export * from './entities/product-sections/product-section';
 export * from './forms/product-sections/product-section-form';
 export * from './queries/product-sections/product-section-filters';
 export * from './validators/product-sections/product-section-validation';
+export * from './entities/price-import/price-source';
+export * from './mappers/price-import/price-import-format';
+export * from './validators/price-import/price-source-discount-validation';

@@ -23,6 +23,8 @@ interface Props {
   saveDisabled?: boolean;
   /** Text of the main button; «Зберегти» by default. */
   submitLabel?: string;
+  /** Text of the read-only main button; «Редагувати» by default, null hides it. */
+  editLabel?: string | null;
   children: ReactNode;
   onClose: () => void;
   onEdit: () => void;
@@ -39,6 +41,7 @@ export function ReferenceEditorDrawer({
   saving,
   saveDisabled = false,
   submitLabel = 'Зберегти',
+  editLabel = 'Редагувати',
   children,
   onClose,
   onEdit,
@@ -106,9 +109,11 @@ export function ReferenceEditorDrawer({
             {readOnly ? 'Закрити' : 'Скасувати'}
           </Button>
           {readOnly ? (
-            <Button key="edit" type="button" variant="contained" onClick={onEdit}>
-              Редагувати
-            </Button>
+            editLabel && (
+              <Button key="edit" type="button" variant="contained" onClick={onEdit}>
+                {editLabel}
+              </Button>
+            )
           ) : (
             <Button
               key="save"

@@ -4,6 +4,7 @@ import { Navigate, useSearchParams } from 'react-router-dom';
 const PricingParametersPage = lazy(
   () => import('./pages/pricing-parameters/pricing-parameters-page'),
 );
+const PriceImportPage = lazy(() => import('./pages/price-import/price-import-page'));
 const MaterialsPage = lazy(() => import('./pages/materials/materials-page'));
 const OperationsPage = lazy(() => import('./pages/operations/operations-page'));
 const ProductSectionsPage = lazy(() => import('./pages/product-sections/product-sections-page'));
@@ -32,6 +33,7 @@ export const referencesRoutes = [
   { path: '/references/garment-accessory', element: <GarmentAccessoriesRedirect /> },
   { path: '/references/garment-part-operation', element: <OperationsPage /> },
   { path: '/references/pricing-parameters', element: <PricingParametersPage /> },
+  { path: '/references/price-import', element: <PriceImportPage /> },
   { path: '/references/product-sections', element: <ProductSectionsPage /> },
   {
     path: '/references/additional-reference',
