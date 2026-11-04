@@ -57,3 +57,11 @@ export interface QuoteRepriceReport {
   readonly changes: readonly QuoteRepriceChange[];
   readonly unavailable: readonly QuoteRepriceProblem[];
 }
+
+/** «Змінити фото»: one photo of the product's card tab «Фото» (CAT-018). */
+export interface QuoteProductPhoto {
+  readonly mediaFileId: number;
+  readonly url: string;
+  readonly thumbnailUrl: string | null;
+  readonly isMain: boolean;
+}

@@ -179,6 +179,7 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
               onRemoveOption={(optionKey) => editor.removeOption(item.key, optionKey)}
               onAddFabric={() => setPanel({ kind: 'fabric', itemKey: item.key })}
               onEditComposition={() => setPanel({ kind: 'custom', itemKey: item.key })}
+              onChangePhoto={() => setPanel({ kind: 'photo', itemKey: item.key })}
               onMove={(offset) => editor.moveItem(item.key, offset)}
               onRemove={() => editor.removeItem(item.key)}
             />

@@ -17,6 +17,7 @@ import { useState } from 'react';
 
 import { QuoteCustomComposition } from './quote-custom-composition';
 import { QuoteItemMenu } from './quote-item-menu';
+import { QuoteItemPhoto } from './quote-item-photo';
 import { QuoteItemPrices } from './quote-item-prices';
 
 import type { QuoteItemDraft, QuoteOptionDraft, QuoteTier } from '@admin/quotes/model';
@@ -43,6 +44,8 @@ interface Props {
   onAddFabric: () => void;
   /** «Змінити склад» of a «Виріб з нуля» or a Catalog model. */
   onEditComposition: () => void;
+  /** «Змінити фото»: another photo of the item's product (CAT-018). */
+  onChangePhoto?: () => void;
   onMove: (offset: -1 | 1) => void;
   onRemove: () => void;
 }
@@ -71,6 +74,7 @@ export function QuoteItemCard({
   onRemoveOption,
   onAddFabric,
   onEditComposition,
+  onChangePhoto,
   onMove,
   onRemove,
 }: Props) {
@@ -80,6 +84,7 @@ export function QuoteItemCard({
   const label = oneOff ? item.name || 'Разова позиція' : item.name;
   const [supplier, setSupplier] = useState(false);
   const meta = [item.season, item.code].filter(Boolean).join(' · ');
+  const changePhoto = item.productId !== null && onChangePhoto ? onChangePhoto : undefined;
   return (
     <Card
       variant="outlined"
@@ -88,19 +93,7 @@ export function QuoteItemCard({
       sx={{ scrollMarginTop: 96, borderColor: itemError ? 'warning.main' : undefined }}
     >
       <Stack direction="row" sx={{ gap: 2, alignItems: 'center', p: 2, pb: 1.5 }}>
-        <Box
-          {...(item.photoUrl ? { component: 'img', src: item.photoUrl, alt: '' } : {})}
-          sx={{
-            width: 56,
-            height: 56,
-            objectFit: 'cover',
-            borderRadius: 1,
-            flexShrink: 0,
-            border: 1,
-            borderColor: 'divider',
-            bgcolor: 'action.hover',
-          }}
-        />
+        <QuoteItemPhoto photoUrl={item.photoUrl} label={label} onChange={changePhoto} />
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Stack direction="row" sx={{ gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
             <Typography
@@ -163,6 +156,7 @@ export function QuoteItemCard({
         )}
         <QuoteItemMenu
           label={label}
+          onChangePhoto={changePhoto}
           isFirst={isFirst}
           isLast={isLast}
           onMove={onMove}

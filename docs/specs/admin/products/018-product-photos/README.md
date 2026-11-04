@@ -12,6 +12,7 @@ The owner asked (2026-11-04) for product photos that quotes (КП) show, the old
 - **R-04:** Column «Активний» is a switch for staff who manage products (`canManage`); others see it read-only. The card header has the same switch. Saving sends the row through `PUT /api/v1/products/{id}/overview` with only `isActive` changed.
 - **R-05:** Chips «Активні» and «Вимкнені» filter the list (`active=true|false`); a second click on the chosen chip shows both again. Counts come from the page (`all − inactive`, `inactive`).
 - **R-06:** «Імпорт зі старого сайту» (Admin, tab «Швейна продукція») opens a side panel: pick `old-site-photo-import.json`, «Перевірити» (dry run, writes nothing), then «Імпортувати», which sends the file in parts of 20 products with progress and «Зупинити». The report lists counts, failed photos with reasons and products not found. A repeat adds nothing twice.
+- **R-07:** A new КП item takes the product's main photo. «Змінити фото» in the КП item (click on the photo or «⋯») shows the product's photos and puts the chosen one into this КП only (`libs/admin/quotes/feature/src/components/photo/`); the product keeps its main photo.
 
 ## Code
 
@@ -23,4 +24,4 @@ The owner asked (2026-11-04) for product photos that quotes (КП) show, the old
 
 ## Tests
 
-`product-photos-tab.component.test.tsx`, `product-photos.mapper.unit.test.ts`, `old-site-photo-import-file.unit.test.ts`, `product-overview.mapper.unit.test.ts`, `sewing-access.mapper.unit.test.ts`.
+`product-photos-tab.component.test.tsx`, `product-photos.mapper.unit.test.ts`, `old-site-photo-import-file.unit.test.ts`, `product-overview.mapper.unit.test.ts`, `sewing-access.mapper.unit.test.ts`; quotes: `quote-photo-picker-drawer.component.test.tsx`, `quote.mapper.unit.test.ts`.
