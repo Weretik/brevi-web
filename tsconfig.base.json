@@ -62,7 +62,11 @@
       "@admin/users/ui": ["libs/admin/users/ui/src/index.ts"],
       "@admin/users/feature": ["libs/admin/users/feature/src/index.ts"],
       "@admin/content/feature": ["libs/admin/content/feature/src/index.ts"],
-      "@admin/shared/ui": ["libs/admin/shared/ui/src/index.ts"]
+      "@admin/shared/ui": ["libs/admin/shared/ui/src/index.ts"],
+      "@admin/quotes/model": ["libs/admin/quotes/model/src/index.ts"],
+      "@admin/quotes/ui": ["libs/admin/quotes/ui/src/index.ts"],
+      "@admin/quotes/data-access": ["libs/admin/quotes/data-access/src/index.ts"],
+      "@admin/quotes/feature": ["libs/admin/quotes/feature/src/index.ts"]
     }
   }
 }

@@ -33,15 +33,10 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
     label: 'Менеджер сервісу',
     items: [
       { id: 'leads', label: 'Ліди' },
-      { id: 'quotes', label: 'Розрахунки та КП', path: '/crm/quotes' },
-      {
-        id: 'issuer-settings',
-        label: 'Реквізити та шаблон КП',
-        path: '/crm/issuer-settings',
-        requiredRole: 'Admin',
-      },
+      { id: 'quotes', label: 'КП', path: '/crm/quotes' },
+      { id: 'quote-introductions', label: 'КП для знайомства' },
+      { id: 'quote-settings', label: 'Налаштування КП', requiredRole: 'Admin' },
       { id: 'price-list', label: 'Прайс' },
-      { id: 'quote-archive', label: 'Архів КП', path: '/crm/quotes/archive' },
       { id: 'tasks', label: 'Завдання в роботу' },
       { id: 'deals', label: 'Угоди' },
     ],

@@ -24,7 +24,7 @@ The Storefront currently has README files for its Nx feature libraries, but they
 - [Admin React: operations — Calculator sheet fields and a «Цех» page](admin/references/014-operations-sheet/README.md) — implemented 2026-11-02.
 - [Admin React: Telegram reminders](admin/reminders/001-telegram-reminders/README.md) — implemented and locally verified 2026-11-01.
 - [Admin React: photo library with folders](admin/media/001-photo-library/README.md) — implemented and locally verified 2026-11-03; replaces 007-media.
-- [Admin React: «КП» commercial proposals](admin/quotes/001-quotes/README.md) — specification 2026-11-04; stage 1 next.
+- [Admin React: «КП» commercial proposals](admin/quotes/001-quotes/README.md) — stage 1 (list and «Товари та ціни» editor) implemented 2026-11-04; stages 2–6 planned.
 - [Visual guidance for tables, menus, and forms](admin/table-visual-guidance.md)
 - [React Admin migration order](admin/react-migration-roadmap.md)
 - [Admin: restore layers and module boundaries](admin/architecture/001-admin-layers-and-boundaries/README.md)
@@ -37,10 +37,10 @@ The Storefront currently has README files for its Nx feature libraries, but they
 - [Admin React: sewing composition structure](admin/products/005-sewing-composition-structure/README.md) — structural remediation verified 2026-10-25.
 - [Admin React: Sewing Article pricing](admin/products/006-sewing-pricing/README.md) — implemented and verified 2026-10-25.
 - [Admin React: PPE pricing](admin/products/007-ppe-pricing/README.md) — implemented and verified 2026-10-25.
-- [Admin React: клієнти, КП та індивідуальне пошиття](admin/clients/001-clients-quotes-custom-sewing/README.md) — P1–P5 locally verified; P6 delivery/history/production, email registry UI and new-selection creation locally verified; manual unknown resolution locally verified; live Gmail acceptance deferred by the owner.
+- [Admin React: клієнти, КП та індивідуальне пошиття](admin/clients/001-clients-quotes-custom-sewing/README.md) — history; its КП, PDF, email and custom-sewing screens were removed 2026-11-04, only KeepinCRM clients stay.
 
 When a specification's status changes, update its line here in the same change.
 
-- [FE-EN-003: BreviERP public legal pages](admin/clients/001-clients-quotes-custom-sewing/tasks/readiness/fe-en-003.md) — local implementation; publication and matching send-only runtime remain mandatory Gmail gates.
+- [FE-EN-003: BreviERP public legal pages](admin/clients/001-clients-quotes-custom-sewing/tasks/readiness/fe-en-003.md) — history; Gmail sending comes back in КП stage 3.
 
-[P6 release candidate and publication boundary](admin/clients/001-clients-quotes-custom-sewing/evidence/p6-release-2026-11-02.md) records the integrated build, backend publication/local migration and pending live deployment checks.
+[P6 release candidate](admin/clients/001-clients-quotes-custom-sewing/evidence/p6-release-2026-11-02.md) — history.

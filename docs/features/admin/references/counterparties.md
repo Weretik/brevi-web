@@ -11,7 +11,7 @@ The «Клієнти» tab follows reference pattern B. It has:
 - the chips «Активні / Не використовуються / Усі», with counts from the server;
 - a server-paged «Цех» table: name with its KeepinCRM ID, type, contact person, phones and status.
 
-Search, the filter and the page are kept in the URL. A row opens the client card at `/crm/clients/:id` (see [clients and quotes](../clients-and-quotes.md)). The tab lives in `clients/feature`, and `references/feature` only hosts the tabs.
+Search, the filter and the page are kept in the URL. A row opens the client card at `/crm/clients/:id` (see [clients](../clients.md)). The tab lives in `clients/feature`, and `references/feature` only hosts the tabs.
 
 ## Code structure
 

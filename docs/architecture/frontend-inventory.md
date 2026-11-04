@@ -44,4 +44,4 @@ tests. Add a new tool through a separate `EN-*` task before including it.
 
 ## Client slice — 2026-10-26
 
-`admin-clients-{model,data-access,feature}` add scoped Vitest/lint/typecheck targets under `libs/admin/clients`. `admin-clients-ui` has lint/typecheck; presentational interaction coverage runs through feature, without an empty UI test runner. Project tags remain scope:admin/domain:clients/type:<layer>. See [actual feature structure](../features/admin/clients-and-quotes.md).
+`admin-clients-{model,data-access,ui,feature}` and `admin-quotes-{model,data-access,ui,feature}` add scoped Vitest/lint/typecheck targets under `libs/admin/clients` and `libs/admin/quotes`; tags are scope:admin/domain:<clients|quotes>/type:<layer>. See [clients](../features/admin/clients.md) and [«КП»](../features/admin/quotes.md).

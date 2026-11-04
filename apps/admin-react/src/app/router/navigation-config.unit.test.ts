@@ -4,7 +4,7 @@ import { adminRouteDefinitions } from './admin-route-definitions';
 import { createNavigation } from './navigation-config';
 
 describe('legacy Admin navigation', () => {
-  it('connects existing quote and archive entries to the shared quote routes', () => {
+  it('links «КП» to the quote list and keeps the later КП pages without a link', () => {
     const paths = new Set(adminRouteDefinitions.map((route) => route.path));
     const manager = createNavigation(paths, ['Admin']).find(
       (group) => group.id === 'service-manager',
@@ -12,14 +12,10 @@ describe('legacy Admin navigation', () => {
     expect(manager?.items.find((item) => item.id === 'quotes')?.to).toBe('/crm/quotes');
     expect(paths.has('/crm/quotes/new')).toBe(true);
     expect(paths.has('/crm/quotes/:quoteId')).toBe(true);
-    expect(manager?.items.find((item) => item.id === 'quote-archive')?.to).toBe(
-      '/crm/quotes/archive',
-    );
-    expect(paths.has('/crm/quotes/:quoteId/history')).toBe(true);
-    expect(manager?.items.find((item) => item.id === 'issuer-settings')?.to).toBe(
-      '/crm/issuer-settings',
-    );
-    expect(paths.has('/crm/issuer-settings')).toBe(true);
+    expect(manager?.items.find((item) => item.id === 'quote-introductions')?.to).toBeUndefined();
+    expect(manager?.items.find((item) => item.id === 'quote-settings')?.to).toBeUndefined();
+    expect(paths.has('/crm/quotes/archive')).toBe(false);
+    expect(paths.has('/crm/issuer-settings')).toBe(false);
   });
   it('connects the reminders group to its four pages', () => {
     const paths = new Set(adminRouteDefinitions.map((route) => route.path));
@@ -48,16 +44,12 @@ describe('legacy Admin navigation', () => {
     expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(33);
     expect(groups[0].items.map((item) => item.id)).not.toContain('clients');
   });
-  it('shows issuer settings only for the server Admin role', () => {
-    const paths = new Set(['/crm/issuer-settings', '/crm/quotes']);
+  it('shows «Налаштування КП» only for the server Admin role', () => {
+    const paths = new Set(['/crm/quotes']);
     const admin = createNavigation(paths, ['Admin']);
     const manager = createNavigation(paths, ['Manager']);
-    const unknown = createNavigation(paths);
-    expect(admin[0].items.find((item) => item.id === 'issuer-settings')?.to).toBe(
-      '/crm/issuer-settings',
-    );
-    expect(manager[0].items.some((item) => item.id === 'issuer-settings')).toBe(false);
-    expect(unknown[0].items.some((item) => item.id === 'issuer-settings')).toBe(false);
+    expect(admin[0].items.some((item) => item.id === 'quote-settings')).toBe(true);
+    expect(manager[0].items.some((item) => item.id === 'quote-settings')).toBe(false);
     expect(manager[0].items.find((item) => item.id === 'quotes')?.to).toBe('/crm/quotes');
   });
 
