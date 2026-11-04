@@ -93,6 +93,7 @@ describe('React Admin routing', () => {
           'Контрагенти',
           'Розрахунки',
           'Параметри ціноутворення',
+          'Імпорт цін',
         ],
       ],
       ['Фото', ['Бібліотека фото']],
@@ -110,7 +111,7 @@ describe('React Admin routing', () => {
       ).toEqual(entries);
       expect(within(list).queryAllByRole('link')).toHaveLength(
         section === 'Загальні довідники'
-          ? 6
+          ? 7
           : section === 'Менеджер сервісу' || section === 'Фото'
             ? 1
             : 0,

@@ -106,6 +106,7 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         label: 'Параметри ціноутворення',
         path: '/references/pricing-parameters',
       },
+      { id: 'price-import', label: 'Імпорт цін', path: '/references/price-import' },
     ],
   },
   {

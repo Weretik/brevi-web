@@ -28,6 +28,7 @@ export * from './components/product-overview/product-overview-delete-dialog';
 export * from './components/sewing-card/sewing-card-header';
 export * from './components/sewing-card/sewing-card-metric-strip';
 export * from './components/sewing-card/sewing-card-status-pill';
+export * from './components/sewing-card/sewing-card-totals';
 export * from './components/sewing-card/sewing-variants-grid';
 export * from './components/sewing-card/sewing-materials-table';
 export * from './components/sewing-card/sewing-line-delete-dialog';
