@@ -1620,6 +1620,25 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/crm/quotes/{id}/pdf': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['QuoteId'];
+      };
+      cookie?: never;
+    };
+    /** @description «Сформувати КП». The PDF of the saved КП with the current settings; only shown items, variants and prices, client texts, the responsible manager's КП contact and the requisites (R-14). */
+    get: operations['getCrmQuotePdf'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/crm/quotes/{id}/reprice': {
     parameters: {
       query?: never;
@@ -1658,6 +1677,117 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/crm/quotes/{id}/send-draft': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['QuoteId'];
+      };
+      cookie?: never;
+    };
+    /** @description «Надіслати КП» (R-15): the signed-in person's connected Gmail (null until connected), whether Gmail is configured on the server, the PDF file name, and the letters (template from the settings first, then the letter variants) with {quoteNumber}, {managerName}, {managerPhone}, {managerEmail}, {site} filled with the sender's КП contact. */
+    get: operations['getCrmQuoteSendDraft'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quotes/{id}/send': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['QuoteId'];
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Sends the PDF of the saved КП of exactly `version` from the signed-in person's Gmail. On success the КП becomes Sent with `lastSentAt` and its version grows; it can be edited and sent again. Any failure (no Gmail, Gmail refused, stale version) leaves the КП as it was and returns 409 with the reason. */
+    post: operations['sendCrmQuote'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/mailboxes/{userId}/connect': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        userId: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description «Підключити Gmail»: the Google consent address (openid, email and gmail.send only). Admin (Director) for any staff member, a Manager only for themselves. The Admin opens it in the same tab; Google returns to `google-callback`, which redirects to `returnPath` with `gmail=connected` or `gmail=error&reason=…`. */
+    post: operations['connectCrmMailbox'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/mailboxes/{userId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        userId: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** @description Forgets the connected Gmail (Admin for anyone, a Manager for themselves). */
+    delete: operations['disconnectCrmMailbox'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/mailboxes/google-callback': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Google OAuth callback, anonymous; the signed state carries the staff member. Stores the Gmail address and the encrypted refresh token, then redirects to the Admin. Not called by the Admin code. */
+    get: operations['crmMailboxGoogleCallback'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quote-settings': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description «Налаштування КП» (R-13). Before the first save returns the defaults with version 0. Has a contact row for every active staff member; an unsaved contact shows the account name, phone and email. */
+    get: operations['getCrmQuoteSettings'];
+    /** @description Saves the whole page with the version that was loaded. */
+    put: operations['saveCrmQuoteSettings'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/crm/quote-lookups/catalog': {
     parameters: {
       query?: never;
@@ -1685,6 +1815,153 @@ export interface paths {
     /** @description Active Manager and Admin users a КП can be given to. */
     get: operations['getCrmQuoteStaff'];
     put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/tasks': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description A page of tasks. Not done: overdue first, then urgent, then by due time. `Done`: newest completion first. Search matches the number («ЗД-0142», «142»), title, client and manager name. */
+    get: operations['getCrmTasks'];
+    put?: never;
+    /** @description Director or Admin gives a new task to an active Manager. `version` must be 0. */
+    post: operations['createCrmTask'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/tasks/board': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description «Мої завдання» kanban: every open task and those done in the last 7 days (at most 500 cards). Open cards come first (urgent, then by due time), done ones newest first; the Admin groups them by `lane`. */
+    get: operations['getCrmTaskBoard'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/tasks/overview': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Counts for the metric strip and filter chips (narrowed by `assigneeUserId` for Admin) and the workload of each active Manager (always all of them for Admin, only the actor for a Manager). */
+    get: operations['getCrmTaskOverview'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/tasks/assignees': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Active users with the Manager role, by name; for the assignee picker and the manager filter. */
+    get: operations['getCrmTaskAssignees'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/tasks/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['TaskId'];
+      };
+      cookie?: never;
+    };
+    get: operations['getCrmTask'];
+    /** @description Director or Admin saves the side panel. Steps are replaced (new ids). `version` is the loaded one. */
+    put: operations['editCrmTask'];
+    post?: never;
+    /** @description Director or Admin deletes the task with its steps and history. */
+    delete: operations['deleteCrmTask'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/tasks/{id}/status': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['TaskId'];
+      };
+      cookie?: never;
+    };
+    get?: never;
+    /** @description The assignee or Admin moves the task. `Done` sets `completedAt`; leaving `Done` clears it. The same status changes nothing. */
+    put: operations['changeCrmTaskStatus'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/tasks/{id}/urgent': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['TaskId'];
+      };
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Director or Admin drags a card into or out of «Терміново». */
+    put: operations['setCrmTaskUrgent'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/tasks/{id}/steps/{stepId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['TaskId'];
+        stepId: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    /** @description The assignee or Admin ticks or unticks one step. */
+    put: operations['markCrmTaskStep'];
     post?: never;
     delete?: never;
     options?: never;
@@ -3828,6 +4105,8 @@ export interface components {
       itemsCount: number;
       /** Format: date-time */
       updatedAt: string;
+      /** Format: date-time */
+      lastSentAt?: string | null;
     };
     CrmQuotePage: {
       items: components['schemas']['CrmQuoteSummary'][];
@@ -3947,6 +4226,11 @@ export interface components {
       createdAt: string;
       /** Format: date-time */
       updatedAt: string;
+      /**
+       * Format: date-time
+       * @description Last time Gmail accepted the КП.
+       */
+      lastSentAt?: string | null;
       version: number;
       items: components['schemas']['CrmQuoteItem'][];
     };
@@ -3978,6 +4262,128 @@ export interface components {
       version: number;
       changes: components['schemas']['CrmQuoteRepriceChange'][];
       unavailable: components['schemas']['CrmQuoteRepriceProblem'][];
+    };
+    CrmQuoteLetter: {
+      name: string;
+      subject: string;
+      body: string;
+    };
+    CrmQuoteSendDraft: {
+      /** Format: email */
+      fromEmail?: string | null;
+      fromName: string;
+      gmailConfigured: boolean;
+      fileName: string;
+      letters: components['schemas']['CrmQuoteLetter'][];
+    };
+    CrmSendQuoteInput: {
+      version: number;
+      /** @description 1 to 10 addresses separated by commas, semicolons or spaces. */
+      to: string;
+      /** @description One line. */
+      subject: string;
+      /** @description Plain text. */
+      body: string;
+    };
+    CrmQuoteCompany: {
+      name: string;
+      /** @description 8 digits. */
+      edrpou?: string | null;
+      /** @description ІПН */
+      taxId?: string | null;
+      iban?: string | null;
+      address?: string | null;
+      phone?: string | null;
+      /** Format: email */
+      email?: string | null;
+      /** Format: uri */
+      site?: string | null;
+      /**
+       * Format: uri
+       * @description https link (photo library); SVG
+       */
+      logoUrl?: string | null;
+    };
+    /** @description Marks: {quoteNumber}, {managerName}, {managerPhone}, {managerEmail}, {site}. */
+    CrmQuoteEmailTemplate: {
+      subject: string;
+      body: string;
+    };
+    CrmQuotePdfTexts: {
+      title: string;
+      vatNotice?: string | null;
+      ctaTitle?: string | null;
+      ctaText?: string | null;
+      /** @description Marks: {managerName}, {managerPhone}, {managerEmail}. */
+      ctaContactTemplate?: string | null;
+    };
+    CrmQuoteAdvantage: {
+      title: string;
+      text?: string | null;
+    };
+    /** @description «КП для знайомства — рекламний каталог» (used in stage 4). */
+    CrmQuoteIntroductionTexts: {
+      logoText?: string | null;
+      summerTitle?: string | null;
+      winterTitle?: string | null;
+      subtitle?: string | null;
+      /** Format: uri */
+      summerBannerUrl?: string | null;
+      /** Format: uri */
+      winterBannerUrl?: string | null;
+      modelsTitle?: string | null;
+      assortmentLinkText?: string | null;
+      /** Format: uri */
+      assortmentUrl?: string | null;
+      productButtonText?: string | null;
+      nextStepText?: string | null;
+      accentColor?: string | null;
+      advantages: components['schemas']['CrmQuoteAdvantage'][];
+    };
+    CrmQuoteLetterVariant: {
+      name: string;
+      subject: string;
+      body: string;
+    };
+    CrmQuoteStaffContact: {
+      userId: number;
+      accountName: string;
+      accountEmail?: string | null;
+      /** @description Name shown to the client. */
+      name: string;
+      phone?: string | null;
+      email?: string | null;
+      /** @description Connected Gmail КП are sent from; null until connected. */
+      mailboxEmail?: string | null;
+    };
+    CrmQuoteSettings: {
+      /** @description 0 before the first save. */
+      version: number;
+      updatedByName?: string | null;
+      /** Format: date-time */
+      updatedAt?: string | null;
+      company: components['schemas']['CrmQuoteCompany'];
+      email: components['schemas']['CrmQuoteEmailTemplate'];
+      pdf: components['schemas']['CrmQuotePdfTexts'];
+      introduction: components['schemas']['CrmQuoteIntroductionTexts'];
+      letterVariants: components['schemas']['CrmQuoteLetterVariant'][];
+      staffContacts: components['schemas']['CrmQuoteStaffContact'][];
+    };
+    CrmQuoteStaffContactInput: {
+      userId: number;
+      name: string;
+      phone?: string | null;
+      /** Format: email */
+      email?: string | null;
+    };
+    CrmSaveQuoteSettingsInput: {
+      version: number;
+      company: components['schemas']['CrmQuoteCompany'];
+      email: components['schemas']['CrmQuoteEmailTemplate'];
+      pdf: components['schemas']['CrmQuotePdfTexts'];
+      introduction: components['schemas']['CrmQuoteIntroductionTexts'];
+      letterVariants: components['schemas']['CrmQuoteLetterVariant'][];
+      staffContacts: components['schemas']['CrmQuoteStaffContactInput'][];
     };
     CrmQuoteCatalogVariant: {
       /** Format: int64 */
@@ -4015,6 +4421,174 @@ export interface components {
       userId: number;
       name: string;
       email?: string | null;
+    };
+    /**
+     * @default Open
+     * @enum {string}
+     */
+    CrmTaskListFilter: 'Open' | 'Overdue' | 'Urgent' | 'New' | 'InProgress' | 'Done';
+    /** @enum {string} */
+    CrmTaskStatus: 'New' | 'InProgress' | 'Done';
+    /**
+     * @description Kanban column. Overdue = not done and past due; Urgent = not done, not overdue, marked urgent.
+     * @enum {string}
+     */
+    CrmTaskLane: 'Overdue' | 'Urgent' | 'Active' | 'Done';
+    CrmTaskPerson: {
+      userId: number;
+      name: string;
+    };
+    CrmTaskSummary: {
+      /** Format: int64 */
+      id: number;
+      /**
+       * @description «ЗД-0142»
+       * @example ЗД-0142
+       */
+      number: string;
+      title: string;
+      status: components['schemas']['CrmTaskStatus'];
+      lane: components['schemas']['CrmTaskLane'];
+      isUrgent: boolean;
+      isOverdue: boolean;
+      /** Format: date-time */
+      dueAt: string;
+      assignee: components['schemas']['CrmTaskPerson'];
+      customerName: string | null;
+      stepsTotal: number;
+      stepsDone: number;
+      /** Format: date-time */
+      completedAt: string | null;
+      /** Format: date-time */
+      updatedAt: string;
+      version: number;
+    };
+    CrmTaskPage: {
+      items: components['schemas']['CrmTaskSummary'][];
+      page: number;
+      pageSize: number;
+      total: number;
+    };
+    CrmTaskStepInput: {
+      text: string;
+      isDone: boolean;
+    };
+    CrmSaveTaskInput: {
+      /** @description 0 for a new task; the loaded version when editing. */
+      version: number;
+      title: string;
+      description?: string | null;
+      assigneeUserId: number;
+      /** Format: date-time */
+      dueAt: string;
+      isUrgent: boolean;
+      /**
+       * Format: uuid
+       * @description An active Crm client.
+       */
+      customerPublicId?: string | null;
+      steps?: components['schemas']['CrmTaskStepInput'][] | null;
+    };
+    CrmTaskStep: {
+      /** Format: int64 */
+      id: number;
+      position: number;
+      text: string;
+      isDone: boolean;
+    };
+    /** @enum {string} */
+    CrmTaskEventKind:
+      | 'Created'
+      | 'Edited'
+      | 'Reassigned'
+      | 'DueChanged'
+      | 'StatusChanged'
+      | 'UrgentChanged'
+      | 'StepChecked'
+      | 'StepUnchecked';
+    CrmTaskEvent: {
+      kind: components['schemas']['CrmTaskEventKind'];
+      by: components['schemas']['CrmTaskPerson'];
+      /** Format: date-time */
+      at: string;
+      /** @description Reassigned: new manager name; DueChanged: new due time (ISO 8601); StatusChanged: new status; UrgentChanged: `true` or `false`; StepChecked/StepUnchecked: step text. */
+      details: string | null;
+    };
+    CrmTask: {
+      /** Format: int64 */
+      id: number;
+      number: string;
+      title: string;
+      description: string | null;
+      status: components['schemas']['CrmTaskStatus'];
+      lane: components['schemas']['CrmTaskLane'];
+      isUrgent: boolean;
+      isOverdue: boolean;
+      /** Format: date-time */
+      dueAt: string;
+      assignee: components['schemas']['CrmTaskPerson'];
+      author: components['schemas']['CrmTaskPerson'];
+      /** Format: uuid */
+      customerPublicId: string | null;
+      customerName: string | null;
+      steps: components['schemas']['CrmTaskStep'][];
+      history: components['schemas']['CrmTaskEvent'][];
+      /** Format: date-time */
+      completedAt: string | null;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+      version: number;
+    };
+    CrmTaskBoard: {
+      items: components['schemas']['CrmTaskSummary'][];
+      /**
+       * Format: date-time
+       * @description Server time the lanes were computed at.
+       */
+      at: string;
+    };
+    CrmTaskLoad: {
+      userId: number;
+      name: string;
+      open: number;
+      overdue: number;
+      urgent: number;
+      inProgress: number;
+      /** @description Tasks of this manager done in the last 7 days. */
+      doneLastWeek: number;
+      /** @description Share of this manager's tasks done in the last 30 days by their due time; null when none were done. */
+      onTimePercent: number | null;
+    };
+    CrmTaskOverview: {
+      open: number;
+      overdue: number;
+      urgent: number;
+      new: number;
+      inProgress: number;
+      done: number;
+      doneLastWeek: number;
+      /** @description Share of tasks done in the last 30 days by their due time; null when none were done. */
+      onTimePercent: number | null;
+      load: components['schemas']['CrmTaskLoad'][];
+    };
+    CrmTaskAssignee: {
+      userId: number;
+      name: string;
+      email: string | null;
+    };
+    CrmChangeTaskStatusRequest: {
+      version: number;
+      status: components['schemas']['CrmTaskStatus'];
+    };
+    CrmSetTaskUrgentRequest: {
+      version: number;
+      isUrgent: boolean;
+    };
+    CrmMarkTaskStepRequest: {
+      version: number;
+      isDone: boolean;
     };
     NonWorkingDayResponse: {
       /** Format: date */
@@ -4215,6 +4789,15 @@ export interface components {
         'application/json': string[];
       };
     };
+    /** @description The task was saved in another window (stale version); errors are Ukrainian strings. */
+    'responses-Conflict': {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        'application/json': string[];
+      };
+    };
   };
   parameters: {
     /** @description Value of the `brevi.csrf` cookie. Required on every non-GET request made with the session cookie. */
@@ -4233,6 +4816,9 @@ export interface components {
     'parameters-ProductId': number;
     ArticleId: number;
     QuoteId: number;
+    /** @description Admin only; ignored for a Manager. */
+    AssigneeUserId: number;
+    TaskId: number;
   };
   requestBodies: never;
   headers: never;
@@ -9554,6 +10140,49 @@ export interface operations {
       409: components['responses']['Conflict'];
     };
   };
+  getCrmQuotePdf: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['QuoteId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description PDF file, `Content-Disposition` attachment named «КП <number>.pdf»; not cached. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/pdf': string;
+        };
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found or not visible to the actor. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   repriceCrmQuote: {
     parameters: {
       query?: never;
@@ -9658,6 +10287,289 @@ export interface operations {
       409: components['responses']['Conflict'];
     };
   };
+  getCrmQuoteSendDraft: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['QuoteId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Draft. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmQuoteSendDraft'];
+        };
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found or not visible to the actor. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  sendCrmQuote: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['QuoteId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmSendQuoteInput'];
+      };
+    };
+    responses: {
+      /** @description Sent. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmQuote'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found or not visible to the actor. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['Conflict'];
+    };
+  };
+  connectCrmMailbox: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        userId: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': {
+          /** @description An Admin path under /crm/. */
+          returnPath: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Consent address. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': {
+            /** Format: uri */
+            consentUrl: string;
+          };
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Only for yourself unless Admin. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Staff member not found or blocked. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Gmail is not configured on the server; errors are Ukrainian strings. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  disconnectCrmMailbox: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        userId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Disconnected or was not connected. */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Only for yourself unless Admin. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  crmMailboxGoogleCallback: {
+    parameters: {
+      query?: {
+        code?: string;
+        state?: string;
+        error?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Back to the Admin with gmail=connected or gmail=error&reason=expired|denied|google|twice. */
+      302: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmQuoteSettings: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Settings. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmQuoteSettings'];
+        };
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required (the Director also holds it). */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  saveCrmQuoteSettings: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmSaveQuoteSettingsInput'];
+      };
+    };
+    responses: {
+      /** @description Saved; version is incremented. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmQuoteSettings'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required (the Director also holds it). */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['Conflict'];
+    };
+  };
   searchCrmQuoteCatalog: {
     parameters: {
       query: {
@@ -9730,6 +10642,482 @@ export interface operations {
         };
         content?: never;
       };
+    };
+  };
+  getCrmTasks: {
+    parameters: {
+      query?: {
+        search?: string;
+        filter?: components['schemas']['CrmTaskListFilter'];
+        /** @description Admin only; ignored for a Manager. */
+        assigneeUserId?: components['parameters']['AssigneeUserId'];
+        page?: number;
+        pageSize?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description One page. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmTaskPage'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role and a numeric actor claim required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createCrmTask: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmSaveTaskInput'];
+      };
+    };
+    responses: {
+      /** @description Created with status `New`. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmTask'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmTaskBoard: {
+    parameters: {
+      query?: {
+        /** @description Admin only; ignored for a Manager. */
+        assigneeUserId?: components['parameters']['AssigneeUserId'];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The cards. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmTaskBoard'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmTaskOverview: {
+    parameters: {
+      query?: {
+        /** @description Admin only; ignored for a Manager. */
+        assigneeUserId?: components['parameters']['AssigneeUserId'];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Counts and workload. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmTaskOverview'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmTaskAssignees: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Managers. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmTaskAssignee'][];
+        };
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmTask: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['TaskId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The task with steps and history (newest first). */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmTask'];
+        };
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found or not visible to the actor. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  editCrmTask: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['TaskId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmSaveTaskInput'];
+      };
+    };
+    responses: {
+      /** @description Saved; `version` is incremented. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmTask'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['responses-Conflict'];
+    };
+  };
+  deleteCrmTask: {
+    parameters: {
+      query: {
+        version: number;
+      };
+      header?: never;
+      path: {
+        id: components['parameters']['TaskId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Deleted. */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['responses-Conflict'];
+    };
+  };
+  changeCrmTaskStatus: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['TaskId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmChangeTaskStatusRequest'];
+      };
+    };
+    responses: {
+      /** @description The task after the change. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmTask'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found or not visible to the actor. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['responses-Conflict'];
+    };
+  };
+  setCrmTaskUrgent: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['TaskId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmSetTaskUrgentRequest'];
+      };
+    };
+    responses: {
+      /** @description The task after the change. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmTask'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['responses-Conflict'];
+    };
+  };
+  markCrmTaskStep: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['TaskId'];
+        stepId: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmMarkTaskStepRequest'];
+      };
+    };
+    responses: {
+      /** @description The task after the change. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmTask'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Task or step not found or not visible to the actor. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['responses-Conflict'];
     };
   };
   getReminderNonWorkingDays: {

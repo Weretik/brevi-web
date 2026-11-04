@@ -4,7 +4,7 @@ import { adminRouteDefinitions } from './admin-route-definitions';
 import { createNavigation } from './navigation-config';
 
 describe('legacy Admin navigation', () => {
-  it('links «КП» to the quote list and keeps the later КП pages without a link', () => {
+  it('links «КП» and «Налаштування КП» and keeps the later КП pages without a link', () => {
     const paths = new Set(adminRouteDefinitions.map((route) => route.path));
     const manager = createNavigation(paths, ['Admin']).find(
       (group) => group.id === 'service-manager',
@@ -13,7 +13,9 @@ describe('legacy Admin navigation', () => {
     expect(paths.has('/crm/quotes/new')).toBe(true);
     expect(paths.has('/crm/quotes/:quoteId')).toBe(true);
     expect(manager?.items.find((item) => item.id === 'quote-introductions')?.to).toBeUndefined();
-    expect(manager?.items.find((item) => item.id === 'quote-settings')?.to).toBeUndefined();
+    expect(manager?.items.find((item) => item.id === 'quote-settings')?.to).toBe(
+      '/crm/quote-settings',
+    );
     expect(paths.has('/crm/quotes/archive')).toBe(false);
     expect(paths.has('/crm/issuer-settings')).toBe(false);
   });
@@ -76,11 +78,14 @@ describe('legacy Admin navigation', () => {
     expect(available[0].items[2].to).toBeUndefined();
   });
 
-  it('shows «Користувачі» only to the server Admin role', () => {
-    const paths = new Set(['/admin/users']);
+  it('shows «Користувачі» and «Завдання менеджерам» only to the server Admin role', () => {
+    const paths = new Set(['/admin/users', '/admin/tasks']);
     const admin = createNavigation(paths, ['Admin']).find((group) => group.id === 'administration');
 
-    expect(admin?.items).toEqual([{ id: 'users', label: 'Користувачі', to: '/admin/users' }]);
+    expect(admin?.items).toEqual([
+      { id: 'users', label: 'Користувачі', to: '/admin/users' },
+      { id: 'manager-tasks', label: 'Завдання менеджерам', to: '/admin/tasks' },
+    ]);
     expect(
       createNavigation(paths, ['Manager']).some((group) => group.id === 'administration'),
     ).toBe(false);

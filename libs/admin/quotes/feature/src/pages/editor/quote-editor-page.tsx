@@ -7,13 +7,17 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { QuoteEditorActions } from './quote-editor-actions';
+import { QuoteEditorFooter } from './quote-editor-footer';
 import { QuoteDeleteDialog } from '../../components/editor/quote-delete-dialog';
 import { QuoteRepriceDrawer } from '../../components/editor/quote-reprice-drawer';
 import { QuoteResponsibleDrawer } from '../../components/editor/quote-responsible-drawer';
 import { QuoteCatalogPickerDrawer } from '../../components/picker/quote-catalog-picker-drawer';
 import { QuoteFabricPickerDrawer } from '../../components/picker/quote-fabric-picker-drawer';
+import { QuoteSendDrawer } from '../../components/sending/quote-send-drawer';
 import { useClientNames } from '../../hooks/editor/use-client-names';
 import { useQuoteEditor } from '../../hooks/editor/use-quote-editor';
+import { useQuotePdf } from '../../hooks/editor/use-quote-pdf';
+import { useGmailReturnNotice } from '../../hooks/sending/use-gmail-return-notice';
 
 import type { QuoteActor } from '@admin/quotes/model';
 
@@ -21,10 +25,14 @@ type Panel =
   | { kind: 'catalog' }
   | { kind: 'fabric'; itemKey: string }
   | { kind: 'responsible' }
-  | { kind: 'reprice' };
+  | { kind: 'reprice' }
+  | { kind: 'send' };
 
 const countLabel = (count: number) =>
   `${count} ${count % 10 === 1 && count % 100 !== 11 ? 'товар' : count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 10 || count % 100 >= 20) ? 'товари' : 'товарів'} у пропозиції`;
+
+const sentLabel = (at: string | null) =>
+  at ? ` · надіслано ${new Date(at).toLocaleDateString('uk-UA')}` : '';
 
 /** «Комерційна пропозиція / Товари та ціни»: a new КП (`/crm/quotes/new`) or a saved one. */
 export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
@@ -37,6 +45,9 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleteQuote, deleting] = useDeleteQuoteMutation();
   const { quote, draft } = editor;
+  const pdf = useQuotePdf({ quote, dirty: editor.dirty, save: editor.save });
+  const gmail = useGmailReturnNotice();
+  const [sentNotice, setSentNotice] = useState<string | null>(null);
 
   if (editor.loading)
     return (
@@ -62,7 +73,7 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
       <ReferencePageHeader
         overline="Комерційна пропозиція"
         title="Товари та ціни"
-        subtitle={quote ? `КП ${quote.number}` : 'Нове КП'}
+        subtitle={quote ? `КП ${quote.number}${sentLabel(quote.lastSentAt)}` : 'Нове КП'}
         actions={
           <QuoteEditorActions
             saved={quote !== null}
@@ -90,6 +101,21 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
           }
         >
           {editor.saveError.message}
+        </Alert>
+      )}
+      {gmail.notice && (
+        <Alert severity={gmail.notice.severity} sx={{ mb: 2 }} onClose={gmail.dismiss}>
+          {gmail.notice.text}
+        </Alert>
+      )}
+      {sentNotice && (
+        <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSentNotice(null)}>
+          {sentNotice}
+        </Alert>
+      )}
+      {pdf.pdfError && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {pdf.pdfError}
         </Alert>
       )}
       <Stack sx={{ gap: 2 }}>
@@ -149,30 +175,19 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
         />
       </Stack>
 
-      <Paper
-        variant="outlined"
-        sx={{
-          position: 'sticky',
-          bottom: 16,
-          mt: 3,
-          p: 1.5,
-          display: 'flex',
-          gap: 1,
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-          zIndex: 1,
+      <QuoteEditorFooter
+        dirty={editor.dirty}
+        saving={editor.saving}
+        generating={pdf.generating}
+        onClose={() => navigate('/crm/quotes')}
+        onSave={() => void editor.save()}
+        onPdf={() => void pdf.generate()}
+        onSend={async () => {
+          setSentNotice(null);
+          const saved = quote && !editor.dirty ? quote : await editor.save();
+          if (saved) setPanel({ kind: 'send' });
         }}
-      >
-        {editor.dirty && (
-          <Typography variant="body2" color="text.secondary" sx={{ mr: 'auto' }}>
-            Є незбережені зміни
-          </Typography>
-        )}
-        <Button onClick={() => navigate('/crm/quotes')}>Закрити</Button>
-        <Button variant="contained" onClick={() => void editor.save()} disabled={editor.saving}>
-          {editor.saving ? 'Зберігаємо…' : 'Зберегти зміни'}
-        </Button>
-      </Paper>
+      />
 
       {panel?.kind === 'catalog' && (
         <QuoteCatalogPickerDrawer
@@ -212,6 +227,18 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
           onApplied={() => {
             setPanel(null);
             void editor.reload();
+          }}
+        />
+      )}
+      {panel?.kind === 'send' && quote && (
+        <QuoteSendDrawer
+          quote={quote}
+          actor={actor}
+          onClose={() => setPanel(null)}
+          onSent={(next) => {
+            setPanel(null);
+            editor.applyServerQuote(next);
+            setSentNotice(`КП ${next.number} надіслано.`);
           }}
         />
       )}

@@ -63,6 +63,8 @@ export interface Quote {
   readonly responsible: QuotePerson;
   readonly createdAt: string;
   readonly updatedAt: string;
+  /** Last time Gmail accepted the КП; null for a draft. */
+  readonly lastSentAt: string | null;
   readonly version: number;
   readonly items: readonly QuoteItem[];
 }
@@ -76,6 +78,7 @@ export interface QuoteSummary {
   readonly responsible: QuotePerson;
   readonly itemsCount: number;
   readonly updatedAt: string;
+  readonly lastSentAt: string | null;
 }
 
 export interface QuotePage {

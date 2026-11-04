@@ -66,7 +66,11 @@
       "@admin/quotes/model": ["libs/admin/quotes/model/src/index.ts"],
       "@admin/quotes/ui": ["libs/admin/quotes/ui/src/index.ts"],
       "@admin/quotes/data-access": ["libs/admin/quotes/data-access/src/index.ts"],
-      "@admin/quotes/feature": ["libs/admin/quotes/feature/src/index.ts"]
+      "@admin/quotes/feature": ["libs/admin/quotes/feature/src/index.ts"],
+      "@admin/tasks/model": ["libs/admin/tasks/model/src/index.ts"],
+      "@admin/tasks/data-access": ["libs/admin/tasks/data-access/src/index.ts"],
+      "@admin/tasks/ui": ["libs/admin/tasks/ui/src/index.ts"],
+      "@admin/tasks/feature": ["libs/admin/tasks/feature/src/index.ts"]
     }
   }
 }

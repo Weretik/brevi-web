@@ -17,6 +17,7 @@ const page: QuotePage = {
       responsible: { userId: 2, name: 'Олена' },
       itemsCount: 3,
       updatedAt: '2026-11-04T10:00:00Z',
+      lastSentAt: null,
     },
   ],
   page: 1,

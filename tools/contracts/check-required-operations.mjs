@@ -79,6 +79,13 @@ const requiredOperations = {
     'setCrmQuoteResponsible',
     'searchCrmQuoteCatalog',
     'getCrmQuoteStaff',
+    'getCrmQuotePdf',
+    'getCrmQuoteSettings',
+    'saveCrmQuoteSettings',
+    'getCrmQuoteSendDraft',
+    'sendCrmQuote',
+    'connectCrmMailbox',
+    'disconnectCrmMailbox',
   ],
 };
 

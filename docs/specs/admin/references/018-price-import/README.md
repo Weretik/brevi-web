@@ -31,4 +31,4 @@ The client's Apps Scripts updated PPE supplier prices in the sheet «ЗІЗ». T
 ## Verification 2026-11-04, stage 3
 
 - No new screen: the backend marks Insight and Трєле connected, so the existing «Оновити зараз» section appears for them (R-07); its text now says «Не чекаючи розкладу».
-- `npx nx test admin-references-model -- price-import` and `admin-references-feature -- price-import` pass; contract synchronized with BreviERP `182a468`.
+- `npx nx test admin-references-model -- price-import` and `admin-references-feature -- price-import` pass; contract synchronized with BreviERP `053ee0c`.

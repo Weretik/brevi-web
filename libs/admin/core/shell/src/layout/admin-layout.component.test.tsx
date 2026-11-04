@@ -128,7 +128,7 @@ describe('AdminLayout', () => {
     expect(within(breadcrumbs).getByText('Приклад')).toHaveAttribute('aria-current', 'location');
     expect(
       within(screen.getByRole('navigation', { name: 'Основна навігація' })).getByRole('link', {
-        name: 'Головна',
+        name: 'Робочий стіл',
       }),
     ).toHaveAttribute('href', '/');
   });

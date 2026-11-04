@@ -23,6 +23,7 @@ const quote: Quote = {
   responsible: { userId: 2, name: 'Олена' },
   createdAt: '2026-11-04T10:00:00Z',
   updatedAt: '2026-11-04T10:00:00Z',
+  lastSentAt: null,
   version: 3,
   items: [
     {
@@ -59,6 +60,10 @@ const quote: Quote = {
 const api = vi.hoisted(() => ({
   save: vi.fn(),
   refetch: vi.fn(),
+  download: vi.fn(),
+  send: vi.fn(),
+  connect: vi.fn(),
+  draft: { current: null as unknown },
   mutation: (fn: (arg: unknown) => unknown) => () => [
     (arg: unknown) => ({ unwrap: () => fn(arg) }),
     { isLoading: false },
@@ -70,7 +75,20 @@ vi.mock('@admin/quotes/data-access', () => ({
   useCreateQuoteMutation: api.mutation(vi.fn()),
   useSaveQuoteMutation: api.mutation(api.save),
   useDeleteQuoteMutation: api.mutation(vi.fn()),
+  downloadQuotePdf: api.download,
+  useGetQuoteSendDraftQuery: () => ({ data: api.draft.current, isLoading: false, isError: false }),
+  useSendQuoteMutation: api.mutation(api.send),
+  useConnectMailboxMutation: api.mutation(api.connect),
+  useDisconnectMailboxMutation: api.mutation(vi.fn()),
 }));
+
+const sendDraft = {
+  fromEmail: 'olena.brevi@gmail.com',
+  fromName: 'Олена',
+  gmailConfigured: true,
+  fileName: 'КП 1-11-2026.pdf',
+  letters: [{ name: 'Стандартний лист', subject: 'КП № 1-11-2026', body: 'Добрий день' }],
+};
 vi.mock('@admin/clients/data-access', () => ({
   useListCustomersQuery: () => ({ data: undefined }),
 }));
@@ -96,6 +114,10 @@ const typeRetail = (value: string) =>
 beforeEach(() => {
   api.save.mockReset();
   api.refetch.mockReset();
+  api.download.mockReset();
+  api.send.mockReset();
+  api.connect.mockReset();
+  api.draft.current = sendDraft;
 });
 afterEach(cleanup);
 
@@ -146,5 +168,112 @@ describe('КП editor', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Оновити' }));
     await waitFor(() => expect(api.refetch).toHaveBeenCalled());
     await waitFor(() => expect(screen.getByLabelText("Ім'я отримувача")).toHaveValue(''));
+  });
+
+  it('«Сформувати КП» downloads the saved КП at once', async () => {
+    api.download.mockResolvedValue(undefined);
+    renderEditor();
+    fireEvent.click(await screen.findByRole('button', { name: 'Сформувати КП' }));
+    await waitFor(() => expect(api.download).toHaveBeenCalledWith(4, '1-11-2026'));
+    expect(api.save).not.toHaveBeenCalled();
+  });
+
+  it('«Сформувати КП» saves unsaved changes first and builds the PDF from the saved version', async () => {
+    const saved = { ...quote, version: 4 };
+    api.save.mockResolvedValue(saved);
+    api.download.mockResolvedValue(undefined);
+    renderEditor();
+    expect(await screen.findByText('КП 1-11-2026')).toBeVisible();
+    fireEvent.change(screen.getByLabelText('Коментар для клієнта'), {
+      target: { value: 'Доставка за наш рахунок' },
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Сформувати КП' }));
+    await waitFor(() => expect(api.download).toHaveBeenCalledWith(4, '1-11-2026'));
+    expect(api.save).toHaveBeenCalledTimes(1);
+    expect(api.save.mock.invocationCallOrder[0]).toBeLessThan(
+      api.download.mock.invocationCallOrder[0] ?? 0,
+    );
+  });
+
+  it('does not build the PDF when saving fails', async () => {
+    api.save.mockRejectedValue({
+      status: 409,
+      message: 'КП змінили в іншому вікні. Оновіть сторінку.',
+    });
+    renderEditor();
+    expect(await screen.findByText('КП 1-11-2026')).toBeVisible();
+    fireEvent.change(screen.getByLabelText('Коментар для клієнта'), { target: { value: 'Інше' } });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Сформувати КП' }));
+    expect(await screen.findByText('КП змінили в іншому вікні. Оновіть сторінку.')).toBeVisible();
+    expect(api.download).not.toHaveBeenCalled();
+  });
+
+  it('«Надіслати КП» saves first, sends the letter and marks the КП sent', async () => {
+    const saved = { ...quote, version: 4 };
+    api.save.mockResolvedValue(saved);
+    api.send.mockResolvedValue({
+      ...saved,
+      version: 5,
+      status: 'Sent',
+      lastSentAt: '2026-11-04T12:00:00Z',
+    });
+    renderEditor();
+    expect(await screen.findByText('КП 1-11-2026')).toBeVisible();
+    fireEvent.change(screen.getByLabelText('Коментар для клієнта'), { target: { value: 'Інше' } });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Надіслати КП' }));
+    const to = await screen.findByLabelText(/Кому/);
+    expect(api.save).toHaveBeenCalledTimes(1);
+    expect(screen.getByLabelText(/Тема/)).toHaveValue('КП № 1-11-2026');
+    fireEvent.change(to, { target: { value: 'client@agro.ua' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Надіслати' }));
+
+    expect(await screen.findByText('КП 1-11-2026 надіслано.')).toBeVisible();
+    expect(api.send).toHaveBeenCalledWith({
+      id: 4,
+      version: 4,
+      form: { to: 'client@agro.ua', subject: 'КП № 1-11-2026', body: 'Добрий день' },
+    });
+  });
+
+  it('shows why Gmail refused and keeps the panel open', async () => {
+    api.send.mockRejectedValue({
+      status: 409,
+      message: 'Google не прийняв лист: перевірте адресу.',
+    });
+    renderEditor();
+    fireEvent.click(await screen.findByRole('button', { name: 'Надіслати КП' }));
+    fireEvent.change(await screen.findByLabelText(/Кому/), { target: { value: 'client@agro.ua' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Надіслати' }));
+
+    expect(await screen.findByText('Google не прийняв лист: перевірте адресу.')).toBeVisible();
+    expect(screen.queryByText('КП 1-11-2026 надіслано.')).toBeNull();
+    expect(api.save).not.toHaveBeenCalled();
+  });
+
+  it('does not send without a recipient', async () => {
+    renderEditor();
+    fireEvent.click(await screen.findByRole('button', { name: 'Надіслати КП' }));
+    await screen.findByLabelText(/Кому/);
+    fireEvent.click(screen.getByRole('button', { name: 'Надіслати' }));
+
+    expect(await screen.findByText('Вкажіть email отримувача.')).toBeVisible();
+    expect(api.send).not.toHaveBeenCalled();
+  });
+
+  it('offers to connect the own Gmail when it is not connected yet', async () => {
+    api.draft.current = { ...sendDraft, fromEmail: null };
+    api.connect.mockRejectedValue({ message: 'Підключати Gmail інших може лише директор.' });
+    renderEditor();
+    fireEvent.click(await screen.findByRole('button', { name: 'Надіслати КП' }));
+
+    expect(await screen.findByText(/Ваш Gmail ще не підключено/)).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Надіслати' })).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: 'Підключити мій Gmail' }));
+    await waitFor(() =>
+      expect(api.connect).toHaveBeenCalledWith({ userId: 2, returnPath: '/crm/quotes/4' }),
+    );
   });
 });
