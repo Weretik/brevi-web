@@ -26,4 +26,4 @@ The client's Apps Scripts updated PPE supplier prices in the sheet «ЗІЗ». T
 
 - `npx nx test admin-references-model -- price-import`: 4 passed; `admin-references-feature -- price-import`: 3 passed.
 - Typecheck and lint for `admin-references-model`, `admin-references-data-access`, `admin-references-feature`: pass.
-- Contract synchronized with BreviERP `2ad6150`; `npm run contracts:check` passes.
+- Contract synchronized with BreviERP `01abf10`; `npm run contracts:check` passes.
