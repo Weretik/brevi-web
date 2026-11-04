@@ -35,7 +35,7 @@ Libraries `libs/admin/quotes/{data-access,model,ui,feature}` generated with `nx 
 
 ## Stages
 
-Same numbering as the backend: 1 list + editor (done); 2 settings + PDF (done); 3 Gmail sending from each manager's own Gmail (done); 4 КП для знайомства (4 steps: layout, recipient, letter variant, catalogue pages, «Зберегти як готовий шаблон», «Готові шаблони») (done); 5a «Виріб з нуля» (done); 5b «Змінити склад» of a Catalog model; later history, archive; 6 import of old КП from the calculator, if it proves easy.
+Same numbering as the backend: 1 list + editor (done); 2 settings + PDF (done); 3 Gmail sending from each manager's own Gmail (done); 4 КП для знайомства (4 steps: layout, recipient, letter variant, catalogue pages, «Зберегти як готовий шаблон», «Готові шаблони») (done); 5a «Виріб з нуля» (done); 5b «Змінити склад» of a Catalog model (done); later history, archive; 6 import of old КП from the calculator, if it proves easy.
 
 ## Stage 2 screens
 
@@ -63,6 +63,11 @@ Same numbering as the backend: 1 list + editor (done); 2 settings + PDF (done); 
 - The panel (ReferenceEditorDrawer, 720 px): «Назва виробу», «Опис для клієнта», then «Тканини» (metres each), «Фурнітура» (quantity in its unit), «Операції» (how many times; «Хвилин» for an operation without a fixed norm), each with a search from the references. «Розрахунок» shows per fabric the three prices, time, labour and full cost, or the first missing thing / the server's reason. «Додати в КП» is enabled only when every fabric is priced.
 - The item card shows «Склад» (accessories and operations with quantities), «Тканини» with read-only prices and «Змінити склад і тканини», which reopens the panel with «Зберегти склад».
 
+## Stage 5b screens
+
+- A sewing model card gets «Змінити склад» next to «Додати тканину». It loads the model's Catalog composition and opens the panel titled «Змінити склад моделі»: the fabrics of the variants already in the КП with their metres, «Додаткові тканини» and «Послуги» of the model (quantity and remove only), «Фурнітура» and «Операції» with search to add more, and «Розрахунок».
+- «Зберегти склад» replaces the model in the КП with its changed composition: the card shows «Склад», the fabrics with read-only prices and «Змінити склад і тканини»; code, site link and season stay, the subtitle reads «змінений склад моделі».
+
 ## Tests
 
-Stage 1: list (search, own-only for a Manager), editor (add model and fabrics, hide a price, manual PPE price needs a reason, one-off PPE validation, 409 reload), picker disabled reason. Stage 2: «Сформувати КП» saves first and does not download after a failed save; settings save, field rules and 409. Stage 3: «Надіслати КП» saves first, sends and marks the КП sent; a Gmail refusal stays in the panel; no recipient blocks sending; no Gmail offers to connect it; «Підключити Gmail» opens Google and is disabled with unsaved changes; recipient and subject rules. Stage 5a: the panel prices the composition and adds the item; «Нове КП» offers «КП з нуля»; the products block opens the panel. Focused run: `npx nx test admin-quotes-feature`.
+Stage 1: list (search, own-only for a Manager), editor (add model and fabrics, hide a price, manual PPE price needs a reason, one-off PPE validation, 409 reload), picker disabled reason. Stage 2: «Сформувати КП» saves first and does not download after a failed save; settings save, field rules and 409. Stage 3: «Надіслати КП» saves first, sends and marks the КП sent; a Gmail refusal stays in the panel; no recipient blocks sending; no Gmail offers to connect it; «Підключити Gmail» opens Google and is disabled with unsaved changes; recipient and subject rules. Stage 5a: the panel prices the composition and adds the item; «Нове КП» offers «КП з нуля»; the products block opens the panel. Stage 5b: «Змінити склад» starts from the Catalog composition, a removed service leaves the price request, and the saved item keeps the model. Focused run: `npx nx test admin-quotes-feature`.

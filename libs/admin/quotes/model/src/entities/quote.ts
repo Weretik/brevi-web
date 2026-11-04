@@ -3,7 +3,8 @@ import type { QuoteIntroduction } from './quote-introduction';
 export type QuoteKind = 'Request' | 'Introduction';
 export type QuoteStatus = 'Draft' | 'Sent';
 export type QuoteItemKind = 'Sewing' | 'Ppe' | 'OneOffPpe' | 'CustomSewing';
-export type QuoteItemLineKind = 'Accessory' | 'Operation';
+/** `Service` is a «послуга» of a Catalog model (by its code); `Fabric` an extra shared fabric such as a lining. */
+export type QuoteItemLineKind = 'Accessory' | 'Operation' | 'Service' | 'Fabric';
 
 /** The three quantity tiers of every price row: до 9, 10–40 and від 41 шт. */
 export type QuoteTier = 'retail' | 'wholesale' | 'large';
@@ -47,6 +48,8 @@ export interface QuoteItemLine {
   readonly quantity: number;
   /** Minutes of an operation without a fixed norm. */
   readonly manualMinutes: number | null;
+  /** The other-cost code of a service; its `referenceId` is 0. */
+  readonly costCode: string | null;
 }
 
 export interface QuoteItem {

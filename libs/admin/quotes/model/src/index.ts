@@ -3,6 +3,7 @@ export type * from './entities/quote-catalog';
 export type * from './models/quote-draft';
 export {
   isSewingKind,
+  quoteChangedModelSubtitle,
   quoteItemSubtitles,
   quoteTierLabels,
   quoteTiers,

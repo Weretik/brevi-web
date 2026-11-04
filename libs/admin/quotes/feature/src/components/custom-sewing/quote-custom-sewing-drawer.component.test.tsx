@@ -2,13 +2,26 @@ import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { QuoteChangeModelDrawer } from './quote-change-model-drawer';
 import { QuoteCustomSewingDrawer } from './quote-custom-sewing-drawer';
 
-import type { QuoteCustomSewingPrice, QuoteItemDraft } from '@admin/quotes/model';
+import type {
+  QuoteCustomSewingPrice,
+  QuoteItemDraft,
+  QuoteModelComposition,
+} from '@admin/quotes/model';
 
 const price: QuoteCustomSewingPrice = {
   lines: [
-    { kind: 'Operation', referenceId: 5, name: 'Пошив', unit: 'хв', unitValue: 12, isActive: true },
+    {
+      kind: 'Operation',
+      referenceId: 5,
+      name: 'Пошив',
+      unit: 'хв',
+      unitValue: 12,
+      isActive: true,
+      costCode: null,
+    },
   ],
   fabrics: [
     {
@@ -26,13 +39,17 @@ const price: QuoteCustomSewingPrice = {
   ],
 };
 
-const api = vi.hoisted(() => ({ calculate: vi.fn() }));
+const api = vi.hoisted(() => ({
+  calculate: vi.fn(),
+  composition: { current: undefined as unknown },
+}));
 
 vi.mock('@admin/quotes/data-access', () => ({
   useCalculateQuoteCustomSewingMutation: () => [
     (arg: unknown) => ({ unwrap: () => api.calculate(arg) }),
     { isLoading: false },
   ],
+  useGetQuoteModelCompositionQuery: () => ({ data: api.composition.current, isError: false }),
 }));
 vi.mock('@admin/references/data-access', () => ({
   useListFabricsQuery: () => ({
@@ -86,7 +103,9 @@ describe('«Виріб з нуля» panel', () => {
     expect(await screen.findByText(/^420(,00)? ₴$/, {}, { timeout: 2000 })).toBeVisible();
     expect(api.calculate).toHaveBeenLastCalledWith({
       fabrics: [{ fabricId: 3, meters: 1.5 }],
-      lines: [{ kind: 'Operation', referenceId: 5, quantity: 1, manualMinutes: null }],
+      lines: [
+        { kind: 'Operation', referenceId: 5, quantity: 1, manualMinutes: null, costCode: null },
+      ],
     });
 
     await waitFor(() => expect(screen.getByRole('button', { name: 'Додати в КП' })).toBeEnabled());
@@ -103,7 +122,94 @@ describe('«Виріб з нуля» panel', () => {
         unit: 'хв',
         quantity: 1,
         manualMinutes: null,
+        costCode: null,
       },
     ]);
+  });
+
+  it('«Змінити склад» starts from the Catalog composition and keeps the model', async () => {
+    const user = userEvent.setup();
+    const composition: QuoteModelComposition = {
+      productId: 10,
+      fabrics: [{ articleId: 100, fabricId: 3, name: 'Саржа', meters: 1.5, isActive: true }],
+      lines: [
+        {
+          kind: 'Service',
+          referenceId: 0,
+          costCode: 'Вишивка',
+          name: 'Вишивка',
+          unit: 'послуга',
+          quantity: 1,
+          manualMinutes: null,
+        },
+        {
+          kind: 'Operation',
+          referenceId: 5,
+          costCode: null,
+          name: 'Пошив',
+          unit: 'хв',
+          quantity: 1,
+          manualMinutes: null,
+        },
+      ],
+    };
+    api.composition.current = composition;
+    api.calculate.mockResolvedValue({
+      ...price,
+      lines: [
+        {
+          kind: 'Service',
+          referenceId: 0,
+          name: 'Вишивка',
+          unit: 'послуга',
+          unitValue: 25,
+          isActive: true,
+          costCode: 'Вишивка',
+        },
+        price.lines[0],
+      ],
+    });
+    const model = {
+      key: 'item-1',
+      id: 7,
+      kind: 'Sewing',
+      productId: 10,
+      code: 'MOD-166',
+      name: 'Костюм «Імпульс»',
+      subtitle: null,
+      description: 'Літній костюм',
+      siteUrl: null,
+      photoUrl: null,
+      season: 'Літо',
+      supplierUrl: '',
+      options: [{ key: 'o-1', id: 70, articleId: 100, title: 'Саржа' }],
+      lines: [],
+    } as unknown as QuoteItemDraft;
+    const onDone = vi.fn<(item: QuoteItemDraft) => void>();
+    render(<QuoteChangeModelDrawer item={model} onClose={vi.fn()} onDone={onDone} />);
+
+    expect(screen.getByRole('dialog', { name: 'Змінити склад моделі' })).toBeVisible();
+    expect(screen.getByLabelText('Разів: Вишивка')).toHaveValue('1');
+    await user.click(screen.getByRole('button', { name: 'Прибрати: Вишивка' }));
+
+    expect(await screen.findByText(/^420(,00)? ₴$/, {}, { timeout: 2000 })).toBeVisible();
+    expect(api.calculate).toHaveBeenLastCalledWith({
+      fabrics: [{ fabricId: 3, meters: 1.5 }],
+      lines: [
+        { kind: 'Operation', referenceId: 5, quantity: 1, manualMinutes: null, costCode: null },
+      ],
+    });
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Зберегти склад' })).toBeEnabled(),
+    );
+    await user.click(screen.getByRole('button', { name: 'Зберегти склад' }));
+    expect(onDone.mock.calls[0][0]).toMatchObject({
+      key: 'item-1',
+      id: null,
+      kind: 'CustomSewing',
+      productId: 10,
+      code: 'MOD-166',
+      subtitle: 'Швейна продукція · змінений склад моделі',
+    });
   });
 });

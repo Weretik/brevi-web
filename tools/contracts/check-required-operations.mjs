@@ -91,6 +91,7 @@ const requiredOperations = {
     'getCrmQuoteIntroductionSetup',
     'getCrmQuoteCatalogProducts',
     'calculateCrmQuoteCustomSewing',
+    'getCrmQuoteModelComposition',
     'getCrmQuoteIntroTemplates',
     'createCrmQuoteIntroTemplate',
     'deleteCrmQuoteIntroTemplate',

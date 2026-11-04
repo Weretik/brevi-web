@@ -18,6 +18,7 @@ import type {
   QuoteCustomSewingDraft,
   QuoteCustomSewingPrice,
   QuoteItemDraft,
+  QuoteModelComposition,
 } from '@admin/quotes/model';
 import type { QuoteCustomChoice } from '@admin/quotes/ui';
 
@@ -28,8 +29,8 @@ const money = new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 2 });
  * The «Виріб з нуля» panel: the composition the manager builds, reference choices, and the price the server
  * recalculates a moment after every change.
  */
-export function useQuoteCustomSewing(item?: QuoteItemDraft) {
-  const [draft, setDraft] = useState<QuoteCustomSewingDraft>(() => customSewingDraft(item));
+export function useQuoteCustomSewing(item?: QuoteItemDraft, model?: QuoteModelComposition) {
+  const [draft, setDraft] = useState<QuoteCustomSewingDraft>(() => customSewingDraft(item, model));
   const fabrics = useListFabricsQuery();
   const accessories = useListGarmentAccessoriesQuery();
   const operations = useListGarmentPartOperationsQuery();

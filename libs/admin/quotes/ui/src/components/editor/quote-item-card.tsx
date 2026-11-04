@@ -43,7 +43,7 @@ interface Props {
   onRecommend: (optionKey: string) => void;
   onRemoveOption: (optionKey: string) => void;
   onAddFabric: () => void;
-  /** «Змінити склад» of a «Виріб з нуля». */
+  /** «Змінити склад» of a «Виріб з нуля» or a Catalog model. */
   onEditComposition: () => void;
   onMove: (offset: -1 | 1) => void;
   onRemove: () => void;
@@ -207,9 +207,14 @@ export function QuoteItemCard({
         />
       ))}
       {item.kind === 'Sewing' && (
-        <Button startIcon={<AddOutlinedIcon />} onClick={onAddFabric} sx={{ mt: 1.5 }}>
-          Додати тканину
-        </Button>
+        <Stack direction="row" sx={{ mt: 1.5, gap: 1, flexWrap: 'wrap' }}>
+          <Button startIcon={<AddOutlinedIcon />} onClick={onAddFabric}>
+            Додати тканину
+          </Button>
+          <Button startIcon={<EditOutlinedIcon />} onClick={onEditComposition}>
+            Змінити склад
+          </Button>
+        </Stack>
       )}
       {custom && (
         <Button startIcon={<EditOutlinedIcon />} onClick={onEditComposition} sx={{ mt: 1.5 }}>

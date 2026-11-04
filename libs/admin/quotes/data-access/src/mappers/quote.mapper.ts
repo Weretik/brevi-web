@@ -4,6 +4,7 @@ import type {
   QuoteCatalogProduct,
   QuoteCustomSewingPrice,
   QuoteItem,
+  QuoteModelComposition,
   QuoteOption,
   QuotePage,
   QuotePrice,
@@ -61,6 +62,7 @@ const item = (value: Schemas['CrmQuoteItem']): QuoteItem => ({
     unit: line.unit,
     quantity: line.quantity,
     manualMinutes: line.manualMinutes ?? null,
+    costCode: line.costCode ?? null,
   })),
 });
 
@@ -181,6 +183,7 @@ export const mapQuoteCustomSewingPrice = (
     unit: line.unit ?? null,
     unitValue: line.unitValue ?? null,
     isActive: line.isActive,
+    costCode: line.costCode ?? null,
   })),
   fabrics: value.fabrics.map((fabric) => ({
     fabricId: fabric.fabricId,
@@ -199,5 +202,27 @@ export const mapQuoteCustomSewingPrice = (
         }
       : null,
     problems: fabric.problems,
+  })),
+});
+
+export const mapQuoteModelComposition = (
+  value: Schemas['CrmQuoteModelComposition'],
+): QuoteModelComposition => ({
+  productId: value.productId,
+  fabrics: value.fabrics.map((fabric) => ({
+    articleId: fabric.articleId,
+    fabricId: fabric.fabricId,
+    name: fabric.name ?? null,
+    meters: fabric.meters,
+    isActive: fabric.isActive,
+  })),
+  lines: value.lines.map((line) => ({
+    kind: line.kind,
+    referenceId: line.referenceId,
+    costCode: line.costCode ?? null,
+    name: line.name ?? null,
+    unit: line.unit,
+    quantity: line.quantity,
+    manualMinutes: line.manualMinutes ?? null,
   })),
 });

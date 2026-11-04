@@ -10,6 +10,7 @@ export {
 } from './api/quotes.api';
 export {
   useCalculateQuoteCustomSewingMutation,
+  useGetQuoteModelCompositionQuery,
   useGetQuoteStaffQuery,
   useSearchQuoteCatalogQuery,
 } from './api/quote-lookups.api';
