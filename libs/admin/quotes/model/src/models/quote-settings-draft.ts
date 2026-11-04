@@ -86,5 +86,16 @@ export const quoteTemplateMarks = [
   '{site}',
 ] as const;
 
+export type QuoteTemplateMark = (typeof quoteTemplateMarks)[number];
+
+/** Button names of the marks: «+ Номер КП» inserts `{quoteNumber}`. */
+export const quoteTemplateMarkLabels: Readonly<Record<QuoteTemplateMark, string>> = {
+  '{quoteNumber}': 'Номер КП',
+  '{managerName}': 'Менеджер',
+  '{managerPhone}': 'Телефон менеджера',
+  '{managerEmail}': 'Email менеджера',
+  '{site}': 'Сайт',
+};
+
 export const quoteAdvantageCount = 5;
 export const quoteMaxLetterVariants = 10;

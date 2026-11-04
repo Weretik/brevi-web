@@ -87,4 +87,16 @@ describe('quoteSettingsErrors', () => {
     expect(errors[`letter:${letterKey}.name`]).toBe('Обовʼязкове поле.');
     expect(errors['staff:7.email']).toBe('Невірна адреса пошти.');
   });
+
+  it('stops a mark the server does not know before it reaches the client', () => {
+    const draft = quoteSettingsToDraft(settings);
+    draft.email.body = 'З повагою, {managerNmae}';
+    draft.pdf.ctaContactTemplate = 'Телефон: {managerPhone}';
+
+    const errors = quoteSettingsErrors(draft);
+    expect(errors['email.body']).toBe(
+      'Невідома мітка {managerNmae}. Вставте мітку кнопкою під полем.',
+    );
+    expect(errors['pdf.ctaContactTemplate']).toBeUndefined();
+  });
 });

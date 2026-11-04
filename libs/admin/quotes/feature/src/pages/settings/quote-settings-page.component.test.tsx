@@ -85,6 +85,7 @@ vi.mock('@admin/quotes/data-access', () => ({
     (args: unknown) => ({ unwrap: () => api.connect(args) }),
     { isLoading: false },
   ],
+  useSearchQuoteCatalogQuery: () => ({ data: undefined, isFetching: false }),
   useDisconnectMailboxMutation: () => [
     (userId: unknown) => ({ unwrap: () => api.disconnect(userId) }),
     { isLoading: false },
@@ -107,22 +108,35 @@ beforeEach(() => {
   api.connect.mockReset();
   api.disconnect.mockReset();
 });
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  sessionStorage.clear();
+});
 
 describe('«Налаштування КП»', () => {
-  it('saves the edited contact and a new letter variant', async () => {
+  it('saves the manager contact from the side panel and a new letter template', async () => {
     api.save.mockResolvedValue({ ...settings, version: 3 });
     renderPage();
 
-    fireEvent.change(section('Контакти менеджерів у КП').getByLabelText('Телефон'), {
-      target: { value: '+380 50 111 22 33' },
+    fireEvent.click(screen.getByRole('button', { name: 'Змінити контакт: Оля' }));
+    const panel = within(screen.getByRole('dialog', { name: 'Оля у КП' }));
+    fireEvent.change(panel.getByLabelText('Телефон'), { target: { value: '+380 50 111 22 33' } });
+    fireEvent.click(panel.getByRole('button', { name: 'Готово' }));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Додати шаблон' }));
+    const letters = section('Лист клієнту');
+    fireEvent.change(letters.getByRole('textbox', { name: /Назва/ }), {
+      target: { value: 'Короткий' },
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Додати варіант' }));
-    const letters = section('Варіанти листа');
-    fireEvent.change(letters.getByLabelText(/Назва варіанта 1/), { target: { value: 'Короткий' } });
-    fireEvent.change(letters.getByLabelText(/Тема/), { target: { value: 'КП Brevi' } });
-    fireEvent.change(letters.getByLabelText(/Текст/), { target: { value: 'Надсилаю КП' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Зберегти зміни' }));
+    fireEvent.change(letters.getByRole('textbox', { name: /Тема листа/ }), {
+      target: { value: 'КП Brevi' },
+    });
+    fireEvent.change(letters.getByRole('textbox', { name: /Текст листа/ }), {
+      target: { value: 'Надсилаю КП' },
+    });
+
+    expect(screen.getByText('Лист клієнту, Менеджери і Gmail')).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
 
     await waitFor(() => expect(api.save).toHaveBeenCalledTimes(1));
     const sent = api.save.mock.calls[0][0] as QuoteSettingsDraft;
@@ -131,14 +145,51 @@ describe('«Налаштування КП»', () => {
     expect(sent.letterVariants[0]).toMatchObject({ name: 'Короткий', subject: 'КП Brevi' });
   });
 
-  it('shows the rules next to the field and does not save', async () => {
+  it('shows the rules next to the field and which section has them, and does not save', async () => {
     renderPage();
     fireEvent.change(screen.getByLabelText('ЄДРПОУ'), { target: { value: '123' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Зберегти зміни' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
 
     expect(await screen.findByText('ЄДРПОУ — 8 цифр.')).toBeVisible();
-    expect(screen.getByText('Виправте позначені поля.')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Компанія — 1 помилка' })).toBeVisible();
     expect(api.save).not.toHaveBeenCalled();
+  });
+
+  it('inserts a mark with a button, shows it filled in the preview and stops a typo', async () => {
+    renderPage();
+    const pdf = section('PDF КП під запит');
+    const contact = pdf.getByLabelText('Контакт менеджера');
+    fireEvent.change(contact, { target: { value: 'Ваш менеджер: ' } });
+    fireEvent.click(
+      pdf.getByRole('button', { name: 'Вставити «Менеджер» у поле «Контакт менеджера»' }),
+    );
+
+    expect(contact).toHaveValue('Ваш менеджер: {managerName}');
+    fireEvent.click(screen.getByRole('button', { name: 'Перегляд' }));
+    expect(
+      within(screen.getByRole('img', { name: 'Перегляд PDF КП' })).getByText('Ольга'),
+    ).toBeVisible();
+    fireEvent.keyDown(screen.getByRole('img', { name: 'Перегляд PDF КП' }), { key: 'Escape' });
+
+    fireEvent.change(contact, { target: { value: 'Ваш менеджер: {managerNmae}' } });
+    fireEvent.click(await screen.findByRole('button', { name: 'Зберегти' }));
+    expect(
+      await screen.findByText('Невідома мітка {managerNmae}. Вставте мітку кнопкою під полем.'),
+    ).toBeVisible();
+    expect(api.save).not.toHaveBeenCalled();
+  });
+
+  it('puts back the saved text of a field and of the whole page', () => {
+    renderPage();
+    const title = screen.getByRole('textbox', { name: /Заголовок документа/ });
+    fireEvent.change(title, { target: { value: 'КП' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Повернути як було: Заголовок документа' }));
+    expect(title).toHaveValue('КОМЕРЦІЙНА ПРОПОЗИЦІЯ');
+
+    fireEvent.change(title, { target: { value: 'КП' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Скасувати зміни' }));
+    expect(title).toHaveValue('КОМЕРЦІЙНА ПРОПОЗИЦІЯ');
+    expect(screen.getByText('Змін немає')).toBeVisible();
   });
 
   it('offers «Оновити» when someone saved the settings in another window', async () => {
@@ -148,8 +199,11 @@ describe('«Налаштування КП»', () => {
     });
     api.refetch.mockResolvedValue({ data: settings });
     renderPage();
-    fireEvent.change(screen.getByLabelText(/Тема листа/), { target: { value: 'Нова тема' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Зберегти зміни' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Змінити: Основний лист' }));
+    fireEvent.change(screen.getByRole('textbox', { name: /Тема листа/ }), {
+      target: { value: 'Нова тема' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
 
     expect(
       await screen.findByText('Налаштування змінили в іншому вікні. Оновіть сторінку.'),
@@ -158,11 +212,14 @@ describe('«Налаштування КП»', () => {
     await waitFor(() => expect(api.refetch).toHaveBeenCalledTimes(1));
   });
 
-  it('opens the Google page for the person whose Gmail is connected', async () => {
+  it('connects Gmail without saving first and keeps the unsaved changes for the way back', async () => {
     const assign = vi.fn();
     vi.stubGlobal('location', { ...window.location, assign, search: '' });
     api.connect.mockResolvedValue('https://accounts.google.com/o/oauth2/v2/auth?x=1');
     renderPage();
+    fireEvent.change(screen.getByRole('textbox', { name: /Заголовок документа/ }), {
+      target: { value: 'КП' },
+    });
 
     fireEvent.click(screen.getByRole('button', { name: 'Підключити Gmail: Оля' }));
 
@@ -171,13 +228,10 @@ describe('«Налаштування КП»', () => {
     );
     expect(api.connect).toHaveBeenCalledWith({ userId: 7, returnPath: '/crm/quote-settings' });
     vi.unstubAllGlobals();
-  });
 
-  it('asks to save the page before connecting Gmail', () => {
+    cleanup();
     renderPage();
-    fireEvent.change(screen.getByLabelText(/Тема листа/), { target: { value: 'Нова тема' } });
-
-    expect(screen.getByRole('button', { name: 'Підключити Gmail: Оля' })).toBeDisabled();
-    expect(screen.getByText('Спочатку збережіть зміни на сторінці.')).toBeVisible();
+    expect(screen.getByRole('textbox', { name: /Заголовок документа/ })).toHaveValue('КП');
+    expect(screen.getByText(/Повернули ваші незбережені зміни/)).toBeVisible();
   });
 });
