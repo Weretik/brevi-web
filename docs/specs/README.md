@@ -24,7 +24,7 @@ The Storefront currently has README files for its Nx feature libraries, but they
 - [Admin React: operations — Calculator sheet fields and a «Цех» page](admin/references/014-operations-sheet/README.md) — implemented 2026-11-02.
 - [Admin React: Telegram reminders](admin/reminders/001-telegram-reminders/README.md) — implemented and locally verified 2026-11-01.
 - [Admin React: photo library with folders](admin/media/001-photo-library/README.md) — implemented and locally verified 2026-11-03; replaces 007-media.
-- [Admin React: «КП» commercial proposals](admin/quotes/001-quotes/README.md) — stage 1 (list and «Товари та ціни» editor) implemented 2026-11-04; stages 2–6 planned.
+- [Admin React: «КП» commercial proposals](admin/quotes/001-quotes/README.md) — stages 1–2 (list, «Товари та ціни» editor, «Налаштування КП», PDF) implemented 2026-11-04; stages 3–6 planned.
 - [Admin React: manager tasks and the «Мої завдання» board](admin/tasks/001-manager-tasks/README.md) — implemented 2026-11-04.
 - [Visual guidance for tables, menus, and forms](admin/table-visual-guidance.md)
 - [React Admin migration order](admin/react-migration-roadmap.md)

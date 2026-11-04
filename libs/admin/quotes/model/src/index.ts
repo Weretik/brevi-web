@@ -29,3 +29,21 @@ export {
   quoteTextMaxLength,
 } from './validators/quote-draft-validation';
 export type { QuoteDraftErrors } from './validators/quote-draft-validation';
+export type * from './entities/quote-settings';
+export type * from './models/quote-settings-draft';
+export {
+  quoteAdvantageCount,
+  quoteMaxLetterVariants,
+  quoteTemplateMarks,
+} from './models/quote-settings-draft';
+export {
+  emptyLetterVariantDraft,
+  quoteSettingsToDraft,
+} from './mappers/quote-settings-draft-mapper';
+export {
+  quoteSettingsErrors,
+  quoteSettingsShortMax,
+  quoteSettingsTextMax,
+  quoteSettingsUrlMax,
+} from './validators/quote-settings-validation';
+export type { QuoteSettingsErrors } from './validators/quote-settings-validation';
