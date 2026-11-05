@@ -81,4 +81,6 @@ export interface FinanceTransactionReviewBody {
   counterparty: FinanceCounterpartyLink | null;
   oneoffName: string | null;
   version: number;
+  /** «Запамʼятати»: the category becomes the default of the chosen finance counterparty. */
+  rememberCategory: boolean;
 }

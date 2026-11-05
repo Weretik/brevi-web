@@ -30,11 +30,13 @@ interface Props {
   onChange: (next: FinanceJournalFilter) => void;
   onApply: () => void;
   onReset: () => void;
+  /** The search and the type are in the quick bar above, so the panel leaves them out. */
+  quick?: boolean;
 }
 
 const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' };
 
-/** Journal filters; the table changes only on «Застосувати». */
+/** Journal filters («Ще фільтри»); the table changes only on «Застосувати». */
 export function FinanceJournalFilters({
   value,
   kind,
@@ -45,6 +47,7 @@ export function FinanceJournalFilters({
   onChange,
   onApply,
   onReset,
+  quick = false,
 }: Props) {
   const set = <Key extends keyof FinanceJournalFilter>(key: Key, next: FinanceJournalFilter[Key]) =>
     onChange({ ...value, [key]: next });
@@ -94,33 +97,41 @@ export function FinanceJournalFilters({
         </Stack>
         {kind === 'transactions' && (
           <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ gap: 2 }}>
-            <TextField
-              select
-              label="Тип"
-              value={value.type}
-              onChange={(event) =>
-                onChange({
-                  ...value,
-                  type: event.target.value as CategoryDirection | '',
-                  categoryId: '',
-                  subcategoryId: '',
-                })
-              }
-              fullWidth
-            >
-              <MenuItem value="">Доходи й витрати</MenuItem>
-              {categoryDirections.map((direction) => (
-                <MenuItem key={direction} value={direction}>
-                  {categoryDirectionLabels[direction]}
-                </MenuItem>
-              ))}
-            </TextField>
+            {!quick && (
+              <TextField
+                select
+                label="Тип"
+                value={value.type}
+                onChange={(event) =>
+                  onChange({
+                    ...value,
+                    type: event.target.value as CategoryDirection | '',
+                    categoryId: '',
+                    subcategoryId: '',
+                  })
+                }
+                fullWidth
+              >
+                <MenuItem value="">Доходи й витрати</MenuItem>
+                {categoryDirections.map((direction) => (
+                  <MenuItem key={direction} value={direction}>
+                    {categoryDirectionLabels[direction]}
+                  </MenuItem>
+                ))}
+              </TextField>
+            )}
             <TextField
               select
               label="Категорія"
               value={value.categoryId}
               disabled={!value.type}
-              helperText={value.type ? undefined : 'Спершу оберіть тип'}
+              helperText={
+                value.type
+                  ? undefined
+                  : quick
+                    ? 'Спершу оберіть «Надходження» або «Витрати»'
+                    : 'Спершу оберіть тип'
+              }
               onChange={(event) =>
                 onChange({ ...value, categoryId: event.target.value, subcategoryId: '' })
               }
@@ -151,12 +162,14 @@ export function FinanceJournalFilters({
           </Stack>
         )}
         <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ gap: 2 }}>
-          <TextField
-            label={kind === 'transactions' ? 'Опис, примітка або контрагент' : 'Примітка'}
-            value={value.search}
-            onChange={(event) => set('search', event.target.value)}
-            fullWidth
-          />
+          {!quick && (
+            <TextField
+              label={kind === 'transactions' ? 'Опис, примітка або контрагент' : 'Примітка'}
+              value={value.search}
+              onChange={(event) => set('search', event.target.value)}
+              fullWidth
+            />
+          )}
           <TextField
             label="Сума від, грн"
             value={value.min}

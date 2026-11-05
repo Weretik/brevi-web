@@ -4660,6 +4660,16 @@ export interface components {
       /** Format: int32 */
       version: number;
     };
+    FinanceOverviewCategoryResponse: {
+      /**
+       * Format: uuid
+       * @description null: operations without a category («Без категорії»)
+       */
+      categoryId: string | null;
+      name: string;
+      /** Format: int64 */
+      amountMinor: number;
+    };
     FinanceOverviewCurrencyResponse: {
       currency: string;
       /**
@@ -4677,6 +4687,25 @@ export interface components {
       differenceMinor: number;
       /** Format: int32 */
       accountCount: number;
+      /**
+       * Format: int32
+       * @description Active incomes of the period
+       */
+      incomeCount: number;
+      /**
+       * Format: int32
+       * @description Active expenses of the period
+       */
+      expenseCount: number;
+      /** @description Largest expense root categories of the period, largest first */
+      topExpenses: components['schemas']['FinanceOverviewCategoryResponse'][];
+      /**
+       * Format: int64
+       * @description Expenses of the period outside topExpenses
+       */
+      otherExpenseMinor: number;
+      /** Format: int32 */
+      otherExpenseCategoryCount: number;
     };
     FinanceOverviewResponse: {
       /** @description null: both areas */
@@ -4691,6 +4720,16 @@ export interface components {
        * @description Active current operations of «Потребують перевірки», whatever the period
        */
       needsReviewCount: number;
+      /**
+       * Format: int32
+       * @description Of them, without a category
+       */
+      needsCategoryCount: number;
+      /**
+       * Format: int32
+       * @description Of them, with an unconfirmed finance counterparty
+       */
+      needsCounterpartyCount: number;
     };
     /** @enum {string} */
     CounterpartyKind: 'Financial' | 'Client' | 'Supplier';
@@ -4886,6 +4925,11 @@ export interface components {
       oneoffName?: string | null;
       /** Format: int32 */
       version: number;
+      /**
+       * @description «Запамʼятати» — the category becomes the default of the chosen finance counterparty and applies to its next operations; ignored for a client, a supplier or a one-off name
+       * @default false
+       */
+      rememberCategory: boolean;
     };
     /** @enum {string} */
     FinanceCounterpartyTab: 'Financial' | 'Clients' | 'Suppliers' | 'Oneoffs';
@@ -4912,6 +4956,11 @@ export interface components {
        * @description Active operations of both areas
        */
       operationCount: number;
+      /**
+       * Format: int64
+       * @description Incomes minus expenses of the current books, kopecks
+       */
+      currentTurnoverMinor: number;
       /** Format: int32 */
       version: number;
       /** Format: date-time */
@@ -4927,6 +4976,11 @@ export interface components {
       active: boolean;
       /** Format: int32 */
       operationCount: number;
+      /**
+       * Format: int64
+       * @description Incomes minus expenses of the current books, kopecks
+       */
+      currentTurnoverMinor: number;
     };
     FinanceCounterpartyCountsResponse: {
       /** Format: int32 */

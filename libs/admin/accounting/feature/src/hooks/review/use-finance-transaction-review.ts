@@ -4,6 +4,7 @@ import {
   useVerifyFinanceCounterpartyMutation,
 } from '@admin/accounting/data-access';
 import {
+  canRememberCategory,
   counterpartyDefaultCategory,
   createFinanceTransactionFormValues,
   financeTransactionReviewBody,
@@ -22,7 +23,8 @@ import type {
 
 /**
  * «Перевірити» one operation: its category and who it is with. An unconfirmed finance counterparty
- * can be confirmed right here, which also clears its other operations.
+ * can be confirmed right here, which also clears its other operations. «Запамʼятати» (on by
+ * default) makes the category the default of a finance counterparty.
  */
 export function useFinanceTransactionReview(
   transaction: FinanceTransaction,
@@ -34,6 +36,7 @@ export function useFinanceTransactionReview(
   );
   const [errors, setErrors] = useState<FinanceTransactionFieldErrors>({});
   const [message, setMessage] = useState<string | null>(null);
+  const [remember, setRemember] = useState(true);
   const [review, reviewState] = useReviewFinanceTransactionMutation();
   const [verify, verifyState] = useVerifyFinanceCounterpartyMutation();
   const pending =
@@ -92,7 +95,7 @@ export function useFinanceTransactionReview(
     try {
       await review({
         id: transaction.id,
-        body: financeTransactionReviewBody(values, transaction.version),
+        body: financeTransactionReviewBody(values, transaction.version, remember),
       }).unwrap();
       onSaved('Операцію перевірено.');
     } catch (error) {
@@ -101,8 +104,19 @@ export function useFinanceTransactionReview(
     }
   }
 
+  const rememberRoot = canRememberCategory(values)
+    ? categories.find((row) => row.id === values.rootId)?.name
+    : undefined;
+
   return {
     values,
+    /** «Запамʼятати: наступні операції «X» одразу в «Y»», or null when it does not apply. */
+    rememberLabel:
+      rememberRoot && values.counterparty
+        ? `Запамʼятати: наступні операції «${values.counterparty.name}» одразу в «${rememberRoot}»`
+        : null,
+    remember,
+    setRemember,
     errors,
     message,
     saving: reviewState.isLoading,

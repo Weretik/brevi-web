@@ -8,6 +8,17 @@ export interface FinanceOverview {
   currencies: FinanceOverviewCurrency[];
   /** Active current operations of «Потребують перевірки», whatever the period. */
   needsReviewCount: number;
+  /** Of them, without a category. */
+  needsCategoryCount: number;
+  /** Of them, with an unconfirmed finance counterparty. */
+  needsCounterpartyCount: number;
+}
+
+/** An expense root category of «Куди пішли гроші»; `categoryId` is null for «Без категорії». */
+export interface FinanceOverviewCategory {
+  categoryId: string | null;
+  name: string;
+  amountMinor: number;
 }
 
 /**
@@ -22,4 +33,11 @@ export interface FinanceOverviewCurrency {
   expenseMinor: number;
   differenceMinor: number;
   accountCount: number;
+  incomeCount: number;
+  expenseCount: number;
+  /** At most five largest expense roots of the period, largest first. */
+  topExpenses: FinanceOverviewCategory[];
+  /** Expenses outside `topExpenses`, over `otherExpenseCategoryCount` groups. */
+  otherExpenseMinor: number;
+  otherExpenseCategoryCount: number;
 }

@@ -1,92 +1,121 @@
 import { useGetFinanceTransactionsQuery } from '@admin/accounting/data-access';
-import { financeJournalPageSize } from '@admin/accounting/model';
-import { FinanceTransactionsGrid } from '@admin/accounting/ui';
+import {
+  financeJournalPageSize,
+  financeOperationForms,
+  formatFinanceCount,
+} from '@admin/accounting/model';
+import { FinanceSegmentedButtons } from '@admin/accounting/ui';
 import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
-import { Box, Paper } from '@mui/material';
-import { useState } from 'react';
+import { Box, Button, Paper, Stack, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
 
-import { FinanceReviewDrawer } from '../../components/review/finance-review-drawer';
+import { FinanceReviewCard } from '../../components/review/finance-review-card';
+import { useFinanceChoices } from '../../hooks/journal/use-finance-choices';
 
-import type { FinanceTransaction } from '@admin/accounting/model';
-import type { GridSortModel } from '@mui/x-data-grid';
+import type { VerificationStatus } from '@admin/accounting/model';
 
-const sortKeys: Record<string, string> = { date: 'Date', amountMinor: 'Amount' };
+type Reason = Exclude<VerificationStatus, 'Verified'> | 'All';
 
 /**
  * «Бухгалтерія → Потребують перевірки»: active operations of the current books without a category
- * or with an unconfirmed finance counterparty. They still count in balances.
+ * or with an unconfirmed finance counterparty, each reviewed right in the list. They still count
+ * in balances.
  */
 export function FinanceReviewPage() {
-  const [page, setPage] = useState(0);
-  const [sortModel, setSortModel] = useState<GridSortModel>([{ field: 'date', sort: 'desc' }]);
-  const [reviewing, setReviewing] = useState<FinanceTransaction | null>(null);
+  const [page, setPage] = useState(1);
+  const [reason, setReason] = useState<Reason>('All');
   const [actionMessage, setActionMessage] = useState<string | null>(null);
+  const choices = useFinanceChoices('Current');
   const query = useGetFinanceTransactionsQuery({
     scope: 'Current',
     needsReview: true,
-    sort: sortKeys[sortModel[0]?.field ?? 'date'] ?? 'Date',
-    direction: sortModel[0]?.sort === 'asc' ? 'Asc' : 'Desc',
-    page: page + 1,
+    sort: 'Date',
+    direction: 'Desc',
+    page,
   });
   const rows = query.data?.items ?? [];
+  const total = query.data?.total ?? 0;
+  const pages = Math.max(1, Math.ceil(total / financeJournalPageSize));
+  const count = (status: Reason) =>
+    status === 'All' ? rows.length : rows.filter((row) => row.verification === status).length;
+  const shown = reason === 'All' ? rows : rows.filter((row) => row.verification === reason);
   const loading = query.isLoading || query.isFetching;
+
+  // The last card of a later page was reviewed: go back to the first page.
+  useEffect(() => {
+    if (query.data && !query.data.items.length && page > 1) setPage(1);
+  }, [query.data, page]);
   const error = query.error
     ? adminApiErrorMessage(query.error, 'Не вдалося завантажити операції.')
     : null;
-  const open = (transaction: FinanceTransaction) => setReviewing(transaction);
 
   return (
-    <Box sx={{ minWidth: 0 }}>
+    <Box sx={{ minWidth: 0, maxWidth: 1040 }}>
       <ReferencePageHeader
         overline="Бухгалтерія"
         title="Потребують перевірки"
-        subtitle="Операції без категорії або з непідтвердженим контрагентом. У залишках вони вже враховані"
+        subtitle={
+          total
+            ? `${formatFinanceCount(total, financeOperationForms)}. Розберіть кожну прямо тут; дата, рахунок і сума не змінюються. У залишках вони вже враховані`
+            : 'Операції без категорії або з новим контрагентом'
+        }
         actions={null}
       />
-      <ReferenceListAlerts
-        error={error}
-        loading={loading}
-        onRetry={() => void query.refetch()}
-        actionMessage={actionMessage}
-        onCloseActionMessage={() => setActionMessage(null)}
-      />
-      <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
-        <FinanceTransactionsGrid
-          ariaLabel="Потребують перевірки"
-          emptyLabel="Усі операції перевірені"
-          actionLabel="Перевірити"
-          rows={rows}
-          rowCount={query.data?.total ?? 0}
+      <Stack sx={{ gap: 2 }}>
+        <ReferenceListAlerts
+          error={error}
           loading={loading}
-          searching={false}
-          unavailable={Boolean(error)}
-          paginationModel={{ page, pageSize: financeJournalPageSize }}
-          onPaginationModelChange={(model) => setPage(model.page)}
-          sortModel={sortModel}
-          onSortModelChange={(model) => {
-            setSortModel(model.length ? model : [{ field: 'date', sort: 'desc' }]);
-            setPage(0);
-          }}
-          onView={open}
-          onEdit={open}
-          onVoid={(id) => {
-            const transaction = rows.find((row) => row.id === id);
-            if (transaction) open(transaction);
-          }}
+          onRetry={() => void query.refetch()}
+          actionMessage={actionMessage}
+          onCloseActionMessage={() => setActionMessage(null)}
         />
-      </Paper>
-      {reviewing && (
-        <FinanceReviewDrawer
-          key={reviewing.id}
-          transaction={reviewing}
-          onClose={() => setReviewing(null)}
-          onSaved={(message) => {
-            setReviewing(null);
-            setActionMessage(message);
-          }}
-        />
-      )}
+        {rows.length > 0 && (
+          <Box>
+            <FinanceSegmentedButtons<Reason>
+              label="Причина"
+              value={reason}
+              onChange={setReason}
+              segments={[
+                { value: 'All', label: `Усі ${count('All')}` },
+                { value: 'NeedsCategory', label: `Без категорії ${count('NeedsCategory')}` },
+                {
+                  value: 'NeedsCounterpartyReview',
+                  label: `Новий контрагент ${count('NeedsCounterpartyReview')}`,
+                },
+              ]}
+            />
+          </Box>
+        )}
+        {!loading && !error && !rows.length && (
+          <Paper variant="outlined" sx={{ p: 3 }}>
+            <Typography color="text.secondary">
+              Перевіряти нічого. Нові операції зʼявляться тут.
+            </Typography>
+          </Paper>
+        )}
+        {shown.map((transaction) => (
+          <FinanceReviewCard
+            key={`${transaction.id}-${transaction.version}`}
+            transaction={transaction}
+            choices={choices}
+            onSaved={setActionMessage}
+          />
+        ))}
+        {pages > 1 && (
+          <Stack direction="row" sx={{ gap: 1, alignItems: 'center', justifyContent: 'flex-end' }}>
+            <Typography variant="body2" color="text.secondary">
+              Сторінка {page} з {pages}
+            </Typography>
+            <Button disabled={page <= 1} onClick={() => setPage(page - 1)}>
+              Назад
+            </Button>
+            <Button disabled={page >= pages} onClick={() => setPage(page + 1)}>
+              Далі
+            </Button>
+          </Stack>
+        )}
+      </Stack>
     </Box>
   );
 }

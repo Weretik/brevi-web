@@ -60,6 +60,8 @@ export interface FinanceCounterparty {
   mergedIntoId: string | null;
   /** Active operations of both areas. */
   operationCount: number;
+  /** Incomes minus expenses of the current books, kopecks. */
+  currentTurnoverMinor: number;
   version: number;
   createdAt: string;
   updatedAt: string;
@@ -71,6 +73,8 @@ export interface FinanceParty extends FinanceCounterpartyLink {
   taxId: string;
   active: boolean;
   operationCount: number;
+  /** Incomes minus expenses of the current books, kopecks. */
+  currentTurnoverMinor: number;
 }
 
 export interface FinanceCounterpartyCounts {

@@ -108,7 +108,7 @@ describe('«Контрагенти» page', () => {
     );
   });
 
-  it('lists suppliers read-only with their operation count', async () => {
+  it('lists suppliers read-only with their operation count and turnover', async () => {
     stubFinanceApi({
       parties: [
         {
@@ -118,6 +118,7 @@ describe('«Контрагенти» page', () => {
           taxId: '',
           active: true,
           operationCount: 4,
+          currentTurnoverMinor: -4_630_000,
         },
       ],
     });
@@ -125,6 +126,8 @@ describe('«Контрагенти» page', () => {
 
     const row = await screen.findByRole('row', { name: /ТОВ Тканини/ });
     expect(row).toHaveTextContent('4');
+    expect(row).toHaveTextContent(/−46\s300,00/);
+    expect(screen.getByRole('columnheader', { name: 'Оборот з 01.10.2026' })).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Дії контрагента' })).toBeNull();
   });
 });

@@ -17,6 +17,8 @@ export interface FinanceCounterpartyPickerProps {
   onChange: (choice: FinanceCounterpartyChoice | null) => void;
   /** «Додати «X» як фінансового»; left out hides the option. */
   onCreate?: (name: string) => void;
+  /** A small field without the hint, for one-line forms. */
+  compact?: boolean;
 }
 
 interface CreateOption {
@@ -39,6 +41,7 @@ export function FinanceCounterpartyPicker({
   onSearch,
   onChange,
   onCreate,
+  compact = false,
 }: FinanceCounterpartyPickerProps) {
   const [input, setInput] = useState('');
   const typed = input.trim();
@@ -51,6 +54,7 @@ export function FinanceCounterpartyPicker({
     <Autocomplete<Option>
       options={choices}
       value={value}
+      size={compact ? 'small' : 'medium'}
       disabled={disabled}
       loading={loading}
       groupBy={(option) =>
@@ -98,7 +102,10 @@ export function FinanceCounterpartyPicker({
           {...params}
           label="Контрагент"
           error={Boolean(error)}
-          helperText={error ?? 'Фінансовий контрагент, клієнт або постачальник; необовʼязково.'}
+          helperText={
+            error ??
+            (compact ? undefined : 'Фінансовий контрагент, клієнт або постачальник; необовʼязково.')
+          }
         />
       )}
     />

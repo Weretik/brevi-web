@@ -24,7 +24,7 @@ import { Box, Button, Paper, Stack } from '@mui/material';
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { FinanceJournalToolbar } from '../../components/journal/finance-journal-toolbar';
+import { FinanceJournalQuickBar } from '../../components/journal/finance-journal-quick-bar';
 import { LedgerScopeTabs } from '../../components/journal/ledger-scope-tabs';
 import { FinanceTransactionDrawer } from '../../components/transactions/finance-transaction-drawer';
 import { useAccountingSettings } from '../../hooks/accounts/use-accounting-settings';
@@ -120,22 +120,22 @@ function TransactionsJournal({ scope, cutoverDate, today, onScopeChange }: Journ
       <ReferencePageHeader
         overline="Бухгалтерія"
         title="Операції"
-        subtitle="Доходи й витрати. Анульована операція лишається в журналі, але не рахується"
+        subtitle="Надходження й витрати. Перекази між своїми рахунками — окремо"
         actions={
           <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap' }}>
             <Button
-              variant="contained"
+              variant="outlined"
               startIcon={<AddOutlinedIcon />}
               onClick={() => add('Income')}
             >
-              Додати дохід
+              Надходження
             </Button>
             <Button
-              variant="outlined"
+              variant="contained"
               startIcon={<RemoveOutlinedIcon />}
               onClick={() => add('Expense')}
             >
-              Додати витрату
+              Витрата
             </Button>
           </Stack>
         }
@@ -148,15 +148,18 @@ function TransactionsJournal({ scope, cutoverDate, today, onScopeChange }: Journ
         actionMessage={actionMessage}
         onCloseActionMessage={() => setActionMessage(null)}
       />
-      <FinanceJournalToolbar
-        applied={journal.applied}
-        activeCount={journal.activeCount}
-        open={journal.open}
-        total={page?.total ?? 0}
-        onToggle={journal.toggle}
+      <FinanceJournalQuickBar
+        journal={journal}
+        scope={scope}
+        cutoverDate={cutoverDate}
+        today={today}
+        kind="transactions"
+        searchPlaceholder="Знайти за описом, приміткою або контрагентом…"
+        totals={<FinanceTransactionTotals totals={page?.totals ?? []} />}
       />
       {journal.open && (
         <FinanceJournalFilters
+          quick
           kind="transactions"
           value={journal.draft}
           accounts={choices.allAccounts}
@@ -168,7 +171,6 @@ function TransactionsJournal({ scope, cutoverDate, today, onScopeChange }: Journ
           onReset={journal.reset}
         />
       )}
-      <FinanceTransactionTotals totals={page?.totals ?? []} />
       <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
         <FinanceTransactionsGrid
           rows={rows}

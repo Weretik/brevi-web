@@ -23,7 +23,10 @@ interface Props {
   onSaved: (message: string) => void;
 }
 
-/** «Перевірити»: the date, account and amount stay; the category and counterparty change. */
+/**
+ * «Перевірити» one operation from «Контрагенти → Разові»: the date, account and amount stay; the
+ * category and counterparty change. «Потребують перевірки» reviews the same way in cards.
+ */
 export function FinanceReviewDrawer({ transaction, onClose, onSaved }: Props) {
   const choices = useFinanceChoices(transaction.scope);
   const review = useFinanceTransactionReview(transaction, choices.categories, onSaved);
@@ -42,7 +45,7 @@ export function FinanceReviewDrawer({ transaction, onClose, onSaved }: Props) {
       paperWidth={600}
       readOnly={false}
       saving={review.saving}
-      submitLabel="Перевірено"
+      submitLabel="Підтвердити"
       onClose={onClose}
       onEdit={() => undefined}
       onSubmit={review.save}
@@ -61,48 +64,54 @@ export function FinanceReviewDrawer({ transaction, onClose, onSaved }: Props) {
                   disabled={review.pending.confirming}
                   onClick={review.confirmCounterparty}
                 >
-                  Підтвердити
+                  Підтвердити контрагента
                 </Button>
               ) : undefined
             }
           >
-            «{review.pending.name}» ще не підтверджений. Підтвердіть його або оберіть іншого
-            контрагента.
+            «{review.pending.name}» ще не підтверджений. Підтвердіть його або оберіть іншого.
           </Alert>
         )}
-        <FinanceTransactionReviewForm
-          summary={
-            <ReferenceFormSection title="Операція">
-              {problem && <FinanceProblemPill label={problem} />}
-              <ReferenceDetailsList
-                items={[
-                  { label: 'Дата', value: formatLedgerDate(transaction.date), mono: true },
-                  { label: 'Рахунок', value: transaction.accountName },
-                  {
-                    label: 'Сума',
-                    value: formatSignedMinor(
-                      transaction.type,
-                      transaction.amountMinor,
-                      transaction.currency,
-                    ),
-                    mono: true,
-                  },
-                  { label: 'Опис', value: transaction.description },
-                ]}
-              />
-            </ReferenceFormSection>
-          }
-          values={review.values}
-          errors={review.errors}
-          roots={choices.categoryChoices(transaction.type, null, keep)}
-          children={
-            review.values.rootId
-              ? choices.categoryChoices(transaction.type, review.values.rootId, keep)
-              : []
-          }
-          counterpartySearch={counterparties.field}
-          onChange={review.change}
-        />
+        <ReferenceFormSection title="Операція">
+          {problem && <FinanceProblemPill label={problem} />}
+          <ReferenceDetailsList
+            items={[
+              { label: 'Дата', value: formatLedgerDate(transaction.date), mono: true },
+              { label: 'Рахунок', value: transaction.accountName },
+              {
+                label: 'Сума',
+                value: formatSignedMinor(
+                  transaction.type,
+                  transaction.amountMinor,
+                  transaction.currency,
+                ),
+                mono: true,
+              },
+              { label: 'Опис', value: transaction.description },
+            ]}
+          />
+        </ReferenceFormSection>
+        <ReferenceFormSection title="Контрагент і категорія">
+          <FinanceTransactionReviewForm
+            layout="panel"
+            formId="finance-review-form"
+            values={review.values}
+            errors={review.errors}
+            roots={choices.categoryChoices(transaction.type, null, keep)}
+            children={
+              review.values.rootId
+                ? choices.categoryChoices(transaction.type, review.values.rootId, keep)
+                : []
+            }
+            counterpartySearch={counterparties.field}
+            saving={review.saving}
+            rememberLabel={review.rememberLabel}
+            remember={review.remember}
+            onRememberChange={review.setRemember}
+            onChange={review.change}
+            onSubmit={() => void review.save()}
+          />
+        </ReferenceFormSection>
       </Stack>
     </ReferenceEditorDrawer>
   );

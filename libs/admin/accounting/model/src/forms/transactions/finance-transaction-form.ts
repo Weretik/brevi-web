@@ -113,14 +113,29 @@ export function financeCategoryChoices(
     .sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name, 'uk'));
 }
 
-/** «Перевірити»: only the category and who the operation is with. */
+/**
+ * «Перевірити»: only the category and who the operation is with. `remember` counts only for a
+ * finance counterparty (see `canRememberCategory`).
+ */
 export function financeTransactionReviewBody(
   values: FinanceTransactionFormValues,
   version: number,
+  remember = false,
 ): FinanceTransactionReviewBody {
   const { categoryId, counterparty, oneoffName } = financeTransactionBody(values);
-  return { categoryId, counterparty, oneoffName, version };
+  return {
+    categoryId,
+    counterparty,
+    oneoffName,
+    version,
+    rememberCategory: remember && canRememberCategory(values),
+  };
 }
+
+/** «Запамʼятати» applies to a finance counterparty picked from the list, not a one-off name. */
+export const canRememberCategory = (
+  values: Pick<FinanceTransactionFormValues, 'oneoff' | 'counterparty'>,
+) => !values.oneoff && values.counterparty?.kind === 'Financial';
 
 /**
  * The default category of a picked counterparty, when it fits the operation: an active category

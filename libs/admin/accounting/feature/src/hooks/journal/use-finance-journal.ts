@@ -18,7 +18,7 @@ const sortKeys: Record<string, FinanceJournalSort> = { date: 'Date', amountMinor
 
 /**
  * Filters, page and sort of «Операції» or «Перекази» in one area. Typed filters apply on
- * «Застосувати», which also goes back to page 1 and folds the filters.
+ * «Застосувати», which also goes back to page 1 and folds the filters; quick choices apply at once.
  */
 export function useFinanceJournal(scope: LedgerScope, cutoverDate: string, today: string) {
   const defaults = defaultFinanceJournalFilter(scope, cutoverDate, today);
@@ -30,8 +30,18 @@ export function useFinanceJournal(scope: LedgerScope, cutoverDate: string, today
   const sort = sortKeys[sortModel[0]?.field ?? 'date'] ?? 'Date';
   const direction: FinanceSortDirection = sortModel[0]?.sort === 'asc' ? 'Asc' : 'Desc';
 
+  function applyNow(patch: Partial<FinanceJournalFilter>) {
+    const next = { ...applied, ...patch };
+    if (financeJournalFilterProblem(next)) return;
+    setDraft(next);
+    setApplied(next);
+    setPage(0);
+  }
+
   return {
     draft,
+    /** The whole area, as the journal opens. */
+    defaults,
     applied,
     open,
     problem: financeJournalFilterProblem(draft),
@@ -50,6 +60,8 @@ export function useFinanceJournal(scope: LedgerScope, cutoverDate: string, today
       setPage(0);
       setOpen(false);
     },
+    /** Applies a quick choice (period, type, search) at once, keeping the other filters. */
+    applyNow,
     reset: () => {
       setDraft(defaults);
       setApplied(defaults);

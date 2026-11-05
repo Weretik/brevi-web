@@ -1,6 +1,6 @@
-import { formatLedgerDate, formatMinor } from '@admin/accounting/model';
+import { financeAccountTypeLabels, formatLedgerDate, formatMinor } from '@admin/accounting/model';
 import {
-  Button,
+  Link,
   Paper,
   Stack,
   Table,
@@ -11,7 +11,6 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import { useState } from 'react';
 
 import { FinanceProblemPill } from '../../components/status/finance-problem-pill';
 
@@ -21,64 +20,80 @@ interface Props {
   /** Active accounts only. */
   accounts: FinanceAccount[];
   cutoverDate: string;
+  /** «Домашня бухгалтерія» shows the archive balance instead of the current one. */
+  archive: boolean;
+  /** «Рахунки і каси». */
+  accountsPath: string;
 }
 
 const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' };
 
-/** «Залишки рахунків»: account and current balance; details add the archive balance. */
-export function FinanceBalancesTable({ accounts, cutoverDate }: Props) {
-  const [details, setDetails] = useState(false);
+/** «Залишки рахунків»: each active account with its balance in the chosen area. */
+export function FinanceBalancesTable({ accounts, cutoverDate, archive, accountsPath }: Props) {
   return (
-    <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
+    <Paper
+      component="section"
+      variant="outlined"
+      aria-labelledby="finance-balances-title"
+      sx={{ overflow: 'hidden' }}
+    >
       <Stack
         direction="row"
-        sx={{ px: 2, py: 1.5, alignItems: 'center', justifyContent: 'space-between', gap: 2 }}
+        sx={{
+          px: 2,
+          py: 1.5,
+          gap: 2,
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          borderBottom: 1,
+          borderColor: 'divider',
+        }}
       >
-        <Typography component="h2" variant="subtitle1" sx={{ fontWeight: 600 }}>
+        <Typography id="finance-balances-title" variant="h6" component="h2">
           Залишки рахунків
         </Typography>
-        <Button size="small" onClick={() => setDetails((value) => !value)} aria-expanded={details}>
-          {details ? 'Згорнути деталі' : 'Розгорнути деталі'}
-        </Button>
+        <Link href={accountsPath} underline="hover" variant="subtitle2">
+          Усі рахунки
+        </Link>
       </Stack>
       <TableContainer>
-        <Table size="small" aria-label="Залишки рахунків">
+        <Table size="small" aria-labelledby="finance-balances-title">
           <TableHead>
             <TableRow>
               <TableCell>Рахунок</TableCell>
-              <TableCell align="right">Поточний залишок</TableCell>
-              {details && <TableCell align="right">Домашня бухгалтерія</TableCell>}
+              <TableCell align="right">
+                {archive ? `Залишок на ${formatLedgerDate(cutoverDate)}` : 'Залишок'}
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {accounts.map((account) => {
-              const current = account.balance?.currentMinor ?? null;
+              const balance = archive
+                ? (account.balance?.legacyMinor ?? account.openingMinor)
+                : (account.balance?.currentMinor ?? null);
               return (
                 <TableRow key={account.id}>
-                  <TableCell sx={{ fontWeight: 600 }}>{account.name}</TableCell>
-                  <TableCell align="right" sx={mono}>
-                    {current === null ? (
+                  <TableCell>
+                    {account.name}
+                    <Typography variant="caption" component="div" color="text.secondary">
+                      {financeAccountTypeLabels[account.type]}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right" sx={{ ...mono, fontWeight: 600 }}>
+                    {balance === null ? (
                       <FinanceProblemPill
                         label={`Не підтверджено залишок на ${formatLedgerDate(cutoverDate)}`}
                       />
                     ) : (
-                      formatMinor(current, account.currency)
+                      formatMinor(balance, account.currency)
                     )}
                   </TableCell>
-                  {details && (
-                    <TableCell align="right" sx={mono}>
-                      {formatMinor(
-                        account.balance?.legacyMinor ?? account.openingMinor,
-                        account.currency,
-                      )}
-                    </TableCell>
-                  )}
                 </TableRow>
               );
             })}
             {!accounts.length && (
               <TableRow>
-                <TableCell colSpan={details ? 3 : 2}>
+                <TableCell colSpan={2}>
                   <Typography variant="body2" color="text.secondary">
                     Активних рахунків немає.
                   </Typography>

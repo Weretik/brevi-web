@@ -106,6 +106,7 @@ export const financeCounterparty = (overrides: Record<string, unknown> = {}) => 
   active: true,
   mergedIntoId: null,
   operationCount: 1,
+  currentTurnoverMinor: 0,
   version: 1,
   createdAt: '2026-11-05T08:00:00+00:00',
   updatedAt: '2026-11-05T08:00:00+00:00',

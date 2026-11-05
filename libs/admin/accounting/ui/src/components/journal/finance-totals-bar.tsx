@@ -1,5 +1,5 @@
 import { formatMinor } from '@admin/accounting/model';
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
 import type { FinanceTransactionTotal, FinanceTransferTotal } from '@admin/accounting/model';
 
@@ -7,7 +7,7 @@ export interface FinanceTotal {
   label: string;
   /** Already formatted, e.g. «−5 055,00 ₴». */
   value: string;
-  tone?: 'income' | 'expense';
+  tone?: 'income' | 'expense' | 'strong';
 }
 
 interface Props {
@@ -16,47 +16,50 @@ interface Props {
   ariaLabel: string;
 }
 
-/** A line of journal totals above the table. */
+const tones = { income: 'success.main', expense: 'error.main', strong: 'text.primary' } as const;
+
+/** One line of journal totals: «Надходження +99 395,76 · Витрати −287 968,70 · Різниця −188 572,94 ₴». */
 export function FinanceTotalsBar({ items, ariaLabel }: Props) {
   if (!items.length) return null;
   return (
-    <Stack
+    <Typography
       component="dl"
-      direction="row"
+      variant="body2"
       aria-label={ariaLabel}
-      sx={{ m: 0, mb: 2, gap: { xs: 2, sm: 4 }, flexWrap: 'wrap' }}
+      sx={{
+        m: 0,
+        display: 'flex',
+        flexWrap: 'wrap',
+        columnGap: 1.5,
+        rowGap: 0.5,
+        alignItems: 'baseline',
+        color: 'text.secondary',
+      }}
     >
       {items.map((item) => (
-        <Box key={item.label}>
-          <Typography component="dt" variant="caption" color="text.secondary">
-            {item.label}
-          </Typography>
-          <Typography
+        <Box key={item.label} sx={{ display: 'flex', gap: 0.75, alignItems: 'baseline' }}>
+          <Box component="dt">{item.label}</Box>
+          <Box
             component="dd"
             sx={{
               m: 0,
               fontWeight: 600,
               fontFamily: 'var(--admin-font-mono)',
               fontVariantNumeric: 'tabular-nums',
-              color:
-                item.tone === 'income'
-                  ? 'success.main'
-                  : item.tone === 'expense'
-                    ? 'error.main'
-                    : 'text.primary',
+              color: item.tone ? tones[item.tone] : 'text.primary',
             }}
           >
             {item.value}
-          </Typography>
+          </Box>
         </Box>
       ))}
-    </Stack>
+    </Typography>
   );
 }
 
-const suffix = (count: number, currency: string) => (count > 1 ? ` · ${currency}` : '');
+const suffix = (count: number, currency: string) => (count > 1 ? ` ${currency}` : '');
 
-/** «Доходи», «Витрати», «Різниця» of the selection, per currency. */
+/** «Надходження», «Витрати», «Різниця» of the selection, per currency. */
 export function FinanceTransactionTotals({ totals }: { totals: FinanceTransactionTotal[] }) {
   return (
     <FinanceTotalsBar
@@ -65,16 +68,20 @@ export function FinanceTransactionTotals({ totals }: { totals: FinanceTransactio
         const tail = suffix(totals.length, total.currency);
         return [
           {
-            label: `Доходи${tail}`,
-            value: formatMinor(total.incomeMinor, total.currency),
+            label: `Надходження${tail}`,
+            value: `+${formatMinor(total.incomeMinor, total.currency)}`,
             tone: 'income' as const,
           },
           {
             label: `Витрати${tail}`,
-            value: formatMinor(total.expenseMinor, total.currency),
+            value: `−${formatMinor(total.expenseMinor, total.currency)}`,
             tone: 'expense' as const,
           },
-          { label: `Різниця${tail}`, value: formatMinor(total.differenceMinor, total.currency) },
+          {
+            label: `Різниця${tail}`,
+            value: formatMinor(total.differenceMinor, total.currency),
+            tone: 'strong' as const,
+          },
         ];
       })}
     />
@@ -89,6 +96,7 @@ export function FinanceTransferTotals({ totals }: { totals: FinanceTransferTotal
       items={totals.map((total) => ({
         label: `Перекази${suffix(totals.length, total.currency)}`,
         value: formatMinor(total.amountMinor, total.currency),
+        tone: 'strong' as const,
       }))}
     />
   );
