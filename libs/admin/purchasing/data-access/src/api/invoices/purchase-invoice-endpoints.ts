@@ -1,6 +1,14 @@
-import { purchaseInvoicesTag, purchaseSyncStateTag } from '../../cache/purchase-invoice-tags';
+import {
+  purchaseInvoicesTag,
+  purchaseSuppliersTag,
+  purchaseSyncStateTag,
+} from '../../cache/purchase-invoice-tags';
 import { purchaseApiError } from '../../errors/purchase-api-error';
 import { mapPurchaseInvoicePage } from '../../mappers/invoices/purchase-invoice.mapper';
+import {
+  mapPurchaseInvoiceReview,
+  mapPurchaseSupplierOptions,
+} from '../../mappers/invoices/purchase-review.mapper';
 import {
   mapPurchaseSyncResult,
   mapPurchaseSyncState,
@@ -10,6 +18,9 @@ import type { PurchasingEndpointBuilder } from '../purchasing-endpoint-builder';
 import type {
   PurchaseInvoicePage,
   PurchaseInvoiceQuery,
+  PurchaseInvoiceReview,
+  PurchaseReviewInput,
+  PurchaseSupplierOption,
   PurchaseSyncResult,
   PurchaseSyncState,
 } from '@admin/purchasing/model';
@@ -43,6 +54,23 @@ export function purchaseInvoiceEndpoints(build: PurchasingEndpointBuilder) {
       // A failed sync records its reason, so the state is refreshed either way.
       invalidatesTags: (_, error) =>
         error ? [purchaseSyncStateTag] : [purchaseInvoicesTag, purchaseSyncStateTag],
+    }),
+    getPurchaseSuppliers: build.query<PurchaseSupplierOption[], void>({
+      query: () => ({ url: '/api/purchasing/invoices/suppliers' }),
+      transformResponse: mapPurchaseSupplierOptions,
+      transformErrorResponse: purchaseApiError,
+      providesTags: [purchaseSuppliersTag],
+    }),
+    reviewPurchaseInvoice: build.mutation<PurchaseInvoiceReview, PurchaseReviewInput>({
+      query: ({ messageId, ...body }) => ({
+        url: `/api/purchasing/invoices/${encodeURIComponent(messageId)}/review`,
+        method: 'PUT',
+        body,
+      }),
+      transformResponse: mapPurchaseInvoiceReview,
+      transformErrorResponse: purchaseApiError,
+      // A stale version means someone else saved: reload the list either way.
+      invalidatesTags: [purchaseInvoicesTag],
     }),
   };
 }

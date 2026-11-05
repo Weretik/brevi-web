@@ -1,4 +1,4 @@
-export const purchaseInvoiceFilters = ['All', 'NeedsReview'] as const;
+export const purchaseInvoiceFilters = ['All', 'NeedsReview', 'WithoutSupplier'] as const;
 export type PurchaseInvoiceFilter = (typeof purchaseInvoiceFilters)[number];
 
 export const purchaseInvoicePageSizes = [25, 50, 100] as const;

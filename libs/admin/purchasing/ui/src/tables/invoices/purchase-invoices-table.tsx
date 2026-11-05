@@ -13,6 +13,8 @@ interface Props {
   narrowed: boolean;
   unavailable: boolean;
   onPageChange: (model: GridPaginationModel) => void;
+  /** A row opens the card in the side panel. */
+  onOpen: (invoice: PurchaseInvoice) => void;
 }
 
 const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' };
@@ -106,6 +108,35 @@ const columns: GridColDef<PurchaseInvoice>[] = [
     ),
   },
   {
+    field: 'supplierName',
+    headerName: 'Постачальник',
+    flex: 0.9,
+    minWidth: 190,
+    sortable: false,
+    renderCell: ({ row }) => (
+      <Stack sx={cell}>
+        {row.supplierId !== null && row.supplierName === null ? (
+          <Typography variant="body2" color="warning.main" noWrap>
+            Постачальника не знайдено
+          </Typography>
+        ) : (
+          <Typography
+            variant="body2"
+            noWrap
+            color={row.supplierName ? 'text.primary' : 'text.secondary'}
+          >
+            {row.supplierName ?? '—'}
+          </Typography>
+        )}
+        {row.reviewNote && (
+          <Typography variant="caption" color="text.secondary" noWrap title={row.reviewNote}>
+            {row.reviewNote}
+          </Typography>
+        )}
+      </Stack>
+    ),
+  },
+  {
     field: 'markedPaid',
     headerName: 'Оплата',
     width: 190,
@@ -155,6 +186,7 @@ export function PurchaseInvoicesTable({
   narrowed,
   unavailable,
   onPageChange,
+  onOpen,
 }: Props) {
   const theme = useTheme();
   return (
@@ -172,6 +204,7 @@ export function PurchaseInvoicesTable({
       rowCount={page?.total ?? 0}
       paginationModel={{ page: (page?.page ?? 1) - 1, pageSize: page?.pageSize ?? 50 }}
       onPaginationModelChange={onPageChange}
+      onRowClick={({ row }) => onOpen(row)}
       pageSizeOptions={[25, 50, 100]}
       localeText={{
         ...theme.components?.MuiDataGrid?.defaultProps?.localeText,
@@ -188,6 +221,7 @@ export function PurchaseInvoicesTable({
         borderTop: 1,
         borderColor: 'divider',
         borderRadius: 0,
+        '& .MuiDataGrid-row': { cursor: 'pointer' },
         '& .MuiDataGrid-columnHeaders': { bgcolor: 'action.hover' },
         '& .MuiDataGrid-cell': { display: 'flex', alignItems: 'center' },
       }}

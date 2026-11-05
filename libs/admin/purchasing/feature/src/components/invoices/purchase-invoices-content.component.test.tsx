@@ -8,6 +8,7 @@ import { PurchaseInvoicesContent } from './purchase-invoices-content';
 const fixture = vi.hoisted(() => ({
   queries: [] as Record<string, unknown>[],
   sync: vi.fn(),
+  review: vi.fn(),
   syncError: null as string | null,
 }));
 
@@ -26,8 +27,11 @@ const invoice = {
   markBy: 'Ірина',
   markedPaid: true,
   supplierId: null,
+  supplierName: null,
   reviewNote: null,
   reviewVersion: 0,
+  reviewedBy: null,
+  reviewedAt: null,
   state: 'AwaitingRecognition',
   issues: [],
   links: [{ id: 'f1', url: 'https://www.dropbox.com/s/a.pdf', safe: true }],
@@ -48,7 +52,7 @@ const problem = {
 vi.mock('@admin/purchasing/data-access', () => ({
   useGetPurchaseInvoicesQuery: (query: Record<string, unknown>) => {
     fixture.queries.push(query);
-    const total = query['filter'] === 'NeedsReview' ? 1 : 2;
+    const total = query['filter'] === 'All' ? 2 : 1;
     return {
       currentData: {
         items: query['pageSize'] === 1 ? [] : [invoice, problem],
@@ -72,12 +76,22 @@ vi.mock('@admin/purchasing/data-access', () => ({
     },
   }),
   useSyncPurchaseInvoicesMutation: () => [fixture.sync, { isLoading: false }],
+  useGetPurchaseSuppliersQuery: () => ({
+    currentData: [
+      { id: 7, name: 'Текстиль-Контакт' },
+      { id: 8, name: 'ФОП Бистров' },
+    ],
+    isFetching: false,
+    error: undefined,
+  }),
+  useReviewPurchaseInvoiceMutation: () => [fixture.review, { isLoading: false }],
 }));
 
 afterEach(() => {
   cleanup();
   fixture.queries = [];
   fixture.sync.mockReset();
+  fixture.review.mockReset();
   fixture.syncError = null;
 });
 
@@ -116,7 +130,12 @@ describe('«Контрагенти → Рахунки на закупку»', ()
 
     await user.type(screen.getByRole('textbox', { name: 'Пошук рахунків' }), 'Бистров');
     await waitFor(() => expect(router.state.location.search).toContain('search=%D0%91'));
-    expect(fixture.queries.at(-1)).toMatchObject({ filter: 'NeedsReview', search: 'Бистров' });
+    expect(fixture.queries).toContainEqual({
+      filter: 'NeedsReview',
+      search: 'Бистров',
+      page: 1,
+      pageSize: 50,
+    });
   });
 
   it('runs «Оновити зараз» and shows the backend reason when it fails', async () => {
@@ -142,5 +161,72 @@ describe('«Контрагенти → Рахунки на закупку»', ()
     renderContent();
 
     expect(screen.getByText(/не вдалося: Заголовок таблиці змінився\./)).toBeVisible();
+  });
+  it('opens a row in the side panel and links a supplier with a note', async () => {
+    const user = userEvent.setup();
+    fixture.review.mockReturnValue({
+      unwrap: () =>
+        Promise.resolve({
+          messageId: 'm1',
+          supplierId: 8,
+          supplierName: 'ФОП Бистров',
+          reviewNote: 'Березень',
+          reviewVersion: 1,
+          reviewedBy: 'buh@brevi.com.ua',
+          reviewedAt: '2026-11-05T08:00:00Z',
+        }),
+    });
+    renderContent();
+
+    const grid = await screen.findByRole('grid', { name: 'Рахунки на закупку' });
+    await user.click(within(grid).getByText('UID 42'));
+    const panel = screen.getByRole('dialog', { name: 'Рахунок на закупку' });
+    expect(within(panel).getByText('Відмічено в джерелі · Ірина · 04.11.2026')).toBeVisible();
+
+    await user.click(within(panel).getByRole('button', { name: 'Редагувати' }));
+    const form = screen.getByRole('dialog', { name: 'Постачальник і примітка' });
+    await user.click(within(form).getByRole('combobox', { name: 'Постачальник' }));
+    await user.click(await screen.findByRole('option', { name: 'ФОП Бистров' }));
+    await user.type(within(form).getByRole('textbox', { name: 'Примітка' }), '  Березень ');
+    await user.click(within(form).getByRole('button', { name: 'Зберегти' }));
+
+    expect(fixture.review).toHaveBeenCalledWith({
+      messageId: 'm1',
+      supplierId: 8,
+      note: 'Березень',
+      version: 0,
+    });
+    expect(await screen.findByText('Збережено: постачальник «ФОП Бистров».')).toBeVisible();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('keeps the panel open with the reason when someone saved first', async () => {
+    const user = userEvent.setup();
+    fixture.review.mockReturnValue({
+      unwrap: () =>
+        Promise.reject({
+          code: 'Conflict',
+          status: 409,
+          message: 'Цей рахунок уже змінили. Відкрийте його знову, щоб побачити нові дані.',
+          fieldErrors: {},
+        }),
+    });
+    renderContent();
+
+    const grid = await screen.findByRole('grid', { name: 'Рахунки на закупку' });
+    await user.click(within(grid).getByText('UID 42'));
+    await user.click(screen.getByRole('button', { name: 'Редагувати' }));
+    await user.click(screen.getByRole('button', { name: 'Зберегти' }));
+
+    expect(await screen.findByText(/Цей рахунок уже змінили/)).toBeVisible();
+    expect(screen.getByRole('dialog', { name: 'Постачальник і примітка' })).toBeVisible();
+  });
+
+  it('offers the «Без постачальника» filter', async () => {
+    const user = userEvent.setup();
+    const router = renderContent();
+
+    await user.click(screen.getByRole('button', { name: 'Без постачальника 1' }));
+    expect(router.state.location.search).toContain('filter=WithoutSupplier');
   });
 });

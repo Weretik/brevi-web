@@ -3449,9 +3449,43 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** @description One page of cards, one per Telegram message, newest message first (unknown dates last). Search matches the message text (case-insensitive) or an exact UID. */
+    /** @description One page of cards, one per Telegram message, newest message first (unknown dates last). Search matches the message text (case-insensitive) or an exact UID. Filter WithoutSupplier lists cards with no supplier linked. */
     get: operations['getPurchaseInvoices'];
     put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/purchasing/invoices/suppliers': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Active Brevi suppliers (Reference) by name, for the supplier link. Offered here because the accountant cannot read the Reference supplier list. */
+    get: operations['getPurchaseInvoiceSuppliers'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/purchasing/invoices/{messageId}/review': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Links a supplier (or none) and writes a note (stage 2). version is the reviewVersion the user saw; each real change adds 1 and a history entry with the values before and after. Saving the same values changes nothing. The sheet sync never touches these fields. */
+    put: operations['reviewPurchaseInvoice'];
     post?: never;
     delete?: never;
     options?: never;
@@ -8164,7 +8198,7 @@ export interface components {
       telegramThreadId: number | null;
     };
     /** @enum {string} */
-    PurchaseInvoiceFilter: 'All' | 'NeedsReview';
+    PurchaseInvoiceFilter: 'All' | 'NeedsReview' | 'WithoutSupplier';
     /**
      * @description NeedsReview when the representative row has problems, otherwise AwaitingRecognition.
      * @enum {string}
@@ -8208,9 +8242,18 @@ export interface components {
        * @description Brevi supplier linked by hand.
        */
       supplierId?: number | null;
+      /** @description Name of the linked supplier; null when none is linked or the supplier no longer exists. */
+      supplierName?: string | null;
       reviewNote?: string | null;
-      /** Format: int32 */
+      /**
+       * Format: int32
+       * @description Send it back with the next review.
+       */
       reviewVersion: number;
+      /** @description E-mail of who last changed the supplier link or note. */
+      reviewedBy?: string | null;
+      /** Format: date-time */
+      reviewedAt?: string | null;
       state: components['schemas']['PurchaseInvoiceState'];
       /** @description Reasons for a manual check, in Ukrainian. */
       issues: string[];
@@ -8224,6 +8267,34 @@ export interface components {
       page: number;
       /** Format: int32 */
       pageSize: number;
+    };
+    PurchaseSupplierOption: {
+      /** Format: int32 */
+      id: number;
+      name: string;
+    };
+    PurchaseInvoiceReviewRequest: {
+      /**
+       * Format: int32
+       * @description Null removes the link.
+       */
+      supplierId?: number | null;
+      /** @description Trimmed; empty removes the note. */
+      note?: string | null;
+      /** Format: int32 */
+      version: number;
+    };
+    PurchaseInvoiceReviewResponse: {
+      messageId: string;
+      /** Format: int32 */
+      supplierId?: number | null;
+      supplierName?: string | null;
+      reviewNote?: string | null;
+      /** Format: int32 */
+      reviewVersion: number;
+      reviewedBy?: string | null;
+      /** Format: date-time */
+      reviewedAt?: string | null;
     };
     PurchaseSyncStateResponse: {
       /** Format: date-time */
@@ -19273,6 +19344,101 @@ export interface operations {
       };
       /** @description Not Director, Accountant or Admin */
       403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getPurchaseInvoiceSuppliers: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PurchaseSupplierOption'][];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director, Accountant or Admin */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  reviewPurchaseInvoice: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        messageId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PurchaseInvoiceReviewRequest'];
+      };
+    };
+    responses: {
+      /** @description Saved (or unchanged) */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PurchaseInvoiceReviewResponse'];
+        };
+      };
+      /** @description Note longer than 1000 characters or invalid supplier id */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director, Accountant or Admin */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Card not found, or the supplier is unknown or no longer used (an inactive supplier may stay linked) */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The version is stale (someone saved first) or the sheet sync is running; body is an array of messages */
+      409: {
         headers: {
           [name: string]: unknown;
         };

@@ -16,6 +16,7 @@ describe('PurchaseInvoicesTable', () => {
         narrowed={false}
         unavailable={false}
         onPageChange={vi.fn()}
+        onOpen={vi.fn()}
       />,
     );
     expect(screen.getByText('Реєстр порожній. Натисніть «Оновити зараз».')).toBeVisible();
@@ -29,6 +30,7 @@ describe('PurchaseInvoicesTable', () => {
         narrowed
         unavailable={false}
         onPageChange={vi.fn()}
+        onOpen={vi.fn()}
       />,
     );
     expect(screen.getByText('Рахунків за цими умовами не знайдено.')).toBeVisible();
