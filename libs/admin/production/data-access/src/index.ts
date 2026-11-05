@@ -85,3 +85,7 @@ export {
   useGetWorkshopDashboardQuery,
   useGetWorkshopReportQuery,
 } from './api/workshop-reports.api';
+export {
+  useGetWorkshopArchiveQuery,
+  useImportWorkshopArchiveMutation,
+} from './api/workshop-archive.api';

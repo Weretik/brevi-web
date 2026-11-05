@@ -3224,6 +3224,40 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/production/archive': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** A page of «Архів цеху»: one old book, newest first, found by every word and limited by date */
+    get: operations['getWorkshopArchive'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/archive/import': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Admin: move workshop-archive.json; dryRun only counts; a line already moved is skipped; any error saves nothing */
+    post: operations['importWorkshopArchive'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/production/fabric-stock': {
     parameters: {
       query?: never;
@@ -8346,6 +8380,77 @@ export interface components {
       unchanged: number;
       errors: number;
       lines: components['schemas']['ProductionReportPriceImportLine'][];
+    };
+    /** @description Another column of the old book, such as «Сезон» or «Пошив». */
+    WorkshopArchiveFieldResponse: {
+      label: string;
+      value: string;
+    };
+    WorkshopArchiveLinkResponse: {
+      label: string;
+      /** Format: uri */
+      url: string;
+    };
+    WorkshopArchiveRowResponse: {
+      id: number;
+      /** @description Row of the old book. */
+      sourceRow: number;
+      /**
+       * Format: date
+       * @description Null when the old book had no readable date.
+       */
+      date: string | null;
+      /** @description The date as written when it is not a date. */
+      dateText: string | null;
+      number: string | null;
+      client: string | null;
+      product: string | null;
+      /** @description Free text such as «10+4». */
+      quantity: string | null;
+      fabric: string | null;
+      status: string | null;
+      notes: string | null;
+      fields: components['schemas']['WorkshopArchiveFieldResponse'][];
+      links: components['schemas']['WorkshopArchiveLinkResponse'][];
+    };
+    WorkshopArchivePageResponse: {
+      /** @enum {string} */
+      kind: 'Schedule' | 'Request';
+      page: number;
+      pageSize: number;
+      total: number;
+      items: components['schemas']['WorkshopArchiveRowResponse'][];
+    };
+    WorkshopArchiveImportRow: {
+      /** @enum {string} */
+      kind: 'Schedule' | 'Request';
+      /** @description Unique: «schedule:12» or the old request id. */
+      sourceKey: string;
+      sourceRow: number;
+      /** Format: date */
+      date?: string | null;
+      dateText?: string | null;
+      number?: string | null;
+      client?: string | null;
+      product?: string | null;
+      quantity?: string | null;
+      fabric?: string | null;
+      status?: string | null;
+      notes?: string | null;
+      fields: components['schemas']['WorkshopArchiveFieldResponse'][];
+      links: components['schemas']['WorkshopArchiveLinkResponse'][];
+    };
+    WorkshopArchiveImportError: {
+      sourceKey: string;
+      error: string;
+    };
+    WorkshopArchiveImportResult: {
+      dryRun: boolean;
+      created: number;
+      /** @description Lines already in the archive. */
+      unchanged: number;
+      errors: number;
+      errorLines: components['schemas']['WorkshopArchiveImportError'][];
     };
     FabricStockRowResponse: {
       /** @description Null for a fabric and colour open orders plan but the stock never held. */
@@ -20032,6 +20137,101 @@ export interface operations {
         content?: never;
       };
       /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders); the person may not make this change. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getWorkshopArchive: {
+    parameters: {
+      query: {
+        kind: 'Schedule' | 'Request';
+        search?: string;
+        from?: string;
+        to?: string;
+        page?: number;
+        pageSize?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['WorkshopArchivePageResponse'];
+        };
+      };
+      /** @description Unknown kind, wrong period or page */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  importWorkshopArchive: {
+    parameters: {
+      query?: {
+        dryRun?: boolean;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['WorkshopArchiveImportRow'][];
+      };
+    };
+    responses: {
+      /** @description What was or would be moved */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['WorkshopArchiveImportResult'];
+        };
+      };
+      /** @description Empty file or more than 5000 rows */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
       403: {
         headers: {
           [name: string]: unknown;

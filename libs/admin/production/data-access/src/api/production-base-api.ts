@@ -13,5 +13,6 @@ export const productionBaseApi = adminApi.enhanceEndpoints({
     'SewingForecast',
     'Timesheet',
     'Payroll',
+    'WorkshopArchive',
   ],
 });
