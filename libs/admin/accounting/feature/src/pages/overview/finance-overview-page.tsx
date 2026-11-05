@@ -7,6 +7,7 @@ import { FinanceBalancesTable, FinanceOverviewSummary } from '@admin/accounting/
 import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
 import {
+  Alert,
   Box,
   Button,
   Paper,
@@ -16,7 +17,9 @@ import {
   ToggleButtonGroup,
 } from '@mui/material';
 import { useMemo, useState } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 
+import { financeReviewPath } from '../../accounting.routes';
 import { useAccountingSettings } from '../../hooks/accounts/use-accounting-settings';
 
 import type { LedgerScope } from '@admin/accounting/model';
@@ -131,6 +134,19 @@ export function FinanceOverviewPage() {
         actionMessage={null}
         onCloseActionMessage={() => undefined}
       />
+      {query.data && query.data.needsReviewCount > 0 && scope !== 'LegacyArchive' && (
+        <Alert
+          severity="warning"
+          sx={{ mb: 2 }}
+          action={
+            <Button color="inherit" size="small" component={RouterLink} to={financeReviewPath}>
+              Перевірити
+            </Button>
+          }
+        >
+          Потребують перевірки: {query.data.needsReviewCount} операцій поточного обліку.
+        </Alert>
+      )}
       {query.data && (
         <FinanceOverviewSummary
           currencies={query.data.currencies}

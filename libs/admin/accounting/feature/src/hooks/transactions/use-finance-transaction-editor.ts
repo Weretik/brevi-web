@@ -4,6 +4,7 @@ import {
   useUpdateFinanceTransactionMutation,
 } from '@admin/accounting/data-access';
 import {
+  counterpartyDefaultCategory,
   createFinanceTransactionFormValues,
   financeTransactionBody,
   formatSignedMinor,
@@ -15,6 +16,7 @@ import { useState } from 'react';
 
 import type {
   CategoryDirection,
+  FinanceCategory,
   FinanceTransaction,
   FinanceTransactionField,
   FinanceTransactionFieldErrors,
@@ -32,6 +34,8 @@ interface Options {
   cutoverDate: string;
   /** Date of a new operation. */
   date: string;
+  /** For the default category of a picked counterparty. */
+  categories: readonly FinanceCategory[];
   onSaved: (message: string) => void;
 }
 
@@ -44,7 +48,7 @@ export const canEditTransaction = (transaction: FinanceTransaction) =>
  * that keeps the date, account, type and category.
  */
 export function useFinanceTransactionEditor(options: Options) {
-  const { scope, cutoverDate, onSaved } = options;
+  const { scope, cutoverDate, categories, onSaved } = options;
   const [mode, setMode] = useState(options.mode);
   const transaction = options.transaction;
   const [values, setValues] = useState(() =>
@@ -70,6 +74,16 @@ export function useFinanceTransactionEditor(options: Options) {
       // A new type or root makes the old category choice meaningless.
       if (field === 'type') return { ...next, rootId: '', subcategoryId: '' };
       if (field === 'rootId') return { ...next, subcategoryId: '' };
+      // A picked counterparty brings its default category into an empty category field.
+      if (field === 'counterparty' && !current.rootId) {
+        const category = counterpartyDefaultCategory(
+          categories,
+          next.counterparty,
+          scope,
+          next.type,
+        );
+        if (category) return { ...next, ...category };
+      }
       return next;
     });
     setErrors((current) => ({ ...current, [field]: undefined }));

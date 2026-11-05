@@ -6,6 +6,7 @@ import {
 import { ReferenceEditorDrawer, ReferenceFormSection } from '@admin/references/ui';
 import { Alert, Button, Stack } from '@mui/material';
 
+import { useFinanceCounterpartySearch } from '../../hooks/counterparties/use-finance-counterparty-search';
 import {
   canEditTransaction,
   useFinanceTransactionEditor,
@@ -47,7 +48,17 @@ export function FinanceTransactionDrawer({
   onVoid,
   ...props
 }: Props) {
-  const editor = useFinanceTransactionEditor({ ...props, scope, cutoverDate, date, onSaved });
+  const editor = useFinanceTransactionEditor({
+    ...props,
+    scope,
+    cutoverDate,
+    date,
+    categories: choices.categories,
+    onSaved,
+  });
+  const counterparties = useFinanceCounterpartySearch(editor.mode !== 'view', (choice) =>
+    editor.change('counterparty', choice),
+  );
   const transaction = editor.transaction;
   const readOnly = editor.mode === 'view';
   const editable = transaction ? canEditTransaction(transaction) : true;
@@ -73,6 +84,7 @@ export function FinanceTransactionDrawer({
     >
       <Stack sx={{ gap: 2 }}>
         {editor.message && <Alert severity="error">{editor.message}</Alert>}
+        {counterparties.error && <Alert severity="error">{counterparties.error}</Alert>}
         {editor.notice && <Alert severity="info">{editor.notice}</Alert>}
         {readOnly && transaction ? (
           <>
@@ -101,6 +113,7 @@ export function FinanceTransactionDrawer({
                   )
                 : []
             }
+            counterpartySearch={counterparties.field}
             addNext={
               transaction ? undefined : { checked: editor.addNext, onChange: editor.setAddNext }
             }

@@ -6,6 +6,11 @@ import {
 import { ReferenceFormSection } from '@admin/references/ui';
 import { FormControlLabel, MenuItem, Stack, Switch, TextField } from '@mui/material';
 
+import { FinanceCategoryFields } from './finance-category-fields';
+import { FinanceCounterpartyFields } from './finance-counterparty-fields';
+
+import type { FinanceNamedChoice } from './finance-category-fields';
+import type { FinanceCounterpartySearch } from './finance-counterparty-fields';
 import type {
   CategoryDirection,
   FinanceTransactionField,
@@ -13,18 +18,14 @@ import type {
   FinanceTransactionFormValues,
 } from '@admin/accounting/model';
 
-interface Choice {
-  id: string;
-  name: string;
-}
-
 interface Props {
   values: FinanceTransactionFormValues;
   errors: FinanceTransactionFieldErrors;
   /** Accounts the operation may use, with the currency in the name. */
-  accounts: Choice[];
-  roots: Choice[];
-  children: Choice[];
+  accounts: FinanceNamedChoice[];
+  roots: FinanceNamedChoice[];
+  children: FinanceNamedChoice[];
+  counterpartySearch: FinanceCounterpartySearch;
   /** Only for a new operation: keep the form open for the next one. */
   addNext?: { checked: boolean; onChange: (checked: boolean) => void };
   onChange: <Field extends FinanceTransactionField>(
@@ -42,6 +43,7 @@ export function FinanceTransactionForm({
   accounts,
   roots,
   children,
+  counterpartySearch,
   addNext,
   onChange,
 }: Props) {
@@ -102,52 +104,25 @@ export function FinanceTransactionForm({
         />
       </ReferenceFormSection>
       <ReferenceFormSection title="Категорія">
-        <TextField
-          select
-          label="Категорія"
-          value={values.rootId}
-          onChange={(event) => onChange('rootId', event.target.value)}
-          error={Boolean(errors.rootId)}
-          helperText={
-            errors.rootId ?? (roots.length ? undefined : 'Спершу додайте категорію в «Категоріях».')
-          }
-          fullWidth
-        >
-          {roots.map((root) => (
-            <MenuItem key={root.id} value={root.id}>
-              {root.name}
-            </MenuItem>
-          ))}
-        </TextField>
-        <TextField
-          select
-          label="Підкатегорія"
-          value={values.subcategoryId}
-          disabled={!children.length}
-          onChange={(event) => onChange('subcategoryId', event.target.value)}
-          fullWidth
-        >
-          <MenuItem value="">Без підкатегорії</MenuItem>
-          {children.map((child) => (
-            <MenuItem key={child.id} value={child.id}>
-              {child.name}
-            </MenuItem>
-          ))}
-        </TextField>
+        <FinanceCategoryFields
+          rootId={values.rootId}
+          subcategoryId={values.subcategoryId}
+          roots={roots}
+          children={children}
+          error={errors.rootId}
+          onRootChange={(id) => onChange('rootId', id)}
+          onSubcategoryChange={(id) => onChange('subcategoryId', id)}
+        />
+      </ReferenceFormSection>
+      <ReferenceFormSection title="Контрагент">
+        <FinanceCounterpartyFields
+          values={values}
+          errors={errors}
+          search={counterpartySearch}
+          onChange={onChange}
+        />
       </ReferenceFormSection>
       <ReferenceFormSection title="Подробиці">
-        <TextField
-          label="Разовий контрагент"
-          value={values.oneoffName}
-          onChange={(event) => onChange('oneoffName', event.target.value)}
-          error={Boolean(errors.oneoffName)}
-          helperText={
-            errors.oneoffName ??
-            'Назва лише для цієї операції; довідник контрагентів — на наступному етапі.'
-          }
-          slotProps={{ htmlInput: { maxLength: financeTransactionLimits.oneoffName } }}
-          fullWidth
-        />
         <TextField
           label="Опис"
           value={values.description}

@@ -6,6 +6,8 @@ export interface FinanceOverview {
   from: string;
   to: string;
   currencies: FinanceOverviewCurrency[];
+  /** Active current operations of «Потребують перевірки», whatever the period. */
+  needsReviewCount: number;
 }
 
 /**

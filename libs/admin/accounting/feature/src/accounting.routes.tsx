@@ -4,7 +4,11 @@ import type { RouteObject } from 'react-router-dom';
 
 const FinanceAccountsPage = lazy(() => import('./pages/accounts/finance-accounts-page'));
 const FinanceCategoriesPage = lazy(() => import('./pages/categories/finance-categories-page'));
+const FinanceCounterpartiesPage = lazy(
+  () => import('./pages/counterparties/finance-counterparties-page'),
+);
 const FinanceOverviewPage = lazy(() => import('./pages/overview/finance-overview-page'));
+const FinanceReviewPage = lazy(() => import('./pages/review/finance-review-page'));
 const FinanceTransactionsPage = lazy(
   () => import('./pages/transactions/finance-transactions-page'),
 );
@@ -12,7 +16,9 @@ const FinanceTransfersPage = lazy(() => import('./pages/transfers/finance-transf
 
 export const financeAccountsPath = '/accounting/accounts';
 export const financeCategoriesPath = '/accounting/categories';
+export const financeCounterpartiesPath = '/accounting/counterparties';
 export const financeOverviewPath = '/accounting/overview';
+export const financeReviewPath = '/accounting/review';
 export const financeTransactionsPath = '/accounting/transactions';
 export const financeTransfersPath = '/accounting/transfers';
 
@@ -21,6 +27,8 @@ export const accountingRoutes: (RouteObject & { path: string })[] = [
   { path: financeOverviewPath, element: <FinanceOverviewPage /> },
   { path: financeTransactionsPath, element: <FinanceTransactionsPage /> },
   { path: financeTransfersPath, element: <FinanceTransfersPage /> },
+  { path: financeReviewPath, element: <FinanceReviewPage /> },
+  { path: financeCounterpartiesPath, element: <FinanceCounterpartiesPage /> },
   { path: financeAccountsPath, element: <FinanceAccountsPage /> },
   { path: financeCategoriesPath, element: <FinanceCategoriesPage /> },
 ];

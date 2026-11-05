@@ -1,4 +1,5 @@
 import {
+  financeCounterpartiesTag,
   financeHistoryTag,
   financeMovementTags,
   financeTransactionsTag,
@@ -16,6 +17,7 @@ import type {
   FinanceTransaction,
   FinanceTransactionBody,
   FinanceTransactionPage,
+  FinanceTransactionReviewBody,
   LedgerScope,
 } from '@admin/accounting/model';
 
@@ -24,7 +26,7 @@ const one = (id: string) => `${transactions}/${encodeURIComponent(id)}`;
 
 /** A saved operation changes balances, the overview, the journal and its own history. */
 const changed = (_: unknown, error: unknown, { id }: { id: string }) =>
-  error ? [] : [...financeMovementTags, financeHistoryTag(id)];
+  error ? [] : [...financeMovementTags, financeCounterpartiesTag, financeHistoryTag(id)];
 
 export function financeTransactionEndpoints(build: AccountingEndpointBuilder) {
   return {
@@ -45,7 +47,8 @@ export function financeTransactionEndpoints(build: AccountingEndpointBuilder) {
       query: (body) => ({ url: transactions, method: 'POST', body }),
       transformResponse: mapFinanceTransaction,
       transformErrorResponse: accountingApiError,
-      invalidatesTags: (_, error) => (error ? [] : financeMovementTags),
+      invalidatesTags: (_, error) =>
+        error ? [] : [...financeMovementTags, financeCounterpartiesTag],
     }),
     updateFinanceTransaction: build.mutation<
       FinanceTransaction,
@@ -58,6 +61,27 @@ export function financeTransactionEndpoints(build: AccountingEndpointBuilder) {
     }),
     voidFinanceTransaction: build.mutation<FinanceTransaction, { id: string; version: number }>({
       query: ({ id, version }) => ({ url: `${one(id)}/void`, method: 'POST', body: { version } }),
+      transformResponse: mapFinanceTransaction,
+      transformErrorResponse: accountingApiError,
+      invalidatesTags: changed,
+    }),
+    /** «Перевірити»: the category and who the operation is with. */
+    reviewFinanceTransaction: build.mutation<
+      FinanceTransaction,
+      { id: string; body: FinanceTransactionReviewBody }
+    >({
+      query: ({ id, body }) => ({ url: `${one(id)}/review`, method: 'PUT', body }),
+      transformResponse: mapFinanceTransaction,
+      transformErrorResponse: accountingApiError,
+      invalidatesTags: changed,
+    }),
+    /** «Зробити постійним»: the one-off name becomes a finance counterparty. */
+    promoteFinanceOneoff: build.mutation<FinanceTransaction, { id: string; version: number }>({
+      query: ({ id, version }) => ({
+        url: `${one(id)}/promote-oneoff`,
+        method: 'POST',
+        body: { version },
+      }),
       transformResponse: mapFinanceTransaction,
       transformErrorResponse: accountingApiError,
       invalidatesTags: changed,

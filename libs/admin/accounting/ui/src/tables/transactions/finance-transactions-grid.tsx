@@ -2,6 +2,7 @@ import {
   formatLedgerDate,
   formatSignedMinor,
   movementSourceLabels,
+  transactionCounterpartyLabel,
   verificationProblemLabels,
 } from '@admin/accounting/model';
 import { ReferenceDataGrid } from '@admin/references/ui';
@@ -33,6 +34,10 @@ interface Props {
   onView: (transaction: FinanceTransaction) => void;
   onEdit: (transaction: FinanceTransaction) => void;
   onVoid: (id: string) => void;
+  /** The menu action that calls `onVoid`; «Анулювати» by default. */
+  actionLabel?: string;
+  ariaLabel?: string;
+  emptyLabel?: string;
 }
 
 const noSelection: GridRowSelectionModel = { type: 'include', ids: new Set() };
@@ -98,15 +103,22 @@ const columns: GridColDef<FinanceTransactionRow>[] = [
     ),
   },
   {
-    field: 'oneoffName',
+    field: 'counterparty',
     headerName: 'Контрагент',
-    width: 190,
+    width: 210,
     sortable: false,
     renderCell: ({ row }) => {
       const problem = verificationProblemLabels[row.verification];
+      const label = transactionCounterpartyLabel(row);
       return (
-        <Stack sx={{ py: 0.5, gap: 0.5, alignItems: 'flex-start' }}>
-          <span>{row.oneoffName || '—'}</span>
+        <Stack sx={{ py: 0.5, gap: 0.5, alignItems: 'flex-start', lineHeight: 1.3 }}>
+          <span>{label.name}</span>
+          {label.caption && (
+            <Typography variant="caption" color="text.secondary">
+              {label.caption}
+            </Typography>
+          )}
+          {label.missing && <FinanceProblemPill label="Немає в довіднику" />}
           {problem && <FinanceProblemPill label={problem} />}
         </Stack>
       );
@@ -130,10 +142,18 @@ const columns: GridColDef<FinanceTransactionRow>[] = [
 ];
 
 /** «Операції»: 50 rows per page from the server; sort by date or amount. */
-export function FinanceTransactionsGrid({ rows, rowCount, onVoid, ...props }: Props) {
+export function FinanceTransactionsGrid({
+  rows,
+  rowCount,
+  onVoid,
+  actionLabel = 'Анулювати',
+  ariaLabel = 'Операції',
+  emptyLabel = 'Операцій поки немає',
+  ...props
+}: Props) {
   return (
     <ReferenceDataGrid
-      ariaLabel="Операції"
+      ariaLabel={ariaLabel}
       rows={rows.map((row) => ({
         ...row,
         name: `${formatLedgerDate(row.date)} ${signed(row)}`,
@@ -142,7 +162,7 @@ export function FinanceTransactionsGrid({ rows, rowCount, onVoid, ...props }: Pr
       loading={props.loading}
       searching={props.searching}
       unavailable={props.unavailable}
-      emptyLabel="Операцій поки немає"
+      emptyLabel={emptyLabel}
       notFoundLabel="За цими фільтрами операцій немає"
       menuLabel="Дії операції"
       selectable={false}
@@ -151,7 +171,7 @@ export function FinanceTransactionsGrid({ rows, rowCount, onVoid, ...props }: Pr
       onView={props.onView}
       onEdit={props.onEdit}
       onDelete={onVoid}
-      deleteLabel="Анулювати"
+      deleteLabel={actionLabel}
       server={{
         rowCount,
         paginationModel: props.paginationModel,

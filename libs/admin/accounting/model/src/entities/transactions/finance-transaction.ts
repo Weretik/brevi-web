@@ -1,5 +1,9 @@
 import type { CategoryDirection, LedgerScope } from '../categories/finance-category';
 import type {
+  FinanceCounterpartyLink,
+  FinanceCounterpartyRef,
+} from '../counterparties/finance-counterparty';
+import type {
   MovementSource,
   MovementStatus,
   VerificationStatus,
@@ -26,6 +30,8 @@ export interface FinanceTransaction {
   categoryRootName: string | null;
   /** Only when a subcategory was chosen. */
   subcategoryName: string | null;
+  /** The chosen counterparty; null with an optional one-off name. */
+  counterparty: FinanceCounterpartyRef | null;
   oneoffName: string;
   description: string;
   comment: string;
@@ -62,7 +68,17 @@ export interface FinanceTransactionBody {
   accountId: string;
   amountMinor: number;
   categoryId: string;
+  /** Cannot go together with `oneoffName`. */
+  counterparty: FinanceCounterpartyLink | null;
   oneoffName: string | null;
   description: string | null;
   comment: string | null;
+}
+
+/** «Перевірити»: the category and who the operation is with. */
+export interface FinanceTransactionReviewBody {
+  categoryId: string;
+  counterparty: FinanceCounterpartyLink | null;
+  oneoffName: string | null;
+  version: number;
 }

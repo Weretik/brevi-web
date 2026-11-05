@@ -1,12 +1,18 @@
 import { minorToInput, parseMoneyToMinor } from '../../mappers/money/finance-money';
+import { categoryPickerValues } from '../counterparties/finance-counterparty-form';
 
 import type {
   CategoryDirection,
   FinanceCategory,
 } from '../../entities/categories/finance-category';
 import type {
+  FinanceCounterpartyChoice,
+  FinanceCounterpartyRef,
+} from '../../entities/counterparties/finance-counterparty';
+import type {
   FinanceTransaction,
   FinanceTransactionBody,
+  FinanceTransactionReviewBody,
 } from '../../entities/transactions/finance-transaction';
 import type { FinanceTransactionFormValues } from '../../validators/transactions/finance-transaction-validation';
 
@@ -24,9 +30,26 @@ export function createFinanceTransactionFormValues(
     rootId: transaction?.categoryRootId ?? '',
     subcategoryId: isChild ? (transaction?.categoryId ?? '') : '',
     amount: transaction ? minorToInput(transaction.amountMinor) : '',
+    counterparty: counterpartyChoiceOf(transaction?.counterparty ?? null),
+    oneoff: Boolean(transaction?.oneoffName),
     oneoffName: transaction?.oneoffName ?? '',
     description: transaction?.description ?? '',
     comment: transaction?.comment ?? '',
+  };
+}
+
+/** The saved counterparty of an operation as a choice of its picker. */
+export function counterpartyChoiceOf(
+  ref: FinanceCounterpartyRef | null,
+): FinanceCounterpartyChoice | null {
+  if (!ref) return null;
+  return {
+    kind: ref.kind,
+    id: ref.id,
+    name: ref.name,
+    hint: '',
+    verified: ref.verified,
+    defaultCategoryId: null,
   };
 }
 
@@ -37,7 +60,15 @@ export function createFinanceTransactionFormValues(
 export function nextFinanceTransactionFormValues(
   values: FinanceTransactionFormValues,
 ): FinanceTransactionFormValues {
-  return { ...values, amount: '', oneoffName: '', description: '', comment: '' };
+  return {
+    ...values,
+    amount: '',
+    counterparty: null,
+    oneoff: false,
+    oneoffName: '',
+    description: '',
+    comment: '',
+  };
 }
 
 /** Request fields; call only after validation passed. */
@@ -50,7 +81,11 @@ export function financeTransactionBody(
     accountId: values.accountId,
     amountMinor: parseMoneyToMinor(values.amount) ?? 0,
     categoryId: values.subcategoryId || values.rootId,
-    oneoffName: values.oneoffName.trim() || null,
+    counterparty:
+      values.oneoff || !values.counterparty
+        ? null
+        : { kind: values.counterparty.kind, id: values.counterparty.id },
+    oneoffName: values.oneoff ? values.oneoffName.trim() || null : null,
     description: values.description.trim() || null,
     comment: values.comment.trim() || null,
   };
@@ -76,4 +111,29 @@ export function financeCategoryChoices(
         (row.active || row.id === keepId),
     )
     .sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name, 'uk'));
+}
+
+/** «Перевірити»: only the category and who the operation is with. */
+export function financeTransactionReviewBody(
+  values: FinanceTransactionFormValues,
+  version: number,
+): FinanceTransactionReviewBody {
+  const { categoryId, counterparty, oneoffName } = financeTransactionBody(values);
+  return { categoryId, counterparty, oneoffName, version };
+}
+
+/**
+ * The default category of a picked counterparty, when it fits the operation: an active category
+ * of the same area and direction.
+ */
+export function counterpartyDefaultCategory(
+  categories: readonly FinanceCategory[],
+  choice: FinanceCounterpartyChoice | null,
+  scope: FinanceCategory['scope'],
+  type: CategoryDirection,
+): { rootId: string; subcategoryId: string } | null {
+  const category = categories.find((row) => row.id === choice?.defaultCategoryId);
+  if (!category || !category.active || category.scope !== scope || category.direction !== type)
+    return null;
+  return categoryPickerValues(categories, category.id);
 }
