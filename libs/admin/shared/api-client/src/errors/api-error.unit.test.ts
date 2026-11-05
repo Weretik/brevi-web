@@ -49,4 +49,18 @@ describe('API error normalization', () => {
       status: 409,
     });
   });
+
+  it('reads a backend { errors: [text] } body such as a 503 from an external system', () => {
+    const error = new AxiosError('Request failed with status code 503');
+    error.response = {
+      data: { errors: ['Google не дає доступу до таблиці.'] },
+      status: 503,
+    } as typeof error.response;
+
+    expect(toApiError(error)).toMatchObject({
+      code: 'Server',
+      message: 'Google не дає доступу до таблиці.',
+      status: 503,
+    });
+  });
 });

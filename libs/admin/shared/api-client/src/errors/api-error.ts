@@ -72,6 +72,8 @@ const responseMessage = (value: unknown): string | undefined => {
   const messages = items.flatMap((item) => {
     if (typeof item === 'string') return [item];
     if (!isRecord(item)) return [];
+    const errors = toStringArray(item['errors']);
+    if (errors) return errors;
     const message = item['errorMessage'] ?? item['ErrorMessage'] ?? item['message'];
     return typeof message === 'string' ? [message] : [];
   });
