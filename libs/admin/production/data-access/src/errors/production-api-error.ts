@@ -68,6 +68,11 @@ export const timesheetErrors = {
   conflict: 'Години вже змінили. Оновіть сторінку.',
 } satisfies AdminApiErrorMessages;
 
+export const reportErrors = {
+  ...common,
+  unauthorized: 'Звіти цеху доступні лише адміністратору.',
+} satisfies AdminApiErrorMessages;
+
 export const payrollErrors = {
   ...common,
   unauthorized: 'Ця дія вам недоступна.',

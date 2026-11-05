@@ -345,3 +345,24 @@ export type {
   PayrollPaymentFormValues,
 } from './forms/payroll-forms';
 export { payrollCsv } from './queries/payroll-csv';
+export { WORKSHOP_REPORT_MAX_MONTHS } from './entities/workshop-report';
+export type {
+  ReportIssueRow,
+  ReportOutputRow,
+  ReportStaffRow,
+  ReportStockRow,
+  WorkshopDashboard,
+  WorkshopDashboardHours,
+  WorkshopDashboardOrder,
+  WorkshopDashboardStage,
+  WorkshopReport,
+  WorkshopReportPair,
+  WorkshopReportQuery,
+  WorkshopReportTotals,
+} from './entities/workshop-report';
+export {
+  previousReportPeriod,
+  reportMonthCount,
+  reportPeriodLabel,
+  reportPeriodProblem,
+} from './forms/workshop-report-period';

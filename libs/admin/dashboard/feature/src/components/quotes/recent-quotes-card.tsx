@@ -1,7 +1,6 @@
 import {
   Box,
   Card,
-  Chip,
   Link,
   Stack,
   Table,
@@ -14,13 +13,12 @@ import {
 import { Link as RouterLink } from 'react-router-dom';
 
 import { QuoteStatusPill } from './quote-status-pill';
-import { formatAmount, quoteFilters } from '../../model/dashboard-demo';
 import { numericTextSx } from '../../model/numeric-text';
 
-import type { DemoQuote } from '../../model/dashboard-demo';
+import type { RecentQuote } from '../../model/dashboard-view';
 
 interface RecentQuotesCardProps {
-  quotes: readonly DemoQuote[];
+  quotes: readonly RecentQuote[];
 }
 
 const headerCellSx = {
@@ -32,6 +30,7 @@ const headerCellSx = {
   whiteSpace: 'nowrap',
 } as const;
 
+/** The latest КП in work, newest first. */
 export function RecentQuotesCard({ quotes }: RecentQuotesCardProps) {
   return (
     <Card aria-labelledby="recent-quotes-title" component="section" sx={{ minWidth: 0, p: 2 }}>
@@ -46,72 +45,61 @@ export function RecentQuotesCard({ quotes }: RecentQuotesCardProps) {
         }}
       >
         <Typography component="h2" id="recent-quotes-title" variant="h6">
-          Розрахунки та КП
+          Останні КП
         </Typography>
-        <Stack direction="row" sx={{ alignItems: 'center', gap: 0.75 }}>
-          {quoteFilters.map((filter, index) => (
-            <Chip
-              color={index === 0 ? 'secondary' : 'default'}
-              key={filter.label}
-              label={`${filter.label} ${filter.count}`}
-              size="small"
-              variant={index === 0 ? 'filled' : 'outlined'}
-            />
-          ))}
-          <Link
-            component={RouterLink}
-            sx={{ color: 'primary.dark', fontSize: 13, fontWeight: 700, ml: 1 }}
-            to="/crm/quotes"
-            underline="hover"
-          >
-            Усі КП
-          </Link>
-        </Stack>
+        <Link
+          component={RouterLink}
+          sx={{ color: 'primary.dark', fontSize: 13, fontWeight: 700 }}
+          to="/crm/quotes"
+          underline="hover"
+        >
+          Усі КП
+        </Link>
       </Stack>
-      <Box sx={{ mx: -2, overflowX: 'auto' }}>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ ...headerCellSx, pl: 2 }}>№</TableCell>
-              <TableCell sx={headerCellSx}>Клієнт</TableCell>
-              <TableCell sx={headerCellSx}>Виріб</TableCell>
-              <TableCell align="right" sx={headerCellSx}>
-                К-сть
-              </TableCell>
-              <TableCell align="right" sx={headerCellSx}>
-                Сума, ₴
-              </TableCell>
-              <TableCell sx={{ ...headerCellSx, pr: 2 }}>Статус</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {quotes.map((quote) => (
-              <TableRow
-                hover
-                key={quote.number}
-                sx={{ '& td': { borderColor: 'divider', whiteSpace: 'nowrap' } }}
-              >
-                <TableCell sx={{ ...numericTextSx, pl: 2 }}>{quote.number}</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>{quote.client}</TableCell>
-                <TableCell
-                  sx={{ color: 'text.secondary', minWidth: 160, whiteSpace: 'normal !important' }}
-                >
-                  {quote.product}
+      {quotes.length === 0 ? (
+        <Typography color="text.secondary" variant="body2">
+          КП в роботі ще немає.
+        </Typography>
+      ) : (
+        <Box sx={{ mx: -2, overflowX: 'auto' }}>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ ...headerCellSx, pl: 2 }}>№</TableCell>
+                <TableCell sx={headerCellSx}>Клієнт</TableCell>
+                <TableCell sx={headerCellSx}>Відповідальний</TableCell>
+                <TableCell align="right" sx={headerCellSx}>
+                  Позицій
                 </TableCell>
-                <TableCell align="right" sx={numericTextSx}>
-                  {quote.quantity}
-                </TableCell>
-                <TableCell align="right" sx={numericTextSx}>
-                  {formatAmount(quote.amount)}
-                </TableCell>
-                <TableCell sx={{ pr: 2 }}>
-                  <QuoteStatusPill label={quote.status.label} tone={quote.status.tone} />
-                </TableCell>
+                <TableCell sx={{ ...headerCellSx, pr: 2 }}>Статус</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Box>
+            </TableHead>
+            <TableBody>
+              {quotes.map((quote) => (
+                <TableRow
+                  hover
+                  key={quote.id}
+                  sx={{ '& td': { borderColor: 'divider', whiteSpace: 'nowrap' } }}
+                >
+                  <TableCell sx={{ ...numericTextSx, pl: 2 }}>
+                    <Link component={RouterLink} to={`/crm/quotes/${quote.id}`} underline="hover">
+                      {quote.number}
+                    </Link>
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>{quote.client}</TableCell>
+                  <TableCell sx={{ color: 'text.secondary' }}>{quote.responsible}</TableCell>
+                  <TableCell align="right" sx={numericTextSx}>
+                    {quote.items}
+                  </TableCell>
+                  <TableCell sx={{ pr: 2 }}>
+                    <QuoteStatusPill label={quote.status.label} tone={quote.status.tone} />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Box>
+      )}
     </Card>
   );
 }

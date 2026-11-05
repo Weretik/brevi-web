@@ -3185,6 +3185,40 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/production/reports': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** «Звіти цеху» of the months from..to (at most 12) and, with both compare months, the months to compare with (Admin) */
+    get: operations['getWorkshopReport'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/dashboard': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** «Огляд виробництва»: open orders by stage, late and ready to ship (everyone with production orders) */
+    get: operations['getWorkshopDashboard'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/production/timesheet': {
     parameters: {
       query?: never;
@@ -7926,6 +7960,126 @@ export interface components {
       /** @description Orders in the new order; the rest follow by order date. */
       orderIds: number[];
     };
+    WorkshopReportTotalsResponse: {
+      sewnPieces: number;
+      /** @description Only pieces with a КП price. */
+      outputValue: number;
+      unpricedPieces: number;
+      accrued: number;
+      minutes: number;
+      issuedMeters: number;
+      issuedValue: number;
+      unpricedIssuedMeters: number;
+      stockMeters: number;
+      /** @description Positive balances at the current price of «Тканини». */
+      stockValue: number;
+      unpricedStockMeters: number;
+    };
+    ReportOutputRowResponse: {
+      orderId: number;
+      orderNumber: number;
+      clientName: string;
+      itemId: number;
+      modelName: string;
+      /** @description Pieces sewn within the plan, not cancelled. */
+      quantity: number;
+      /** @description The item report price of the КП. */
+      unitPrice: number | null;
+      value: number | null;
+    };
+    ReportStaffRowResponse: {
+      employeeId: number;
+      name: string;
+      position: string;
+      minutes: number;
+      sewn: number;
+      cut: number;
+      accrued: number;
+      /** @description Accrued per 8 hours of «Робочий час»; null without hours. */
+      dayAverage: number | null;
+    };
+    ReportIssueRowResponse: {
+      movementId: number;
+      /** Format: date */
+      issuedOn: string;
+      fabricCode: string;
+      fabricName: string;
+      color: string;
+      orderId: number | null;
+      orderNumber: number | null;
+      modelName: string | null;
+      meters: number;
+      pricePerMeter: number | null;
+      value: number | null;
+    };
+    ReportStockRowResponse: {
+      stockId: number;
+      fabricCode: string;
+      fabricName: string;
+      color: string;
+      /** @description Balance at the end of the last month; may be negative. */
+      meters: number;
+      pricePerMeter: number | null;
+      value: number | null;
+    };
+    /** @description «Звіти цеху» of the months from..to; several months are the sum of their months, the stock is at the end of the last one. */
+    WorkshopReportResponse: {
+      from: string;
+      to: string;
+      /** @description Months closed in «Зарплата»: read as they were closed. */
+      closedMonths: string[];
+      /** @description Counted from the current data; can still change. */
+      openMonths: string[];
+      totals: components['schemas']['WorkshopReportTotalsResponse'];
+      output: components['schemas']['ReportOutputRowResponse'][];
+      staff: components['schemas']['ReportStaffRowResponse'][];
+      materials: components['schemas']['ReportIssueRowResponse'][];
+      stock: components['schemas']['ReportStockRowResponse'][];
+      /** @description Warnings of «Зарплата» in the months. */
+      warnings: string[];
+    };
+    WorkshopReportPairResponse: {
+      current: components['schemas']['WorkshopReportResponse'];
+      /** @description Only when compareFrom and compareTo are given. */
+      comparison: components['schemas']['WorkshopReportResponse'] | null;
+    };
+    DashboardOrderResponse: {
+      id: number;
+      number: number;
+      clientName: string;
+      /** @description The model of the first item. */
+      product: string;
+      items: number;
+      quantity: number;
+      /** @description Share of pieces sewn within the plan. */
+      progress: number;
+      /** Format: date */
+      dueDate: string;
+      isLate: boolean;
+    };
+    DashboardStageResponse: {
+      stage: number;
+      label: string;
+      orders: components['schemas']['DashboardOrderResponse'][];
+    };
+    DashboardHoursResponse: {
+      employeeId: number;
+      name: string;
+      minutes: number;
+    };
+    /** @description «Огляд виробництва» on the admin home: «Нове» orders, no prices or rates. */
+    WorkshopDashboardResponse: {
+      /** Format: date */
+      today: string;
+      openOrders: number;
+      openPieces: number;
+      lateOrders: number;
+      readyOrders: number;
+      readyPieces: number;
+      stages: components['schemas']['DashboardStageResponse'][];
+      /** @description This week by active worker; only for WorkshopChief and Admin. */
+      hours: components['schemas']['DashboardHoursResponse'][] | null;
+    };
     TimesheetRowResponse: {
       employeeId: number;
       name: string;
@@ -8074,6 +8228,7 @@ export interface components {
       canSetUp: boolean;
       /** @description Payments, adjustments, «Видано»: Admin on an open month that has started. */
       canPay: boolean;
+      /** @description Admin on an open month that has started, without a warning that blocks closing. */
       canClose: boolean;
       canReopen: boolean;
     };
@@ -8091,7 +8246,7 @@ export interface components {
       embroideryEmployee: components['schemas']['PayrollPersonResponse'] | null;
       /** @description Sewing of all workers in UAH; the base of the master and chief shares. */
       totalSewing: number;
-      /** @description Problems of the calculation; they block closing. */
+      /** @description Problems of the calculation; they block closing, except an unchosen master or chief (that share is not paid). */
       warnings: string[];
       lines: components['schemas']['PayrollLineResponse'][];
       totals: components['schemas']['PayrollTotalsResponse'];
@@ -18447,6 +18602,86 @@ export interface operations {
       };
     };
   };
+  getWorkshopReport: {
+    parameters: {
+      query: {
+        from: string;
+        to: string;
+        compareFrom?: string;
+        compareTo?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['WorkshopReportPairResponse'];
+        };
+      };
+      /** @description Invalid months, more than 12 or a future month */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getWorkshopDashboard: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['WorkshopDashboardResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   getTimesheetDay: {
     parameters: {
       query: {
@@ -19120,7 +19355,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Closed already, not started or the calculation has warnings */
+      /** @description Closed already, not started or the calculation has warnings other than an unchosen master or chief */
       409: {
         headers: {
           [name: string]: unknown;

@@ -1,9 +1,10 @@
-import { Box, Card, Chip, Stack, Typography } from '@mui/material';
+import { Box, Card, Link, Stack, Typography } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
 
 import { WorkshopOrderCard } from './workshop-order-card';
 import { numericTextSx } from '../../model/numeric-text';
 
-import type { WorkshopStage } from '../../model/dashboard-demo';
+import type { WorkshopStage } from '../../model/dashboard-view';
 
 interface WorkshopBoardProps {
   stages: readonly WorkshopStage[];
@@ -17,7 +18,7 @@ const stageDotColor: Record<WorkshopStage['tone'], string> = {
   success: 'success.main',
 };
 
-/** Workshop orders grouped by production stage (kanban). */
+/** «Нове» orders by the stage of their slowest item (kanban). */
 export function WorkshopBoard({ stages }: WorkshopBoardProps) {
   return (
     <Card component="section" aria-labelledby="workshop-board-title" sx={{ p: 2 }}>
@@ -34,11 +35,14 @@ export function WorkshopBoard({ stages }: WorkshopBoardProps) {
         <Typography component="h2" id="workshop-board-title" variant="h6">
           Дошка цеху
         </Typography>
-        <Stack direction="row" spacing={0.75}>
-          <Chip color="secondary" label="Усі" size="small" />
-          <Chip label="Мої" size="small" variant="outlined" />
-          <Chip label="Термінові" size="small" variant="outlined" />
-        </Stack>
+        <Link
+          component={RouterLink}
+          sx={{ color: 'primary.dark', fontSize: 13, fontWeight: 700 }}
+          to="/production/orders"
+          underline="hover"
+        >
+          Усі завдання
+        </Link>
       </Stack>
       <Box
         sx={{
@@ -104,9 +108,14 @@ export function WorkshopBoard({ stages }: WorkshopBoardProps) {
                 {stage.orders.length}
               </Box>
             </Box>
+            {stage.orders.length === 0 && (
+              <Typography color="text.disabled" sx={{ fontSize: 12, px: 0.5 }}>
+                Немає завдань
+              </Typography>
+            )}
             <Stack component="ul" spacing={1} sx={{ m: 0, p: 0 }}>
               {stage.orders.map((order) => (
-                <WorkshopOrderCard key={order.number} order={order} />
+                <WorkshopOrderCard key={order.id} order={order} />
               ))}
             </Stack>
           </Box>

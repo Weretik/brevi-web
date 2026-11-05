@@ -1,1 +1,5 @@
-export { createProductionOrderRoutes, createProductionRoutes } from './production.routes';
+export {
+  createProductionOrderRoutes,
+  createProductionReportRoutes,
+  createProductionRoutes,
+} from './production.routes';

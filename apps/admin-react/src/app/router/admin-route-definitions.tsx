@@ -1,9 +1,13 @@
 import { clientsRoutes } from '@admin/clients/feature';
 import { contentRoutes } from '@admin/content/feature';
-import { dashboardRoutes } from '@admin/dashboard/feature';
+import { createDashboardRoutes } from '@admin/dashboard/feature';
 import { createEmbroideryRoutes } from '@admin/embroidery/feature';
 import { mediaRoutes } from '@admin/media/feature';
-import { createProductionOrderRoutes, createProductionRoutes } from '@admin/production/feature';
+import {
+  createProductionOrderRoutes,
+  createProductionReportRoutes,
+  createProductionRoutes,
+} from '@admin/production/feature';
 import { productsRoutes } from '@admin/products/feature';
 import { createQuotesRoutes } from '@admin/quotes/feature';
 import { createReferencesRoutes } from '@admin/references/feature';
@@ -11,13 +15,14 @@ import { remindersRoutes } from '@admin/reminders/feature';
 import { createTasksRoutes } from '@admin/tasks/feature';
 
 import { useCanSeePurchaseInvoices } from './use-can-see-purchase-invoices';
+import { useDashboardViewer } from './use-dashboard-viewer';
 import { useEmbroideryViewer } from './use-embroidery-viewer';
 import { useProductionOrderActor } from './use-production-order-actor';
 import { useQuoteActor } from './use-quote-actor';
 import { useTaskViewer } from './use-task-viewer';
 
 export const adminRouteDefinitions = [
-  ...dashboardRoutes,
+  ...createDashboardRoutes({ useViewer: useDashboardViewer }),
   ...createReferencesRoutes({ useCanSeePurchaseInvoices }),
   ...clientsRoutes,
   ...createQuotesRoutes({ useQuoteActor }),
@@ -35,6 +40,9 @@ export const embroideryRoutes = createEmbroideryRoutes({ useEmbroideryViewer });
 
 /** «Швейний цех» pages need the WorkshopChief or Admin role, so the router wraps them too. */
 export const productionRoutes = createProductionRoutes({ useOrderActor: useProductionOrderActor });
+
+/** «Звіти цеху» are for Admin (the director holds Admin), so the router wraps them too. */
+export const productionReportRoutes = createProductionReportRoutes();
 
 /** «Виробничі завдання» need Admin, Manager or WorkshopChief, so the router wraps them too. */
 export const productionOrderRoutes = createProductionOrderRoutes({
