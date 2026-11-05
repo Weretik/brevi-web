@@ -1,6 +1,6 @@
 import { ppeSupplierOfferLimits } from '@admin/products/model';
 import { ReferenceFormSection } from '@admin/references/ui';
-import { Button, FormControlLabel, MenuItem, Stack, Switch, TextField } from '@mui/material';
+import { Button, FormControlLabel, Link, MenuItem, Stack, Switch, TextField } from '@mui/material';
 
 import { PpeLinkField } from './ppe-link-field';
 import { PpeSupplierSelect } from './ppe-supplier-select';
@@ -18,6 +18,10 @@ interface Props {
   suppliers: readonly PpeSupplierOption[];
   ruleNames: readonly string[];
   readOnly: boolean;
+  /** The supplier (purchase) price is for Admin only (CAT-019). */
+  showCost?: boolean;
+  /** Opens the card of the chosen supplier (CAT-019). */
+  onOpenSupplier?: (supplierId: number) => void;
   dirty: boolean;
   saving: boolean;
   onChange: <Field extends PpeSupplierOfferField>(
@@ -30,7 +34,7 @@ interface Props {
 
 /** Supplier fields of the sheet tab «ЗІЗ» (columns D, F–H, K, N, O). */
 export function PpeSupplierForm(props: Props) {
-  const { values, errors, readOnly, onChange } = props;
+  const { values, errors, readOnly, onChange, showCost = true } = props;
   const ruleMissing = values.ruleCode !== '' && !props.ruleNames.includes(values.ruleCode);
   return (
     <Stack
@@ -52,6 +56,19 @@ export function PpeSupplierForm(props: Props) {
           disabled={readOnly}
           onChange={(value) => onChange('supplierId', value)}
         />
+        {props.onOpenSupplier && typeof values.supplierId === 'number' && (
+          <Link
+            component="button"
+            type="button"
+            underline="hover"
+            onClick={() => {
+              if (typeof values.supplierId === 'number') props.onOpenSupplier?.(values.supplierId);
+            }}
+            sx={{ alignSelf: 'flex-start', color: 'primary.dark' }}
+          >
+            Переглянути постачальника
+          </Link>
+        )}
         <PpeLinkField
           label="Посилання на товар постачальника"
           openLabel="Відкрити товар постачальника"
@@ -85,17 +102,19 @@ export function PpeSupplierForm(props: Props) {
           />
         </Stack>
       </ReferenceFormSection>
-      <ReferenceFormSection title="Ціна постачальника">
-        <TextField
-          label="Ціна постачальника, грн"
-          value={values.supplierPrice}
-          onChange={(event) => onChange('supplierPrice', event.target.value)}
-          error={Boolean(errors.supplierPrice)}
-          helperText={errors.supplierPrice}
-          disabled={readOnly}
-          fullWidth
-          slotProps={{ htmlInput: { inputMode: 'decimal' } }}
-        />
+      <ReferenceFormSection title={showCost ? 'Ціна постачальника' : 'Ціноутворення'}>
+        {showCost && (
+          <TextField
+            label="Ціна постачальника, грн"
+            value={values.supplierPrice}
+            onChange={(event) => onChange('supplierPrice', event.target.value)}
+            error={Boolean(errors.supplierPrice)}
+            helperText={errors.supplierPrice}
+            disabled={readOnly}
+            fullWidth
+            slotProps={{ htmlInput: { inputMode: 'decimal' } }}
+          />
+        )}
         <FormControlLabel
           control={
             <Switch

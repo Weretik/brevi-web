@@ -10,9 +10,11 @@ import type { GarmentAccessoryFormValues } from '@admin/references/model';
 interface Props {
   values: GarmentAccessoryFormValues;
   priceUpdatedAt: string | null;
+  /** A click on the supplier opens its card (CAT-019). */
+  onOpenSupplier?: (name: string) => void;
 }
 
-export function GarmentAccessoryDetails({ values, priceUpdatedAt }: Props) {
+export function GarmentAccessoryDetails({ values, priceUpdatedAt, onOpenSupplier }: Props) {
   return (
     <Stack sx={{ gap: 2 }}>
       <ReferenceFormSection title="Основні дані">
@@ -32,7 +34,11 @@ export function GarmentAccessoryDetails({ values, priceUpdatedAt }: Props) {
       <ReferenceFormSection title="Закупівля">
         <ReferenceDetailsList
           items={[
-            { label: 'Постачальник', value: values.supplierName },
+            {
+              label: 'Постачальник',
+              value: values.supplierName,
+              onOpen: onOpenSupplier ? () => onOpenSupplier(values.supplierName) : undefined,
+            },
             { label: 'Ціна', value: formatUah(Number(values.price)), mono: true },
             { label: 'Одиниця', value: values.unit },
             { label: 'Дата ціни', value: formatIsoDate(priceUpdatedAt), mono: true },

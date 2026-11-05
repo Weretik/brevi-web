@@ -17,6 +17,8 @@ interface Props {
   rows: SewingVariantRow[];
   loading: boolean;
   canManage: boolean;
+  /** Cost columns are for Admin only (CAT-019). */
+  showCost?: boolean;
   onOpen: (row: SewingVariantRow) => void;
   onEdit: (row: SewingVariantRow) => void;
   onDelete: (row: SewingVariantRow) => void;
@@ -53,6 +55,7 @@ function moneyColumn(
 
 function columns(
   canManage: boolean,
+  showCost: boolean,
   onEdit: Props['onEdit'],
   onDelete: Props['onDelete'],
 ): GridColDef<SewingVariantRow>[] {
@@ -92,10 +95,14 @@ function columns(
       cellClassName: 'sewing-mono',
       valueFormatter: (value: number | null) => (value === null ? '—' : metres.format(value)),
     },
-    moneyColumn('materials', 'Матеріали', (row) => amount(row, ['materials', 'otherCosts'])),
-    moneyColumn('labour', 'Праця', (row) => amount(row, labourKinds)),
-    moneyColumn('overhead', 'Накладні', (row) => amount(row, ['overhead'])),
-    moneyColumn('fullCost', 'Собівартість', (row) => row.summary?.fullCost ?? null, true),
+    ...(showCost
+      ? [
+          moneyColumn('materials', 'Матеріали', (row) => amount(row, ['materials', 'otherCosts'])),
+          moneyColumn('labour', 'Праця', (row) => amount(row, labourKinds)),
+          moneyColumn('overhead', 'Накладні', (row) => amount(row, ['overhead'])),
+          moneyColumn('fullCost', 'Собівартість', (row) => row.summary?.fullCost ?? null, true),
+        ]
+      : []),
     {
       ...moneyColumn('retail', '1–9 шт.', (row) => row.summary?.prices?.retail ?? null, true),
       minWidth: 150,
@@ -164,11 +171,19 @@ function columns(
  * «Тканини» tab, as the sheet «Прайс на сайт»: one row per fabric of the model with its sale SKU,
  * metres, live cost and three prices. A row opens the side panel of the fabric.
  */
-export function SewingVariantsGrid({ rows, loading, canManage, onOpen, onEdit, onDelete }: Props) {
+export function SewingVariantsGrid({
+  rows,
+  loading,
+  canManage,
+  showCost = true,
+  onOpen,
+  onEdit,
+  onDelete,
+}: Props) {
   const theme = useTheme();
   const gridColumns = useMemo(
-    () => columns(canManage, onEdit, onDelete),
-    [canManage, onDelete, onEdit],
+    () => columns(canManage, showCost, onEdit, onDelete),
+    [canManage, showCost, onDelete, onEdit],
   );
   return (
     <Box

@@ -2,7 +2,7 @@
 
 **Status:** stages 1–2 implemented 2026-11-04. Spec: [018](../../../specs/admin/references/018-price-import/README.md); backend BreviERP CAT-017.
 
-`/references/price-import` lists PPE supplier price sources (АВ-Центр, 3C-Маркет, Перчатка-центр, Insight, Трєле, СЕМТО) with their logic, schedule, discount and last update. A row opens the side panel. Administrators and the director change the discount there. File suppliers are updated from their files, and АВ-Центр, 3C-Маркет and Перчатка-центр (updated by the backend every Monday) also with «Оновити зараз»: «Перевірити» previews old and new prices, «Застосувати» saves them.
+`/references/price-import` lists PPE supplier price sources (АВ-Центр, 3C-Маркет, Перчатка-центр, Insight, Трєле, СЕМТО) with their logic, schedule, discount and last update. A row opens the side panel; the supplier name opens the supplier card ([spec 019](../../../specs/admin/products/019-photos-cost-access-suppliers/README.md)). Administrators and the director change the discount there. File suppliers are updated from their files, and АВ-Центр, 3C-Маркет and Перчатка-центр (updated by the backend every Monday) also with «Оновити зараз»: «Перевірити» previews old and new prices, «Застосувати» saves them.
 
 ## Structure diagram
 

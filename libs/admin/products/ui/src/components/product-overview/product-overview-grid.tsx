@@ -90,7 +90,14 @@ function photoColumn(): GridColDef<ProductListRow> {
           src={row.product.mainPhotoUrl ?? undefined}
           alt={row.product.mainPhotoUrl ? row.name : undefined}
           aria-label={row.product.mainPhotoUrl ? undefined : 'Без фото'}
-          sx={{ width: 40, height: 40, bgcolor: 'action.hover', color: 'text.disabled' }}
+          // The whole photo, full height: a person is not cut to a square (CAT-019).
+          sx={{
+            width: 40,
+            height: 48,
+            bgcolor: 'action.hover',
+            color: 'text.disabled',
+            '& img': { objectFit: 'contain' },
+          }}
         >
           <ImageOutlinedIcon fontSize="small" />
         </Avatar>

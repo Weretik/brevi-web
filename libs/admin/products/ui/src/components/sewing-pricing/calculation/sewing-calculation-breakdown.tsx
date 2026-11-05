@@ -32,17 +32,11 @@ export function SewingCalculationBreakdown({
             value: calculation.minutes === null ? '—' : `${minutes.format(calculation.minutes)} хв`,
           },
           {
-            label: 'Вартість хвилини',
-            value:
-              calculation.minuteCost === null ? '—' : sewingPriceFormat(calculation.minuteCost),
-          },
-          {
             label: 'Трудовитрати, грн',
             value:
               calculation.minutes === null || calculation.minuteCost === null
                 ? '—'
                 : sewingPriceFormat(calculation.minutes * calculation.minuteCost),
-            note: 'час × вартість хвилини',
           },
         ]}
       />

@@ -42,6 +42,7 @@ export function mapProductOverviewItem(row: ProductOverviewItemResponse): Produc
       problems: variant.problems,
     })),
     mainPhotoUrl: row.mainPhotoUrl ?? null,
+    mainPhotoFullUrl: row.mainPhotoFullUrl ?? null,
   };
 }
 

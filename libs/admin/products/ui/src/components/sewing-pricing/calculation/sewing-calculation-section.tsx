@@ -8,10 +8,10 @@ import type { SewingPricingPanelProps } from '../sewing-pricing-panel-props';
 export function SewingCalculationSection(
   props: Pick<
     SewingPricingPanelProps,
-    'calculation' | 'calculationLoading' | 'calculationError' | 'onRetryCalculation'
+    'calculation' | 'calculationLoading' | 'calculationError' | 'onRetryCalculation' | 'showCost'
   >,
 ) {
-  const { calculation } = props;
+  const { calculation, showCost = true } = props;
   return (
     <>
       <Typography variant="subtitle1" component="h4">
@@ -33,7 +33,9 @@ export function SewingCalculationSection(
           {calculation.blockers.length > 0 && (
             <SewingPricingBlockers blockers={calculation.blockers} />
           )}
-          {calculation.calculated && <SewingCalculationBreakdown calculation={calculation} />}
+          {calculation.calculated && showCost && (
+            <SewingCalculationBreakdown calculation={calculation} />
+          )}
         </>
       )}
     </>

@@ -56,4 +56,5 @@
 [015 Remove review marks](015-remove-review-marks/README.md): no «Перевірено», «Обов’язковий», «Ціна в прайсі» or «Розраховано …» line; marks only for problems.
 [016 Fabric variants](016-fabric-variants/README.md): fabric per variant, one shared composition, «Тканини»/«Комплектація»/«Трудовитрати» tables with side panels, immediate save.
 [017 Sewing card in one request](017-sewing-card-one-request/README.md): one card response, labour in UAH, all three prices in the header, the fabric on «Розрахунок».
-[018 Product photos and the active switch](018-product-photos/README.md): tab «Фото», main-photo preview, «Активний» switch and filter, old-site photo import.
+[018 Product photos and the active switch](018-product-photos/README.md): tab «Фото», main-photo preview, «Активний» switch and filter.
+[019 Full photos, cost only for Admin, supplier cards](019-photos-cost-access-suppliers/README.md): photos not cut, main photo in quick view and КП, cost and supplier price for Admin only, supplier names open the supplier card.

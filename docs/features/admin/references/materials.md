@@ -7,7 +7,7 @@
 `/references/garment-accessory` and `?tab=fabrics` redirect to it. Each tab follows the
 [reference list pattern](../../../standards/admin/design-system.md):
 header with «Видалити» (only while rows are selected) and the add action, a full-width
-search row, activity chips and a supplier filter, then a Data Grid with code, names, supplier, price, price date and status pill, a row
+search row, activity chips and a supplier filter, then a Data Grid with code, names, supplier (a click opens the supplier card, [spec 019](../../../specs/admin/products/019-photos-cost-access-suppliers/README.md)), price, price date and status pill, a row
 menu, bulk deletion, and an editor drawer. Fabrics add RU names, composition,
 density and the КП description; accessories add the unit (шт., м, послуга). The
 sheet data was moved once through the backend import endpoint; the Admin has no

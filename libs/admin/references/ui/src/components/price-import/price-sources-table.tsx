@@ -17,16 +17,20 @@ import {
   Typography,
 } from '@mui/material';
 
+import { SupplierNameButton } from '../suppliers/supplier-name-button';
+
 import type { PriceSource } from '@admin/references/model';
 
 interface Props {
   sources: PriceSource[];
   loading: boolean;
   onOpen: (source: PriceSource) => void;
+  /** A click on the supplier opens its card (CAT-019). */
+  onOpenSupplier?: (source: PriceSource) => void;
 }
 
 /** «Імпорт цін» table: one row per supplier; a row opens its side panel. */
-export function PriceSourcesTable({ sources, loading, onOpen }: Props) {
+export function PriceSourcesTable({ sources, loading, onOpen, onOpenSupplier }: Props) {
   return (
     <TableContainer component={Paper} variant="outlined">
       <Table aria-label="Постачальники ЗІЗ та оновлення цін" size="small">
@@ -64,7 +68,14 @@ export function PriceSourcesTable({ sources, loading, onOpen }: Props) {
                 >
                   <TableCell>
                     <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      {source.title}
+                      {source.supplierName && onOpenSupplier ? (
+                        <SupplierNameButton
+                          name={source.title}
+                          onOpen={() => onOpenSupplier(source)}
+                        />
+                      ) : (
+                        source.title
+                      )}
                     </Typography>
                     {!source.supplierName && (
                       <Typography variant="caption" color="error">

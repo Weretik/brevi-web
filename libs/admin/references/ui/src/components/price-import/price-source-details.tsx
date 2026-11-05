@@ -12,7 +12,14 @@ import { ReferenceFormSection } from '../reference-editor/reference-form-section
 import type { PriceSource } from '@admin/references/model';
 
 /** Read-only side panel content of an «Імпорт цін» row: logic, discount, products and last update. */
-export function PriceSourceDetails({ source }: { source: PriceSource }) {
+export function PriceSourceDetails({
+  source,
+  onOpenSupplier,
+}: {
+  source: PriceSource;
+  /** A click on the supplier opens its card (CAT-019). */
+  onOpenSupplier?: () => void;
+}) {
   const run = source.lastRun;
   return (
     <Stack sx={{ gap: 2 }}>
@@ -35,6 +42,11 @@ export function PriceSourceDetails({ source }: { source: PriceSource }) {
               value:
                 priceFileLabel(source.fileKind, source.fileCount) ??
                 priceSourceMethodLabel(source.method),
+            },
+            {
+              label: 'Постачальник',
+              value: source.supplierName,
+              onOpen: source.supplierName ? onOpenSupplier : undefined,
             },
             { label: 'Розклад', value: source.schedule },
             { label: 'Логіка', value: source.logic },

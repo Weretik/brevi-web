@@ -8,7 +8,9 @@ import type { SewingPriceCalculation } from '@admin/products/model';
 const mocks = vi.hoisted(() => ({
   getPublished: vi.fn(),
   getCalculation: vi.fn(),
+  canSeeCost: vi.fn(() => true),
 }));
+vi.mock('../../hooks/product-access/use-can-see-cost', () => ({ useCanSeeCost: mocks.canSeeCost }));
 vi.mock('@admin/products/data-access', () => ({
   useGetPublishedSewingPriceQuery: mocks.getPublished,
   useGetSewingCalculationQuery: mocks.getCalculation,
@@ -82,7 +84,8 @@ describe('Article price (published automatically)', () => {
     expect(screen.getByRole('heading', { name: 'Ціна: Габардин' })).toBeTruthy();
     expect(screen.getByText(/2,5 м =/)).toBeTruthy();
     expect(screen.getByText('Час операцій')).toBeTruthy();
-    expect(screen.getByText('Вартість хвилини')).toBeTruthy();
+    // «Вартість хвилини» is not shown (CAT-019).
+    expect(screen.queryByText('Вартість хвилини')).toBeNull();
     expect(screen.getByText('Трудовитрати, грн')).toBeTruthy();
     expect(screen.getByText('10 хв')).toBeTruthy();
     expect(screen.getByText('Роздріб · 1–9 шт.')).toBeTruthy();
@@ -94,6 +97,18 @@ describe('Article price (published automatically)', () => {
     );
     expect(screen.queryByRole('button', { name: 'Розрахувати ціну' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Опублікувати ціну' })).toBeNull();
+  });
+
+  it('hides the cost breakdown from a manager (CAT-019)', () => {
+    mocks.canSeeCost.mockReturnValueOnce(false);
+    mocks.getPublished.mockReturnValue({
+      currentData: published,
+      isFetching: false,
+      refetch: vi.fn(),
+    });
+    render(<SewingPricingFeature {...props} />);
+    expect(screen.getByText('Роздріб · 1–9 шт.')).toBeTruthy();
+    expect(screen.queryByText('Повна собівартість')).toBeNull();
   });
 
   it('explains a missing price and does not load a calculation', () => {

@@ -32,6 +32,7 @@ export * from './components/reference-list-controls/reference-page-header';
 export * from './components/reference-list-controls/reference-search-bar';
 export * from './components/reference-list-controls/reference-supplier-filter';
 export * from './components/suppliers/supplier-editor-drawer';
+export * from './components/suppliers/supplier-name-button';
 export * from './components/reference-list/reference-status-pill';
 export * from './components/product-sections/product-section-delete-dialog';
 export * from './components/product-sections/product-section-details';

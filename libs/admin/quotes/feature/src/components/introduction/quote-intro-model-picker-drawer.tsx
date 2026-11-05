@@ -106,7 +106,7 @@ export function QuoteIntroModelPickerDrawer({ season, usedProductIds, onClose, o
                     component="img"
                     src={product.photoUrl}
                     alt=""
-                    sx={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 1 }}
+                    sx={{ width: 48, height: 48, objectFit: 'contain', borderRadius: 1 }}
                   />
                 ) : (
                   <Box sx={{ width: 48, height: 48, borderRadius: 1, bgcolor: 'action.hover' }} />

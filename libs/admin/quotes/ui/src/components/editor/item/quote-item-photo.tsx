@@ -25,7 +25,7 @@ export function QuoteItemPhoto({ photoUrl, label, onChange }: Props) {
       component="img"
       src={photoUrl}
       alt=""
-      sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+      sx={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
     />
   ) : null;
   if (!onChange) return <Box sx={frame}>{image}</Box>;

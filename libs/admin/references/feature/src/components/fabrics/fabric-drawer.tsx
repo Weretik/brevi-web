@@ -2,6 +2,7 @@ import { FabricDetails, FabricForm, ReferenceEditorDrawer } from '@admin/referen
 import { Alert, Stack } from '@mui/material';
 
 import { useFabricEditor } from '../../hooks/fabrics/use-fabric-editor';
+import { useSupplierPreview } from '../suppliers/supplier-preview';
 
 import type { FabricEditorMode } from '../../hooks/fabrics/use-fabric-editor';
 import type { Fabric } from '@admin/references/model';
@@ -24,6 +25,7 @@ export function FabricDrawer({ mode: initialMode, fabric, nextId, onClose, onSav
   const editor = useFabricEditor(initialMode, fabric, nextId, onSaved);
   const readOnly = editor.mode === 'view';
 
+  const supplierPreview = useSupplierPreview();
   return (
     <ReferenceEditorDrawer
       titleId="fabric-drawer-title"
@@ -42,10 +44,15 @@ export function FabricDrawer({ mode: initialMode, fabric, nextId, onClose, onSav
       onEdit={editor.enableEditing}
       onSubmit={editor.save}
     >
+      {supplierPreview.element}
       <Stack sx={{ gap: 2 }}>
         {editor.message && <Alert severity="error">{editor.message}</Alert>}
         {readOnly ? (
-          <FabricDetails values={editor.values} priceUpdatedAt={fabric?.priceUpdatedAt ?? null} />
+          <FabricDetails
+            values={editor.values}
+            priceUpdatedAt={fabric?.priceUpdatedAt ?? null}
+            onOpenSupplier={(name) => supplierPreview.open({ name })}
+          />
         ) : (
           <FabricForm
             creating={editor.mode === 'create'}

@@ -1,10 +1,12 @@
 import { PpeCardPrices, PpeSupplierForm, SewingCardHeader } from '@admin/products/ui';
+import { useSupplierPreview } from '@admin/references/feature';
 import { Alert, Box, Button, CircularProgress, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 
 import { PpeCardMetrics } from './ppe-card-metrics';
 import { usePpeCard } from '../../hooks/ppe-card/use-ppe-card';
 import { usePpeSupplierForm } from '../../hooks/ppe-card/use-ppe-supplier-form';
+import { useCanSeeCost } from '../../hooks/product-access/use-can-see-cost';
 import { useProductActiveSwitch } from '../../hooks/product-overview/use-product-active-switch';
 import { ProductDeleteDialog } from '../product-deletion/product-delete-dialog';
 import { ProductOverviewDrawer } from '../product-overview/product-overview-drawer';
@@ -24,6 +26,8 @@ interface Props {
 export function PpeProductCard({ product, onDeleted }: Props) {
   const card = usePpeCard(product.id);
   const form = usePpeSupplierForm(card.offer);
+  const showCost = useCanSeeCost();
+  const supplierPreview = useSupplierPreview();
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [activeError, setActiveError] = useState<string | null>(null);
@@ -63,7 +67,8 @@ export function PpeProductCard({ product, onDeleted }: Props) {
           {activeError}
         </Alert>
       )}
-      <PpeCardMetrics offer={card.offer} />
+      {supplierPreview.element}
+      <PpeCardMetrics offer={card.offer} showCost={showCost} />
       {card.offerLoading && <CircularProgress aria-label="Завантаження постачальника" />}
       {card.offerError && (
         <Alert severity="error" action={<Button onClick={card.reloadOffer}>Повторити</Button>}>
@@ -86,6 +91,8 @@ export function PpeProductCard({ product, onDeleted }: Props) {
             suppliers={card.suppliers}
             ruleNames={card.ruleNames}
             readOnly={!card.canManage}
+            showCost={showCost}
+            onOpenSupplier={(id) => supplierPreview.open({ id })}
             dirty={form.dirty}
             saving={form.saving}
             onChange={form.change}

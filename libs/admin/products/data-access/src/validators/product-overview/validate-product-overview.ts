@@ -48,7 +48,8 @@ function validItem(value: unknown): boolean {
     optionalDate(row['pricesUpdatedAt']) &&
     isCodes(row['problems']) &&
     entries(row['variants'], validVariant) &&
-    (row['mainPhotoUrl'] === undefined || isText(row['mainPhotoUrl']))
+    (row['mainPhotoUrl'] === undefined || isText(row['mainPhotoUrl'])) &&
+    (row['mainPhotoFullUrl'] === undefined || isText(row['mainPhotoFullUrl']))
   );
 }
 

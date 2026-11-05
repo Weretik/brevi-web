@@ -50,6 +50,7 @@ export function SewingPricingPanel(props: SewingPricingPanelProps) {
           calculationLoading={props.calculationLoading}
           calculationError={props.calculationError}
           onRetryCalculation={props.onRetryCalculation}
+          showCost={props.showCost}
         />
       </Stack>
     </Paper>

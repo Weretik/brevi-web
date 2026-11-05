@@ -1,4 +1,4 @@
-import { ProductOverviewDetails, ProductOverviewForm } from '@admin/products/ui';
+import { ProductMainPhoto, ProductOverviewDetails, ProductOverviewForm } from '@admin/products/ui';
 import { ReferenceEditorDrawer } from '@admin/references/ui';
 import { Alert, Button, Stack } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
@@ -42,7 +42,7 @@ export function ProductOverviewDrawer({
       title={readOnly ? row.name : `Редагування: ${row.name}`}
       description={
         readOnly
-          ? 'Ціни, собівартість і дані для КП. Склад — у повній картці.'
+          ? 'Фото, ціни і дані для КП. Склад — у повній картці.'
           : 'Розділ, статус і дані для КП.'
       }
       formId="product-overview-form"
@@ -57,6 +57,9 @@ export function ProductOverviewDrawer({
         {editor.message && <Alert severity="error">{editor.message}</Alert>}
         {readOnly ? (
           <>
+            {showCardLink && (
+              <ProductMainPhoto url={row.mainPhotoFullUrl ?? row.mainPhotoUrl} name={row.name} />
+            )}
             {showPrices && <ProductOverviewPriceBlock row={row} />}
             <ProductOverviewDetails
               row={row}

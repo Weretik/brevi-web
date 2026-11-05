@@ -5,6 +5,7 @@ import { useState } from 'react';
 
 import { SewingCardMetrics } from './sewing-card-metrics';
 import { SewingCardPricingTab } from './sewing-card-pricing-tab';
+import { useCanSeeCost } from '../../hooks/product-access/use-can-see-cost';
 import { useProductActiveSwitch } from '../../hooks/product-overview/use-product-active-switch';
 import {
   sewingCardTabLabels,
@@ -38,6 +39,7 @@ export function SewingProductCard({ product, onDeleted }: Props) {
   const [activeError, setActiveError] = useState<string | null>(null);
   const activeSwitch = useProductActiveSwitch(setActiveError);
   const [pricingArticleId, setPricingArticleId] = useState<number | null>(null);
+  const showCost = useCanSeeCost();
   const launched =
     card.row?.isActive !== false && (!card.summaryLoaded || isSewingCreateReady(card.articles));
   const sectionName =
@@ -77,7 +79,7 @@ export function SewingProductCard({ product, onDeleted }: Props) {
           {activeError}
         </Alert>
       )}
-      <SewingCardMetrics totals={card.totals} />
+      <SewingCardMetrics totals={card.totals} showCost={showCost} />
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs
           value={tab}

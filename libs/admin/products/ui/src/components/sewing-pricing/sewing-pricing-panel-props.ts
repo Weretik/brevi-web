@@ -19,4 +19,6 @@ export interface SewingPricingPanelProps {
   publicationError: string | null;
   onRetryCalculation: () => void;
   onRetryPublication: () => void;
+  /** The cost breakdown is for Admin only (CAT-019); otherwise only the reasons a price is missing. */
+  showCost?: boolean;
 }

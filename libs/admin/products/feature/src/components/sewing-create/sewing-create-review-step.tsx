@@ -2,6 +2,7 @@ import { sewingVariantRows } from '@admin/products/model';
 import { Alert, FormControlLabel, Stack, Switch } from '@mui/material';
 import { useState } from 'react';
 
+import { useCanSeeCost } from '../../hooks/product-access/use-can-see-cost';
 import { SewingCardMetrics } from '../sewing-card/sewing-card-metrics';
 import { SewingCardPricingTab } from '../sewing-card/sewing-card-pricing-tab';
 
@@ -20,9 +21,10 @@ interface Props {
 /** Step 5 «Перевірка»: live prices of the fabrics and whether the model goes to the price list. */
 export function SewingCreateReviewStep(props: Props) {
   const [articleId, setArticleId] = useState<number | null>(null);
+  const showCost = useCanSeeCost();
   return (
     <Stack sx={{ gap: 2 }}>
-      <SewingCardMetrics totals={props.totals} />
+      <SewingCardMetrics totals={props.totals} showCost={showCost} />
       <Alert severity="warning">
         Кожна ціна має бути вища за повну собівартість, перевірте назву і тканину.
       </Alert>

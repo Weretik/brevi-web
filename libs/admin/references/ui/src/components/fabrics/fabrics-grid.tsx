@@ -1,8 +1,10 @@
 import { formatIsoDate, formatUah } from '@admin/references/model';
 import { Stack, Typography } from '@mui/material';
+import { useMemo } from 'react';
 
 import { ReferenceDataGrid } from '../reference-list/reference-data-grid';
 import { ReferenceStatusPill } from '../reference-list/reference-status-pill';
+import { SupplierNameButton } from '../suppliers/supplier-name-button';
 
 import type { Fabric } from '@admin/references/model';
 import type { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
@@ -17,9 +19,11 @@ interface Props {
   onView: (fabric: Fabric) => void;
   onEdit: (fabric: Fabric) => void;
   onDelete: (id: number) => void;
+  /** A click on the supplier opens its card (CAT-019). */
+  onOpenSupplier?: (name: string) => void;
 }
 
-const columns: GridColDef<Fabric>[] = [
+const columns = (onOpenSupplier?: (name: string) => void): GridColDef<Fabric>[] => [
   {
     field: 'code',
     headerName: 'Код',
@@ -45,7 +49,18 @@ const columns: GridColDef<Fabric>[] = [
       </Stack>
     ),
   },
-  { field: 'providerName', headerName: 'Постачальник', flex: 1, minWidth: 160 },
+  {
+    field: 'providerName',
+    headerName: 'Постачальник',
+    flex: 1,
+    minWidth: 160,
+    renderCell: ({ row, tabIndex }) =>
+      onOpenSupplier ? (
+        <SupplierNameButton name={row.providerName} onOpen={onOpenSupplier} tabIndex={tabIndex} />
+      ) : (
+        row.providerName || '—'
+      ),
+  },
   {
     field: 'composition',
     headerName: 'Склад',
@@ -94,11 +109,12 @@ const columns: GridColDef<Fabric>[] = [
   },
 ];
 
-export function FabricsGrid(props: Props) {
+export function FabricsGrid({ onOpenSupplier, ...props }: Props) {
+  const gridColumns = useMemo(() => columns(onOpenSupplier), [onOpenSupplier]);
   return (
     <ReferenceDataGrid
       ariaLabel="Тканини"
-      columns={columns}
+      columns={gridColumns}
       emptyLabel="Тканин поки немає"
       notFoundLabel="Тканин не знайдено"
       menuLabel="Дії тканини"
