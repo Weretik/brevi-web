@@ -16,6 +16,7 @@ const overview = {
   scope: 'Current',
   from: '2026-10-01',
   to: '2026-11-05',
+  needsReviewCount: 3,
   currencies: [
     {
       currency: 'UAH',
@@ -60,6 +61,11 @@ describe('«Огляд» page', () => {
     expect(table).toHaveTextContent(/Банк\s*1\s000,00/);
     expect(table).toHaveTextContent(/Каса\s*Не підтверджено/);
     expect(table).not.toHaveTextContent('Старий');
+    expect(screen.getByText(/Потребують перевірки: 3/)).toBeVisible();
+    expect(screen.getByRole('link', { name: 'Перевірити' })).toHaveAttribute(
+      'href',
+      '/accounting/review',
+    );
   });
 
   it('switches the area and shows its whole period', async () => {

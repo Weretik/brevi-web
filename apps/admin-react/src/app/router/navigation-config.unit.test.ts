@@ -168,13 +168,15 @@ describe('legacy Admin navigation', () => {
     });
   });
 
-  it('shows «Бухгалтерія» to the director only and links its two pages', () => {
+  it('shows «Бухгалтерія» to the director only and links its pages', () => {
     const paths = new Set([
       '/accounting/overview',
       '/accounting/transactions',
       '/accounting/transfers',
       '/accounting/accounts',
       '/accounting/categories',
+      '/accounting/counterparties',
+      '/accounting/review',
     ]);
     const accounting = (roles: string[]) =>
       createNavigation(paths, roles).find((group) => group.id === 'accounting');
@@ -185,6 +187,8 @@ describe('legacy Admin navigation', () => {
       { id: 'finance-transfers', label: 'Перекази', to: '/accounting/transfers' },
       { id: 'finance-accounts', label: 'Рахунки і каси', to: '/accounting/accounts' },
       { id: 'finance-categories', label: 'Категорії', to: '/accounting/categories' },
+      { id: 'finance-counterparties', label: 'Контрагенти', to: '/accounting/counterparties' },
+      { id: 'finance-review', label: 'Потребують перевірки', to: '/accounting/review' },
     ]);
     expect(accounting(['Director'])?.items).toHaveLength(10);
     expect(accounting(['Admin'])).toBeUndefined();

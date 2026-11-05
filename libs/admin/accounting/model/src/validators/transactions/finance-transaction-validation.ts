@@ -1,6 +1,7 @@
 import { parseMoneyToMinor } from '../../mappers/money/finance-money';
 
 import type { CategoryDirection, LedgerScope } from '../../entities/categories/finance-category';
+import type { FinanceCounterpartyChoice } from '../../entities/counterparties/finance-counterparty';
 
 export interface FinanceTransactionFormValues {
   date: string;
@@ -11,6 +12,10 @@ export interface FinanceTransactionFormValues {
   /** Empty when no subcategory is picked. */
   subcategoryId: string;
   amount: string;
+  /** The chosen counterparty; ignored when `oneoff` is on. */
+  counterparty: FinanceCounterpartyChoice | null;
+  /** «Разовий контрагент»: only a name, no record. */
+  oneoff: boolean;
   oneoffName: string;
   description: string;
   comment: string;
@@ -69,9 +74,29 @@ export function validateFinanceTransaction(
   if (!values.rootId) errors.rootId = 'Оберіть категорію.';
   const amount = positiveAmountProblem(values.amount);
   if (amount) errors.amount = amount;
+  if (values.oneoff && !values.oneoffName.trim())
+    errors.oneoffName = 'Вкажіть назву разового контрагента.';
   for (const field of ['oneoffName', 'description', 'comment'] as const) {
     const limit = financeTransactionLimits[field];
-    if (values[field].trim().length > limit) errors[field] = `Не більше ${limit} символів.`;
+    if (values[field].trim().length > limit && !errors[field])
+      errors[field] = `Не більше ${limit} символів.`;
+  }
+  return errors;
+}
+
+/** «Перевірити»: a category and a confirmed counterparty, or a one-off name. */
+export function validateFinanceTransactionReview(
+  values: FinanceTransactionFormValues,
+): FinanceTransactionFieldErrors {
+  const errors: FinanceTransactionFieldErrors = {};
+  if (!values.rootId) errors.rootId = 'Оберіть категорію.';
+  if (values.oneoff) {
+    const name = values.oneoffName.trim();
+    if (!name) errors.oneoffName = 'Вкажіть назву разового контрагента.';
+    else if (name.length > financeTransactionLimits.oneoffName)
+      errors.oneoffName = `Не більше ${financeTransactionLimits.oneoffName} символів.`;
+  } else if (values.counterparty && !values.counterparty.verified) {
+    errors.counterparty = `Спершу підтвердіть контрагента «${values.counterparty.name}».`;
   }
   return errors;
 }

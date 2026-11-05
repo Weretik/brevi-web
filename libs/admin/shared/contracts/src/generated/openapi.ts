@@ -259,10 +259,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** @description «Операції»: one area, newest first by default (ties: newest saved first). Totals cover the whole filtered selection per currency, without cancelled rows. */
+    /** @description «Операції»: one area, newest first by default (ties: newest saved first). Totals cover the whole filtered selection per currency, without cancelled rows. needsReview keeps «Потребують перевірки» (verification other than Verified); counterpartyKind with counterpartyId keeps one counterparty. */
     get: operations['getFinanceTransactions'];
     put?: never;
-    /** @description «Додати дохід» / «Додати витрату». The date must fall into the area (Current from 2026-10-01) and be on or after the account opening date; Current needs an active account; the category must be active, of the same area and direction. The currency comes from the account. */
+    /** @description «Додати дохід» / «Додати витрату». The date must fall into the area (Current from 2026-10-01) and be on or after the account opening date; Current needs an active account; the category must be active, of the same area and direction. The currency comes from the account. A finance counterparty that is not confirmed yet gives verification NeedsCounterpartyReview; an archived counterparty cannot be newly chosen. */
     post: operations['createFinanceTransaction'];
     delete?: never;
     options?: never;
@@ -382,6 +382,177 @@ export interface paths {
     };
     /** @description Change log of one transfer, newest first. */
     get: operations['getFinanceTransferHistory'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/transactions/{id}/review': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** @description «Перевірити» an operation of «Потребують перевірки»: sets the category and who it is with, nothing else (date, account and amount of a bank line stay). A finance counterparty must be confirmed first (400). The result is Verified. */
+    put: operations['reviewFinanceTransaction'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/transactions/{id}/promote-oneoff': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description «Зробити постійним»: a confirmed finance counterparty is created from the one-off name and the operation is linked to it. Other operations with the same name are not changed. */
+    post: operations['promoteFinanceOneoff'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/counterparties': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description «Контрагенти», one tab: Financial (financial), Clients and Suppliers (parties, read-only, from «Клієнти» and «Постачальники»), Oneoffs (operations with a one-off name). 50 rows per page; counts of every tab with the same search. Without includeArchived archived records and cancelled operations are left out. */
+    get: operations['getFinanceCounterparties'];
+    put?: never;
+    /** @description «Додати фінансового» (verified false: waits for «Підтвердити») or «Зберегти як фінансового контрагента» from an operation (verified true). ЄДРПОУ keeps digits, IBAN letters and digits. */
+    post: operations['createFinanceCounterparty'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/counterparties/choices': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Choices of the counterparty field of an operation: active finance counterparties, clients and suppliers matching search, at most 15 of each kind in that order. */
+    get: operations['getFinanceCounterpartyChoices'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/counterparties/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Edit a finance counterparty. The default category must be of the current books; auto-apply needs a confirmed counterparty with a default category. */
+    put: operations['updateFinanceCounterparty'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/counterparties/{id}/verify': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description «Підтвердити»: its active operations leave «Потребують перевірки» (without a category they stay as NeedsCategory) without a new version of each operation. */
+    post: operations['verifyFinanceCounterparty'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/counterparties/{id}/archive': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description «Архівувати»: it cannot be chosen for new operations; operations keep the link. */
+    post: operations['archiveFinanceCounterparty'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/counterparties/{id}/restore': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description «Відновити» an archived finance counterparty. */
+    post: operations['restoreFinanceCounterparty'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/counterparties/{id}/merge': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description «Об'єднати»: the counterparty is a duplicate of targetId. Its operations move to the target, its names become other names of the target, and it is archived with mergedIntoId. Returns the target. */
+    post: operations['mergeFinanceCounterparty'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/counterparties/{id}/history': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Change log of one finance counterparty, newest first. */
+    get: operations['getFinanceCounterpartyHistory'];
     put?: never;
     post?: never;
     delete?: never;
@@ -4418,7 +4589,7 @@ export interface components {
       version: number;
     };
     /** @enum {string} */
-    AuditEntity: 'Account' | 'Category' | 'Transaction' | 'Transfer';
+    AuditEntity: 'Account' | 'Category' | 'Transaction' | 'Transfer' | 'Counterparty';
     /** @enum {string} */
     AuditAction:
       | 'Create'
@@ -4429,7 +4600,11 @@ export interface components {
       | 'CutoverConfirm'
       | 'CutoverReset'
       | 'Void'
-      | 'Deactivate';
+      | 'Deactivate'
+      | 'Verify'
+      | 'Merge'
+      | 'Review'
+      | 'Promote';
     /** @description Snapshots are the JSON text of the record before and after (null when absent). */
     FinanceHistoryEntryResponse: {
       /** Format: int64 */
@@ -4511,7 +4686,14 @@ export interface components {
       /** Format: date */
       to: string;
       currencies: components['schemas']['FinanceOverviewCurrencyResponse'][];
+      /**
+       * Format: int32
+       * @description Active current operations of «Потребують перевірки», whatever the period
+       */
+      needsReviewCount: number;
     };
+    /** @enum {string} */
+    CounterpartyKind: 'Financial' | 'Client' | 'Supplier';
     /** @enum {string} */
     MovementSource: 'Manual' | 'BankImport' | 'HomeAccountingImport';
     /** @enum {string} */
@@ -4522,6 +4704,16 @@ export interface components {
     VerificationStatus: 'Verified' | 'NeedsCategory' | 'NeedsCounterpartyReview';
     /** @enum {string} */
     MovementStatus: 'Active' | 'Void';
+    FinanceCounterpartyRefResponse: {
+      kind: components['schemas']['CounterpartyKind'];
+      id: string;
+      name: string;
+      active: boolean;
+      /** @description False only for a finance counterparty waiting for «Підтвердити» */
+      verified: boolean;
+      /** @description The record is gone from its list; the link stays */
+      missing: boolean;
+    };
     FinanceTransactionResponse: {
       /** Format: uuid */
       id: string;
@@ -4558,6 +4750,8 @@ export interface components {
       createdAt: string;
       /** Format: date-time */
       updatedAt: string;
+      /** @description The chosen counterparty; null with an optional oneoffName */
+      counterparty: components['schemas']['FinanceCounterpartyRefResponse'] | null;
     };
     FinanceTransactionTotalResponse: {
       currency: string;
@@ -4578,6 +4772,11 @@ export interface components {
       pageSize: number;
       totals: components['schemas']['FinanceTransactionTotalResponse'][];
     };
+    FinanceCounterpartyLinkInput: {
+      kind: components['schemas']['CounterpartyKind'];
+      /** @description UUID for Financial and Client, a number for Supplier */
+      id: string;
+    };
     FinanceTransactionInput: {
       scope: components['schemas']['LedgerScope'];
       /** Format: date */
@@ -4592,6 +4791,8 @@ export interface components {
       oneoffName?: string | null;
       description?: string | null;
       comment?: string | null;
+      /** @description Picked from the list; cannot go together with oneoffName */
+      counterparty?: components['schemas']['FinanceCounterpartyLinkInput'] | null;
     };
     FinanceTransactionUpdateInput: {
       /** Format: date */
@@ -4608,6 +4809,8 @@ export interface components {
       comment?: string | null;
       /** Format: int32 */
       version: number;
+      /** @description Picked from the list; cannot go together with oneoffName */
+      counterparty?: components['schemas']['FinanceCounterpartyLinkInput'] | null;
     };
     FinanceTransferResponse: {
       /** Format: uuid */
@@ -4674,6 +4877,122 @@ export interface components {
       note?: string | null;
       /** Format: int32 */
       version: number;
+    };
+    FinanceTransactionReviewInput: {
+      /** Format: uuid */
+      categoryId: string;
+      /** @description Picked from the list; cannot go together with oneoffName */
+      counterparty?: components['schemas']['FinanceCounterpartyLinkInput'] | null;
+      oneoffName?: string | null;
+      /** Format: int32 */
+      version: number;
+    };
+    /** @enum {string} */
+    FinanceCounterpartyTab: 'Financial' | 'Clients' | 'Suppliers' | 'Oneoffs';
+    FinanceCounterpartyResponse: {
+      /** Format: uuid */
+      id: string;
+      name: string;
+      edrpou: string;
+      iban: string;
+      bankName: string;
+      aliases: string[];
+      /** Format: uuid */
+      defaultCategoryId: string | null;
+      defaultCategoryRootName: string | null;
+      defaultSubcategoryName: string | null;
+      autoApplyCategory: boolean;
+      note: string;
+      verified: boolean;
+      active: boolean;
+      /** Format: uuid */
+      mergedIntoId: string | null;
+      /**
+       * Format: int32
+       * @description Active operations of both areas
+       */
+      operationCount: number;
+      /** Format: int32 */
+      version: number;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+    };
+    FinancePartyResponse: {
+      kind: components['schemas']['CounterpartyKind'];
+      id: string;
+      name: string;
+      taxId: string;
+      active: boolean;
+      /** Format: int32 */
+      operationCount: number;
+    };
+    FinanceCounterpartyCountsResponse: {
+      /** Format: int32 */
+      financial: number;
+      /** Format: int32 */
+      clients: number;
+      /** Format: int32 */
+      suppliers: number;
+      /** Format: int32 */
+      oneoffs: number;
+    };
+    FinanceCounterpartyPageResponse: {
+      tab: components['schemas']['FinanceCounterpartyTab'];
+      financial: components['schemas']['FinanceCounterpartyResponse'][];
+      parties: components['schemas']['FinancePartyResponse'][];
+      oneoffs: components['schemas']['FinanceTransactionResponse'][];
+      /** Format: int32 */
+      total: number;
+      /** Format: int32 */
+      page: number;
+      /** Format: int32 */
+      pageSize: number;
+      counts: components['schemas']['FinanceCounterpartyCountsResponse'];
+    };
+    FinanceCounterpartyInput: {
+      name: string;
+      edrpou?: string | null;
+      iban?: string | null;
+      bankName?: string | null;
+      aliases?: string[] | null;
+      /** Format: uuid */
+      defaultCategoryId?: string | null;
+      autoApplyCategory: boolean;
+      note?: string | null;
+      verified: boolean;
+    };
+    FinanceCounterpartyChoiceResponse: {
+      kind: components['schemas']['CounterpartyKind'];
+      id: string;
+      name: string;
+      /** @description ЄДРПОУ/ІПН or empty */
+      hint: string;
+      verified: boolean;
+      /** Format: uuid */
+      defaultCategoryId: string | null;
+    };
+    FinanceCounterpartyUpdateInput: {
+      name: string;
+      edrpou?: string | null;
+      iban?: string | null;
+      bankName?: string | null;
+      aliases?: string[] | null;
+      /** Format: uuid */
+      defaultCategoryId?: string | null;
+      autoApplyCategory: boolean;
+      note?: string | null;
+      /** Format: int32 */
+      version: number;
+    };
+    FinanceCounterpartyMergeInput: {
+      /** Format: uuid */
+      targetId: string;
+      /** Format: int32 */
+      version: number;
+      /** Format: int32 */
+      targetVersion: number;
     };
     /** @enum {string} */
     StaffRole: 'Director' | 'Admin' | 'Accountant' | 'Manager' | 'WorkshopChief';
@@ -10753,6 +11072,10 @@ export interface operations {
         subcategoryId?: string;
         /** @description Case-insensitive part of the description, note or one-off name */
         search?: string;
+        needsReview?: boolean;
+        counterpartyKind?: components['schemas']['CounterpartyKind'];
+        /** @description With counterpartyKind: UUID for Financial and Client, a number for Supplier */
+        counterpartyId?: string;
         minMinor?: number;
         maxMinor?: number;
         source?: components['schemas']['MovementSource'];
@@ -11244,6 +11567,612 @@ export interface operations {
     };
   };
   getFinanceTransferHistory: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceHistoryEntryResponse'][];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  reviewFinanceTransaction: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FinanceTransactionReviewInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceTransactionResponse'];
+        };
+      };
+      /** @description Invalid fields; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Operation, category or counterparty not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The version is stale (someone saved first); body is an array of messages */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  promoteFinanceOneoff: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FinanceVersionInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceTransactionResponse'];
+        };
+      };
+      /** @description Invalid fields; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The version is stale (someone saved first); body is an array of messages */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getFinanceCounterparties: {
+    parameters: {
+      query?: {
+        tab?: components['schemas']['FinanceCounterpartyTab'];
+        /** @description Name, other names, ЄДРПОУ/ІПН or IBAN */
+        search?: string;
+        includeArchived?: boolean;
+        page?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceCounterpartyPageResponse'];
+        };
+      };
+      /** @description Invalid fields; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createFinanceCounterparty: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FinanceCounterpartyInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceCounterpartyResponse'];
+        };
+      };
+      /** @description Invalid fields; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Default category not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getFinanceCounterpartyChoices: {
+    parameters: {
+      query?: {
+        /** @description Name or ЄДРПОУ/ІПН */
+        search?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceCounterpartyChoiceResponse'][];
+        };
+      };
+      /** @description Invalid fields; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateFinanceCounterparty: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FinanceCounterpartyUpdateInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceCounterpartyResponse'];
+        };
+      };
+      /** @description Invalid fields; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Counterparty or default category not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The version is stale (someone saved first); body is an array of messages */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  verifyFinanceCounterparty: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FinanceVersionInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceCounterpartyResponse'];
+        };
+      };
+      /** @description Invalid fields; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Counterparty not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The version is stale (someone saved first); body is an array of messages */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  archiveFinanceCounterparty: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FinanceVersionInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceCounterpartyResponse'];
+        };
+      };
+      /** @description Invalid fields; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Counterparty not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The version is stale (someone saved first); body is an array of messages */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  restoreFinanceCounterparty: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FinanceVersionInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceCounterpartyResponse'];
+        };
+      };
+      /** @description Invalid fields; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Counterparty not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The version is stale (someone saved first); body is an array of messages */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  mergeFinanceCounterparty: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FinanceCounterpartyMergeInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceCounterpartyResponse'];
+        };
+      };
+      /** @description Invalid fields; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Counterparty not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The version is stale (someone saved first); body is an array of messages */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getFinanceCounterpartyHistory: {
     parameters: {
       query?: never;
       header?: never;

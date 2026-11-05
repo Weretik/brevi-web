@@ -55,6 +55,7 @@ export const financeTransaction = (overrides: Record<string, unknown> = {}) => (
   categoryRootId: 'c1',
   categoryRootName: 'Матеріали',
   subcategoryName: 'Тканини',
+  counterparty: null,
   oneoffName: '',
   description: 'Нитки',
   comment: '',
@@ -89,6 +90,28 @@ export const financeTransfer = (overrides: Record<string, unknown> = {}) => ({
   ...overrides,
 });
 
+export const financeCounterparty = (overrides: Record<string, unknown> = {}) => ({
+  id: 'f1',
+  name: 'ФОП Іваненко',
+  edrpou: '12345678',
+  iban: '',
+  bankName: '',
+  aliases: [],
+  defaultCategoryId: null,
+  defaultCategoryRootName: null,
+  defaultSubcategoryName: null,
+  autoApplyCategory: false,
+  note: '',
+  verified: false,
+  active: true,
+  mergedIntoId: null,
+  operationCount: 1,
+  version: 1,
+  createdAt: '2026-11-05T08:00:00+00:00',
+  updatedAt: '2026-11-05T08:00:00+00:00',
+  ...overrides,
+});
+
 export interface StubCall {
   method: string;
   path: string;
@@ -106,6 +129,10 @@ export function stubFinanceApi(data: {
   transactionTotals?: unknown[];
   transfers?: unknown[];
   overview?: unknown;
+  counterparties?: unknown[];
+  parties?: unknown[];
+  oneoffs?: unknown[];
+  choices?: unknown[];
   written?: (call: StubCall) => unknown;
 }) {
   const calls: StubCall[] = [];
@@ -122,6 +149,29 @@ export function stubFinanceApi(data: {
       return json(data.accounts ?? [financeAccount()]);
     if (path.startsWith('/api/accounting/categories')) return json(data.categories ?? []);
     if (path.startsWith('/api/accounting/overview')) return json(data.overview);
+    if (path.startsWith('/api/accounting/counterparties/choices')) return json(data.choices ?? []);
+    if (path.startsWith('/api/accounting/counterparties')) {
+      const tab = new URLSearchParams(path.split('?')[1]).get('tab') ?? 'Financial';
+      const financial = data.counterparties ?? [];
+      const parties = data.parties ?? [];
+      const oneoffs = data.oneoffs ?? [];
+      const rows = { Financial: financial, Oneoffs: oneoffs }[tab] ?? parties;
+      return json({
+        tab,
+        financial: tab === 'Financial' ? financial : [],
+        parties: tab === 'Clients' || tab === 'Suppliers' ? parties : [],
+        oneoffs: tab === 'Oneoffs' ? oneoffs : [],
+        total: rows.length,
+        page: 1,
+        pageSize: 50,
+        counts: {
+          financial: financial.length,
+          clients: tab === 'Clients' ? parties.length : 0,
+          suppliers: tab === 'Suppliers' ? parties.length : 0,
+          oneoffs: oneoffs.length,
+        },
+      });
+    }
     const page = (items: unknown[], totals: unknown[]) =>
       json({ items, total: items.length, page: 1, pageSize: 50, totals });
     if (path.startsWith('/api/accounting/transactions'))

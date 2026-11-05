@@ -14,6 +14,14 @@ const operation = {
   categoryRootId: 'c1',
   categoryRootName: 'Матеріали',
   subcategoryName: 'Тканини',
+  counterparty: {
+    kind: 'Financial',
+    id: 'f1',
+    name: 'ФОП Іваненко',
+    active: true,
+    verified: false,
+    missing: false,
+  },
   oneoffName: '',
   description: 'Нитки',
   comment: '',
@@ -37,6 +45,7 @@ describe('movement mapper', () => {
       totals: [{ currency: 'UAH', incomeMinor: 0, expenseMinor: 0, differenceMinor: 0 }],
     });
     expect(page.items[0]).toMatchObject({ status: 'Void', subcategoryName: 'Тканини' });
+    expect(page.items[0]?.counterparty).toMatchObject({ kind: 'Financial', verified: false });
     expect(page.totals[0]?.currency).toBe('UAH');
   });
 
@@ -48,8 +57,13 @@ describe('movement mapper', () => {
       }),
     ).toThrow(/стан/);
     expect(
-      mapFinanceOverview({ scope: null, from: '2026-10-01', to: '2026-11-05', currencies: [] })
-        .scope,
+      mapFinanceOverview({
+        scope: null,
+        from: '2026-10-01',
+        to: '2026-11-05',
+        needsReviewCount: 0,
+        currencies: [],
+      }).scope,
     ).toBeNull();
   });
 });

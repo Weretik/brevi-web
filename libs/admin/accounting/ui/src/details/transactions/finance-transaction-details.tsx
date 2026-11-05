@@ -3,6 +3,7 @@ import {
   formatSignedMinor,
   ledgerScopeLabels,
   movementSourceLabels,
+  transactionCounterpartyLabel,
   transactionTypeLabels,
   verificationProblemLabels,
 } from '@admin/accounting/model';
@@ -16,12 +17,14 @@ import type { FinanceTransaction } from '@admin/accounting/model';
 /** Read-only view of an operation in the side panel. */
 export function FinanceTransactionDetails({ transaction }: { transaction: FinanceTransaction }) {
   const problem = verificationProblemLabels[transaction.verification];
+  const counterparty = transactionCounterpartyLabel(transaction);
   return (
     <Stack sx={{ gap: 2 }}>
-      {(transaction.status === 'Void' || problem) && (
-        <Stack direction="row" sx={{ gap: 1 }}>
+      {(transaction.status === 'Void' || problem || counterparty.missing) && (
+        <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap' }}>
           {transaction.status === 'Void' && <FinanceProblemPill label="Анульовано" />}
           {problem && <FinanceProblemPill label={problem} />}
+          {counterparty.missing && <FinanceProblemPill label="Контрагента немає в довіднику" />}
         </Stack>
       )}
       <ReferenceFormSection title="Операція">
@@ -41,7 +44,12 @@ export function FinanceTransactionDetails({ transaction }: { transaction: Financ
             },
             { label: 'Категорія', value: transaction.categoryRootName ?? '' },
             { label: 'Підкатегорія', value: transaction.subcategoryName ?? '' },
-            { label: 'Разовий контрагент', value: transaction.oneoffName },
+            {
+              label: 'Контрагент',
+              value: counterparty.caption
+                ? `${counterparty.name} (${counterparty.caption.toLowerCase()})`
+                : '',
+            },
             { label: 'Опис', value: transaction.description },
             { label: 'Примітка', value: transaction.comment },
           ]}

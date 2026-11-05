@@ -102,6 +102,99 @@ describe('«Операції» page', () => {
     expect(await screen.findByText('Операцію додано.')).toBeVisible();
   });
 
+  it('picks a counterparty that brings its default category', async () => {
+    const user = userEvent.setup();
+    const calls = stubFinanceApi({
+      categories,
+      choices: [
+        {
+          kind: 'Supplier',
+          id: '7',
+          name: 'ТОВ Тканини',
+          hint: '12345678',
+          verified: true,
+          defaultCategoryId: null,
+        },
+        {
+          kind: 'Financial',
+          id: 'f1',
+          name: 'ФОП Іваненко',
+          hint: '',
+          verified: true,
+          defaultCategoryId: 'c2',
+        },
+      ],
+      written: () => financeTransaction(),
+    });
+    openPage();
+    await screen.findByText('Операцій поки немає');
+
+    await user.click(screen.getByRole('button', { name: 'Додати витрату' }));
+    const panel = screen.getByRole('dialog', { name: 'Нова операція' });
+    await user.click(within(panel).getByRole('combobox', { name: 'Рахунок' }));
+    await user.click(await screen.findByRole('option', { name: 'Банк' }));
+    await user.type(within(panel).getByRole('textbox', { name: 'Сума, грн' }), '100');
+    await user.click(within(panel).getByRole('combobox', { name: 'Контрагент' }));
+    expect(await screen.findByText('Постачальники')).toBeVisible();
+    await user.click(screen.getByRole('option', { name: /ФОП Іваненко/ }));
+    expect(within(panel).getByRole('combobox', { name: 'Підкатегорія' })).toHaveTextContent(
+      'Тканини',
+    );
+    await user.click(within(panel).getByRole('button', { name: 'Зберегти' }));
+
+    await waitFor(() => expect(calls.filter((call) => call.method === 'POST')).toHaveLength(1));
+    expect(calls.find((call) => call.method === 'POST')?.body).toMatchObject({
+      categoryId: 'c2',
+      counterparty: { kind: 'Financial', id: 'f1' },
+      oneoffName: null,
+    });
+  });
+
+  it('adds a typed name as a confirmed finance counterparty', async () => {
+    const user = userEvent.setup();
+    const calls = stubFinanceApi({
+      categories,
+      written: (call) =>
+        call.path === '/api/accounting/counterparties'
+          ? {
+              ...(call.body as object),
+              id: 'f9',
+              edrpou: '',
+              iban: '',
+              bankName: '',
+              note: '',
+              defaultCategoryRootName: null,
+              defaultSubcategoryName: null,
+              active: true,
+              mergedIntoId: null,
+              operationCount: 0,
+              version: 1,
+              createdAt: '2026-11-05T08:00:00+00:00',
+              updatedAt: '2026-11-05T08:00:00+00:00',
+            }
+          : financeTransaction(),
+    });
+    openPage();
+    await screen.findByText('Операцій поки немає');
+
+    await user.click(screen.getByRole('button', { name: 'Додати витрату' }));
+    const panel = screen.getByRole('dialog', { name: 'Нова операція' });
+    await user.type(within(panel).getByRole('combobox', { name: 'Контрагент' }), 'Ринок');
+    await user.click(
+      await screen.findByRole('option', { name: 'Додати «Ринок» як фінансового контрагента' }),
+    );
+
+    await waitFor(() =>
+      expect(calls.find((call) => call.method === 'POST')).toMatchObject({
+        path: '/api/accounting/counterparties',
+        body: { name: 'Ринок', verified: true },
+      }),
+    );
+    await waitFor(() =>
+      expect(within(panel).getByRole('combobox', { name: 'Контрагент' })).toHaveValue('Ринок'),
+    );
+  });
+
   it('cancels an operation with the version it was shown with', async () => {
     const user = userEvent.setup();
     const calls = stubFinanceApi({ categories, transactions: [financeTransaction()] });

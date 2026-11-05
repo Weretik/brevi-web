@@ -7,6 +7,8 @@ interface Props {
   deleting: boolean;
   /** Text of the confirm button; «Видалити» by default («Анулювати» for movements). */
   confirmLabel?: string;
+  /** «primary» for a confirmation that removes nothing. */
+  confirmColor?: 'error' | 'primary';
   onClose: () => void;
   onConfirm: () => void;
 }
@@ -18,6 +20,7 @@ export function FinanceDeleteDialog({
   text,
   deleting,
   confirmLabel = 'Видалити',
+  confirmColor = 'error',
   onClose,
   onConfirm,
 }: Props) {
@@ -29,7 +32,7 @@ export function FinanceDeleteDialog({
         <Button disabled={deleting} onClick={onClose}>
           Скасувати
         </Button>
-        <Button disabled={deleting} color="error" variant="contained" onClick={onConfirm}>
+        <Button disabled={deleting} color={confirmColor} variant="contained" onClick={onConfirm}>
           {confirmLabel}
         </Button>
       </DialogActions>
