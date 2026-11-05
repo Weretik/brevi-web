@@ -1,5 +1,5 @@
 import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
-import { Alert, Box, Button, Link, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, Link, Stack, TextField, Typography } from '@mui/material';
 
 interface Props {
   hasKey: boolean;
@@ -34,13 +34,13 @@ export function AiKeySection({
           . Він зберігається зашифрованим і більше не показується.
         </Typography>
       ) : (
-        <Alert severity="warning">
-          Ключ OpenAI не додано, тому ШІ не працює. Створіть ключ на{' '}
+        <Typography variant="body2">
+          Створіть ключ на{' '}
           <Link href="https://platform.openai.com/api-keys" target="_blank" rel="noreferrer">
             platform.openai.com → API keys
           </Link>{' '}
           і вставте його нижче.
-        </Alert>
+        </Typography>
       )}
       <Stack
         direction={{ xs: 'column', sm: 'row' }}

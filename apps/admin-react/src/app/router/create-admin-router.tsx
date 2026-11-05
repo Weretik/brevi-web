@@ -18,6 +18,7 @@ import {
   adminRouteDefinitions,
   embroideryRoutes,
   productionOrderRoutes,
+  productionReportRoutes,
   productionRoutes,
   tasksRoutes,
 } from './admin-route-definitions';
@@ -67,6 +68,7 @@ export function createAdminRouter() {
         { element: <RequireRole allow={canPriceEmbroidery} />, children: embroideryRoutes },
         { element: <RequireRole allow={canManageWorkshop} />, children: productionRoutes },
         { element: <RequireRole allow={canUseAccounting} />, children: accountingRoutes },
+        { element: <RequireRole allow={canManageUsers} />, children: productionReportRoutes },
         {
           element: <RequireRole allow={canUseProductionOrders} />,
           children: productionOrderRoutes,

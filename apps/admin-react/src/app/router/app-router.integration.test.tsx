@@ -123,7 +123,7 @@ describe('React Admin routing', () => {
     }
   });
 
-  it('shows the demo overview and the signed-in person in the profile menu', async () => {
+  it('shows the overview and the signed-in person in the profile menu', async () => {
     const user = userEvent.setup();
     window.history.replaceState({}, '', '/');
     renderApp();
@@ -131,7 +131,7 @@ describe('React Admin routing', () => {
     expect(
       await screen.findByRole('heading', { name: 'Огляд виробництва' }, { timeout: 5000 }),
     ).toBeVisible();
-    expect(screen.getByText('Демо-дані')).toBeVisible();
+    expect(screen.queryByText('Демо-дані')).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Профіль' }));
     const menu = await screen.findByRole('menu');
     expect(within(menu).getByText('manager@brevi.com.ua')).toBeVisible();

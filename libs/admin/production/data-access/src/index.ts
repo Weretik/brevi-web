@@ -80,3 +80,7 @@ export {
   useVoidPayrollAdjustmentMutation,
   useVoidPayrollPaymentMutation,
 } from './api/payroll.api';
+export {
+  useGetWorkshopDashboardQuery,
+  useGetWorkshopReportQuery,
+} from './api/workshop-reports.api';

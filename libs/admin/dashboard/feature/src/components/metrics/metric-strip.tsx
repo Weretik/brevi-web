@@ -2,7 +2,7 @@ import { Box, Paper, Typography } from '@mui/material';
 
 import { numericTextSx } from '../../model/numeric-text';
 
-import type { DashboardMetric } from '../../model/dashboard-demo';
+import type { DashboardMetric } from '../../model/dashboard-view';
 
 interface MetricStripProps {
   metrics: readonly DashboardMetric[];
@@ -17,7 +17,7 @@ export function MetricStrip({ metrics }: MetricStripProps) {
       variant="outlined"
       sx={{
         display: 'grid',
-        gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)', lg: 'repeat(6, 1fr)' },
+        gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)', lg: `repeat(${metrics.length}, 1fr)` },
         overflow: 'hidden',
       }}
     >

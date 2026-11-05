@@ -1,6 +1,7 @@
 export {
   purchasingApi,
   useGetPurchaseInvoicesQuery,
+  useGetPurchaseDocumentTemplateQuery,
   useLazyGetPurchaseDocumentTemplateQuery,
   useRecognizeNewPurchaseFilesMutation,
   useRecognizePurchaseFileMutation,

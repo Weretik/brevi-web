@@ -108,6 +108,7 @@ describe('legacy Admin navigation', () => {
       '/production/payroll-rules',
       '/production/payroll',
       '/production/timesheet',
+      '/production/reports',
     ]);
     const shop = (roles: string[]) =>
       createNavigation(paths, roles).find((group) => group.id === 'sewing-shop');
@@ -134,6 +135,12 @@ describe('legacy Admin navigation', () => {
     expect(shop(['Manager'])?.items.some((item) => item.id === 'workshop-staff')).toBe(false);
     expect(shop(['Manager'])?.items.some((item) => item.id === 'work-log')).toBe(false);
     expect(shop(['Manager'])?.items.some((item) => item.id === 'salary')).toBe(false);
+    expect(shop(['Admin'])?.items.find((item) => item.id === 'workshop-reports')?.to).toBe(
+      '/production/reports',
+    );
+    expect(shop(['WorkshopChief'])?.items.some((item) => item.id === 'workshop-reports')).toBe(
+      false,
+    );
     expect(shop(['Manager'])?.items[2]).toEqual({
       id: 'sewing-forecast',
       label: 'Прогноз пошиття',

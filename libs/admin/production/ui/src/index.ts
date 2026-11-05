@@ -50,3 +50,10 @@ export { PayrollYearTable } from './payroll/payroll-year-table';
 export { PayrollSetupForm } from './payroll/payroll-setup-form';
 export type { PayrollPersonOption, PayrollSetupValues } from './payroll/payroll-setup-form';
 export { PayrollAdjustmentForm, PayrollPaymentForm } from './payroll/payroll-entry-forms';
+export { ReportTotals } from './reports/report-totals';
+export {
+  ReportMaterialsTable,
+  ReportOutputTable,
+  ReportStaffTable,
+  ReportStockTable,
+} from './reports/report-tables';

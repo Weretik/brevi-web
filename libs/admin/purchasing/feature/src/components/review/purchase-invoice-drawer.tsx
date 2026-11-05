@@ -6,10 +6,15 @@ import { usePurchaseFileActions } from '../../hooks/documents/use-purchase-file-
 import { usePurchaseReviewEditor } from '../../hooks/review/use-purchase-review-editor';
 import { PurchaseFileActions } from '../documents/purchase-file-actions';
 
-import type { PurchaseInvoice, PurchaseInvoiceReview } from '@admin/purchasing/model';
+import type {
+  PurchaseInvoice,
+  PurchaseInvoiceLink,
+  PurchaseInvoiceReview,
+} from '@admin/purchasing/model';
 
 interface Props {
   invoice: PurchaseInvoice;
+  onFix: (link: PurchaseInvoiceLink) => void;
   onClose: () => void;
   onSaved: (review: PurchaseInvoiceReview) => void;
 }
@@ -18,7 +23,7 @@ interface Props {
  * A register row in the «Цех» side panel; «Редагувати» links the supplier and writes a note.
  * Each original can be read by AI or checked by hand as JSON.
  */
-export function PurchaseInvoiceDrawer({ invoice, onClose, onSaved }: Props) {
+export function PurchaseInvoiceDrawer({ invoice, onFix, onClose, onSaved }: Props) {
   const editor = usePurchaseReviewEditor(invoice, onSaved);
   const files = usePurchaseFileActions();
   const readOnly = editor.mode === 'view';
@@ -53,6 +58,7 @@ export function PurchaseInvoiceDrawer({ invoice, onClose, onSaved }: Props) {
                 link={link}
                 busy={files.busy}
                 notice={files.notice}
+                onFix={onFix}
                 onRecognize={(value) => void files.recognize(value)}
                 onTemplate={(value) => void files.downloadTemplate(value)}
                 onUpload={(value, file) => void files.upload(value, file)}

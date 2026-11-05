@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 
-import type { StatusTone } from '../../model/dashboard-demo';
+import type { StatusTone } from '../../model/dashboard-view';
 
 interface QuoteStatusPillProps {
   label: string;

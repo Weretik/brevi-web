@@ -1,15 +1,32 @@
 import {
   formatPurchaseDocumentDate,
   formatPurchaseMoney,
-  purchaseVatLabel,
+  purchaseInvoicePageSizes,
+  purchaseInvoiceStatus,
 } from '@admin/purchasing/model';
-import { Chip, Link, Stack, Typography } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import { DataGrid } from '@mui/x-data-grid';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import {
+  Box,
+  Collapse,
+  IconButton,
+  LinearProgress,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TablePagination,
+  TableRow,
+  Typography,
+} from '@mui/material';
+import { Fragment, useState } from 'react';
+
+import { PurchaseStatusChip, PurchaseVatChip } from '../../components/status/purchase-status-chip';
 
 import type { PurchaseInvoice, PurchaseInvoicePage } from '@admin/purchasing/model';
-import type { GridColDef, GridPaginationModel } from '@mui/x-data-grid';
-import type {} from '@mui/x-data-grid/themeAugmentation';
+import type { ReactNode } from 'react';
 
 interface Props {
   page: PurchaseInvoicePage | undefined;
@@ -17,207 +34,145 @@ interface Props {
   /** Search or a filter is on: an empty page means «nothing found», not «empty register». */
   narrowed: boolean;
   unavailable: boolean;
-  onPageChange: (model: GridPaginationModel) => void;
-  /** A row opens the card in the side panel. */
-  onOpen: (invoice: PurchaseInvoice) => void;
+  /** Zero-based page, as the table counts. */
+  onPageChange: (model: { page: number; pageSize: number }) => void;
+  /** What a row shows when its arrow is open: positions, message, originals, buttons. */
+  renderDetails: (invoice: PurchaseInvoice) => ReactNode;
 }
 
 const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' };
-const clamp = (lines: number) => ({
-  display: '-webkit-box',
-  WebkitLineClamp: lines,
-  WebkitBoxOrient: 'vertical' as const,
-  overflow: 'hidden',
-});
+const columns = 8;
 
-const cell = { justifyContent: 'center', height: '100%', minWidth: 0, py: 1 };
-
-const columns: GridColDef<PurchaseInvoice>[] = [
-  {
-    field: 'messageAt',
-    headerName: 'Дата',
-    width: 170,
-    sortable: false,
-    renderCell: ({ row }) => (
-      <Stack sx={cell}>
-        <Typography variant="body2" noWrap sx={mono}>
-          {row.messageAt || '—'}
-        </Typography>
-        <Typography variant="caption" color="text.secondary" noWrap sx={mono}>
-          UID {row.sourceUid}
-        </Typography>
-      </Stack>
-    ),
-  },
-  {
-    field: 'text',
-    headerName: 'Повідомлення',
-    flex: 1.6,
-    minWidth: 280,
-    sortable: false,
-    renderCell: ({ row }) => (
-      <Stack sx={cell}>
-        <Typography variant="body2" sx={clamp(2)} title={row.text}>
-          {row.text || '—'}
-        </Typography>
-        <Typography variant="caption" color="text.secondary" noWrap>
-          {[row.chatName, row.fromUser].filter(Boolean).join(' · ') || '—'}
-        </Typography>
-      </Stack>
-    ),
-  },
-  {
-    field: 'links',
-    headerName: 'Оригінали',
-    width: 210,
-    sortable: false,
-    renderCell: ({ row }) => (
-      <Stack sx={{ ...cell, gap: 0.25 }}>
-        {row.links.length === 0 ? (
-          <Typography variant="body2" color="text.secondary">
-            —
+function InvoiceRow({
+  invoice,
+  open,
+  onToggle,
+  details,
+}: {
+  invoice: PurchaseInvoice;
+  open: boolean;
+  onToggle: () => void;
+  details: ReactNode;
+}) {
+  const { status } = purchaseInvoiceStatus(invoice);
+  const documents = invoice.links.flatMap((link) => (link.document ? [link.document] : []));
+  const first = documents[0];
+  const supplier = first?.supplierName ?? invoice.supplierName;
+  return (
+    <Fragment>
+      <TableRow
+        hover
+        onClick={onToggle}
+        sx={{
+          cursor: 'pointer',
+          '& > td': { borderBottom: open ? 0 : undefined },
+          bgcolor: open ? 'action.hover' : undefined,
+        }}
+      >
+        <TableCell padding="checkbox">
+          <IconButton
+            size="small"
+            aria-expanded={open}
+            aria-label={`${open ? 'Згорнути' : 'Розгорнути'} рахунок UID ${invoice.sourceUid}`}
+            onClick={(event) => {
+              event.stopPropagation();
+              onToggle();
+            }}
+          >
+            {open ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
+          </IconButton>
+        </TableCell>
+        <TableCell>
+          <PurchaseStatusChip status={status} />
+        </TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>
+          <Typography variant="body2" sx={mono}>
+            {invoice.messageAt || '—'}
           </Typography>
-        ) : (
-          row.links.slice(0, 2).map((link, index) =>
-            link.safe ? (
-              <Link
-                key={link.id}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                variant="body2"
-                onClick={(event) => event.stopPropagation()}
-                noWrap
-              >
-                Оригінал{row.links.length > 1 ? ` ${index + 1}` : ''} ↗
-              </Link>
-            ) : (
-              <Typography
-                key={link.id}
-                variant="body2"
-                color="warning.main"
-                noWrap
-                title={link.url}
-              >
-                Посилання потребує перевірки
-              </Typography>
-            ),
-          )
-        )}
-        {row.links.length > 2 && (
-          <Typography variant="caption" color="text.secondary">
-            ще {row.links.length - 2}
+          <Typography variant="caption" color="text.secondary" sx={mono}>
+            UID {invoice.sourceUid}
           </Typography>
-        )}
-      </Stack>
-    ),
-  },
-  {
-    field: 'document',
-    headerName: 'Рахунок',
-    width: 210,
-    sortable: false,
-    renderCell: ({ row }) => {
-      const documents = row.links.flatMap((link) => (link.document ? [link.document] : []));
-      const first = documents[0];
-      if (!first) return null;
-      return (
-        <Stack sx={{ ...cell, gap: 0.25 }}>
-          <Typography variant="body2" noWrap title={first.supplierName}>
-            № {first.documentNumber} · {formatPurchaseDocumentDate(first.documentDate)}
-          </Typography>
-          <Stack direction="row" sx={{ gap: 0.75, alignItems: 'center', minWidth: 0 }}>
-            <Typography variant="caption" noWrap sx={mono}>
-              {formatPurchaseMoney(first.totalPayable)}
-            </Typography>
-            <Chip
-              size="small"
-              variant="outlined"
-              label={purchaseVatLabel(first)}
-              sx={{ height: 20 }}
-            />
-            {documents.length > 1 && (
-              <Typography variant="caption" color="text.secondary" noWrap>
-                +{documents.length - 1}
-              </Typography>
-            )}
-          </Stack>
-        </Stack>
-      );
-    },
-  },
-  {
-    field: 'supplierName',
-    headerName: 'Постачальник',
-    flex: 0.9,
-    minWidth: 190,
-    sortable: false,
-    renderCell: ({ row }) => (
-      <Stack sx={cell}>
-        {row.supplierId !== null && row.supplierName === null ? (
-          <Typography variant="body2" color="warning.main" noWrap>
-            Постачальника не знайдено
-          </Typography>
-        ) : (
+        </TableCell>
+        <TableCell sx={{ minWidth: 200, maxWidth: 320 }}>
           <Typography
             variant="body2"
             noWrap
-            color={row.supplierName ? 'text.primary' : 'text.secondary'}
+            title={supplier ?? undefined}
+            color={supplier ? 'text.primary' : 'text.secondary'}
           >
-            {row.supplierName ?? '—'}
+            {supplier ?? '—'}
           </Typography>
-        )}
-        {row.reviewNote && (
-          <Typography variant="caption" color="text.secondary" noWrap title={row.reviewNote}>
-            {row.reviewNote}
-          </Typography>
-        )}
-      </Stack>
-    ),
-  },
-  {
-    field: 'markedPaid',
-    headerName: 'Оплата',
-    width: 190,
-    sortable: false,
-    renderCell: ({ row }) => (
-      <Stack sx={cell}>
-        <Typography variant="body2" noWrap>
-          {row.markedPaid ? 'Відмічено в джерелі' : 'Не підтверджено'}
-        </Typography>
-        {row.markedPaid && (row.markBy || row.markAt) && (
-          <Typography variant="caption" color="text.secondary" noWrap>
-            {[row.markBy, row.markAt].filter(Boolean).join(' · ')}
-          </Typography>
-        )}
-      </Stack>
-    ),
-  },
-  {
-    field: 'issues',
-    headerName: 'Проблеми',
-    flex: 1,
-    minWidth: 220,
-    sortable: false,
-    renderCell: ({ row }) =>
-      row.issues.length > 0 ? (
-        <Stack sx={cell}>
           <Typography
-            variant="body2"
-            color="warning.main"
-            sx={clamp(2)}
-            title={row.issues.join('\n')}
+            variant="caption"
+            color="text.secondary"
+            noWrap
+            component="div"
+            title={invoice.text}
           >
-            {row.issues.join('; ')}
+            {[invoice.chatName, invoice.fromUser].filter(Boolean).join(' · ') ||
+              invoice.text ||
+              '—'}
           </Typography>
-        </Stack>
-      ) : null,
-  },
-];
+        </TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>
+          {first ? (
+            <Typography variant="body2" sx={mono}>
+              № {first.documentNumber} · {formatPurchaseDocumentDate(first.documentDate)}
+              {documents.length > 1 && (
+                <Typography component="span" variant="caption" color="text.secondary">
+                  {' '}
+                  +{documents.length - 1}
+                </Typography>
+              )}
+            </Typography>
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              {invoice.links.length > 1 ? `Оригіналів: ${invoice.links.length}` : '—'}
+            </Typography>
+          )}
+        </TableCell>
+        <TableCell align="right" sx={{ ...mono, whiteSpace: 'nowrap' }}>
+          {first ? formatPurchaseMoney(first.totalPayable) : ''}
+        </TableCell>
+        <TableCell>{first && <PurchaseVatChip vat={first.vat} />}</TableCell>
+        <TableCell sx={{ whiteSpace: 'nowrap' }}>
+          {invoice.markedPaid && (
+            <Typography
+              variant="body2"
+              title={[invoice.markBy, invoice.markAt].filter(Boolean).join(' · ')}
+            >
+              Відмічено
+            </Typography>
+          )}
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell
+          colSpan={columns}
+          sx={{ p: 0, borderBottom: open ? 1 : 0, borderColor: 'divider' }}
+        >
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            <Box
+              sx={{
+                bgcolor: 'action.hover',
+                px: { xs: 1.5, sm: 2 },
+                pb: 2,
+                pt: 0.5,
+                pl: { sm: 7 },
+              }}
+            >
+              {details}
+            </Box>
+          </Collapse>
+        </TableCell>
+      </TableRow>
+    </Fragment>
+  );
+}
 
 /**
- * «Рахунки на закупку»: one row per Telegram message of the sheet «финансы». Only problems are
- * marked; «СПЛАЧЕНО» in the sheet is shown as a source mark, not as a payment.
+ * «Рахунки на закупку»: one row per Telegram message with its state, supplier, invoice number, sum
+ * and VAT. The arrow opens what the AI read. «СПЛАЧЕНО» in the sheet is a source mark, not a payment.
  */
 export function PurchaseInvoicesTable({
   page,
@@ -225,45 +180,78 @@ export function PurchaseInvoicesTable({
   narrowed,
   unavailable,
   onPageChange,
-  onOpen,
+  renderDetails,
 }: Props) {
-  const theme = useTheme();
+  const [open, setOpen] = useState<ReadonlySet<string>>(new Set());
+  const items = page?.items ?? [];
+  const toggle = (id: string) =>
+    setOpen((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  const empty = unavailable
+    ? 'Реєстр недоступний. Повторіть запит.'
+    : narrowed
+      ? 'Рахунків за цими умовами не знайдено.'
+      : 'Реєстр порожній. Натисніть «Оновити зараз».';
+
   return (
-    <DataGrid
-      aria-label="Рахунки на закупку"
-      rows={page?.items ?? []}
-      columns={columns}
-      getRowId={(row) => row.messageId}
-      loading={loading}
-      rowHeight={64}
-      columnHeaderHeight={44}
-      disableColumnMenu
-      disableRowSelectionOnClick
-      paginationMode="server"
-      rowCount={page?.total ?? 0}
-      paginationModel={{ page: (page?.page ?? 1) - 1, pageSize: page?.pageSize ?? 50 }}
-      onPaginationModelChange={onPageChange}
-      onRowClick={({ row }) => onOpen(row)}
-      pageSizeOptions={[25, 50, 100]}
-      localeText={{
-        ...theme.components?.MuiDataGrid?.defaultProps?.localeText,
-        noRowsLabel: unavailable
-          ? 'Реєстр недоступний. Повторіть запит.'
-          : narrowed
-            ? 'Рахунків за цими умовами не знайдено.'
-            : 'Реєстр порожній. Натисніть «Оновити зараз».',
-      }}
-      sx={{
-        minWidth: 0,
-        height: 'var(--admin-table-height)',
-        border: 0,
-        borderTop: 1,
-        borderColor: 'divider',
-        borderRadius: 0,
-        '& .MuiDataGrid-row': { cursor: 'pointer' },
-        '& .MuiDataGrid-columnHeaders': { bgcolor: 'action.hover' },
-        '& .MuiDataGrid-cell': { display: 'flex', alignItems: 'center' },
-      }}
-    />
+    <Box sx={{ minWidth: 0 }}>
+      {loading && <LinearProgress aria-label="Завантаження рахунків" />}
+      <TableContainer sx={{ borderTop: 1, borderColor: 'divider' }}>
+        <Table size="small" aria-label="Рахунки на закупку" sx={{ minWidth: 900 }}>
+          <TableHead sx={{ bgcolor: 'action.hover' }}>
+            <TableRow>
+              <TableCell padding="checkbox" />
+              <TableCell>Стан</TableCell>
+              <TableCell>Дата</TableCell>
+              <TableCell>Постачальник</TableCell>
+              <TableCell>Рахунок</TableCell>
+              <TableCell align="right">Сума</TableCell>
+              <TableCell>ПДВ</TableCell>
+              <TableCell>Оплата</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {items.length === 0 && !loading ? (
+              <TableRow>
+                <TableCell colSpan={columns}>
+                  <Stack sx={{ py: 4, alignItems: 'center' }}>
+                    <Typography variant="body2" color="text.secondary">
+                      {empty}
+                    </Typography>
+                  </Stack>
+                </TableCell>
+              </TableRow>
+            ) : (
+              items.map((invoice) => (
+                <InvoiceRow
+                  key={invoice.messageId}
+                  invoice={invoice}
+                  open={open.has(invoice.messageId)}
+                  onToggle={() => toggle(invoice.messageId)}
+                  details={open.has(invoice.messageId) ? renderDetails(invoice) : null}
+                />
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <TablePagination
+        component="div"
+        count={page?.total ?? 0}
+        page={Math.max(0, (page?.page ?? 1) - 1)}
+        rowsPerPage={page?.pageSize ?? 50}
+        rowsPerPageOptions={[...purchaseInvoicePageSizes]}
+        labelRowsPerPage="Рядків на сторінці"
+        labelDisplayedRows={({ from, to, count }) => `${from}–${to} з ${count}`}
+        onPageChange={(_, next) => onPageChange({ page: next, pageSize: page?.pageSize ?? 50 })}
+        onRowsPerPageChange={(event) =>
+          onPageChange({ page: 0, pageSize: Number(event.target.value) })
+        }
+      />
+    </Box>
   );
 }

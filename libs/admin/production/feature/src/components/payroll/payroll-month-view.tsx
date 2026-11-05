@@ -71,7 +71,9 @@ export function PayrollMonthView({ month, onMessage }: Props) {
       {month.warnings.length > 0 && (
         <Alert severity="warning">
           <Typography variant="body2" sx={{ fontWeight: 600 }}>
-            Місяць не можна закрити, доки є попередження:
+            {permissions.canPay && !permissions.canClose
+              ? 'Місяць не можна закрити, доки є попередження:'
+              : 'Попередження розрахунку:'}
           </Typography>
           <Box component="ul" sx={{ m: 0, pl: 2.5 }}>
             {month.warnings.map((warning) => (
@@ -111,7 +113,6 @@ export function PayrollMonthView({ month, onMessage }: Props) {
             <Button
               variant="contained"
               startIcon={<LockOutlinedIcon />}
-              disabled={month.warnings.length > 0}
               onClick={() => setConfirm('close')}
             >
               Закрити місяць
