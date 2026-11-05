@@ -8,6 +8,7 @@ import {
   adminRouteDefinitions,
   embroideryRoutes,
   productionOrderRoutes,
+  productionReportRoutes,
   productionRoutes,
   tasksRoutes,
 } from './admin-route-definitions';
@@ -25,6 +26,7 @@ const registeredPaths = new Set([
     ...tasksRoutes.board,
     ...productionRoutes,
     ...productionOrderRoutes,
+    ...productionReportRoutes,
     ...accountingRoutes,
   ].map((route) => route.path),
   usersPath,

@@ -6,8 +6,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { App } from '../app';
 import { createAdminRouter } from './create-admin-router';
 
-import type { SessionUser } from '@admin/core/auth';
+import type { SessionRole, SessionUser } from '@admin/core/auth';
 import type { ReactNode } from 'react';
+
+const session = vi.hoisted(() => ({ roles: ['Manager'] as SessionRole[] }));
 
 vi.mock('@admin/core/auth', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@admin/core/auth')>()),
@@ -17,11 +19,11 @@ vi.mock('@admin/core/auth', async (importOriginal) => ({
       id: '2',
       email: 'manager@brevi.com.ua',
       fullName: 'Олена',
-      roles: ['Manager'],
+      roles: session.roles,
       avatarUrl: null,
     }),
   useGetAdminSessionRolesQuery: () => ({
-    currentData: ['Manager'],
+    currentData: session.roles,
     isSuccess: true,
     isFetching: false,
   }),
@@ -57,6 +59,24 @@ afterEach(() => {
   window.history.replaceState({}, '', '/');
   window.localStorage.clear();
   vi.unstubAllGlobals();
+  session.roles = ['Manager'];
+});
+
+describe('owner menu', () => {
+  it('opens «Звіти цеху» from the menu for the owner', async () => {
+    session.roles = ['Admin'];
+    const user = userEvent.setup();
+    window.history.replaceState({}, '', '/');
+    renderApp();
+
+    const navigation = await screen.findByRole('navigation', { name: 'Основна навігація' });
+    await user.click(within(navigation).getByRole('button', { name: 'Швейний цех' }));
+    const list = within(navigation).getByRole('list', { name: 'Швейний цех' });
+    expect(within(list).getByRole('link', { name: 'Звіти цеху' })).toHaveAttribute(
+      'href',
+      '/production/reports',
+    );
+  });
 });
 
 describe('React Admin routing', () => {
