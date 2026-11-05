@@ -65,3 +65,12 @@ export function ensureEmbroiderySavedCalculation(
   ensureEmbroideryCalculation(value['result']);
   return value as Schemas['CrmEmbroiderySavedCalculation'];
 }
+
+export function ensureEmbroideryArchiveResult(
+  value: unknown,
+): Schemas['CrmEmbroideryArchiveImportResult'] {
+  check(value, ['lines'], ['created', 'unchanged', 'errors']);
+  const lines = (value as { lines: unknown[] }).lines;
+  if (lines.some((line) => !isRecord(line) || typeof line['action'] !== 'string')) throw invalid();
+  return value as Schemas['CrmEmbroideryArchiveImportResult'];
+}

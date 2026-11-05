@@ -28,6 +28,11 @@ It replaces the «Ціна вишивки» page of the old calculator.brevi.com
 - In the saved side panel «Додати в КП» opens a second panel: the price for the client (Опт / Стандарт / Терміново with the saved unit price, «Стандарт» by default) and the КП «Під запит» in work (search by number or client; a Manager sees only own ones). «Додати» appends one row; a snackbar offers «Відкрити КП».
 - In the КП editor the row is «Вишивка» with its number, the level as the row title and the price in all three columns (owner's choice of 2026-11-04); the price cannot be typed, the description and «показати» ticks can.
 
+## «Імпорт архіву» (stage 2)
+
+- Director and Admin see «Імпорт архіву» on «Збережені». The side panel takes the transfer file `embroidery-archive.json` (built from the old calculator's D1 export), checks it on the server at once and lists every old calculation: name, date, author and «Буде перенесено», «Уже перенесено» or the error. «Імпортувати» is enabled only when the check has no errors and something to move; after it the rows show their new «ВШ-…» numbers.
+- Nothing is repriced: the server prices each record with its own old rates and refuses it unless it gives the old saved prices.
+
 ## «Налаштування»
 
 - «Ставки»: the stitch rate is read-only here and links to «Параметри ціноутворення»; threads, hooping, program hour and tax are edited.
@@ -50,6 +55,7 @@ Snapshot: BreviERP `docs/sdd/contracts/openapi.yaml` at commit `a9c88f4ad7d1593c
 | `getCrmEmbroideryCalculation`    | GET `/api/crm/embroidery/calculations/{id}`    | side panel; `rates` and `result.cost` null for a Manager                                                |
 | `saveCrmEmbroideryCalculation`   | POST `/api/crm/embroidery/calculations`        | name, client, the priced request; invalidates LIST                                                      |
 | `addCrmQuoteEmbroidery`          | POST `/api/crm/quotes/{id}/embroidery`         | «Додати в КП»: calculation id and level; invalidates the КП, its history and the list                   |
+| `importCrmEmbroideryArchive`     | POST `/api/crm/embroidery/calculations/import` | «Імпорт архіву»: the file rows as they are, `dryRun` for the check; a real import invalidates LIST      |
 | `deleteCrmEmbroideryCalculation` | DELETE `/api/crm/embroidery/calculations/{id}` | Admin only, after confirmation                                                                          |
 
 Responses pass a shape check in `data-access/src/validators` before mapping. A 400 shows the server's first message.
@@ -57,7 +63,7 @@ Responses pass a shape check in `data-access/src/validators` before mapping. A 4
 ## Stages
 
 1. «Розрахунок» and «Налаштування» — done.
-2. «Збережені» calculations — done. The old archive waits for a full export of the old table.
+2. «Збережені» calculations — done, with «Імпорт архіву» of the old calculator (export of 2026-11-05: 8 records to move, the test record left out).
 3. «Додати в КП» — done.
 
 ## Code

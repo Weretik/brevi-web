@@ -35,3 +35,7 @@ export { FabricConsumptionTable } from './stock/fabric-consumption-table';
 export { ProductionItemFabricPanel } from './stock/production-item-fabric';
 export { FabricIssueForm } from './stock/fabric-issue-form';
 export { ProductionReasonDialog } from './dialogs/production-reason-dialog';
+export { ProductionWorkTable } from './work/production-work-table';
+export { ProductionWorkForm } from './work/production-work-form';
+export { ProductionItemWorkPanel } from './work/production-item-work-panel';
+export { SewingForecastTable, forecastRowProblem } from './forecast/sewing-forecast-table';

@@ -20,3 +20,4 @@ export * from './forms/saved/embroidery-save-form';
 export * from './components/saved/embroidery-saved-summary';
 export * from './tables/embroidery-saved-table';
 export * from './forms/saved/embroidery-add-to-quote-form';
+export * from './tables/embroidery-archive-table';

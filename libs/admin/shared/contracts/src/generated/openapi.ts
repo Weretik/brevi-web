@@ -2191,6 +2191,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/crm/embroidery/calculations/import': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description «Імпорт архіву» (Director and Admin). Moves calculations of the old calculator's archive into «Збережені» with their own dates, authors (matched by email, otherwise the email is shown) and frozen rates. Each record is priced with its old rates and must give the old saved prices to the kopeck, otherwise its line is `error`. A record already moved (same `legacyId`) is `unchanged`. With `dryRun=true`, or when any line is `error`, nothing is saved and `dryRun` in the answer is true. */
+    post: operations['importCrmEmbroideryArchive'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/crm/embroidery/calculations/{id}': {
     parameters: {
       query?: never;
@@ -3006,6 +3023,126 @@ export interface paths {
     put?: never;
     /** «Сторно видачі»: every line returns to the stock and the plan is reserved again */
     post: operations['reverseFabricIssue'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/work': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** «Журнал робіт» of a month, optionally of one worker or order */
+    get: operations['getWorkLog'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/work/choices': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Workers, items of «Нове» orders and over-plan reasons */
+    get: operations['getWorkChoices'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/orders/{id}/items/{itemId}/work': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** «Робота» of an item */
+    get: operations['getProductionItemWork'];
+    put?: never;
+    /** Records sewn or cut pieces; beyond the plan only as over-plan with a reason */
+    post: operations['createProductionWork'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/work/{workId}/void': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** «Сторно» of a record with a reason */
+    post: operations['voidProductionWork'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/work/import': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Moves the work log of the old «Цех» (Admin); nothing is saved unless every row is fine */
+    post: operations['importProductionWork'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/forecast': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** «Прогноз пошиття»: the queue with approximate ends of sewing */
+    get: operations['getSewingForecast'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/forecast/queue': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Sets the order of the queue (WorkshopChief and Admin) */
+    put: operations['saveSewingForecastQueue'];
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -6201,6 +6338,45 @@ export interface components {
         markups: components['schemas']['CrmEmbroideryMarkup'][];
       };
     };
+    CrmEmbroideryArchivePrice: {
+      unit: number;
+      total: number;
+      repeatUnit: number;
+    };
+    CrmEmbroideryArchiveRow: {
+      /** @description The old record id. */
+      legacyId: string;
+      name?: string | null;
+      /** Format: date-time */
+      createdAt: string;
+      createdByEmail?: string | null;
+      calculation: components['schemas']['CrmCalculateEmbroideryInput'];
+      /** @description The embroiderer's rate per 1000 stitches then. */
+      stitchRate: number;
+      settings: components['schemas']['CrmSaveEmbroiderySettingsInput'];
+      /** @description The old saved prices, «Опт», «Стандарт», «Терміново» in order. */
+      prices: components['schemas']['CrmEmbroideryArchivePrice'][];
+    };
+    CrmEmbroideryArchiveImportLine: {
+      legacyId: string;
+      name: string;
+      /** Format: date-time */
+      createdAt: string;
+      createdByName: string;
+      /** @enum {string} */
+      action: 'created' | 'unchanged' | 'error';
+      message?: string | null;
+      /** @description «ВШ-0042» once saved. */
+      number?: string | null;
+    };
+    CrmEmbroideryArchiveImportResult: {
+      /** @description True when nothing was saved. */
+      dryRun: boolean;
+      created: number;
+      unchanged: number;
+      errors: number;
+      lines: components['schemas']['CrmEmbroideryArchiveImportLine'][];
+    };
     /**
      * @default Open
      * @enum {string}
@@ -7151,6 +7327,201 @@ export interface components {
     ReverseFabricIssueInput: {
       orderVersion: number;
       reason: string;
+    };
+    ProductionWorkResponse: {
+      id: number;
+      orderId: number;
+      orderNumber: number;
+      clientName: string;
+      itemId: number;
+      modelName: string;
+      employeeId: number;
+      employeeName: string;
+      /** @enum {string} */
+      kind: 'Sewing' | 'Cutting';
+      quantity: number;
+      /** Format: date */
+      workDate: string;
+      /** @description Beyond the item quantity; does not count toward the plan. */
+      overPlan: boolean;
+      /** @description Why over plan. */
+      reason: string | null;
+      comment: string | null;
+      /** @description Sewing rate of the item in UAH when the work was recorded. */
+      rate: number;
+      isVoided: boolean;
+      /** Format: date-time */
+      voidedAt: string | null;
+      voidedByName: string | null;
+      voidReason: string | null;
+      createdByName: string;
+      /** Format: date-time */
+      createdAt: string;
+    };
+    /** @description Pieces of records not cancelled. */
+    WorkLogTotals: {
+      sewn: number;
+      cut: number;
+      records: number;
+    };
+    WorkLogResponse: {
+      month: string;
+      rows: components['schemas']['ProductionWorkResponse'][];
+      totals: components['schemas']['WorkLogTotals'];
+    };
+    WorkEmployeeChoice: {
+      id: number;
+      fullName: string;
+      position: string;
+    };
+    WorkItemChoice: {
+      orderId: number;
+      orderNumber: number;
+      clientName: string;
+      itemId: number;
+      modelName: string;
+      quantity: number;
+      sewn: number;
+      cut: number;
+      sewingRate: number | null;
+    };
+    WorkChoicesResponse: {
+      employees: components['schemas']['WorkEmployeeChoice'][];
+      /** @description Items of «Нове» orders. */
+      items: components['schemas']['WorkItemChoice'][];
+      overPlanReasons: string[];
+    };
+    ProductionItemWorkResponse: {
+      orderId: number;
+      itemId: number;
+      orderNumber: number;
+      modelName: string;
+      quantity: number;
+      sewingRate: number | null;
+      /** @description Plan pieces sewn (not cancelled, not over plan). */
+      sewn: number;
+      cut: number;
+      rows: components['schemas']['ProductionWorkResponse'][];
+      /** @description WorkshopChief and Admin on a «Нове» order with a sewing rate. */
+      canRecord: boolean;
+      /** @description Why work cannot be recorded, for those who see the work. */
+      cannotRecord: string | null;
+    };
+    CreateProductionWorkInput: {
+      employeeId: number;
+      /** @enum {string} */
+      kind: 'Sewing' | 'Cutting';
+      quantity: number;
+      /** Format: date */
+      workDate: string;
+      overPlan: boolean;
+      /**
+       * @description Required when overPlan.
+       * @enum {string|null}
+       */
+      reason:
+        | 'Запас'
+        | 'Заміна браку'
+        | 'Зміна кількості'
+        | 'Зразок'
+        | 'Повторне пошиття'
+        | 'Інше'
+        | null;
+      comment: string | null;
+    };
+    VoidProductionWorkInput: {
+      reason: string;
+    };
+    ProductionWorkImportRow: {
+      legacyId: string;
+      orderLegacyId: string;
+      position: number;
+      employeeName: string;
+      /** @enum {string} */
+      kind: 'Sewing' | 'Cutting';
+      quantity: number;
+      overPlan: boolean;
+      reason: string | null;
+      comment: string | null;
+      rate: number;
+      /** Format: date */
+      workDate: string;
+      /** Format: date-time */
+      at: string;
+      actorEmail: string | null;
+      /** Format: date-time */
+      voidedAt: string | null;
+      voidReason: string | null;
+    };
+    ProductionWorkImportInput: {
+      rows: components['schemas']['ProductionWorkImportRow'][];
+    };
+    ProductionWorkImportLine: {
+      legacyId: string;
+      orderNumber: number | null;
+      position: number;
+      employeeName: string;
+      kind: string;
+      quantity: number;
+      /** @enum {string} */
+      action: 'created' | 'unchanged' | 'error';
+      error: string | null;
+    };
+    ProductionWorkImportResult: {
+      dryRun: boolean;
+      created: number;
+      unchanged: number;
+      errors: number;
+      lines: components['schemas']['ProductionWorkImportLine'][];
+    };
+    ForecastSettingsResponse: {
+      seamstressCount: number;
+      shiftMinutes: number;
+      /** @description Admin only. */
+      minuteCost: number | null;
+    };
+    ForecastRowResponse: {
+      orderId: number;
+      orderNumber: number;
+      clientName: string;
+      managerName: string;
+      /** @description Pieces left to sew. */
+      remaining: number;
+      /** @description Sewing minutes left; only for those who see the sewing rate. */
+      minutes: number | null;
+      /**
+       * Format: date
+       * @description Approximate end of sewing, not a delivery date.
+       */
+      finishOn: string | null;
+      /** @enum {string} */
+      status: 'Estimated' | 'Complete' | 'Unknown';
+      /** @enum {string|null} */
+      reason: 'MissingRate' | 'UnknownPredecessor' | 'BeyondHorizon' | null;
+      /**
+       * Format: date
+       * @description The earliest «Готово до» of the items.
+       */
+      dueDate: string;
+      /** @description finishOn is after dueDate. */
+      isLate: boolean;
+    };
+    ForecastResponse: {
+      /** Format: date */
+      startDate: string;
+      /** @description Only for those who see the sewing rate. */
+      settings: components['schemas']['ForecastSettingsResponse'] | null;
+      /** @description Why no date is counted at all. */
+      problem: string | null;
+      rows: components['schemas']['ForecastRowResponse'][];
+      canReorder: boolean;
+      /** @description Queue version; 0 before the first save. */
+      version: number;
+    };
+    SaveForecastQueueInput: {
+      version: number;
+      /** @description Orders in the new order; the rest follow by order date. */
+      orderIds: number[];
     };
     WorkshopTelegramChatResponse: {
       /** Format: int64 */
@@ -14263,6 +14634,47 @@ export interface operations {
       };
     };
   };
+  importCrmEmbroideryArchive: {
+    parameters: {
+      query?: {
+        dryRun?: boolean;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmEmbroideryArchiveRow'][];
+      };
+    };
+    responses: {
+      /** @description What was moved, or would be. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmEmbroideryArchiveImportResult'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required (the Director also holds Admin). */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   getCrmEmbroideryCalculation: {
     parameters: {
       query?: never;
@@ -16775,6 +17187,385 @@ export interface operations {
         content?: never;
       };
       /** @description Stale or already reversed */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getWorkLog: {
+    parameters: {
+      query: {
+        /** @description YYYY-MM */
+        month: string;
+        employeeId?: number;
+        orderId?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['WorkLogResponse'];
+        };
+      };
+      /** @description Invalid month */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getWorkChoices: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['WorkChoicesResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getProductionItemWork: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+        itemId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionItemWorkResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such order or item */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createProductionWork: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+        itemId: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateProductionWorkInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionItemWorkResponse'];
+        };
+      };
+      /** @description Invalid, no rate, future date or no such worker */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such order or item */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description More than left of the plan */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  voidProductionWork: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        workId: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['VoidProductionWorkInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionItemWorkResponse'];
+        };
+      };
+      /** @description Invalid */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such record */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Already cancelled */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  importProductionWork: {
+    parameters: {
+      query?: {
+        /** @description Only check and show. */
+        dryRun?: boolean;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ProductionWorkImportInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionWorkImportResult'];
+        };
+      };
+      /** @description Invalid file */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getSewingForecast: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ForecastResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  saveSewingForecastQueue: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SaveForecastQueueInput'];
+      };
+    };
+    responses: {
+      /** @description Saved */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Invalid */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Stale version or an order left the queue */
       409: {
         headers: {
           [name: string]: unknown;

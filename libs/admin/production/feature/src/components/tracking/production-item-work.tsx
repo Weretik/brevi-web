@@ -6,6 +6,7 @@ import {
 import { Box, Typography } from '@mui/material';
 
 import { ProductionItemFabricSection } from '../stock/production-item-fabric-section';
+import { ProductionItemWorkSection } from '../work/production-item-work-section';
 
 import type {
   ProductionFileKind,
@@ -39,7 +40,7 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-/** What the workshop does with one item: stages, shipments, fabric and its files. */
+/** What the workshop does with one item: stages, shipments, work, fabric and its files. */
 export function ProductionItemWork({
   order,
   item,
@@ -71,6 +72,11 @@ export function ProductionItemWork({
           onCancel={permissions.canTrack ? onCancelShipment : undefined}
         />
       </Section>
+      {permissions.seesSewingRate && (
+        <Section title="Робота">
+          <ProductionItemWorkSection order={order} item={item} onMessage={onMessage} />
+        </Section>
+      )}
       <Section title="Тканина">
         <ProductionItemFabricSection orderId={order.id} item={item} onMessage={onMessage} />
       </Section>
