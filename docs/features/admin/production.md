@@ -1,6 +1,6 @@
 # Admin: «Швейний цех»
 
-**Status:** implementation exists, checked 2026-11-05 (stage 7). SDD: [stage 1](../../specs/admin/production/001-workshop-references/README.md) ([consumer contract](../../specs/admin/production/001-workshop-references/contracts/api-contract.md)), [stage 2 «Виробничі завдання»](../../specs/admin/production/002-production-orders/README.md), [stage 3 stages, shipments, files, Telegram](../../specs/admin/production/003-order-tracking/README.md), [stage 4 «Склад тканин»](../../specs/admin/production/004-fabric-stock/README.md), [stage 5 «Журнал робіт» and «Прогноз пошиття»](../../specs/admin/production/005-work-log/README.md), [stage 6 «Робочий час» and «Зарплата»](../../specs/admin/production/006-timesheet-payroll/README.md), [stage 7 «Звіти цеху» and the overview](../../specs/admin/production/007-workshop-reports/README.md).
+**Status:** implementation exists, checked 2026-11-05 (stage 8). SDD: [stage 1](../../specs/admin/production/001-workshop-references/README.md) ([consumer contract](../../specs/admin/production/001-workshop-references/contracts/api-contract.md)), [stage 2 «Виробничі завдання»](../../specs/admin/production/002-production-orders/README.md), [stage 3 stages, shipments, files, Telegram](../../specs/admin/production/003-order-tracking/README.md), [stage 4 «Склад тканин»](../../specs/admin/production/004-fabric-stock/README.md), [stage 5 «Журнал робіт» and «Прогноз пошиття»](../../specs/admin/production/005-work-log/README.md), [stage 6 «Робочий час» and «Зарплата»](../../specs/admin/production/006-timesheet-payroll/README.md), [stage 7 «Звіти цеху» and the overview](../../specs/admin/production/007-workshop-reports/README.md), [stage 8 «Архів цеху»](../../specs/admin/production/008-workshop-archive/README.md).
 
 The sidebar group «Швейний цех» gets three reference pages for the head of the workshop (role `WorkshopChief`), Admin and the director; the other items of the group without a page stay placeholders for later stages. «Працівники цеху» (`/production/staff`) is the list of workers: they do not sign in, the head of the workshop records their work. Chips switch «Працюють» / «Архів» and filter by position; a worker who left goes «В архів» instead of being deleted. «Норми витрати тканини» (`/production/fabric-norms`) shows every sewing model of «Товари» with its fabric per item in metres (one, two or three colours); only problems get a mark. Both lists have «Імпорт» of the transfer JSON with a server preview first. «Правила зарплати» (`/production/payroll-rules`) shows the payroll coefficients read from «Параметри ціноутворення», with a link there.
 
@@ -18,6 +18,8 @@ After «Передати в цех» every item shows its «Етапи» (the he
 
 «Звіти цеху» (`/production/reports`, Admin only) shows whole months, at most 12, optionally against a second period: tab «Огляд» with output at the КП price, accrued pay, fabric issued and the stock at the end, then «Випуск», «Працівники» (with pay per 8 hours), «Видані матеріали» and «Залишки». Only gaps (no price, no hours, negative stock) and payroll warnings are marked; a month closed in «Зарплата» keeps its report. The admin home shows the real workshop board, see [Overview](dashboard.md).
 
+«Архів цеху» (`/production/archive`, the same people as «Виробничі завдання») reads the old «Графік роботи 2017–2026» and «Старі заявки» with «Пошук» and «Від» / «До», opens a line read only with its other fields and links, and lists the closed Brevi orders on «Закриті завдання». Admin has «Імпорт» of workshop-archive.json; a repeated import skips what is already there.
+
 ## Structure diagram
 
 ```mermaid
@@ -25,7 +27,7 @@ flowchart LR
   Menu["legacy-menu.ts: Швейний цех"] --> Router["create-admin-router: RequireRole canManageWorkshop / canUseProductionOrders"]
   Router --> Routes["feature: production.routes.tsx (createProductionRoutes, createProductionOrderRoutes)"]
   Actor["app: use-production-order-actor.ts"] --> Routes
-  Routes --> Pages["feature/pages: staff, norms, payroll, orders, stock, work, forecast, timesheet"]
+  Routes --> Pages["feature/pages: staff, norms, payroll, orders, stock, work, forecast, timesheet, archive"]
   Pages --> Hooks["feature/hooks: lists, editors, archive, delete, import, orders, requests, stock"]
   Pages --> UI["ui: grids, forms, details, chips, import preview, payroll table, orders"]
   Pages --> RefUI["@admin/references/ui: page header, search, filter row, side panel"]
@@ -39,14 +41,14 @@ flowchart LR
 ```text
 libs/admin/production/
   model/src/
-    entities/                     # worker, fabric norm, import result, payroll parameter, production order, tracking (stages, files, Telegram, settings), fabric stock, work, sewing forecast, timesheet, payroll, workshop report and overview
+    entities/                     # worker, fabric norm, import result, payroll parameter, production order, tracking (stages, files, Telegram, settings), fabric stock, work, sewing forecast, timesheet, payroll, workshop report and overview, workshop archive
     forms/                        # worker, norm, order item and order forms, shipment and cancel reason, workshop settings, receipt, correction, issue, work (and months), timesheet hours, payment and adjustment, report period
     queries/                      # list filters, chip counts, orders, stock and payroll CSV
-    validators/                   # reads workshop-staff.json, fabric-norms.json, production-orders.json, production-progress.json, fabric-stock.json, production-work.json
+    validators/                   # reads workshop-staff.json, fabric-norms.json, production-orders.json, production-progress.json, fabric-stock.json, production-work.json, workshop-archive.json
     mappers/format-production.ts  # metres, parameter values, dates
     mappers/format-application.ts # application text, linked embroidery details and link
   data-access/src/
-    api/{workshop-staff,fabric-norms,payroll-parameters,production-orders,production-tracking,workshop-settings,fabric-stock,production-work,payroll,workshop-reports}.api.ts # endpoints; production-base-api.ts adds tags
+    api/{workshop-staff,fabric-norms,payroll-parameters,production-orders,production-tracking,workshop-settings,fabric-stock,production-work,payroll,workshop-reports,workshop-archive}.api.ts # endpoints; production-base-api.ts adds tags
     mappers/                      # runtime-checked response → model
     validators/production-response.ts
     errors/production-api-error.ts
@@ -61,6 +63,7 @@ libs/admin/production/
     timesheet/                    # day table, month summary, change history
     payroll/                      # parameters table; month table with «Видано», payments and adjustments, worker detail, year, roles/embroidery and entry forms
     reports/                      # report totals with comparison and gaps; output, staff, materials and stock tables
+    archive/                      # archive grid, read-only line details
   feature/src/
     production.routes.tsx         # createProductionRoutes (workshop), createProductionOrderRoutes, createProductionReportRoutes (Admin); the app wraps them in RequireRole
     pages/{staff,norms,payroll}/
@@ -72,6 +75,7 @@ libs/admin/production/
     pages/timesheet/              # «Робочий час»
     pages/payroll/                # «Правила зарплати», «Зарплата»
     pages/reports/                # «Звіти цеху»
+    pages/archive/                # «Архів цеху»
     hooks/{staff,norms,import,payroll}/
     hooks/orders/                 # list, export, create, card, editor, copy and delete, «Розрахунок вишивки» search
     hooks/requests/               # debounce, request id against duplicates
@@ -80,6 +84,7 @@ libs/admin/production/
     hooks/stock/                  # stock list, receipt, correction, issue, «Сторно» reason (also used for work)
     hooks/work/                   # «Додати роботу» editor
     hooks/timesheet/              # a day: typed hours, changes, save
+    hooks/archive/                # tab, search, dates, pages of the archive or closed orders
     hooks/payroll/                # payment and adjustment editors, month actions («Видано», cancel, close, reopen)
     components/{staff,norms,import}/ # side panels
     components/orders/            # header and item side panels, header actions, КП item line, order summary
@@ -94,10 +99,10 @@ libs/admin/core/auth/src/session/session-user.ts # WorkshopChief, canManageWorks
 
 ## Tests
 
-- `libs/admin/production/model/src/forms/production-forms.test.ts`, `libs/admin/production/model/src/forms/production-order-forms.test.ts`, `libs/admin/production/model/src/validators/production-import-file.test.ts`, `libs/admin/production/model/src/forms/fabric-stock-forms.test.ts`, `libs/admin/production/model/src/forms/production-work-form.test.ts`, `libs/admin/production/model/src/forms/timesheet-form.test.ts`, `libs/admin/production/model/src/forms/payroll-forms.test.ts`, `libs/admin/production/model/src/forms/workshop-report-period.test.ts`
-- `libs/admin/production/data-access/src/mappers/production-mappers.test.ts`, `libs/admin/production/data-access/src/mappers/production-order.mapper.test.ts`, `libs/admin/production/data-access/src/mappers/production-tracking.mapper.test.ts`, `libs/admin/production/data-access/src/mappers/fabric-stock.mapper.test.ts`, `libs/admin/production/data-access/src/mappers/production-work.mapper.test.ts`, `libs/admin/production/data-access/src/mappers/payroll.mapper.test.ts`, `libs/admin/production/data-access/src/mappers/workshop-report.mapper.test.ts`
+- `libs/admin/production/model/src/forms/production-forms.test.ts`, `libs/admin/production/model/src/forms/production-order-forms.test.ts`, `libs/admin/production/model/src/validators/production-import-file.test.ts`, `libs/admin/production/model/src/forms/fabric-stock-forms.test.ts`, `libs/admin/production/model/src/forms/production-work-form.test.ts`, `libs/admin/production/model/src/forms/timesheet-form.test.ts`, `libs/admin/production/model/src/forms/payroll-forms.test.ts`, `libs/admin/production/model/src/forms/workshop-report-period.test.ts`, `libs/admin/production/model/src/validators/workshop-archive-import-file.test.ts`
+- `libs/admin/production/data-access/src/mappers/production-mappers.test.ts`, `libs/admin/production/data-access/src/mappers/production-order.mapper.test.ts`, `libs/admin/production/data-access/src/mappers/production-tracking.mapper.test.ts`, `libs/admin/production/data-access/src/mappers/fabric-stock.mapper.test.ts`, `libs/admin/production/data-access/src/mappers/production-work.mapper.test.ts`, `libs/admin/production/data-access/src/mappers/payroll.mapper.test.ts`, `libs/admin/production/data-access/src/mappers/workshop-report.mapper.test.ts`, `libs/admin/production/data-access/src/mappers/workshop-archive.mapper.test.ts`
 - `libs/admin/production/ui/src/payroll/payroll-parameters-table.component.test.tsx`, `libs/admin/production/ui/src/forecast/sewing-forecast-table.component.test.tsx`, `libs/admin/production/ui/src/timesheet/timesheet-day-table.component.test.tsx`, `libs/admin/production/ui/src/payroll/payroll-month-table.component.test.tsx`, `libs/admin/production/ui/src/reports/report-totals.component.test.tsx`
-- `libs/admin/production/feature/src/pages/staff/workshop-staff-page.component.test.tsx`, `libs/admin/production/feature/src/pages/norms/fabric-norms-page.component.test.tsx`
+- `libs/admin/production/feature/src/pages/staff/workshop-staff-page.component.test.tsx`, `libs/admin/production/feature/src/pages/norms/fabric-norms-page.component.test.tsx`, `libs/admin/production/feature/src/pages/archive/workshop-archive-page.component.test.tsx`
 - `libs/admin/production/feature/src/pages/orders/production-order-create-page.component.test.tsx`, `libs/admin/production/feature/src/pages/orders/production-order-page.component.test.tsx`
 - `apps/admin-react/src/app/router/navigation-config.unit.test.ts` (who sees the items)
 

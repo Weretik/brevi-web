@@ -368,3 +368,12 @@ export {
   reportPeriodLabel,
   reportPeriodProblem,
 } from './forms/workshop-report-period';
+export { workshopArchiveKindLabels } from './entities/workshop-archive';
+export type {
+  WorkshopArchiveImportRow,
+  WorkshopArchiveKind,
+  WorkshopArchivePage,
+  WorkshopArchiveQuery,
+  WorkshopArchiveRow,
+} from './entities/workshop-archive';
+export { parseWorkshopArchiveImportFile } from './validators/workshop-archive-import-file';

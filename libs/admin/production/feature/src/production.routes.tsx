@@ -15,6 +15,7 @@ const SewingForecastPage = lazy(() => import('./pages/forecast/sewing-forecast-p
 const TimesheetPage = lazy(() => import('./pages/timesheet/timesheet-page'));
 const PayrollPage = lazy(() => import('./pages/payroll/payroll-page'));
 const WorkshopReportPage = lazy(() => import('./pages/reports/workshop-report-page'));
+const WorkshopArchivePage = lazy(() => import('./pages/archive/workshop-archive-page'));
 
 interface ProductionRouteOptions {
   /** The signed-in person: may they import the old «Цех» log. */
@@ -40,7 +41,7 @@ interface ProductionOrderRouteOptions {
 }
 
 /**
- * «Виробничі завдання», «Склад тканин» and «Прогноз пошиття»; the app puts them behind Admin, Manager or
+ * «Виробничі завдання», «Склад тканин», «Прогноз пошиття» and «Архів цеху»; the app puts them behind Admin, Manager or
  * WorkshopChief. The server still decides what each person may change and which prices they see.
  */
 export function createProductionOrderRoutes({ useOrderActor }: ProductionOrderRouteOptions) {
@@ -56,6 +57,10 @@ export function createProductionOrderRoutes({ useOrderActor }: ProductionOrderRo
       element: <FabricStockPage useOrderActor={useOrderActor} />,
     },
     { path: '/production/forecast', element: <SewingForecastPage /> },
+    {
+      path: '/production/archive',
+      element: <WorkshopArchivePage useOrderActor={useOrderActor} />,
+    },
   ];
 }
 
