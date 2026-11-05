@@ -228,6 +228,7 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         path: '/admin/tasks',
         requiredRoles: admin,
       },
+      { id: 'ai-settings', label: 'Налаштування ШІ', path: '/admin/ai', requiredRoles: admin },
     ],
   },
 ];

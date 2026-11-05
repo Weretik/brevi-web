@@ -1,3 +1,4 @@
+import { aiSettingsPath } from '@admin/ai/feature';
 import { sessionRoleLabel } from '@admin/core/auth';
 import { AdminLayout } from '@admin/core/shell';
 import { profilePath, usersPath } from '@admin/users/feature';
@@ -25,6 +26,7 @@ const registeredPaths = new Set([
     ...productionOrderRoutes,
   ].map((route) => route.path),
   usersPath,
+  aiSettingsPath,
 ]);
 
 export function AdminRouteLayout({ user }: { user: SessionUser }) {

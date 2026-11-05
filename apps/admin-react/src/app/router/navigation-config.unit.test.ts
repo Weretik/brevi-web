@@ -80,13 +80,14 @@ describe('legacy Admin navigation', () => {
     expect(available[0].items[2].to).toBeUndefined();
   });
 
-  it('shows «Користувачі» and «Завдання менеджерам» only to the server Admin role', () => {
-    const paths = new Set(['/admin/users', '/admin/tasks']);
+  it('shows «Користувачі», «Завдання менеджерам» and «Налаштування ШІ» only to Admin', () => {
+    const paths = new Set(['/admin/users', '/admin/tasks', '/admin/ai']);
     const admin = createNavigation(paths, ['Admin']).find((group) => group.id === 'administration');
 
     expect(admin?.items).toEqual([
       { id: 'users', label: 'Користувачі', to: '/admin/users' },
       { id: 'manager-tasks', label: 'Завдання менеджерам', to: '/admin/tasks' },
+      { id: 'ai-settings', label: 'Налаштування ШІ', to: '/admin/ai' },
     ]);
     expect(
       createNavigation(paths, ['Manager']).some((group) => group.id === 'administration'),

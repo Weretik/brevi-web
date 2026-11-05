@@ -7,10 +7,12 @@ import {
   ReferenceSearchBar,
 } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
+import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined';
 import SyncOutlinedIcon from '@mui/icons-material/SyncOutlined';
-import { Alert, Box, Button, Paper } from '@mui/material';
+import { Alert, Box, Button, Paper, Stack } from '@mui/material';
 import { useState } from 'react';
 
+import { usePurchaseRecognitionBatch } from '../../hooks/documents/use-purchase-recognition-batch';
 import { usePurchaseInvoiceList } from '../../hooks/invoices/use-purchase-invoice-list';
 import { usePurchaseInvoiceSync } from '../../hooks/invoices/use-purchase-invoice-sync';
 import { PurchaseInvoiceDrawer } from '../review/purchase-invoice-drawer';
@@ -28,17 +30,24 @@ const formatTime = (value: string) =>
 
 /**
  * «Контрагенти → Рахунки на закупку»: messages of the Google sheet «финансы», refreshed daily
- * and by «Оновити зараз». Read-only in this stage; only problems are marked.
+ * and by «Оновити зараз». «Розпізнати всі нові» reads new originals by AI in batches; only
+ * problems are marked.
  */
 export function PurchaseInvoicesContent({ tabs }: Props) {
   const state = usePurchaseInvoiceList();
   const [notice, setNotice] = useState<{ text: string; ok: boolean } | null>(null);
-  const [opened, setOpened] = useState<PurchaseInvoice | null>(null);
+  const [openedRow, setOpenedRow] = useState<PurchaseInvoice | null>(null);
   const { sync, syncing, syncState } = usePurchaseInvoiceSync((text, ok) =>
     setNotice({ text, ok }),
   );
+  const batch = usePurchaseRecognitionBatch((text, ok) => setNotice({ text, ok }));
   const { list } = state;
   const page = list.currentData;
+  // The panel follows the reloaded page, so a new recognition shows at once.
+  const opened = openedRow
+    ? (page?.items.find((item) => item.messageId === openedRow.messageId) ?? openedRow)
+    : null;
+  const close = () => setOpenedRow(null);
   const lastSuccess = syncState?.lastSuccessAt;
 
   return (
@@ -59,16 +68,37 @@ export function PurchaseInvoicesContent({ tabs }: Props) {
           )
         }
         actions={
-          <Button
-            variant="outlined"
-            startIcon={<SyncOutlinedIcon />}
-            disabled={syncing}
-            onClick={() => void sync()}
-          >
-            {syncing ? 'Оновлення…' : 'Оновити зараз'}
-          </Button>
+          <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap' }}>
+            {batch.running ? (
+              <Button variant="outlined" color="warning" onClick={batch.stop}>
+                Зупинити
+              </Button>
+            ) : (
+              <Button
+                variant="outlined"
+                startIcon={<AutoAwesomeOutlinedIcon />}
+                disabled={syncing}
+                onClick={() => void batch.start()}
+              >
+                Розпізнати всі нові
+              </Button>
+            )}
+            <Button
+              variant="outlined"
+              startIcon={<SyncOutlinedIcon />}
+              disabled={syncing || batch.running}
+              onClick={() => void sync()}
+            >
+              {syncing ? 'Оновлення…' : 'Оновити зараз'}
+            </Button>
+          </Stack>
         }
       />
+      {batch.running && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          {batch.progress ?? 'Розпізнавання оригіналів…'}
+        </Alert>
+      )}
       {notice && (
         <Alert
           severity={notice.ok ? 'success' : 'error'}
@@ -121,6 +151,12 @@ export function PurchaseInvoicesContent({ tabs }: Props) {
               selected={state.filter === 'WithoutSupplier'}
               onClick={() => state.setFilter('WithoutSupplier')}
             />
+            <ReferenceFilterChip
+              label="Не розпізнані"
+              count={state.counts.NotRecognized}
+              selected={state.filter === 'NotRecognized'}
+              onClick={() => state.setFilter('NotRecognized')}
+            />
           </>
         }
         count={page?.total ?? 0}
@@ -136,16 +172,16 @@ export function PurchaseInvoicesContent({ tabs }: Props) {
           narrowed={Boolean(state.search) || state.filter !== 'All'}
           unavailable={Boolean(list.error)}
           onPageChange={state.setPage}
-          onOpen={setOpened}
+          onOpen={setOpenedRow}
         />
       </Paper>
       {opened && (
         <PurchaseInvoiceDrawer
           key={opened.messageId}
           invoice={opened}
-          onClose={() => setOpened(null)}
+          onClose={close}
           onSaved={(review) => {
-            setOpened(null);
+            close();
             setNotice({
               text: review.supplierName
                 ? `Збережено: постачальник «${review.supplierName}».`

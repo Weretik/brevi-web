@@ -58,6 +58,7 @@ export function usePurchaseInvoiceList() {
   const allCount = useGetPurchaseInvoicesQuery(count('All'));
   const reviewCount = useGetPurchaseInvoicesQuery(count('NeedsReview'));
   const withoutSupplierCount = useGetPurchaseInvoicesQuery(count('WithoutSupplier'));
+  const notRecognizedCount = useGetPurchaseInvoicesQuery(count('NotRecognized'));
 
   return {
     term,
@@ -70,6 +71,7 @@ export function usePurchaseInvoiceList() {
       All: allCount.currentData?.total ?? 0,
       NeedsReview: reviewCount.currentData?.total ?? 0,
       WithoutSupplier: withoutSupplierCount.currentData?.total ?? 0,
+      NotRecognized: notRecognizedCount.currentData?.total ?? 0,
     },
     list,
     setPage: ({ page: next, pageSize: size }: GridPaginationModel) =>

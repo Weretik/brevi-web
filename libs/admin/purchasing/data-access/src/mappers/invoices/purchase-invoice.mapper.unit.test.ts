@@ -26,7 +26,40 @@ const card = {
   reviewedAt: '2026-11-05T08:00:00+00:00',
   state: 'NeedsReview',
   issues: ['Немає посилання на оригінал'],
-  links: [{ id: 'f'.repeat(64), url: 'https://www.dropbox.com/x.pdf', safe: true }],
+  links: [
+    {
+      id: 'f'.repeat(64),
+      url: 'https://www.dropbox.com/x.pdf',
+      safe: true,
+      document: null,
+      recognition: {
+        result: 'NeedsReview',
+        problems: ['Сума позицій 1300.00, а до оплати 1560.00.'],
+        model: 'gpt-6.1-terra',
+        costUsd: 0.004,
+        by: 'buh@brevi.com.ua',
+        at: '2026-11-05T08:00:00+00:00',
+      },
+    },
+  ],
+};
+
+const document = {
+  documentType: 'Рахунок-фактура',
+  documentNumber: '110776',
+  documentDate: '2026-10-21',
+  supplierName: 'ФОП БИСТРОВ ДМИТРО АНДРІЙОВИЧ',
+  vat: 'WithoutVat',
+  pricesIncludeVat: false,
+  vatAmount: null,
+  totalPayable: '8000.00',
+  items: [
+    { position: 1, name: 'Реклама', quantity: '1', unit: 'посл.', price: '8000', sum: '8000.00' },
+  ],
+  source: 'Manual',
+  model: null,
+  checkedBy: 'buh@brevi.com.ua',
+  checkedAt: '2026-11-05T08:00:00+00:00',
 };
 
 describe('purchase invoice responses', () => {
@@ -34,6 +67,25 @@ describe('purchase invoice responses', () => {
     const page = mapPurchaseInvoicePage({ items: [card], total: 1, page: 1, pageSize: 50 });
     expect(page.items[0]).toEqual(card);
     expect(page.total).toBe(1);
+  });
+
+  it('maps the checked facts of a link and refuses an unknown VAT mode', () => {
+    const link = { ...card.links[0], document, recognition: null };
+    const page = mapPurchaseInvoicePage({
+      items: [{ ...card, links: [link] }],
+      total: 1,
+      page: 1,
+      pageSize: 50,
+    });
+    expect(page.items[0]?.links[0]?.document).toEqual(document);
+    expect(() =>
+      mapPurchaseInvoicePage({
+        items: [{ ...card, links: [{ ...link, document: { ...document, vat: 'unknown' } }] }],
+        total: 1,
+        page: 1,
+        pageSize: 50,
+      }),
+    ).toThrow('ПДВ');
   });
 
   it('refuses an unknown state or a missing field', () => {

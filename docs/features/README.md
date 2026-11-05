@@ -8,7 +8,7 @@ In each feature card, “Structure diagram” shows relationships between parts,
 
 - Service manager: [«КП»: list, «Товари та ціни» editor, «КП для знайомства» with ready templates, PDF, Gmail sending and «Налаштування КП»](admin/quotes.md); [client card from KeepinCRM](admin/clients.md); [manager tasks: «Завдання менеджерам» and the «Мої завдання» board](admin/tasks.md); [«Ціна вишивки»: embroidery and chevron price with «Налаштування»](admin/embroidery.md).
 - Admin foundation: [shell, navigation, and session](admin/shell.md); [overview page «Огляд виробництва»](admin/dashboard.md).
-- Staff accounts: [sign-in users «Користувачі» (Admin only)](admin/users.md); [«Мій кабінет» and the profile menu](admin/profile.md).
+- Staff accounts: [sign-in users «Користувачі» (Admin only)](admin/users.md); [«Налаштування ШІ»: OpenAI key, models, limit and recognition rules (Admin only)](admin/ai.md); [«Мій кабінет» and the profile menu](admin/profile.md).
 - Site content: [«Контент»: privacy and terms](admin/content.md).
 - Products: [«Товари» tables, details, creation, and editing](admin/products/products.md); [Sewing fabrics and composition](admin/products/sewing-composition.md); [Article calculation and published prices](admin/products/sewing-pricing.md); [PPE pricing and input approval](admin/products/ppe-pricing.md).
 - Sewing workshop: [«Швейний цех»: «Виробничі завдання» (етапи, відвантаження, тканина, файли, Telegram), «Склад тканин», «Журнал робіт», «Прогноз пошиття», «Працівники цеху», «Норми витрати тканини», «Правила зарплати», «Робочий час», «Зарплата», «Звіти цеху», «Налаштування цеху»](admin/production.md).
