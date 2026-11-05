@@ -76,7 +76,7 @@ export function quoteSettingsErrors(draft: QuoteSettingsDraft): QuoteSettingsErr
   check('email.body', draft.email.body, marks(required(quoteSettingsTextMax)));
 
   check('pdf.title', pdf.title, required(quoteSettingsShortMax));
-  for (const key of ['vatNotice', 'ctaTitle', 'ctaText'] as const)
+  for (const key of ['vatNotice', 'ctaTitle', 'ctaText', 'introText'] as const)
     check(`pdf.${key}`, pdf[key], optional(quoteSettingsTextMax));
   check('pdf.ctaContactTemplate', pdf.ctaContactTemplate, marks(optional(quoteSettingsTextMax)));
 

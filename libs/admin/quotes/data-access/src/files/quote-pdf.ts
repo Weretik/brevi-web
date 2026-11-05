@@ -1,8 +1,12 @@
 import { requestApiBlob } from '@admin/shared/api-client';
 
-/** Downloads the PDF built from the saved КП and saves it as «КП <number>.pdf». */
-export async function downloadQuotePdf(id: number, number: string): Promise<void> {
-  const blob = await requestApiBlob({ url: `/api/crm/quotes/${id}/pdf` });
+/** The PDF built on the server from the saved КП. */
+export function fetchQuotePdf(id: number): Promise<Blob> {
+  return requestApiBlob({ url: `/api/crm/quotes/${id}/pdf` });
+}
+
+/** Saves a КП PDF as «КП <number>.pdf». */
+export function saveQuotePdf(blob: Blob, number: string): void {
   const url = URL.createObjectURL(blob);
   try {
     const link = document.createElement('a');
@@ -14,4 +18,9 @@ export async function downloadQuotePdf(id: number, number: string): Promise<void
   } finally {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
+}
+
+/** Downloads the PDF built from the saved КП and saves it as «КП <number>.pdf». */
+export async function downloadQuotePdf(id: number, number: string): Promise<void> {
+  saveQuotePdf(await fetchQuotePdf(id), number);
 }

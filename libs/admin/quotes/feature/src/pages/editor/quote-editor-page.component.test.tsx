@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -66,7 +66,8 @@ const quote: Quote = {
 const api = vi.hoisted(() => ({
   save: vi.fn(),
   refetch: vi.fn(),
-  download: vi.fn(),
+  fetchPdf: vi.fn(),
+  savePdf: vi.fn(),
   send: vi.fn(),
   connect: vi.fn(),
   archive: vi.fn(),
@@ -83,7 +84,8 @@ vi.mock('@admin/quotes/data-access', () => ({
   useCreateQuoteMutation: api.mutation(vi.fn()),
   useSaveQuoteMutation: api.mutation(api.save),
   useDeleteQuoteMutation: api.mutation(vi.fn()),
-  downloadQuotePdf: api.download,
+  fetchQuotePdf: api.fetchPdf,
+  saveQuotePdf: api.savePdf,
   useGetQuoteSendDraftQuery: () => ({ data: api.draft.current, isLoading: false, isError: false }),
   useSendQuoteMutation: api.mutation(api.send),
   useConnectMailboxMutation: api.mutation(api.connect),
@@ -148,10 +150,23 @@ const typeRetail = (value: string) =>
     target: { value },
   });
 
+const pdfBlob = new Blob(['%PDF-'], { type: 'application/pdf' });
+
+/** «Надіслати КП» opens the preview first; the letter panel opens from its own «Надіслати КП». */
+async function sendFromPreview() {
+  const preview = await screen.findByRole('dialog', { name: /Перегляд КП/ });
+  await within(preview).findByTitle(/PDF КП/);
+  fireEvent.click(within(preview).getByRole('button', { name: 'Надіслати КП' }));
+}
+
 beforeEach(() => {
   api.save.mockReset();
   api.refetch.mockReset();
-  api.download.mockReset();
+  api.fetchPdf.mockReset();
+  api.fetchPdf.mockResolvedValue(pdfBlob);
+  api.savePdf.mockReset();
+  URL.createObjectURL = vi.fn(() => 'blob:quote-pdf');
+  URL.revokeObjectURL = vi.fn();
   api.send.mockReset();
   api.connect.mockReset();
   api.archive.mockReset();
@@ -289,18 +304,27 @@ describe('КП editor', () => {
     await waitFor(() => expect(screen.getByLabelText('Отримувач')).toHaveValue(''));
   });
 
-  it('«Переглянути PDF» downloads the saved КП at once', async () => {
-    api.download.mockResolvedValue(undefined);
+  it('«Переглянути PDF» shows the PDF of the saved КП and downloads it from the preview', async () => {
     renderEditor();
     fireEvent.click(await screen.findByRole('button', { name: 'Переглянути PDF' }));
-    await waitFor(() => expect(api.download).toHaveBeenCalledWith(4, '1-11-2026'));
+    const preview = await screen.findByRole('dialog', { name: 'Перегляд КП № 1-11-2026' });
+    expect(await within(preview).findByTitle('PDF КП № 1-11-2026')).toHaveAttribute(
+      'src',
+      'blob:quote-pdf',
+    );
+    expect(api.fetchPdf).toHaveBeenCalledWith(4);
     expect(api.save).not.toHaveBeenCalled();
+
+    fireEvent.click(within(preview).getByRole('button', { name: 'Завантажити' }));
+    expect(api.savePdf).toHaveBeenCalledWith(pdfBlob, '1-11-2026');
+    fireEvent.click(within(preview).getByRole('button', { name: 'Повернутися до редагування' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:quote-pdf');
   });
 
   it('«Переглянути PDF» saves unsaved changes first and builds the PDF from the saved version', async () => {
     const saved = { ...quote, version: 4 };
     api.save.mockResolvedValue(saved);
-    api.download.mockResolvedValue(undefined);
     renderEditor();
     expect(await screen.findByText('КП 1-11-2026')).toBeVisible();
     fireEvent.change(screen.getByLabelText('Коментар для клієнта'), {
@@ -308,10 +332,10 @@ describe('КП editor', () => {
     });
 
     fireEvent.click(screen.getByRole('button', { name: 'Переглянути PDF' }));
-    await waitFor(() => expect(api.download).toHaveBeenCalledWith(4, '1-11-2026'));
+    await waitFor(() => expect(api.fetchPdf).toHaveBeenCalledWith(4));
     expect(api.save).toHaveBeenCalledTimes(1);
     expect(api.save.mock.invocationCallOrder[0]).toBeLessThan(
-      api.download.mock.invocationCallOrder[0] ?? 0,
+      api.fetchPdf.mock.invocationCallOrder[0] ?? 0,
     );
   });
 
@@ -326,7 +350,7 @@ describe('КП editor', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Переглянути PDF' }));
     expect(await screen.findByText('КП змінили в іншому вікні. Оновіть сторінку.')).toBeVisible();
-    expect(api.download).not.toHaveBeenCalled();
+    expect(api.fetchPdf).not.toHaveBeenCalled();
   });
 
   it('«Надіслати КП» saves first, sends the letter and marks the КП sent', async () => {
@@ -343,6 +367,7 @@ describe('КП editor', () => {
     fireEvent.change(screen.getByLabelText('Коментар для клієнта'), { target: { value: 'Інше' } });
 
     fireEvent.click(screen.getByRole('button', { name: 'Надіслати КП' }));
+    await sendFromPreview();
     const to = await screen.findByLabelText(/Кому/);
     expect(api.save).toHaveBeenCalledTimes(1);
     expect(screen.getByLabelText(/Тема/)).toHaveValue('КП № 1-11-2026');
@@ -364,6 +389,7 @@ describe('КП editor', () => {
     });
     renderEditor();
     fireEvent.click(await screen.findByRole('button', { name: 'Надіслати КП' }));
+    await sendFromPreview();
     fireEvent.change(await screen.findByLabelText(/Кому/), { target: { value: 'client@agro.ua' } });
     fireEvent.click(screen.getByRole('button', { name: 'Надіслати' }));
 
@@ -375,6 +401,7 @@ describe('КП editor', () => {
   it('does not send without a recipient', async () => {
     renderEditor();
     fireEvent.click(await screen.findByRole('button', { name: 'Надіслати КП' }));
+    await sendFromPreview();
     await screen.findByLabelText(/Кому/);
     fireEvent.click(screen.getByRole('button', { name: 'Надіслати' }));
 
@@ -387,6 +414,7 @@ describe('КП editor', () => {
     api.connect.mockRejectedValue({ message: 'Підключати Gmail інших може лише директор.' });
     renderEditor();
     fireEvent.click(await screen.findByRole('button', { name: 'Надіслати КП' }));
+    await sendFromPreview();
 
     expect(await screen.findByText(/Ваш Gmail ще не підключено/)).toBeVisible();
     expect(screen.getByRole('button', { name: 'Надіслати' })).toBeDisabled();

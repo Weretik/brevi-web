@@ -11,152 +11,164 @@ interface Props {
   focused: string | null;
 }
 
-/** Accent of the КП PDF (the server draws it with the same colour). */
-const accent = '#E8780F';
-const accentSoft = '#FDF1E6';
-const muted = '#6B6B66';
+/** Colours of the КП PDF «Класика+» (the server draws it with the same ones). */
+const accent = '#FD9600';
+const accentText = '#9A5A00';
+const accentOnDark = '#FFB547';
+const graphite = '#262626';
+const line = '#E2DED8';
+const muted = '#555555';
 
-const rows = [
-  { name: 'Куртка робоча, твіл', prices: ['1 240,00', '1 120,00', '1 050,00'] },
-  { name: 'Напівкомбінезон, твіл', prices: ['980,00', '890,00', '840,00'] },
+/** The standard opening text the server uses when the field is empty. */
+const standardIntro =
+  'Підібрали для {client} добірку відповідно до вашого запиту. Для кожної позиції вказані характеристики та ціна, щоб ви могли швидко сформувати потрібний набір.';
+
+const prices = [
+  { label: '10–40 шт.', value: '1 120,00 грн' },
+  { label: 'від 41 шт.', value: '1 050,00 грн' },
 ];
 
-/** A sketch of the КП page with the example data; the real PDF is drawn by the server. */
+/** A sketch of the first КП page with the example data; the real PDF is drawn by the server. */
 export function QuotePdfPreview({ draft, sample, focused }: Props) {
   const { company, pdf } = draft;
   const hl = (...paths: string[]) => previewHighlight(focused, ...paths);
   const site = sample.marks['{site}'];
+  const intro = (pdf.introText.trim() || standardIntro).replaceAll('{client}', sample.client);
   const hasCta = Boolean(
     pdf.ctaTitle.trim() || pdf.ctaText.trim() || pdf.ctaContactTemplate.trim(),
   );
+  const requisites = [
+    [
+      company.name,
+      company.edrpou && `ЄДРПОУ ${company.edrpou}`,
+      company.taxId && `ІПН ${company.taxId}`,
+      company.iban && `IBAN ${company.iban}`,
+    ],
+    [company.address, site, company.email],
+  ].map((parts) => parts.filter((part) => part && part.trim()).join(' · '));
   return (
     <Box
       role="img"
       aria-label="Перегляд PDF КП"
       sx={{
         bgcolor: '#fff',
-        color: '#1F1F1F',
+        color: graphite,
         border: 1,
         borderColor: 'divider',
         borderRadius: 0.5,
         boxShadow: '0 6px 18px rgba(0,0,0,.08)',
-        p: 2.25,
-        fontSize: 10,
+        fontSize: 9.5,
         lineHeight: 1.45,
         aspectRatio: '1 / 1.414',
         display: 'flex',
         flexDirection: 'column',
-        gap: 1.25,
         overflow: 'hidden',
       }}
     >
-      <Stack
-        direction="row"
-        sx={{
-          justifyContent: 'space-between',
-          gap: 1,
-          pb: 1,
-          borderBottom: `2px solid ${accent}`,
-          ...hl('company.'),
-        }}
-      >
-        {company.logoUrl.trim().startsWith('https://') ? (
-          <Box
-            component="img"
-            src={company.logoUrl.trim()}
-            alt=""
-            sx={{ maxHeight: 28, maxWidth: 110, objectFit: 'contain' }}
-          />
-        ) : (
-          <Typography sx={{ fontSize: 13, fontWeight: 700, color: accent }}>
-            {company.name || 'Назва компанії'}
-          </Typography>
-        )}
-        <Box sx={{ textAlign: 'right', fontSize: 8.5, color: muted }}>
-          <Box sx={{ fontWeight: 700, color: '#1F1F1F' }}>{company.name}</Box>
-          {[company.address, company.phone, company.email]
-            .filter((line) => line.trim())
-            .map((line) => (
-              <Box key={line}>{line}</Box>
-            ))}
-          {site && <Box sx={{ color: accent }}>{site}</Box>}
+      <Box sx={{ px: 2.25, pt: 2 }}>
+        <Stack direction="row" sx={{ justifyContent: 'space-between', gap: 1, ...hl('company.') }}>
+          {company.logoUrl.trim().startsWith('https://') ? (
+            <Box
+              component="img"
+              src={company.logoUrl.trim()}
+              alt=""
+              sx={{ maxHeight: 30, maxWidth: 110, objectFit: 'contain' }}
+            />
+          ) : (
+            <Typography sx={{ fontSize: 13, fontWeight: 700, color: accentText }}>
+              {company.name || 'Назва компанії'}
+            </Typography>
+          )}
+          <Box sx={{ textAlign: 'right' }}>
+            <Box sx={{ fontWeight: 700, fontSize: 11, letterSpacing: '.04em', ...hl('pdf.title') }}>
+              {pdf.title || 'Заголовок'}
+            </Box>
+            <Box>
+              № <b>{sample.number}</b> · від {sample.date}
+            </Box>
+          </Box>
+        </Stack>
+        <Box
+          sx={{
+            mt: 0.75,
+            pt: 0.5,
+            borderTop: `2px solid ${accent}`,
+            fontSize: 7.5,
+            color: '#444',
+            ...hl('company.'),
+          }}
+        >
+          {requisites.map((text) => text && <Box key={text}>{text}</Box>)}
+        </Box>
+      </Box>
+
+      <Stack direction="row" sx={{ px: 2.25, pt: 1.5, gap: 1.5 }}>
+        <Box sx={{ flex: '0 0 30%' }}>
+          <Box sx={{ fontSize: 7, color: muted, letterSpacing: '.08em' }}>ДЛЯ</Box>
+          <Box sx={{ fontWeight: 700, fontSize: 11 }}>{sample.client}</Box>
+        </Box>
+        <Box sx={{ flex: 1 }}>
+          <Box sx={hl('pdf.introText')}>{intro}</Box>
+          {pdf.vatNotice.trim() && (
+            <Box sx={{ fontWeight: 600, ...hl('pdf.vatNotice') }}>{pdf.vatNotice}</Box>
+          )}
         </Box>
       </Stack>
 
-      <Box>
-        <Box sx={{ fontSize: 15, fontWeight: 700, color: accent, ...hl('pdf.title') }}>
-          {pdf.title || 'Заголовок'}
-        </Box>
-        <Box sx={{ color: muted }}>
-          № {sample.number} від {sample.date}
-        </Box>
-        <Box>
-          <Box component="span" sx={{ color: muted }}>
-            Для:{' '}
+      <Stack
+        direction="row"
+        sx={{ mx: 2.25, mt: 1.5, pt: 1.25, gap: 1.25, borderTop: `1px solid ${line}` }}
+      >
+        <Box sx={{ width: 64, height: 82, flex: 'none', bgcolor: '#F7F5F2' }} />
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Box sx={{ fontWeight: 700, fontSize: 11 }}>
+            <Box component="span" sx={{ color: accentText, mr: 0.75 }}>
+              01
+            </Box>
+            Куртка робоча, твіл
           </Box>
-          <b>{sample.client}</b>
-        </Box>
-      </Box>
-
-      <Box sx={{ border: '1px solid #E3E3DF', p: 1 }}>
-        <Box component="table" sx={{ width: '100%', borderCollapse: 'collapse', fontSize: 9 }}>
-          <thead>
-            <tr>
-              {['Варіант тканини', 'до 9 шт.', '10–40 шт.', 'від 41 шт.'].map((head, index) => (
-                <Box
-                  component="th"
-                  key={head}
-                  sx={{
-                    textAlign: index === 0 ? 'left' : 'right',
-                    color: muted,
-                    fontWeight: 400,
-                    borderBottom: '1px solid #E3E3DF',
-                    py: 0.25,
-                  }}
-                >
-                  {head}
-                </Box>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr key={row.name}>
-                <Box component="td" sx={{ fontWeight: 600, py: 0.5 }}>
-                  {row.name}
-                </Box>
-                {row.prices.map((price, index) => (
-                  <Box component="td" key={index} sx={{ textAlign: 'right', fontWeight: 600 }}>
-                    {price}
-                  </Box>
-                ))}
-              </tr>
+          <Box sx={{ fontSize: 7.5, color: muted }}>Код MOD-1</Box>
+          <Box sx={{ fontSize: 8.5 }}>Опис моделі з картки товару.</Box>
+          <Stack direction="row" sx={{ mt: 0.75, border: `1px solid ${line}` }}>
+            {prices.map((price) => (
+              <Box key={price.label} sx={{ flex: 1, px: 0.75, py: 0.5 }}>
+                <Box sx={{ fontSize: 7, color: muted }}>{price.label}</Box>
+                <Box sx={{ fontWeight: 700 }}>{price.value}</Box>
+              </Box>
             ))}
-          </tbody>
+          </Stack>
         </Box>
-      </Box>
-
-      {pdf.vatNotice.trim() && (
-        <Box sx={{ fontStyle: 'italic', color: muted, ...hl('pdf.vatNotice') }}>
-          {pdf.vatNotice}
-        </Box>
-      )}
+      </Stack>
 
       {hasCta && (
         <Box
           sx={{
-            border: `1px solid ${accent}`,
-            bgcolor: accentSoft,
+            mx: 2.25,
+            mt: 1.5,
+            bgcolor: graphite,
+            color: '#E8E6E3',
+            borderRadius: 1,
             p: 1.25,
             whiteSpace: 'pre-line',
           }}
         >
           {pdf.ctaTitle.trim() && (
-            <Box sx={{ fontSize: 11, fontWeight: 700, ...hl('pdf.ctaTitle') }}>{pdf.ctaTitle}</Box>
+            <Box
+              sx={{ fontSize: 10.5, fontWeight: 700, color: accentOnDark, ...hl('pdf.ctaTitle') }}
+            >
+              {pdf.ctaTitle}
+            </Box>
           )}
           {pdf.ctaText.trim() && <Box sx={hl('pdf.ctaText')}>{pdf.ctaText}</Box>}
           {pdf.ctaContactTemplate.trim() && (
-            <Box sx={{ pt: 0.5, fontWeight: 600, ...hl('pdf.ctaContactTemplate', 'staff:') }}>
+            <Box
+              sx={{
+                pt: 0.5,
+                fontWeight: 600,
+                color: '#fff',
+                ...hl('pdf.ctaContactTemplate', 'staff:'),
+              }}
+            >
               <QuoteMarkedText text={pdf.ctaContactTemplate} marks={sample.marks} />
             </Box>
           )}
@@ -164,24 +176,29 @@ export function QuotePdfPreview({ draft, sample, focused }: Props) {
       )}
 
       <Box sx={{ flex: 1 }} />
-      <Box
+      <Stack
+        direction="row"
         sx={{
-          borderTop: '1px solid #E3E3DF',
-          pt: 0.75,
+          bgcolor: graphite,
+          color: '#fff',
+          px: 2.25,
+          py: 1,
           fontSize: 8,
-          color: muted,
-          ...hl('company.name', 'company.edrpou', 'company.taxId', 'company.iban'),
+          justifyContent: 'space-between',
+          alignItems: 'flex-end',
+          ...hl('staff:'),
         }}
       >
-        {[
-          company.name,
-          company.edrpou && `ЄДРПОУ ${company.edrpou}`,
-          company.taxId && `ІПН ${company.taxId}`,
-          company.iban && `IBAN ${company.iban}`,
-        ]
-          .filter(Boolean)
-          .join(' · ')}
-      </Box>
+        <Box>
+          <Box sx={{ fontWeight: 700, color: accentOnDark }}>{sample.marks['{managerName}']}</Box>
+          <Box>{sample.marks['{managerPhone}']}</Box>
+          <Box>{sample.marks['{managerEmail}']}</Box>
+        </Box>
+        <Box sx={{ textAlign: 'right' }}>
+          {site && <Box>{site}</Box>}
+          <Box>Сторінка 1 з 1</Box>
+        </Box>
+      </Stack>
     </Box>
   );
 }

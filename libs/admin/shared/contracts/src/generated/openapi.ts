@@ -5847,6 +5847,8 @@ export interface components {
       ctaText?: string | null;
       /** @description Marks: {managerName}, {managerPhone}, {managerEmail}. */
       ctaContactTemplate?: string | null;
+      /** @description Opening text under the client name. Marks: {client}, {managerName}, {managerPhone}, {managerEmail}, {site}, {quoteNumber}. Empty means the standard text. */
+      introText?: string | null;
     };
     CrmQuoteAdvantage: {
       title: string;

@@ -24,6 +24,7 @@ export interface QuotePdfTextsDraft {
   ctaTitle: string;
   ctaText: string;
   ctaContactTemplate: string;
+  introText: string;
 }
 
 export interface QuoteAdvantageDraft {

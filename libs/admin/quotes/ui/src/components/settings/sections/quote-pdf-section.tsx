@@ -12,7 +12,7 @@ interface Props {
   onChange: (patch: Partial<QuotePdfTextsDraft>) => void;
 }
 
-/** «PDF КП під запит»: the title, the VAT note and the block at the bottom of the page. */
+/** «PDF КП під запит»: the title, the opening text, the VAT note and the block at the bottom of the page. */
 export function QuotePdfSection({ pdf, saved, errors, onChange }: Props) {
   const at = errorsAt(errors, 'pdf');
   const field = (
@@ -34,9 +34,14 @@ export function QuotePdfSection({ pdf, saved, errors, onChange }: Props) {
     <>
       <Stack sx={{ gap: 1.5 }}>
         {field('title', 'Заголовок документа', { required: true })}
+        {field('introText', 'Вступ під назвою клієнта', {
+          multiline: true,
+          helperText:
+            '{client} — назва клієнта. Порожнє поле — стандартний текст: «Підібрали для {client} добірку…».',
+        })}
         {field('vatNotice', 'Примітка про ПДВ', {
           multiline: true,
-          helperText: 'Під цінами, курсивом.',
+          helperText: 'Під вступом, жирним.',
         })}
       </Stack>
       <QuoteSettingsGroup title="Блок унизу сторінки">

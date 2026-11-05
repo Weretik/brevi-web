@@ -27,11 +27,12 @@ import { QuoteEditorHeader } from './quote-editor-header';
 import { QuoteEditorNotices } from './quote-editor-notices';
 import { QuoteEditorPanels } from './quote-editor-panels';
 import { QuoteDeleteDialog } from '../../components/editor/quote-delete-dialog';
+import { QuotePreview } from '../../components/preview/quote-preview';
 import { useClientSuggestions } from '../../hooks/clients/use-client-suggestions';
 import { useQuoteEditor } from '../../hooks/editor/use-quote-editor';
-import { useQuotePdf } from '../../hooks/editor/use-quote-pdf';
 import { useQuoteLifecycle } from '../../hooks/lifecycle/use-quote-lifecycle';
 import { useRouteNotice } from '../../hooks/lifecycle/use-route-notice';
+import { useQuotePreview } from '../../hooks/preview/use-quote-preview';
 import { useGmailReturnNotice } from '../../hooks/sending/use-gmail-return-notice';
 import { useQuoteStartPrefill } from '../../hooks/start/use-quote-start-prefill';
 
@@ -68,7 +69,7 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleteQuote, deleting] = useDeleteQuoteMutation();
   const { quote, draft } = editor;
-  const pdf = useQuotePdf({ quote, dirty: editor.dirty, save: editor.save });
+  const preview = useQuotePreview({ quote, dirty: editor.dirty, save: editor.save });
   const gmail = useGmailReturnNotice();
   const [sentNotice, setSentNotice] = useState<string | null>(null);
   const lifecycle = useQuoteLifecycle(quote, editor.applyServerQuote);
@@ -95,14 +96,14 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
   const actions = {
     dirty: editor.dirty,
     saving: editor.saving,
-    generating: pdf.generating,
+    generating: preview.preparing,
     locked: lifecycle.archived,
     onSave: () => void editor.save(),
-    onPdf: () => void pdf.generate(),
-    onSend: async () => {
+    onPdf: () => void preview.open(),
+    // The manager sees the PDF first and sends it from the preview (crm R-30).
+    onSend: () => {
       setSentNotice(null);
-      const saved = quote && !editor.dirty ? quote : await editor.save();
-      if (saved) setPanel({ kind: 'send' });
+      void preview.open();
     },
   };
 
@@ -131,7 +132,6 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
         gmail={gmail}
         sentNotice={sentNotice}
         onSentNoticeClose={() => setSentNotice(null)}
-        pdfError={pdf.pdfError}
       />
 
       <Box
@@ -209,6 +209,11 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
         </Box>
       </Box>
       {!wide && <QuoteSendActions layout="bar" {...actions} />}
+      <QuotePreview
+        preview={preview}
+        locked={lifecycle.archived}
+        onSend={() => setPanel({ kind: 'send' })}
+      />
 
       <QuoteEditorPanels
         panel={panel}

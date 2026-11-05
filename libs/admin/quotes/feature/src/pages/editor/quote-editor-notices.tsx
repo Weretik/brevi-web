@@ -15,7 +15,6 @@ interface Props {
   gmail: ReturnType<typeof useGmailReturnNotice>;
   sentNotice: string | null;
   onSentNoticeClose: () => void;
-  pdfError: string | null;
 }
 
 /** The notices above the КП editor: archive, errors, Gmail return, sent and copy notices. */
@@ -28,7 +27,6 @@ export function QuoteEditorNotices({
   gmail,
   sentNotice,
   onSentNoticeClose,
-  pdfError,
 }: Props) {
   return (
     <>
@@ -73,11 +71,6 @@ export function QuoteEditorNotices({
       {sentNotice && (
         <Alert severity="success" sx={{ mb: 2 }} onClose={onSentNoticeClose}>
           {sentNotice}
-        </Alert>
-      )}
-      {pdfError && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {pdfError}
         </Alert>
       )}
     </>

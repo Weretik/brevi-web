@@ -22,7 +22,14 @@ const draft = (): QuoteSettingsDraft => ({
     logoUrl: '',
   },
   email: { subject: 'КП', body: 'Текст' },
-  pdf: { title: 'КП', vatNotice: '', ctaTitle: '', ctaText: '', ctaContactTemplate: '' },
+  pdf: {
+    title: 'КП',
+    vatNotice: '',
+    ctaTitle: '',
+    ctaText: '',
+    ctaContactTemplate: '',
+    introText: '',
+  },
   introduction: {
     logoText: '',
     summerTitle: '',
