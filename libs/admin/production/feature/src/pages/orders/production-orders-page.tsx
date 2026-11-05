@@ -1,10 +1,12 @@
 import {
   useImportProductionOrdersMutation,
   useImportProductionProgressMutation,
+  useImportProductionReportPricesMutation,
 } from '@admin/production/data-access';
 import {
   parseProductionOrderImportFile,
   parseProductionProgressImportFile,
+  parseProductionReportPriceImportFile,
   productionStageLabels,
   productionStages,
 } from '@admin/production/model';
@@ -38,10 +40,11 @@ export function ProductionOrdersPage({ useOrderActor }: Props) {
   const navigate = useNavigate();
   const list = useProductionOrders();
   const [message, setMessage] = useState<string | null>(null);
-  const [importing, setImporting] = useState<'orders' | 'progress' | null>(null);
+  const [importing, setImporting] = useState<'orders' | 'progress' | 'prices' | null>(null);
   const exporter = useProductionOrdersExport(setMessage);
   const [importOrders] = useImportProductionOrdersMutation();
   const [importProgress] = useImportProductionProgressMutation();
+  const [importPrices] = useImportProductionReportPricesMutation();
   const page = list.page;
 
   return (
@@ -75,6 +78,13 @@ export function ProductionOrdersPage({ useOrderActor }: Props) {
                   onClick={() => setImporting('progress')}
                 >
                   Імпорт етапів
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<UploadFileOutlinedIcon />}
+                  onClick={() => setImporting('prices')}
+                >
+                  Ціни КП
                 </Button>
               </>
             )}
@@ -175,6 +185,17 @@ export function ProductionOrdersPage({ useOrderActor }: Props) {
           detailLabel="Що зміниться"
           parse={parseProductionProgressImportFile}
           send={(rows, dryRun) => importProgress({ rows, dryRun }).unwrap()}
+          onClose={() => setImporting(null)}
+        />
+      )}
+      {importing === 'prices' && (
+        <ProductionImportDrawer
+          title="Ціни КП"
+          description="Файл production-report-prices.json: ціни КП для завдань зі старого «Цеху», щоб «Звіти цеху» рахували вартість випуску. Ціну отримає лише позиція без ціни. Спершу перевіримо, потім збережемо."
+          keyLabel="Завдання"
+          detailLabel="Що зміниться"
+          parse={parseProductionReportPriceImportFile}
+          send={(rows, dryRun) => importPrices({ rows, dryRun }).unwrap()}
           onClose={() => setImporting(null)}
         />
       )}

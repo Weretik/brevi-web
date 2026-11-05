@@ -122,3 +122,25 @@ export function mapProgressImportResult(value: unknown): ProductionImportResult 
     }),
   };
 }
+
+/** Moved КП prices in the shared import preview: «№ 12» and how many items take a price. */
+export function mapReportPriceImportResult(value: unknown): ProductionImportResult {
+  const row = record(value, 'результат імпорту');
+  return {
+    dryRun: boolean(row['dryRun'], 'перегляд'),
+    created: 0,
+    updated: integer(row['updated'], 'оновлено'),
+    unchanged: integer(row['unchanged'], 'без змін'),
+    errors: integer(row['errors'], 'помилки'),
+    lines: list(row['lines'], 'рядки імпорту').map((item) => {
+      const line = record(item, 'рядок імпорту');
+      const number = nullableInteger(line['number'], 'номер', 1);
+      return {
+        key: number === null ? text(line['legacyId'], 'id завдання') : `№ ${number}`,
+        detail: `Позицій з ціною: ${integer(line['prices'], 'позицій')}`,
+        action: oneOf(line['action'], ['updated', 'unchanged', 'error'] as const, 'дія імпорту'),
+        error: nullableText(line['error'], 'помилка'),
+      };
+    }),
+  };
+}

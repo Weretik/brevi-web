@@ -1,7 +1,10 @@
 import { productionBaseApi } from './production-base-api';
 import { productionOrderErrors, toProductionApiError } from '../errors/production-api-error';
 import { mapProductionOrder } from '../mappers/production-order.mapper';
-import { mapProgressImportResult } from '../mappers/production-tracking.mapper';
+import {
+  mapProgressImportResult,
+  mapReportPriceImportResult,
+} from '../mappers/production-tracking.mapper';
 
 import type {
   CreateProductionShipmentBody,
@@ -9,6 +12,7 @@ import type {
   ProductionImportResult,
   ProductionOrder,
   ProductionProgressImportRow,
+  ProductionReportPriceImportRow,
   ProductionStage,
 } from '@admin/production/model';
 import type { components } from '@admin/shared/contracts';
@@ -22,6 +26,10 @@ const shipmentInput = (
 const progressInput = (
   rows: ProductionProgressImportRow[],
 ): Schemas['ProductionProgressImportRow'][] => rows;
+
+const reportPriceInput = (
+  rows: ProductionReportPriceImportRow[],
+): Schemas['ProductionReportPriceImportRow'][] => rows;
 
 const errors = (response: unknown) => toProductionApiError(response, productionOrderErrors);
 const list = { type: 'ProductionOrder' as const, id: 'LIST' };
@@ -142,6 +150,21 @@ export const productionTrackingApi = productionBaseApi.injectEndpoints({
       invalidatesTags: (result, error) =>
         error || !result || result.dryRun || result.errors > 0 ? [] : [{ type: 'ProductionOrder' }],
     }),
+    importProductionReportPrices: build.mutation<
+      ProductionImportResult,
+      { rows: ProductionReportPriceImportRow[]; dryRun: boolean }
+    >({
+      query: ({ rows, dryRun }) => ({
+        url: '/api/production/orders/report-price-import',
+        method: 'POST',
+        params: { dryRun },
+        body: reportPriceInput(rows),
+      }),
+      transformResponse: mapReportPriceImportResult,
+      transformErrorResponse: errors,
+      invalidatesTags: (result, error) =>
+        error || !result || result.dryRun || result.errors > 0 ? [] : [{ type: 'ProductionOrder' }],
+    }),
   }),
 });
 
@@ -151,6 +174,7 @@ export const {
   useCreateProductionShipmentMutation,
   useDeleteProductionOrderFileMutation,
   useImportProductionProgressMutation,
+  useImportProductionReportPricesMutation,
   useSendProductionOrderTelegramMutation,
   useSetProductionItemStagesMutation,
   useUploadProductionOrderFileMutation,

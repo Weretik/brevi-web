@@ -140,6 +140,7 @@ export type {
   ProductionFileKind,
   ProductionOrderFile,
   ProductionProgressImportRow,
+  ProductionReportPriceImportRow,
   ProductionShipment,
   ProductionStage,
   ProductionTelegram,
@@ -159,6 +160,7 @@ export type {
   ProductionShipmentFormValues,
 } from './forms/production-shipment-form';
 export { parseProductionProgressImportFile } from './validators/production-progress-import-file';
+export { parseProductionReportPriceImportFile } from './validators/production-report-price-import-file';
 export {
   validateWorkshopSettings,
   workshopSettingsBody,

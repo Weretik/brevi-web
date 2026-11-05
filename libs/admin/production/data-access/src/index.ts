@@ -32,6 +32,7 @@ export {
   useCreateProductionShipmentMutation,
   useDeleteProductionOrderFileMutation,
   useImportProductionProgressMutation,
+  useImportProductionReportPricesMutation,
   useSendProductionOrderTelegramMutation,
   useSetProductionItemStagesMutation,
   useUploadProductionOrderFileMutation,
