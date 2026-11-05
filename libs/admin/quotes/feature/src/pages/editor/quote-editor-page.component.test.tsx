@@ -72,6 +72,7 @@ const api = vi.hoisted(() => ({
   connect: vi.fn(),
   archive: vi.fn(),
   copy: vi.fn(),
+  addEmbroidery: vi.fn(),
   draft: { current: null as unknown },
   mutation: (fn: (arg: unknown) => unknown) => () => [
     (arg: unknown) => ({ unwrap: () => fn(arg) }),
@@ -93,6 +94,10 @@ vi.mock('@admin/quotes/data-access', () => ({
   useCalculateQuoteCustomSewingMutation: api.mutation(vi.fn()),
   useSetQuoteArchivedMutation: api.mutation(api.archive),
   useCopyQuoteMutation: api.mutation(api.copy),
+  useAddQuoteEmbroideryMutation: () => [
+    (arg: unknown) => Promise.resolve({ data: api.addEmbroidery(arg) }),
+    { isLoading: false, isError: false },
+  ],
   useGetQuoteHistoryQuery: () => ({
     data: [
       {
@@ -127,6 +132,38 @@ vi.mock('@admin/references/data-access', () => ({
   useListFabricsQuery: () => ({ data: [], isLoading: false, isError: false }),
   useListGarmentAccessoriesQuery: () => ({ data: [], isLoading: false, isError: false }),
   useListGarmentPartOperationsQuery: () => ({ data: [], isLoading: false, isError: false }),
+}));
+vi.mock('@admin/embroidery/data-access', () => ({
+  useGetEmbroideryCalculationsQuery: () => ({
+    data: {
+      items: [
+        {
+          id: 42,
+          number: 'ВШ-0042',
+          name: 'Логотип',
+          customerPublicId: null,
+          customerName: null,
+          mode: 'Garment',
+          quantity: 50,
+          stitchesPerUnit: 8000,
+          hoopLabel: '18 см',
+          incomplete: false,
+          prices: [
+            { name: 'Опт', unit: 70, total: 3500, repeatUnit: 60 },
+            { name: 'Стандарт', unit: 80, total: 4000, repeatUnit: 70 },
+          ],
+          createdAt: '2026-11-04T10:00:00Z',
+          createdByName: 'Олена',
+          mockup: null,
+        },
+      ],
+      page: 1,
+      pageSize: 25,
+      total: 1,
+    },
+    isFetching: false,
+    isError: false,
+  }),
 }));
 vi.mock('@admin/clients/data-access', () => ({
   useListCustomersQuery: () => ({ data: undefined }),
@@ -238,6 +275,26 @@ describe('КП editor', () => {
     renderEditor();
     fireEvent.click(await screen.findByRole('button', { name: 'Новий виріб' }));
     expect(await screen.findByRole('dialog', { name: 'Виріб з нуля' })).toBeVisible();
+  });
+
+  it('adds a saved embroidery calculation from the «Вишивка» tile', async () => {
+    api.addEmbroidery.mockReturnValue({ ...quote, version: 4 });
+    renderEditor();
+    fireEvent.click(await screen.findByRole('button', { name: 'Вишивка' }));
+    const panel = await screen.findByRole('dialog', { name: 'Додати вишивку' });
+    fireEvent.mouseDown(within(panel).getByLabelText(/Розрахунок вишивки/));
+    fireEvent.click(await screen.findByText('ВШ-0042 · Логотип'));
+    expect(within(panel).getByLabelText(/Стандарт — 80,00 грн/)).toBeChecked();
+    fireEvent.click(within(panel).getByRole('button', { name: 'Додати' }));
+
+    await waitFor(() =>
+      expect(api.addEmbroidery).toHaveBeenCalledWith({
+        id: 4,
+        calculationId: 42,
+        level: 'Стандарт',
+      }),
+    );
+    expect(api.save).not.toHaveBeenCalled();
   });
 
   it('asks a reason for a manual PPE price before saving', async () => {
