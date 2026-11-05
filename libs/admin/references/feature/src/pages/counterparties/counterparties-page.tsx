@@ -1,19 +1,32 @@
 import { CustomersReferenceContent } from '@admin/clients/feature';
+import { PurchaseInvoicesContent } from '@admin/purchasing/feature';
 import { Tab, Tabs } from '@mui/material';
 import { useSearchParams } from 'react-router-dom';
 
 import { SuppliersPage } from '../suppliers/suppliers-page';
 
-export type CounterpartiesTab = 'suppliers' | 'clients';
-
-export function counterpartiesTabOf(value: string | null): CounterpartiesTab {
-  return value === 'clients' ? 'clients' : 'suppliers';
+interface Props {
+  /** The app passes the role check: accountant and Admin see «Рахунки на закупку». */
+  canSeePurchaseInvoices?: boolean;
 }
 
-/** «Загальні довідники → Контрагенти»: suppliers and clients from KeepinCRM, switched by `?tab=`. */
-export function CounterpartiesPage() {
+export type CounterpartiesTab = 'suppliers' | 'clients' | 'purchases';
+
+/** `?tab=` of the page; «Рахунки на закупку» falls back to suppliers for those who cannot see it. */
+export function counterpartiesTabOf(value: string | null, purchases = false): CounterpartiesTab {
+  if (value === 'clients') return 'clients';
+  if (value === 'purchases' && purchases) return 'purchases';
+  return 'suppliers';
+}
+
+/**
+ * «Загальні довідники → Контрагенти»: suppliers and clients from KeepinCRM, and purchase invoices
+ * for the accountant and Admin, switched by `?tab=`.
+ */
+export function CounterpartiesPage({ canSeePurchaseInvoices = false }: Props) {
   const [searchParams, setSearchParams] = useSearchParams();
-  const tab = counterpartiesTabOf(searchParams.get('tab'));
+  const purchases = canSeePurchaseInvoices;
+  const tab = counterpartiesTabOf(searchParams.get('tab'), purchases);
   const tabs = (
     <Tabs
       value={tab}
@@ -25,8 +38,10 @@ export function CounterpartiesPage() {
     >
       <Tab value="suppliers" label="Постачальники" />
       <Tab value="clients" label="Клієнти" />
+      {purchases && <Tab value="purchases" label="Рахунки на закупку" />}
     </Tabs>
   );
+  if (tab === 'purchases') return <PurchaseInvoicesContent tabs={tabs} />;
   return tab === 'suppliers' ? (
     <SuppliersPage tabs={tabs} />
   ) : (

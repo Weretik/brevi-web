@@ -24,6 +24,14 @@ const mapSummary = (value: Schemas['CrmEmbroiderySavedSummary']): EmbroiderySave
   prices: value.prices.map((price) => ({ ...price })),
   createdAt: value.createdAt,
   createdByName: value.createdByName,
+  mockup: value.mockup
+    ? {
+        mediaFileId: value.mockup.mediaFileId,
+        fileName: value.mockup.fileName,
+        url: value.mockup.url,
+        thumbnailUrl: value.mockup.thumbnailUrl ?? null,
+      }
+    : null,
 });
 
 export const mapEmbroiderySavedPage = (

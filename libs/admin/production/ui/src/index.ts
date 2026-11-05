@@ -11,6 +11,7 @@ export { ProductionImportPreview } from './import/production-import-preview';
 export { ProductionConfirmDialog } from './dialogs/production-confirm-dialog';
 export { ProductionItemCard } from './orders/production-item-card';
 export { ProductionItemForm } from './orders/production-item-form';
+export type { EmbroideryPicker } from './orders/production-item-applications';
 export { ProductionOrderChips } from './orders/production-order-chips';
 export { ProductionOrderHistory } from './orders/production-order-history';
 export { ProductionOrderPrint } from './orders/production-order-print';

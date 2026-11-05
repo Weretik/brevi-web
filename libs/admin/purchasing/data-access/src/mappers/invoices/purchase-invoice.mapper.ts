@@ -1,0 +1,62 @@
+import { purchaseInvoiceStates } from '@admin/purchasing/model';
+
+import {
+  flag,
+  integer,
+  list,
+  nullableInteger,
+  nullableText,
+  oneOf,
+  record,
+  text,
+} from '../../validators/purchase-response';
+
+import type {
+  PurchaseInvoice,
+  PurchaseInvoiceLink,
+  PurchaseInvoicePage,
+} from '@admin/purchasing/model';
+
+function mapLink(value: unknown): PurchaseInvoiceLink {
+  const row = record(value, 'посилання');
+  return {
+    id: text(row['id'], 'id файлу'),
+    url: text(row['url'], 'адреса'),
+    safe: flag(row['safe'], 'безпечне посилання'),
+  };
+}
+
+export function mapPurchaseInvoice(value: unknown): PurchaseInvoice {
+  const row = record(value, 'рахунок');
+  return {
+    messageId: text(row['messageId'], 'id повідомлення'),
+    telegramKey: text(row['telegramKey'], 'Telegram id'),
+    sourceUid: text(row['sourceUid'], 'UID'),
+    rowNumber: integer(row['rowNumber'], 'рядок', 1),
+    sourceRowCount: integer(row['sourceRowCount'], 'кількість рядків', 1),
+    chatName: nullableText(row['chatName'], 'чат'),
+    fromUser: nullableText(row['fromUser'], 'автор'),
+    messageAt: nullableText(row['messageAt'], 'дата повідомлення'),
+    text: text(row['text'], 'текст'),
+    statusOriginal: text(row['statusOriginal'], 'статус'),
+    markAt: nullableText(row['markAt'], 'дата відмітки'),
+    markBy: nullableText(row['markBy'], 'хто відмітив'),
+    markedPaid: flag(row['markedPaid'], 'оплата'),
+    supplierId: nullableInteger(row['supplierId'], 'постачальник'),
+    reviewNote: nullableText(row['reviewNote'], 'примітка'),
+    reviewVersion: integer(row['reviewVersion'], 'версія'),
+    state: oneOf(row['state'], purchaseInvoiceStates, 'стан'),
+    issues: list(row['issues'], 'проблеми').map((item) => text(item, 'проблема')),
+    links: list(row['links'], 'посилання').map(mapLink),
+  };
+}
+
+export function mapPurchaseInvoicePage(value: unknown): PurchaseInvoicePage {
+  const row = record(value, 'сторінка рахунків');
+  return {
+    items: list(row['items'], 'рахунки').map(mapPurchaseInvoice),
+    total: integer(row['total'], 'кількість'),
+    page: integer(row['page'], 'сторінка', 1),
+    pageSize: integer(row['pageSize'], 'розмір сторінки', 1),
+  };
+}

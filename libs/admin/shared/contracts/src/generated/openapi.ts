@@ -2228,6 +2228,25 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/crm/embroidery/calculations/{id}/mockup': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    /** @description «Макет» — a Media library photo of the design for the workshop; `mediaFileId` null clears it. */
+    put: operations['setCrmEmbroideryMockup'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/crm/tasks': {
     parameters: {
       query?: never;
@@ -2566,6 +2585,23 @@ export interface paths {
     };
     /** The КП for the order form: sewn items, fabric variants, workshop norm and (not for managers) the sewing rate */
     get: operations['getProductionQuoteDraft'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/orders/embroideries': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** «Розрахунок вишивки»: saved «Ціна вишивки» calculations to link to an embroidery, newest first, at most 50; no prices */
+    get: operations['getProductionEmbroideries'];
     put?: never;
     post?: never;
     delete?: never;
@@ -3400,6 +3436,56 @@ export interface paths {
     put?: never;
     /** Send a test line to the chosen group and topic */
     post: operations['sendWorkshopTelegramTest'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/purchasing/invoices': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description One page of cards, one per Telegram message, newest message first (unknown dates last). Search matches the message text (case-insensitive) or an exact UID. */
+    get: operations['getPurchaseInvoices'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/purchasing/invoices/sync-state': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['getPurchaseInvoicesSyncState'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/purchasing/invoices/sync': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description «Оновити зараз»: reads the whole sheet, checks it, then applies it in one transaction. Safe to repeat; manual supplier links and notes are never changed. Rows and links missing from the sheet become inactive. */
+    post: operations['syncPurchaseInvoices'];
     delete?: never;
     options?: never;
     head?: never;
@@ -6509,6 +6595,12 @@ export interface components {
       total: number;
       repeatUnit: number;
     };
+    CrmEmbroideryMockup: {
+      mediaFileId: number;
+      fileName: string;
+      url: string;
+      thumbnailUrl: string | null;
+    };
     CrmEmbroiderySavedSummary: {
       /** Format: int64 */
       id: number;
@@ -6531,6 +6623,8 @@ export interface components {
       /** Format: date-time */
       createdAt: string;
       createdByName: string;
+      /** @description «Макет» from the Media library; null when none or the photo was removed. */
+      mockup: components['schemas']['CrmEmbroideryMockup'] | null;
     };
     CrmEmbroiderySavedPage: {
       items: components['schemas']['CrmEmbroiderySavedSummary'][];
@@ -6598,6 +6692,10 @@ export interface components {
       unchanged: number;
       errors: number;
       lines: components['schemas']['CrmEmbroideryArchiveImportLine'][];
+    };
+    CrmSetEmbroideryMockupInput: {
+      /** @description A Media library photo; null clears the mockup. */
+      mediaFileId?: number | null;
     };
     /**
      * @default Open
@@ -6902,6 +7000,11 @@ export interface components {
       place?: string | null;
       description?: string | null;
       color?: string | null;
+      /**
+       * Format: int64
+       * @description A saved «Ціна вишивки» calculation; only for an embroidery. It must exist when first linked.
+       */
+      embroideryCalculationId?: number | null;
     };
     ProductionItemDetailsInput: {
       quantity: number;
@@ -6950,12 +7053,38 @@ export interface components {
       /** @description «Надіслати в цех»: not sent yet and the group is set. */
       canSendTelegram: boolean;
     };
+    /** @description The saved calculation of an embroidery for the workshop; no prices. Materials are shown only, the stock is not changed. */
+    ProductionEmbroideryResponse: {
+      /** Format: int64 */
+      id: number;
+      number: string;
+      name: string;
+      customerName: string | null;
+      /** @enum {string} */
+      mode: 'Garment' | 'Chevron';
+      quantity: number;
+      stitchesPerUnit: number;
+      hoopLabel: string;
+      hoopings: number;
+      /** @description Флізелін to cut, metres. */
+      stabilizerMetres: number | null;
+      /** @description Fabric under the chevrons, metres; null for embroidery on a garment. */
+      fabricMetres: number | null;
+      mockupUrl: string | null;
+      mockupThumbnailUrl: string | null;
+    };
     ItemApplicationResponse: {
       /** @enum {string} */
       kind: 'Embroidery' | 'Print';
       place: string | null;
       description: string | null;
       color: string | null;
+      /** Format: int64 */
+      embroideryCalculationId: number | null;
+      /** @description «ВШ-0042», kept even when the calculation was removed. */
+      embroideryNumber: string | null;
+      /** @description The calculation as it is now; null when none or it was removed. */
+      embroidery: components['schemas']['ProductionEmbroideryResponse'] | null;
     };
     ProductionShipmentResponse: {
       id: number;
@@ -7102,12 +7231,30 @@ export interface components {
       norm: components['schemas']['FabricNormInput'] | null;
       options: components['schemas']['ProductionQuoteDraftOption'][];
     };
+    ProductionEmbroideryChoiceResponse: {
+      /** Format: int64 */
+      id: number;
+      number: string;
+      name: string;
+      customerName: string | null;
+      quantity: number;
+      stitchesPerUnit: number;
+      hoopLabel: string;
+      mockupThumbnailUrl: string | null;
+    };
+    ProductionQuoteDraftEmbroidery: {
+      /** Format: int64 */
+      quoteItemId: number;
+      calculation: components['schemas']['ProductionEmbroideryChoiceResponse'];
+    };
     ProductionQuoteDraftResponse: {
       quoteId: number;
       number: string;
       clientName: string;
       managerName: string;
       items: components['schemas']['ProductionQuoteDraftItem'][];
+      /** @description «Вишивка» rows of the КП whose calculation still exists; the form puts them into the items' applications. */
+      embroideries: components['schemas']['ProductionQuoteDraftEmbroidery'][];
     };
     ProductionItemImportRow: {
       modelCode?: string | null;
@@ -8015,6 +8162,108 @@ export interface components {
       telegramChatId: number | null;
       /** @description A topic of a group with topics; null posts to the main chat. */
       telegramThreadId: number | null;
+    };
+    /** @enum {string} */
+    PurchaseInvoiceFilter: 'All' | 'NeedsReview';
+    /**
+     * @description NeedsReview when the representative row has problems, otherwise AwaitingRecognition.
+     * @enum {string}
+     */
+    PurchaseInvoiceState: 'NeedsReview' | 'AwaitingRecognition';
+    PurchaseInvoiceLinkResponse: {
+      /** @description File id, SHA-256 of messageId:url. */
+      id: string;
+      /** @description The exact link from the sheet. */
+      url: string;
+      /** @description True only for an HTTPS dropbox.com link without user or password; show other links as text. */
+      safe: boolean;
+    };
+    PurchaseInvoiceResponse: {
+      messageId: string;
+      /** @description ChatId:MessageId. */
+      telegramKey: string;
+      /** @description UID of the representative row (smallest row number). */
+      sourceUid: string;
+      /** Format: int32 */
+      rowNumber: number;
+      /**
+       * Format: int32
+       * @description Active sheet rows of this message.
+       */
+      sourceRowCount: number;
+      chatName?: string | null;
+      /** @description Author of the message. */
+      fromUser?: string | null;
+      /** @description The DateTime cell as written in the sheet. */
+      messageAt?: string | null;
+      text: string;
+      statusOriginal: string;
+      markAt?: string | null;
+      /** @description Who set the payment mark (FromUserStatus). */
+      markBy?: string | null;
+      /** @description Status is exactly «СПЛАЧЕНО». A note from the sheet, not a payment. */
+      markedPaid: boolean;
+      /**
+       * Format: int32
+       * @description Brevi supplier linked by hand.
+       */
+      supplierId?: number | null;
+      reviewNote?: string | null;
+      /** Format: int32 */
+      reviewVersion: number;
+      state: components['schemas']['PurchaseInvoiceState'];
+      /** @description Reasons for a manual check, in Ukrainian. */
+      issues: string[];
+      links: components['schemas']['PurchaseInvoiceLinkResponse'][];
+    };
+    PurchaseInvoicePage: {
+      items: components['schemas']['PurchaseInvoiceResponse'][];
+      /** Format: int32 */
+      total: number;
+      /** Format: int32 */
+      page: number;
+      /** Format: int32 */
+      pageSize: number;
+    };
+    PurchaseSyncStateResponse: {
+      /** Format: date-time */
+      lastSuccessAt?: string | null;
+      /** Format: date-time */
+      lastAttemptAt?: string | null;
+      /** @description Reason of the last failed attempt; null after a success. */
+      error?: string | null;
+      /**
+       * Format: int32
+       * @description Active sheet rows after the last successful sync.
+       */
+      recordCount: number;
+      /** Format: int32 */
+      fileCount: number;
+    };
+    PurchaseSyncResponse: {
+      /** Format: int32 */
+      recordCount: number;
+      /** Format: int32 */
+      fileCount: number;
+      /** Format: int32 */
+      messagesAdded: number;
+      /** Format: int32 */
+      messagesUpdated: number;
+      /** Format: int32 */
+      rowsAdded: number;
+      /** Format: int32 */
+      rowsUpdated: number;
+      /** Format: int32 */
+      rowsDeactivated: number;
+      /** Format: int32 */
+      filesAdded: number;
+      /** Format: int32 */
+      filesDeactivated: number;
+      /** Format: date-time */
+      syncedAt: string;
+    };
+    PurchaseErrors: {
+      errors: string[];
     };
     NonWorkingDayResponse: {
       /** Format: date */
@@ -15227,6 +15476,54 @@ export interface operations {
       };
     };
   };
+  setCrmEmbroideryMockup: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmSetEmbroideryMockupInput'];
+      };
+    };
+    responses: {
+      /** @description The saved calculation with its mockup. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmEmbroiderySavedCalculation'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role and a numeric actor claim required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   getCrmTasks: {
     parameters: {
       query?: {
@@ -16240,6 +16537,43 @@ export interface operations {
       };
       /** @description The КП is not sent or is archived. */
       409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getProductionEmbroideries: {
+    parameters: {
+      query?: {
+        /** @description Name, client or «ВШ-0042». */
+        search?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Calculations. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionEmbroideryChoiceResponse'][];
+        };
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders). */
+      403: {
         headers: {
           [name: string]: unknown;
         };
@@ -18897,6 +19231,145 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+    };
+  };
+  getPurchaseInvoices: {
+    parameters: {
+      query?: {
+        page?: number;
+        pageSize?: number;
+        search?: string;
+        filter?: components['schemas']['PurchaseInvoiceFilter'];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PurchaseInvoicePage'];
+        };
+      };
+      /** @description Invalid page, page size, search or filter */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director, Accountant or Admin */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getPurchaseInvoicesSyncState: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK; nulls and zeros before the first sync */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PurchaseSyncStateResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director, Accountant or Admin */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  syncPurchaseInvoices: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Synced */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PurchaseSyncResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director, Accountant or Admin */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Another sync is running; body is an array of messages */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The sheet breaks a register rule (header, duplicate UID, different payment marks in one message, a UID moved to another message); nothing changed */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PurchaseErrors'];
+        };
+      };
+      /** @description Google Sheets cannot be read (no access, not found, not responding); nothing changed */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PurchaseErrors'];
+        };
       };
     };
   };

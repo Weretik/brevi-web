@@ -1,6 +1,6 @@
 # «Ціна вишивки»: embroidery and chevron price
 
-**State:** stages 1–2 implemented 2026-11-04, Admin React. Specification: [Admin «Ціна вишивки»](../../specs/admin/embroidery/001-embroidery-price/README.md); formulas and rules in BreviERP `docs/sdd/specs/crm/005-embroidery-price/README.md`. Look: [«Цех»](../../standards/admin/design-system.md), variant A.
+**State:** stages 1–2 implemented 2026-11-04, stage 4 («Макет», link to production orders) 2026-11-05, Admin React. Specification: [Admin «Ціна вишивки»](../../specs/admin/embroidery/001-embroidery-price/README.md); formulas and rules in BreviERP `docs/sdd/specs/crm/005-embroidery-price/README.md`. Look: [«Цех»](../../standards/admin/design-system.md), variant A.
 
 ## Behavior and routes
 
@@ -8,11 +8,13 @@
 | ------------------------------ | ----------------------------------------------------------------------- |
 | `/crm/embroidery`              | «Менеджер сервісу › Ціна вишивки» (Manager or Admin role): «Розрахунок» |
 | `/crm/embroidery?tab=saved`    | «Збережені»: saved calculations, search, side panel, «Повторити»        |
+| `…?tab=saved&calculation=42`   | Opens «ВШ-0042» in «Збережені» (link from a production order)           |
 | `/crm/embroidery?tab=settings` | «Налаштування» (Admin role; the tab is hidden for a Manager)            |
 
 - The form on the left, live prices on the right; the server computes prices 300 ms after the last change, so a Manager never receives rates or cost.
 - Director and Admin also see the cost card, «Розшифровка собівартості», material sums and the roll layout.
-- «Зберегти розрахунок» stores the priced form with frozen rates and an optional client; «Збережені» lists them, a row opens a read-only side panel with «Повторити розрахунок» (Admin also deletes). «Додати в КП» from that panel appends a row to a chosen КП with one saved price in all three columns.
+- «Зберегти розрахунок» stores the priced form with frozen rates and an optional client; «Збережені» lists them, a row opens a read-only side panel with «Повторити розрахунок» (Admin also deletes). «Додати в КП» from that panel appends a row to a chosen КП with one saved price in all three columns; the КП editor's «Вишивка» tile does the same from inside the КП.
+- «Макет» in the saved side panel picks one photo of the design from «Медіа» (`MediaPickerDrawer`) or clears it; the workshop sees it in the production order, and «Медіа» does not delete a photo in use.
 - «Налаштування» is saved whole with a version (409 → «Оновити»); hoops and extra costs open in `ReferenceEditorDrawer`; the stitch rate comes from «Параметри ціноутворення».
 
 ## Structure diagram
@@ -24,6 +26,7 @@ flowchart LR
   Feature --> Model[embroidery model: form values, settings draft, validation, format]
   Feature --> DA[embroidery data-access: RTK Query]
   Feature --> Ref[references ui: page header, side panel]
+  Feature --> Media[media feature: MediaPickerDrawer for «Макет»]
   DA --> Backend[BreviERP /api/crm/embroidery]
 ```
 
@@ -60,7 +63,7 @@ libs/admin/embroidery/
     pages/embroidery-price-page.tsx header, tabs, keeps both tabs mounted
     components/calculation/         «Розрахунок» layout and copy
     components/settings/            «Налаштування» tab, row side panel, leave dialog
-    components/saved/               «Збережені» tab, save panel, saved side panel, «Додати в КП» panel
+    components/saved/               «Збережені» tab, save panel, saved side panel, «Додати в КП» panel, «Макет»
     hooks/calculation/              form state, debounce, calculate query, copy
     hooks/saved/                    client and КП search for the panels
     hooks/settings/                 settings editor, leave guard

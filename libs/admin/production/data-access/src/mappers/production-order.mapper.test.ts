@@ -101,6 +101,51 @@ describe('production order mappers', () => {
     expect(mapped.isTransferred).toBe(true);
   });
 
+  it('maps a linked embroidery calculation and one that was removed', () => {
+    const embroidery = {
+      id: 42,
+      number: 'ВШ-0042',
+      name: 'Логотип',
+      customerName: null,
+      mode: 'Garment',
+      quantity: 10,
+      stitchesPerUnit: 8000,
+      hoopLabel: '18 см',
+      hoopings: 10,
+      stabilizerMetres: 0.6,
+      fabricMetres: null,
+      mockupUrl: 'https://cdn.test/logo.png',
+      mockupThumbnailUrl: null,
+    };
+    const item = order.items[0];
+    const mapped = mapProductionOrder({
+      ...order,
+      items: [
+        {
+          ...item,
+          applications: [
+            {
+              ...item.applications[0],
+              embroideryCalculationId: 42,
+              embroideryNumber: 'ВШ-0042',
+              embroidery,
+            },
+            {
+              ...item.applications[0],
+              embroideryCalculationId: 7,
+              embroideryNumber: 'ВШ-0007',
+              embroidery: null,
+            },
+          ],
+        },
+      ],
+    });
+    expect(mapped.items[0].applications.map((x) => x.embroidery?.stabilizerMetres ?? null)).toEqual(
+      [0.6, null],
+    );
+    expect(mapped.items[0].applications[1].embroideryNumber).toBe('ВШ-0007');
+  });
+
   it('maps stages, shipments, files and the Telegram mark', () => {
     const mapped = mapProductionOrder(order);
     expect(mapped.items[0]).toMatchObject({
