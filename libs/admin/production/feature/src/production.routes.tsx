@@ -14,6 +14,7 @@ const WorkLogPage = lazy(() => import('./pages/work/work-log-page'));
 const SewingForecastPage = lazy(() => import('./pages/forecast/sewing-forecast-page'));
 const TimesheetPage = lazy(() => import('./pages/timesheet/timesheet-page'));
 const PayrollPage = lazy(() => import('./pages/payroll/payroll-page'));
+const WorkshopReportPage = lazy(() => import('./pages/reports/workshop-report-page'));
 
 interface ProductionRouteOptions {
   /** The signed-in person: may they import the old «Цех» log. */
@@ -56,4 +57,9 @@ export function createProductionOrderRoutes({ useOrderActor }: ProductionOrderRo
     },
     { path: '/production/forecast', element: <SewingForecastPage /> },
   ];
+}
+
+/** «Звіти цеху»; the app puts it behind Admin (the director holds Admin), as the server does. */
+export function createProductionReportRoutes() {
+  return [{ path: '/production/reports', element: <WorkshopReportPage /> }];
 }

@@ -1,8 +1,9 @@
-import { Box, LinearProgress, Paper, Typography } from '@mui/material';
+import { Box, LinearProgress, Link, Paper, Typography } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
 
 import { numericTextSx } from '../../model/numeric-text';
 
-import type { WorkshopOrder } from '../../model/dashboard-demo';
+import type { WorkshopOrder } from '../../model/dashboard-view';
 
 const visuallyHiddenSx = {
   border: 0,
@@ -19,16 +20,15 @@ interface WorkshopOrderCardProps {
 }
 
 export function WorkshopOrderCard({ order }: WorkshopOrderCardProps) {
-  const isReady = order.progress >= 100;
 
   return (
     <Paper component="li" sx={{ listStyle: 'none', px: 1.5, py: 1.25 }} variant="outlined">
       <Box
         sx={{ ...numericTextSx, display: 'flex', fontSize: 11.5, justifyContent: 'space-between' }}
       >
-        <Box component="span" sx={{ color: 'text.secondary' }}>
+        <Link component={RouterLink} to={`/production/orders/${order.id}`} underline="hover">
           {order.number}
-        </Box>
+        </Link>
         <Box
           component="span"
           sx={{
@@ -49,7 +49,7 @@ export function WorkshopOrderCard({ order }: WorkshopOrderCardProps) {
         {order.client} · {order.quantity} шт
       </Typography>
       <LinearProgress
-        aria-label={`Готовність ${order.number}`}
+        aria-label={`Пошито ${order.number}`}
         sx={{ bgcolor: 'action.hover', borderRadius: 2, height: 4, mb: 0.75, mt: 1.25 }}
         value={order.progress}
         variant="determinate"
@@ -63,9 +63,8 @@ export function WorkshopOrderCard({ order }: WorkshopOrderCardProps) {
         }}
       >
         <Box component="span" sx={numericTextSx}>
-          {order.progress}%
+          пошито {order.progress}%
         </Box>
-        <span>{isReady ? 'до відвантаження' : 'в роботі'}</span>
       </Box>
     </Paper>
   );

@@ -128,6 +128,12 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         path: '/production/timesheet',
         requiredRoles: workshop,
       },
+      {
+        id: 'workshop-reports',
+        label: 'Звіти цеху',
+        path: '/production/reports',
+        requiredRoles: admin,
+      },
       { id: 'embroidery', label: 'Вишивка' },
       { id: 'cashbox', label: 'Каса цеху' },
     ],
