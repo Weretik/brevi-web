@@ -1,0 +1,243 @@
+import { formatDay, formatMoney, formatWorkMonth, payrollCsv } from '@admin/production/model';
+import {
+  PayrollAdjustmentsTable,
+  PayrollMonthTable,
+  PayrollPaymentsTable,
+  ProductionConfirmDialog,
+  ProductionReasonDialog,
+} from '@admin/production/ui';
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import { Alert, Box, Button, Stack, Typography } from '@mui/material';
+import { useMemo, useState } from 'react';
+
+import { PayrollEmployeeDrawer } from './payroll-employee-drawer';
+import { PayrollAdjustmentDrawer, PayrollPaymentDrawer } from './payroll-entry-drawers';
+import { PayrollSetupSection } from './payroll-setup-section';
+import { downloadCsv } from '../../hooks/files/download-csv';
+import { usePayrollMonthActions } from '../../hooks/payroll/use-payroll-month-actions';
+
+import type { PayrollLine, PayrollMonth } from '@admin/production/model';
+
+interface Props {
+  month: PayrollMonth;
+  onMessage: (message: string) => void;
+}
+
+type Panel = 'payment' | 'adjustment';
+
+/** «Розрахунок» of a month: roles, embroidery, the table, payments and closing. */
+export function PayrollMonthView({ month, onMessage }: Props) {
+  const label = formatWorkMonth(month.month);
+  const [panel, setPanel] = useState<Panel | null>(null);
+  const [open, setOpen] = useState<PayrollLine | null>(null);
+  const actions = usePayrollMonthActions(month, onMessage);
+  const { cancel, confirm, setConfirm, error, setError } = actions;
+  const people = useMemo(
+    () =>
+      month.lines
+        .filter((line) => line.isActive)
+        .map((line) => ({ employeeId: line.employeeId, name: line.name, position: line.position })),
+    [month.lines],
+  );
+  const { permissions } = month;
+  const closedBy = [
+    month.closedByName,
+    month.closedAt ? new Date(month.closedAt).toLocaleDateString('uk-UA') : null,
+  ]
+    .filter(Boolean)
+    .join(', ');
+
+  const pending = cancel.pending;
+  return (
+    <Stack sx={{ gap: 2.5 }}>
+      {month.isClosed && (
+        <Alert
+          severity="info"
+          icon={<LockOutlinedIcon />}
+          action={
+            permissions.canReopen && (
+              <Button color="inherit" size="small" onClick={() => setConfirm('reopen')}>
+                Відкрити
+              </Button>
+            )
+          }
+        >
+          Місяць закрито{closedBy ? ` (${closedBy})` : ''}. Показано розрахунок на момент закриття;
+          робота, години й виплати в ньому не змінюються.
+        </Alert>
+      )}
+      {month.warnings.length > 0 && (
+        <Alert severity="warning">
+          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+            Місяць не можна закрити, доки є попередження:
+          </Typography>
+          <Box component="ul" sx={{ m: 0, pl: 2.5 }}>
+            {month.warnings.map((warning) => (
+              <li key={warning}>{warning}</li>
+            ))}
+          </Box>
+        </Alert>
+      )}
+      {error && <Alert severity="error">{error}</Alert>}
+      <PayrollSetupSection
+        key={`${month.month}:${month.master?.employeeId}:${month.chief?.employeeId}:${month.stitches}:${month.embroideryEmployee?.employeeId}`}
+        month={month}
+        people={people}
+        onDone={onMessage}
+        onError={setError}
+      />
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        sx={{ gap: 1, justifyContent: 'space-between', alignItems: { sm: 'center' } }}
+      >
+        <Typography variant="h6">
+          Нарахування працівникам
+          <Typography variant="body2" color="text.secondary" component="span" sx={{ ml: 1 }}>
+            пошив усіх: {formatMoney(month.totalSewing)}
+          </Typography>
+        </Typography>
+        <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap' }}>
+          <Button
+            variant="outlined"
+            startIcon={<DownloadOutlinedIcon />}
+            disabled={month.lines.length === 0}
+            onClick={() => downloadCsv(payrollCsv(month), `zarplata-${month.month}.csv`)}
+          >
+            Excel
+          </Button>
+          {permissions.canClose && (
+            <Button
+              variant="contained"
+              startIcon={<LockOutlinedIcon />}
+              disabled={month.warnings.length > 0}
+              onClick={() => setConfirm('close')}
+            >
+              Закрити місяць
+            </Button>
+          )}
+        </Stack>
+      </Stack>
+      <PayrollMonthTable
+        lines={month.lines}
+        totals={month.totals}
+        canEditIssued={permissions.canPay}
+        busy={actions.savingIssued}
+        onOpen={setOpen}
+        onSaveIssued={actions.saveIssued}
+      />
+      <Typography variant="caption" color="text.secondary">
+        Натисніть на працівника, щоб побачити деталізацію. Години наведено для довідки й на зарплату
+        не впливають.
+      </Typography>
+      <Box>
+        <Stack
+          direction="row"
+          sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 1 }}
+        >
+          <Typography variant="h6">Виплати</Typography>
+          {permissions.canPay && (
+            <Button startIcon={<AddOutlinedIcon />} onClick={() => setPanel('payment')}>
+              Додати виплату
+            </Button>
+          )}
+        </Stack>
+        <PayrollPaymentsTable
+          rows={month.payments}
+          busy={cancel.busy}
+          onCancel={
+            permissions.canPay ? (row) => cancel.request({ kind: 'payment', row }) : undefined
+          }
+        />
+      </Box>
+      <Box>
+        <Stack
+          direction="row"
+          sx={{ justifyContent: 'space-between', alignItems: 'center', mb: 1 }}
+        >
+          <Typography variant="h6">Інше нарахування / утримання</Typography>
+          {permissions.canPay && (
+            <Button startIcon={<AddOutlinedIcon />} onClick={() => setPanel('adjustment')}>
+              Додати
+            </Button>
+          )}
+        </Stack>
+        <PayrollAdjustmentsTable
+          rows={month.adjustments}
+          busy={cancel.busy}
+          onCancel={
+            permissions.canPay ? (row) => cancel.request({ kind: 'adjustment', row }) : undefined
+          }
+        />
+      </Box>
+      {panel === 'payment' && (
+        <PayrollPaymentDrawer
+          month={month.month}
+          monthLabel={label}
+          people={people}
+          onClose={() => setPanel(null)}
+          onSaved={(text) => {
+            setPanel(null);
+            onMessage(text);
+          }}
+        />
+      )}
+      {panel === 'adjustment' && (
+        <PayrollAdjustmentDrawer
+          month={month.month}
+          monthLabel={label}
+          people={people}
+          onClose={() => setPanel(null)}
+          onSaved={(text) => {
+            setPanel(null);
+            onMessage(text);
+          }}
+        />
+      )}
+      {open && (
+        <PayrollEmployeeDrawer
+          month={month.month}
+          monthLabel={label}
+          line={open}
+          onClose={() => setOpen(null)}
+        />
+      )}
+      <ProductionReasonDialog
+        open={pending !== null}
+        title={pending?.kind === 'payment' ? 'Скасувати виплату?' : 'Скасувати запис?'}
+        text={
+          pending
+            ? `${pending.row.employeeName}, ${formatMoney(pending.row.amount)}${
+                pending.kind === 'payment' ? ` від ${formatDay(pending.row.paidOn)}` : ''
+              }. Запис лишиться в списку закресленим і не рахуватиметься.`
+            : ''
+        }
+        confirmLabel="Скасувати запис"
+        reason={cancel.reason}
+        error={cancel.error}
+        busy={cancel.busy}
+        onChange={cancel.change}
+        onClose={cancel.cancel}
+        onConfirm={() => void cancel.confirm()}
+      />
+      <ProductionConfirmDialog
+        open={confirm !== null}
+        title={
+          confirm === 'close'
+            ? `Закрити ${label.toLowerCase()}?`
+            : `Відкрити ${label.toLowerCase()}?`
+        }
+        text={
+          confirm === 'close'
+            ? 'Розрахунок збережеться як є. Після закриття роботу, години, виплати й утримання за цей місяць змінити не можна.'
+            : 'Місяць знову рахуватиметься з поточних даних, і в ньому можна буде змінювати роботу, години й виплати.'
+        }
+        confirmLabel={confirm === 'close' ? 'Закрити місяць' : 'Відкрити місяць'}
+        busy={actions.changingMonth}
+        onClose={() => setConfirm(null)}
+        onConfirm={() => void actions.confirmed()}
+      />
+    </Stack>
+  );
+}

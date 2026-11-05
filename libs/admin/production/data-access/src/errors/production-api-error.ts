@@ -60,3 +60,17 @@ export const sewingForecastErrors = {
   notFound: 'Прогноз не знайдено.',
   conflict: 'Черговість щойно змінили. Оновіть сторінку.',
 } satisfies AdminApiErrorMessages;
+
+export const timesheetErrors = {
+  ...common,
+  unauthorized: '«Робочий час» веде начальник цеху або адміністратор.',
+  notFound: 'Працівника не знайдено. Оновіть сторінку.',
+  conflict: 'Години вже змінили. Оновіть сторінку.',
+} satisfies AdminApiErrorMessages;
+
+export const payrollErrors = {
+  ...common,
+  unauthorized: 'Ця дія вам недоступна.',
+  notFound: 'Працівника, виплату чи запис не знайдено. Оновіть сторінку.',
+  conflict: 'Місяць уже змінили або закрили. Оновіть сторінку.',
+} satisfies AdminApiErrorMessages;

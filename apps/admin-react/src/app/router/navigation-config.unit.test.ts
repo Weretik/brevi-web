@@ -44,8 +44,8 @@ describe('legacy Admin navigation', () => {
       'Контент',
       'Загальні звіти',
     ]);
-    expect(groups.map((group) => group.items.length)).toEqual([5, 6, 5, 4, 8, 1, 2, 1]);
-    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(32);
+    expect(groups.map((group) => group.items.length)).toEqual([5, 4, 5, 4, 8, 1, 2, 1]);
+    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(30);
     expect(groups[0].items.map((item) => item.id)).not.toContain('clients');
   });
   it('shows «Налаштування КП» only for the server Admin role', () => {
@@ -102,6 +102,8 @@ describe('legacy Admin navigation', () => {
       '/production/staff',
       '/production/fabric-norms',
       '/production/payroll-rules',
+      '/production/payroll',
+      '/production/timesheet',
     ]);
     const shop = (roles: string[]) =>
       createNavigation(paths, roles).find((group) => group.id === 'sewing-shop');
@@ -120,8 +122,14 @@ describe('legacy Admin navigation', () => {
       '/production/payroll-rules',
     ]);
     expect(shop(['Admin'])?.items[4].label).toBe('Працівники цеху');
+    expect(
+      shop(['WorkshopChief'])
+        ?.items.filter((item) => item.id === 'salary' || item.id === 'work-time')
+        .map((item) => item.to),
+    ).toEqual(['/production/payroll', '/production/timesheet']);
     expect(shop(['Manager'])?.items.some((item) => item.id === 'workshop-staff')).toBe(false);
     expect(shop(['Manager'])?.items.some((item) => item.id === 'work-log')).toBe(false);
+    expect(shop(['Manager'])?.items.some((item) => item.id === 'salary')).toBe(false);
     expect(shop(['Manager'])?.items[2]).toEqual({
       id: 'sewing-forecast',
       label: 'Прогноз пошиття',
