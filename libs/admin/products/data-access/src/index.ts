@@ -52,6 +52,5 @@ export {
 export {
   useGetProductPhotosQuery,
   useSetProductPhotosMutation,
-  useImportOldSitePhotosMutation,
   productPhotosApi,
 } from './api/product-photos/product-photos.api';

@@ -86,7 +86,7 @@ export function QuotePhotoPickerDrawer({ item, onClose, onDone }: Props) {
                   src={photo.thumbnailUrl ?? photo.url}
                   alt=""
                   loading="lazy"
-                  sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  sx={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
                 />
                 {photo.isMain && (
                   <Box

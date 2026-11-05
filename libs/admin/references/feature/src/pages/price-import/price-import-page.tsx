@@ -5,6 +5,7 @@ import { Box } from '@mui/material';
 import { useState } from 'react';
 
 import { PriceSourceDrawer } from '../../components/price-import/price-source-drawer';
+import { useSupplierPreview } from '../../components/suppliers/supplier-preview';
 
 /** «Імпорт цін»: how PPE supplier prices reach Brevi, their discounts and file updates (CAT-017). */
 export function PriceImportPage() {
@@ -13,6 +14,7 @@ export function PriceImportPage() {
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const sources = data?.sources ?? [];
   const open = sources.find((source) => source.key === openKey) ?? null;
+  const supplierPreview = useSupplierPreview();
 
   return (
     <Box sx={{ minWidth: 0 }}>
@@ -32,7 +34,11 @@ export function PriceImportPage() {
         sources={sources}
         loading={isFetching}
         onOpen={(source) => setOpenKey(source.key)}
+        onOpenSupplier={(source) =>
+          supplierPreview.open({ id: source.supplierId, name: source.supplierName })
+        }
       />
+      {supplierPreview.element}
       {open && (
         <PriceSourceDrawer
           key={open.key}

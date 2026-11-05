@@ -14,6 +14,7 @@ import { Box, Button, Paper } from '@mui/material';
 import { useMemo, useState } from 'react';
 
 import { FabricDrawer } from '../../components/fabrics/fabric-drawer';
+import { useSupplierPreview } from '../../components/suppliers/supplier-preview';
 import { useFabricDeletion } from '../../hooks/fabrics/use-fabric-deletion';
 import { useFabrics } from '../../hooks/fabrics/use-fabrics';
 import { useReferenceListFilters } from '../../hooks/reference-lists/use-reference-list-filters';
@@ -38,6 +39,7 @@ export function FabricsContent({ tabs }: Props) {
   const deletion = useFabricDeletion(setActionMessage);
   const nextId = rows.reduce((largest, row) => Math.max(largest, row.id), 0) + 1;
 
+  const supplierPreview = useSupplierPreview();
   return (
     <Box sx={{ minWidth: 0 }}>
       <ReferencePageHeader
@@ -103,8 +105,10 @@ export function FabricsContent({ tabs }: Props) {
           onView={(fabric) => setActive({ mode: 'view', fabric })}
           onEdit={(fabric) => setActive({ mode: 'edit', fabric })}
           onDelete={(id) => deletion.requestDelete([id])}
+          onOpenSupplier={(name) => supplierPreview.open({ name })}
         />
       </Paper>
+      {supplierPreview.element}
       {active && (
         <FabricDrawer
           key={`${active.mode}-${active.fabric?.id ?? 'new'}`}

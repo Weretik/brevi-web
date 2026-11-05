@@ -13,13 +13,11 @@ import {
   ReferenceSearchBar,
 } from '@admin/references/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
-import PhotoLibraryOutlinedIcon from '@mui/icons-material/PhotoLibraryOutlined';
 import { Box, Button, Paper } from '@mui/material';
 import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 
 import { ProductOverviewDrawer } from '../../components/product-overview/product-overview-drawer';
-import { OldSitePhotoImportDrawer } from '../../components/product-photos/old-site-photo-import-drawer';
 import { useProductActiveSwitch } from '../../hooks/product-overview/use-product-active-switch';
 import { useProductOverview } from '../../hooks/product-overview/use-product-overview';
 
@@ -45,8 +43,6 @@ export function ProductOverviewContent({ type, tabs }: Props) {
   const activeSwitch = useProductActiveSwitch(setActionMessage);
   const access = useGetProductAccessQuery();
   const canManage = access.currentData?.canManage === true;
-  const canImportPhotos = access.currentData?.canManagePhotos === true;
-  const [importing, setImporting] = useState(false);
   const deletion = useReferenceDeletion((id) => deleteProduct(id).unwrap(), setActionMessage);
   const open = (mode: ProductOverviewEditorMode, row: ProductListRow) => {
     if (row.kind === 'model') setActive({ mode, row: row.product });
@@ -65,15 +61,6 @@ export function ProductOverviewContent({ type, tabs }: Props) {
               disabled={deletion.deleting || loading}
               onDelete={() => deletion.requestDelete(deletion.selectedIds)}
             />
-            {canImportPhotos && sewing && (
-              <Button
-                variant="outlined"
-                startIcon={<PhotoLibraryOutlinedIcon />}
-                onClick={() => setImporting(true)}
-              >
-                Імпорт зі старого сайту
-              </Button>
-            )}
             <Button
               variant="contained"
               startIcon={<AddOutlinedIcon />}
@@ -155,7 +142,6 @@ export function ProductOverviewContent({ type, tabs }: Props) {
           }}
         />
       )}
-      {importing && <OldSitePhotoImportDrawer onClose={() => setImporting(false)} />}
       <ProductOverviewDeleteDialog
         ids={deletion.pendingDeleteIds}
         deleting={deletion.deleting}

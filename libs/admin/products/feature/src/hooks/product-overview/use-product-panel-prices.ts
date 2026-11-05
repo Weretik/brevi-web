@@ -6,6 +6,8 @@ import { productProblemReasons, sewingPanelMetrics } from '@admin/products/model
 import { sewingPriceFormat } from '@admin/products/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
 
+import { useCanSeeCost } from '../product-access/use-can-see-cost';
+
 import type { ProductOverview, SewingAmountRange } from '@admin/products/model';
 import type { ProductPanelMetric } from '@admin/products/ui';
 
@@ -31,6 +33,7 @@ export function useProductPanelPrices(row: ProductOverview) {
   const summary = useGetSewingArticleSummaryQuery(row.id, { skip: !sewing });
   const offer = useGetPpeSupplierOfferQuery(row.id, { skip: sewing });
   const failure = sewing ? summary.error : offer.error;
+  const showCost = useCanSeeCost();
 
   let metrics: ProductPanelMetric[];
   const blockers = productProblemReasons(row.type, row.problems);
@@ -46,12 +49,14 @@ export function useProductPanelPrices(row: ProductOverview) {
             ? '—'
             : `${minutes.format(figures.minutes)} хв · ${money(figures.labour)}`,
       },
-      { label: 'Собівартість', value: range(figures.fullCost) },
+      ...(showCost ? [{ label: 'Собівартість', value: range(figures.fullCost) }] : []),
       { label: 'Ціни оновлено', value: day(row.pricesUpdatedAt) },
     ];
   } else {
     metrics = [
-      { label: 'Ціна постачальника', value: money(offer.data?.supplierPrice) },
+      ...(showCost
+        ? [{ label: 'Ціна постачальника', value: money(offer.data?.supplierPrice) }]
+        : []),
       { label: 'Правило', value: offer.data?.ruleCode ?? '—' },
       { label: 'Ціна 1–9 шт.', value: money(row.prices?.retail) },
       { label: 'Ціни оновлено', value: day(row.pricesUpdatedAt ?? offer.data?.priceUpdatedAt) },

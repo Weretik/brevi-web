@@ -4184,6 +4184,8 @@ export interface components {
       variants: components['schemas']['ProductOverviewVariant'][];
       /** @description Preview (or the full photo when there is no preview) of the main visible product photo (CAT-018); null without photos. */
       mainPhotoUrl: string | null;
+      /** @description The same main photo in full size, for quick view and quotes (CAT-019); null without photos. */
+      mainPhotoFullUrl: string | null;
     };
     ProductSectionCount: {
       /** Format: int32 */

@@ -1,7 +1,9 @@
 import { formatIsoDate, formatUah } from '@admin/references/model';
+import { useMemo } from 'react';
 
 import { ReferenceDataGrid } from '../reference-list/reference-data-grid';
 import { ReferenceStatusPill } from '../reference-list/reference-status-pill';
+import { SupplierNameButton } from '../suppliers/supplier-name-button';
 
 import type { GarmentAccessory } from '@admin/references/model';
 import type { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
@@ -16,9 +18,11 @@ interface Props {
   onView: (accessory: GarmentAccessory) => void;
   onEdit: (accessory: GarmentAccessory) => void;
   onDelete: (id: number) => void;
+  /** A click on the supplier opens its card (CAT-019). */
+  onOpenSupplier?: (name: string) => void;
 }
 
-const columns: GridColDef<GarmentAccessory>[] = [
+const columns = (onOpenSupplier?: (name: string) => void): GridColDef<GarmentAccessory>[] => [
   {
     field: 'code',
     headerName: 'Код',
@@ -33,7 +37,18 @@ const columns: GridColDef<GarmentAccessory>[] = [
     minWidth: 220,
     cellClassName: 'reference-strong',
   },
-  { field: 'supplierName', headerName: 'Постачальник', flex: 1, minWidth: 180 },
+  {
+    field: 'supplierName',
+    headerName: 'Постачальник',
+    flex: 1,
+    minWidth: 180,
+    renderCell: ({ row, tabIndex }) =>
+      onOpenSupplier ? (
+        <SupplierNameButton name={row.supplierName} onOpen={onOpenSupplier} tabIndex={tabIndex} />
+      ) : (
+        row.supplierName || '—'
+      ),
+  },
   {
     field: 'price',
     headerName: 'Ціна',
@@ -74,11 +89,12 @@ const columns: GridColDef<GarmentAccessory>[] = [
   },
 ];
 
-export function GarmentAccessoriesGrid(props: Props) {
+export function GarmentAccessoriesGrid({ onOpenSupplier, ...props }: Props) {
+  const gridColumns = useMemo(() => columns(onOpenSupplier), [onOpenSupplier]);
   return (
     <ReferenceDataGrid
       ariaLabel="Фурнітура"
-      columns={columns}
+      columns={gridColumns}
       emptyLabel="Фурнітури поки немає"
       notFoundLabel="Фурнітури не знайдено"
       menuLabel="Дії фурнітури"

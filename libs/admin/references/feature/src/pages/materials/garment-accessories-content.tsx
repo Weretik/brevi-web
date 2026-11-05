@@ -14,6 +14,7 @@ import { Box, Button, Paper } from '@mui/material';
 import { useMemo, useState } from 'react';
 
 import { GarmentAccessoryDrawer } from '../../components/garment-accessories/garment-accessory-drawer';
+import { useSupplierPreview } from '../../components/suppliers/supplier-preview';
 import { useGarmentAccessories } from '../../hooks/garment-accessories/use-garment-accessories';
 import { useGarmentAccessoryDeletion } from '../../hooks/garment-accessories/use-garment-accessory-deletion';
 import { useReferenceListFilters } from '../../hooks/reference-lists/use-reference-list-filters';
@@ -39,6 +40,7 @@ export function GarmentAccessoriesContent({ tabs }: Props) {
   const deletion = useGarmentAccessoryDeletion(setActionMessage);
   const nextId = rows.reduce((largest, row) => Math.max(largest, row.id), 0) + 1;
 
+  const supplierPreview = useSupplierPreview();
   return (
     <Box sx={{ minWidth: 0 }}>
       <ReferencePageHeader
@@ -104,8 +106,10 @@ export function GarmentAccessoriesContent({ tabs }: Props) {
           onView={(accessory) => setActive({ mode: 'view', accessory })}
           onEdit={(accessory) => setActive({ mode: 'edit', accessory })}
           onDelete={(id) => deletion.requestDelete([id])}
+          onOpenSupplier={(name) => supplierPreview.open({ name })}
         />
       </Paper>
+      {supplierPreview.element}
       {active && (
         <GarmentAccessoryDrawer
           key={`${active.mode}-${active.accessory?.id ?? 'new'}`}

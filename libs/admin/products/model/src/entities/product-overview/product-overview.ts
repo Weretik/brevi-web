@@ -56,6 +56,8 @@ export interface ProductOverview {
   variants: ProductVariant[];
   /** Preview of the main visible photo (CAT-018); the photo quotes use. */
   mainPhotoUrl: string | null;
+  /** The same main photo in full size, for quick view (CAT-019). */
+  mainPhotoFullUrl: string | null;
 }
 
 /** One page of a «Товари» tab from the server. */

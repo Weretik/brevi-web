@@ -1,8 +1,5 @@
-import type {
-  OldSitePhotoImportReportResponse,
-  ProductPhotoListResponse,
-} from '../../contracts/product-photos/product-photos.dto';
-import type { OldSitePhotoImportReport, ProductCardPhoto } from '@admin/products/model';
+import type { ProductPhotoListResponse } from '../../contracts/product-photos/product-photos.dto';
+import type { ProductCardPhoto } from '@admin/products/model';
 
 /** Photos in display order (CAT-018). */
 export function mapProductPhotos(value: ProductPhotoListResponse): ProductCardPhoto[] {
@@ -16,30 +13,4 @@ export function mapProductPhotos(value: ProductPhotoListResponse): ProductCardPh
       isMain: photo.isMain,
       missing: photo.missing,
     }));
-}
-
-export function mapOldSitePhotoImportReport(
-  value: OldSitePhotoImportReportResponse,
-): OldSitePhotoImportReport {
-  return {
-    dryRun: value.dryRun,
-    products: value.products,
-    found: value.found,
-    modelsToCreate: value.modelsToCreate,
-    modelsCreated: value.modelsCreated,
-    notFound: value.notFound,
-    filesToDownload: value.filesToDownload,
-    filesDownloaded: value.filesDownloaded,
-    photosAdded: value.photosAdded,
-    lines: value.lines.map((line) => ({
-      oldId: line.oldId,
-      oldName: line.oldName,
-      status: line.status,
-      productId: line.productId ?? null,
-      productName: line.productName ?? null,
-      photosToAdd: line.photosToAdd,
-      photosAdded: line.photosAdded,
-      errors: line.errors,
-    })),
-  };
 }

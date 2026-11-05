@@ -56,7 +56,8 @@ export function QuoteMainModelField({ season, label, value, error, path, onChang
               borderRadius: 0.5,
               bgcolor: 'action.hover',
               backgroundImage: product.photoUrl ? `url("${product.photoUrl}")` : undefined,
-              backgroundSize: 'cover',
+              backgroundSize: 'contain',
+              backgroundRepeat: 'no-repeat',
               backgroundPosition: 'center',
             }}
           />

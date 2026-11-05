@@ -63,6 +63,4 @@ export * from './forms/sewing-material/sewing-material-form';
 export * from './forms/sewing-operation/sewing-operation-form';
 export * from './queries/sewing-variants/sewing-variant-rows';
 export * from './entities/product-photos/product-photos';
-export * from './validators/product-photos/old-site-photo-import-file';
-export * from './mappers/product-photos/old-site-photo-import-report';
 export * from './ordering/move-photo';

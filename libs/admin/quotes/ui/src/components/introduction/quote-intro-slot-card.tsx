@@ -97,7 +97,7 @@ export function QuoteIntroSlotCard({
           component="img"
           src={slot.photoUrl}
           alt=""
-          sx={{ width: '100%', height: 140, objectFit: 'cover', borderRadius: 1 }}
+          sx={{ width: '100%', height: 140, objectFit: 'contain', borderRadius: 1 }}
         />
       ) : (
         <Box sx={{ height: 140, borderRadius: 1, bgcolor: 'action.hover' }} />

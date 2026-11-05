@@ -8,9 +8,10 @@ import { render } from '../../test-utils';
 
 import type { ProductDetail, PpeSupplierOffer } from '@admin/products/model';
 
-const mocks = vi.hoisted(() => ({ card: vi.fn(), save: vi.fn() }));
+const mocks = vi.hoisted(() => ({ card: vi.fn(), save: vi.fn(), canSeeCost: vi.fn(() => true) }));
 
 vi.mock('../../hooks/ppe-card/use-ppe-card', () => ({ usePpeCard: mocks.card }));
+vi.mock('../../hooks/product-access/use-can-see-cost', () => ({ useCanSeeCost: mocks.canSeeCost }));
 vi.mock('@admin/products/data-access', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@admin/products/data-access')>()),
   useUpdatePpeSupplierOfferMutation: () => [
@@ -133,5 +134,16 @@ describe('PpeProductCard', () => {
     expect(screen.getAllByText('Не вибрано правило ціноутворення').length).toBeGreaterThan(0);
     expect(screen.queryByRole('button', { name: 'Зберегти' })).not.toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: 'Ціна постачальника, грн' })).toBeDisabled();
+  });
+
+  it('hides the supplier price from a manager (CAT-019)', () => {
+    mocks.canSeeCost.mockReturnValue(false);
+    renderCard();
+
+    expect(
+      screen.queryByRole('textbox', { name: 'Ціна постачальника, грн' }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText('Ціна постачальника')).not.toBeInTheDocument();
+    mocks.canSeeCost.mockReturnValue(true);
   });
 });

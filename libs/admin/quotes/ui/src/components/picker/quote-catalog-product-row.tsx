@@ -44,7 +44,7 @@ export function QuoteCatalogProductRow({ product, chosen, alreadyAdded, onToggle
             component="img"
             src={product.photoUrl}
             alt=""
-            sx={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 1, flexShrink: 0 }}
+            sx={{ width: 48, height: 48, objectFit: 'contain', borderRadius: 1, flexShrink: 0 }}
           />
         ) : (
           <Box

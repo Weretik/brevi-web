@@ -9,6 +9,7 @@ import { Alert, Stack } from '@mui/material';
 import { PriceFileUpload } from './price-file-upload';
 import { PriceRefresh } from './price-refresh';
 import { usePriceSourceDiscount } from '../../hooks/price-import/use-price-source-discount';
+import { useSupplierPreview } from '../suppliers/supplier-preview';
 
 import type { PriceImportResult, PriceSource } from '@admin/references/model';
 
@@ -28,6 +29,7 @@ export function PriceSourceDrawer({
   onDiscountSaved,
   onApplied,
 }: Props) {
+  const supplierPreview = useSupplierPreview();
   const discount = usePriceSourceDiscount(source, onDiscountSaved);
   const readOnly = !discount.editing;
   const upload = source.fileKind !== 'None' && Boolean(source.supplierName);
@@ -63,7 +65,13 @@ export function PriceSourceDrawer({
         )}
         {readOnly && refresh && <PriceRefresh source={source} onApplied={onApplied} />}
         {readOnly && upload && <PriceFileUpload source={source} onApplied={onApplied} />}
-        <PriceSourceDetails source={source} />
+        <PriceSourceDetails
+          source={source}
+          onOpenSupplier={() =>
+            supplierPreview.open({ id: source.supplierId, name: source.supplierName })
+          }
+        />
+        {supplierPreview.element}
       </Stack>
     </ReferenceEditorDrawer>
   );

@@ -4,6 +4,8 @@ import type { SewingAmountRange, SewingCardTotals as Totals } from '@admin/produ
 
 interface Props {
   totals: Totals;
+  /** «Собівартість» is for Admin only (CAT-019). */
+  showCost: boolean;
 }
 
 const minutes = new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 1 });
@@ -19,7 +21,7 @@ function range(value: SewingAmountRange | null) {
  * Figures of the model: fabrics, labour and cost on one line, then the three price levels.
  * Labour comes from the server calculation, as in the «Товари» side panel.
  */
-export function SewingCardMetrics({ totals }: Props) {
+export function SewingCardMetrics({ totals, showCost }: Props) {
   return (
     <SewingCardTotals
       costs={[
@@ -41,7 +43,7 @@ export function SewingCardMetrics({ totals }: Props) {
           note:
             totals.minutes === null ? undefined : `${minutes.format(totals.minutes)} хв на 1 виріб`,
         },
-        { label: 'Собівартість', value: range(totals.fullCost) },
+        ...(showCost ? [{ label: 'Собівартість', value: range(totals.fullCost) }] : []),
       ]}
       format={sewingWholePriceFormat}
       tiers={[

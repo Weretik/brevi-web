@@ -6,6 +6,7 @@ import {
 import { Alert, Stack } from '@mui/material';
 
 import { useGarmentAccessoryEditor } from '../../hooks/garment-accessories/use-garment-accessory-editor';
+import { useSupplierPreview } from '../suppliers/supplier-preview';
 
 import type { GarmentAccessoryEditorMode } from '../../hooks/garment-accessories/use-garment-accessory-editor';
 import type { GarmentAccessory } from '@admin/references/model';
@@ -34,6 +35,7 @@ export function GarmentAccessoryDrawer({
   const editor = useGarmentAccessoryEditor(initialMode, accessory, nextId, onSaved);
   const readOnly = editor.mode === 'view';
 
+  const supplierPreview = useSupplierPreview();
   return (
     <ReferenceEditorDrawer
       titleId="garment-accessory-drawer-title"
@@ -52,12 +54,14 @@ export function GarmentAccessoryDrawer({
       onEdit={editor.enableEditing}
       onSubmit={editor.save}
     >
+      {supplierPreview.element}
       <Stack sx={{ gap: 2 }}>
         {editor.message && <Alert severity="error">{editor.message}</Alert>}
         {readOnly ? (
           <GarmentAccessoryDetails
             values={editor.values}
             priceUpdatedAt={accessory?.priceUpdatedAt ?? null}
+            onOpenSupplier={(name) => supplierPreview.open({ name })}
           />
         ) : (
           <GarmentAccessoryForm

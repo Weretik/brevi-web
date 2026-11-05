@@ -33,6 +33,7 @@ const row = {
   problems: [],
   variants: [variant],
   mainPhotoUrl: 'https://cdn.example.test/thumbs/7.webp',
+  mainPhotoFullUrl: 'https://cdn.example.test/library/7.jpg',
 };
 
 const page = {

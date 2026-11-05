@@ -5,6 +5,7 @@ import { Button, Stack } from '@mui/material';
 
 import { SewingModelState } from './sewing-model-state';
 import { SewingVariantDrawer } from './sewing-variant-drawer';
+import { useCanSeeCost } from '../../hooks/product-access/use-can-see-cost';
 import { useSewingLinePanel } from '../../hooks/sewing-model/use-sewing-line-panel';
 
 import type { SewingModel } from '../../hooks/sewing-model/use-sewing-model';
@@ -18,6 +19,7 @@ interface Props {
 /** «Тканини»: every fabric of the model with its live cost and prices; add or change in a panel. */
 export function SewingVariantsTab({ model, writes }: Props) {
   const lines = useSewingLinePanel<number>();
+  const showCost = useCanSeeCost();
   const rows = sewingVariantRows(model.summary);
   const open = lines.panel;
   const variant =
@@ -48,6 +50,7 @@ export function SewingVariantsTab({ model, writes }: Props) {
         rows={rows}
         loading={model.loading || model.refreshing}
         canManage={model.canManage}
+        showCost={showCost}
         onOpen={(row) => {
           writes.clearError();
           lines.view(row.id);

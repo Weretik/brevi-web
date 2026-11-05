@@ -25,6 +25,7 @@ export * from './components/product-overview/product-price-cells';
 export * from './components/product-overview/product-overview-price-panel';
 export * from './components/product-overview/product-overview-section-chips';
 export * from './components/product-overview/product-overview-delete-dialog';
+export * from './components/product-overview/product-main-photo';
 export * from './components/sewing-card/sewing-card-header';
 export * from './components/sewing-card/sewing-card-metric-strip';
 export * from './components/sewing-card/sewing-card-status-pill';
