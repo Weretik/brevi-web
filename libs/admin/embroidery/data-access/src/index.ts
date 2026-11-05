@@ -7,5 +7,6 @@ export {
   useGetEmbroideryFormQuery,
   useGetEmbroiderySettingsQuery,
   useSaveEmbroiderySettingsMutation,
+  useSetEmbroideryMockupMutation,
 } from './api/embroidery.api';
 export type { EmbroiderySavedListArgs } from './api/embroidery.api';

@@ -40,6 +40,12 @@ const saved: Schemas['CrmEmbroiderySavedCalculation'] = {
     prices: [{ name: 'Опт', unit: 81.54, total: 4077, repeatUnit: 69.64 }],
     createdAt: '2026-11-04T19:52:00Z',
     createdByName: 'Олена',
+    mockup: {
+      mediaFileId: 5,
+      fileName: 'logo.png',
+      url: 'https://cdn.test/logo.png',
+      thumbnailUrl: null,
+    },
   },
   input,
   result: {

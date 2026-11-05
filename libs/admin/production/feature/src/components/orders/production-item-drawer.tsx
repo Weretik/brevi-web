@@ -3,6 +3,8 @@ import { ProductionItemForm } from '@admin/production/ui';
 import { ReferenceEditorDrawer } from '@admin/references/ui';
 import { Alert, Stack, Typography } from '@mui/material';
 
+import { useEmbroideryPicker } from '../../hooks/orders/use-embroidery-picker';
+
 import type {
   ProductionItem,
   ProductionItemErrors,
@@ -33,6 +35,7 @@ export function ProductionItemDrawer({
   onClose,
   onSubmit,
 }: Props) {
+  const embroidery = useEmbroideryPicker();
   const fabric = [item.fabricCode, item.fabricName].filter(Boolean).join(' · ');
   return (
     <ReferenceEditorDrawer
@@ -61,6 +64,7 @@ export function ProductionItemDrawer({
           errors={errors}
           withRate={withRate}
           disabled={saving}
+          embroidery={embroidery}
           onChange={onChange}
         />
       </Stack>

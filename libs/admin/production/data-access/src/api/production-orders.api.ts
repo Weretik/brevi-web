@@ -2,6 +2,7 @@ import { productionBaseApi } from './production-base-api';
 import { productionOrderErrors, toProductionApiError } from '../errors/production-api-error';
 import { mapOrderImportResult } from '../mappers/production-import.mapper';
 import {
+  mapProductionEmbroideryChoices,
   mapProductionOrder,
   mapProductionOrderHistory,
   mapProductionOrderPage,
@@ -11,6 +12,7 @@ import {
 
 import type {
   CreateProductionOrderBody,
+  ProductionEmbroideryChoice,
   ProductionImportResult,
   ProductionOrder,
   ProductionOrderChange,
@@ -78,6 +80,14 @@ export const productionOrdersApi = productionBaseApi.injectEndpoints({
       transformErrorResponse: errors,
       providesTags: [list],
     }),
+    getProductionEmbroideries: build.query<ProductionEmbroideryChoice[], string>({
+      query: (search) => ({
+        url: '/api/production/orders/embroideries',
+        params: search.trim() ? { search: search.trim() } : {},
+      }),
+      transformResponse: mapProductionEmbroideryChoices,
+      transformErrorResponse: errors,
+    }),
     getProductionQuoteDraft: build.query<ProductionQuoteDraft, number>({
       query: (quoteId) => `/api/production/orders/quote-sources/${quoteId}`,
       transformResponse: mapProductionQuoteDraft,
@@ -143,6 +153,7 @@ export const {
   useCopyProductionOrderMutation,
   useCreateProductionOrderMutation,
   useDeleteProductionOrderMutation,
+  useGetProductionEmbroideriesQuery,
   useGetProductionOrderHistoryQuery,
   useGetProductionOrderQuery,
   useGetProductionOrdersQuery,

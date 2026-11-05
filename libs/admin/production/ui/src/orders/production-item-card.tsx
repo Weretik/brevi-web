@@ -1,13 +1,9 @@
-import {
-  formatDay,
-  formatMeters,
-  formatMoney,
-  itemApplicationKindLabels,
-} from '@admin/production/model';
+import { applicationText, formatDay, formatMeters, formatMoney } from '@admin/production/model';
 import { ReferenceDetailsList } from '@admin/references/ui';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { Box, Button, Paper, Stack, Typography } from '@mui/material';
 
+import { ProductionItemEmbroideries } from './production-item-embroideries';
 import { ProductionStagePill, productionStageTone } from '../tracking/production-stage-pill';
 
 import type { ProductionItem, ProductionOrderPermissions } from '@admin/production/model';
@@ -37,15 +33,7 @@ export function ProductionItemCard({ item, permissions, onEdit, children }: Prop
     { label: 'Коментар', value: item.comment },
     {
       label: 'Нанесення',
-      value: item.applications.length
-        ? item.applications
-            .map((x) =>
-              [itemApplicationKindLabels[x.kind], x.place, x.description, x.color]
-                .filter(Boolean)
-                .join(', '),
-            )
-            .join('\n')
-        : null,
+      value: item.applications.length ? item.applications.map(applicationText).join('\n') : null,
     },
   ];
   if (permissions.seesSewingRate)
@@ -108,6 +96,10 @@ export function ProductionItemCard({ item, permissions, onEdit, children }: Prop
       >
         <ReferenceDetailsList items={details} />
       </Box>
+      <ProductionItemEmbroideries
+        applications={item.applications}
+        canOpenCalculation={permissions.canCopy}
+      />
       {children && <Stack sx={{ gap: 2, mt: 2 }}>{children}</Stack>}
     </Paper>
   );

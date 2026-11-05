@@ -30,6 +30,9 @@ import type {
   EmbroiderySettings,
   EmbroiderySettingsContent,
 } from '@admin/embroidery/model';
+import type { components } from '@admin/shared/contracts';
+
+type Schemas = components['schemas'];
 
 const settingsTag = [{ type: 'EmbroiderySettings' as const, id: 'CURRENT' }];
 const savedListTag = { type: 'EmbroideryCalculations' as const, id: 'LIST' };
@@ -108,6 +111,21 @@ export const embroideryApi = embroideryBaseApi.injectEndpoints({
       transformErrorResponse: toEmbroideryApiError,
       invalidatesTags: (_result, error) => (error ? [] : [savedListTag]),
     }),
+    setEmbroideryMockup: build.mutation<
+      EmbroiderySavedCalculation,
+      { id: number; mediaFileId: number | null }
+    >({
+      query: ({ id, mediaFileId }) => ({
+        url: `/api/crm/embroidery/calculations/${id}/mockup`,
+        method: 'PUT',
+        body: { mediaFileId } satisfies Schemas['CrmSetEmbroideryMockupInput'],
+      }),
+      transformResponse: (value: unknown) =>
+        mapEmbroiderySavedCalculation(ensureEmbroiderySavedCalculation(value)),
+      transformErrorResponse: toEmbroideryApiError,
+      invalidatesTags: (_result, error, { id }) =>
+        error ? [] : [savedListTag, { type: 'EmbroideryCalculations', id }],
+    }),
     deleteEmbroideryCalculation: build.mutation<void, number>({
       query: (id) => ({ url: `/api/crm/embroidery/calculations/${id}`, method: 'DELETE' }),
       transformErrorResponse: toEmbroideryApiError,
@@ -126,4 +144,5 @@ export const {
   useGetEmbroideryFormQuery,
   useGetEmbroiderySettingsQuery,
   useSaveEmbroiderySettingsMutation,
+  useSetEmbroideryMockupMutation,
 } = embroideryApi;

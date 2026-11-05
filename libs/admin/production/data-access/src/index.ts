@@ -16,6 +16,7 @@ export {
   useCopyProductionOrderMutation,
   useCreateProductionOrderMutation,
   useDeleteProductionOrderMutation,
+  useGetProductionEmbroideriesQuery,
   useGetProductionOrderHistoryQuery,
   useGetProductionOrderQuery,
   useGetProductionOrdersQuery,

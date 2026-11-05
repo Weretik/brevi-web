@@ -110,6 +110,7 @@ const requiredOperations = {
     'getCrmEmbroideryCalculation',
     'saveCrmEmbroideryCalculation',
     'deleteCrmEmbroideryCalculation',
+    'setCrmEmbroideryMockup',
   ],
 };
 

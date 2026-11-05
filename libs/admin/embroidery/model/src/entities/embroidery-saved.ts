@@ -27,6 +27,15 @@ export interface EmbroiderySavedSummary {
   prices: readonly EmbroiderySavedPrice[];
   createdAt: string;
   createdByName: string;
+  /** «Макет» from «Медіа»: a photo of the design for the workshop; null when none. */
+  mockup: EmbroideryMockup | null;
+}
+
+export interface EmbroideryMockup {
+  mediaFileId: number;
+  fileName: string;
+  url: string;
+  thumbnailUrl: string | null;
 }
 
 export interface EmbroiderySavedPage {

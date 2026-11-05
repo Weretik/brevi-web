@@ -81,6 +81,7 @@ vi.mock('@admin/production/data-access', () => {
     { isLoading: false },
   ];
   return {
+    useGetProductionEmbroideriesQuery: () => ({ data: [], isFetching: false }),
     useGetProductionOrderQuery: () => ({ data: api.current, isLoading: false, refetch: vi.fn() }),
     useGetProductionOrderHistoryQuery: () => ({
       data: [
