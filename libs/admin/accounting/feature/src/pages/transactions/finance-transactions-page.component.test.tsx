@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { FinanceTransactionsPage } from './finance-transactions-page';
 import {
   financeAccount,
+  financeAttachment,
   financeCategory,
   financeTransaction,
   requestsTo,
@@ -216,6 +217,54 @@ describe('«Операції» page', () => {
         path: '/api/accounting/transactions/t1/void',
         body: { version: 2 },
       }),
+    );
+  });
+
+  it('lists, adds and deletes files of an operation in its panel', async () => {
+    // The file picker's own filter is off, so the page's check is what refuses a wrong file.
+    const user = userEvent.setup({ applyAccept: false });
+    const calls = stubFinanceApi({
+      categories,
+      transactions: [financeTransaction()],
+      attachments: [financeAttachment()],
+      written: (call) =>
+        call.method === 'POST' ? financeAttachment({ id: 'f2', fileName: 'чек.png' }) : null,
+    });
+    openPage();
+
+    fireEvent.contextMenu(await screen.findByRole('row', { name: /Нитки/ }), {
+      clientX: 10,
+      clientY: 10,
+    });
+    await user.click(screen.getAllByRole('menuitem')[0]!);
+    const panel = await screen.findByRole('dialog', { name: 'Операція' });
+    const files = await within(panel).findByRole('list', { name: 'Файли операції' });
+    expect(files).toHaveTextContent('Рахунок 12.pdf');
+    expect(files).toHaveTextContent('250 КБ · 05.11.2026');
+
+    const input = within(panel).getByLabelText('Додати файли до операції');
+    await user.upload(input, [
+      new File(['x'], 'акт.docx', { type: 'application/msword' }),
+      new File(['png'], 'чек.png', { type: 'image/png' }),
+    ]);
+    expect(
+      await within(panel).findByText(/«акт\.docx»: Підходять лише PDF, JPG або PNG\./),
+    ).toBeVisible();
+    const posts = calls.filter((call) => call.method === 'POST');
+    expect(posts.map((call) => call.path)).toEqual(['/api/accounting/transactions/t1/attachments']);
+    const sent = posts[0]?.body;
+    expect(sent instanceof FormData ? (sent.get('file') as File).name : String(sent)).toMatch(
+      /name="file"/,
+    );
+
+    await user.click(within(panel).getByRole('button', { name: 'Видалити файл Рахунок 12.pdf' }));
+    const dialog = screen.getByRole('dialog', { name: 'Видалити файл?' });
+    expect(dialog).toHaveTextContent(/«Рахунок 12\.pdf» зникне з операції/);
+    await user.click(within(dialog).getByRole('button', { name: 'Видалити' }));
+    await waitFor(() =>
+      expect(calls.find((call) => call.method === 'DELETE')?.path).toBe(
+        '/api/accounting/attachments/f1',
+      ),
     );
   });
 

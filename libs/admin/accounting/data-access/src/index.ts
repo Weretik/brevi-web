@@ -7,10 +7,12 @@ export {
   useCreateFinanceTransactionMutation,
   useCreateFinanceTransferMutation,
   useDeleteFinanceAccountMutation,
+  useDeleteFinanceAttachmentMutation,
   useDeleteFinanceCategoryMutation,
   useGetAccountingSettingsQuery,
   useGetFinanceAccountHistoryQuery,
   useGetFinanceAccountsQuery,
+  useGetFinanceAttachmentsQuery,
   useGetFinanceCategoriesQuery,
   useGetFinanceCategoryHistoryQuery,
   useGetFinanceCounterpartiesQuery,
@@ -32,7 +34,9 @@ export {
   useUpdateFinanceCounterpartyMutation,
   useUpdateFinanceTransactionMutation,
   useUpdateFinanceTransferMutation,
+  useUploadFinanceAttachmentMutation,
   useVerifyFinanceCounterpartyMutation,
   useVoidFinanceTransactionMutation,
   useVoidFinanceTransferMutation,
 } from './api/accounting.api';
+export { fetchFinanceAttachmentContent } from './files/finance-attachment-content';

@@ -1,4 +1,4 @@
-import { auditActionLabels } from '@admin/accounting/model';
+import { auditActionLabels, historyFileName } from '@admin/accounting/model';
 import { Alert, Box, CircularProgress, Stack, Typography } from '@mui/material';
 
 import type { FinanceHistoryEntry } from '@admin/accounting/model';
@@ -31,6 +31,7 @@ export function FinanceHistoryList({ entries, loading, error }: Props) {
         <Box component="li" key={entry.id}>
           <Typography variant="body2" sx={{ fontWeight: 600 }}>
             {auditActionLabels[entry.action]}
+            {historyFileName(entry) ? ` · ${historyFileName(entry)}` : ''}
           </Typography>
           <Typography variant="caption" color="text.secondary">
             <Box component="span" sx={{ fontFamily: 'var(--admin-font-mono)' }}>

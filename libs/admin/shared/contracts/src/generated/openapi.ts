@@ -4604,7 +4604,9 @@ export interface components {
       | 'Verify'
       | 'Merge'
       | 'Review'
-      | 'Promote';
+      | 'Promote'
+      | 'AttachmentAdd'
+      | 'AttachmentDelete';
     /** @description Snapshots are the JSON text of the record before and after (null when absent). */
     FinanceHistoryEntryResponse: {
       /** Format: int64 */

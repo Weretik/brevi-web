@@ -1,5 +1,6 @@
 import { accountingBaseApi } from './accounting-base-api';
 import { financeAccountEndpoints } from './accounts/finance-account-endpoints';
+import { financeAttachmentEndpoints } from './attachments/finance-attachment-endpoints';
 import { financeCategoryEndpoints } from './categories/finance-category-endpoints';
 import { financeCounterpartyEndpoints } from './counterparties/finance-counterparty-endpoints';
 import { financeOverviewEndpoints } from './overview/finance-overview-endpoints';
@@ -9,6 +10,7 @@ import { financeTransferEndpoints } from './transfers/finance-transfer-endpoints
 export const accountingApi = accountingBaseApi.injectEndpoints({
   endpoints: (build) => ({
     ...financeAccountEndpoints(build),
+    ...financeAttachmentEndpoints(build),
     ...financeCategoryEndpoints(build),
     ...financeCounterpartyEndpoints(build),
     ...financeOverviewEndpoints(build),
@@ -25,10 +27,12 @@ export const {
   useCreateFinanceTransactionMutation,
   useCreateFinanceTransferMutation,
   useDeleteFinanceAccountMutation,
+  useDeleteFinanceAttachmentMutation,
   useDeleteFinanceCategoryMutation,
   useGetAccountingSettingsQuery,
   useGetFinanceAccountHistoryQuery,
   useGetFinanceAccountsQuery,
+  useGetFinanceAttachmentsQuery,
   useGetFinanceCategoriesQuery,
   useGetFinanceCategoryHistoryQuery,
   useGetFinanceCounterpartiesQuery,
@@ -50,6 +54,7 @@ export const {
   useUpdateFinanceCounterpartyMutation,
   useUpdateFinanceTransactionMutation,
   useUpdateFinanceTransferMutation,
+  useUploadFinanceAttachmentMutation,
   useVerifyFinanceCounterpartyMutation,
   useVoidFinanceTransactionMutation,
   useVoidFinanceTransferMutation,
