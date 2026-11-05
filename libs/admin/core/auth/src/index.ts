@@ -8,6 +8,7 @@ export { useGetAdminSessionRolesQuery } from './session/session-roles.api';
 export {
   canManageUsers,
   canManageWorkshop,
+  canUseAccounting,
   canUsePurchaseInvoices,
   isStaff,
   sessionRoleLabel,

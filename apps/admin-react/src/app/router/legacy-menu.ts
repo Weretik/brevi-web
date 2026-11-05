@@ -33,6 +33,8 @@ const embroideryPrice = ['Admin', 'Manager'] as const;
 const workshop = ['Admin', 'WorkshopChief'] as const;
 /** «Виробничі завдання»: managers too, since they pass КП to the workshop. */
 const productionOrders = ['Admin', 'Manager', 'WorkshopChief'] as const;
+/** «Бухгалтерія»: the director only (ACC-001); Admin and Accountant do not see it. */
+const accounting = ['Director'] as const;
 
 export const legacyGroups: readonly LegacyNavigationGroup[] = [
   {
@@ -138,11 +140,26 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
     section: 'Робота',
     label: 'Бухгалтерія',
     items: [
-      { id: 'bills', label: 'Рахунки' },
-      { id: 'receipts', label: 'Надходження' },
-      { id: 'expenses', label: 'Витрати' },
-      { id: 'reports', label: 'Звіти' },
-      { id: 'accounting-references', label: 'Довідники' },
+      { id: 'finance-overview', label: 'Огляд', requiredRoles: accounting },
+      { id: 'finance-operations', label: 'Операції', requiredRoles: accounting },
+      { id: 'finance-transfers', label: 'Перекази', requiredRoles: accounting },
+      {
+        id: 'finance-accounts',
+        label: 'Рахунки і каси',
+        path: '/accounting/accounts',
+        requiredRoles: accounting,
+      },
+      {
+        id: 'finance-categories',
+        label: 'Категорії',
+        path: '/accounting/categories',
+        requiredRoles: accounting,
+      },
+      { id: 'finance-counterparties', label: 'Контрагенти', requiredRoles: accounting },
+      { id: 'finance-review', label: 'Потребують перевірки', requiredRoles: accounting },
+      { id: 'finance-import', label: 'Імпорт виписок', requiredRoles: accounting },
+      { id: 'finance-reports', label: 'Звіти', requiredRoles: accounting },
+      { id: 'finance-audit', label: 'Журнал змін', requiredRoles: accounting },
     ],
   },
   {

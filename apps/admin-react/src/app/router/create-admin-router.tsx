@@ -1,7 +1,9 @@
+import { accountingRoutes } from '@admin/accounting/feature';
 import { aiRoutes } from '@admin/ai/feature';
 import {
   canManageUsers,
   canManageWorkshop,
+  canUseAccounting,
   LoginPage,
   loginPath,
   refreshSession,
@@ -64,6 +66,7 @@ export function createAdminRouter() {
         { element: <RequireRole allow={canWorkOnTasks} />, children: tasksRoutes.board },
         { element: <RequireRole allow={canPriceEmbroidery} />, children: embroideryRoutes },
         { element: <RequireRole allow={canManageWorkshop} />, children: productionRoutes },
+        { element: <RequireRole allow={canUseAccounting} />, children: accountingRoutes },
         {
           element: <RequireRole allow={canUseProductionOrders} />,
           children: productionOrderRoutes,

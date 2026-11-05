@@ -37,15 +37,14 @@ describe('legacy Admin navigation', () => {
     expect(groups.map((group) => group.label)).toEqual([
       'Менеджер сервісу',
       'Швейний цех',
-      'Бухгалтерія',
       'Нагадування',
       'Загальні довідники',
       'Фото',
       'Контент',
       'Загальні звіти',
     ]);
-    expect(groups.map((group) => group.items.length)).toEqual([5, 4, 5, 4, 8, 1, 2, 1]);
-    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(30);
+    expect(groups.map((group) => group.items.length)).toEqual([5, 4, 4, 8, 1, 2, 1]);
+    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(25);
     expect(groups[0].items.map((item) => item.id)).not.toContain('clients');
   });
   it('shows «Налаштування КП» only for the server Admin role', () => {
@@ -67,7 +66,9 @@ describe('legacy Admin navigation', () => {
       label: 'Бібліотека фото',
       to: '/media',
     });
-    expect(groups[4].items.some((item) => item.id === 'media')).toBe(false);
+    expect(
+      groups.find((group) => group.id === 'references')?.items.some((item) => item.id === 'media'),
+    ).toBe(false);
   });
 
   it('enables a legacy URL only when the React route is registered', () => {
@@ -75,8 +76,10 @@ describe('legacy Admin navigation', () => {
     const unavailable = createNavigation(new Set(['/']));
     const available = createNavigation(new Set(['/', legacyPath]));
 
-    expect(unavailable[4].items[4].to).toBeUndefined();
-    expect(available[4].items[4].to).toBe(legacyPath);
+    const references = (groups: typeof available) =>
+      groups.find((group) => group.id === 'references')?.items[4];
+    expect(references(unavailable)?.to).toBeUndefined();
+    expect(references(available)?.to).toBe(legacyPath);
     expect(available[0].items[2].to).toBeUndefined();
   });
 
@@ -152,5 +155,19 @@ describe('legacy Admin navigation', () => {
       label: 'Склад тканин',
       to: '/production/fabric-stock',
     });
+  });
+
+  it('shows «Бухгалтерія» to the director only and links its two pages', () => {
+    const paths = new Set(['/accounting/accounts', '/accounting/categories']);
+    const accounting = (roles: string[]) =>
+      createNavigation(paths, roles).find((group) => group.id === 'accounting');
+
+    expect(accounting(['Director'])?.items.filter((item) => item.to)).toEqual([
+      { id: 'finance-accounts', label: 'Рахунки і каси', to: '/accounting/accounts' },
+      { id: 'finance-categories', label: 'Категорії', to: '/accounting/categories' },
+    ]);
+    expect(accounting(['Director'])?.items).toHaveLength(10);
+    expect(accounting(['Admin'])).toBeUndefined();
+    expect(accounting(['Accountant'])).toBeUndefined();
   });
 });

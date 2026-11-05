@@ -19,7 +19,8 @@ import type {
 import type {} from '@mui/x-data-grid/themeAugmentation';
 
 interface ReferenceRow extends GridValidRowModel {
-  id: number;
+  /** Numeric ids in references; text ids (uuid) in other modules. */
+  id: number | string;
   name: string;
 }
 
@@ -39,7 +40,7 @@ interface Props<Row extends ReferenceRow> {
   onSelectionChange: (selection: GridRowSelectionModel) => void;
   onView: (row: Row) => void;
   onEdit: (row: Row) => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: Row['id']) => void;
   /** Rows that are details of another row (no checkbox, no menu). */
   isDetailRow?: (row: Row) => boolean;
   /** Column sorting; off when the row order carries meaning (detail rows follow their parent). */

@@ -61,6 +61,180 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/accounting/settings': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Cutover date between «Домашня бухгалтерія» and the current books, the time zone and today in Kyiv. */
+    get: operations['getAccountingSettings'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/accounts': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description «Рахунки і каси»: active accounts by order and name; with includeArchived archived ones follow. */
+    get: operations['getFinanceAccounts'];
+    put?: never;
+    /** @description «Додати рахунок». The name is trimmed, the currency upper-cased, the IBAN keeps letters and digits. */
+    post: operations['createFinanceAccount'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/accounts/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Edit an account. A save that changes nothing keeps the version. */
+    put: operations['updateFinanceAccount'];
+    post?: never;
+    /** @description Delete an account; the change log keeps its last snapshot. */
+    delete: operations['deleteFinanceAccount'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/accounts/{id}/cutover': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** @description «Залишок на 01.10»: confirm the starting balance of the current books (who and when are stored) or clear it with confirmed false. */
+    put: operations['setFinanceAccountCutover'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/accounts/{id}/archive': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description «Архівувати»: the account leaves the active list. */
+    post: operations['archiveFinanceAccount'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/accounts/{id}/restore': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description «Відновити» an archived account. */
+    post: operations['restoreFinanceAccount'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/accounts/{id}/history': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Change log of one account, newest first. */
+    get: operations['getFinanceAccountHistory'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/categories': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description «Категорії» of one area of the books (all areas without scope), roots and subcategories in one flat list. */
+    get: operations['getFinanceCategories'];
+    put?: never;
+    /** @description «Додати категорію», or a subcategory with parentId. A subcategory must match its root in direction and scope; only two levels. */
+    post: operations['createFinanceCategory'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/categories/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Rename a category or change its note and order. */
+    put: operations['updateFinanceCategory'];
+    post?: never;
+    /** @description Delete a category; a root goes with its subcategories, each with its own log entry. */
+    delete: operations['deleteFinanceCategory'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/categories/{id}/history': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Change log of one category, newest first. */
+    get: operations['getFinanceCategoryHistory'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/admin/users': {
     parameters: {
       query?: never;
@@ -3893,6 +4067,154 @@ export interface components {
        * @description Profile photo on the CDN; null shows the initial and a color
        */
       avatarUrl: string | null;
+    };
+    AccountingSettingsResponse: {
+      /** Format: date */
+      cutoverDate: string;
+      timeZone: string;
+      /** Format: date */
+      today: string;
+    };
+    /** @enum {string} */
+    FinanceAccountType: 'Bank' | 'Card' | 'Cash' | 'Other';
+    /** @description Money is in kopecks; version goes back with the next change. */
+    FinanceAccountResponse: {
+      /** Format: uuid */
+      id: string;
+      name: string;
+      type: components['schemas']['FinanceAccountType'];
+      currency: string;
+      iban: string;
+      /** Format: int64 */
+      openingMinor: number;
+      /** Format: date */
+      openingDate: string;
+      /** Format: int64 */
+      cutoverBalanceMinor: number | null;
+      cutoverConfirmed: boolean;
+      /** Format: date-time */
+      cutoverConfirmedAt: string | null;
+      cutoverConfirmedBy: string | null;
+      note: string;
+      active: boolean;
+      /** Format: int32 */
+      sortOrder: number;
+      /** Format: int32 */
+      version: number;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+    };
+    FinanceAccountInput: {
+      name: string;
+      type: components['schemas']['FinanceAccountType'];
+      /** @description ISO code, UAH by default */
+      currency: string;
+      iban?: string | null;
+      /**
+       * Format: int64
+       * @description Opening balance in kopecks
+       */
+      openingMinor: number;
+      /** Format: date */
+      openingDate: string;
+      note?: string | null;
+      /** Format: int32 */
+      sortOrder: number;
+    };
+    FinanceAccountUpdateInput: {
+      name: string;
+      type: components['schemas']['FinanceAccountType'];
+      /** @description ISO code, UAH by default */
+      currency: string;
+      iban?: string | null;
+      /**
+       * Format: int64
+       * @description Opening balance in kopecks
+       */
+      openingMinor: number;
+      /** Format: date */
+      openingDate: string;
+      note?: string | null;
+      /** Format: int32 */
+      sortOrder: number;
+      /** Format: int32 */
+      version: number;
+    };
+    FinanceAccountCutoverInput: {
+      /**
+       * Format: int64
+       * @description Required when confirmed
+       */
+      balanceMinor?: number | null;
+      confirmed: boolean;
+      /** Format: int32 */
+      version: number;
+    };
+    FinanceVersionInput: {
+      /** Format: int32 */
+      version: number;
+    };
+    /** @enum {string} */
+    AuditEntity: 'Account' | 'Category';
+    /** @enum {string} */
+    AuditAction:
+      'Create' | 'Update' | 'Archive' | 'Restore' | 'Delete' | 'CutoverConfirm' | 'CutoverReset';
+    /** @description Snapshots are the JSON text of the record before and after (null when absent). */
+    FinanceHistoryEntryResponse: {
+      /** Format: int64 */
+      id: number;
+      entity: components['schemas']['AuditEntity'];
+      /** Format: uuid */
+      entityId: string;
+      action: components['schemas']['AuditAction'];
+      by: string;
+      /** Format: date-time */
+      at: string;
+      beforeJson: string | null;
+      afterJson: string | null;
+    };
+    /**
+     * @description Current: from 2026-10-01; LegacyArchive: «Домашня бухгалтерія» before it.
+     * @enum {string}
+     */
+    LedgerScope: 'Current' | 'LegacyArchive';
+    /** @enum {string} */
+    CategoryDirection: 'Income' | 'Expense';
+    /** @description parentId is null for a root. */
+    FinanceCategoryResponse: {
+      /** Format: uuid */
+      id: string;
+      name: string;
+      direction: components['schemas']['CategoryDirection'];
+      scope: components['schemas']['LedgerScope'];
+      /** Format: uuid */
+      parentId: string | null;
+      note: string;
+      active: boolean;
+      /** Format: int32 */
+      sortOrder: number;
+      /** Format: int32 */
+      version: number;
+    };
+    FinanceCategoryInput: {
+      name: string;
+      direction: components['schemas']['CategoryDirection'];
+      scope: components['schemas']['LedgerScope'];
+      /** Format: uuid */
+      parentId?: string | null;
+      note?: string | null;
+      /** Format: int32 */
+      sortOrder: number;
+    };
+    FinanceCategoryUpdateInput: {
+      name: string;
+      note?: string | null;
+      /** Format: int32 */
+      sortOrder: number;
+      /** Format: int32 */
+      version: number;
     };
     /** @enum {string} */
     StaffRole: 'Director' | 'Admin' | 'Accountant' | 'Manager' | 'WorkshopChief';
@@ -9007,6 +9329,679 @@ export interface operations {
       };
       /** @description Not signed in */
       401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getAccountingSettings: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AccountingSettingsResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getFinanceAccounts: {
+    parameters: {
+      query?: {
+        includeArchived?: boolean;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceAccountResponse'][];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createFinanceAccount: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FinanceAccountInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceAccountResponse'];
+        };
+      };
+      /** @description Invalid fields; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateFinanceAccount: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FinanceAccountUpdateInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceAccountResponse'];
+        };
+      };
+      /** @description Invalid fields; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The version is stale (someone saved first); body is an array of messages */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  deleteFinanceAccount: {
+    parameters: {
+      query: {
+        version: number;
+      };
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Deleted */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The version is stale (someone saved first); body is an array of messages */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  setFinanceAccountCutover: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FinanceAccountCutoverInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceAccountResponse'];
+        };
+      };
+      /** @description Invalid fields; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The version is stale (someone saved first); body is an array of messages */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  archiveFinanceAccount: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FinanceVersionInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceAccountResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The version is stale (someone saved first); body is an array of messages */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  restoreFinanceAccount: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FinanceVersionInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceAccountResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The version is stale (someone saved first); body is an array of messages */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getFinanceAccountHistory: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceHistoryEntryResponse'][];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getFinanceCategories: {
+    parameters: {
+      query?: {
+        scope?: components['schemas']['LedgerScope'];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceCategoryResponse'][];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createFinanceCategory: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FinanceCategoryInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceCategoryResponse'];
+        };
+      };
+      /** @description Invalid fields; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Parent not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The same level already has this name (case-insensitive) */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateFinanceCategory: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FinanceCategoryUpdateInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceCategoryResponse'];
+        };
+      };
+      /** @description Invalid fields; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Stale version or the name is taken at this level */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  deleteFinanceCategory: {
+    parameters: {
+      query: {
+        version: number;
+      };
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Deleted */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The version is stale (someone saved first); body is an array of messages */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getFinanceCategoryHistory: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceHistoryEntryResponse'][];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
         headers: {
           [name: string]: unknown;
         };

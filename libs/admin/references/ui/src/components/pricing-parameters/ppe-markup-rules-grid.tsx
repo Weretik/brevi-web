@@ -27,7 +27,13 @@ const markup = (field: keyof PpeMarkupRule, headerName: string): GridColDef<PpeM
 });
 
 const columns: GridColDef<PpeMarkupRule>[] = [
-  { field: 'name', headerName: 'Правило', flex: 1.2, minWidth: 220, cellClassName: 'reference-strong' },
+  {
+    field: 'name',
+    headerName: 'Правило',
+    flex: 1.2,
+    minWidth: 220,
+    cellClassName: 'reference-strong',
+  },
   markup('retailMarkup', 'Роздріб'),
   markup('wholesaleMarkup', 'Опт'),
   markup('largeWholesaleMarkup', 'Великий опт'),

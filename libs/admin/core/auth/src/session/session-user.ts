@@ -33,6 +33,9 @@ export const canManageWorkshop = (user: SessionUser): boolean =>
 export const canUsePurchaseInvoices = (user: SessionUser): boolean =>
   user.roles.includes('Admin') || user.roles.includes('Accountant');
 
+/** «Бухгалтерія»: only the director (ACC-001, user decision 2026-11-05). */
+export const canUseAccounting = (user: SessionUser): boolean => user.roles.includes('Director');
+
 const roleLabels: Record<Exclude<SessionRole, 'User'>, string> = {
   Director: 'Директор',
   Admin: 'Адміністратор',

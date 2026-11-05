@@ -65,6 +65,10 @@ describe('React Admin routing', () => {
     renderApp();
     const navigation = screen.getByRole('navigation', { name: 'Основна навігація' });
     expect(within(navigation).queryByText('Початок')).not.toBeInTheDocument();
+    // «Бухгалтерія» is for the director only (ACC-001).
+    expect(
+      within(navigation).queryByRole('button', { name: 'Бухгалтерія' }),
+    ).not.toBeInTheDocument();
     const sections = [
       ['Менеджер сервісу', ['Ліди', 'КП', 'Ціна вишивки', 'Прайс', 'Мої завдання', 'Угоди']],
       [
@@ -79,7 +83,6 @@ describe('React Admin routing', () => {
           'Каса цеху',
         ],
       ],
-      ['Бухгалтерія', ['Рахунки', 'Надходження', 'Витрати', 'Звіти', 'Довідники']],
       [
         'Загальні довідники',
         [
