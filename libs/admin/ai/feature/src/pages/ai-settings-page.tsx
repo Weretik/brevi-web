@@ -5,7 +5,7 @@ import { Alert, Box, Button, CircularProgress, Paper, Stack, Typography } from '
 import { AiKeySection } from '../components/ai-key-section';
 import { AiModelsDrawer } from '../components/ai-models-drawer';
 import { AiModelsSection } from '../components/ai-models-section';
-import { AiPromptSection } from '../components/ai-prompt-section';
+import { AiRulesSection } from '../components/ai-rules-section';
 import { AiStatusStrip } from '../components/ai-status-strip';
 import { AiWorkSection } from '../components/ai-work-section';
 import { useAiSettings } from '../hooks/use-ai-settings';
@@ -123,12 +123,10 @@ export function AiSettingsPage() {
           </Card>
           {settings.prompts.map((prompt) => (
             <Card key={prompt.key} title={prompt.title} notice={page.notices.prompt}>
-              <AiPromptSection
-                value={page.prompts[prompt.key] ?? ''}
-                dirty={page.promptDirty(prompt.key)}
+              <AiRulesSection
+                rules={page.rulesOf(prompt.key)}
                 disabled={page.busy}
-                onChange={(text) => page.changePrompt(prompt.key, text)}
-                onSave={() => void page.savePrompt(prompt.key)}
+                onSave={(rules, done) => page.saveRules(prompt.key, rules, done)}
               />
             </Card>
           ))}

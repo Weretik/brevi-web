@@ -154,4 +154,50 @@ describe('AiSettingsPage', () => {
     render(<AiSettingsPage />);
     expect(screen.getByText(/вичерпано ліміт місяця/)).toBeInTheDocument();
   });
+
+  it('adds, changes and deletes recognition conditions one by one', async () => {
+    fixture.settings = {
+      ...base,
+      prompts: [{ ...base.prompts[0], text: '- Бистров завжди без ПДВ' }],
+    };
+    fixture.prompt.mockResolvedValue({});
+    render(<AiSettingsPage />);
+
+    const conditions = screen.getByRole('list', { name: 'Умови' });
+    expect(within(conditions).getByText('Бистров завжди без ПДВ')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Додати умову' }));
+    await userEvent.type(screen.getByLabelText('Нова умова'), 'Номер без №');
+    await userEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
+    expect(fixture.prompt).toHaveBeenLastCalledWith({
+      key: 'purchase-invoices',
+      text: '- Бистров завжди без ПДВ\n- Номер без №',
+    });
+    expect(await screen.findByText('Умову додано.')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Змінити умову 1' }));
+    const field = screen.getByLabelText('Умова 1');
+    await userEvent.clear(field);
+    await userEvent.type(field, 'Бистров без ПДВ');
+    await userEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
+    expect(fixture.prompt).toHaveBeenLastCalledWith({
+      key: 'purchase-invoices',
+      text: '- Бистров без ПДВ',
+    });
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Видалити умову 1' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Видалити' }));
+    expect(fixture.prompt).toHaveBeenLastCalledWith({ key: 'purchase-invoices', text: '' });
+  });
+
+  it('asks to write a condition before saving an empty one', async () => {
+    fixture.settings = base;
+    render(<AiSettingsPage />);
+
+    expect(screen.getByText(/Умов немає/)).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Додати умову' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
+    expect(screen.getByText('Напишіть умову')).toBeInTheDocument();
+    expect(fixture.prompt).not.toHaveBeenCalled();
+  });
 });

@@ -7,6 +7,8 @@ import {
   useUpdateAiSettingsMutation,
 } from '@admin/ai/data-access';
 import {
+  aiRulesOf,
+  aiRulesText,
   aiSettingsFormOf,
   aiSettingsInputOf,
   validateAiKey,
@@ -47,14 +49,12 @@ export function useAiSettings() {
   const [modelErrors, setModelErrors] = useState<AiSettingsErrors>({});
   const [key, setKeyValue] = useState('');
   const [keyError, setKeyError] = useState<string | undefined>();
-  const [prompts, setPrompts] = useState<Record<string, string>>({});
   const [notices, setNotices] = useState<Partial<Record<AiArea, AiNotice>>>({});
   const [testingTier, setTestingTier] = useState<AiModelTier | null>(null);
 
   useEffect(() => {
     if (!settings) return;
     setLimit(String(settings.monthlyLimitUsd));
-    setPrompts(Object.fromEntries(settings.prompts.map((prompt) => [prompt.key, prompt.text])));
   }, [settings]);
 
   const notify = (area: AiArea, notice: AiNotice | null) =>
@@ -164,13 +164,16 @@ export function useAiSettings() {
     }
   }
 
-  async function savePrompt(promptKey: string) {
+  /** Saves the whole list after one condition is added, changed or deleted. */
+  async function saveRules(promptKey: string, rules: string[], done: string): Promise<boolean> {
     notify('prompt', null);
     try {
-      await updatePrompt({ key: promptKey, text: prompts[promptKey] ?? '' }).unwrap();
-      notify('prompt', { text: 'Умови збережено.', ok: true });
+      await updatePrompt({ key: promptKey, text: aiRulesText(rules) }).unwrap();
+      notify('prompt', { text: done, ok: true });
+      return true;
     } catch (error) {
       fail('prompt', error, 'Не вдалося зберегти умови.');
+      return false;
     }
   }
 
@@ -207,12 +210,8 @@ export function useAiSettings() {
       setKeyValue(value);
       setKeyError(undefined);
     },
-    prompts,
-    promptDirty: (promptKey: string) =>
-      (prompts[promptKey] ?? '') !==
-      (settings?.prompts.find((x) => x.key === promptKey)?.text ?? ''),
-    changePrompt: (promptKey: string, text: string) =>
-      setPrompts((current) => ({ ...current, [promptKey]: text })),
+    rulesOf: (promptKey: string) =>
+      aiRulesOf(settings?.prompts.find((x) => x.key === promptKey)?.text ?? ''),
     testingTier,
     toggle,
     saveLimit,
@@ -220,6 +219,6 @@ export function useAiSettings() {
     saveKey,
     deleteKey,
     check,
-    savePrompt,
+    saveRules,
   };
 }
