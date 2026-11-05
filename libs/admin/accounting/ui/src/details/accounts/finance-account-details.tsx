@@ -41,6 +41,32 @@ export function FinanceAccountDetails({ account, cutoverDate, cutoverActions }: 
           ]}
         />
       </ReferenceFormSection>
+      {account.balance && (
+        <ReferenceFormSection title="Залишки">
+          <ReferenceDetailsList
+            items={[
+              {
+                label: 'Поточний облік',
+                value:
+                  account.balance.currentMinor === null
+                    ? 'Невідомий, поки не підтверджено залишок на 01.10'
+                    : formatMinor(account.balance.currentMinor, account.currency),
+                mono: account.balance.currentMinor !== null,
+              },
+              {
+                label: 'Домашня бухгалтерія',
+                value: formatMinor(account.balance.legacyMinor, account.currency),
+                mono: true,
+              },
+              {
+                label: 'Усі записи разом',
+                value: formatMinor(account.balance.totalMinor, account.currency),
+                mono: true,
+              },
+            ]}
+          />
+        </ReferenceFormSection>
+      )}
       <ReferenceFormSection title={`Залишок на ${formatLedgerDate(cutoverDate)}`}>
         {confirmed ? (
           <ReferenceDetailsList

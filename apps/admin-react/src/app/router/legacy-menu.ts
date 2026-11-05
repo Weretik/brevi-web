@@ -146,9 +146,24 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
     section: 'Робота',
     label: 'Бухгалтерія',
     items: [
-      { id: 'finance-overview', label: 'Огляд', requiredRoles: accounting },
-      { id: 'finance-operations', label: 'Операції', requiredRoles: accounting },
-      { id: 'finance-transfers', label: 'Перекази', requiredRoles: accounting },
+      {
+        id: 'finance-overview',
+        label: 'Огляд',
+        path: '/accounting/overview',
+        requiredRoles: accounting,
+      },
+      {
+        id: 'finance-operations',
+        label: 'Операції',
+        path: '/accounting/transactions',
+        requiredRoles: accounting,
+      },
+      {
+        id: 'finance-transfers',
+        label: 'Перекази',
+        path: '/accounting/transfers',
+        requiredRoles: accounting,
+      },
       {
         id: 'finance-accounts',
         label: 'Рахунки і каси',

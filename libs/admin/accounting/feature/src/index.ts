@@ -1,1 +1,8 @@
-export { accountingRoutes, financeAccountsPath, financeCategoriesPath } from './accounting.routes';
+export {
+  accountingRoutes,
+  financeAccountsPath,
+  financeCategoriesPath,
+  financeOverviewPath,
+  financeTransactionsPath,
+  financeTransfersPath,
+} from './accounting.routes';

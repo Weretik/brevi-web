@@ -104,10 +104,10 @@ export interface paths {
       cookie?: never;
     };
     get?: never;
-    /** @description Edit an account. A save that changes nothing keeps the version. */
+    /** @description Edit an account. A save that changes nothing keeps the version. With movements the currency is fixed and the opening date cannot be later than the earliest movement (400). */
     put: operations['updateFinanceAccount'];
     post?: never;
-    /** @description Delete an account; the change log keeps its last snapshot. */
+    /** @description Delete an account; the change log keeps its last snapshot. An account with any operation or transfer (cancelled ones too) can only be archived: 409. */
     delete: operations['deleteFinanceAccount'];
     options?: never;
     head?: never;
@@ -211,7 +211,7 @@ export interface paths {
     /** @description Rename a category or change its note and order. */
     put: operations['updateFinanceCategory'];
     post?: never;
-    /** @description Delete a category; a root goes with its subcategories, each with its own log entry. */
+    /** @description Delete a category; a root goes with its subcategories, each with its own log entry. When an operation (cancelled ones too) uses the category or a subcategory, the whole branch is switched off instead (active false, log action Deactivate). */
     delete: operations['deleteFinanceCategory'];
     options?: never;
     head?: never;
@@ -227,6 +227,161 @@ export interface paths {
     };
     /** @description Change log of one category, newest first. */
     get: operations['getFinanceCategoryHistory'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/overview': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description «Огляд»: per currency of the active accounts, the balance of the chosen area (both without scope; balances ignore the period) and active income and expense of the inclusive period. For Current, unconfirmedCutoverCount > 0 means the total is not known yet. */
+    get: operations['getFinanceOverview'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/transactions': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description «Операції»: one area, newest first by default (ties: newest saved first). Totals cover the whole filtered selection per currency, without cancelled rows. */
+    get: operations['getFinanceTransactions'];
+    put?: never;
+    /** @description «Додати дохід» / «Додати витрату». The date must fall into the area (Current from 2026-10-01) and be on or after the account opening date; Current needs an active account; the category must be active, of the same area and direction. The currency comes from the account. */
+    post: operations['createFinanceTransaction'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/transactions/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Edit an active hand-made operation; the area stays. An unchanged account or category may already be archived or switched off; a new date must fit the area. */
+    put: operations['updateFinanceTransaction'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/transactions/{id}/void': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description «Анулювати»: never deleted; the operation stays in the journal (includeVoided) and the log but no longer counts. A cancelled operation cannot be changed (400). */
+    post: operations['voidFinanceTransaction'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/transactions/{id}/history': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Change log of one operation, newest first. */
+    get: operations['getFinanceTransactionHistory'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/transfers': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description «Перекази»: one area, newest first by default. accountId matches either side. Totals sum active transfers of the whole selection once per transfer, per currency. */
+    get: operations['getFinanceTransfers'];
+    put?: never;
+    /** @description «Додати переказ» between two different own accounts of one currency. Date and account rules as for operations, for both accounts. No balance check. */
+    post: operations['createFinanceTransfer'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/transfers/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Edit an active hand-made transfer; the area stays. */
+    put: operations['updateFinanceTransfer'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/transfers/{id}/void': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description «Анулювати» a transfer: it stays in the journal and the log but no longer moves money. */
+    post: operations['voidFinanceTransfer'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/transfers/{id}/history': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Change log of one transfer, newest first. */
+    get: operations['getFinanceTransferHistory'];
     put?: never;
     post?: never;
     delete?: never;
@@ -4111,6 +4266,25 @@ export interface components {
     };
     /** @enum {string} */
     FinanceAccountType: 'Bank' | 'Card' | 'Cash' | 'Other';
+    FinanceAccountBalanceResponse: {
+      /**
+       * Format: int64
+       * @description Opening balance plus active «Домашня бухгалтерія» movements
+       */
+      legacyMinor: number;
+      /**
+       * Format: int64
+       * @description Confirmed balance on 01.10.2026 plus active current movements; null while not confirmed (unknown, not zero)
+       */
+      currentMinor: number | null;
+      /**
+       * Format: int64
+       * @description Opening balance plus every active movement of both areas; not legacy + current
+       */
+      totalMinor: number;
+      /** @description True once any movement, cancelled ones too, uses the account */
+      hasHistory: boolean;
+    };
     /** @description Money is in kopecks; version goes back with the next change. */
     FinanceAccountResponse: {
       /** Format: uuid */
@@ -4139,6 +4313,8 @@ export interface components {
       createdAt: string;
       /** Format: date-time */
       updatedAt: string;
+      /** @description Counted on every read; null only inside change log snapshots. */
+      balance: components['schemas']['FinanceAccountBalanceResponse'] | null;
     };
     FinanceAccountInput: {
       name: string;
@@ -4191,10 +4367,18 @@ export interface components {
       version: number;
     };
     /** @enum {string} */
-    AuditEntity: 'Account' | 'Category';
+    AuditEntity: 'Account' | 'Category' | 'Transaction' | 'Transfer';
     /** @enum {string} */
     AuditAction:
-      'Create' | 'Update' | 'Archive' | 'Restore' | 'Delete' | 'CutoverConfirm' | 'CutoverReset';
+      | 'Create'
+      | 'Update'
+      | 'Archive'
+      | 'Restore'
+      | 'Delete'
+      | 'CutoverConfirm'
+      | 'CutoverReset'
+      | 'Void'
+      | 'Deactivate';
     /** @description Snapshots are the JSON text of the record before and after (null when absent). */
     FinanceHistoryEntryResponse: {
       /** Format: int64 */
@@ -4247,6 +4431,196 @@ export interface components {
       note?: string | null;
       /** Format: int32 */
       sortOrder: number;
+      /** Format: int32 */
+      version: number;
+    };
+    FinanceOverviewCurrencyResponse: {
+      currency: string;
+      /**
+       * Format: int64
+       * @description Sum of known balances of active accounts
+       */
+      balanceMinor: number;
+      /** Format: int32 */
+      unconfirmedCutoverCount: number;
+      /** Format: int64 */
+      incomeMinor: number;
+      /** Format: int64 */
+      expenseMinor: number;
+      /** Format: int64 */
+      differenceMinor: number;
+      /** Format: int32 */
+      accountCount: number;
+    };
+    FinanceOverviewResponse: {
+      /** @description null: both areas */
+      scope: components['schemas']['LedgerScope'] | null;
+      /** Format: date */
+      from: string;
+      /** Format: date */
+      to: string;
+      currencies: components['schemas']['FinanceOverviewCurrencyResponse'][];
+    };
+    /** @enum {string} */
+    MovementSource: 'Manual' | 'BankImport' | 'HomeAccountingImport';
+    /** @enum {string} */
+    FinanceJournalSort: 'Date' | 'Amount';
+    /** @enum {string} */
+    FinanceSortDirection: 'Desc' | 'Asc';
+    /** @enum {string} */
+    VerificationStatus: 'Verified' | 'NeedsCategory' | 'NeedsCounterpartyReview';
+    /** @enum {string} */
+    MovementStatus: 'Active' | 'Void';
+    FinanceTransactionResponse: {
+      /** Format: uuid */
+      id: string;
+      /** Format: date */
+      date: string;
+      type: components['schemas']['CategoryDirection'];
+      /** Format: uuid */
+      accountId: string;
+      accountName: string;
+      /**
+       * Format: int64
+       * @description Positive; type gives the sign
+       */
+      amountMinor: number;
+      currency: string;
+      /** Format: uuid */
+      categoryId: string | null;
+      /** Format: uuid */
+      categoryRootId: string | null;
+      categoryRootName: string | null;
+      /** @description Set only when a subcategory was chosen */
+      subcategoryName: string | null;
+      oneoffName: string;
+      description: string;
+      comment: string;
+      source: components['schemas']['MovementSource'];
+      verification: components['schemas']['VerificationStatus'];
+      scope: components['schemas']['LedgerScope'];
+      status: components['schemas']['MovementStatus'];
+      /** Format: int32 */
+      version: number;
+      createdBy: string;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+    };
+    FinanceTransactionTotalResponse: {
+      currency: string;
+      /** Format: int64 */
+      incomeMinor: number;
+      /** Format: int64 */
+      expenseMinor: number;
+      /** Format: int64 */
+      differenceMinor: number;
+    };
+    FinanceTransactionPageResponse: {
+      items: components['schemas']['FinanceTransactionResponse'][];
+      /** Format: int32 */
+      total: number;
+      /** Format: int32 */
+      page: number;
+      /** Format: int32 */
+      pageSize: number;
+      totals: components['schemas']['FinanceTransactionTotalResponse'][];
+    };
+    FinanceTransactionInput: {
+      scope: components['schemas']['LedgerScope'];
+      /** Format: date */
+      date: string;
+      type: components['schemas']['CategoryDirection'];
+      /** Format: uuid */
+      accountId: string;
+      /** Format: int64 */
+      amountMinor: number;
+      /** Format: uuid */
+      categoryId: string;
+      oneoffName?: string | null;
+      description?: string | null;
+      comment?: string | null;
+    };
+    FinanceTransactionUpdateInput: {
+      /** Format: date */
+      date: string;
+      type: components['schemas']['CategoryDirection'];
+      /** Format: uuid */
+      accountId: string;
+      /** Format: int64 */
+      amountMinor: number;
+      /** Format: uuid */
+      categoryId: string;
+      oneoffName?: string | null;
+      description?: string | null;
+      comment?: string | null;
+      /** Format: int32 */
+      version: number;
+    };
+    FinanceTransferResponse: {
+      /** Format: uuid */
+      id: string;
+      /** Format: date */
+      date: string;
+      /** Format: uuid */
+      fromAccountId: string;
+      fromAccountName: string;
+      /** Format: uuid */
+      toAccountId: string;
+      toAccountName: string;
+      /** Format: int64 */
+      amountMinor: number;
+      currency: string;
+      note: string;
+      source: components['schemas']['MovementSource'];
+      scope: components['schemas']['LedgerScope'];
+      status: components['schemas']['MovementStatus'];
+      /** Format: int32 */
+      version: number;
+      createdBy: string;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      updatedAt: string;
+    };
+    FinanceTransferTotalResponse: {
+      currency: string;
+      /** Format: int64 */
+      amountMinor: number;
+    };
+    FinanceTransferPageResponse: {
+      items: components['schemas']['FinanceTransferResponse'][];
+      /** Format: int32 */
+      total: number;
+      /** Format: int32 */
+      page: number;
+      /** Format: int32 */
+      pageSize: number;
+      totals: components['schemas']['FinanceTransferTotalResponse'][];
+    };
+    FinanceTransferInput: {
+      scope: components['schemas']['LedgerScope'];
+      /** Format: date */
+      date: string;
+      /** Format: uuid */
+      fromAccountId: string;
+      /** Format: uuid */
+      toAccountId: string;
+      /** Format: int64 */
+      amountMinor: number;
+      note?: string | null;
+    };
+    FinanceTransferUpdateInput: {
+      /** Format: date */
+      date: string;
+      /** Format: uuid */
+      fromAccountId: string;
+      /** Format: uuid */
+      toAccountId: string;
+      /** Format: int64 */
+      amountMinor: number;
+      note?: string | null;
       /** Format: int32 */
       version: number;
     };
@@ -8894,15 +9268,15 @@ export interface components {
     /** @enum {string} */
     PurchaseInvoiceFilter: 'All' | 'NeedsReview' | 'WithoutSupplier' | 'NotRecognized';
     /**
-     * @description NeedsReview when the representative row or the last recognition of a file has problems; Recognized when every safe link has checked facts; otherwise AwaitingRecognition. Shown only as problems, never as a badge.
-     * @enum {string}
-     */
-    PurchaseInvoiceState: 'NeedsReview' | 'AwaitingRecognition' | 'Recognized';
-    /**
      * @description WithVat only when VAT is clearly printed; otherwise WithoutVat.
      * @enum {string}
      */
     PurchaseDocumentVat: 'WithVat' | 'WithoutVat';
+    /**
+     * @description NeedsReview when the representative row or the last recognition of a file has problems; Recognized when every safe link has checked facts; otherwise AwaitingRecognition. Shown only as problems, never as a badge.
+     * @enum {string}
+     */
+    PurchaseInvoiceState: 'NeedsReview' | 'AwaitingRecognition' | 'Recognized';
     PurchaseDocumentItemResponse: {
       /** Format: int32 */
       position: number;
@@ -9708,7 +10082,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description The version is stale (someone saved first); body is an array of messages */
+      /** @description Stale version, or the account has movements and can only be archived */
       409: {
         headers: {
           [name: string]: unknown;
@@ -10091,7 +10465,7 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
-      /** @description Deleted */
+      /** @description Deleted or switched off */
       204: {
         headers: {
           [name: string]: unknown;
@@ -10129,6 +10503,595 @@ export interface operations {
     };
   };
   getFinanceCategoryHistory: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceHistoryEntryResponse'][];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getFinanceOverview: {
+    parameters: {
+      query: {
+        from: string;
+        to: string;
+        /** @description Omit for both areas */
+        scope?: components['schemas']['LedgerScope'];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceOverviewResponse'];
+        };
+      };
+      /** @description Invalid fields; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getFinanceTransactions: {
+    parameters: {
+      query?: {
+        /** @description Current by default; LegacyArchive is «Домашня бухгалтерія» */
+        scope?: components['schemas']['LedgerScope'];
+        /** @description Inclusive */
+        from?: string;
+        /** @description Inclusive */
+        to?: string;
+        accountId?: string;
+        type?: components['schemas']['CategoryDirection'];
+        /** @description A root takes its subcategories */
+        categoryId?: string;
+        /** @description One exact category; wins over categoryId */
+        subcategoryId?: string;
+        /** @description Case-insensitive part of the description, note or one-off name */
+        search?: string;
+        minMinor?: number;
+        maxMinor?: number;
+        source?: components['schemas']['MovementSource'];
+        includeVoided?: boolean;
+        sort?: components['schemas']['FinanceJournalSort'];
+        direction?: components['schemas']['FinanceSortDirection'];
+        /** @description 50 rows per page, fixed */
+        page?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceTransactionPageResponse'];
+        };
+      };
+      /** @description Invalid fields; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createFinanceTransaction: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FinanceTransactionInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceTransactionResponse'];
+        };
+      };
+      /** @description Invalid fields; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Account or category not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateFinanceTransaction: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FinanceTransactionUpdateInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceTransactionResponse'];
+        };
+      };
+      /** @description Invalid fields; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Operation, account or category not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The version is stale (someone saved first); body is an array of messages */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  voidFinanceTransaction: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FinanceVersionInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceTransactionResponse'];
+        };
+      };
+      /** @description Invalid fields; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The version is stale (someone saved first); body is an array of messages */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getFinanceTransactionHistory: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceHistoryEntryResponse'][];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getFinanceTransfers: {
+    parameters: {
+      query?: {
+        /** @description Current by default; LegacyArchive is «Домашня бухгалтерія» */
+        scope?: components['schemas']['LedgerScope'];
+        /** @description Inclusive */
+        from?: string;
+        /** @description Inclusive */
+        to?: string;
+        accountId?: string;
+        /** @description Case-insensitive part of the note */
+        search?: string;
+        minMinor?: number;
+        maxMinor?: number;
+        source?: components['schemas']['MovementSource'];
+        includeVoided?: boolean;
+        sort?: components['schemas']['FinanceJournalSort'];
+        direction?: components['schemas']['FinanceSortDirection'];
+        /** @description 50 rows per page, fixed */
+        page?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceTransferPageResponse'];
+        };
+      };
+      /** @description Invalid fields; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createFinanceTransfer: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FinanceTransferInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceTransferResponse'];
+        };
+      };
+      /** @description Invalid fields; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description An account not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateFinanceTransfer: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FinanceTransferUpdateInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceTransferResponse'];
+        };
+      };
+      /** @description Invalid fields; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Transfer or account not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The version is stale (someone saved first); body is an array of messages */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  voidFinanceTransfer: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FinanceVersionInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceTransferResponse'];
+        };
+      };
+      /** @description Invalid fields; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The version is stale (someone saved first); body is an array of messages */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getFinanceTransferHistory: {
     parameters: {
       query?: never;
       header?: never;
@@ -15326,6 +16289,8 @@ export interface operations {
         pageSize?: number;
         /** @description True lists only «Архів», false (default) only КП in work. */
         archived?: boolean;
+        /** @description The client card tab «КП»; only this client's КП, in work and archived together (archived is ignored). */
+        customerId?: number;
       };
       header?: never;
       path?: never;
@@ -17910,6 +18875,8 @@ export interface operations {
           | 'Ready'
           | 'Shipped'
           | 'Complete';
+        /** @description The client card tab «Завдання в цех»; only orders made from this client's КП. */
+        customerId?: number;
         page?: number;
         pageSize?: number;
       };
@@ -21148,6 +22115,14 @@ export interface operations {
         pageSize?: number;
         search?: string;
         filter?: components['schemas']['PurchaseInvoiceFilter'];
+        /** @description The supplier card tab «Рахунки на закупку»; only cards linked to this supplier. */
+        supplierId?: number;
+        /** @description Only cards with a checked document dated on or after this day. */
+        documentFrom?: string;
+        /** @description Only cards with a checked document dated on or before this day; not earlier than documentFrom. */
+        documentTo?: string;
+        /** @description Only cards with a checked document of this VAT mode. */
+        vat?: components['schemas']['PurchaseDocumentVat'];
       };
       header?: never;
       path?: never;

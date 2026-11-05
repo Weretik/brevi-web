@@ -2,6 +2,8 @@ import { ReferenceDataGrid } from '@admin/references/ui';
 import SubdirectoryArrowRightOutlinedIcon from '@mui/icons-material/SubdirectoryArrowRightOutlined';
 import { Box } from '@mui/material';
 
+import { FinanceProblemPill } from '../../components/status/finance-problem-pill';
+
 import type { FinanceCategoryRow } from '@admin/accounting/model';
 import type { GridColDef, GridRowSelectionModel } from '@mui/x-data-grid';
 
@@ -23,17 +25,24 @@ const columns: GridColDef<FinanceCategoryRow>[] = [
     headerName: 'Категорія',
     flex: 1,
     minWidth: 240,
-    renderCell: ({ row }) =>
-      row.level === 0 ? (
-        <Box component="span" sx={{ fontWeight: 600 }}>
-          {row.name}
-        </Box>
-      ) : (
-        <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, pl: 2 }}>
-          <SubdirectoryArrowRightOutlinedIcon fontSize="small" color="action" aria-hidden />
-          {row.name}
-        </Box>
-      ),
+    renderCell: ({ row }) => (
+      <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
+        {row.level === 0 ? (
+          <Box component="span" sx={{ fontWeight: 600 }}>
+            {row.name}
+          </Box>
+        ) : (
+          <Box
+            component="span"
+            sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, pl: 2 }}
+          >
+            <SubdirectoryArrowRightOutlinedIcon fontSize="small" color="action" aria-hidden />
+            {row.name}
+          </Box>
+        )}
+        {!row.active && <FinanceProblemPill label="Вимкнена" />}
+      </Box>
+    ),
   },
   {
     field: 'childCount',

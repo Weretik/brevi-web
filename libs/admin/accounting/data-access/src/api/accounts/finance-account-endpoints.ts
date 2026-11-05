@@ -1,4 +1,9 @@
-import { financeAccountsTag, financeHistoryTag } from '../../cache/accounting-tags';
+import {
+  financeAccountsTag,
+  financeHistoryTag,
+  financeMovementTags,
+  financeOverviewTag,
+} from '../../cache/accounting-tags';
 import { accountingApiError } from '../../errors/accounting-api-error';
 import {
   mapAccountingSettings,
@@ -19,9 +24,12 @@ import type {
 const accounts = '/api/accounting/accounts';
 const one = (id: string) => `${accounts}/${encodeURIComponent(id)}`;
 
-/** Every change returns the account; the list and its history are fetched again. */
+/**
+ * Every change returns the account; the list, its history, the overview and the journals (they show
+ * account names) are fetched again.
+ */
 const changed = (_: unknown, error: unknown, { id }: { id: string }) =>
-  error ? [] : [financeAccountsTag, financeHistoryTag(id)];
+  error ? [] : [...financeMovementTags, financeHistoryTag(id)];
 
 export function financeAccountEndpoints(build: AccountingEndpointBuilder) {
   return {
@@ -41,7 +49,7 @@ export function financeAccountEndpoints(build: AccountingEndpointBuilder) {
       query: (body) => ({ url: accounts, method: 'POST', body }),
       transformResponse: mapFinanceAccount,
       transformErrorResponse: accountingApiError,
-      invalidatesTags: (_, error) => (error ? [] : [financeAccountsTag]),
+      invalidatesTags: (_, error) => (error ? [] : [financeAccountsTag, financeOverviewTag]),
     }),
     updateFinanceAccount: build.mutation<
       FinanceAccount,

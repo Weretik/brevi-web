@@ -7,9 +7,8 @@ import {
   categoryDirections,
   countFinanceCategories,
   financeCategoryRows,
-  formatLedgerDate,
-  ledgerScopeLabels,
-  ledgerScopes,
+  ledgerScopeOfTab,
+  ledgerTabOfScope,
   nextFinanceSortOrder,
 } from '@admin/accounting/model';
 import { FinanceCategoriesGrid, FinanceDeleteDialog } from '@admin/accounting/ui';
@@ -22,18 +21,16 @@ import {
 } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
-import { Box, Button, Paper, Tab, Tabs } from '@mui/material';
+import { Box, Button, Paper } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { FinanceCategoryDrawer } from '../../components/categories/finance-category-drawer';
+import { LedgerScopeTabs } from '../../components/journal/ledger-scope-tabs';
 import { useAccountingSettings } from '../../hooks/accounts/use-accounting-settings';
 
 import type { FinanceCategoryEditorMode } from '../../hooks/categories/use-finance-category-editor';
-import type { CategoryDirection, FinanceCategoryRow, LedgerScope } from '@admin/accounting/model';
-
-const scopeOf = (value: string | null): LedgerScope =>
-  value === 'archive' ? 'LegacyArchive' : 'Current';
+import type { CategoryDirection, FinanceCategoryRow } from '@admin/accounting/model';
 
 /** «Бухгалтерія → Категорії»: current books and «Домашня бухгалтерія» on tabs (`?tab=archive`). */
 export function FinanceCategoriesPage() {
@@ -45,7 +42,7 @@ export function FinanceCategoriesPage() {
     : null;
   const { cutoverDate } = useAccountingSettings();
   const [searchParams, setSearchParams] = useSearchParams();
-  const scope = scopeOf(searchParams.get('tab'));
+  const scope = ledgerScopeOfTab(searchParams.get('tab'));
   const [direction, setDirection] = useState<CategoryDirection>('Expense');
   const [search, setSearch] = useState('');
   const [active, setActive] = useState<{
@@ -65,13 +62,12 @@ export function FinanceCategoriesPage() {
     () => (search.trim() ? financeCategoryRows(all, scope, direction, search) : allRows),
     [all, allRows, scope, direction, search],
   );
-  const cutover = formatLedgerDate(cutoverDate);
 
   async function confirmDelete() {
     if (!pendingDelete) return;
     try {
       await deleteCategory({ id: pendingDelete.id, version: pendingDelete.version }).unwrap();
-      setActionMessage('Категорію видалено.');
+      setActionMessage('Готово: невикористану категорію видалено, використану — вимкнено.');
     } catch (failure) {
       setActionMessage(
         `Не вдалося видалити категорію. ${adminApiErrorMessage(failure, 'Спробуйте ще раз.')}`,
@@ -97,25 +93,11 @@ export function FinanceCategoriesPage() {
           </Button>
         }
       />
-      <Tabs
-        value={scope}
-        onChange={(_, next: LedgerScope) =>
-          setSearchParams(next === 'Current' ? {} : { tab: 'archive' }, { replace: true })
-        }
-        sx={{ mb: 2 }}
-      >
-        {ledgerScopes.map((value) => (
-          <Tab
-            key={value}
-            value={value}
-            label={
-              value === 'Current'
-                ? `${ledgerScopeLabels[value]} з ${cutover}`
-                : `${ledgerScopeLabels[value]} до ${cutover}`
-            }
-          />
-        ))}
-      </Tabs>
+      <LedgerScopeTabs
+        scope={scope}
+        cutoverDate={cutoverDate}
+        onChange={(next) => setSearchParams(ledgerTabOfScope(next), { replace: true })}
+      />
       <ReferenceListAlerts
         error={error}
         loading={loading}
@@ -183,8 +165,8 @@ export function FinanceCategoriesPage() {
         title="Видалити категорію?"
         text={
           pendingDelete?.level === 0 && pendingDelete.childCount > 0
-            ? `«${pendingDelete.name}» буде видалено разом із підкатегоріями: ${pendingDelete.childCount}.`
-            : `«${pendingDelete?.name ?? ''}» буде видалено. В історії залишиться останній запис.`
+            ? `«${pendingDelete.name}» буде видалено разом із підкатегоріями: ${pendingDelete.childCount}. Якщо котрусь із них уже використано в операціях, усю гілку буде вимкнено замість видалення.`
+            : `«${pendingDelete?.name ?? ''}» буде видалено. Якщо категорію вже використано в операціях, її буде вимкнено замість видалення.`
         }
         deleting={deleteState.isLoading}
         onClose={() => setPendingDelete(null)}

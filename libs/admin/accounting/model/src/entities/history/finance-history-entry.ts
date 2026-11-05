@@ -6,10 +6,12 @@ export const auditActions = [
   'Delete',
   'CutoverConfirm',
   'CutoverReset',
+  'Void',
+  'Deactivate',
 ] as const;
 export type AuditAction = (typeof auditActions)[number];
 
-export const auditEntities = ['Account', 'Category'] as const;
+export const auditEntities = ['Account', 'Category', 'Transaction', 'Transfer'] as const;
 export type AuditEntity = (typeof auditEntities)[number];
 
 export const auditActionLabels: Record<AuditAction, string> = {
@@ -20,6 +22,8 @@ export const auditActionLabels: Record<AuditAction, string> = {
   Delete: 'Видалено',
   CutoverConfirm: 'Підтверджено залишок на 01.10',
   CutoverReset: 'Скасовано залишок на 01.10',
+  Void: 'Анульовано',
+  Deactivate: 'Вимкнено, бо вже використана',
 };
 
 /** One change of a record; snapshots are the JSON text before and after. */

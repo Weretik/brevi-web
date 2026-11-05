@@ -1,4 +1,8 @@
-import { financeCategoriesTag, financeHistoryTag } from '../../cache/accounting-tags';
+import {
+  financeCategoriesTag,
+  financeHistoryTag,
+  financeTransactionsTag,
+} from '../../cache/accounting-tags';
 import { accountingApiError } from '../../errors/accounting-api-error';
 import {
   mapFinanceCategories,
@@ -40,13 +44,13 @@ export function financeCategoryEndpoints(build: AccountingEndpointBuilder) {
       transformResponse: mapFinanceCategory,
       transformErrorResponse: accountingApiError,
       invalidatesTags: (_, error, { id }) =>
-        error ? [] : [financeCategoriesTag, financeHistoryTag(id)],
+        error ? [] : [financeCategoriesTag, financeHistoryTag(id), financeTransactionsTag],
     }),
-    /** A root goes with its subcategories. */
+    /** A root goes with its subcategories; a used branch is switched off instead. */
     deleteFinanceCategory: build.mutation<void, { id: string; version: number }>({
       query: ({ id, version }) => ({ url: one(id), method: 'DELETE', params: { version } }),
       transformErrorResponse: accountingApiError,
-      invalidatesTags: (_, error) => (error ? [] : [financeCategoriesTag]),
+      invalidatesTags: (_, error) => (error ? [] : [financeCategoriesTag, financeTransactionsTag]),
     }),
     getFinanceCategoryHistory: build.query<FinanceHistoryEntry[], string>({
       query: (id) => ({ url: `${one(id)}/history` }),
