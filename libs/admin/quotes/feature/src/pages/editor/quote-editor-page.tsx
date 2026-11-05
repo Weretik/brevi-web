@@ -190,6 +190,7 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
               onAddProduct={() => setPanel({ kind: 'catalog' })}
               onAddOneOff={() => editor.addItems([oneOffItemDraft()])}
               onAddCustom={() => setPanel({ kind: 'custom' })}
+              onAddEmbroidery={() => setPanel({ kind: 'embroidery' })}
             />
           </Box>
           <QuoteNotesCard

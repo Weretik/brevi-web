@@ -1,3 +1,4 @@
+import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined';
 import CategoryOutlinedIcon from '@mui/icons-material/CategoryOutlined';
 import ContentCutOutlinedIcon from '@mui/icons-material/ContentCutOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
@@ -10,6 +11,8 @@ interface Props {
   onAddProduct: () => void;
   onAddOneOff: () => void;
   onAddCustom: () => void;
+  /** «Вишивка» from a saved «Ціна вишивки» calculation; no tile without it. */
+  onAddEmbroidery?: () => void;
 }
 
 interface Tile {
@@ -20,7 +23,13 @@ interface Tile {
 }
 
 /** «Додати позицію»: three ways to add an item, each with a line on when to use it. */
-export function QuoteAddItems({ empty, onAddProduct, onAddOneOff, onAddCustom }: Props) {
+export function QuoteAddItems({
+  empty,
+  onAddProduct,
+  onAddOneOff,
+  onAddCustom,
+  onAddEmbroidery,
+}: Props) {
   const tiles: Tile[] = [
     {
       title: 'З каталогу',
@@ -41,6 +50,13 @@ export function QuoteAddItems({ empty, onAddProduct, onAddOneOff, onAddCustom }:
       onClick: onAddOneOff,
     },
   ];
+  if (onAddEmbroidery)
+    tiles.push({
+      title: 'Вишивка',
+      text: 'Збережений розрахунок з «Ціна вишивки»: рядок з обраною ціною.',
+      icon: <AutoAwesomeOutlinedIcon />,
+      onClick: onAddEmbroidery,
+    });
   return (
     <Paper variant="outlined" sx={{ p: 2, borderStyle: 'dashed' }} aria-label="Додати позицію">
       <Typography variant="overline" color="text.secondary" component="h2">
@@ -51,7 +67,11 @@ export function QuoteAddItems({ empty, onAddProduct, onAddOneOff, onAddCustom }:
           display: 'grid',
           gap: 1.5,
           mt: 1,
-          gridTemplateColumns: { xs: '1fr', md: 'repeat(3, minmax(0, 1fr))' },
+          gridTemplateColumns: {
+            xs: '1fr',
+            md: `repeat(${tiles.length > 3 ? 2 : tiles.length}, minmax(0, 1fr))`,
+            xl: `repeat(${tiles.length}, minmax(0, 1fr))`,
+          },
         }}
       >
         {tiles.map((tile) => (

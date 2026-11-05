@@ -2,6 +2,7 @@ import { QuoteChangeModelDrawer } from '../../components/custom-sewing/quote-cha
 import { QuoteCustomSewingDrawer } from '../../components/custom-sewing/quote-custom-sewing-drawer';
 import { QuoteRepriceDrawer } from '../../components/editor/quote-reprice-drawer';
 import { QuoteResponsibleDrawer } from '../../components/editor/quote-responsible-drawer';
+import { QuoteEmbroideryDrawer } from '../../components/embroidery/quote-embroidery-drawer';
 import { QuoteHistoryDrawer } from '../../components/lifecycle/quote-history-drawer';
 import { QuotePhotoPickerDrawer } from '../../components/photo/quote-photo-picker-drawer';
 import { QuoteCatalogPickerDrawer } from '../../components/picker/quote-catalog-picker-drawer';
@@ -13,6 +14,7 @@ import type { Quote, QuoteActor } from '@admin/quotes/model';
 
 export type QuoteEditorPanel =
   | { kind: 'catalog' }
+  | { kind: 'embroidery' }
   | { kind: 'fabric'; itemKey: string }
   | { kind: 'custom'; itemKey?: string }
   | { kind: 'photo'; itemKey: string }
@@ -82,6 +84,17 @@ export function QuoteEditorPanels({ panel, editor, actor, onClose, onHandedOver,
           onDone={(next) => {
             if (item) editor.updateItem(item.key, { ...next, key: item.key });
             else editor.addItems([next]);
+            onClose();
+          }}
+        />
+      );
+    case 'embroidery':
+      return (
+        <QuoteEmbroideryDrawer
+          ensureSaved={() => (quote && !editor.dirty ? Promise.resolve(quote) : editor.save())}
+          onClose={onClose}
+          onAdded={(next) => {
+            editor.applyServerQuote(next);
             onClose();
           }}
         />
