@@ -13,6 +13,7 @@ const fixture = vi.hoisted(() => ({
   recognizeNew: vi.fn(),
   save: vi.fn(),
   template: vi.fn(),
+  draft: undefined as unknown,
   syncError: null as string | null,
 }));
 
@@ -103,6 +104,11 @@ vi.mock('@admin/purchasing/data-access', () => ({
   useRecognizeNewPurchaseFilesMutation: () => [fixture.recognizeNew, { isLoading: false }],
   useSavePurchaseDocumentMutation: () => [fixture.save, { isLoading: false }],
   useLazyGetPurchaseDocumentTemplateQuery: () => [fixture.template],
+  useGetPurchaseDocumentTemplateQuery: () => ({
+    data: fixture.draft,
+    isFetching: false,
+    error: undefined,
+  }),
 }));
 
 const batch = (values: Record<string, unknown>) => ({
@@ -129,6 +135,7 @@ afterEach(() => {
   fixture.save.mockReset();
   fixture.template.mockReset();
   fixture.syncError = null;
+  fixture.draft = undefined;
   vi.restoreAllMocks();
 });
 
@@ -141,28 +148,40 @@ function renderContent(url = '/references/counterparties?tab=purchases') {
   return router;
 }
 
+async function openRow(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(await screen.findByRole('button', { name: 'Розгорнути рахунок UID 42' }));
+}
+
+async function openPanel(user: ReturnType<typeof userEvent.setup>) {
+  await openRow(user);
+  await user.click(screen.getByRole('button', { name: 'Постачальник і примітка' }));
+  return screen.getByRole('dialog', { name: 'Рахунок на закупку' });
+}
+
 describe('«Контрагенти → Рахунки на закупку»', () => {
-  it('shows a card per message and marks only problems', async () => {
+  it('shows the state of each invoice and opens what was read with the arrow', async () => {
+    const user = userEvent.setup();
     renderContent();
 
-    const grid = await screen.findByRole('grid', { name: 'Рахунки на закупку' });
-    expect(within(grid).getAllByText('Рахунок від ФОП Бистров')).toHaveLength(2);
-    expect(within(grid).getByRole('link', { name: 'Оригінал ↗' })).toHaveAttribute(
+    const table = await screen.findByRole('table', { name: 'Рахунки на закупку' });
+    expect(within(table).getByText('○ Не розпізнано')).toBeVisible();
+    expect(within(table).getByText('! Попередження')).toBeVisible();
+    expect(within(table).getByText('Відмічено')).toBeVisible();
+
+    await openRow(user);
+    expect(screen.getAllByText('Рахунок від ФОП Бистров')[0]).toBeVisible();
+    expect(screen.getByRole('link', { name: 'Оригінал ↗' })).toHaveAttribute(
       'href',
       'https://www.dropbox.com/s/a.pdf',
     );
-    expect(within(grid).getByText('Посилання потребує перевірки')).toBeVisible();
-    expect(within(grid).getByText('Відмічено в джерелі')).toBeVisible();
-    expect(within(grid).getByText('Не підтверджено')).toBeVisible();
-    expect(within(grid).getByText('Посилання не з Dropbox')).toBeVisible();
-    expect(screen.queryByText(/Готово|Перевірено|Актуальн/)).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Заповнити вручну' })).toBeVisible();
   });
 
   it('keeps the problems filter and search in the URL', async () => {
     const user = userEvent.setup();
     const router = renderContent();
 
-    await user.click(screen.getByRole('button', { name: 'Потребують перевірки 1' }));
+    await user.click(screen.getByRole('button', { name: 'Помилки і перевірка 1' }));
     expect(router.state.location.search).toContain('filter=NeedsReview');
 
     await user.type(screen.getByRole('textbox', { name: 'Пошук рахунків' }), 'Бистров');
@@ -215,9 +234,7 @@ describe('«Контрагенти → Рахунки на закупку»', ()
     });
     renderContent();
 
-    const grid = await screen.findByRole('grid', { name: 'Рахунки на закупку' });
-    await user.click(within(grid).getByText('UID 42'));
-    const panel = screen.getByRole('dialog', { name: 'Рахунок на закупку' });
+    const panel = await openPanel(user);
     expect(within(panel).getByText('Відмічено в джерелі · Ірина · 04.11.2026')).toBeVisible();
 
     await user.click(within(panel).getByRole('button', { name: 'Редагувати' }));
@@ -250,8 +267,7 @@ describe('«Контрагенти → Рахунки на закупку»', ()
     });
     renderContent();
 
-    const grid = await screen.findByRole('grid', { name: 'Рахунки на закупку' });
-    await user.click(within(grid).getByText('UID 42'));
+    await openPanel(user);
     await user.click(screen.getByRole('button', { name: 'Редагувати' }));
     await user.click(screen.getByRole('button', { name: 'Зберегти' }));
 
@@ -303,7 +319,7 @@ describe('«Контрагенти → Рахунки на закупку»', ()
     expect(fixture.recognizeNew).toHaveBeenCalledTimes(1);
   });
 
-  it('recognizes one original from the side panel and shows the problems', async () => {
+  it('recognizes one original from the open row and shows the problems', async () => {
     const user = userEvent.setup();
     fixture.recognize.mockReturnValue({
       unwrap: () =>
@@ -317,14 +333,12 @@ describe('«Контрагенти → Рахунки на закупку»', ()
     });
     renderContent();
 
-    const grid = await screen.findByRole('grid', { name: 'Рахунки на закупку' });
-    await user.click(within(grid).getByText('UID 42'));
-    const panel = screen.getByRole('dialog', { name: 'Рахунок на закупку' });
-    await user.click(within(panel).getByRole('button', { name: 'Розпізнати' }));
+    await openRow(user);
+    await user.click(screen.getByRole('button', { name: 'Розпізнати' }));
 
     expect(fixture.recognize).toHaveBeenCalledWith('f1');
     expect(
-      await within(panel).findByText('Потребує перевірки: Сума позицій не збігається з підсумком'),
+      await screen.findByText('Потребує перевірки: Сума позицій не збігається з підсумком'),
     ).toBeVisible();
   });
 
@@ -346,20 +360,65 @@ describe('«Контрагенти → Рахунки на закупку»', ()
       });
     renderContent();
 
-    const grid = await screen.findByRole('grid', { name: 'Рахунки на закупку' });
-    await user.click(within(grid).getByText('UID 42'));
-    const panel = screen.getByRole('dialog', { name: 'Рахунок на закупку' });
+    await openRow(user);
     const file = new File(['{"documentNumber":"110776"}'], 'r.json', { type: 'application/json' });
-    await user.upload(within(panel).getByLabelText('Файл JSON'), file);
+    await user.upload(screen.getByLabelText('Файл JSON'), file);
 
-    expect(
-      await within(panel).findByText('Дані замінено, старі збережено в історії.'),
-    ).toBeVisible();
+    expect(await screen.findByText('Дані замінено, старі збережено в історії.')).toBeVisible();
     expect(confirm).toHaveBeenCalledTimes(1);
     expect(fixture.save).toHaveBeenLastCalledWith({
       fileId: 'f1',
       document: { documentNumber: '110776' },
       replace: true,
     });
+  });
+
+  it('fixes the facts in the side panel and saves them when the sums add up', async () => {
+    const user = userEvent.setup();
+    fixture.draft = {
+      sourceUID: '42',
+      originalFileLink: 'https://www.dropbox.com/s/a.pdf',
+      documentType: 'Рахунок',
+      documentNumber: '110776',
+      documentDate: '2026-10-21',
+      supplierName: 'ФОП Бистров',
+      vat: 'without_vat',
+      items: [{ name: 'Реклама', quantity: '1', unit: null, price: '7900', sum: '7900.00' }],
+      vatAmount: null,
+      totalPayable: '8000.00',
+    };
+    fixture.save.mockReturnValue({
+      unwrap: () => Promise.resolve({ fileId: 'f1', unchanged: false, replaced: true }),
+    });
+    renderContent();
+
+    await openRow(user);
+    await user.click(screen.getByRole('button', { name: 'Заповнити вручну' }));
+    const editor = screen.getByRole('dialog', { name: 'Виправити дані рахунку' });
+    expect(within(editor).getByText(/не збігається з «До оплати»/)).toBeVisible();
+
+    await user.click(within(editor).getByRole('button', { name: 'Зберегти' }));
+    expect(fixture.save).not.toHaveBeenCalled();
+    expect(within(editor).getByText(/Сума позицій не збігається/)).toBeVisible();
+
+    for (const field of ['Ціна 1', 'Сума 1']) {
+      const input = within(editor).getByLabelText(field);
+      await user.clear(input);
+      await user.type(input, '8000');
+    }
+    expect(within(editor).getByText(/— збігається з «До оплати»\./)).toBeVisible();
+    await user.click(within(editor).getByRole('button', { name: 'Зберегти' }));
+
+    expect(fixture.save).toHaveBeenCalledWith({
+      fileId: 'f1',
+      replace: true,
+      document: expect.objectContaining({
+        sourceUID: '42',
+        vat: 'without_vat',
+        totalPayable: '8000.00',
+        items: [{ name: 'Реклама', quantity: '1', unit: null, price: '8000', sum: '8000' }],
+      }),
+    });
+    expect(await screen.findByText('Дані рахунку збережено.')).toBeVisible();
   });
 });
