@@ -1,6 +1,10 @@
 export const financeAccountsTag = { type: 'FinanceAccount' as const, id: 'LIST' };
 export const financeCategoriesTag = { type: 'FinanceCategory' as const, id: 'LIST' };
 export const financeCounterpartiesTag = { type: 'FinanceCounterparty' as const, id: 'LIST' };
+export const financeAttachmentsTag = (transactionId: string) => ({
+  type: 'FinanceAttachment' as const,
+  id: transactionId,
+});
 export const financeHistoryTag = (id: string) => ({ type: 'FinanceHistory' as const, id });
 export const financeTransactionsTag = { type: 'FinanceTransaction' as const, id: 'LIST' };
 export const financeTransfersTag = { type: 'FinanceTransfer' as const, id: 'LIST' };

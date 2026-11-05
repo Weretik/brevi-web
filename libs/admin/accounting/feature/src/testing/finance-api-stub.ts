@@ -113,6 +113,27 @@ export const financeCounterparty = (overrides: Record<string, unknown> = {}) => 
   ...overrides,
 });
 
+export const financeAttachment = (overrides: Record<string, unknown> = {}) => ({
+  id: 'f1',
+  transactionId: 't1',
+  fileName: 'Рахунок 12.pdf',
+  contentType: 'application/pdf',
+  sizeBytes: 250 * 1024,
+  createdBy: 'director@brevi.com.ua',
+  createdAt: '2026-11-05T08:00:00+00:00',
+  ...overrides,
+});
+
+/** JSON of most writes; a file upload stays as sent (multipart text or FormData). */
+function readBody(body: BodyInit): unknown {
+  if (typeof body !== 'string') return body;
+  try {
+    return JSON.parse(body);
+  } catch {
+    return body;
+  }
+}
+
 export interface StubCall {
   method: string;
   path: string;
@@ -134,12 +155,13 @@ export function stubFinanceApi(data: {
   parties?: unknown[];
   oneoffs?: unknown[];
   choices?: unknown[];
+  attachments?: unknown[];
   written?: (call: StubCall) => unknown;
 }) {
   const calls: StubCall[] = [];
   const fetcher = vi.fn().mockImplementation(async (path: string, init?: RequestInit) => {
     const method = init?.method ?? 'GET';
-    const body = init?.body ? JSON.parse(String(init.body)) : null;
+    const body = init?.body ? readBody(init.body) : null;
     calls.push({ method, path, body });
     const json = (value: unknown) => ({ ok: true, json: async () => value });
     if (method !== 'GET') return json(data.written?.({ method, path, body }) ?? body);
@@ -173,6 +195,7 @@ export function stubFinanceApi(data: {
         },
       });
     }
+    if (path.includes('/attachments')) return json(data.attachments ?? []);
     const page = (items: unknown[], totals: unknown[]) =>
       json({ items, total: items.length, page: 1, pageSize: 50, totals });
     if (path.startsWith('/api/accounting/transactions'))
