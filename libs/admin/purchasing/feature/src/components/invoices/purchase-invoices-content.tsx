@@ -12,12 +12,16 @@ import SyncOutlinedIcon from '@mui/icons-material/SyncOutlined';
 import { Alert, Box, Button, Paper, Stack } from '@mui/material';
 import { useState } from 'react';
 
+import { PurchaseInvoiceRowDetails } from './purchase-invoice-row-details';
+import { usePurchaseFileActions } from '../../hooks/documents/use-purchase-file-actions';
 import { usePurchaseRecognitionBatch } from '../../hooks/documents/use-purchase-recognition-batch';
 import { usePurchaseInvoiceList } from '../../hooks/invoices/use-purchase-invoice-list';
 import { usePurchaseInvoiceSync } from '../../hooks/invoices/use-purchase-invoice-sync';
+import { PurchaseDocumentEditor } from '../documents/purchase-document-editor';
+import { PurchaseFileActions } from '../documents/purchase-file-actions';
 import { PurchaseInvoiceDrawer } from '../review/purchase-invoice-drawer';
 
-import type { PurchaseInvoice } from '@admin/purchasing/model';
+import type { PurchaseInvoice, PurchaseInvoiceLink } from '@admin/purchasing/model';
 import type { ReactNode } from 'react';
 
 interface Props {
@@ -41,6 +45,8 @@ export function PurchaseInvoicesContent({ tabs }: Props) {
     setNotice({ text, ok }),
   );
   const batch = usePurchaseRecognitionBatch((text, ok) => setNotice({ text, ok }));
+  const files = usePurchaseFileActions();
+  const [fixing, setFixing] = useState<PurchaseInvoiceLink | null>(null);
   const { list } = state;
   const page = list.currentData;
   // The panel follows the reloaded page, so a new recognition shows at once.
@@ -140,7 +146,7 @@ export function PurchaseInvoicesContent({ tabs }: Props) {
               onClick={() => state.setFilter('All')}
             />
             <ReferenceFilterChip
-              label="Потребують перевірки"
+              label="Помилки і перевірка"
               count={state.counts.NeedsReview}
               selected={state.filter === 'NeedsReview'}
               onClick={() => state.setFilter('NeedsReview')}
@@ -172,13 +178,30 @@ export function PurchaseInvoicesContent({ tabs }: Props) {
           narrowed={Boolean(state.search) || state.filter !== 'All'}
           unavailable={Boolean(list.error)}
           onPageChange={state.setPage}
-          onOpen={setOpenedRow}
+          renderDetails={(invoice) => (
+            <PurchaseInvoiceRowDetails
+              invoice={invoice}
+              onOpenReview={setOpenedRow}
+              renderActions={(link) => (
+                <PurchaseFileActions
+                  link={link}
+                  busy={files.busy}
+                  notice={files.notice}
+                  onFix={setFixing}
+                  onRecognize={(value) => void files.recognize(value)}
+                  onTemplate={(value) => void files.downloadTemplate(value)}
+                  onUpload={(value, file) => void files.upload(value, file)}
+                />
+              )}
+            />
+          )}
         />
       </Paper>
       {opened && (
         <PurchaseInvoiceDrawer
           key={opened.messageId}
           invoice={opened}
+          onFix={setFixing}
           onClose={close}
           onSaved={(review) => {
             close();
@@ -188,6 +211,17 @@ export function PurchaseInvoicesContent({ tabs }: Props) {
                 : 'Збережено.',
               ok: true,
             });
+          }}
+        />
+      )}
+      {fixing && (
+        <PurchaseDocumentEditor
+          key={fixing.id}
+          link={fixing}
+          onClose={() => setFixing(null)}
+          onSaved={(text) => {
+            setFixing(null);
+            setNotice({ text, ok: true });
           }}
         />
       )}

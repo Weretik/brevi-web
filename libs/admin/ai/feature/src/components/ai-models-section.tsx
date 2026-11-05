@@ -1,140 +1,75 @@
 import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
-import { Button, FormControlLabel, Stack, Switch, TextField, Typography } from '@mui/material';
+import {
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from '@mui/material';
 
-import type { AiModelTier, AiSettingsErrors, AiSettingsFormValues } from '@admin/ai/model';
+import type { AiModelTier, AiSettings } from '@admin/ai/model';
 
 interface Props {
-  values: AiSettingsFormValues;
-  errors: AiSettingsErrors;
-  hasKey: boolean;
+  settings: AiSettings;
   disabled: boolean;
   testingTier: AiModelTier | null;
-  canTest: boolean;
-  onChange: (values: AiSettingsFormValues) => void;
   onTest: (tier: AiModelTier) => void;
 }
 
-const tiers = [
-  {
-    tier: 'Fast' as const,
-    title: 'Основна модель',
-    hint: 'Читає кожен рахунок. Дешева.',
-    model: 'fastModel' as const,
-    input: 'fastInputPrice' as const,
-    output: 'fastOutputPrice' as const,
-  },
-  {
-    tier: 'Strong' as const,
-    title: 'Сильна модель',
-    hint: 'Лише повтор, коли суми не зійшлися.',
-    model: 'strongModel' as const,
-    input: 'strongInputPrice' as const,
-    output: 'strongOutputPrice' as const,
-  },
-];
+const price = (value: number) => value.toLocaleString('uk-UA', { minimumFractionDigits: 2 });
+const mono = { fontFamily: 'var(--admin-font-mono)' } as const;
 
-/** On/off, two models with prices per 1M tokens, the monthly limit. */
-export function AiModelsSection({
-  values,
-  errors,
-  hasKey,
-  disabled,
-  testingTier,
-  canTest,
-  onChange,
-  onTest,
-}: Props) {
-  const set = (field: keyof AiSettingsFormValues, value: string | boolean) =>
-    onChange({ ...values, [field]: value });
-
+/** Read-only models and prices; «Змінити» in the card title opens the side panel. */
+export function AiModelsSection({ settings, disabled, testingTier, onTest }: Props) {
+  const rows = [
+    {
+      tier: 'Fast' as const,
+      use: 'Кожен рахунок',
+      model: settings.fastModel,
+      prices: `${price(settings.fastInputPrice)} / ${price(settings.fastOutputPrice)}`,
+    },
+    {
+      tier: 'Strong' as const,
+      use: 'Повтор, якщо суми не зійшлися',
+      model: settings.strongModel,
+      prices: `${price(settings.strongInputPrice)} / ${price(settings.strongOutputPrice)}`,
+    },
+  ];
   return (
-    <Stack sx={{ gap: 2 }}>
-      <Stack>
-        <FormControlLabel
-          control={
-            <Switch
-              checked={values.enabled}
-              disabled={disabled || (!hasKey && !values.enabled)}
-              onChange={(event) => set('enabled', event.target.checked)}
-            />
-          }
-          label="ШІ увімкнено"
-        />
-        {errors.enabled && (
-          <Typography variant="caption" color="error">
-            {errors.enabled}
-          </Typography>
-        )}
-      </Stack>
-      {tiers.map((row) => (
-        <Stack key={row.tier} sx={{ gap: 1 }}>
-          <Typography variant="subtitle2">
-            {row.title}{' '}
-            <Typography component="span" variant="caption" color="text.secondary">
-              {row.hint}
-            </Typography>
-          </Typography>
-          <Stack
-            direction={{ xs: 'column', sm: 'row' }}
-            sx={{ gap: 1, alignItems: { sm: 'flex-start' } }}
-          >
-            <TextField
-              label="Модель"
-              size="small"
-              value={values[row.model]}
-              error={Boolean(errors[row.model])}
-              helperText={errors[row.model]}
-              disabled={disabled}
-              onChange={(event) => set(row.model, event.target.value)}
-              sx={{ flex: 2 }}
-            />
-            <TextField
-              label="Вхід, $ за 1 млн"
-              size="small"
-              inputMode="decimal"
-              value={values[row.input]}
-              error={Boolean(errors[row.input])}
-              helperText={errors[row.input]}
-              disabled={disabled}
-              onChange={(event) => set(row.input, event.target.value)}
-              sx={{ flex: 1 }}
-            />
-            <TextField
-              label="Вихід, $ за 1 млн"
-              size="small"
-              inputMode="decimal"
-              value={values[row.output]}
-              error={Boolean(errors[row.output])}
-              helperText={errors[row.output]}
-              disabled={disabled}
-              onChange={(event) => set(row.output, event.target.value)}
-              sx={{ flex: 1 }}
-            />
-            <Button
-              variant="outlined"
-              startIcon={<FactCheckOutlinedIcon />}
-              disabled={disabled || !canTest}
-              onClick={() => onTest(row.tier)}
-            >
-              {testingTier === row.tier ? 'Перевірка…' : 'Перевірити'}
-            </Button>
-          </Stack>
-        </Stack>
-      ))}
-      <TextField
-        label="Ліміт на місяць, $"
-        size="small"
-        inputMode="decimal"
-        value={values.monthlyLimitUsd}
-        error={Boolean(errors.monthlyLimitUsd)}
-        helperText={
-          errors.monthlyLimitUsd ??
-          'Коли витрати місяця дійдуть до ліміту, ШІ зупиниться до наступного місяця.'
-        }
-        disabled={disabled}
-        onChange={(event) => set('monthlyLimitUsd', event.target.value)}
-        sx={{ maxWidth: 260 }}
-      />
-    </Stack>
+    <TableContainer sx={{ border: 1, borderColor: 'divider', borderRadius: 1 }}>
+      <Table size="small" aria-label="Моделі й ціни" sx={{ minWidth: 520 }}>
+        <TableHead>
+          <TableRow>
+            <TableCell>Для чого</TableCell>
+            <TableCell>Модель</TableCell>
+            <TableCell>Вхід / вихід, $ за 1 млн токенів</TableCell>
+            <TableCell />
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {rows.map((row) => (
+            <TableRow key={row.tier}>
+              <TableCell>{row.use}</TableCell>
+              <TableCell sx={mono}>{row.model}</TableCell>
+              <TableCell sx={mono}>{row.prices}</TableCell>
+              <TableCell align="right">
+                <Button
+                  size="small"
+                  variant="outlined"
+                  startIcon={<FactCheckOutlinedIcon />}
+                  disabled={disabled || !settings.hasKey}
+                  aria-label={`Перевірити ${row.model}`}
+                  onClick={() => onTest(row.tier)}
+                >
+                  {testingTier === row.tier ? 'Перевірка…' : 'Перевірити'}
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 }

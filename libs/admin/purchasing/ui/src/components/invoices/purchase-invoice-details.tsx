@@ -1,8 +1,10 @@
+import { purchaseLinkStatus } from '@admin/purchasing/model';
 import { ReferenceDetailsList, ReferenceFormSection } from '@admin/references/ui';
 import { Divider, Link, Stack, Typography } from '@mui/material';
 import { Fragment } from 'react';
 
 import { PurchaseDocumentView } from '../documents/purchase-document-view';
+import { PurchaseStatusChip } from '../status/purchase-status-chip';
 
 import type { PurchaseInvoice, PurchaseInvoiceLink } from '@admin/purchasing/model';
 import type { ReactNode } from 'react';
@@ -93,9 +95,12 @@ export function PurchaseInvoiceDetails({ invoice, renderLinkActions }: Props) {
                 <Fragment key={link.id}>
                   {index > 0 && <Divider />}
                   <Stack sx={{ gap: 1 }}>
-                    <Link href={link.url} target="_blank" rel="noopener noreferrer">
-                      Оригінал{invoice.links.length > 1 ? ` ${index + 1}` : ''} ↗
-                    </Link>
+                    <Stack direction="row" sx={{ gap: 1, alignItems: 'center' }}>
+                      <Link href={link.url} target="_blank" rel="noopener noreferrer">
+                        Оригінал{invoice.links.length > 1 ? ` ${index + 1}` : ''} ↗
+                      </Link>
+                      <PurchaseStatusChip status={purchaseLinkStatus(link).status} />
+                    </Stack>
                     {link.document && <PurchaseDocumentView document={link.document} />}
                     {renderLinkActions?.(link)}
                   </Stack>

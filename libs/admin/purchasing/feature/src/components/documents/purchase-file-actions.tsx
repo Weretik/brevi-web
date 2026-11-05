@@ -1,5 +1,7 @@
-import { Alert, Button, Stack } from '@mui/material';
-import { useRef } from 'react';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { Alert, Button, IconButton, Menu, MenuItem, Stack } from '@mui/material';
+import { useRef, useState } from 'react';
 
 import type { PurchaseFileNotice } from '../../hooks/documents/use-purchase-file-actions';
 import type { PurchaseInvoiceLink } from '@admin/purchasing/model';
@@ -8,27 +10,39 @@ interface Props {
   link: PurchaseInvoiceLink;
   busy: string | null;
   notice: PurchaseFileNotice | null;
+  onFix: (link: PurchaseInvoiceLink) => void;
   onRecognize: (link: PurchaseInvoiceLink) => void;
   onTemplate: (link: PurchaseInvoiceLink) => void;
   onUpload: (link: PurchaseInvoiceLink, file: File) => void;
 }
 
-/** Buttons under one original: read it by AI again, or check the facts by hand as JSON. */
+/** «Виправити» and «Розпізнати» under one original; the JSON file way lives in «⋯». */
 export function PurchaseFileActions({
   link,
   busy,
   notice,
+  onFix,
   onRecognize,
   onTemplate,
   onUpload,
 }: Props) {
   const input = useRef<HTMLInputElement>(null);
+  const [menu, setMenu] = useState<HTMLElement | null>(null);
   const working = busy === link.id;
   const tried = Boolean(link.document || link.recognition);
 
   return (
     <Stack sx={{ gap: 1 }}>
-      <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap' }}>
+      <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
+        <Button
+          size="small"
+          variant={link.document ? 'outlined' : 'contained'}
+          startIcon={<EditOutlinedIcon />}
+          disabled={busy !== null}
+          onClick={() => onFix(link)}
+        >
+          {link.document ? 'Виправити' : 'Заповнити вручну'}
+        </Button>
         <Button
           size="small"
           variant="outlined"
@@ -37,12 +51,32 @@ export function PurchaseFileActions({
         >
           {working ? 'Зачекайте…' : tried ? 'Розпізнати знову' : 'Розпізнати'}
         </Button>
-        <Button size="small" disabled={busy !== null} onClick={() => onTemplate(link)}>
-          Шаблон JSON
-        </Button>
-        <Button size="small" disabled={busy !== null} onClick={() => input.current?.click()}>
-          Завантажити JSON
-        </Button>
+        <IconButton
+          size="small"
+          aria-label="Інші дії з оригіналом"
+          disabled={busy !== null}
+          onClick={(event) => setMenu(event.currentTarget)}
+        >
+          <MoreHorizIcon fontSize="small" />
+        </IconButton>
+        <Menu anchorEl={menu} open={Boolean(menu)} onClose={() => setMenu(null)}>
+          <MenuItem
+            onClick={() => {
+              setMenu(null);
+              onTemplate(link);
+            }}
+          >
+            Завантажити JSON-файл даних
+          </MenuItem>
+          <MenuItem
+            onClick={() => {
+              setMenu(null);
+              input.current?.click();
+            }}
+          >
+            Відправити JSON-файл
+          </MenuItem>
+        </Menu>
         <input
           ref={input}
           type="file"
