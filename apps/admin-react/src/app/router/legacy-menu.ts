@@ -79,6 +79,18 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         requiredRoles: productionOrders,
       },
       {
+        id: 'work-log',
+        label: 'Журнал робіт',
+        path: '/production/work',
+        requiredRoles: workshop,
+      },
+      {
+        id: 'sewing-forecast',
+        label: 'Прогноз пошиття',
+        path: '/production/forecast',
+        requiredRoles: productionOrders,
+      },
+      {
         id: 'workshop-staff',
         label: 'Працівники цеху',
         path: '/production/staff',

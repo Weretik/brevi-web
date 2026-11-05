@@ -46,3 +46,17 @@ export const fabricStockErrors = {
   notFound: 'Рядок складу, тканину чи постачальника не знайдено. Оновіть сторінку.',
   conflict: 'Склад або завдання вже змінили. Оновіть сторінку.',
 } satisfies AdminApiErrorMessages;
+
+export const productionWorkErrors = {
+  ...common,
+  unauthorized: 'Журнал робіт веде начальник цеху або адміністратор у завданні «Нове».',
+  notFound: 'Завдання, позицію чи запис роботи не знайдено. Оновіть сторінку.',
+  conflict: 'Роботу вже змінили. Оновіть сторінку.',
+} satisfies AdminApiErrorMessages;
+
+export const sewingForecastErrors = {
+  ...common,
+  unauthorized: 'Змінювати черговість може начальник цеху або адміністратор.',
+  notFound: 'Прогноз не знайдено.',
+  conflict: 'Черговість щойно змінили. Оновіть сторінку.',
+} satisfies AdminApiErrorMessages;
