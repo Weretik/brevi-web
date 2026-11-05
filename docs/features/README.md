@@ -14,6 +14,7 @@ In each feature card, “Structure diagram” shows relationships between parts,
 - Sewing workshop: [«Швейний цех»: «Виробничі завдання» (етапи, відвантаження, тканина, файли, Telegram), «Склад тканин», «Журнал робіт», «Прогноз пошиття», «Працівники цеху», «Норми витрати тканини», «Правила зарплати», «Робочий час», «Зарплата», «Звіти цеху», «Налаштування цеху»](admin/production.md).
 - Photos: [«Фото»: photo library with folders, search, upload and usages](admin/media.md).
 - Reminders: [Telegram deadline reminders: tasks, periods, chats, days off](admin/reminders.md).
+- Accounting: [«Бухгалтерія»: «Рахунки і каси» and «Категорії» (director only)](admin/accounting.md).
 - Reference data: [«Контрагенти»: suppliers and clients from KeepinCRM](admin/references/counterparties.md); [«Рахунки на закупку»: purchase invoices from the sheet «финансы»](admin/purchasing.md); [suppliers: search, contacts, and CRUD](admin/references/suppliers.md); [fabrics and accessories](admin/references/materials.md); [operations and garment part groups](admin/references/operations.md); [pricing parameters](admin/references/pricing-parameters.md); [«Типи і розділи»: product sections](admin/references/product-sections.md); [«Імпорт цін»: PPE supplier prices](admin/references/price-import.md).
 
 ## Storefront Angular (`apps/storefront`)

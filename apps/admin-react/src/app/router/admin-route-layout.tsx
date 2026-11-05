@@ -1,3 +1,4 @@
+import { accountingRoutes } from '@admin/accounting/feature';
 import { aiSettingsPath } from '@admin/ai/feature';
 import { sessionRoleLabel } from '@admin/core/auth';
 import { AdminLayout } from '@admin/core/shell';
@@ -24,6 +25,7 @@ const registeredPaths = new Set([
     ...tasksRoutes.board,
     ...productionRoutes,
     ...productionOrderRoutes,
+    ...accountingRoutes,
   ].map((route) => route.path),
   usersPath,
   aiSettingsPath,

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import type { KeyboardEvent, MouseEvent } from 'react';
 
 interface IdentifiableRow {
-  id: number;
+  id: number | string;
 }
 
 interface RowMenuState<Row> {
@@ -16,8 +16,8 @@ export function useReferenceRowContextMenu<Row extends IdentifiableRow>(rows: Ro
   const [rowMenu, setRowMenu] = useState<RowMenuState<Row> | null>(null);
 
   function findRow(element: HTMLDivElement) {
-    const rowId = Number(element.dataset['id']);
-    return rows.find((row) => row.id === rowId);
+    const rowId = element.dataset['id'];
+    return rows.find((row) => String(row.id) === rowId);
   }
 
   function openRowMenuForElement(
