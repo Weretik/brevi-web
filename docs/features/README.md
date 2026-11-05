@@ -11,7 +11,7 @@ In each feature card, “Structure diagram” shows relationships between parts,
 - Staff accounts: [sign-in users «Користувачі» (Admin only)](admin/users.md); [«Налаштування ШІ»: OpenAI key, models, limit and recognition rules (Admin only)](admin/ai.md); [«Мій кабінет» and the profile menu](admin/profile.md).
 - Site content: [«Контент»: privacy and terms](admin/content.md).
 - Products: [«Товари» tables, details, creation, and editing](admin/products/products.md); [Sewing fabrics and composition](admin/products/sewing-composition.md); [Article calculation and published prices](admin/products/sewing-pricing.md); [PPE pricing and input approval](admin/products/ppe-pricing.md).
-- Sewing workshop: [«Швейний цех»: «Виробничі завдання» (етапи, відвантаження, тканина, файли, Telegram), «Склад тканин», «Журнал робіт», «Прогноз пошиття», «Працівники цеху», «Норми витрати тканини», «Правила зарплати», «Робочий час», «Зарплата», «Звіти цеху», «Налаштування цеху»](admin/production.md).
+- Sewing workshop: [«Швейний цех»: «Виробничі завдання» (етапи, відвантаження, тканина, файли, Telegram), «Склад тканин», «Журнал робіт», «Прогноз пошиття», «Працівники цеху», «Норми витрати тканини», «Правила зарплати», «Робочий час», «Зарплата», «Звіти цеху», «Архів цеху», «Налаштування цеху»](admin/production.md).
 - Photos: [«Фото»: photo library with folders, search, upload and usages](admin/media.md).
 - Reminders: [Telegram deadline reminders: tasks, periods, chats, days off](admin/reminders.md).
 - Accounting: [«Бухгалтерія»: «Огляд», «Операції», «Перекази», «Рахунки і каси», «Категорії», «Контрагенти», «Потребують перевірки» (director only)](admin/accounting.md).

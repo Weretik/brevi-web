@@ -43,8 +43,8 @@ describe('legacy Admin navigation', () => {
       'Контент',
       'Загальні звіти',
     ]);
-    expect(groups.map((group) => group.items.length)).toEqual([5, 4, 4, 8, 1, 2, 1]);
-    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(25);
+    expect(groups.map((group) => group.items.length)).toEqual([5, 3, 4, 8, 1, 2, 1]);
+    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(24);
     expect(groups[0].items.map((item) => item.id)).not.toContain('clients');
   });
   it('shows «Налаштування КП» only for the server Admin role', () => {
@@ -109,6 +109,7 @@ describe('legacy Admin navigation', () => {
       '/production/payroll',
       '/production/timesheet',
       '/production/reports',
+      '/production/archive',
     ]);
     const shop = (roles: string[]) =>
       createNavigation(paths, roles).find((group) => group.id === 'sewing-shop');
@@ -140,6 +141,9 @@ describe('legacy Admin navigation', () => {
     );
     expect(shop(['WorkshopChief'])?.items.some((item) => item.id === 'workshop-reports')).toBe(
       false,
+    );
+    expect(shop(['Manager'])?.items.find((item) => item.id === 'workshop-archive')?.to).toBe(
+      '/production/archive',
     );
     expect(shop(['Manager'])?.items[2]).toEqual({
       id: 'sewing-forecast',

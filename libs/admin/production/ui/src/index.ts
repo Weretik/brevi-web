@@ -57,3 +57,5 @@ export {
   ReportStaffTable,
   ReportStockTable,
 } from './reports/report-tables';
+export { WorkshopArchiveDetails } from './archive/workshop-archive-details';
+export { WorkshopArchiveGrid } from './archive/workshop-archive-grid';
