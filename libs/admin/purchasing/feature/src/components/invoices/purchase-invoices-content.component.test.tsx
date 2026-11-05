@@ -12,7 +12,6 @@ const fixture = vi.hoisted(() => ({
   recognize: vi.fn(),
   recognizeNew: vi.fn(),
   save: vi.fn(),
-  template: vi.fn(),
   draft: undefined as unknown,
   syncError: null as string | null,
 }));
@@ -103,7 +102,6 @@ vi.mock('@admin/purchasing/data-access', () => ({
   useRecognizePurchaseFileMutation: () => [fixture.recognize, { isLoading: false }],
   useRecognizeNewPurchaseFilesMutation: () => [fixture.recognizeNew, { isLoading: false }],
   useSavePurchaseDocumentMutation: () => [fixture.save, { isLoading: false }],
-  useLazyGetPurchaseDocumentTemplateQuery: () => [fixture.template],
   useGetPurchaseDocumentTemplateQuery: () => ({
     data: fixture.draft,
     isFetching: false,
@@ -133,7 +131,6 @@ afterEach(() => {
   fixture.recognize.mockReset();
   fixture.recognizeNew.mockReset();
   fixture.save.mockReset();
-  fixture.template.mockReset();
   fixture.syncError = null;
   fixture.draft = undefined;
   vi.restoreAllMocks();
@@ -192,6 +189,22 @@ describe('«Контрагенти → Рахунки на закупку»', ()
       page: 1,
       pageSize: 50,
     });
+  });
+
+  it('narrows the register by invoice date and VAT, kept in the URL', async () => {
+    const user = userEvent.setup();
+    const router = renderContent('/references/counterparties?tab=purchases&from=2026-11-01');
+
+    expect(screen.getByLabelText('Дата рахунку з')).toHaveValue('2026-11-01');
+    await user.click(screen.getByRole('button', { name: 'Без ПДВ' }));
+    expect(router.state.location.search).toContain('vat=WithoutVat');
+    expect(fixture.queries).toContainEqual(
+      expect.objectContaining({ documentFrom: '2026-11-01', vat: 'WithoutVat', page: 1 }),
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Скинути дату і ПДВ' }));
+    expect(router.state.location.search).not.toContain('vat=');
+    expect(router.state.location.search).not.toContain('from=');
   });
 
   it('runs «Оновити зараз» and shows the backend reason when it fails', async () => {
@@ -340,37 +353,6 @@ describe('«Контрагенти → Рахунки на закупку»', ()
     expect(
       await screen.findByText('Потребує перевірки: Сума позицій не збігається з підсумком'),
     ).toBeVisible();
-  });
-
-  it('asks before replacing checked facts with an uploaded JSON', async () => {
-    const user = userEvent.setup();
-    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(true);
-    fixture.save
-      .mockReturnValueOnce({
-        unwrap: () =>
-          Promise.reject({
-            code: 'Conflict',
-            status: 409,
-            message: 'Вже є інші дані.',
-            fieldErrors: {},
-          }),
-      })
-      .mockReturnValueOnce({
-        unwrap: () => Promise.resolve({ fileId: 'f1', unchanged: false, replaced: true }),
-      });
-    renderContent();
-
-    await openRow(user);
-    const file = new File(['{"documentNumber":"110776"}'], 'r.json', { type: 'application/json' });
-    await user.upload(screen.getByLabelText('Файл JSON'), file);
-
-    expect(await screen.findByText('Дані замінено, старі збережено в історії.')).toBeVisible();
-    expect(confirm).toHaveBeenCalledTimes(1);
-    expect(fixture.save).toHaveBeenLastCalledWith({
-      fileId: 'f1',
-      document: { documentNumber: '110776' },
-      replace: true,
-    });
   });
 
   it('fixes the facts in the side panel and saves them when the sums add up', async () => {

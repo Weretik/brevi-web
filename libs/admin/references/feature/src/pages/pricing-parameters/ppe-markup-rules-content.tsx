@@ -28,9 +28,10 @@ interface Props {
 export function PpeMarkupRulesContent({ tabs }: Props) {
   const { rows, loading, error, reload } = usePpeMarkupRules();
   const [search, setSearch] = useState('');
-  const [active, setActive] = useState<{ mode: PricingEditorMode; rule: PpeMarkupRule | null } | null>(
-    null,
-  );
+  const [active, setActive] = useState<{
+    mode: PricingEditorMode;
+    rule: PpeMarkupRule | null;
+  } | null>(null);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const [deleteRule] = useDeletePpeMarkupRuleMutation();
   const deletion = useReferenceDeletion((id) => deleteRule(id).unwrap(), setActionMessage);

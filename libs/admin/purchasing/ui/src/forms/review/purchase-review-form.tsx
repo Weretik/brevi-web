@@ -1,4 +1,4 @@
-import { purchaseReviewNoteMaxLength } from '@admin/purchasing/model';
+import { formatPurchaseMessageAt, purchaseReviewNoteMaxLength } from '@admin/purchasing/model';
 import { ReferenceFormSection } from '@admin/references/ui';
 import { Autocomplete, TextField, Typography } from '@mui/material';
 
@@ -54,7 +54,7 @@ export function PurchaseReviewForm({
           color="text.secondary"
           sx={{ fontFamily: 'var(--admin-font-mono)' }}
         >
-          {invoice.messageAt ?? '—'} · UID {invoice.sourceUid}
+          {formatPurchaseMessageAt(invoice.messageAt)} · UID {invoice.sourceUid}
         </Typography>
       </ReferenceFormSection>
       <ReferenceFormSection title="Постачальник і примітка">

@@ -48,6 +48,7 @@ function listParams(query: ProductionOrderListQuery) {
     ...(query.manager ? { manager: query.manager } : {}),
     ...(query.dueTo ? { dueTo: query.dueTo } : {}),
     ...(query.stage ? { stage: query.stage } : {}),
+    ...(query.customerId ? { customerId: query.customerId } : {}),
   };
 }
 

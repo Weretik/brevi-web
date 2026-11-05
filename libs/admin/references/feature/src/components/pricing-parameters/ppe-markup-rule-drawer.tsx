@@ -1,4 +1,8 @@
-import { PpeMarkupRuleDetails, PpeMarkupRuleForm, ReferenceEditorDrawer } from '@admin/references/ui';
+import {
+  PpeMarkupRuleDetails,
+  PpeMarkupRuleForm,
+  ReferenceEditorDrawer,
+} from '@admin/references/ui';
 import { Alert, Stack } from '@mui/material';
 
 import { usePpeMarkupRuleEditor } from '../../hooks/pricing-parameters/use-ppe-markup-rule-editor';
@@ -19,7 +23,13 @@ const titles: Record<PricingEditorMode, string> = {
   edit: 'Редагування правила націнки',
 };
 
-export function PpeMarkupRuleDrawer({ mode: initialMode, rule, newSortOrder, onClose, onSaved }: Props) {
+export function PpeMarkupRuleDrawer({
+  mode: initialMode,
+  rule,
+  newSortOrder,
+  onClose,
+  onSaved,
+}: Props) {
   const editor = usePpeMarkupRuleEditor(initialMode, rule, newSortOrder, onSaved);
   const readOnly = editor.mode === 'view';
 

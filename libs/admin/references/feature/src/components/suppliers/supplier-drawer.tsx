@@ -1,3 +1,4 @@
+import { SupplierPurchaseInvoices } from '@admin/purchasing/feature';
 import { SupplierEditorDrawer } from '@admin/references/ui';
 
 import { useSupplierEditor } from '../../hooks/suppliers/use-supplier-editor';
@@ -10,9 +11,18 @@ interface Props {
   nextId: number;
   onClose: () => void;
   onSaved: () => void;
+  /** Accountant, Admin and Director: the viewed card gets the tab «Рахунки на закупку». */
+  canSeePurchaseInvoices?: boolean;
 }
 
-export function SupplierDrawer({ mode, supplier, nextId, onClose, onSaved }: Props) {
+export function SupplierDrawer({
+  mode,
+  supplier,
+  nextId,
+  onClose,
+  onSaved,
+  canSeePurchaseInvoices = false,
+}: Props) {
   const editor = useSupplierEditor(mode, supplier, nextId, onSaved);
   return (
     <SupplierEditorDrawer
@@ -22,6 +32,11 @@ export function SupplierDrawer({ mode, supplier, nextId, onClose, onSaved }: Pro
       message={editor.message}
       saving={editor.saving}
       keepinCrmId={supplier?.keepinCrmId ?? null}
+      invoices={
+        canSeePurchaseInvoices && supplier ? (
+          <SupplierPurchaseInvoices supplierId={supplier.id} />
+        ) : undefined
+      }
       onChange={editor.change}
       onSave={() => void editor.save()}
       onEnableEditing={editor.enableEditing}
