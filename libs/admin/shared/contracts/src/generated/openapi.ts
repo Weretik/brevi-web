@@ -2228,6 +2228,25 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/crm/embroidery/calculations/{id}/mockup': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    /** @description «Макет» — a Media library photo of the design for the workshop; `mediaFileId` null clears it. */
+    put: operations['setCrmEmbroideryMockup'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/crm/tasks': {
     parameters: {
       query?: never;
@@ -2566,6 +2585,23 @@ export interface paths {
     };
     /** The КП for the order form: sewn items, fabric variants, workshop norm and (not for managers) the sewing rate */
     get: operations['getProductionQuoteDraft'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/orders/embroideries': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** «Розрахунок вишивки»: saved «Ціна вишивки» calculations to link to an embroidery, newest first, at most 50; no prices */
+    get: operations['getProductionEmbroideries'];
     put?: never;
     post?: never;
     delete?: never;
@@ -6337,6 +6373,12 @@ export interface components {
       total: number;
       repeatUnit: number;
     };
+    CrmEmbroideryMockup: {
+      mediaFileId: number;
+      fileName: string;
+      url: string;
+      thumbnailUrl: string | null;
+    };
     CrmEmbroiderySavedSummary: {
       /** Format: int64 */
       id: number;
@@ -6359,6 +6401,8 @@ export interface components {
       /** Format: date-time */
       createdAt: string;
       createdByName: string;
+      /** @description «Макет» from the Media library; null when none or the photo was removed. */
+      mockup: components['schemas']['CrmEmbroideryMockup'] | null;
     };
     CrmEmbroiderySavedPage: {
       items: components['schemas']['CrmEmbroiderySavedSummary'][];
@@ -6426,6 +6470,10 @@ export interface components {
       unchanged: number;
       errors: number;
       lines: components['schemas']['CrmEmbroideryArchiveImportLine'][];
+    };
+    CrmSetEmbroideryMockupInput: {
+      /** @description A Media library photo; null clears the mockup. */
+      mediaFileId?: number | null;
     };
     /**
      * @default Open
@@ -6730,6 +6778,11 @@ export interface components {
       place?: string | null;
       description?: string | null;
       color?: string | null;
+      /**
+       * Format: int64
+       * @description A saved «Ціна вишивки» calculation; only for an embroidery. It must exist when first linked.
+       */
+      embroideryCalculationId?: number | null;
     };
     ProductionItemDetailsInput: {
       quantity: number;
@@ -6778,12 +6831,38 @@ export interface components {
       /** @description «Надіслати в цех»: not sent yet and the group is set. */
       canSendTelegram: boolean;
     };
+    /** @description The saved calculation of an embroidery for the workshop; no prices. Materials are shown only, the stock is not changed. */
+    ProductionEmbroideryResponse: {
+      /** Format: int64 */
+      id: number;
+      number: string;
+      name: string;
+      customerName: string | null;
+      /** @enum {string} */
+      mode: 'Garment' | 'Chevron';
+      quantity: number;
+      stitchesPerUnit: number;
+      hoopLabel: string;
+      hoopings: number;
+      /** @description Флізелін to cut, metres. */
+      stabilizerMetres: number | null;
+      /** @description Fabric under the chevrons, metres; null for embroidery on a garment. */
+      fabricMetres: number | null;
+      mockupUrl: string | null;
+      mockupThumbnailUrl: string | null;
+    };
     ItemApplicationResponse: {
       /** @enum {string} */
       kind: 'Embroidery' | 'Print';
       place: string | null;
       description: string | null;
       color: string | null;
+      /** Format: int64 */
+      embroideryCalculationId: number | null;
+      /** @description «ВШ-0042», kept even when the calculation was removed. */
+      embroideryNumber: string | null;
+      /** @description The calculation as it is now; null when none or it was removed. */
+      embroidery: components['schemas']['ProductionEmbroideryResponse'] | null;
     };
     ProductionShipmentResponse: {
       id: number;
@@ -6930,12 +7009,30 @@ export interface components {
       norm: components['schemas']['FabricNormInput'] | null;
       options: components['schemas']['ProductionQuoteDraftOption'][];
     };
+    ProductionEmbroideryChoiceResponse: {
+      /** Format: int64 */
+      id: number;
+      number: string;
+      name: string;
+      customerName: string | null;
+      quantity: number;
+      stitchesPerUnit: number;
+      hoopLabel: string;
+      mockupThumbnailUrl: string | null;
+    };
+    ProductionQuoteDraftEmbroidery: {
+      /** Format: int64 */
+      quoteItemId: number;
+      calculation: components['schemas']['ProductionEmbroideryChoiceResponse'];
+    };
     ProductionQuoteDraftResponse: {
       quoteId: number;
       number: string;
       clientName: string;
       managerName: string;
       items: components['schemas']['ProductionQuoteDraftItem'][];
+      /** @description «Вишивка» rows of the КП whose calculation still exists; the form puts them into the items' applications. */
+      embroideries: components['schemas']['ProductionQuoteDraftEmbroidery'][];
     };
     ProductionItemImportRow: {
       modelCode?: string | null;
@@ -14911,6 +15008,54 @@ export interface operations {
       };
     };
   };
+  setCrmEmbroideryMockup: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmSetEmbroideryMockupInput'];
+      };
+    };
+    responses: {
+      /** @description The saved calculation with its mockup. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmEmbroiderySavedCalculation'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role and a numeric actor claim required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   getCrmTasks: {
     parameters: {
       query?: {
@@ -15924,6 +16069,43 @@ export interface operations {
       };
       /** @description The КП is not sent or is archived. */
       409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getProductionEmbroideries: {
+    parameters: {
+      query?: {
+        /** @description Name, client or «ВШ-0042». */
+        search?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Calculations. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionEmbroideryChoiceResponse'][];
+        };
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders). */
+      403: {
         headers: {
           [name: string]: unknown;
         };

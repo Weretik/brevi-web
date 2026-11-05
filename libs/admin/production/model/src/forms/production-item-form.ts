@@ -7,11 +7,20 @@ import type {
   ProductionItemDetails,
 } from '../entities/production-order';
 
+/** The saved calculation an embroidery points to, as the form shows it. */
+export interface ItemEmbroideryLink {
+  id: number;
+  number: string;
+  name: string;
+}
+
 export interface ItemApplicationFormValues {
   kind: ItemApplicationKind;
   place: string;
   description: string;
   color: string;
+  /** «Розрахунок вишивки»; only for an embroidery. */
+  embroidery: ItemEmbroideryLink | null;
 }
 
 /** Text of the item inputs; «Розцінка» only for those who see it. */
@@ -35,7 +44,12 @@ export const emptyItemApplication = (): ItemApplicationFormValues => ({
   place: '',
   description: '',
   color: '',
+  embroidery: null,
 });
+
+/** «ВШ-0042 · Логотип»; just the number when the name is not known. */
+export const embroideryLinkLabel = (link: ItemEmbroideryLink) =>
+  link.name ? `${link.number} · ${link.name}` : link.number;
 
 export function createProductionItemFormValues(
   item: ProductionItem | null = null,
@@ -54,6 +68,14 @@ export function createProductionItemFormValues(
       place: x.place ?? '',
       description: x.description ?? '',
       color: x.color ?? '',
+      embroidery:
+        x.embroideryCalculationId !== null
+          ? {
+              id: x.embroideryCalculationId,
+              number: x.embroidery?.number ?? x.embroideryNumber ?? '',
+              name: x.embroidery?.name ?? '',
+            }
+          : null,
     })),
     sewingRate: item?.sewingRate == null ? '' : String(item.sewingRate),
   };
@@ -104,6 +126,7 @@ export function productionItemDetails(values: ProductionItemFormValues): Product
       place: optional(x.place),
       description: optional(x.description),
       color: optional(x.color),
+      embroideryCalculationId: x.kind === 'Embroidery' ? (x.embroidery?.id ?? null) : null,
     })),
   };
 }

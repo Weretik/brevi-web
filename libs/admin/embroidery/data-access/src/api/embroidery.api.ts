@@ -1,10 +1,6 @@
 import { embroideryBaseApi } from './embroidery-base-api';
 import { toEmbroideryApiError } from '../errors/embroidery-api-error';
 import {
-  mapEmbroideryArchiveResult,
-  toEmbroideryArchiveRows,
-} from '../mappers/embroidery-archive.mapper';
-import {
   mapEmbroiderySavedCalculation,
   mapEmbroiderySavedPage,
   toSaveEmbroideryCalculationInput,
@@ -17,7 +13,6 @@ import {
   toSaveEmbroiderySettingsInput,
 } from '../mappers/embroidery.mapper';
 import {
-  ensureEmbroideryArchiveResult,
   ensureEmbroideryCalculation,
   ensureEmbroideryForm,
   ensureEmbroiderySavedCalculation,
@@ -26,8 +21,6 @@ import {
 } from '../validators/embroidery-response';
 
 import type {
-  EmbroideryArchiveResult,
-  EmbroideryArchiveRow,
   EmbroideryCalculation,
   EmbroideryCalculationRequest,
   EmbroideryFormSetup,
@@ -37,6 +30,9 @@ import type {
   EmbroiderySettings,
   EmbroiderySettingsContent,
 } from '@admin/embroidery/model';
+import type { components } from '@admin/shared/contracts';
+
+type Schemas = components['schemas'];
 
 const settingsTag = [{ type: 'EmbroiderySettings' as const, id: 'CURRENT' }];
 const savedListTag = { type: 'EmbroideryCalculations' as const, id: 'LIST' };
@@ -115,20 +111,20 @@ export const embroideryApi = embroideryBaseApi.injectEndpoints({
       transformErrorResponse: toEmbroideryApiError,
       invalidatesTags: (_result, error) => (error ? [] : [savedListTag]),
     }),
-    importEmbroideryArchive: build.mutation<
-      EmbroideryArchiveResult,
-      { rows: readonly EmbroideryArchiveRow[]; dryRun: boolean }
+    setEmbroideryMockup: build.mutation<
+      EmbroiderySavedCalculation,
+      { id: number; mediaFileId: number | null }
     >({
-      query: ({ rows, dryRun }) => ({
-        url: '/api/crm/embroidery/calculations/import',
-        method: 'POST',
-        params: { dryRun },
-        body: toEmbroideryArchiveRows(rows),
+      query: ({ id, mediaFileId }) => ({
+        url: `/api/crm/embroidery/calculations/${id}/mockup`,
+        method: 'PUT',
+        body: { mediaFileId } satisfies Schemas['CrmSetEmbroideryMockupInput'],
       }),
       transformResponse: (value: unknown) =>
-        mapEmbroideryArchiveResult(ensureEmbroideryArchiveResult(value)),
+        mapEmbroiderySavedCalculation(ensureEmbroiderySavedCalculation(value)),
       transformErrorResponse: toEmbroideryApiError,
-      invalidatesTags: (result, error) => (error || !result || result.dryRun ? [] : [savedListTag]),
+      invalidatesTags: (_result, error, { id }) =>
+        error ? [] : [savedListTag, { type: 'EmbroideryCalculations', id }],
     }),
     deleteEmbroideryCalculation: build.mutation<void, number>({
       query: (id) => ({ url: `/api/crm/embroidery/calculations/${id}`, method: 'DELETE' }),
@@ -144,9 +140,9 @@ export const {
   useDeleteEmbroideryCalculationMutation,
   useGetEmbroideryCalculationQuery,
   useGetEmbroideryCalculationsQuery,
-  useImportEmbroideryArchiveMutation,
   useSaveEmbroideryCalculationMutation,
   useGetEmbroideryFormQuery,
   useGetEmbroiderySettingsQuery,
   useSaveEmbroiderySettingsMutation,
+  useSetEmbroideryMockupMutation,
 } = embroideryApi;

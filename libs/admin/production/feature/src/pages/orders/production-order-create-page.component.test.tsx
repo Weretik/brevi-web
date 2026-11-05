@@ -38,10 +38,12 @@ const api = vi.hoisted(() => ({
         ],
       },
     ],
+    embroideries: [],
   },
 }));
 
 vi.mock('@admin/production/data-access', () => ({
+  useGetProductionEmbroideriesQuery: () => ({ data: [], isFetching: false }),
   useGetProductionQuoteSourcesQuery: () => ({
     data: [
       {

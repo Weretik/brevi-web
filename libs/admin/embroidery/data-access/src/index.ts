@@ -3,10 +3,10 @@ export {
   useDeleteEmbroideryCalculationMutation,
   useGetEmbroideryCalculationQuery,
   useGetEmbroideryCalculationsQuery,
-  useImportEmbroideryArchiveMutation,
   useSaveEmbroideryCalculationMutation,
   useGetEmbroideryFormQuery,
   useGetEmbroiderySettingsQuery,
   useSaveEmbroiderySettingsMutation,
+  useSetEmbroideryMockupMutation,
 } from './api/embroidery.api';
 export type { EmbroiderySavedListArgs } from './api/embroidery.api';

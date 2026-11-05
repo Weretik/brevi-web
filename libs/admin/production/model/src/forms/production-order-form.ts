@@ -57,7 +57,17 @@ export function createOrderFormValues(
       quoteItemId: item.quoteItemId,
       include: true,
       optionId: item.options.length === 1 ? item.options[0].optionId : null,
-      values: createProductionItemFormValues(),
+      values: {
+        ...createProductionItemFormValues(),
+        // The КП «Вишивка» rows go to every item; the manager removes what does not apply.
+        applications: draft.embroideries.map(({ calculation }) => ({
+          kind: 'Embroidery' as const,
+          place: '',
+          description: calculation.name,
+          color: '',
+          embroidery: { id: calculation.id, number: calculation.number, name: calculation.name },
+        })),
+      },
     })),
   };
 }

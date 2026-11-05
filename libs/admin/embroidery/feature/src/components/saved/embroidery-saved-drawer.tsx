@@ -27,6 +27,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { EmbroideryAddToQuoteDrawer } from './embroidery-add-to-quote-drawer';
+import { EmbroideryMockupSection } from './embroidery-mockup-section';
 import { useEmbroideryCopy } from '../../hooks/calculation/use-embroidery-copy';
 
 import type { EmbroideryCalculationRequest } from '@admin/embroidery/model';
@@ -119,6 +120,7 @@ export function EmbroiderySavedDrawer({ id, canDelete, onClose, onRepeat }: Prop
             onCopy={(price) => void copier.copy(saved.result.prices, price, saved.input.quantity)}
           />
           <EmbroiderySavedSummaryView saved={saved} />
+          <EmbroideryMockupSection summary={saved.summary} />
           {saved.result.cost && <EmbroideryBreakdownTable cost={saved.result.cost} />}
           {canDelete && (
             <Box>

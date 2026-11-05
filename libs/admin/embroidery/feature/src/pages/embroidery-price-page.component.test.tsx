@@ -76,7 +76,6 @@ const listQuery = vi.hoisted(() => vi.fn());
 const getQuery = vi.hoisted(() => vi.fn());
 
 const addToQuote = vi.hoisted(() => vi.fn());
-const importArchive = vi.hoisted(() => vi.fn());
 
 vi.mock('@admin/quotes/data-access', () => ({
   useListQuotesQuery: () => ({
@@ -109,7 +108,7 @@ vi.mock('@admin/embroidery/data-access', () => ({
   useGetEmbroideryCalculationsQuery: listQuery,
   useGetEmbroideryCalculationQuery: getQuery,
   useDeleteEmbroideryCalculationMutation: () => [vi.fn(), { isLoading: false }],
-  useImportEmbroideryArchiveMutation: () => [importArchive],
+  useSetEmbroideryMockupMutation: () => [vi.fn(), { isLoading: false }],
 }));
 
 const summary: EmbroiderySavedSummary = {
@@ -126,6 +125,7 @@ const summary: EmbroiderySavedSummary = {
   prices: calculation.prices,
   createdAt: '2026-11-04T19:52:00Z',
   createdByName: 'Олена',
+  mockup: null,
 };
 
 beforeEach(() => {
@@ -148,7 +148,6 @@ afterEach(() => {
   listQuery.mockReset();
   getQuery.mockReset();
   addToQuote.mockReset();
-  importArchive.mockReset();
 });
 
 function renderPage(isAdmin: boolean, url = '/crm/embroidery') {
@@ -366,60 +365,5 @@ describe('«Ціна вишивки»', () => {
 
     expect(addToQuote).toHaveBeenCalledWith({ id: 31, calculationId: 7, level: 'Терміново' });
     expect(screen.getByText('Вишивку додано в КП-2026-11-0031.')).toBeInTheDocument();
-  });
-
-  it('imports the old archive only after a clean check, and only for Director and Admin', async () => {
-    const line = {
-      legacyId: 'a1',
-      name: 'енерджи групп',
-      createdAt: '2026-10-26T14:55:16Z',
-      createdByName: 'pnevman@gmail.com',
-      message: null,
-    };
-    importArchive
-      .mockResolvedValueOnce({
-        data: {
-          dryRun: true,
-          created: 1,
-          unchanged: 0,
-          errors: 0,
-          lines: [{ ...line, action: 'created', number: null }],
-        },
-      })
-      .mockResolvedValueOnce({
-        data: {
-          dryRun: false,
-          created: 1,
-          unchanged: 0,
-          errors: 0,
-          lines: [{ ...line, action: 'created', number: 'ВШ-0009' }],
-        },
-      });
-    listQuery.mockReturnValue({
-      data: { items: [], page: 1, pageSize: 25, total: 0 },
-      isLoading: false,
-      isFetching: false,
-      isError: false,
-    });
-    renderPage(false, '/crm/embroidery?tab=saved');
-    expect(screen.queryByRole('button', { name: 'Імпорт архіву' })).not.toBeInTheDocument();
-    cleanup();
-
-    renderPage(true, '/crm/embroidery?tab=saved');
-    fireEvent.click(screen.getByRole('button', { name: 'Імпорт архіву' }));
-    const file = new File(['[{"legacyId":"a1"}]'], 'embroidery-archive.json', {
-      type: 'application/json',
-    });
-    await act(async () => {
-      fireEvent.change(screen.getByLabelText('Файл архіву'), { target: { files: [file] } });
-    });
-
-    expect(importArchive).toHaveBeenLastCalledWith({ rows: [{ legacyId: 'a1' }], dryRun: true });
-    expect(screen.getByText('Буде перенесено: 1 · Уже перенесено: 0')).toBeInTheDocument();
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: 'Імпортувати' }));
-    });
-    expect(importArchive).toHaveBeenLastCalledWith({ rows: [{ legacyId: 'a1' }], dryRun: false });
-    expect(screen.getByText('ВШ-0009')).toBeInTheDocument();
   });
 });
