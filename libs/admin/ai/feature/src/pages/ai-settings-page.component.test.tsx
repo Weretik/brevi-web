@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from '@testing-library/react';
+import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -63,28 +63,57 @@ afterEach(() => {
 });
 
 describe('AiSettingsPage', () => {
-  it('asks for a key and saves it without showing it again', async () => {
+  it('says why the AI does not work and saves a key without showing it again', async () => {
     fixture.settings = base;
     fixture.setKey.mockResolvedValue({ ...base, hasKey: true, keyHint: '1234' });
     render(<AiSettingsPage />);
 
-    expect(screen.getByText(/Ключ OpenAI не додано/)).toBeInTheDocument();
-    expect(screen.getByRole('switch', { name: 'ШІ увімкнено' })).toBeDisabled();
+    expect(screen.getByText('Не працює')).toBeInTheDocument();
+    expect(screen.getByText(/ШІ не читає рахунки: немає ключа openai/)).toBeInTheDocument();
+    expect(screen.getByRole('switch', { name: /ШІ увімкнено/ })).toBeDisabled();
     await userEvent.type(
-      screen.getByLabelText('Ключ OpenAI'),
+      screen.getByLabelText('Ключ OpenAI', { selector: 'input' }),
       'sk-proj-abcdefghijklmnopqrstuvwxyz1234',
     );
     await userEvent.click(screen.getByRole('button', { name: 'Зберегти ключ' }));
 
     expect(fixture.setKey).toHaveBeenCalledWith('sk-proj-abcdefghijklmnopqrstuvwxyz1234');
+    const card = screen.getByRole('region', { name: 'Ключ OpenAI' });
     expect(
-      await screen.findByText('Ключ збережено (…1234). Натисніть «Перевірити».'),
+      await within(card).findByText('Ключ збережено (…1234). Перевірте моделі нижче.'),
     ).toBeInTheDocument();
-    expect(screen.getByLabelText('Ключ OpenAI')).toHaveValue('');
+    expect(screen.getByLabelText('Ключ OpenAI', { selector: 'input' })).toHaveValue('');
   });
 
-  it('saves models with the version and checks a model', async () => {
+  it('saves the switch at once and the limit with its own button', async () => {
     fixture.settings = { ...base, hasKey: true, keyHint: '1234', version: 2 };
+    fixture.update.mockResolvedValue(fixture.settings);
+    render(<AiSettingsPage />);
+
+    await userEvent.click(screen.getByRole('switch', { name: 'ШІ увімкнено' }));
+    await waitFor(() =>
+      expect(fixture.update).toHaveBeenCalledWith(
+        expect.objectContaining({ enabled: true, monthlyLimitUsd: 5, version: 2 }),
+      ),
+    );
+
+    const save = screen.getByRole('button', { name: 'Зберегти ліміт' });
+    expect(save).toBeDisabled();
+    const limit = screen.getByLabelText('Ліміт на місяць, $');
+    await userEvent.clear(limit);
+    await userEvent.type(limit, '20,5');
+    await userEvent.click(save);
+
+    await waitFor(() =>
+      expect(fixture.update).toHaveBeenLastCalledWith(
+        expect.objectContaining({ enabled: false, monthlyLimitUsd: 20.5, version: 2 }),
+      ),
+    );
+    expect(await screen.findByText('Ліміт збережено.')).toBeInTheDocument();
+  });
+
+  it('checks a model and changes prices in the side panel', async () => {
+    fixture.settings = { ...base, hasKey: true, keyHint: '1234', enabled: true, version: 3 };
     fixture.update.mockResolvedValue(fixture.settings);
     fixture.test.mockResolvedValue({
       tier: 'Strong',
@@ -95,27 +124,34 @@ describe('AiSettingsPage', () => {
     });
     render(<AiSettingsPage />);
 
-    expect(screen.getByText(/sk-…1234/)).toBeInTheDocument();
-    await userEvent.click(screen.getAllByRole('button', { name: 'Перевірити' })[1]!);
+    expect(screen.getByText('Працює')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Перевірити gpt-6.1-terra' }));
     expect(fixture.test).toHaveBeenCalledWith('Strong');
-    expect(await screen.findByText(/модель gpt-6.1-terra працює/)).toBeInTheDocument();
+    expect(await screen.findByText(/gpt-6.1-terra працює/)).toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole('switch', { name: 'ШІ увімкнено' }));
-    const limit = screen.getByLabelText('Ліміт на місяць, $');
-    await userEvent.clear(limit);
-    await userEvent.type(limit, '10,5');
-    await userEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Змінити' }));
+    const panel = screen.getByRole('dialog', { name: 'Моделі й ціни' });
+    const price = within(panel).getAllByLabelText('Вхід, $')[0]!;
+    await userEvent.clear(price);
+    await userEvent.type(price, '0,2');
+    await userEvent.click(within(panel).getByRole('button', { name: 'Зберегти' }));
 
     await waitFor(() =>
       expect(fixture.update).toHaveBeenCalledWith(
-        expect.objectContaining({ enabled: true, monthlyLimitUsd: 10.5, version: 2 }),
+        expect.objectContaining({ fastInputPrice: 0.2, enabled: true, version: 3 }),
       ),
     );
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
-  it('marks a reached limit as a problem', () => {
-    fixture.settings = { ...base, usage: { ...base.usage, costUsd: 5 } };
+  it('marks a reached limit as the reason', () => {
+    fixture.settings = {
+      ...base,
+      hasKey: true,
+      enabled: true,
+      usage: { ...base.usage, costUsd: 5 },
+    };
     render(<AiSettingsPage />);
-    expect(screen.getByText(/Ліміт цього місяця вичерпано/)).toBeInTheDocument();
+    expect(screen.getByText(/вичерпано ліміт місяця/)).toBeInTheDocument();
   });
 });
