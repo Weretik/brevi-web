@@ -3052,6 +3052,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/production/orders/report-price-import': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Admin: «Ціни КП» of orders moved from the old «Цех» for «Звіти цеху»; only an item without a price takes one; dryRun only shows them; any error saves nothing */
+    post: operations['importProductionReportPrices'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/production/fabric-stock': {
     parameters: {
       query?: never;
@@ -7928,6 +7945,33 @@ export interface components {
       unchanged: number;
       errors: number;
       lines: components['schemas']['ProductionProgressImportLine'][];
+    };
+    ProductionItemReportPriceImportRow: {
+      /** @description The item's place in the order, from 1. */
+      position: number;
+      /** @description UAH per item from the КП. */
+      unitPrice: number;
+    };
+    ProductionReportPriceImportRow: {
+      /** @description The order's id in the old app, as in production-orders.json. */
+      legacyId: string;
+      items: components['schemas']['ProductionItemReportPriceImportRow'][];
+    };
+    ProductionReportPriceImportLine: {
+      number: number | null;
+      legacyId: string;
+      /** @description Items that take a price; an item that already has one keeps it. */
+      prices: number;
+      /** @enum {string} */
+      action: 'updated' | 'unchanged' | 'error';
+      error: string | null;
+    };
+    ProductionReportPriceImportResult: {
+      dryRun: boolean;
+      updated: number;
+      unchanged: number;
+      errors: number;
+      lines: components['schemas']['ProductionReportPriceImportLine'][];
     };
     FabricStockRowResponse: {
       /** @description Null for a fabric and colour open orders plan but the stock never held. */
@@ -18975,6 +19019,46 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['ProductionProgressImportResult'];
+        };
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders); the person may not make this change. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  importProductionReportPrices: {
+    parameters: {
+      query?: {
+        dryRun?: boolean;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ProductionReportPriceImportRow'][];
+      };
+    };
+    responses: {
+      /** @description What changed or would change. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionReportPriceImportResult'];
         };
       };
       /** @description Unauthenticated. */
