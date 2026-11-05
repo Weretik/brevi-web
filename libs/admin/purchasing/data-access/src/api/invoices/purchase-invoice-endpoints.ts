@@ -4,6 +4,11 @@ import {
   purchaseSyncStateTag,
 } from '../../cache/purchase-invoice-tags';
 import { purchaseApiError } from '../../errors/purchase-api-error';
+import {
+  mapPurchaseDocumentSave,
+  mapPurchaseRecognition,
+  mapPurchaseRecognitionBatch,
+} from '../../mappers/invoices/purchase-document.mapper';
 import { mapPurchaseInvoicePage } from '../../mappers/invoices/purchase-invoice.mapper';
 import {
   mapPurchaseInvoiceReview,
@@ -16,9 +21,13 @@ import {
 
 import type { PurchasingEndpointBuilder } from '../purchasing-endpoint-builder';
 import type {
+  PurchaseDocumentSave,
+  PurchaseDocumentUpload,
   PurchaseInvoicePage,
   PurchaseInvoiceQuery,
   PurchaseInvoiceReview,
+  PurchaseRecognition,
+  PurchaseRecognitionBatch,
   PurchaseReviewInput,
   PurchaseSupplierOption,
   PurchaseSyncResult,
@@ -71,6 +80,43 @@ export function purchaseInvoiceEndpoints(build: PurchasingEndpointBuilder) {
       transformErrorResponse: purchaseApiError,
       // A stale version means someone else saved: reload the list either way.
       invalidatesTags: [purchaseInvoicesTag],
+    }),
+    recognizePurchaseFile: build.mutation<PurchaseRecognition, string>({
+      query: (fileId) => ({
+        url: `/api/purchasing/invoices/files/${encodeURIComponent(fileId)}/recognize`,
+        method: 'POST',
+      }),
+      transformResponse: mapPurchaseRecognition,
+      transformErrorResponse: purchaseApiError,
+      invalidatesTags: (_, error) => (error ? [] : [purchaseInvoicesTag]),
+    }),
+    /** One batch; the feature repeats it. The list reloads after every batch that read a file. */
+    recognizeNewPurchaseFiles: build.mutation<PurchaseRecognitionBatch, void>({
+      query: () => ({ url: '/api/purchasing/invoices/recognize-new', method: 'POST' }),
+      transformResponse: mapPurchaseRecognitionBatch,
+      transformErrorResponse: purchaseApiError,
+      invalidatesTags: (result) =>
+        result && result.recognized + result.needsReview + result.failed + result.skipped > 0
+          ? [purchaseInvoicesTag]
+          : [],
+    }),
+    savePurchaseDocument: build.mutation<PurchaseDocumentSave, PurchaseDocumentUpload>({
+      query: ({ fileId, document, replace }) => ({
+        url: `/api/purchasing/invoices/files/${encodeURIComponent(fileId)}/document`,
+        method: 'PUT',
+        body: { document, replace },
+      }),
+      transformResponse: mapPurchaseDocumentSave,
+      transformErrorResponse: purchaseApiError,
+      invalidatesTags: (_, error) => (error ? [] : [purchaseInvoicesTag]),
+    }),
+    /** The JSON as the server gives it, to be saved as a file and edited by hand. */
+    getPurchaseDocumentTemplate: build.query<unknown, string>({
+      query: (fileId) => ({
+        url: `/api/purchasing/invoices/files/${encodeURIComponent(fileId)}/document-template`,
+      }),
+      transformErrorResponse: purchaseApiError,
+      keepUnusedDataFor: 0,
     }),
   };
 }

@@ -1,5 +1,6 @@
 import { purchaseInvoiceStates } from '@admin/purchasing/model';
 
+import { mapPurchaseDocument, mapPurchaseRecognitionAttempt } from './purchase-document.mapper';
 import {
   flag,
   integer,
@@ -24,6 +25,8 @@ function mapLink(value: unknown): PurchaseInvoiceLink {
     id: text(row['id'], 'id файлу'),
     url: text(row['url'], 'адреса'),
     safe: flag(row['safe'], 'безпечне посилання'),
+    document: mapPurchaseDocument(row['document']),
+    recognition: mapPurchaseRecognitionAttempt(row['recognition']),
   };
 }
 

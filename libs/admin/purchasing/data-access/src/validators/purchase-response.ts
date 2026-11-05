@@ -50,3 +50,8 @@ export function oneOf<T extends string>(value: unknown, allowed: readonly T[], w
     throw invalid(what);
   return value as T;
 }
+
+export function amount(value: unknown, what = 'сума'): number {
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) throw invalid(what);
+  return value;
+}

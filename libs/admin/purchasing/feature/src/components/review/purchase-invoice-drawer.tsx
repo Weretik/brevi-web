@@ -2,7 +2,9 @@ import { PurchaseInvoiceDetails, PurchaseReviewForm } from '@admin/purchasing/ui
 import { ReferenceEditorDrawer } from '@admin/references/ui';
 import { Alert, Stack } from '@mui/material';
 
+import { usePurchaseFileActions } from '../../hooks/documents/use-purchase-file-actions';
 import { usePurchaseReviewEditor } from '../../hooks/review/use-purchase-review-editor';
+import { PurchaseFileActions } from '../documents/purchase-file-actions';
 
 import type { PurchaseInvoice, PurchaseInvoiceReview } from '@admin/purchasing/model';
 
@@ -12,9 +14,13 @@ interface Props {
   onSaved: (review: PurchaseInvoiceReview) => void;
 }
 
-/** A register row in the «Цех» side panel; «Редагувати» links the supplier and writes a note. */
+/**
+ * A register row in the «Цех» side panel; «Редагувати» links the supplier and writes a note.
+ * Each original can be read by AI or checked by hand as JSON.
+ */
 export function PurchaseInvoiceDrawer({ invoice, onClose, onSaved }: Props) {
   const editor = usePurchaseReviewEditor(invoice, onSaved);
+  const files = usePurchaseFileActions();
   const readOnly = editor.mode === 'view';
 
   return (
@@ -40,7 +46,19 @@ export function PurchaseInvoiceDrawer({ invoice, onClose, onSaved }: Props) {
           <Alert severity="error">{editor.suppliersError}</Alert>
         )}
         {readOnly ? (
-          <PurchaseInvoiceDetails invoice={invoice} />
+          <PurchaseInvoiceDetails
+            invoice={invoice}
+            renderLinkActions={(link) => (
+              <PurchaseFileActions
+                link={link}
+                busy={files.busy}
+                notice={files.notice}
+                onRecognize={(value) => void files.recognize(value)}
+                onTemplate={(value) => void files.downloadTemplate(value)}
+                onUpload={(value, file) => void files.upload(value, file)}
+              />
+            )}
+          />
         ) : (
           <PurchaseReviewForm
             invoice={invoice}

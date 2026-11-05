@@ -1,10 +1,16 @@
 import { ReferenceDetailsList, ReferenceFormSection } from '@admin/references/ui';
-import { Link, Stack, Typography } from '@mui/material';
+import { Divider, Link, Stack, Typography } from '@mui/material';
+import { Fragment } from 'react';
 
-import type { PurchaseInvoice } from '@admin/purchasing/model';
+import { PurchaseDocumentView } from '../documents/purchase-document-view';
+
+import type { PurchaseInvoice, PurchaseInvoiceLink } from '@admin/purchasing/model';
+import type { ReactNode } from 'react';
 
 interface Props {
   invoice: PurchaseInvoice;
+  /** Buttons of one safe link («Розпізнати», JSON), given by the feature. */
+  renderLinkActions?: (link: PurchaseInvoiceLink) => ReactNode;
 }
 
 const formatTime = (value: string) =>
@@ -14,7 +20,7 @@ const formatTime = (value: string) =>
  * Read-only card of one purchase invoice in the side panel: the message from the sheet, originals,
  * the source payment mark, problems (only when there are any) and the manual supplier and note.
  */
-export function PurchaseInvoiceDetails({ invoice }: Props) {
+export function PurchaseInvoiceDetails({ invoice, renderLinkActions }: Props) {
   const supplier =
     invoice.supplierId !== null && invoice.supplierName === null
       ? 'Постачальника не знайдено або видалено з довідника'
@@ -81,12 +87,19 @@ export function PurchaseInvoiceDetails({ invoice }: Props) {
             —
           </Typography>
         ) : (
-          <Stack sx={{ gap: 0.75 }}>
+          <Stack sx={{ gap: 1.5 }}>
             {invoice.links.map((link, index) =>
               link.safe ? (
-                <Link key={link.id} href={link.url} target="_blank" rel="noopener noreferrer">
-                  Оригінал{invoice.links.length > 1 ? ` ${index + 1}` : ''} ↗
-                </Link>
+                <Fragment key={link.id}>
+                  {index > 0 && <Divider />}
+                  <Stack sx={{ gap: 1 }}>
+                    <Link href={link.url} target="_blank" rel="noopener noreferrer">
+                      Оригінал{invoice.links.length > 1 ? ` ${index + 1}` : ''} ↗
+                    </Link>
+                    {link.document && <PurchaseDocumentView document={link.document} />}
+                    {renderLinkActions?.(link)}
+                  </Stack>
+                </Fragment>
               ) : (
                 <Typography
                   key={link.id}

@@ -82,7 +82,10 @@
       "@admin/purchasing/model": ["libs/admin/purchasing/model/src/index.ts"],
       "@admin/purchasing/data-access": ["libs/admin/purchasing/data-access/src/index.ts"],
       "@admin/purchasing/ui": ["libs/admin/purchasing/ui/src/index.ts"],
-      "@admin/purchasing/feature": ["libs/admin/purchasing/feature/src/index.ts"]
+      "@admin/purchasing/feature": ["libs/admin/purchasing/feature/src/index.ts"],
+      "@admin/ai/model": ["libs/admin/ai/model/src/index.ts"],
+      "@admin/ai/data-access": ["libs/admin/ai/data-access/src/index.ts"],
+      "@admin/ai/feature": ["libs/admin/ai/feature/src/index.ts"]
     }
   }
 }

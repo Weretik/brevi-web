@@ -1,4 +1,9 @@
-import { Link, Stack, Typography } from '@mui/material';
+import {
+  formatPurchaseDocumentDate,
+  formatPurchaseMoney,
+  purchaseVatLabel,
+} from '@admin/purchasing/model';
+import { Chip, Link, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { DataGrid } from '@mui/x-data-grid';
 
@@ -106,6 +111,40 @@ const columns: GridColDef<PurchaseInvoice>[] = [
         )}
       </Stack>
     ),
+  },
+  {
+    field: 'document',
+    headerName: 'Рахунок',
+    width: 210,
+    sortable: false,
+    renderCell: ({ row }) => {
+      const documents = row.links.flatMap((link) => (link.document ? [link.document] : []));
+      const first = documents[0];
+      if (!first) return null;
+      return (
+        <Stack sx={{ ...cell, gap: 0.25 }}>
+          <Typography variant="body2" noWrap title={first.supplierName}>
+            № {first.documentNumber} · {formatPurchaseDocumentDate(first.documentDate)}
+          </Typography>
+          <Stack direction="row" sx={{ gap: 0.75, alignItems: 'center', minWidth: 0 }}>
+            <Typography variant="caption" noWrap sx={mono}>
+              {formatPurchaseMoney(first.totalPayable)}
+            </Typography>
+            <Chip
+              size="small"
+              variant="outlined"
+              label={purchaseVatLabel(first)}
+              sx={{ height: 20 }}
+            />
+            {documents.length > 1 && (
+              <Typography variant="caption" color="text.secondary" noWrap>
+                +{documents.length - 1}
+              </Typography>
+            )}
+          </Stack>
+        </Stack>
+      );
+    },
   },
   {
     field: 'supplierName',
