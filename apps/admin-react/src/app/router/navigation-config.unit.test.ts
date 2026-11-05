@@ -97,6 +97,8 @@ describe('legacy Admin navigation', () => {
     const paths = new Set([
       '/production/orders',
       '/production/fabric-stock',
+      '/production/work',
+      '/production/forecast',
       '/production/staff',
       '/production/fabric-norms',
       '/production/payroll-rules',
@@ -106,17 +108,25 @@ describe('legacy Admin navigation', () => {
 
     expect(
       shop(['WorkshopChief'])
-        ?.items.slice(0, 5)
+        ?.items.slice(0, 7)
         .map((item) => item.to),
     ).toEqual([
       '/production/orders',
       '/production/fabric-stock',
+      '/production/work',
+      '/production/forecast',
       '/production/staff',
       '/production/fabric-norms',
       '/production/payroll-rules',
     ]);
-    expect(shop(['Admin'])?.items[2].label).toBe('Працівники цеху');
+    expect(shop(['Admin'])?.items[4].label).toBe('Працівники цеху');
     expect(shop(['Manager'])?.items.some((item) => item.id === 'workshop-staff')).toBe(false);
+    expect(shop(['Manager'])?.items.some((item) => item.id === 'work-log')).toBe(false);
+    expect(shop(['Manager'])?.items[2]).toEqual({
+      id: 'sewing-forecast',
+      label: 'Прогноз пошиття',
+      to: '/production/forecast',
+    });
   });
 
   it('shows «Виробничі завдання» and «Склад тканин» to managers as well', () => {

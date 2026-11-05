@@ -72,6 +72,7 @@ describe('React Admin routing', () => {
         [
           'Виробничі завдання',
           'Склад тканин',
+          'Прогноз пошиття',
           'Графік роботи',
           'Зарплата',
           'Фурнітура в цеху',
@@ -110,11 +111,13 @@ describe('React Admin routing', () => {
       expect(within(list).queryAllByRole('link')).toHaveLength(
         section === 'Загальні довідники'
           ? 7
-          : section === 'Менеджер сервісу' || section === 'Швейний цех'
+          : section === 'Менеджер сервісу'
             ? 2
-            : section === 'Фото'
-              ? 1
-              : 0,
+            : section === 'Швейний цех'
+              ? 3
+              : section === 'Фото'
+                ? 1
+                : 0,
       );
     }
   });

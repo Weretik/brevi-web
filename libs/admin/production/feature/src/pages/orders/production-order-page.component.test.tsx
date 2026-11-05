@@ -152,6 +152,48 @@ vi.mock('@admin/production/data-access', () => {
     useGetFabricStockChoicesQuery: () => ({ data: undefined, isFetching: false }),
     useCreateFabricIssueMutation: mutation(() => undefined),
     useReverseFabricIssueMutation: mutation(() => undefined),
+    useGetProductionItemWorkQuery: () => ({
+      data: {
+        orderId: 5,
+        itemId: 3,
+        orderNumber: 12,
+        modelName: 'Куртка',
+        quantity: 10,
+        sewingRate: 120,
+        sewn: 4,
+        cut: 10,
+        rows: [
+          {
+            id: 9,
+            orderId: 5,
+            orderNumber: 12,
+            clientName: 'School 5',
+            itemId: 3,
+            modelName: 'Куртка',
+            employeeId: 2,
+            employeeName: 'Андреева',
+            kind: 'Sewing',
+            quantity: 4,
+            workDate: '2026-11-04',
+            overPlan: false,
+            reason: null,
+            comment: null,
+            rate: 120,
+            isVoided: false,
+            voidedAt: null,
+            voidedByName: null,
+            voidReason: null,
+            createdByName: 'Начальник',
+            createdAt: '2026-11-04T10:00:00Z',
+          },
+        ],
+        canRecord: true,
+        cannotRecord: null,
+      },
+      isLoading: false,
+    }),
+    useGetWorkChoicesQuery: () => ({ data: undefined, isFetching: false }),
+    useVoidProductionWorkMutation: mutation(() => undefined),
   };
 });
 
@@ -240,6 +282,19 @@ describe('ProductionOrderPage', () => {
     api.current = api.order(true);
     renderPage();
     expect(screen.getByRole('button', { name: 'Видати тканину' })).toBeTruthy();
+  });
+
+  it('shows the work of an item to the workshop only', () => {
+    api.current = api.order(false);
+    renderPage();
+    expect(screen.queryByText(/Пошито 4 з 10/)).toBeNull();
+    cleanup();
+    api.current = api.order(true);
+    renderPage();
+    expect(screen.getByText(/Пошито 4 з 10 · покроєно 10 з 10/)).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Додати роботу' })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: /Сторнувати роботу Андреева/ }));
+    expect(screen.getByText('Сторнувати роботу?')).toBeTruthy();
   });
 
   it('keeps a failed Telegram message on the card with its reason', () => {
