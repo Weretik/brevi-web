@@ -1,11 +1,18 @@
+import type { PurchaseDocument, PurchaseRecognitionAttempt } from './purchase-document';
+
 /** A link from the sheet to an original document; only safe (HTTPS Dropbox) links are opened. */
 export interface PurchaseInvoiceLink {
   id: string;
   url: string;
   safe: boolean;
+  /** Checked facts; null until recognised or uploaded. */
+  document: PurchaseDocument | null;
+  /** The last recognition while there are no facts. */
+  recognition: PurchaseRecognitionAttempt | null;
 }
 
-export const purchaseInvoiceStates = ['NeedsReview', 'AwaitingRecognition'] as const;
+/** Recognized is never shown as a badge: only problems are marked. */
+export const purchaseInvoiceStates = ['NeedsReview', 'AwaitingRecognition', 'Recognized'] as const;
 export type PurchaseInvoiceState = (typeof purchaseInvoiceStates)[number];
 
 /**

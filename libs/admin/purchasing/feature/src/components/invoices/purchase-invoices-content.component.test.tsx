@@ -9,6 +9,10 @@ const fixture = vi.hoisted(() => ({
   queries: [] as Record<string, unknown>[],
   sync: vi.fn(),
   review: vi.fn(),
+  recognize: vi.fn(),
+  recognizeNew: vi.fn(),
+  save: vi.fn(),
+  template: vi.fn(),
   syncError: null as string | null,
 }));
 
@@ -34,7 +38,15 @@ const invoice = {
   reviewedAt: null,
   state: 'AwaitingRecognition',
   issues: [],
-  links: [{ id: 'f1', url: 'https://www.dropbox.com/s/a.pdf', safe: true }],
+  links: [
+    {
+      id: 'f1',
+      url: 'https://www.dropbox.com/s/a.pdf',
+      safe: true,
+      document: null,
+      recognition: null,
+    },
+  ],
 };
 const problem = {
   ...invoice,
@@ -46,7 +58,9 @@ const problem = {
   markAt: null,
   state: 'NeedsReview',
   issues: ['Посилання не з Dropbox'],
-  links: [{ id: 'f2', url: 'http://example.com/a.pdf', safe: false }],
+  links: [
+    { id: 'f2', url: 'http://example.com/a.pdf', safe: false, document: null, recognition: null },
+  ],
 };
 
 vi.mock('@admin/purchasing/data-access', () => ({
@@ -85,14 +99,37 @@ vi.mock('@admin/purchasing/data-access', () => ({
     error: undefined,
   }),
   useReviewPurchaseInvoiceMutation: () => [fixture.review, { isLoading: false }],
+  useRecognizePurchaseFileMutation: () => [fixture.recognize, { isLoading: false }],
+  useRecognizeNewPurchaseFilesMutation: () => [fixture.recognizeNew, { isLoading: false }],
+  useSavePurchaseDocumentMutation: () => [fixture.save, { isLoading: false }],
+  useLazyGetPurchaseDocumentTemplateQuery: () => [fixture.template],
 }));
+
+const batch = (values: Record<string, unknown>) => ({
+  unwrap: () =>
+    Promise.resolve({
+      recognized: 0,
+      needsReview: 0,
+      failed: 0,
+      skipped: 0,
+      remaining: 0,
+      costUsd: 0,
+      stopReason: null,
+      ...values,
+    }),
+});
 
 afterEach(() => {
   cleanup();
   fixture.queries = [];
   fixture.sync.mockReset();
   fixture.review.mockReset();
+  fixture.recognize.mockReset();
+  fixture.recognizeNew.mockReset();
+  fixture.save.mockReset();
+  fixture.template.mockReset();
   fixture.syncError = null;
+  vi.restoreAllMocks();
 });
 
 function renderContent(url = '/references/counterparties?tab=purchases') {
@@ -228,5 +265,101 @@ describe('«Контрагенти → Рахунки на закупку»', ()
 
     await user.click(screen.getByRole('button', { name: 'Без постачальника 1' }));
     expect(router.state.location.search).toContain('filter=WithoutSupplier');
+  });
+
+  it('offers the «Не розпізнані» filter', async () => {
+    const user = userEvent.setup();
+    const router = renderContent();
+
+    await user.click(screen.getByRole('button', { name: 'Не розпізнані 1' }));
+    expect(router.state.location.search).toContain('filter=NotRecognized');
+  });
+
+  it('recognizes all new originals in batches and shows the total', async () => {
+    const user = userEvent.setup();
+    fixture.recognizeNew
+      .mockReturnValueOnce(batch({ recognized: 4, needsReview: 1, remaining: 3, costUsd: 0.002 }))
+      .mockReturnValueOnce(batch({ recognized: 3, remaining: 0, costUsd: 0.001 }));
+    renderContent();
+
+    await user.click(screen.getByRole('button', { name: 'Розпізнати всі нові' }));
+
+    expect(
+      await screen.findByText('Розпізнано 7 з 8, потребують перевірки 1, витрачено 0.0030 $.'),
+    ).toBeVisible();
+    expect(fixture.recognizeNew).toHaveBeenCalledTimes(2);
+  });
+
+  it('stops the batch with the server reason', async () => {
+    const user = userEvent.setup();
+    fixture.recognizeNew.mockReturnValueOnce(
+      batch({ remaining: 9, stopReason: 'ШІ вимкнено в «Налаштування ШІ».' }),
+    );
+    renderContent();
+
+    await user.click(screen.getByRole('button', { name: 'Розпізнати всі нові' }));
+
+    expect(await screen.findByText(/^ШІ вимкнено в «Налаштування ШІ»\./)).toBeVisible();
+    expect(fixture.recognizeNew).toHaveBeenCalledTimes(1);
+  });
+
+  it('recognizes one original from the side panel and shows the problems', async () => {
+    const user = userEvent.setup();
+    fixture.recognize.mockReturnValue({
+      unwrap: () =>
+        Promise.resolve({
+          fileId: 'f1',
+          result: 'NeedsReview',
+          problems: ['Сума позицій не збігається з підсумком'],
+          model: 'gpt-6.1-terra',
+          costUsd: 0.01,
+        }),
+    });
+    renderContent();
+
+    const grid = await screen.findByRole('grid', { name: 'Рахунки на закупку' });
+    await user.click(within(grid).getByText('UID 42'));
+    const panel = screen.getByRole('dialog', { name: 'Рахунок на закупку' });
+    await user.click(within(panel).getByRole('button', { name: 'Розпізнати' }));
+
+    expect(fixture.recognize).toHaveBeenCalledWith('f1');
+    expect(
+      await within(panel).findByText('Потребує перевірки: Сума позицій не збігається з підсумком'),
+    ).toBeVisible();
+  });
+
+  it('asks before replacing checked facts with an uploaded JSON', async () => {
+    const user = userEvent.setup();
+    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(true);
+    fixture.save
+      .mockReturnValueOnce({
+        unwrap: () =>
+          Promise.reject({
+            code: 'Conflict',
+            status: 409,
+            message: 'Вже є інші дані.',
+            fieldErrors: {},
+          }),
+      })
+      .mockReturnValueOnce({
+        unwrap: () => Promise.resolve({ fileId: 'f1', unchanged: false, replaced: true }),
+      });
+    renderContent();
+
+    const grid = await screen.findByRole('grid', { name: 'Рахунки на закупку' });
+    await user.click(within(grid).getByText('UID 42'));
+    const panel = screen.getByRole('dialog', { name: 'Рахунок на закупку' });
+    const file = new File(['{"documentNumber":"110776"}'], 'r.json', { type: 'application/json' });
+    await user.upload(within(panel).getByLabelText('Файл JSON'), file);
+
+    expect(
+      await within(panel).findByText('Дані замінено, старі збережено в історії.'),
+    ).toBeVisible();
+    expect(confirm).toHaveBeenCalledTimes(1);
+    expect(fixture.save).toHaveBeenLastCalledWith({
+      fileId: 'f1',
+      document: { documentNumber: '110776' },
+      replace: true,
+    });
   });
 });

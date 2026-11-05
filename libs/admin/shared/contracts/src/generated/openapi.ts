@@ -3442,6 +3442,76 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/ai/settings': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Settings, this month's use (UTC) and the editable extra rules. Defaults before the first save. */
+    get: operations['getAiSettings'];
+    /** @description Models, prices per 1M tokens, on/off and the monthly limit in USD. version is the one the admin saw. */
+    put: operations['updateAiSettings'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/ai/settings/key': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Replaces the OpenAI key. It is stored encrypted (ASP.NET Data Protection) and never returned or logged. */
+    put: operations['setAiKey'];
+    post?: never;
+    /** @description Removes the key and switches the AI off. */
+    delete: operations['removeAiKey'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/ai/settings/prompts/{key}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Extra rules of one request kind (purchase-invoices = «Умови розпізнавання рахунків»), added after the fixed instruction of the module. Empty text removes them. */
+    put: operations['updateAiPrompt'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/ai/settings/test': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description «Перевірити»: a tiny request to the model of the tier (works while the AI is off). Its cost is added to the month. */
+    post: operations['testAiConnection'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/purchasing/invoices': {
     parameters: {
       query?: never;
@@ -3449,7 +3519,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** @description One page of cards, one per Telegram message, newest message first (unknown dates last). Search matches the message text (case-insensitive) or an exact UID. Filter WithoutSupplier lists cards with no supplier linked. */
+    /** @description One page of cards, one per Telegram message, newest message first (unknown dates last). Search matches the message text (case-insensitive) or an exact UID. Filter WithoutSupplier lists cards with no supplier linked; NotRecognized lists cards with a link that has no checked facts; NeedsReview also includes cards whose last recognition of a file failed. */
     get: operations['getPurchaseInvoices'];
     put?: never;
     post?: never;
@@ -3520,6 +3590,74 @@ export interface paths {
     put?: never;
     /** @description «Оновити зараз»: reads the whole sheet, checks it, then applies it in one transaction. Safe to repeat; manual supplier links and notes are never changed. Rows and links missing from the sheet become inactive. */
     post: operations['syncPurchaseInvoices'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/purchasing/invoices/files/{fileId}/recognize': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description «Розпізнати» / «Розпізнати знову» (stage 3): downloads the Dropbox original (PDF or picture, at most 20 MB), reads it with the fast model of «Налаштування ШІ», checks the facts in kopecks and retries once with the strong model. Valid facts are saved (earlier ones go to history); otherwise the problems are recorded and shown on the card. Problems of the answer come back with 200. */
+    post: operations['recognizePurchaseFile'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/purchasing/invoices/recognize-new': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description One batch (5 files) of «Розпізнати всі нові»: active safe links never tried before, newest messages first. Repeat while remaining is above 0 and stopReason is null. Failed files are not retried here; use recognizePurchaseFile. */
+    post: operations['recognizeNewPurchaseFiles'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/purchasing/invoices/files/{fileId}/document': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** @description «Завантажити JSON»: checked facts prepared by hand. sourceUID must be an active row of the file's message and originalFileLink the exact link. The same facts again change nothing; different saved facts need replace = true (the old ones go to history). */
+    put: operations['savePurchaseDocument'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/purchasing/invoices/files/{fileId}/document-template': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description «Шаблон JSON»: the saved facts, else the last AI answer, else empty fields, with sourceUID and originalFileLink filled in. */
+    get: operations['getPurchaseDocumentTemplate'];
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -8197,13 +8335,144 @@ export interface components {
       /** @description A topic of a group with topics; null posts to the main chat. */
       telegramThreadId: number | null;
     };
-    /** @enum {string} */
-    PurchaseInvoiceFilter: 'All' | 'NeedsReview' | 'WithoutSupplier';
+    AiUsageResponse: {
+      /** @description yyyy-MM (UTC) */
+      month: string;
+      /** Format: int32 */
+      requests: number;
+      /** Format: int64 */
+      inputTokens: number;
+      /** Format: int64 */
+      outputTokens: number;
+      /** @description Counted from the token usage and the prices in settings. */
+      costUsd: number;
+    };
+    AiPromptResponse: {
+      key: string;
+      title: string;
+      text: string;
+      updatedBy?: string | null;
+      /** Format: date-time */
+      updatedAt?: string | null;
+    };
+    AiSettingsResponse: {
+      hasKey: boolean;
+      /** @description Last four characters of the key. */
+      keyHint?: string | null;
+      enabled: boolean;
+      fastModel: string;
+      /** @description USD per 1M input tokens. */
+      fastInputPrice: number;
+      fastOutputPrice: number;
+      strongModel: string;
+      strongInputPrice: number;
+      strongOutputPrice: number;
+      monthlyLimitUsd: number;
+      /** Format: int32 */
+      version: number;
+      updatedBy?: string | null;
+      /** Format: date-time */
+      updatedAt?: string | null;
+      usage: components['schemas']['AiUsageResponse'];
+      prompts: components['schemas']['AiPromptResponse'][];
+    };
+    AiSettingsRequest: {
+      enabled: boolean;
+      fastModel: string;
+      fastInputPrice: number;
+      fastOutputPrice: number;
+      strongModel: string;
+      strongInputPrice: number;
+      strongOutputPrice: number;
+      monthlyLimitUsd: number;
+      /** Format: int32 */
+      version: number;
+    };
+    AiKeyRequest: {
+      apiKey: string;
+    };
+    AiPromptRequest: {
+      text?: string | null;
+    };
     /**
-     * @description NeedsReview when the representative row has problems, otherwise AwaitingRecognition.
+     * @description Fast is tried first; Strong is the retry when the fast answer fails its checks.
      * @enum {string}
      */
-    PurchaseInvoiceState: 'NeedsReview' | 'AwaitingRecognition';
+    AiModelTier: 'Fast' | 'Strong';
+    AiTestRequest: {
+      tier: components['schemas']['AiModelTier'];
+    };
+    AiTestResponse: {
+      tier: components['schemas']['AiModelTier'];
+      model: string;
+      /** Format: int64 */
+      inputTokens: number;
+      /** Format: int64 */
+      outputTokens: number;
+      costUsd: number;
+    };
+    AiErrors: {
+      errors: string[];
+    };
+    /** @enum {string} */
+    PurchaseInvoiceFilter: 'All' | 'NeedsReview' | 'WithoutSupplier' | 'NotRecognized';
+    /**
+     * @description NeedsReview when the representative row or the last recognition of a file has problems; Recognized when every safe link has checked facts; otherwise AwaitingRecognition. Shown only as problems, never as a badge.
+     * @enum {string}
+     */
+    PurchaseInvoiceState: 'NeedsReview' | 'AwaitingRecognition' | 'Recognized';
+    /**
+     * @description WithVat only when VAT is clearly printed; otherwise WithoutVat.
+     * @enum {string}
+     */
+    PurchaseDocumentVat: 'WithVat' | 'WithoutVat';
+    PurchaseDocumentItemResponse: {
+      /** Format: int32 */
+      position: number;
+      name: string;
+      /** @description Decimal with a dot, up to 4 places. */
+      quantity: string;
+      unit?: string | null;
+      /** @description As printed; with VAT when pricesIncludeVat. */
+      price: string;
+      /** @description Up to 2 places. */
+      sum: string;
+    };
+    /** @enum {string} */
+    PurchaseDocumentSource: 'Ai' | 'Manual';
+    PurchaseDocumentResponse: {
+      documentType: string;
+      documentNumber: string;
+      /** Format: date */
+      documentDate: string;
+      /** @description As printed; never links a Brevi supplier by itself. */
+      supplierName: string;
+      vat: components['schemas']['PurchaseDocumentVat'];
+      pricesIncludeVat: boolean;
+      vatAmount?: string | null;
+      totalPayable: string;
+      items: components['schemas']['PurchaseDocumentItemResponse'][];
+      source: components['schemas']['PurchaseDocumentSource'];
+      /** @description OpenAI model that read it; null for a manual file. */
+      model?: string | null;
+      checkedBy: string;
+      /** Format: date-time */
+      checkedAt: string;
+    };
+    /**
+     * @description Skipped means the type cannot be read by AI (Excel, Word); upload JSON by hand.
+     * @enum {string}
+     */
+    PurchaseRecognitionResult: 'Recognized' | 'NeedsReview' | 'Failed' | 'Skipped';
+    PurchaseRecognitionAttemptResponse: {
+      result: components['schemas']['PurchaseRecognitionResult'];
+      problems: string[];
+      model?: string | null;
+      costUsd: number;
+      by: string;
+      /** Format: date-time */
+      at: string;
+    };
     PurchaseInvoiceLinkResponse: {
       /** @description File id, SHA-256 of messageId:url. */
       id: string;
@@ -8211,6 +8480,10 @@ export interface components {
       url: string;
       /** @description True only for an HTTPS dropbox.com link without user or password; show other links as text. */
       safe: boolean;
+      /** @description Checked facts of the original; null until recognised or uploaded. */
+      document?: components['schemas']['PurchaseDocumentResponse'] | null;
+      /** @description The last recognition while there are no checked facts; null otherwise. */
+      recognition?: components['schemas']['PurchaseRecognitionAttemptResponse'] | null;
     };
     PurchaseInvoiceResponse: {
       messageId: string;
@@ -8335,6 +8608,63 @@ export interface components {
     };
     PurchaseErrors: {
       errors: string[];
+    };
+    PurchaseRecognitionResponse: {
+      fileId: string;
+      result: components['schemas']['PurchaseRecognitionResult'];
+      problems: string[];
+      model?: string | null;
+      costUsd: number;
+    };
+    PurchaseRecognitionBatchResponse: {
+      /** Format: int32 */
+      recognized: number;
+      /** Format: int32 */
+      needsReview: number;
+      /** Format: int32 */
+      failed: number;
+      /** Format: int32 */
+      skipped: number;
+      /**
+       * Format: int32
+       * @description New files still waiting after this batch.
+       */
+      remaining: number;
+      costUsd: number;
+      /** @description Why the batch stopped early (AI off, no key, monthly limit, sync running). */
+      stopReason?: string | null;
+    };
+    /** @description The JSON of checked facts. Decimals are strings with a dot. vat: with_vat or without_vat. */
+    PurchaseDocumentFile: {
+      sourceUID: string;
+      originalFileLink: string;
+      documentType: string;
+      documentNumber: string;
+      /** @description YYYY-MM-DD */
+      documentDate: string;
+      supplierName: string;
+      /** @enum {string} */
+      vat: 'with_vat' | 'without_vat';
+      pricesIncludeVat: boolean;
+      items: {
+        name: string;
+        quantity: string;
+        unit?: string | null;
+        price: string;
+        sum: string;
+      }[];
+      vatAmount: string | null;
+      totalPayable: string;
+    };
+    PurchaseDocumentSaveRequest: {
+      document: components['schemas']['PurchaseDocumentFile'];
+      /** @description Confirms replacing different saved facts. */
+      replace: boolean;
+    };
+    PurchaseDocumentSaveResponse: {
+      fileId: string;
+      unchanged: boolean;
+      replaced: boolean;
     };
     NonWorkingDayResponse: {
       /** Format: date */
@@ -8574,6 +8904,7 @@ export interface components {
     /** @description Admin only; ignored for a Manager. */
     AssigneeUserId: number;
     TaskId: number;
+    FileId: string;
   };
   requestBodies: never;
   headers: never;
@@ -19305,6 +19636,281 @@ export interface operations {
       };
     };
   };
+  getAiSettings: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AiSettingsResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Admin */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateAiSettings: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AiSettingsRequest'];
+      };
+    };
+    responses: {
+      /** @description Saved (or unchanged) */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AiSettingsResponse'];
+        };
+      };
+      /** @description Invalid model name, price or limit, or switching on without a key */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Admin */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The version is stale; body is an array of messages */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  setAiKey: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AiKeyRequest'];
+      };
+    };
+    responses: {
+      /** @description Saved */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AiSettingsResponse'];
+        };
+      };
+      /** @description The key is not 20–300 characters without spaces */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Admin */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  removeAiKey: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Removed */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AiSettingsResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Admin */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateAiPrompt: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        key: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AiPromptRequest'];
+      };
+    };
+    responses: {
+      /** @description Saved */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AiSettingsResponse'];
+        };
+      };
+      /** @description Longer than 4000 characters */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Admin */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unknown key */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  testAiConnection: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AiTestRequest'];
+      };
+    };
+    responses: {
+      /** @description OpenAI answered */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AiTestResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Admin */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description OpenAI refused (key, model, balance or limit); the message says which */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AiErrors'];
+        };
+      };
+      /** @description No key, the monthly limit is reached, or OpenAI does not answer */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AiErrors'];
+        };
+      };
+    };
+  };
   getPurchaseInvoices: {
     parameters: {
       query?: {
@@ -19536,6 +20142,210 @@ export interface operations {
         content: {
           'application/json': components['schemas']['PurchaseErrors'];
         };
+      };
+    };
+  };
+  recognizePurchaseFile: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        fileId: components['parameters']['FileId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Tried; see result and problems */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PurchaseRecognitionResponse'];
+        };
+      };
+      /** @description The link is not a safe Dropbox link */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director, Accountant or Admin */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description File not found or its message has no active rows */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The sheet sync is running; body is an array of messages */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The AI is off, has no key or reached its monthly limit; nothing was sent or recorded */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PurchaseErrors'];
+        };
+      };
+    };
+  };
+  recognizeNewPurchaseFiles: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Batch done */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PurchaseRecognitionBatchResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director, Accountant or Admin */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  savePurchaseDocument: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        fileId: components['parameters']['FileId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PurchaseDocumentSaveRequest'];
+      };
+    };
+    responses: {
+      /** @description Saved or unchanged */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PurchaseDocumentSaveResponse'];
+        };
+      };
+      /** @description The facts fail the checks (problems in Ukrainian) or the UID does not belong to the message */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director, Accountant or Admin */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description File not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Other facts are saved and replace is false, or the sheet sync is running */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getPurchaseDocumentTemplate: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        fileId: components['parameters']['FileId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PurchaseDocumentFile'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director, Accountant or Admin */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description File not found or its message has no active rows */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };

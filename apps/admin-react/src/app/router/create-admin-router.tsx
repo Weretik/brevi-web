@@ -1,3 +1,4 @@
+import { aiRoutes } from '@admin/ai/feature';
 import {
   canManageUsers,
   canManageWorkshop,
@@ -59,6 +60,7 @@ export function createAdminRouter() {
         ...profileRoutes,
         { element: <RequireRole allow={canManageUsers} />, children: usersRoutes },
         { element: <RequireRole allow={canManageUsers} />, children: tasksRoutes.admin },
+        { element: <RequireRole allow={canManageUsers} />, children: aiRoutes },
         { element: <RequireRole allow={canWorkOnTasks} />, children: tasksRoutes.board },
         { element: <RequireRole allow={canPriceEmbroidery} />, children: embroideryRoutes },
         { element: <RequireRole allow={canManageWorkshop} />, children: productionRoutes },

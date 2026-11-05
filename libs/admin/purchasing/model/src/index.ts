@@ -7,6 +7,30 @@ export type {
 } from './entities/invoices/purchase-invoice';
 export type { PurchaseSyncResult, PurchaseSyncState } from './entities/invoices/purchase-sync';
 export {
+  purchaseDocumentSources,
+  purchaseDocumentVats,
+  purchaseRecognitionResults,
+} from './entities/invoices/purchase-document';
+export type {
+  PurchaseDocument,
+  PurchaseDocumentItem,
+  PurchaseDocumentSave,
+  PurchaseDocumentSource,
+  PurchaseDocumentUpload,
+  PurchaseDocumentVat,
+  PurchaseRecognition,
+  PurchaseRecognitionAttempt,
+  PurchaseRecognitionBatch,
+  PurchaseRecognitionResult,
+} from './entities/invoices/purchase-document';
+export {
+  describePurchaseDocument,
+  describePurchaseRecognitionBatch,
+  formatPurchaseDocumentDate,
+  formatPurchaseMoney,
+  purchaseVatLabel,
+} from './mappers/invoices/describe-purchase-document';
+export {
   defaultPurchaseInvoicePageSize,
   purchaseInvoiceFilters,
   purchaseInvoicePageSizes,
