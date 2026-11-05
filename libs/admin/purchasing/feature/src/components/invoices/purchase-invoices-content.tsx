@@ -13,7 +13,9 @@ import { useState } from 'react';
 
 import { usePurchaseInvoiceList } from '../../hooks/invoices/use-purchase-invoice-list';
 import { usePurchaseInvoiceSync } from '../../hooks/invoices/use-purchase-invoice-sync';
+import { PurchaseInvoiceDrawer } from '../review/purchase-invoice-drawer';
 
+import type { PurchaseInvoice } from '@admin/purchasing/model';
 import type { ReactNode } from 'react';
 
 interface Props {
@@ -31,6 +33,7 @@ const formatTime = (value: string) =>
 export function PurchaseInvoicesContent({ tabs }: Props) {
   const state = usePurchaseInvoiceList();
   const [notice, setNotice] = useState<{ text: string; ok: boolean } | null>(null);
+  const [opened, setOpened] = useState<PurchaseInvoice | null>(null);
   const { sync, syncing, syncState } = usePurchaseInvoiceSync((text, ok) =>
     setNotice({ text, ok }),
   );
@@ -112,6 +115,12 @@ export function PurchaseInvoicesContent({ tabs }: Props) {
               selected={state.filter === 'NeedsReview'}
               onClick={() => state.setFilter('NeedsReview')}
             />
+            <ReferenceFilterChip
+              label="Без постачальника"
+              count={state.counts.WithoutSupplier}
+              selected={state.filter === 'WithoutSupplier'}
+              onClick={() => state.setFilter('WithoutSupplier')}
+            />
           </>
         }
         count={page?.total ?? 0}
@@ -127,8 +136,25 @@ export function PurchaseInvoicesContent({ tabs }: Props) {
           narrowed={Boolean(state.search) || state.filter !== 'All'}
           unavailable={Boolean(list.error)}
           onPageChange={state.setPage}
+          onOpen={setOpened}
         />
       </Paper>
+      {opened && (
+        <PurchaseInvoiceDrawer
+          key={opened.messageId}
+          invoice={opened}
+          onClose={() => setOpened(null)}
+          onSaved={(review) => {
+            setOpened(null);
+            setNotice({
+              text: review.supplierName
+                ? `Збережено: постачальник «${review.supplierName}».`
+                : 'Збережено.',
+              ok: true,
+            });
+          }}
+        />
+      )}
     </Box>
   );
 }

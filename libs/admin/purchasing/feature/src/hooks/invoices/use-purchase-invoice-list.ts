@@ -54,13 +54,10 @@ export function usePurchaseInvoiceList() {
   }, [term, search, update]);
 
   const list = useGetPurchaseInvoicesQuery({ search, filter, page, pageSize });
-  const allCount = useGetPurchaseInvoicesQuery({ search, filter: 'All', page: 1, pageSize: 1 });
-  const reviewCount = useGetPurchaseInvoicesQuery({
-    search,
-    filter: 'NeedsReview',
-    page: 1,
-    pageSize: 1,
-  });
+  const count = (value: PurchaseInvoiceFilter) => ({ search, filter: value, page: 1, pageSize: 1 });
+  const allCount = useGetPurchaseInvoicesQuery(count('All'));
+  const reviewCount = useGetPurchaseInvoicesQuery(count('NeedsReview'));
+  const withoutSupplierCount = useGetPurchaseInvoicesQuery(count('WithoutSupplier'));
 
   return {
     term,
@@ -72,6 +69,7 @@ export function usePurchaseInvoiceList() {
     counts: {
       All: allCount.currentData?.total ?? 0,
       NeedsReview: reviewCount.currentData?.total ?? 0,
+      WithoutSupplier: withoutSupplierCount.currentData?.total ?? 0,
     },
     list,
     setPage: ({ page: next, pageSize: size }: GridPaginationModel) =>

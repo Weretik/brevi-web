@@ -9,6 +9,8 @@ export const purchasingApi = purchasingBaseApi.injectEndpoints({
 
 export const {
   useGetPurchaseInvoicesQuery,
+  useGetPurchaseSuppliersQuery,
   useGetPurchaseSyncStateQuery,
+  useReviewPurchaseInvoiceMutation,
   useSyncPurchaseInvoicesMutation,
 } = purchasingApi;

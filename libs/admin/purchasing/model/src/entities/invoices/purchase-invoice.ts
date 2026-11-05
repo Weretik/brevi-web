@@ -29,8 +29,14 @@ export interface PurchaseInvoice {
   /** Status «СПЛАЧЕНО» in the sheet: a note, not a payment. */
   markedPaid: boolean;
   supplierId: number | null;
+  /** Name of the linked supplier; null when none or the supplier no longer exists. */
+  supplierName: string | null;
   reviewNote: string | null;
+  /** Sent back with the next review save. */
   reviewVersion: number;
+  /** E-mail of who last changed the supplier link or note. */
+  reviewedBy: string | null;
+  reviewedAt: string | null;
   state: PurchaseInvoiceState;
   issues: readonly string[];
   links: readonly PurchaseInvoiceLink[];

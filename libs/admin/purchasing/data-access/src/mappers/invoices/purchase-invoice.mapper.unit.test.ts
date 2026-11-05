@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { mapPurchaseInvoicePage } from './purchase-invoice.mapper';
+import { mapPurchaseInvoiceReview, mapPurchaseSupplierOptions } from './purchase-review.mapper';
 import { mapPurchaseSyncState } from './purchase-sync.mapper';
 
 const card = {
@@ -17,9 +18,12 @@ const card = {
   markAt: '25.06.2026',
   markBy: 'Юлія',
   markedPaid: true,
-  supplierId: null,
-  reviewNote: null,
-  reviewVersion: 0,
+  supplierId: 7,
+  supplierName: 'Текстиль-Контакт',
+  reviewNote: 'Тканина на березень',
+  reviewVersion: 2,
+  reviewedBy: 'buh@brevi.com.ua',
+  reviewedAt: '2026-11-05T08:00:00+00:00',
   state: 'NeedsReview',
   issues: ['Немає посилання на оригінал'],
   links: [{ id: 'f'.repeat(64), url: 'https://www.dropbox.com/x.pdf', safe: true }],
@@ -67,5 +71,22 @@ describe('purchase invoice responses', () => {
       recordCount: 0,
       fileCount: 0,
     });
+  });
+  it('maps a saved review and the supplier options', () => {
+    expect(
+      mapPurchaseInvoiceReview({
+        messageId: 'm1',
+        supplierId: null,
+        supplierName: null,
+        reviewNote: null,
+        reviewVersion: 3,
+        reviewedBy: 'buh@brevi.com.ua',
+        reviewedAt: '2026-11-05T08:00:00Z',
+      }).reviewVersion,
+    ).toBe(3);
+    expect(mapPurchaseSupplierOptions([{ id: 7, name: 'Текстиль-Контакт' }])).toEqual([
+      { id: 7, name: 'Текстиль-Контакт' },
+    ]);
+    expect(() => mapPurchaseSupplierOptions([{ id: 0, name: 'x' }])).toThrow('id постачальника');
   });
 });

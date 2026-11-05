@@ -4,7 +4,7 @@ import type { AdminApiError } from '@admin/shared/api-client';
 
 const messages = {
   unauthorized: 'Рахунки на закупку бачать директор, бухгалтер і адміністратор.',
-  badRequest: 'Перевірте пошук і сторінку.',
+  badRequest: 'Перевірте пошук, сторінку або примітку.',
 };
 
 /**
