@@ -4,6 +4,7 @@ import { profilePath, usersPath } from '@admin/users/feature';
 
 import {
   adminRouteDefinitions,
+  embroideryRoutes,
   productionOrderRoutes,
   productionRoutes,
   tasksRoutes,
@@ -17,6 +18,7 @@ import type { SessionUser } from '@admin/core/auth';
 const registeredPaths = new Set([
   ...[
     ...adminRouteDefinitions,
+    ...embroideryRoutes,
     ...tasksRoutes.admin,
     ...tasksRoutes.board,
     ...productionRoutes,
