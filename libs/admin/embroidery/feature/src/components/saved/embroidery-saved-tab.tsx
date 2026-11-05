@@ -1,6 +1,7 @@
 import { useGetEmbroideryCalculationsQuery } from '@admin/embroidery/data-access';
 import { EmbroiderySavedTable } from '@admin/embroidery/ui';
 import SearchIcon from '@mui/icons-material/Search';
+import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import {
   Alert,
   Box,
@@ -8,35 +9,40 @@ import {
   InputAdornment,
   LinearProgress,
   Paper,
+  Stack,
   TablePagination,
   TextField,
   Typography,
 } from '@mui/material';
 import { useDeferredValue, useState } from 'react';
 
+import { EmbroideryArchiveDrawer } from './embroidery-archive-drawer';
 import { EmbroiderySavedDrawer } from './embroidery-saved-drawer';
 
 import type { EmbroideryCalculationRequest } from '@admin/embroidery/model';
 
 interface Props {
   canDelete: boolean;
+  /** «Імпорт архіву» of the old calculator; Director and Admin. */
+  canImport: boolean;
   onRepeat: (request: EmbroideryCalculationRequest) => void;
 }
 
 const pageSize = 25;
 
 /** «Збережені»: everyone's saved calculations, newest first, with search. */
-export function EmbroiderySavedTab({ canDelete, onRepeat }: Props) {
+export function EmbroiderySavedTab({ canDelete, canImport, onRepeat }: Props) {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [openId, setOpenId] = useState<number | null>(null);
+  const [archive, setArchive] = useState(false);
   const deferred = useDeferredValue(search);
   const list = useGetEmbroideryCalculationsQuery({ search: deferred, page, pageSize });
   const rows = list.data?.items ?? [];
 
   return (
     <Paper variant="outlined" component="section" aria-label="Збережені розрахунки">
-      <Box sx={{ p: 2 }}>
+      <Stack direction="row" sx={{ p: 2, gap: 1.5, alignItems: 'center' }}>
         <TextField
           size="small"
           fullWidth
@@ -57,7 +63,17 @@ export function EmbroiderySavedTab({ canDelete, onRepeat }: Props) {
             setPage(1);
           }}
         />
-      </Box>
+        {canImport && (
+          <Button
+            variant="outlined"
+            startIcon={<UploadFileOutlinedIcon />}
+            sx={{ flexShrink: 0 }}
+            onClick={() => setArchive(true)}
+          >
+            Імпорт архіву
+          </Button>
+        )}
+      </Stack>
       <Box sx={{ height: 4 }}>{list.isFetching && <LinearProgress />}</Box>
       {list.isError ? (
         <Alert
@@ -92,6 +108,7 @@ export function EmbroiderySavedTab({ canDelete, onRepeat }: Props) {
           />
         </>
       )}
+      {archive && <EmbroideryArchiveDrawer onClose={() => setArchive(false)} />}
       {openId !== null && (
         <EmbroiderySavedDrawer
           id={openId}
