@@ -21,6 +21,7 @@ const response = {
     {
       key: 'purchase-invoices',
       title: 'Умови розпізнавання рахунків',
+      baseText: 'You read one Ukrainian supplier invoice.',
       text: '',
       updatedBy: null,
       updatedAt: null,
@@ -34,6 +35,7 @@ describe('mapAiSettings', () => {
     expect(settings.keyHint).toBe('1234');
     expect(settings.usage.costUsd).toBe(0.00035);
     expect(settings.prompts[0]?.title).toBe('Умови розпізнавання рахунків');
+    expect(settings.prompts[0]?.baseText).toBe('You read one Ukrainian supplier invoice.');
   });
 
   it('rejects a broken answer', () => {

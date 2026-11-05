@@ -8,7 +8,7 @@
 - «Робота ШІ»: the switch saves at once (cannot be on without a key); «Ліміт на місяць» has its own «Зберегти ліміт», highlighted while the value differs from the saved one.
 - «Ключ OpenAI»: write-only; «Зберегти ключ» / «Замінити ключ», «Видалити ключ» asks first and switches the AI off.
 - «Моделі й ціни»: a read-only table (what the model is for, name, $ per 1M input/output tokens) with «Перевірити» per model (works while the AI is off); «Змінити» opens the side panel to edit them.
-- «Умови розпізнавання рахунків»: an optional numbered list of conditions. «Додати умову» opens a field in the list; each condition can be changed (pencil) or deleted (asked in its row); every action saves the list at once. A condition is one line up to 500 characters, all together up to 4000; they are stored as «- condition» lines and appended to the fixed recognition instruction (older free text is read one condition per line).
+- «Умови розпізнавання рахунків»: an optional numbered list of conditions. «Додати умову» opens a field in the list; each condition can be changed (pencil) or deleted (asked in its row); every action saves the list at once. A condition is one line up to 500 characters, all together up to 4000; they are stored as «- condition» lines and appended to the fixed recognition instruction (older free text is read one condition per line). Above them a collapsed «Базова інструкція — лише для читання» shows that fixed instruction as the backend sends it (English, read-only, `components/ai-base-instruction.tsx`).
 
 Each card shows its own result under its fields. Saves send the version the user opened; a newer change by someone else comes back as the backend reason.
 
