@@ -19,6 +19,7 @@ function mapPrompt(value: unknown): AiPrompt {
   return {
     key: text(row['key'], 'ключ умов'),
     title: text(row['title'], 'назва умов'),
+    baseText: text(row['baseText'], 'базова інструкція'),
     text: text(row['text'], 'текст умов'),
     updatedBy: nullableText(row['updatedBy'], 'хто змінив умови'),
     updatedAt: nullableDateTime(row['updatedAt'], 'коли змінено умови'),

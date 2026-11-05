@@ -2,6 +2,7 @@ import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { Alert, Box, Button, CircularProgress, Paper, Stack, Typography } from '@mui/material';
 
+import { AiBaseInstruction } from '../components/ai-base-instruction';
 import { AiKeySection } from '../components/ai-key-section';
 import { AiModelsDrawer } from '../components/ai-models-drawer';
 import { AiModelsSection } from '../components/ai-models-section';
@@ -135,11 +136,14 @@ export function AiSettingsPage() {
             <Stack sx={{ gap: 2, minWidth: 0 }}>
               {settings.prompts.map((prompt) => (
                 <Card key={prompt.key} title={prompt.title} notice={page.notices.prompt}>
-                  <AiRulesSection
-                    rules={page.rulesOf(prompt.key)}
-                    disabled={page.busy}
-                    onSave={(rules, done) => page.saveRules(prompt.key, rules, done)}
-                  />
+                  <Stack sx={{ gap: 2 }}>
+                    <AiBaseInstruction text={prompt.baseText} />
+                    <AiRulesSection
+                      rules={page.rulesOf(prompt.key)}
+                      disabled={page.busy}
+                      onSave={(rules, done) => page.saveRules(prompt.key, rules, done)}
+                    />
+                  </Stack>
                 </Card>
               ))}
             </Stack>

@@ -8827,6 +8827,9 @@ export interface components {
     AiPromptResponse: {
       key: string;
       title: string;
+      /** @description The fixed instruction the module sends for this request kind; read-only, empty when unknown. */
+      baseText: string;
+      /** @description The admin's extra rules added after the fixed instruction; empty when none. */
       text: string;
       updatedBy?: string | null;
       /** Format: date-time */

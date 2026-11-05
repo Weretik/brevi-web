@@ -89,10 +89,10 @@ export function AiRulesSection({ rules, disabled, onSave }: Props) {
   return (
     <Stack sx={{ gap: 1.5 }}>
       <Typography variant="body2" color="text.secondary">
-        Основна інструкція вже вбудована. Додавайте умову, коли ШІ повторює ту саму помилку.
+        Додавайте умову, коли ШІ повторює ту саму помилку.
       </Typography>
       {rules.length === 0 && editing?.index !== 'new' ? (
-        <Typography variant="body2">Умов немає: ШІ працює за основною інструкцією.</Typography>
+        <Typography variant="body2">Умов немає: ШІ працює за базовою інструкцією.</Typography>
       ) : (
         <Box
           component="ol"
