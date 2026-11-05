@@ -85,7 +85,11 @@
       "@admin/purchasing/feature": ["libs/admin/purchasing/feature/src/index.ts"],
       "@admin/ai/model": ["libs/admin/ai/model/src/index.ts"],
       "@admin/ai/data-access": ["libs/admin/ai/data-access/src/index.ts"],
-      "@admin/ai/feature": ["libs/admin/ai/feature/src/index.ts"]
+      "@admin/ai/feature": ["libs/admin/ai/feature/src/index.ts"],
+      "@admin/accounting/model": ["libs/admin/accounting/model/src/index.ts"],
+      "@admin/accounting/data-access": ["libs/admin/accounting/data-access/src/index.ts"],
+      "@admin/accounting/ui": ["libs/admin/accounting/ui/src/index.ts"],
+      "@admin/accounting/feature": ["libs/admin/accounting/feature/src/index.ts"]
     }
   }
 }

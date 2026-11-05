@@ -6,7 +6,8 @@ import { Divider, ListItemIcon, Menu, MenuItem } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
 interface MenuRow {
-  id: number;
+  /** Numeric ids in references; text ids (uuid) in other modules. */
+  id: number | string;
   name: string;
 }
 
@@ -18,7 +19,7 @@ interface Props<Row extends MenuRow> {
   onClose: (restoreFocus?: boolean) => void;
   onView: (row: Row) => void;
   onEdit: (row: Row) => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: Row['id']) => void;
   /** «Переглянути» by default; e.g. «Швидкий перегляд» when the row also has a full page. */
   viewLabel?: string;
   /** Adds «Відкрити повну картку» that opens this page. */
