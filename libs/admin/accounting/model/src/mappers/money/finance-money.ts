@@ -39,3 +39,12 @@ export function formatLedgerDate(date: string): string {
   const [year, month, day] = date.split('-');
   return year && month && day ? `${day}.${month}.${year}` : date;
 }
+
+/** Signed operation amount: «+500,00 ₴» for an income, «−300,00 ₴» for an expense. */
+export function formatSignedMinor(
+  type: 'Income' | 'Expense',
+  minor: number,
+  currency = 'UAH',
+): string {
+  return `${type === 'Income' ? '+' : '−'}${formatMinor(minor, currency)}`;
+}

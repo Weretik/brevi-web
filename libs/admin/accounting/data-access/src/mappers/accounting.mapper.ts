@@ -23,6 +23,7 @@ import {
 import type {
   AccountingSettings,
   FinanceAccount,
+  FinanceAccountBalance,
   FinanceCategory,
   FinanceHistoryEntry,
 } from '@admin/accounting/model';
@@ -47,6 +48,18 @@ export function mapFinanceAccount(value: unknown): FinanceAccount {
     version: integer(row['version'], 'версія'),
     createdAt: dateTime(row['createdAt'], 'створено'),
     updatedAt: dateTime(row['updatedAt'], 'змінено'),
+    balance: mapFinanceAccountBalance(row['balance']),
+  };
+}
+
+function mapFinanceAccountBalance(value: unknown): FinanceAccountBalance | null {
+  if (value === null || value === undefined) return null;
+  const row = record(value, 'залишки рахунку');
+  return {
+    legacyMinor: integer(row['legacyMinor'], 'залишок домашньої бухгалтерії'),
+    currentMinor: nullableInteger(row['currentMinor'], 'поточний залишок'),
+    totalMinor: integer(row['totalMinor'], 'загальний залишок'),
+    hasHistory: flag(row['hasHistory'], 'рух коштів'),
   };
 }
 

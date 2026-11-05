@@ -29,6 +29,7 @@ const account = (overrides: Record<string, unknown> = {}) => ({
   version: 3,
   createdAt: '2026-11-05T08:00:00+00:00',
   updatedAt: '2026-11-05T08:00:00+00:00',
+  balance: { legacyMinor: 0, currentMinor: null, totalMinor: 0, hasHistory: false },
   ...overrides,
 });
 
@@ -44,6 +45,12 @@ const accounts = [
     cutoverConfirmedBy: 'director@brevi.com.ua',
     cutoverConfirmedAt: '2026-11-05T08:00:00+00:00',
     sortOrder: 20,
+    balance: {
+      legacyMinor: 10_000,
+      currentMinor: 6_254_640,
+      totalMinor: 6_264_640,
+      hasHistory: true,
+    },
   }),
   account({ id: 'a3', name: 'Старий рахунок', active: false, sortOrder: 30 }),
 ];
@@ -96,6 +103,19 @@ describe('«Рахунки і каси» page', () => {
 
     await user.click(screen.getByRole('button', { name: 'Архів 1' }));
     expect(await screen.findByText('Старий рахунок')).toBeVisible();
+  });
+
+  it('offers only the archive for an account with movements', async () => {
+    const writes = stubApi();
+    openPage();
+    const cash = await screen.findByRole('row', { name: /Каса/ });
+
+    fireEvent.contextMenu(within(cash).getAllByRole('gridcell')[0] as HTMLElement);
+    fireEvent.click(await screen.findByRole('menuitem', { name: 'Видалити' }));
+
+    expect(await screen.findByText(/можна лише перенести в архів/)).toBeVisible();
+    expect(screen.queryByRole('dialog', { name: 'Видалити рахунок?' })).not.toBeInTheDocument();
+    expect(writes).toHaveLength(0);
   });
 
   it('adds an account with the opening balance in kopecks', async () => {

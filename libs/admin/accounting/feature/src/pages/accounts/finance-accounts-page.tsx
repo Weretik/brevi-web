@@ -33,7 +33,7 @@ const filters: { value: FinanceAccountFilter; label: string }[] = [
   { value: 'archived', label: 'Архів' },
 ];
 
-/** «Бухгалтерія → Рахунки і каси» (ACC-001 stage 1). */
+/** «Бухгалтерія → Рахунки і каси» with counted balances (ACC-001). */
 export function FinanceAccountsPage() {
   const query = useGetFinanceAccountsQuery();
   const rows = useMemo(() => query.data ?? [], [query.data]);
@@ -125,7 +125,14 @@ export function FinanceAccountsPage() {
           unavailable={Boolean(error)}
           onView={(account) => setActive({ mode: 'view', account })}
           onEdit={(account) => setActive({ mode: 'edit', account })}
-          onDelete={(id) => setPendingDelete(rows.find((row) => row.id === id) ?? null)}
+          onDelete={(id) => {
+            const account = rows.find((row) => row.id === id) ?? null;
+            if (account?.balance?.hasHistory)
+              setActionMessage(
+                `По рахунку «${account.name}» вже є рух коштів, тому його можна лише перенести в архів.`,
+              );
+            else setPendingDelete(account);
+          }}
         />
       </Paper>
       {active && (

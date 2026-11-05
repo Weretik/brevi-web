@@ -28,6 +28,21 @@ export interface FinanceAccount {
   version: number;
   createdAt: string;
   updatedAt: string;
+  /** Counted by the server on every read. */
+  balance: FinanceAccountBalance | null;
+}
+
+/**
+ * Balances in kopecks from active movements: `legacyMinor` — opening balance plus «Домашня
+ * бухгалтерія»; `currentMinor` — confirmed balance on 01.10.2026 plus the current books (null while
+ * not confirmed: unknown, not zero); `totalMinor` — both areas together.
+ */
+export interface FinanceAccountBalance {
+  legacyMinor: number;
+  currentMinor: number | null;
+  totalMinor: number;
+  /** True once any movement, cancelled ones too, uses the account: it can only be archived. */
+  hasHistory: boolean;
 }
 
 /** Body of a create; an update adds `version`. */

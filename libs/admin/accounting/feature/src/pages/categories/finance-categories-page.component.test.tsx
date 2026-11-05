@@ -129,7 +129,9 @@ describe('«Категорії» page', () => {
     openPage();
 
     await openMenu(/Матеріали/, 'Видалити');
-    expect(screen.getByText('«Матеріали» буде видалено разом із підкатегоріями: 1.')).toBeVisible();
+    expect(
+      screen.getByText(/«Матеріали» буде видалено разом із підкатегоріями: 1\./),
+    ).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Видалити' }));
 
     await waitFor(() => expect(writes).toHaveLength(1));

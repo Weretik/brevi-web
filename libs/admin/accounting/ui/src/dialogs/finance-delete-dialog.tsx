@@ -5,12 +5,22 @@ interface Props {
   title: string;
   text: string;
   deleting: boolean;
+  /** Text of the confirm button; «Видалити» by default («Анулювати» for movements). */
+  confirmLabel?: string;
   onClose: () => void;
   onConfirm: () => void;
 }
 
-/** Confirmation before deleting an account or a category. */
-export function FinanceDeleteDialog({ open, title, text, deleting, onClose, onConfirm }: Props) {
+/** Confirmation before deleting an account or a category, or cancelling a movement. */
+export function FinanceDeleteDialog({
+  open,
+  title,
+  text,
+  deleting,
+  confirmLabel = 'Видалити',
+  onClose,
+  onConfirm,
+}: Props) {
   return (
     <Dialog open={open} onClose={onClose} aria-labelledby="finance-delete-title">
       <DialogTitle id="finance-delete-title">{title}</DialogTitle>
@@ -20,7 +30,7 @@ export function FinanceDeleteDialog({ open, title, text, deleting, onClose, onCo
           Скасувати
         </Button>
         <Button disabled={deleting} color="error" variant="contained" onClick={onConfirm}>
-          Видалити
+          {confirmLabel}
         </Button>
       </DialogActions>
     </Dialog>

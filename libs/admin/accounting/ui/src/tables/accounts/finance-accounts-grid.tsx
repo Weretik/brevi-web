@@ -41,18 +41,30 @@ const columns: GridColDef<FinanceAccount>[] = [
     valueFormatter: (value: string) => value || '—',
   },
   {
-    field: 'cutoverBalanceMinor',
-    headerName: 'Залишок на 01.10',
-    width: 190,
+    field: 'currentBalance',
+    headerName: 'Поточний залишок',
+    width: 200,
     align: 'right',
     headerAlign: 'right',
     cellClassName: 'reference-mono',
+    sortable: false,
     renderCell: ({ row }) =>
-      row.cutoverConfirmed && row.cutoverBalanceMinor !== null ? (
-        formatMinor(row.cutoverBalanceMinor, row.currency)
+      row.balance?.currentMinor !== null && row.balance?.currentMinor !== undefined ? (
+        formatMinor(row.balance.currentMinor, row.currency)
       ) : (
         <FinanceProblemPill label="Не підтверджено" />
       ),
+  },
+  {
+    field: 'legacyBalance',
+    headerName: 'Домашня бухгалтерія',
+    width: 200,
+    align: 'right',
+    headerAlign: 'right',
+    cellClassName: 'reference-mono',
+    sortable: false,
+    valueGetter: (_: unknown, row: FinanceAccount) => row.balance?.legacyMinor ?? row.openingMinor,
+    valueFormatter: (value: number, row: FinanceAccount) => formatMinor(value, row.currency),
   },
 ];
 

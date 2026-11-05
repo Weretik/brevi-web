@@ -165,11 +165,20 @@ describe('legacy Admin navigation', () => {
   });
 
   it('shows «Бухгалтерія» to the director only and links its two pages', () => {
-    const paths = new Set(['/accounting/accounts', '/accounting/categories']);
+    const paths = new Set([
+      '/accounting/overview',
+      '/accounting/transactions',
+      '/accounting/transfers',
+      '/accounting/accounts',
+      '/accounting/categories',
+    ]);
     const accounting = (roles: string[]) =>
       createNavigation(paths, roles).find((group) => group.id === 'accounting');
 
     expect(accounting(['Director'])?.items.filter((item) => item.to)).toEqual([
+      { id: 'finance-overview', label: 'Огляд', to: '/accounting/overview' },
+      { id: 'finance-operations', label: 'Операції', to: '/accounting/transactions' },
+      { id: 'finance-transfers', label: 'Перекази', to: '/accounting/transfers' },
       { id: 'finance-accounts', label: 'Рахунки і каси', to: '/accounting/accounts' },
       { id: 'finance-categories', label: 'Категорії', to: '/accounting/categories' },
     ]);
