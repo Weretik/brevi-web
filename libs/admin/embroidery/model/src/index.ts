@@ -8,3 +8,5 @@ export * from './forms/embroidery-settings-form';
 export * from './validators/embroidery-calculation-validation';
 export * from './validators/embroidery-settings-validation';
 export * from './mappers/embroidery-format';
+export * from './entities/embroidery-archive';
+export * from './validators/embroidery-archive-file';

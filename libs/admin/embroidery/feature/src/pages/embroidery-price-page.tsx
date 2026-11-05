@@ -94,6 +94,7 @@ function EmbroideryPriceContent({
       {tab === 'saved' && (
         <EmbroiderySavedTab
           canDelete={canEdit}
+          canImport={canEdit}
           onRepeat={(request) => {
             calculator.load(request);
             setTab('calculation');

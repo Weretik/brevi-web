@@ -2191,6 +2191,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/crm/embroidery/calculations/import': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description «Імпорт архіву» (Director and Admin). Moves calculations of the old calculator's archive into «Збережені» with their own dates, authors (matched by email, otherwise the email is shown) and frozen rates. Each record is priced with its old rates and must give the old saved prices to the kopeck, otherwise its line is `error`. A record already moved (same `legacyId`) is `unchanged`. With `dryRun=true`, or when any line is `error`, nothing is saved and `dryRun` in the answer is true. */
+    post: operations['importCrmEmbroideryArchive'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/crm/embroidery/calculations/{id}': {
     parameters: {
       query?: never;
@@ -6318,6 +6335,45 @@ export interface components {
         rates: components['schemas']['CrmEmbroideryRates'];
         markups: components['schemas']['CrmEmbroideryMarkup'][];
       };
+    };
+    CrmEmbroideryArchivePrice: {
+      unit: number;
+      total: number;
+      repeatUnit: number;
+    };
+    CrmEmbroideryArchiveRow: {
+      /** @description The old record id. */
+      legacyId: string;
+      name?: string | null;
+      /** Format: date-time */
+      createdAt: string;
+      createdByEmail?: string | null;
+      calculation: components['schemas']['CrmCalculateEmbroideryInput'];
+      /** @description The embroiderer's rate per 1000 stitches then. */
+      stitchRate: number;
+      settings: components['schemas']['CrmSaveEmbroiderySettingsInput'];
+      /** @description The old saved prices, «Опт», «Стандарт», «Терміново» in order. */
+      prices: components['schemas']['CrmEmbroideryArchivePrice'][];
+    };
+    CrmEmbroideryArchiveImportLine: {
+      legacyId: string;
+      name: string;
+      /** Format: date-time */
+      createdAt: string;
+      createdByName: string;
+      /** @enum {string} */
+      action: 'created' | 'unchanged' | 'error';
+      message?: string | null;
+      /** @description «ВШ-0042» once saved. */
+      number?: string | null;
+    };
+    CrmEmbroideryArchiveImportResult: {
+      /** @description True when nothing was saved. */
+      dryRun: boolean;
+      created: number;
+      unchanged: number;
+      errors: number;
+      lines: components['schemas']['CrmEmbroideryArchiveImportLine'][];
     };
     /**
      * @default Open
@@ -14568,6 +14624,47 @@ export interface operations {
         content?: never;
       };
       /** @description Admin or Manager role and a numeric actor claim required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  importCrmEmbroideryArchive: {
+    parameters: {
+      query?: {
+        dryRun?: boolean;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmEmbroideryArchiveRow'][];
+      };
+    };
+    responses: {
+      /** @description What was moved, or would be. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmEmbroideryArchiveImportResult'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin role required (the Director also holds Admin). */
       403: {
         headers: {
           [name: string]: unknown;
