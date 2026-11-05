@@ -1,4 +1,4 @@
-import { PurchaseInvoicesTable } from '@admin/purchasing/ui';
+import { PurchaseInvoiceNarrowing, PurchaseInvoicesTable } from '@admin/purchasing/ui';
 import {
   ReferenceFilterChip,
   ReferenceFilterRow,
@@ -136,6 +136,12 @@ export function PurchaseInvoicesContent({ tabs }: Props) {
         value={state.term}
         onChange={state.setTerm}
       />
+      <PurchaseInvoiceNarrowing
+        from={state.documentFrom}
+        to={state.documentTo}
+        vat={state.vat}
+        onChange={state.setNarrowing}
+      />
       <ReferenceFilterRow
         filters={
           <>
@@ -175,7 +181,7 @@ export function PurchaseInvoicesContent({ tabs }: Props) {
         <PurchaseInvoicesTable
           page={page}
           loading={list.isFetching}
-          narrowed={Boolean(state.search) || state.filter !== 'All'}
+          narrowed={state.narrowed}
           unavailable={Boolean(list.error)}
           onPageChange={state.setPage}
           renderDetails={(invoice) => (
@@ -189,8 +195,6 @@ export function PurchaseInvoicesContent({ tabs }: Props) {
                   notice={files.notice}
                   onFix={setFixing}
                   onRecognize={(value) => void files.recognize(value)}
-                  onTemplate={(value) => void files.downloadTemplate(value)}
-                  onUpload={(value, file) => void files.upload(value, file)}
                 />
               )}
             />

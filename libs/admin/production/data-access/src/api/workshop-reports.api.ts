@@ -17,7 +17,7 @@ export const workshopReportsApi = productionBaseApi.injectEndpoints({
       query: (params) => ({ url: '/api/production/reports', params }),
       transformResponse: mapWorkshopReportPair,
       transformErrorResponse: errors,
-      providesTags: ['Payroll', 'ProductionWork', 'FabricStock'],
+      providesTags: ['Payroll', 'ProductionWork', 'FabricStock', 'ProductionOrder'],
     }),
     getWorkshopDashboard: build.query<WorkshopDashboard, void>({
       query: () => ({ url: '/api/production/dashboard' }),

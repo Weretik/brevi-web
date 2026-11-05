@@ -132,6 +132,8 @@ export interface QuoteListQuery {
   readonly responsibleUserId: number | null;
   readonly page: number;
   readonly pageSize: number;
+  /** The client card tab «КП»: only this client's КП, in work and archived together. */
+  readonly customerId?: number;
 }
 
 export type QuoteEventKind =

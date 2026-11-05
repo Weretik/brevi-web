@@ -1,4 +1,5 @@
 import {
+  formatPurchaseMessageAt,
   formatPurchaseDocumentDate,
   formatPurchaseMoney,
   purchaseInvoicePageSizes,
@@ -87,13 +88,13 @@ function InvoiceRow({
         </TableCell>
         <TableCell sx={{ whiteSpace: 'nowrap' }}>
           <Typography variant="body2" sx={mono}>
-            {invoice.messageAt || '—'}
+            {formatPurchaseMessageAt(invoice.messageAt)}
           </Typography>
           <Typography variant="caption" color="text.secondary" sx={mono}>
             UID {invoice.sourceUid}
           </Typography>
         </TableCell>
-        <TableCell sx={{ minWidth: 200, maxWidth: 320 }}>
+        <TableCell sx={{ minWidth: 180, maxWidth: 260 }}>
           <Typography
             variant="body2"
             noWrap
@@ -116,15 +117,20 @@ function InvoiceRow({
         </TableCell>
         <TableCell sx={{ whiteSpace: 'nowrap' }}>
           {first ? (
-            <Typography variant="body2" sx={mono}>
-              № {first.documentNumber} · {formatPurchaseDocumentDate(first.documentDate)}
-              {documents.length > 1 && (
-                <Typography component="span" variant="caption" color="text.secondary">
-                  {' '}
-                  +{documents.length - 1}
-                </Typography>
-              )}
-            </Typography>
+            <>
+              <Typography variant="body2" sx={mono}>
+                № {first.documentNumber}
+                {documents.length > 1 && (
+                  <Typography component="span" variant="caption" color="text.secondary">
+                    {' '}
+                    +{documents.length - 1}
+                  </Typography>
+                )}
+              </Typography>
+              <Typography variant="caption" color="text.secondary" sx={mono}>
+                від {formatPurchaseDocumentDate(first.documentDate)}
+              </Typography>
+            </>
           ) : (
             <Typography variant="body2" color="text.secondary">
               {invoice.links.length > 1 ? `Оригіналів: ${invoice.links.length}` : '—'}
@@ -152,16 +158,21 @@ function InvoiceRow({
           sx={{ p: 0, borderBottom: open ? 1 : 0, borderColor: 'divider' }}
         >
           <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box
-              sx={{
-                bgcolor: 'action.hover',
-                px: { xs: 1.5, sm: 2 },
-                pb: 2,
-                pt: 0.5,
-                pl: { sm: 7 },
-              }}
-            >
-              {details}
+            <Box sx={{ bgcolor: 'action.hover' }}>
+              {/* Stays in view while the table scrolls sideways and keeps a readable width. */}
+              <Box
+                sx={{
+                  position: 'sticky',
+                  left: 0,
+                  maxWidth: 880,
+                  px: { xs: 1.5, sm: 2 },
+                  pb: 2,
+                  pt: 0.5,
+                  pl: { sm: 7 },
+                }}
+              >
+                {details}
+              </Box>
             </Box>
           </Collapse>
         </TableCell>
@@ -200,9 +211,22 @@ export function PurchaseInvoicesTable({
   return (
     <Box sx={{ minWidth: 0 }}>
       {loading && <LinearProgress aria-label="Завантаження рахунків" />}
-      <TableContainer sx={{ borderTop: 1, borderColor: 'divider' }}>
-        <Table size="small" aria-label="Рахунки на закупку" sx={{ minWidth: 900 }}>
-          <TableHead sx={{ bgcolor: 'action.hover' }}>
+      {/* Same frame as the other tables: fixed height, own scroll both ways, header stays on top. */}
+      <TableContainer
+        sx={{
+          borderTop: 1,
+          borderColor: 'divider',
+          maxHeight: 'var(--admin-table-height)',
+          overflow: 'auto',
+        }}
+      >
+        <Table
+          size="small"
+          stickyHeader
+          aria-label="Рахунки на закупку"
+          sx={{ minWidth: 820, '& td, & th': { px: 1.25 } }}
+        >
+          <TableHead sx={{ '& th': { bgcolor: 'background.paper' } }}>
             <TableRow>
               <TableCell padding="checkbox" />
               <TableCell>Стан</TableCell>

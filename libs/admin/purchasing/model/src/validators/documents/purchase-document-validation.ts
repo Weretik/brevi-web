@@ -61,7 +61,9 @@ export function checkPurchaseDocument(values: PurchaseDocumentFormValues): Purch
       Number(purchaseNumberText(item.quantity)) <= 0
     )
       itemErrors[item.key] = 'Кількість — додатне число';
-    else if (!decimal.test(purchaseNumberText(item.price))) itemErrors[item.key] = 'Ціна — число';
+    // An empty price is fine: the server takes it as sum ÷ quantity (invoices without a «Ціна» column).
+    else if (item.price.trim() && !decimal.test(purchaseNumberText(item.price)))
+      itemErrors[item.key] = 'Ціна — число';
     else if (sum === null) itemErrors[item.key] = 'Сума — число до копійок';
     lines = sum === null || lines === null ? null : lines + sum;
   }
@@ -80,7 +82,7 @@ export function checkPurchaseDocument(values: PurchaseDocumentFormValues): Purch
   const balanced = linesKopecks !== null && total !== null && linesKopecks === total;
 
   for (const item of values.items) {
-    if (itemErrors[item.key]) continue;
+    if (itemErrors[item.key] || !item.price.trim()) continue;
     const quantity = Number(purchaseNumberText(item.quantity));
     const price = Number(purchaseNumberText(item.price));
     const sum = Number(purchaseNumberText(item.sum));

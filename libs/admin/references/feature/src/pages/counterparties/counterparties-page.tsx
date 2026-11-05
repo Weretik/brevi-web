@@ -43,7 +43,7 @@ export function CounterpartiesPage({ canSeePurchaseInvoices = false }: Props) {
   );
   if (tab === 'purchases') return <PurchaseInvoicesContent tabs={tabs} />;
   return tab === 'suppliers' ? (
-    <SuppliersPage tabs={tabs} />
+    <SuppliersPage tabs={tabs} canSeePurchaseInvoices={purchases} />
   ) : (
     <CustomersReferenceContent tabs={tabs} />
   );

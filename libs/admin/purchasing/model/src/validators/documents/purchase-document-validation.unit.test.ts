@@ -24,6 +24,16 @@ const template = {
 };
 
 describe('«Виправити» form', () => {
+  it('accepts lines without a price when the sums add up', () => {
+    const { values } = purchaseDocumentFormOf({
+      ...template,
+      items: template.items.map((item) => ({ ...item, price: '' })),
+    });
+    const check = checkPurchaseDocument(values);
+    expect(check.itemErrors).toEqual({});
+    expect(check.valid).toBe(true);
+  });
+
   it('accepts discounted lines when the totals add up and writes the server JSON', () => {
     const { values, identity } = purchaseDocumentFormOf(template);
     const check = checkPurchaseDocument(values);

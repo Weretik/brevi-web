@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { mapProgressImportResult, mapWorkshopSettings } from './production-tracking.mapper';
+import {
+  mapProgressImportResult,
+  mapReportPriceImportResult,
+  mapWorkshopSettings,
+} from './production-tracking.mapper';
 
 describe('production tracking mappers', () => {
   it('keeps negative Telegram group ids', () => {
@@ -30,5 +34,16 @@ describe('production tracking mappers', () => {
     });
     expect(result.lines[0]).toMatchObject({ key: '№ 7', detail: 'Етапів: 2 · Файлів: 3' });
     expect(result.lines[1]).toMatchObject({ key: 'b', action: 'error' });
+  });
+
+  it('shows the moved КП prices as «№ N» with how many items take one', () => {
+    const result = mapReportPriceImportResult({
+      dryRun: true,
+      updated: 1,
+      unchanged: 0,
+      errors: 0,
+      lines: [{ number: 7, legacyId: 'a', prices: 2, action: 'updated', error: null }],
+    });
+    expect(result.lines[0]).toMatchObject({ key: '№ 7', detail: 'Позицій з ціною: 2' });
   });
 });

@@ -5,3 +5,5 @@ export * from './components/documents/purchase-document-view';
 export * from './components/status/purchase-status-chip';
 export * from './components/documents/purchase-draft-view';
 export * from './forms/documents/purchase-document-form';
+export * from './tables/suppliers/supplier-purchase-invoices-table';
+export * from './components/filters/purchase-invoice-narrowing';

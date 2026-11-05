@@ -74,7 +74,8 @@ describe('PurchaseInvoicesTable', () => {
     const table = screen.getByRole('table', { name: 'Рахунки на закупку' });
     expect(within(table).getByText('✓ Розпізнано')).toBeVisible();
     expect(within(table).getByText('ТОВ Захист-Про')).toBeVisible();
-    expect(within(table).getByText('№ 1542 · 03.11.2026')).toBeVisible();
+    expect(within(table).getByText('№ 1542')).toBeVisible();
+    expect(within(table).getByText('від 03.11.2026')).toBeVisible();
     expect(within(table).getByText('4 044,19 грн')).toBeVisible();
     expect(within(table).getByText('Без ПДВ')).toBeVisible();
     expect(screen.queryByText('Деталі рахунку')).not.toBeInTheDocument();

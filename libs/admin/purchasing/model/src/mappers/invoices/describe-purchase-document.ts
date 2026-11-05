@@ -9,6 +9,26 @@ export function formatPurchaseDocumentDate(value: string): string {
   return year && month && day ? `${day}.${month}.${year}` : value;
 }
 
+const kyivTime = new Intl.DateTimeFormat('uk-UA', {
+  timeZone: 'Europe/Kyiv',
+  day: '2-digit',
+  month: '2-digit',
+  year: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+});
+
+/**
+ * The sheet's DateTime cell for people: an ISO time «2026-11-04T21:39:54.000Z» → «04.11.26 23:39»
+ * in Kyiv; anything else (already human, or broken) stays as written.
+ */
+export function formatPurchaseMessageAt(value: string | null): string {
+  if (!value) return '—';
+  if (!/^\d{4}-\d{2}-\d{2}T/.test(value)) return value;
+  const time = new Date(value);
+  return Number.isNaN(time.getTime()) ? value : kyivTime.format(time).replace(',', '');
+}
+
 /** «8000.00» → «8 000,00 грн». The value is already exact; only the look changes. */
 export function formatPurchaseMoney(value: string): string {
   const [whole = '0', fraction = ''] = value.split('.');

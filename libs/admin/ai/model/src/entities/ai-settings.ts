@@ -15,6 +15,8 @@ export interface AiUsage {
 export interface AiPrompt {
   key: string;
   title: string;
+  /** Fixed instruction sent by the system; read-only, empty when unknown. */
+  baseText: string;
   text: string;
   updatedBy: string | null;
   updatedAt: string | null;

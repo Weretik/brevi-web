@@ -1,3 +1,5 @@
+import type { PurchaseDocumentVat } from '../entities/invoices/purchase-document';
+
 export const purchaseInvoiceFilters = [
   'All',
   'NeedsReview',
@@ -14,4 +16,10 @@ export interface PurchaseInvoiceQuery {
   pageSize: number;
   search: string;
   filter: PurchaseInvoiceFilter;
+  /** The supplier card tab «Рахунки на закупку»: only invoices linked to this supplier. */
+  supplierId?: number;
+  /** yyyy-mm-dd: invoice date of the checked facts, from and to inclusive. */
+  documentFrom?: string;
+  documentTo?: string;
+  vat?: PurchaseDocumentVat;
 }

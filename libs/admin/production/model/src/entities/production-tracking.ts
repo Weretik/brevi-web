@@ -126,6 +126,12 @@ export interface CreateProductionShipmentBody {
   comment: string | null;
 }
 
+/** КП prices of an order of the old «Цех» from production-report-prices.json. */
+export interface ProductionReportPriceImportRow {
+  legacyId: string;
+  items: { position: number; unitPrice: number }[];
+}
+
 /** Progress of an order of the old «Цех» from production-progress.json. */
 export interface ProductionProgressImportRow {
   legacyId: string;

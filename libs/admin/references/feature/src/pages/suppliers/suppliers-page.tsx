@@ -23,7 +23,10 @@ import type { Supplier, SupplierDialogMode } from '@admin/references/model';
 import type { ReactNode } from 'react';
 
 /** «Контрагенти → Постачальники»; `tabs` are the page tabs shown above the header. */
-export function SuppliersPage({ tabs }: { tabs?: ReactNode } = {}) {
+export function SuppliersPage({
+  tabs,
+  canSeePurchaseInvoices = false,
+}: { tabs?: ReactNode; canSeePurchaseInvoices?: boolean } = {}) {
   const { rows, loading, error, reload } = useSuppliers();
   const [active, setActive] = useState<{
     mode: SupplierDialogMode;
@@ -134,6 +137,7 @@ export function SuppliersPage({ tabs }: { tabs?: ReactNode } = {}) {
           mode={active.mode}
           supplier={active.supplier}
           nextId={nextId}
+          canSeePurchaseInvoices={canSeePurchaseInvoices}
           onClose={() => setActive(null)}
           onSaved={() => {
             setActive(null);

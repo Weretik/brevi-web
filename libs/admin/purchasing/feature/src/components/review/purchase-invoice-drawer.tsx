@@ -21,7 +21,7 @@ interface Props {
 
 /**
  * A register row in the «Цех» side panel; «Редагувати» links the supplier and writes a note.
- * Each original can be read by AI or checked by hand as JSON.
+ * Each original can be read by AI or filled in by hand («Виправити»).
  */
 export function PurchaseInvoiceDrawer({ invoice, onFix, onClose, onSaved }: Props) {
   const editor = usePurchaseReviewEditor(invoice, onSaved);
@@ -60,8 +60,6 @@ export function PurchaseInvoiceDrawer({ invoice, onFix, onClose, onSaved }: Prop
                 notice={files.notice}
                 onFix={onFix}
                 onRecognize={(value) => void files.recognize(value)}
-                onTemplate={(value) => void files.downloadTemplate(value)}
-                onUpload={(value, file) => void files.upload(value, file)}
               />
             )}
           />

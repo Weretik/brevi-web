@@ -36,6 +36,7 @@ const base = {
     {
       key: 'purchase-invoices',
       title: 'Умови розпізнавання рахунків',
+      baseText: 'You read one Ukrainian supplier invoice.',
       text: '',
       updatedBy: null,
       updatedAt: null,
@@ -188,6 +189,16 @@ describe('AiSettingsPage', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Видалити умову 1' }));
     await userEvent.click(screen.getByRole('button', { name: 'Видалити' }));
     expect(fixture.prompt).toHaveBeenLastCalledWith({ key: 'purchase-invoices', text: '' });
+  });
+
+  it('shows the base instruction for reading only', async () => {
+    fixture.settings = base;
+    render(<AiSettingsPage />);
+
+    await userEvent.click(screen.getByRole('button', { name: /Базова інструкція/ }));
+    const instruction = screen.getByLabelText('Текст базової інструкції');
+    expect(instruction).toHaveTextContent('You read one Ukrainian supplier invoice.');
+    expect(within(instruction).queryByRole('textbox')).not.toBeInTheDocument();
   });
 
   it('asks to write a condition before saving an empty one', async () => {
