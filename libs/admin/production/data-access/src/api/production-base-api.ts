@@ -11,5 +11,7 @@ export const productionBaseApi = adminApi.enhanceEndpoints({
     'ItemFabric',
     'ProductionWork',
     'SewingForecast',
+    'Timesheet',
+    'Payroll',
   ],
 });

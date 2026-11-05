@@ -3185,6 +3185,228 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/production/timesheet': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** «Робочий час» of a day with the totals of its month */
+    get: operations['getTimesheetDay'];
+    /** Saves the changed marks of a day; each change is kept in the history */
+    put: operations['saveTimesheetDay'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/payroll/{month}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** «Зарплата» of a month */
+    get: operations['getPayrollMonth'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/payroll/{month}/employees/{employeeId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** A worker's month in detail */
+    get: operations['getPayrollEmployee'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/payroll/history/{year}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** «Історія за рік» */
+    get: operations['getPayrollYear'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/payroll/{month}/roles': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Chooses the master and the chief (holds for every open month) */
+    put: operations['setPayrollRoles'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/payroll/{month}/embroidery': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Stitches of the month and who embroidered them */
+    put: operations['setPayrollEmbroidery'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/payroll/{month}/payments': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Adds a payment (Admin) */
+    post: operations['createPayrollPayment'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/payroll/payments/{paymentId}/void': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Cancels a payment with a reason (Admin) */
+    post: operations['voidPayrollPayment'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/payroll/{month}/adjustments': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Adds an extra accrual or a deduction with a reason (Admin) */
+    post: operations['createPayrollAdjustment'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/payroll/adjustments/{adjustmentId}/void': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Cancels an adjustment with a reason (Admin) */
+    post: operations['voidPayrollAdjustment'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/payroll/{month}/issued': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Sets «Видано» of a worker (Admin) */
+    put: operations['setPayrollIssued'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/payroll/{month}/close': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Closes the month: keeps the calculation and locks work, hours and pay in it (Admin) */
+    post: operations['closePayrollMonth'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/payroll/{month}/reopen': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Opens a closed month again (Admin) */
+    post: operations['reopenPayrollMonth'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/production/settings': {
     parameters: {
       query?: never;
@@ -7669,6 +7891,252 @@ export interface components {
       version: number;
       /** @description Orders in the new order; the rest follow by order date. */
       orderIds: number[];
+    };
+    TimesheetRowResponse: {
+      employeeId: number;
+      name: string;
+      position: string;
+      isActive: boolean;
+      /** @description Null while the day is not marked; 0 means absent. */
+      minutes: number | null;
+      version: number | null;
+    };
+    TimesheetChangeResponse: {
+      id: number;
+      employeeId: number;
+      employeeName: string;
+      /** @description Null on the first mark. */
+      beforeMinutes: number | null;
+      afterMinutes: number;
+      /** Format: date-time */
+      changedAt: string;
+      changedByName: string;
+    };
+    TimesheetMonthDayResponse: {
+      /** Format: date */
+      date: string;
+      people: number;
+      minutes: number;
+    };
+    TimesheetMonthEmployeeResponse: {
+      employeeId: number;
+      name: string;
+      position: string;
+      days: number;
+      minutes: number;
+    };
+    TimesheetMonthResponse: {
+      month: string;
+      days: components['schemas']['TimesheetMonthDayResponse'][];
+      employees: components['schemas']['TimesheetMonthEmployeeResponse'][];
+    };
+    TimesheetDayResponse: {
+      /** Format: date */
+      date: string;
+      /** @description The day has come and its month is not closed. */
+      canEdit: boolean;
+      isMonthClosed: boolean;
+      rows: components['schemas']['TimesheetRowResponse'][];
+      changes: components['schemas']['TimesheetChangeResponse'][];
+      month: components['schemas']['TimesheetMonthResponse'];
+    };
+    TimesheetEntryInput: {
+      employeeId: number;
+      minutes: number;
+      /** @description The version read; null for a first mark. */
+      version: number | null;
+    };
+    SaveTimesheetDayInput: {
+      /** Format: date */
+      date: string;
+      entries: components['schemas']['TimesheetEntryInput'][];
+    };
+    /** @description Shares of «Параметри ціноутворення» as fractions (0.08 = 8 %); null when not filled in. */
+    PayrollRatesResponse: {
+      bonus: number | null;
+      bonusThreshold: number | null;
+      cutting: number | null;
+      master: number | null;
+      chief: number | null;
+      embroidery: number | null;
+    };
+    PayrollPersonResponse: {
+      employeeId: number;
+      name: string;
+      /** @description False when found by position. */
+      isAssigned: boolean;
+    };
+    PayrollLineResponse: {
+      employeeId: number;
+      name: string;
+      position: string;
+      isActive: boolean;
+      minutes: number;
+      sewn: number;
+      sewing: number;
+      cut: number;
+      cutting: number;
+      bonus: number;
+      master: number;
+      chief: number;
+      embroidery: number;
+      /** @description Adjustments: extra accruals minus deductions. */
+      other: number;
+      accrued: number;
+      paid: number;
+      due: number;
+      /** @description «Видано», when entered. */
+      issued: number | null;
+    };
+    PayrollTotalsResponse: {
+      minutes: number;
+      sewing: number;
+      cutting: number;
+      bonus: number;
+      master: number;
+      chief: number;
+      embroidery: number;
+      other: number;
+      accrued: number;
+      paid: number;
+      due: number;
+      issued: number;
+    };
+    PayrollPaymentResponse: {
+      id: number;
+      employeeId: number;
+      employeeName: string;
+      /** Format: date */
+      paidOn: string;
+      /** @enum {string} */
+      kind: 'Advance' | 'Card' | 'Cash' | 'Other';
+      amount: number;
+      comment: string | null;
+      /** Format: date-time */
+      createdAt: string;
+      createdByName: string;
+      /** Format: date-time */
+      voidedAt: string | null;
+      voidedByName: string | null;
+      voidReason: string | null;
+    };
+    PayrollAdjustmentResponse: {
+      id: number;
+      employeeId: number;
+      employeeName: string;
+      /** @description Positive: extra accrual; negative: deduction. */
+      amount: number;
+      reason: string;
+      /** Format: date-time */
+      createdAt: string;
+      createdByName: string;
+      /** Format: date-time */
+      voidedAt: string | null;
+      voidedByName: string | null;
+      voidReason: string | null;
+    };
+    PayrollPermissionsResponse: {
+      /** @description Roles and embroidery: WorkshopChief and Admin on an open month. */
+      canSetUp: boolean;
+      /** @description Payments, adjustments, «Видано»: Admin on an open month that has started. */
+      canPay: boolean;
+      canClose: boolean;
+      canReopen: boolean;
+    };
+    /** @description A month of «Зарплата»; a closed month as it was when closed. */
+    PayrollMonthResponse: {
+      month: string;
+      isClosed: boolean;
+      /** Format: date-time */
+      closedAt: string | null;
+      closedByName: string | null;
+      rates: components['schemas']['PayrollRatesResponse'];
+      master: components['schemas']['PayrollPersonResponse'] | null;
+      chief: components['schemas']['PayrollPersonResponse'] | null;
+      stitches: number;
+      embroideryEmployee: components['schemas']['PayrollPersonResponse'] | null;
+      /** @description Sewing of all workers in UAH; the base of the master and chief shares. */
+      totalSewing: number;
+      /** @description Problems of the calculation; they block closing. */
+      warnings: string[];
+      lines: components['schemas']['PayrollLineResponse'][];
+      totals: components['schemas']['PayrollTotalsResponse'];
+      payments: components['schemas']['PayrollPaymentResponse'][];
+      adjustments: components['schemas']['PayrollAdjustmentResponse'][];
+      permissions: components['schemas']['PayrollPermissionsResponse'];
+    };
+    PayrollWorkRowResponse: {
+      workId: number;
+      employeeId: number;
+      /** Format: date */
+      workDate: string;
+      orderId: number;
+      orderNumber: number;
+      modelName: string;
+      /** @enum {string} */
+      kind: 'Sewing' | 'Cutting';
+      quantity: number;
+      /** @description Sewing rate the month is paid by: the item current rate while the month is open. */
+      rate: number;
+      amount: number;
+      overPlan: boolean;
+    };
+    PayrollEmployeeResponse: {
+      month: string;
+      isClosed: boolean;
+      line: components['schemas']['PayrollLineResponse'];
+      work: components['schemas']['PayrollWorkRowResponse'][];
+      payments: components['schemas']['PayrollPaymentResponse'][];
+      adjustments: components['schemas']['PayrollAdjustmentResponse'][];
+    };
+    PayrollYearMonthResponse: {
+      month: string;
+      isClosed: boolean;
+      accrued: number;
+    };
+    PayrollYearRowResponse: {
+      employeeId: number;
+      name: string;
+      position: string;
+      /** @description January first; null where nothing was earned. */
+      accrued: (number | null)[];
+      total: number;
+    };
+    PayrollYearResponse: {
+      year: number;
+      months: components['schemas']['PayrollYearMonthResponse'][];
+      rows: components['schemas']['PayrollYearRowResponse'][];
+    };
+    SetPayrollRolesInput: {
+      masterEmployeeId: number | null;
+      chiefEmployeeId: number | null;
+    };
+    SetPayrollEmbroideryInput: {
+      stitches: number;
+      employeeId: number | null;
+    };
+    CreatePayrollPaymentInput: {
+      employeeId: number;
+      /** Format: date */
+      paidOn: string;
+      /** @enum {string} */
+      kind: 'Advance' | 'Card' | 'Cash' | 'Other';
+      amount: number;
+      comment: string | null;
+    };
+    VoidPayrollEntryInput: {
+      reason: string;
+    };
+    CreatePayrollAdjustmentInput: {
+      employeeId: number;
+      /** @description Not zero; negative for a deduction. */
+      amount: number;
+      reason: string;
+    };
+    SetPayrollIssuedInput: {
+      employeeId: number;
+      /** @description Null clears it. */
+      amount: number | null;
     };
     WorkshopTelegramChatResponse: {
       /** Format: int64 */
@@ -17900,6 +18368,739 @@ export interface operations {
         content?: never;
       };
       /** @description Stale version or an order left the queue */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getTimesheetDay: {
+    parameters: {
+      query: {
+        date: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TimesheetDayResponse'];
+        };
+      };
+      /** @description Invalid date */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  saveTimesheetDay: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SaveTimesheetDayInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['TimesheetDayResponse'];
+        };
+      };
+      /** @description Invalid minutes, future day or no such worker */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Stale version or the month is closed */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getPayrollMonth: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description YYYY-MM */
+        month: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PayrollMonthResponse'];
+        };
+      };
+      /** @description Invalid month */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getPayrollEmployee: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description YYYY-MM */
+        month: string;
+        employeeId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PayrollEmployeeResponse'];
+        };
+      };
+      /** @description Invalid month */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The worker has nothing in the month */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getPayrollYear: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        year: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PayrollYearResponse'];
+        };
+      };
+      /** @description Invalid year */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  setPayrollRoles: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description YYYY-MM */
+        month: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SetPayrollRolesInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PayrollMonthResponse'];
+        };
+      };
+      /** @description Invalid */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Month closed or not started */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  setPayrollEmbroidery: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description YYYY-MM */
+        month: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SetPayrollEmbroideryInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PayrollMonthResponse'];
+        };
+      };
+      /** @description Invalid */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Month closed or not started */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createPayrollPayment: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description YYYY-MM */
+        month: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreatePayrollPaymentInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PayrollMonthResponse'];
+        };
+      };
+      /** @description Invalid */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Month closed or not started */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  voidPayrollPayment: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        paymentId: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['VoidPayrollEntryInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PayrollMonthResponse'];
+        };
+      };
+      /** @description Invalid */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such payment */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Already cancelled or the month is closed */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createPayrollAdjustment: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description YYYY-MM */
+        month: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreatePayrollAdjustmentInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PayrollMonthResponse'];
+        };
+      };
+      /** @description Invalid */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Month closed or not started */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  voidPayrollAdjustment: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        adjustmentId: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['VoidPayrollEntryInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PayrollMonthResponse'];
+        };
+      };
+      /** @description Invalid */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such adjustment */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Already cancelled or the month is closed */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  setPayrollIssued: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description YYYY-MM */
+        month: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SetPayrollIssuedInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PayrollMonthResponse'];
+        };
+      };
+      /** @description Invalid */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Month closed or not started */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  closePayrollMonth: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description YYYY-MM */
+        month: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PayrollMonthResponse'];
+        };
+      };
+      /** @description Invalid */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Closed already, not started or the calculation has warnings */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  reopenPayrollMonth: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description YYYY-MM */
+        month: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PayrollMonthResponse'];
+        };
+      };
+      /** @description Invalid */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The month is not closed */
       409: {
         headers: {
           [name: string]: unknown;

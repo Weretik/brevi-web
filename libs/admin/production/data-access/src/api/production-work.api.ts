@@ -38,9 +38,15 @@ const workInput = (body: CreateProductionWorkBody): Schemas['CreateProductionWor
 const workErrors = (response: unknown) => toProductionApiError(response, productionWorkErrors);
 const forecastErrors = (response: unknown) => toProductionApiError(response, sewingForecastErrors);
 
-/** Work changes the log, the item section, what is left to sew and so the forecast. */
+/** Work changes the log, the item section, what is left to sew (so the forecast) and the pay. */
 const workChanged = (_result: unknown, error: unknown) =>
-  error ? [] : [{ type: 'ProductionWork' as const }, { type: 'SewingForecast' as const }];
+  error
+    ? []
+    : [
+        { type: 'ProductionWork' as const },
+        { type: 'SewingForecast' as const },
+        { type: 'Payroll' as const },
+      ];
 
 export const productionWorkApi = productionBaseApi.injectEndpoints({
   endpoints: (build) => ({
@@ -109,7 +115,7 @@ export const productionWorkApi = productionBaseApi.injectEndpoints({
       invalidatesTags: (result, error) =>
         error || !result || result.dryRun
           ? []
-          : [{ type: 'ProductionWork' }, { type: 'SewingForecast' }],
+          : [{ type: 'ProductionWork' }, { type: 'SewingForecast' }, { type: 'Payroll' }],
     }),
     getSewingForecast: build.query<SewingForecast, void>({
       query: () => '/api/production/forecast',

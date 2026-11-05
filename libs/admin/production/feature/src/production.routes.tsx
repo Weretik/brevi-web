@@ -12,6 +12,8 @@ const ProductionOrderPage = lazy(() => import('./pages/orders/production-order-p
 const FabricStockPage = lazy(() => import('./pages/stock/fabric-stock-page'));
 const WorkLogPage = lazy(() => import('./pages/work/work-log-page'));
 const SewingForecastPage = lazy(() => import('./pages/forecast/sewing-forecast-page'));
+const TimesheetPage = lazy(() => import('./pages/timesheet/timesheet-page'));
+const PayrollPage = lazy(() => import('./pages/payroll/payroll-page'));
 
 interface ProductionRouteOptions {
   /** The signed-in person: may they import the old «Цех» log. */
@@ -26,6 +28,8 @@ export function createProductionRoutes({ useOrderActor }: ProductionRouteOptions
     { path: '/production/payroll-rules', element: <PayrollRulesPage /> },
     { path: '/production/settings', element: <WorkshopSettingsPage /> },
     { path: '/production/work', element: <WorkLogPage useOrderActor={useOrderActor} /> },
+    { path: '/production/timesheet', element: <TimesheetPage /> },
+    { path: '/production/payroll', element: <PayrollPage /> },
   ];
 }
 
