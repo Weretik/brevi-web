@@ -1,10 +1,6 @@
 import { embroideryBaseApi } from './embroidery-base-api';
 import { toEmbroideryApiError } from '../errors/embroidery-api-error';
 import {
-  mapEmbroideryArchiveResult,
-  toEmbroideryArchiveRows,
-} from '../mappers/embroidery-archive.mapper';
-import {
   mapEmbroiderySavedCalculation,
   mapEmbroiderySavedPage,
   toSaveEmbroideryCalculationInput,
@@ -17,7 +13,6 @@ import {
   toSaveEmbroiderySettingsInput,
 } from '../mappers/embroidery.mapper';
 import {
-  ensureEmbroideryArchiveResult,
   ensureEmbroideryCalculation,
   ensureEmbroideryForm,
   ensureEmbroiderySavedCalculation,
@@ -26,8 +21,6 @@ import {
 } from '../validators/embroidery-response';
 
 import type {
-  EmbroideryArchiveResult,
-  EmbroideryArchiveRow,
   EmbroideryCalculation,
   EmbroideryCalculationRequest,
   EmbroideryFormSetup,
@@ -115,21 +108,6 @@ export const embroideryApi = embroideryBaseApi.injectEndpoints({
       transformErrorResponse: toEmbroideryApiError,
       invalidatesTags: (_result, error) => (error ? [] : [savedListTag]),
     }),
-    importEmbroideryArchive: build.mutation<
-      EmbroideryArchiveResult,
-      { rows: readonly EmbroideryArchiveRow[]; dryRun: boolean }
-    >({
-      query: ({ rows, dryRun }) => ({
-        url: '/api/crm/embroidery/calculations/import',
-        method: 'POST',
-        params: { dryRun },
-        body: toEmbroideryArchiveRows(rows),
-      }),
-      transformResponse: (value: unknown) =>
-        mapEmbroideryArchiveResult(ensureEmbroideryArchiveResult(value)),
-      transformErrorResponse: toEmbroideryApiError,
-      invalidatesTags: (result, error) => (error || !result || result.dryRun ? [] : [savedListTag]),
-    }),
     deleteEmbroideryCalculation: build.mutation<void, number>({
       query: (id) => ({ url: `/api/crm/embroidery/calculations/${id}`, method: 'DELETE' }),
       transformErrorResponse: toEmbroideryApiError,
@@ -144,7 +122,6 @@ export const {
   useDeleteEmbroideryCalculationMutation,
   useGetEmbroideryCalculationQuery,
   useGetEmbroideryCalculationsQuery,
-  useImportEmbroideryArchiveMutation,
   useSaveEmbroideryCalculationMutation,
   useGetEmbroideryFormQuery,
   useGetEmbroiderySettingsQuery,
