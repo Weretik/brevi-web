@@ -3220,6 +3220,56 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/purchasing/invoices': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description One page of cards, one per Telegram message, newest message first (unknown dates last). Search matches the message text (case-insensitive) or an exact UID. */
+    get: operations['getPurchaseInvoices'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/purchasing/invoices/sync-state': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get: operations['getPurchaseInvoicesSyncState'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/purchasing/invoices/sync': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description «Оновити зараз»: reads the whole sheet, checks it, then applies it in one transaction. Safe to repeat; manual supplier links and notes are never changed. Rows and links missing from the sheet become inactive. */
+    post: operations['syncPurchaseInvoices'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/reminders/non-working-days': {
     parameters: {
       query?: never;
@@ -7644,6 +7694,108 @@ export interface components {
       telegramChatId: number | null;
       /** @description A topic of a group with topics; null posts to the main chat. */
       telegramThreadId: number | null;
+    };
+    /** @enum {string} */
+    PurchaseInvoiceFilter: 'All' | 'NeedsReview';
+    /**
+     * @description NeedsReview when the representative row has problems, otherwise AwaitingRecognition.
+     * @enum {string}
+     */
+    PurchaseInvoiceState: 'NeedsReview' | 'AwaitingRecognition';
+    PurchaseInvoiceLinkResponse: {
+      /** @description File id, SHA-256 of messageId:url. */
+      id: string;
+      /** @description The exact link from the sheet. */
+      url: string;
+      /** @description True only for an HTTPS dropbox.com link without user or password; show other links as text. */
+      safe: boolean;
+    };
+    PurchaseInvoiceResponse: {
+      messageId: string;
+      /** @description ChatId:MessageId. */
+      telegramKey: string;
+      /** @description UID of the representative row (smallest row number). */
+      sourceUid: string;
+      /** Format: int32 */
+      rowNumber: number;
+      /**
+       * Format: int32
+       * @description Active sheet rows of this message.
+       */
+      sourceRowCount: number;
+      chatName?: string | null;
+      /** @description Author of the message. */
+      fromUser?: string | null;
+      /** @description The DateTime cell as written in the sheet. */
+      messageAt?: string | null;
+      text: string;
+      statusOriginal: string;
+      markAt?: string | null;
+      /** @description Who set the payment mark (FromUserStatus). */
+      markBy?: string | null;
+      /** @description Status is exactly «СПЛАЧЕНО». A note from the sheet, not a payment. */
+      markedPaid: boolean;
+      /**
+       * Format: int32
+       * @description Brevi supplier linked by hand.
+       */
+      supplierId?: number | null;
+      reviewNote?: string | null;
+      /** Format: int32 */
+      reviewVersion: number;
+      state: components['schemas']['PurchaseInvoiceState'];
+      /** @description Reasons for a manual check, in Ukrainian. */
+      issues: string[];
+      links: components['schemas']['PurchaseInvoiceLinkResponse'][];
+    };
+    PurchaseInvoicePage: {
+      items: components['schemas']['PurchaseInvoiceResponse'][];
+      /** Format: int32 */
+      total: number;
+      /** Format: int32 */
+      page: number;
+      /** Format: int32 */
+      pageSize: number;
+    };
+    PurchaseSyncStateResponse: {
+      /** Format: date-time */
+      lastSuccessAt?: string | null;
+      /** Format: date-time */
+      lastAttemptAt?: string | null;
+      /** @description Reason of the last failed attempt; null after a success. */
+      error?: string | null;
+      /**
+       * Format: int32
+       * @description Active sheet rows after the last successful sync.
+       */
+      recordCount: number;
+      /** Format: int32 */
+      fileCount: number;
+    };
+    PurchaseSyncResponse: {
+      /** Format: int32 */
+      recordCount: number;
+      /** Format: int32 */
+      fileCount: number;
+      /** Format: int32 */
+      messagesAdded: number;
+      /** Format: int32 */
+      messagesUpdated: number;
+      /** Format: int32 */
+      rowsAdded: number;
+      /** Format: int32 */
+      rowsUpdated: number;
+      /** Format: int32 */
+      rowsDeactivated: number;
+      /** Format: int32 */
+      filesAdded: number;
+      /** Format: int32 */
+      filesDeactivated: number;
+      /** Format: date-time */
+      syncedAt: string;
+    };
+    PurchaseErrors: {
+      errors: string[];
     };
     NonWorkingDayResponse: {
       /** Format: date */
@@ -17878,6 +18030,145 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+    };
+  };
+  getPurchaseInvoices: {
+    parameters: {
+      query?: {
+        page?: number;
+        pageSize?: number;
+        search?: string;
+        filter?: components['schemas']['PurchaseInvoiceFilter'];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PurchaseInvoicePage'];
+        };
+      };
+      /** @description Invalid page, page size, search or filter */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director, Accountant or Admin */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getPurchaseInvoicesSyncState: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK; nulls and zeros before the first sync */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PurchaseSyncStateResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director, Accountant or Admin */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  syncPurchaseInvoices: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Synced */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PurchaseSyncResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director, Accountant or Admin */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Another sync is running; body is an array of messages */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The sheet breaks a register rule (header, duplicate UID, different payment marks in one message, a UID moved to another message); nothing changed */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PurchaseErrors'];
+        };
+      };
+      /** @description Google Sheets cannot be read (no access, not found, not responding); nothing changed */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PurchaseErrors'];
+        };
       };
     };
   };

@@ -2,7 +2,7 @@
 
 **Status:** implemented 2026-11-03 ([SDD 016](../../../specs/admin/references/016-counterparties/README.md)).
 
-`/references/counterparties` («Загальні довідники → Контрагенти») has two tabs: «Постачальники» (default, the [suppliers page](suppliers.md)) and «Клієнти» (`?tab=clients`). The data for both comes from KeepinCRM and is refreshed by the daily backend job `brevierp-sync`. The old addresses `/references/supplier` and `/crm/clients` redirect here.
+`/references/counterparties` («Загальні довідники → Контрагенти») has «Постачальники» (default, the [suppliers page](suppliers.md)), «Клієнти» (`?tab=clients`) and, for the accountant and Admin, [«Рахунки на закупку»](../purchasing.md) (`?tab=purchases`). Suppliers and clients come from KeepinCRM and are refreshed by the daily backend job `brevierp-sync`. The old addresses `/references/supplier` and `/crm/clients` redirect here.
 
 The «Клієнти» tab follows reference pattern B. It has:
 
@@ -17,7 +17,7 @@ Search, the filter and the page are kept in the URL. A row opens the client card
 
 ```text
 libs/admin/references/feature/src/pages/counterparties/counterparties-page.tsx  # tabs host, ?tab=
-libs/admin/references/feature/src/references.routes.tsx                          # route and old supplier redirect
+libs/admin/references/feature/src/references.routes.tsx                          # createReferencesRoutes, old supplier redirect
 libs/admin/clients/
 ├── feature/src/pages/customers/reference/customers-reference-content.tsx       # «Клієнти» tab
 ├── feature/src/hooks/customers/use-customer-reference-list.ts                  # URL state, server list and counts

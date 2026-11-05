@@ -78,7 +78,11 @@
       "@admin/embroidery/model": ["libs/admin/embroidery/model/src/index.ts"],
       "@admin/embroidery/data-access": ["libs/admin/embroidery/data-access/src/index.ts"],
       "@admin/embroidery/ui": ["libs/admin/embroidery/ui/src/index.ts"],
-      "@admin/embroidery/feature": ["libs/admin/embroidery/feature/src/index.ts"]
+      "@admin/embroidery/feature": ["libs/admin/embroidery/feature/src/index.ts"],
+      "@admin/purchasing/model": ["libs/admin/purchasing/model/src/index.ts"],
+      "@admin/purchasing/data-access": ["libs/admin/purchasing/data-access/src/index.ts"],
+      "@admin/purchasing/ui": ["libs/admin/purchasing/ui/src/index.ts"],
+      "@admin/purchasing/feature": ["libs/admin/purchasing/feature/src/index.ts"]
     }
   }
 }

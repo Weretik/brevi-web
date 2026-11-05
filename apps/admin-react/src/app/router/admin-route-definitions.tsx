@@ -6,10 +6,11 @@ import { mediaRoutes } from '@admin/media/feature';
 import { createProductionOrderRoutes, createProductionRoutes } from '@admin/production/feature';
 import { productsRoutes } from '@admin/products/feature';
 import { createQuotesRoutes } from '@admin/quotes/feature';
-import { referencesRoutes } from '@admin/references/feature';
+import { createReferencesRoutes } from '@admin/references/feature';
 import { remindersRoutes } from '@admin/reminders/feature';
 import { createTasksRoutes } from '@admin/tasks/feature';
 
+import { useCanSeePurchaseInvoices } from './use-can-see-purchase-invoices';
 import { useEmbroideryViewer } from './use-embroidery-viewer';
 import { useProductionOrderActor } from './use-production-order-actor';
 import { useQuoteActor } from './use-quote-actor';
@@ -17,7 +18,7 @@ import { useTaskViewer } from './use-task-viewer';
 
 export const adminRouteDefinitions = [
   ...dashboardRoutes,
-  ...referencesRoutes,
+  ...createReferencesRoutes({ useCanSeePurchaseInvoices }),
   ...clientsRoutes,
   ...createQuotesRoutes({ useQuoteActor }),
   ...productsRoutes,
