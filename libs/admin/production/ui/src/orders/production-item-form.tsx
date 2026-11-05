@@ -9,6 +9,7 @@ import { Box, Button, IconButton, Stack, TextField, Tooltip, Typography } from '
 
 import { ProductionItemApplications } from './production-item-applications';
 
+import type { EmbroideryPicker } from './production-item-applications';
 import type {
   FabricNormValues,
   ProductionItemErrors,
@@ -28,6 +29,8 @@ interface Props {
   /** Admin and the head of the workshop also set «Розцінка пошиття». */
   withRate: boolean;
   disabled?: boolean;
+  /** «Розрахунок вишивки» for an embroidery. */
+  embroidery?: EmbroideryPicker;
   onChange: (values: ProductionItemFormValues) => void;
 }
 
@@ -39,6 +42,7 @@ export function ProductionItemForm({
   norm,
   withRate,
   disabled = false,
+  embroidery,
   onChange,
 }: Props) {
   const set = <K extends keyof ProductionItemFormValues>(
@@ -168,6 +172,7 @@ export function ProductionItemForm({
         idPrefix={idPrefix}
         applications={values.applications}
         disabled={disabled}
+        embroidery={embroidery}
         onChange={(applications) => set('applications', applications)}
       />
       {withRate && (

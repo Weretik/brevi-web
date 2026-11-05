@@ -108,6 +108,7 @@ vi.mock('@admin/embroidery/data-access', () => ({
   useGetEmbroideryCalculationsQuery: listQuery,
   useGetEmbroideryCalculationQuery: getQuery,
   useDeleteEmbroideryCalculationMutation: () => [vi.fn(), { isLoading: false }],
+  useSetEmbroideryMockupMutation: () => [vi.fn(), { isLoading: false }],
 }));
 
 const summary: EmbroiderySavedSummary = {
@@ -124,6 +125,7 @@ const summary: EmbroiderySavedSummary = {
   prices: calculation.prices,
   createdAt: '2026-11-04T19:52:00Z',
   createdByName: 'Олена',
+  mockup: null,
 };
 
 beforeEach(() => {

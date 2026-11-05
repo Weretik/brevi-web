@@ -1,4 +1,4 @@
-import { formatDay, formatMeters, itemApplicationKindLabels } from '@admin/production/model';
+import { applicationText, formatDay, formatMeters } from '@admin/production/model';
 import { Box, GlobalStyles, Typography } from '@mui/material';
 
 import type { ProductionOrder } from '@admin/production/model';
@@ -75,15 +75,7 @@ export function ProductionOrderPrint({ order }: { order: ProductionOrder }) {
                 <td>{[item.mainColor, ...item.additionalColors].join(' + ')}</td>
                 <td style={{ whiteSpace: 'pre-line' }}>{item.sizesText ?? ''}</td>
                 <td style={{ whiteSpace: 'pre-line' }}>
-                  {[
-                    item.technicalChanges,
-                    item.comment,
-                    ...item.applications.map((x) =>
-                      [itemApplicationKindLabels[x.kind], x.place, x.description, x.color]
-                        .filter(Boolean)
-                        .join(', '),
-                    ),
-                  ]
+                  {[item.technicalChanges, item.comment, ...item.applications.map(applicationText)]
                     .filter(Boolean)
                     .join('\n')}
                 </td>

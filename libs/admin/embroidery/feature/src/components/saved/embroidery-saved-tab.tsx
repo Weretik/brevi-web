@@ -13,6 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useDeferredValue, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import { EmbroiderySavedDrawer } from './embroidery-saved-drawer';
 
@@ -29,7 +30,11 @@ const pageSize = 25;
 export function EmbroiderySavedTab({ canDelete, onRepeat }: Props) {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
-  const [openId, setOpenId] = useState<number | null>(null);
+  const [params] = useSearchParams();
+  // «?calculation=42» from a production order opens that calculation.
+  const [openId, setOpenId] = useState<number | null>(
+    () => Number(params.get('calculation')) || null,
+  );
   const deferred = useDeferredValue(search);
   const list = useGetEmbroideryCalculationsQuery({ search: deferred, page, pageSize });
   const rows = list.data?.items ?? [];

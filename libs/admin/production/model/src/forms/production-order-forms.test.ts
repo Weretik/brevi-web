@@ -60,6 +60,7 @@ const draft: ProductionQuoteDraft = {
     },
     { quoteItemId: 12, name: 'Жилет', modelCode: null, norm: null, options: [] },
   ],
+  embroideries: [],
 };
 
 describe('production order forms', () => {
@@ -105,6 +106,47 @@ describe('production order forms', () => {
       quoteOptionId: 21,
       details: { quantity: 12, mainColor: 'чорний', additionalColors: ['червоний'] },
     });
+  });
+
+  it('puts the КП embroidery into every item and sends the calculation only for an embroidery', () => {
+    const calculation = {
+      id: 42,
+      number: 'ВШ-0042',
+      name: 'Логотип',
+      customerName: null,
+      quantity: 12,
+      stitchesPerUnit: 8000,
+      hoopLabel: '18 см',
+      mockupThumbnailUrl: null,
+    };
+    const values = createOrderFormValues(
+      { ...draft, embroideries: [{ quoteItemId: 13, calculation }] },
+      '2026-11-04',
+    );
+    expect(values.lines.map((x) => x.values.applications[0]?.embroidery?.number)).toEqual([
+      'ВШ-0042',
+      'ВШ-0042',
+    ]);
+
+    const line = values.lines[0].values;
+    const details = createOrderBody(
+      draft,
+      {
+        ...values,
+        lines: [
+          {
+            ...values.lines[0],
+            values: {
+              ...line,
+              applications: [line.applications[0], { ...line.applications[0], kind: 'Print' }],
+            },
+          },
+        ],
+      },
+      'req-2',
+    ).items[0].details;
+    expect(details.applications.map((x) => x.embroideryCalculationId)).toEqual([42, null]);
+    expect(details.applications[0].description).toBe('Логотип');
   });
 
   it('asks for at least one item', () => {

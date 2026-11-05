@@ -24,6 +24,8 @@ import {
 
 import type {
   ItemApplication,
+  ProductionEmbroidery,
+  ProductionEmbroideryChoice,
   ProductionItem,
   ProductionOrder,
   ProductionOrderChange,
@@ -43,6 +45,36 @@ const nullableDay = (value: unknown, what: string) =>
 
 const texts = (value: unknown, what: string) => list(value, what).map((x) => text(x, what));
 
+export function mapProductionEmbroideryChoice(value: unknown): ProductionEmbroideryChoice {
+  const row = record(value, 'розрахунок вишивки');
+  return {
+    id: integer(row['id'], 'id розрахунку вишивки', 1),
+    number: nonEmptyText(row['number'], 'номер розрахунку вишивки'),
+    name: text(row['name'], 'назва розрахунку вишивки'),
+    customerName: nullableText(row['customerName'], 'клієнт розрахунку вишивки'),
+    quantity: integer(row['quantity'], 'кількість вишивки', 1),
+    stitchesPerUnit: integer(row['stitchesPerUnit'], 'стібки'),
+    hoopLabel: text(row['hoopLabel'], 'пʼяльця'),
+    mockupThumbnailUrl: nullableText(row['mockupThumbnailUrl'], 'мініатюра макета'),
+  };
+}
+
+export const mapProductionEmbroideryChoices = (value: unknown) =>
+  list(value, 'розрахунки вишивки').map(mapProductionEmbroideryChoice);
+
+function mapEmbroidery(value: unknown): ProductionEmbroidery | null {
+  if (value === null || value === undefined) return null;
+  const row = record(value, 'розрахунок вишивки');
+  return {
+    ...mapProductionEmbroideryChoice(row),
+    mode: oneOf(row['mode'], ['Garment', 'Chevron'] as const, 'вид вишивки'),
+    hoopings: integer(row['hoopings'], 'запʼялювання'),
+    stabilizerMetres: nullableNumber(row['stabilizerMetres'], 'флізелін'),
+    fabricMetres: nullableNumber(row['fabricMetres'], 'тканина вишивки'),
+    mockupUrl: nullableText(row['mockupUrl'], 'макет'),
+  };
+}
+
 function mapApplication(value: unknown): ItemApplication {
   const row = record(value, 'нанесення');
   return {
@@ -50,6 +82,9 @@ function mapApplication(value: unknown): ItemApplication {
     place: nullableText(row['place'], 'місце нанесення'),
     description: nullableText(row['description'], 'опис нанесення'),
     color: nullableText(row['color'], 'колір нанесення'),
+    embroideryCalculationId: nullableInteger(row['embroideryCalculationId'], 'розрахунок вишивки'),
+    embroideryNumber: nullableText(row['embroideryNumber'], 'номер розрахунку вишивки'),
+    embroidery: mapEmbroidery(row['embroidery']),
   };
 }
 
@@ -214,6 +249,14 @@ export function mapProductionQuoteDraft(value: unknown): ProductionQuoteDraft {
             sewingRate: nullableNumber(x['sewingRate'], 'розцінка'),
           };
         }),
+      };
+    }),
+    // Optional for a backend that does not send it yet.
+    embroideries: list(row['embroideries'] ?? [], 'вишивка КП').map((entry) => {
+      const x = record(entry, 'вишивка КП');
+      return {
+        quoteItemId: integer(x['quoteItemId'], 'позиція КП', 1),
+        calculation: mapProductionEmbroideryChoice(x['calculation']),
       };
     }),
   };

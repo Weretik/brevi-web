@@ -6,6 +6,8 @@ The sidebar group «Швейний цех» gets three pages for the head of the
 
 «Виробничі завдання» (`/production/orders`, Admin, Manager and the head of the workshop) is what the workshop sews. A manager makes an order from a sent КП at `/production/orders/new`: for each sewing item they pick the fabric and fill in quantity, «Готово до», colours, sizes, technical changes, comment and applications, and see the planned fabric. The list has search, status chips, «Прострочені», a manager filter, «Експорт» to CSV and, for Admin, «Імпорт» of the old orders. The card `/production/orders/:id` has «Опис» and «Історія змін», edit in side panels, «Копіювати», «Друк» and, for Admin, «Видалити». Who sees «Розцінка пошиття» and the КП price comes from the server's `permissions`.
 
+An embroidery can point to a saved «Ціна вишивки» calculation («Розрахунок вишивки», searched by name, client or «ВШ-0042»); the КП «Вишивка» rows are put into every item of a new order, and the manager removes what does not apply. The item card then shows the number, stitches, hoop, hoopings, флізелін and fabric metres and the mockup, without prices; a manager or Admin opens the calculation, a removed one stays as its number. Materials are shown only; the stock does not change.
+
 After «Передати в цех» every item shows its «Етапи» (the head of the workshop and Admin tick them; the furthest colours the item) and «Відвантаження» («Відвантажити» side panel, cancel with ×). The header gets «Закрити» when everything is shipped, «Скасувати» with a reason and, for Admin, «Повернути в роботу». Files of the order and of each item are uploaded to the CDN with their kind; old ones are Google Drive links. The Telegram block sends the one message to the workshop group and shows a failure with its reason. The list has an «Етап» column and filter and, for Admin, «Імпорт етапів». «Налаштування цеху» (`/production/settings`) picks the Brevi bot's group and topic.
 
 «Склад тканин» (`/production/fabric-stock`, the same people as «Виробничі завдання») shows each fabric and colour with its balance, the reservation of «Нове» orders and what is available; the value in UAH only for Admin and the head of the workshop. A row opens its card with the reservation and every movement. The head of the workshop and Admin record «Прихід» (supplier from the server's `choices`), «Початковий залишок», «Коригування» with a reason and «Сторно». Every item of an order card has «Тканина»: the plan by colour, what issues covered and «Видати тканину» (planned, replacement and extra lines) or «Сторно видачі». The page also has «Зведення витрати» for a period, «Excel» and, for Admin, «Імпорт» of the old stock.
@@ -38,6 +40,7 @@ libs/admin/production/
     queries/                      # list filters, chip counts, orders and stock CSV
     validators/                   # reads workshop-staff.json, fabric-norms.json, production-orders.json, production-progress.json, fabric-stock.json, production-work.json
     mappers/format-production.ts  # metres, parameter values, dates
+    mappers/format-application.ts # application text, linked embroidery details and link
   data-access/src/
     api/{workshop-staff,fabric-norms,payroll-parameters,production-orders,production-tracking,workshop-settings,fabric-stock,production-work}.api.ts # endpoints; production-base-api.ts adds tags
     mappers/                      # runtime-checked response → model
@@ -45,7 +48,7 @@ libs/admin/production/
     errors/production-api-error.ts
   ui/src/
     staff/  norms/  payroll/  import/  dialogs/
-    orders/                       # grid, chips, status, item form and card, history, КП list, print sheet
+    orders/                       # grid, chips, status, item form and card, applications with «Розрахунок вишивки», embroidery block, history, КП list, print sheet
     tracking/                     # stage pill and toggles, shipments, files, Telegram block, shipment form
     settings/                     # workshop settings form
     stock/                        # stock grid and chips, line details, movements, receipt and correction forms, consumption, item «Тканина», issue form
@@ -60,7 +63,7 @@ libs/admin/production/
     pages/work/                   # «Журнал робіт»
     pages/forecast/               # «Прогноз пошиття»
     hooks/{staff,norms,import,payroll}/
-    hooks/orders/                 # list, export, create, card, editor, copy and delete
+    hooks/orders/                 # list, export, create, card, editor, copy and delete, «Розрахунок вишивки» search
     hooks/requests/               # debounce, request id against duplicates
     hooks/tracking/               # stages and shipments, close/cancel/reopen
     hooks/files/  hooks/telegram/  hooks/settings/
