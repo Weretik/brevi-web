@@ -22,7 +22,7 @@ export {
 export type { QuoteCatalogQuery } from './api/quote-lookups.api';
 export { toSaveQuoteInput } from './mappers/quote-input.mapper';
 export { useGetQuoteSettingsQuery, useSaveQuoteSettingsMutation } from './api/quote-settings.api';
-export { downloadQuotePdf } from './files/quote-pdf';
+export { downloadQuotePdf, fetchQuotePdf, saveQuotePdf } from './files/quote-pdf';
 export {
   useConnectMailboxMutation,
   useDisconnectMailboxMutation,

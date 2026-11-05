@@ -27,6 +27,7 @@ const settings: QuoteSettings = {
     ctaTitle: null,
     ctaText: null,
     ctaContactTemplate: null,
+    introText: null,
   },
   introduction: {
     logoText: null,

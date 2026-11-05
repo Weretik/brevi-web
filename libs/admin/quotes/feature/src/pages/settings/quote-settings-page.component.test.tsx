@@ -28,6 +28,7 @@ const settings: QuoteSettings = {
     ctaTitle: null,
     ctaText: null,
     ctaContactTemplate: null,
+    introText: null,
   },
   introduction: {
     logoText: null,
@@ -166,9 +167,10 @@ describe('«Налаштування КП»', () => {
 
     expect(contact).toHaveValue('Ваш менеджер: {managerName}');
     fireEvent.click(screen.getByRole('button', { name: 'Перегляд' }));
+    // The note fills the mark; the footer names the same manager.
     expect(
-      within(screen.getByRole('img', { name: 'Перегляд PDF КП' })).getByText('Ольга'),
-    ).toBeVisible();
+      within(screen.getByRole('img', { name: 'Перегляд PDF КП' })).getAllByText('Ольга'),
+    ).toHaveLength(2);
     fireEvent.keyDown(screen.getByRole('img', { name: 'Перегляд PDF КП' }), { key: 'Escape' });
 
     fireEvent.change(contact, { target: { value: 'Ваш менеджер: {managerNmae}' } });

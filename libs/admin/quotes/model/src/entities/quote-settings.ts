@@ -22,6 +22,8 @@ export interface QuotePdfTexts {
   ctaTitle: string | null;
   ctaText: string | null;
   ctaContactTemplate: string | null;
+  /** The opening text under the client name; `{client}` is the client. Null means the standard text. */
+  introText: string | null;
 }
 
 export interface QuoteAdvantage {

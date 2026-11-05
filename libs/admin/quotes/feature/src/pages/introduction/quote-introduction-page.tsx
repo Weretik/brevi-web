@@ -20,11 +20,12 @@ import { QuoteIntroModelPickerDrawer } from '../../components/introduction/quote
 import { QuoteIntroTemplateSaveDrawer } from '../../components/introduction/quote-intro-template-save-drawer';
 import { QuoteIntroTemplatesDrawer } from '../../components/introduction/quote-intro-templates-drawer';
 import { QuoteHistoryDrawer } from '../../components/lifecycle/quote-history-drawer';
+import { QuotePreview } from '../../components/preview/quote-preview';
 import { QuoteSendDrawer } from '../../components/sending/quote-send-drawer';
-import { useQuotePdf } from '../../hooks/editor/use-quote-pdf';
 import { useQuoteIntroductionEditor } from '../../hooks/introduction/use-quote-introduction-editor';
 import { useQuoteLifecycle } from '../../hooks/lifecycle/use-quote-lifecycle';
 import { useRouteNotice } from '../../hooks/lifecycle/use-route-notice';
+import { useQuotePreview } from '../../hooks/preview/use-quote-preview';
 import { useGmailReturnNotice } from '../../hooks/sending/use-gmail-return-notice';
 import { useQuoteStartPrefill } from '../../hooks/start/use-quote-start-prefill';
 
@@ -48,7 +49,7 @@ export default function QuoteIntroductionPage({ actor }: { actor: QuoteActor }) 
   const prefill = useQuoteStartPrefill();
   const editor = useQuoteIntroductionEditor(id, prefill);
   const { quote, draft, setup } = editor;
-  const pdf = useQuotePdf({ quote, dirty: editor.dirty, save: editor.save });
+  const preview = useQuotePreview({ quote, dirty: editor.dirty, save: editor.save });
   const gmail = useGmailReturnNotice();
   const [panel, setPanel] = useState<Panel | null>(null);
   const [notice, setNotice] = useState<{ severity: 'success' | 'warning'; text: string } | null>(
@@ -170,11 +171,6 @@ export default function QuoteIntroductionPage({ actor }: { actor: QuoteActor }) 
           {notice.text}
         </Alert>
       )}
-      {pdf.pdfError && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {pdf.pdfError}
-        </Alert>
-      )}
       <Stack sx={{ gap: 2 }}>
         <QuoteIntroLayoutStep layout={draft.layout} onChange={editor.setLayout} />
         <QuoteIntroRecipientStep draft={draft} errors={editor.errors} onChange={editor.change} />
@@ -198,15 +194,19 @@ export default function QuoteIntroductionPage({ actor }: { actor: QuoteActor }) 
         layout="bar"
         dirty={editor.dirty}
         saving={editor.saving}
-        generating={pdf.generating}
+        generating={preview.preparing}
         locked={lifecycle.archived}
         onSave={() => void editor.save()}
-        onPdf={() => void pdf.generate()}
-        onSend={async () => {
+        onPdf={() => void preview.open()}
+        onSend={() => {
           setNotice(null);
-          const saved = quote && !editor.dirty ? quote : await editor.save();
-          if (saved) setPanel({ kind: 'send' });
+          void preview.open();
         }}
+      />
+      <QuotePreview
+        preview={preview}
+        locked={lifecycle.archived}
+        onSend={() => setPanel({ kind: 'send' })}
       />
 
       {panel?.kind === 'pick' && (

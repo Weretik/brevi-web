@@ -47,6 +47,8 @@ export {
   updateQuoteOption,
 } from './mappers/quote-draft-edits';
 export { formatQuotePrice, parseQuotePrice, priceInputText } from './mappers/quote-price-text';
+export { quotePreviewWarnings } from './mappers/quote-preview-warnings';
+export type { QuotePreviewWarning } from './mappers/quote-preview-warnings';
 export {
   draftPriceAmount,
   hasManualPrice,

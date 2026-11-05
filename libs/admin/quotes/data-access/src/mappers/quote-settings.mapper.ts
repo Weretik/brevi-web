@@ -24,7 +24,7 @@ const companyKeys = [
   'site',
   'logoUrl',
 ] as const;
-const pdfKeys = ['vatNotice', 'ctaTitle', 'ctaText', 'ctaContactTemplate'] as const;
+const pdfKeys = ['vatNotice', 'ctaTitle', 'ctaText', 'ctaContactTemplate', 'introText'] as const;
 const introductionKeys = [
   'logoText',
   'summerTitle',
