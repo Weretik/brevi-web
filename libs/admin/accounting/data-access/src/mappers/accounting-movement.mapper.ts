@@ -135,6 +135,8 @@ export function mapFinanceOverview(value: unknown): FinanceOverview {
     from: date(row['from'], 'початок періоду'),
     to: date(row['to'], 'кінець періоду'),
     needsReviewCount: integer(row['needsReviewCount'], 'потребують перевірки'),
+    needsCategoryCount: integer(row['needsCategoryCount'], 'без категорії'),
+    needsCounterpartyCount: integer(row['needsCounterpartyCount'], 'новий контрагент'),
     currencies: list(row['currencies'], 'валюти').map((item) => {
       const currency = record(item, 'валюта огляду');
       return {
@@ -145,6 +147,21 @@ export function mapFinanceOverview(value: unknown): FinanceOverview {
         expenseMinor: integer(currency['expenseMinor'], 'витрати'),
         differenceMinor: integer(currency['differenceMinor'], 'різниця'),
         accountCount: integer(currency['accountCount'], 'рахунків'),
+        incomeCount: integer(currency['incomeCount'], 'надходжень'),
+        expenseCount: integer(currency['expenseCount'], 'витрат'),
+        topExpenses: list(currency['topExpenses'], 'куди пішли гроші').map((entry) => {
+          const category = record(entry, 'категорія витрат');
+          return {
+            categoryId: nullableText(category['categoryId'], 'категорія'),
+            name: text(category['name'], 'назва категорії'),
+            amountMinor: integer(category['amountMinor'], 'сума'),
+          };
+        }),
+        otherExpenseMinor: integer(currency['otherExpenseMinor'], 'інші витрати'),
+        otherExpenseCategoryCount: integer(
+          currency['otherExpenseCategoryCount'],
+          'інших категорій',
+        ),
       };
     }),
   };

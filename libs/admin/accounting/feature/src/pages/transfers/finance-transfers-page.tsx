@@ -23,7 +23,7 @@ import { Box, Button, Paper } from '@mui/material';
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { FinanceJournalToolbar } from '../../components/journal/finance-journal-toolbar';
+import { FinanceJournalQuickBar } from '../../components/journal/finance-journal-quick-bar';
 import { LedgerScopeTabs } from '../../components/journal/ledger-scope-tabs';
 import { FinanceTransferDrawer } from '../../components/transfers/finance-transfer-drawer';
 import { useAccountingSettings } from '../../hooks/accounts/use-accounting-settings';
@@ -127,15 +127,18 @@ function TransfersJournal({ scope, cutoverDate, today, onScopeChange }: JournalP
         actionMessage={actionMessage}
         onCloseActionMessage={() => setActionMessage(null)}
       />
-      <FinanceJournalToolbar
-        applied={journal.applied}
-        activeCount={journal.activeCount}
-        open={journal.open}
-        total={page?.total ?? 0}
-        onToggle={journal.toggle}
+      <FinanceJournalQuickBar
+        journal={journal}
+        scope={scope}
+        cutoverDate={cutoverDate}
+        today={today}
+        kind="transfers"
+        searchPlaceholder="Знайти за приміткою…"
+        totals={<FinanceTransferTotals totals={page?.totals ?? []} />}
       />
       {journal.open && (
         <FinanceJournalFilters
+          quick
           kind="transfers"
           value={journal.draft}
           accounts={choices.allAccounts}
@@ -145,7 +148,6 @@ function TransfersJournal({ scope, cutoverDate, today, onScopeChange }: JournalP
           onReset={journal.reset}
         />
       )}
-      <FinanceTransferTotals totals={page?.totals ?? []} />
       <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
         <FinanceTransfersGrid
           rows={rows}

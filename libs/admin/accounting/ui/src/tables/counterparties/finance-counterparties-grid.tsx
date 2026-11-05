@@ -1,12 +1,16 @@
 import { ReferenceDataGrid } from '@admin/references/ui';
 import { Stack, Typography } from '@mui/material';
+import { useMemo } from 'react';
 
+import { financeTurnoverColumn } from './finance-turnover-column';
 import { FinanceProblemPill } from '../../components/status/finance-problem-pill';
 
 import type { FinanceCounterparty } from '@admin/accounting/model';
 import type { GridColDef, GridPaginationModel, GridRowSelectionModel } from '@mui/x-data-grid';
 
 interface Props {
+  /** The start of the current books, for «Оборот з …». */
+  cutoverDate: string;
   rows: FinanceCounterparty[];
   rowCount: number;
   loading: boolean;
@@ -21,7 +25,7 @@ interface Props {
 
 const noSelection: GridRowSelectionModel = { type: 'include', ids: new Set() };
 
-const columns: GridColDef<FinanceCounterparty>[] = [
+const baseColumns: GridColDef<FinanceCounterparty>[] = [
   {
     field: 'name',
     headerName: 'Контрагент',
@@ -29,17 +33,19 @@ const columns: GridColDef<FinanceCounterparty>[] = [
     minWidth: 240,
     sortable: false,
     renderCell: ({ row }) => (
-      <Stack sx={{ py: 0.5, gap: 0.5, alignItems: 'flex-start', lineHeight: 1.3 }}>
-        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-          {row.name}
-        </Typography>
+      <Stack sx={{ py: 0.5, lineHeight: 1.3, minWidth: 0 }}>
+        <Stack direction="row" sx={{ gap: 1, alignItems: 'center', minWidth: 0 }}>
+          <Typography variant="body2" noWrap sx={{ fontWeight: 600 }}>
+            {row.name}
+          </Typography>
+          {!row.verified && <FinanceProblemPill label="Не підтверджено" />}
+          {!row.active && <FinanceProblemPill label="Архів" />}
+        </Stack>
         {row.aliases.length > 0 && (
-          <Typography variant="caption" color="text.secondary">
-            {row.aliases.join(', ')}
+          <Typography variant="caption" color="text.secondary" noWrap>
+            також: {row.aliases.join(', ')}
           </Typography>
         )}
-        {!row.verified && <FinanceProblemPill label="Не підтверджено" />}
-        {!row.active && <FinanceProblemPill label="Архів" />}
       </Stack>
     ),
   },
@@ -53,11 +59,11 @@ const columns: GridColDef<FinanceCounterparty>[] = [
   },
   {
     field: 'defaultCategoryRootName',
-    headerName: 'Категорія',
-    width: 220,
+    headerName: 'Категорія за замовчуванням',
+    width: 240,
     sortable: false,
     valueGetter: (_: unknown, row: FinanceCounterparty) =>
-      [row.defaultCategoryRootName, row.defaultSubcategoryName].filter(Boolean).join(' → ') || '—',
+      [row.defaultCategoryRootName, row.defaultSubcategoryName].filter(Boolean).join(' › ') || '—',
   },
   {
     field: 'operationCount',
@@ -71,7 +77,14 @@ const columns: GridColDef<FinanceCounterparty>[] = [
 ];
 
 /** «Контрагенти → Фінансові»: 50 rows per page; a row opens the side panel. */
-export function FinanceCounterpartiesGrid({ rowCount, onArchive, ...props }: Props) {
+export function FinanceCounterpartiesGrid({ rowCount, onArchive, cutoverDate, ...props }: Props) {
+  const columns = useMemo(
+    () => [
+      ...baseColumns,
+      financeTurnoverColumn<FinanceCounterparty>(cutoverDate, 'reference-mono'),
+    ],
+    [cutoverDate],
+  );
   return (
     <ReferenceDataGrid
       ariaLabel="Фінансові контрагенти"

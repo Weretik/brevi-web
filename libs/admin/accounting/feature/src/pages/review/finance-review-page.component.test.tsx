@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { cleanup, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -39,19 +39,36 @@ function openPage() {
 }
 
 describe('«Потребують перевірки» page', () => {
-  it('lists the current operations that need a review', async () => {
-    const calls = stubFinanceApi({ transactions: [waiting] });
+  it('shows each operation as a card with its problem', async () => {
+    const calls = stubFinanceApi({
+      transactions: [
+        waiting,
+        financeTransaction({
+          id: 't2',
+          description: 'Комісія банку',
+          verification: 'NeedsCategory',
+          categoryId: null,
+          categoryRootName: null,
+          subcategoryName: null,
+        }),
+      ],
+    });
     openPage();
 
-    const row = await screen.findByRole('row', { name: /Нитки/ });
-    expect(within(row).getByText('Перевірити контрагента')).toBeVisible();
-    expect(within(row).getByText('ФОП Іваненко')).toBeVisible();
+    const card = await screen.findByRole('article', { name: /Нитки/ });
+    expect(within(card).getByText('Перевірити контрагента')).toBeVisible();
+    expect(within(card).getByText('Вручну · ФОП Іваненко')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Без категорії 1' })).toBeVisible();
     expect(requestsTo(calls, '/api/accounting/transactions')[0]).toMatch(
       /scope=Current.*needsReview=true/,
     );
+
+    await userEvent.click(screen.getByRole('button', { name: 'Без категорії 1' }));
+    expect(screen.queryByRole('article', { name: /Нитки/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('article', { name: /Комісія банку/ })).toBeVisible();
   });
 
-  it('confirms the counterparty and saves the review with the operation version', async () => {
+  it('confirms the counterparty and saves the review with «Запамʼятати»', async () => {
     const user = userEvent.setup();
     const calls = stubFinanceApi({
       transactions: [waiting],
@@ -65,17 +82,13 @@ describe('«Потребують перевірки» page', () => {
     });
     openPage();
 
-    fireEvent.contextMenu(await screen.findByRole('row', { name: /Нитки/ }), {
-      clientX: 10,
-      clientY: 10,
-    });
-    await user.click(screen.getByRole('menuitem', { name: 'Переглянути' }));
-    const panel = await screen.findByRole('dialog', { name: 'Перевірка операції' });
-    await user.click(within(panel).getByRole('button', { name: 'Перевірено' }));
-    expect(within(panel).getByText(/Спершу підтвердіть/)).toBeVisible();
+    const card = await screen.findByRole('article', { name: /Нитки/ });
+    expect(within(card).getByText(/ще не підтверджений/)).toBeVisible();
+    await user.click(within(card).getByRole('button', { name: 'Підтвердити' }));
+    expect(within(card).getByText(/Спершу підтвердіть/)).toBeVisible();
     expect(calls.filter((call) => call.method !== 'GET')).toHaveLength(0);
 
-    await user.click(await within(panel).findByRole('button', { name: 'Підтвердити' }));
+    await user.click(await within(card).findByRole('button', { name: 'Підтвердити контрагента' }));
     await waitFor(() =>
       expect(calls.find((call) => call.method === 'POST')).toEqual({
         method: 'POST',
@@ -83,7 +96,12 @@ describe('«Потребують перевірки» page', () => {
         body: { version: 3 },
       }),
     );
-    await user.click(within(panel).getByRole('button', { name: 'Перевірено' }));
+    expect(
+      within(card).getByRole('checkbox', {
+        name: 'Запамʼятати: наступні операції «ФОП Іваненко» одразу в «Матеріали»',
+      }),
+    ).toBeChecked();
+    await user.click(within(card).getByRole('button', { name: 'Підтвердити' }));
 
     await waitFor(() =>
       expect(calls.find((call) => call.method === 'PUT')).toEqual({
@@ -94,6 +112,7 @@ describe('«Потребують перевірки» page', () => {
           counterparty: { kind: 'Financial', id: 'f1' },
           oneoffName: null,
           version: 2,
+          rememberCategory: true,
         },
       }),
     );

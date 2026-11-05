@@ -37,6 +37,7 @@ export function mapFinanceCounterparty(value: unknown): FinanceCounterparty {
     active: flag(row['active'], 'активний'),
     mergedIntoId: nullableText(row['mergedIntoId'], 'обʼєднано в'),
     operationCount: integer(row['operationCount'], 'операцій'),
+    currentTurnoverMinor: integer(row['currentTurnoverMinor'], 'оборот'),
     version: integer(row['version'], 'версія'),
     createdAt: dateTime(row['createdAt'], 'створено'),
     updatedAt: dateTime(row['updatedAt'], 'змінено'),
@@ -52,6 +53,7 @@ function mapFinanceParty(value: unknown): FinanceParty {
     taxId: text(row['taxId'], 'ЄДРПОУ/ІПН'),
     active: flag(row['active'], 'активний'),
     operationCount: integer(row['operationCount'], 'операцій'),
+    currentTurnoverMinor: integer(row['currentTurnoverMinor'], 'оборот'),
   };
 }
 

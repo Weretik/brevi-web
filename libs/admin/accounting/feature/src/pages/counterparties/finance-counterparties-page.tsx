@@ -24,6 +24,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { FinanceCounterpartyDrawer } from '../../components/counterparties/finance-counterparty-drawer';
 import { FinanceReviewDrawer } from '../../components/review/finance-review-drawer';
+import { useAccountingSettings } from '../../hooks/accounts/use-accounting-settings';
 import { useFinanceCounterpartyActions } from '../../hooks/counterparties/use-finance-counterparty-actions';
 import { useFinanceCounterpartyList } from '../../hooks/counterparties/use-finance-counterparty-list';
 
@@ -44,6 +45,7 @@ export function FinanceCounterpartiesPage() {
   const list = useFinanceCounterpartyList();
   const navigate = useNavigate();
   const categories = useGetFinanceCategoriesQuery().data ?? [];
+  const { cutoverDate } = useAccountingSettings();
   const [active, setActive] = useState<{
     mode: FinanceCounterpartyEditorMode;
     counterparty: FinanceCounterparty | null;
@@ -80,7 +82,7 @@ export function FinanceCounterpartiesPage() {
       <ReferencePageHeader
         overline="Бухгалтерія"
         title="Контрагенти"
-        subtitle="З ким операції: фінансові контрагенти, клієнти, постачальники і разові назви"
+        subtitle="З ким рухаються гроші. Клієнти й постачальники беруться з їхніх розділів"
         actions={
           <Button
             variant="contained"
@@ -132,6 +134,7 @@ export function FinanceCounterpartiesPage() {
         <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
           <FinanceCounterpartiesGrid
             {...grid}
+            cutoverDate={cutoverDate}
             rows={page?.financial ?? []}
             onView={(counterparty) => setActive({ mode: 'view', counterparty })}
             onEdit={(counterparty) =>
@@ -144,7 +147,12 @@ export function FinanceCounterpartiesPage() {
         </Paper>
       )}
       {(list.tab === 'Clients' || list.tab === 'Suppliers') && (
-        <FinancePartiesGrid {...grid} rows={page?.parties ?? []} onOpen={openParty} />
+        <FinancePartiesGrid
+          {...grid}
+          cutoverDate={cutoverDate}
+          rows={page?.parties ?? []}
+          onOpen={openParty}
+        />
       )}
       {list.tab === 'Oneoffs' && (
         <Paper variant="outlined" sx={{ overflow: 'hidden' }}>

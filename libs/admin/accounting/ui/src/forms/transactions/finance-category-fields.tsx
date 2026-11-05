@@ -13,6 +13,7 @@ interface Props {
   error?: string;
   /** «Без категорії» in the root list: a counterparty may have no default. */
   optional?: boolean;
+  size?: 'small' | 'medium';
   onRootChange: (id: string) => void;
   onSubcategoryChange: (id: string) => void;
 }
@@ -25,6 +26,7 @@ export function FinanceCategoryFields({
   children,
   error,
   optional,
+  size,
   onRootChange,
   onSubcategoryChange,
 }: Props) {
@@ -32,6 +34,7 @@ export function FinanceCategoryFields({
     <>
       <TextField
         select
+        size={size}
         label="Категорія"
         value={rootId}
         onChange={(event) => onRootChange(event.target.value)}
@@ -50,6 +53,7 @@ export function FinanceCategoryFields({
       </TextField>
       <TextField
         select
+        size={size}
         label="Підкатегорія"
         value={subcategoryId}
         disabled={!children.length}

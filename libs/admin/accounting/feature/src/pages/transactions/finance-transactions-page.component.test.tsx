@@ -56,10 +56,10 @@ describe('«Операції» page', () => {
 
     const row = await screen.findByRole('row', { name: /Нитки/ });
     expect(within(row).getByText(/−300,00/)).toBeVisible();
-    expect(within(row).getByText('Тканини')).toBeVisible();
+    expect(within(row).getByText('Матеріали › Тканини')).toBeVisible();
     expect(screen.getByRole('row', { name: /Продажі/ })).toHaveTextContent(/\+500,00/);
     const totals = screen.getByLabelText('Підсумки вибірки');
-    expect(totals).toHaveTextContent(/Різниця\s*200,00/);
+    expect(totals).toHaveTextContent(/Надходження\s*\+500,00.*Витрати\s*−300,00.*Різниця\s*200,00/);
     expect(requestsTo(calls, '/api/accounting/transactions')[0]).toMatch(
       /scope=Current.*page=1.*from=2026-10-01.*to=2026-11-05/,
     );
@@ -74,7 +74,7 @@ describe('«Операції» page', () => {
     openPage();
     await screen.findByText('Операцій поки немає');
 
-    await user.click(screen.getByRole('button', { name: 'Додати витрату' }));
+    await user.click(screen.getByRole('button', { name: 'Витрата' }));
     const panel = screen.getByRole('dialog', { name: 'Нова операція' });
     await user.click(within(panel).getByRole('combobox', { name: 'Рахунок' }));
     await user.click(await screen.findByRole('option', { name: 'Банк' }));
@@ -129,7 +129,7 @@ describe('«Операції» page', () => {
     openPage();
     await screen.findByText('Операцій поки немає');
 
-    await user.click(screen.getByRole('button', { name: 'Додати витрату' }));
+    await user.click(screen.getByRole('button', { name: 'Витрата' }));
     const panel = screen.getByRole('dialog', { name: 'Нова операція' });
     await user.click(within(panel).getByRole('combobox', { name: 'Рахунок' }));
     await user.click(await screen.findByRole('option', { name: 'Банк' }));
@@ -168,6 +168,7 @@ describe('«Операції» page', () => {
               active: true,
               mergedIntoId: null,
               operationCount: 0,
+              currentTurnoverMinor: 0,
               version: 1,
               createdAt: '2026-11-05T08:00:00+00:00',
               updatedAt: '2026-11-05T08:00:00+00:00',
@@ -177,7 +178,7 @@ describe('«Операції» page', () => {
     openPage();
     await screen.findByText('Операцій поки немає');
 
-    await user.click(screen.getByRole('button', { name: 'Додати витрату' }));
+    await user.click(screen.getByRole('button', { name: 'Витрата' }));
     const panel = screen.getByRole('dialog', { name: 'Нова операція' });
     await user.type(within(panel).getByRole('combobox', { name: 'Контрагент' }), 'Ринок');
     await user.click(
@@ -230,12 +231,15 @@ describe('«Операції» page', () => {
       /scope=LegacyArchive.*from=2010-01-01.*to=2026-09-30/,
     );
 
-    await user.click(screen.getByRole('button', { name: 'Фільтри' }));
+    await user.click(screen.getByRole('button', { name: 'Витрати' }));
+    await waitFor(() =>
+      expect(requestsTo(calls, '/api/accounting/transactions').at(-1)).toMatch(/type=Expense/),
+    );
+    await user.click(screen.getByRole('button', { name: 'Ще фільтри' }));
     const filters = screen.getByRole('form', { name: 'Фільтри журналу' });
-    await user.click(within(filters).getByRole('combobox', { name: 'Тип' }));
-    await user.click(await screen.findByRole('option', { name: 'Витрати' }));
+    expect(within(filters).queryByRole('combobox', { name: 'Тип' })).not.toBeInTheDocument();
     await user.click(within(filters).getByRole('switch', { name: 'Показати анульовані' }));
-    expect(requestsTo(calls, '/api/accounting/transactions')).toHaveLength(1);
+    expect(requestsTo(calls, '/api/accounting/transactions')).toHaveLength(2);
     await user.click(within(filters).getByRole('button', { name: 'Застосувати' }));
 
     await waitFor(() =>
@@ -243,6 +247,27 @@ describe('«Операції» page', () => {
         /type=Expense.*includeVoided=true|includeVoided=true.*type=Expense/,
       ),
     );
-    expect(screen.getByRole('button', { name: 'Фільтри · 2' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Ще фільтри · 1' })).toBeVisible();
+  });
+
+  it('applies a quick period and a typed search at once', async () => {
+    const user = userEvent.setup();
+    const calls = stubFinanceApi({ categories });
+    openPage();
+    await screen.findByText('Операцій поки немає');
+    expect(screen.getByRole('button', { name: 'З 01.10' })).toHaveAttribute('aria-pressed', 'true');
+
+    await user.click(screen.getByRole('button', { name: 'Жовтень' }));
+    await waitFor(() =>
+      expect(requestsTo(calls, '/api/accounting/transactions').at(-1)).toMatch(
+        /from=2026-10-01.*to=2026-10-31/,
+      ),
+    );
+    await user.type(screen.getByRole('searchbox', { name: 'Пошук' }), 'нитки');
+    await waitFor(() =>
+      expect(requestsTo(calls, '/api/accounting/transactions').at(-1)).toMatch(
+        /from=2026-10-01.*to=2026-10-31.*search=%D0%BD/,
+      ),
+    );
   });
 });

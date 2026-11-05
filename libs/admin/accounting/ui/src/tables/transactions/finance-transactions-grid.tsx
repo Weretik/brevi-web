@@ -49,13 +49,16 @@ const struck = (row: FinanceTransaction) =>
 const signed = (row: FinanceTransaction) =>
   formatSignedMinor(row.type, row.amountMinor, row.currency);
 
+const twoLines = { py: 0.5, lineHeight: 1.3, minWidth: 0 } as const;
+const clipped = { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } as const;
+
 const columns: GridColDef<FinanceTransactionRow>[] = [
   {
     field: 'date',
     headerName: 'Дата',
-    width: 140,
+    width: 112,
     renderCell: ({ row }) => (
-      <Stack sx={{ py: 0.5, lineHeight: 1.3 }}>
+      <Stack sx={twoLines}>
         <Box component="span" sx={{ fontFamily: 'var(--admin-font-mono)', ...struck(row) }}>
           {formatLedgerDate(row.date)}
         </Box>
@@ -67,25 +70,58 @@ const columns: GridColDef<FinanceTransactionRow>[] = [
       </Stack>
     ),
   },
-  { field: 'accountName', headerName: 'Рахунок', width: 180, sortable: false },
+  {
+    field: 'description',
+    headerName: 'Опис і контрагент',
+    flex: 1,
+    minWidth: 260,
+    sortable: false,
+    renderCell: ({ row }) => {
+      const label = transactionCounterpartyLabel(row);
+      const counterpartyProblem =
+        row.verification === 'NeedsCounterpartyReview'
+          ? verificationProblemLabels.NeedsCounterpartyReview
+          : null;
+      return (
+        <Stack sx={twoLines}>
+          <Stack direction="row" sx={{ gap: 1, alignItems: 'center', minWidth: 0 }}>
+            {voided(row) && <FinanceProblemPill label="Анульовано" />}
+            <Box component="span" sx={{ fontWeight: 600, ...clipped, ...struck(row) }}>
+              {row.description || row.comment || '—'}
+            </Box>
+          </Stack>
+          <Stack direction="row" sx={{ gap: 1, alignItems: 'center', minWidth: 0 }}>
+            <Typography variant="caption" color="text.secondary" sx={clipped}>
+              {[label.name === '—' ? null : label.name, label.caption]
+                .filter(Boolean)
+                .join(' · ') || 'Без контрагента'}
+            </Typography>
+            {label.missing && <FinanceProblemPill label="Немає в довіднику" />}
+            {counterpartyProblem && <FinanceProblemPill label={counterpartyProblem} />}
+          </Stack>
+        </Stack>
+      );
+    },
+  },
   {
     field: 'categoryRootName',
     headerName: 'Категорія',
-    width: 180,
+    width: 220,
     sortable: false,
-    valueFormatter: (value: string | null) => value ?? '—',
+    renderCell: ({ row }) =>
+      row.categoryRootName ? (
+        <Box component="span" sx={clipped}>
+          {[row.categoryRootName, row.subcategoryName].filter(Boolean).join(' › ')}
+        </Box>
+      ) : (
+        <FinanceProblemPill label={verificationProblemLabels.NeedsCategory ?? 'Без категорії'} />
+      ),
   },
-  {
-    field: 'subcategoryName',
-    headerName: 'Підкатегорія',
-    width: 170,
-    sortable: false,
-    valueFormatter: (value: string | null) => value ?? '—',
-  },
+  { field: 'accountName', headerName: 'Рахунок', width: 170, sortable: false },
   {
     field: 'amountMinor',
     headerName: 'Сума',
-    width: 170,
+    width: 150,
     align: 'right',
     headerAlign: 'right',
     cellClassName: 'reference-mono',
@@ -100,43 +136,6 @@ const columns: GridColDef<FinanceTransactionRow>[] = [
       >
         {signed(row)}
       </Box>
-    ),
-  },
-  {
-    field: 'counterparty',
-    headerName: 'Контрагент',
-    width: 210,
-    sortable: false,
-    renderCell: ({ row }) => {
-      const problem = verificationProblemLabels[row.verification];
-      const label = transactionCounterpartyLabel(row);
-      return (
-        <Stack sx={{ py: 0.5, gap: 0.5, alignItems: 'flex-start', lineHeight: 1.3 }}>
-          <span>{label.name}</span>
-          {label.caption && (
-            <Typography variant="caption" color="text.secondary">
-              {label.caption}
-            </Typography>
-          )}
-          {label.missing && <FinanceProblemPill label="Немає в довіднику" />}
-          {problem && <FinanceProblemPill label={problem} />}
-        </Stack>
-      );
-    },
-  },
-  {
-    field: 'description',
-    headerName: 'Примітка',
-    flex: 1,
-    minWidth: 220,
-    sortable: false,
-    renderCell: ({ row }) => (
-      <Stack direction="row" sx={{ gap: 1, alignItems: 'center', minWidth: 0 }}>
-        {voided(row) && <FinanceProblemPill label="Анульовано" />}
-        <Box component="span" sx={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          {[row.description, row.comment].filter(Boolean).join(' · ') || '—'}
-        </Box>
-      </Stack>
     ),
   },
 ];

@@ -1,7 +1,9 @@
 import { counterpartyKindLabels } from '@admin/accounting/model';
 import { Paper, Stack, Typography } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
+import { useMemo } from 'react';
 
+import { financeTurnoverColumn } from './finance-turnover-column';
 import { FinanceProblemPill } from '../../components/status/finance-problem-pill';
 
 import type { FinanceParty } from '@admin/accounting/model';
@@ -11,6 +13,8 @@ import type {} from '@mui/x-data-grid/themeAugmentation';
 type Row = FinanceParty & { key: string };
 
 interface Props {
+  /** The start of the current books, for «Оборот з …». */
+  cutoverDate: string;
   rows: FinanceParty[];
   rowCount: number;
   loading: boolean;
@@ -22,7 +26,7 @@ interface Props {
   onOpen: (party: FinanceParty) => void;
 }
 
-const columns: GridColDef<Row>[] = [
+const baseColumns: GridColDef<Row>[] = [
   {
     field: 'name',
     headerName: 'Назва',
@@ -58,8 +62,19 @@ const columns: GridColDef<Row>[] = [
 ];
 
 /** «Контрагенти → Клієнти / Постачальники»: read-only here, edited in their own lists. */
-export function FinancePartiesGrid({ rows, onOpen, searching, unavailable, ...props }: Props) {
+export function FinancePartiesGrid({
+  rows,
+  onOpen,
+  searching,
+  unavailable,
+  cutoverDate,
+  ...props
+}: Props) {
   const kind = rows[0]?.kind;
+  const columns = useMemo(
+    () => [...baseColumns, financeTurnoverColumn<Row>(cutoverDate, 'party-mono')],
+    [cutoverDate],
+  );
   return (
     <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
       <DataGrid

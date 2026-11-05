@@ -62,8 +62,37 @@ describe('movement mapper', () => {
         from: '2026-10-01',
         to: '2026-11-05',
         needsReviewCount: 0,
+        needsCategoryCount: 0,
+        needsCounterpartyCount: 0,
         currencies: [],
       }).scope,
     ).toBeNull();
+    const [uah] = mapFinanceOverview({
+      scope: 'Current',
+      from: '2026-11-01',
+      to: '2026-11-05',
+      needsReviewCount: 3,
+      needsCategoryCount: 2,
+      needsCounterpartyCount: 1,
+      currencies: [
+        {
+          currency: 'UAH',
+          balanceMinor: 1,
+          unconfirmedCutoverCount: 0,
+          incomeMinor: 0,
+          expenseMinor: 500,
+          differenceMinor: -500,
+          accountCount: 1,
+          incomeCount: 0,
+          expenseCount: 2,
+          topExpenses: [{ categoryId: null, name: 'Без категорії', amountMinor: 500 }],
+          otherExpenseMinor: 0,
+          otherExpenseCategoryCount: 0,
+        },
+      ],
+    }).currencies;
+    expect(uah?.topExpenses).toEqual([
+      { categoryId: null, name: 'Без категорії', amountMinor: 500 },
+    ]);
   });
 });
