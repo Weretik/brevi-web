@@ -6,10 +6,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { App } from '../app';
 import { createAdminRouter } from './create-admin-router';
 
-import type { SessionUser } from '@admin/core/auth';
+import type { SessionRole, SessionUser } from '@admin/core/auth';
 import type { ReactNode } from 'react';
 
-const session = vi.hoisted(() => ({ roles: ['Manager'] }));
+const session = vi.hoisted(() => ({ roles: ['Manager'] as SessionRole[] }));
 
 vi.mock('@admin/core/auth', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@admin/core/auth')>()),
