@@ -90,6 +90,7 @@ libs/admin/quotes/
     components/custom-sewing/        «Виріб з нуля» side panel; «Змінити склад» loader for a Catalog model
     components/photo/                «Змінити фото» side panel: another photo of the item's product
     components/introduction/         «Обрати модель», «Готові шаблони», «Зберегти як шаблон» side panels
+    components/customers/            client card tab «КП» (`CustomerQuotes`, `customerId`, in work and archived, «Стан» column)
     components/lifecycle/            «Історія змін» side panel
     components/start/                «Нове КП» side panel
     hooks/{list,editor,picker,settings,sending,preview}/  list state; draft and save; catalogue search; settings draft, unsaved changes over the Google sign-in, section in view; send panel, Gmail connect and its return notice; PDF preview (save first, object URL, download)

@@ -1,4 +1,6 @@
 import { CustomerContacts } from '@admin/clients/ui';
+import { CustomerProductionOrders } from '@admin/production/feature';
+import { CustomerQuotes } from '@admin/quotes/feature';
 import { Alert, Box, Button, CircularProgress, Stack, Typography } from '@mui/material';
 
 import { ConfirmClientRefresh } from '../../../components/changes/confirm-client-refresh';
@@ -7,8 +9,10 @@ import { CustomerContactDialog } from '../../../components/contacts/customer-con
 import { CustomerForm } from '../../../components/customers/customer-form';
 import { DuplicateCandidates } from '../../../components/customers/duplicate-candidates';
 import { CustomerMergeDialog } from '../../../components/merge/customer-merge-dialog';
+import { CustomerTabs } from '../../../components/tabs/customer-tabs';
 import { customerError } from '../../../errors/customer-error';
 import { useCustomerDetail } from '../../../hooks/customers/use-customer-detail';
+import { useCustomerTab } from '../../../hooks/customers/use-customer-tab';
 
 export default function CustomerDetailPage() {
   const {
@@ -37,6 +41,8 @@ export default function CustomerDetailPage() {
     save,
     pending,
   } = useCustomerDetail();
+  const { tab, setTab } = useCustomerTab();
+  const numericId = Number(customerId);
   return (
     <Box sx={{ p: { xs: 2, md: 3 }, maxWidth: 1100 }}>
       <Stack spacing={2}>
@@ -59,6 +65,14 @@ export default function CustomerDetailPage() {
             <Typography component="h1" variant="h4">
               {customer.displayName}
             </Typography>
+            {/* Unsaved changes stay on «Картка»: the other tabs open after saving. */}
+            <CustomerTabs tab={tab} disabled={dirty} onChange={setTab} />
+            {tab === 'quotes' && <CustomerQuotes customerId={numericId} />}
+            {tab === 'orders' && <CustomerProductionOrders customerId={numericId} />}
+          </>
+        )}
+        {!query.error && customer && tab === 'card' && (
+          <>
             {saved && (
               <Alert severity="success" onClose={() => setSaved(false)}>
                 Клієнта збережено.

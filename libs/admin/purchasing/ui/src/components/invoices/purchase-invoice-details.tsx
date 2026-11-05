@@ -1,4 +1,4 @@
-import { purchaseLinkStatus } from '@admin/purchasing/model';
+import { formatPurchaseMessageAt, purchaseLinkStatus } from '@admin/purchasing/model';
 import { ReferenceDetailsList, ReferenceFormSection } from '@admin/references/ui';
 import { Divider, Link, Stack, Typography } from '@mui/material';
 import { Fragment } from 'react';
@@ -64,7 +64,7 @@ export function PurchaseInvoiceDetails({ invoice, renderLinkActions }: Props) {
               label: 'Чат і автор',
               value: [invoice.chatName, invoice.fromUser].filter(Boolean).join(' · ') || null,
             },
-            { label: 'Дата', value: invoice.messageAt, mono: true },
+            { label: 'Дата', value: formatPurchaseMessageAt(invoice.messageAt), mono: true },
             {
               label: 'Джерело',
               value: `UID ${invoice.sourceUid} · рядок ${invoice.rowNumber}${

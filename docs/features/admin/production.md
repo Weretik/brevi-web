@@ -87,6 +87,7 @@ libs/admin/production/
     components/stock/             # line card, receipt, correction, consumption and issue side panels, item «Тканина»
     components/work/              # «Додати роботу» side panel, «Сторно» dialog, item «Робота»
     components/payroll/           # month view, roles and embroidery, payment / adjustment / worker side panels
+    components/customers/         # client card tab «Завдання в цех» (`CustomerProductionOrders`, `customerId`)
 apps/admin-react/src/app/router/  # legacy-menu.ts items, create-admin-router.tsx guards, use-production-order-actor.ts
 libs/admin/core/auth/src/session/session-user.ts # WorkshopChief, canManageWorkshop
 ```

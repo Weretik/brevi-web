@@ -34,6 +34,7 @@ export const quotesApi = quotesBaseApi.injectEndpoints({
           responsibleUserId: query.responsibleUserId ?? undefined,
           page: query.page,
           pageSize: query.pageSize,
+          customerId: query.customerId,
         },
       }),
       transformResponse: mapQuotePage,

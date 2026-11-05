@@ -1,6 +1,8 @@
 import { Box, Paper } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 
+import { QuoteStatusPill } from '../components/editor/quote-status-pill';
+
 import type { QuoteSummary } from '@admin/quotes/model';
 import type { GridColDef, GridPaginationModel } from '@mui/x-data-grid';
 import type {} from '@mui/x-data-grid/themeAugmentation';
@@ -12,12 +14,29 @@ interface Props {
   searching: boolean;
   /** The «Архів» tab. */
   archive?: boolean;
+  /** The client card: a «Стан» column (draft, sent or archived), since both lists are mixed. */
+  withStatus?: boolean;
+  /** Text of an empty list instead of the «КП» page wording. */
+  emptyLabel?: string;
   paginationModel: GridPaginationModel;
   onPaginationModelChange: (model: GridPaginationModel) => void;
   onOpen: (row: QuoteSummary) => void;
 }
 
 const dateFormat = new Intl.DateTimeFormat('uk-UA', { dateStyle: 'short', timeStyle: 'short' });
+
+const statusColumn: GridColDef<QuoteSummary> = {
+  field: 'status',
+  headerName: 'Стан',
+  width: 170,
+  renderCell: ({ row }) => (
+    <QuoteStatusPill
+      status={row.status}
+      lastSentAt={row.lastSentAt}
+      archived={row.archivedAt !== null}
+    />
+  ),
+};
 
 const columns: GridColDef<QuoteSummary>[] = [
   { field: 'number', headerName: 'Номер', width: 120, cellClassName: 'quote-mono' },
@@ -66,6 +85,8 @@ export function QuotesTable({
   loading,
   searching,
   archive = false,
+  withStatus = false,
+  emptyLabel,
   paginationModel,
   onPaginationModelChange,
   onOpen,
@@ -76,7 +97,7 @@ export function QuotesTable({
         <DataGrid
           aria-label="Комерційні пропозиції"
           rows={rows as QuoteSummary[]}
-          columns={columns}
+          columns={withStatus ? [...columns, statusColumn] : columns}
           loading={loading}
           rowCount={rowCount}
           paginationMode="server"
@@ -89,11 +110,13 @@ export function QuotesTable({
           onPaginationModelChange={onPaginationModelChange}
           onRowClick={({ row }) => onOpen(row)}
           localeText={{
-            noRowsLabel: searching
-              ? 'Нічого не знайдено'
-              : archive
-                ? 'В архіві немає КП'
-                : 'Ще немає жодної КП',
+            noRowsLabel: emptyLabel
+              ? emptyLabel
+              : searching
+                ? 'Нічого не знайдено'
+                : archive
+                  ? 'В архіві немає КП'
+                  : 'Ще немає жодної КП',
             paginationRowsPerPage: 'Рядків на сторінці',
           }}
           sx={{

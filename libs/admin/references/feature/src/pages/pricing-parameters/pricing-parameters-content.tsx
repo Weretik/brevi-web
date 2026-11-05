@@ -15,7 +15,10 @@ import { Box, Button, Paper } from '@mui/material';
 import { useMemo, useState } from 'react';
 
 import { PricingParameterDrawer } from '../../components/pricing-parameters/pricing-parameter-drawer';
-import { nextSortOrder, usePricingParameters } from '../../hooks/pricing-parameters/use-pricing-lists';
+import {
+  nextSortOrder,
+  usePricingParameters,
+} from '../../hooks/pricing-parameters/use-pricing-lists';
 import { useReferenceDeletion } from '../../hooks/reference-lists/use-reference-deletion';
 
 import type {

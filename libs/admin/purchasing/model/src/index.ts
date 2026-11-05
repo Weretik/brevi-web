@@ -27,6 +27,7 @@ export {
   describePurchaseDocument,
   describePurchaseRecognitionBatch,
   formatPurchaseDocumentDate,
+  formatPurchaseMessageAt,
   formatPurchaseMoney,
   purchaseVatLabel,
 } from './mappers/invoices/describe-purchase-document';

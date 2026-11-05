@@ -15,7 +15,17 @@ import {
 } from '@admin/production/ui';
 import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
-import { Alert, Box, Checkbox, FormControlLabel, Stack, Tab, Tabs, TextField, Typography } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Checkbox,
+  FormControlLabel,
+  Stack,
+  Tab,
+  Tabs,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useState } from 'react';
 
 type View = 'overview' | 'output' | 'staff' | 'materials' | 'stock';
@@ -28,7 +38,17 @@ const views: { value: View; label: string }[] = [
   { value: 'stock', label: 'Залишки' },
 ];
 
-function MonthField({ label, value, max, onChange }: { label: string; value: string; max: string; onChange: (value: string) => void }) {
+function MonthField({
+  label,
+  value,
+  max,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  max: string;
+  onChange: (value: string) => void;
+}) {
   return (
     <TextField
       label={label}
@@ -80,10 +100,22 @@ export function WorkshopReportPage() {
         actions={null}
       />
       <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 1.5, alignItems: 'center', mb: 2 }}>
-        <MonthField label="Від" value={from} max={current} onChange={(value) => setPeriod(value, to)} />
-        <MonthField label="До" value={to} max={current} onChange={(value) => setPeriod(from, value)} />
+        <MonthField
+          label="Від"
+          value={from}
+          max={current}
+          onChange={(value) => setPeriod(value, to)}
+        />
+        <MonthField
+          label="До"
+          value={to}
+          max={current}
+          onChange={(value) => setPeriod(from, value)}
+        />
         <FormControlLabel
-          control={<Checkbox checked={compare} onChange={(event) => setCompare(event.target.checked)} />}
+          control={
+            <Checkbox checked={compare} onChange={(event) => setCompare(event.target.checked)} />
+          }
           label="Порівняти з"
         />
         {compare && (
@@ -99,7 +131,9 @@ export function WorkshopReportPage() {
         </Alert>
       )}
       <ReferenceListAlerts
-        error={query.error ? adminApiErrorMessage(query.error, 'Не вдалося сформувати звіт.') : null}
+        error={
+          query.error ? adminApiErrorMessage(query.error, 'Не вдалося сформувати звіт.') : null
+        }
         loading={query.isFetching}
         onRetry={() => void query.refetch()}
         actionMessage={null}
@@ -127,7 +161,9 @@ export function WorkshopReportPage() {
               <Tab key={item.value} value={item.value} label={item.label} />
             ))}
           </Tabs>
-          {view === 'overview' && <ReportTotals report={report} comparison={query.data?.comparison ?? null} />}
+          {view === 'overview' && (
+            <ReportTotals report={report} comparison={query.data?.comparison ?? null} />
+          )}
           {view === 'output' && <ReportOutputTable rows={report.output} />}
           {view === 'staff' && <ReportStaffTable rows={report.staff} />}
           {view === 'materials' && <ReportMaterialsTable rows={report.materials} />}

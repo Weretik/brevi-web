@@ -37,13 +37,17 @@ import type {
 export function purchaseInvoiceEndpoints(build: PurchasingEndpointBuilder) {
   return {
     getPurchaseInvoices: build.query<PurchaseInvoicePage, PurchaseInvoiceQuery>({
-      query: ({ page, pageSize, search, filter }) => ({
+      query: ({ page, pageSize, search, filter, supplierId, documentFrom, documentTo, vat }) => ({
         url: '/api/purchasing/invoices',
         params: {
           page,
           pageSize,
           search: search || undefined,
           filter: filter === 'All' ? undefined : filter,
+          supplierId,
+          documentFrom: documentFrom || undefined,
+          documentTo: documentTo || undefined,
+          vat,
         },
       }),
       transformResponse: mapPurchaseInvoicePage,

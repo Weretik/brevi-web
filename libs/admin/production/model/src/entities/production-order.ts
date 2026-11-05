@@ -241,6 +241,8 @@ export interface ProductionOrderListQuery {
   stage: ProductionStage | null;
   page: number;
   pageSize: number;
+  /** The client card tab «Завдання в цех»: only orders made from this client's КП. */
+  customerId?: number;
 }
 
 export interface ProductionItemDetails {

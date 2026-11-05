@@ -8572,15 +8572,15 @@ export interface components {
     /** @enum {string} */
     PurchaseInvoiceFilter: 'All' | 'NeedsReview' | 'WithoutSupplier' | 'NotRecognized';
     /**
-     * @description NeedsReview when the representative row or the last recognition of a file has problems; Recognized when every safe link has checked facts; otherwise AwaitingRecognition. Shown only as problems, never as a badge.
-     * @enum {string}
-     */
-    PurchaseInvoiceState: 'NeedsReview' | 'AwaitingRecognition' | 'Recognized';
-    /**
      * @description WithVat only when VAT is clearly printed; otherwise WithoutVat.
      * @enum {string}
      */
     PurchaseDocumentVat: 'WithVat' | 'WithoutVat';
+    /**
+     * @description NeedsReview when the representative row or the last recognition of a file has problems; Recognized when every safe link has checked facts; otherwise AwaitingRecognition. Shown only as problems, never as a badge.
+     * @enum {string}
+     */
+    PurchaseInvoiceState: 'NeedsReview' | 'AwaitingRecognition' | 'Recognized';
     PurchaseDocumentItemResponse: {
       /** Format: int32 */
       position: number;
@@ -14331,6 +14331,8 @@ export interface operations {
         pageSize?: number;
         /** @description True lists only «Архів», false (default) only КП in work. */
         archived?: boolean;
+        /** @description The client card tab «КП»; only this client's КП, in work and archived together (archived is ignored). */
+        customerId?: number;
       };
       header?: never;
       path?: never;
@@ -16915,6 +16917,8 @@ export interface operations {
           | 'Ready'
           | 'Shipped'
           | 'Complete';
+        /** @description The client card tab «Завдання в цех»; only orders made from this client's КП. */
+        customerId?: number;
         page?: number;
         pageSize?: number;
       };
@@ -20153,6 +20157,14 @@ export interface operations {
         pageSize?: number;
         search?: string;
         filter?: components['schemas']['PurchaseInvoiceFilter'];
+        /** @description The supplier card tab «Рахунки на закупку»; only cards linked to this supplier. */
+        supplierId?: number;
+        /** @description Only cards with a checked document dated on or after this day. */
+        documentFrom?: string;
+        /** @description Only cards with a checked document dated on or before this day; not earlier than documentFrom. */
+        documentTo?: string;
+        /** @description Only cards with a checked document of this VAT mode. */
+        vat?: components['schemas']['PurchaseDocumentVat'];
       };
       header?: never;
       path?: never;
