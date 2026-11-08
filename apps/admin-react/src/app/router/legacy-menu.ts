@@ -188,6 +188,12 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         requiredRoles: accounting,
       },
       {
+        id: 'purchase-invoices',
+        label: 'Рахунки на закупку',
+        path: '/accounting/purchase-invoices',
+        requiredRoles: accounting,
+      },
+      {
         id: 'finance-review',
         label: 'Потребують перевірки',
         path: '/accounting/review',

@@ -4,6 +4,7 @@ import {
   canManageUsers,
   canManageWorkshop,
   canUseAccounting,
+  canUsePurchaseInvoices,
   LoginPage,
   loginPath,
   refreshSession,
@@ -11,6 +12,7 @@ import {
   RequireRole,
   useAdminSession,
 } from '@admin/core/auth';
+import { purchasingRoutes } from '@admin/purchasing/feature';
 import { createProfileRoutes, createUsersRoutes } from '@admin/users/feature';
 import { createBrowserRouter } from 'react-router-dom';
 
@@ -68,6 +70,7 @@ export function createAdminRouter() {
         { element: <RequireRole allow={canPriceEmbroidery} />, children: embroideryRoutes },
         { element: <RequireRole allow={canManageWorkshop} />, children: productionRoutes },
         { element: <RequireRole allow={canUseAccounting} />, children: accountingRoutes },
+        { element: <RequireRole allow={canUsePurchaseInvoices} />, children: purchasingRoutes },
         { element: <RequireRole allow={canManageUsers} />, children: productionReportRoutes },
         {
           element: <RequireRole allow={canUseProductionOrders} />,

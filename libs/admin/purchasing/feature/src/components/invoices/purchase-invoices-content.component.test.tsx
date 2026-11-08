@@ -136,9 +136,9 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-function renderContent(url = '/references/counterparties?tab=purchases') {
+function renderContent(url = '/accounting/purchase-invoices') {
   const router = createMemoryRouter(
-    [{ path: '/references/counterparties', element: <PurchaseInvoicesContent /> }],
+    [{ path: '/accounting/purchase-invoices', element: <PurchaseInvoicesContent /> }],
     { initialEntries: [url] },
   );
   render(<RouterProvider router={router} />);
@@ -155,7 +155,7 @@ async function openPanel(user: ReturnType<typeof userEvent.setup>) {
   return screen.getByRole('dialog', { name: 'Рахунок на закупку' });
 }
 
-describe('«Контрагенти → Рахунки на закупку»', () => {
+describe('«Бухгалтерія → Рахунки на закупку»', () => {
   it('shows the state of each invoice and opens what was read with the arrow', async () => {
     const user = userEvent.setup();
     renderContent();
@@ -193,7 +193,7 @@ describe('«Контрагенти → Рахунки на закупку»', ()
 
   it('narrows the register by invoice date and VAT, kept in the URL', async () => {
     const user = userEvent.setup();
-    const router = renderContent('/references/counterparties?tab=purchases&from=2026-11-01');
+    const router = renderContent('/accounting/purchase-invoices?from=2026-11-01');
 
     expect(screen.getByLabelText('Дата рахунку з')).toHaveValue('2026-11-01');
     await user.click(screen.getByRole('button', { name: 'Без ПДВ' }));

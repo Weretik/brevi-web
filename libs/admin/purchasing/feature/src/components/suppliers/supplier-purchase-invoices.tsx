@@ -4,13 +4,13 @@ import { Alert, Box, Button, CircularProgress, Stack, Typography } from '@mui/ma
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { purchaseInvoicesPath } from '../../purchasing-paths';
+
 interface Props {
   supplierId: number;
 }
 
 const pageSize = 25;
-const registerPath = '/references/counterparties?tab=purchases';
-
 /**
  * Supplier card tab «Рахунки на закупку»: invoices the accountant linked to this supplier, newest first.
  * A row opens the register on that invoice; it is read-only here.
@@ -58,7 +58,7 @@ export function SupplierPurchaseInvoices({ supplierId }: Props) {
         page={list.data}
         onPageChange={(next) => setPage(next + 1)}
         onOpen={(invoice) =>
-          navigate(`${registerPath}&search=${encodeURIComponent(invoice.sourceUid)}`)
+          navigate(`${purchaseInvoicesPath}?search=${encodeURIComponent(invoice.sourceUid)}`)
         }
       />
     </Stack>

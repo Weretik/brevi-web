@@ -2,7 +2,7 @@
 
 **Status:** implemented 2026-11-03 ([SDD 016](../../../specs/admin/references/016-counterparties/README.md)).
 
-`/references/counterparties` («Загальні довідники → Контрагенти») has «Постачальники» (default, the [suppliers page](suppliers.md)), «Клієнти» (`?tab=clients`) and, for the accountant and Admin, [«Рахунки на закупку»](../purchasing.md) (`?tab=purchases`). Suppliers and clients come from KeepinCRM and are refreshed by the daily backend job `brevierp-sync`. The old addresses `/references/supplier` and `/crm/clients` redirect here.
+`/references/counterparties` («Загальні довідники → Контрагенти») has «Постачальники» (default, the [suppliers page](suppliers.md)), and «Клієнти» (`?tab=clients`). [«Рахунки на закупку»](../purchasing.md) moved to «Бухгалтерія» (Director only); the old `?tab=purchases` link leads there. Suppliers and clients come from KeepinCRM and are refreshed by the daily backend job `brevierp-sync`. The old addresses `/references/supplier` and `/crm/clients` redirect here.
 
 The «Клієнти» tab follows reference pattern B. It has:
 
