@@ -13,8 +13,12 @@ const FinanceTransactionsPage = lazy(
   () => import('./pages/transactions/finance-transactions-page'),
 );
 const FinanceTransfersPage = lazy(() => import('./pages/transfers/finance-transfers-page'));
+const BankStatementPage = lazy(() => import('./pages/statements/bank-statement-page'));
+const BankStatementsPage = lazy(() => import('./pages/statements/bank-statements-page'));
 const LegacyFinanceImportPage = lazy(() => import('./pages/import/legacy-finance-import-page'));
 
+export const bankStatementsPath = '/accounting/statements';
+export const bankStatementPath = (id: string) => `${bankStatementsPath}/${encodeURIComponent(id)}`;
 export const financeAccountsPath = '/accounting/accounts';
 export const financeCategoriesPath = '/accounting/categories';
 export const financeCounterpartiesPath = '/accounting/counterparties';
@@ -33,5 +37,7 @@ export const accountingRoutes: (RouteObject & { path: string })[] = [
   { path: financeCounterpartiesPath, element: <FinanceCounterpartiesPage /> },
   { path: financeAccountsPath, element: <FinanceAccountsPage /> },
   { path: financeCategoriesPath, element: <FinanceCategoriesPage /> },
+  { path: bankStatementsPath, element: <BankStatementsPage /> },
+  { path: `${bankStatementsPath}/:id`, element: <BankStatementPage /> },
   { path: legacyFinanceImportPath, element: <LegacyFinanceImportPage /> },
 ];

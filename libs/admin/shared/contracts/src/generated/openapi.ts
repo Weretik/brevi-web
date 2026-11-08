@@ -561,6 +561,144 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/accounting/transactions/{id}/attachments': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Files of one income or expense, oldest first; removed files are left out. */
+    get: operations['getFinanceAttachments'];
+    put?: never;
+    /** @description «Додати файл»: a PDF, JPEG or PNG from 1 byte to 10 MiB, told by its first bytes, into the private storage under finance/<transactionId>/<attachmentId>.<ext>. A voided operation takes no files. Logged as AttachmentAdd of the Transaction. */
+    post: operations['uploadFinanceAttachment'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/attachments/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    /** @description «Видалити»: the file leaves the operation and the storage; the change log keeps its name (AttachmentDelete of the Transaction). */
+    delete: operations['deleteFinanceAttachment'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/attachments/{id}/content': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description The content for an inline view: Content-Disposition inline, Cache-Control private, no-store, X-Content-Type-Options nosniff. */
+    get: operations['getFinanceAttachmentContent'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/legacy-import': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description «Імпорт архіву Фінансів» (stage 5): finance.json of the old Calculator export (format brevi-finance-v5), as is or gzipped by the browser (told by the gzip signature; unpacked up to 200 MiB). dryRun=true only checks and reports. dryRun=false moves the records with their old ids in one transaction and only when the check has no errors; otherwise the report comes back with applied=false and nothing is written. A record whose id Brevi already has is skipped, so a second run adds only what is missing. Old clients and suppliers used in operations are linked to «Клієнти» by KeepinCRM id and to «Постачальники» by KeepinCRM id or a unique name; unknown ones become finance counterparties. Bank statement previews and files are not moved. */
+    post: operations['importLegacyFinance'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/statements': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description «Історія виписок» (stage 6) — the last 100 uploaded statements of all accounts, newest first. */
+    get: operations['getBankStatements'];
+    put?: never;
+    /** @description «Завантажити виписку» (stage 6): a statement of one account as the bank gave it — XLSX, XLS or CSV, at most 12 MiB and 10 000 rows. It becomes a preview with recognised lines (duplicates, transfers between own accounts, counterparties by ЄДРПОУ, IBAN or name, auto categories); nothing reaches the books until book. The same file of the same account returns the statement uploaded before with existing=true. */
+    post: operations['uploadBankStatement'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/statements/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description A statement with 100 of its lines in file order (optionally of one state), the number of lines in each state and what book would add now. */
+    get: operations['getBankStatement'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/statements/{id}/lines/{lineId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** @description The director's choice for one line of a statement that is not booked — category of the current books in the direction of the line (or none), a counterparty or a one-off name (not both), description, note and excluded. A transfer line takes only the note and excluded; an error line and an exact duplicate cannot be included. The bank data never change. */
+    put: operations['updateBankStatementLine'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/statements/{id}/book': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description «Провести виписку»: every included line of states Ready, NeedsCategory and NewCounterparty becomes an operation (source BankImport) and every Transfer line a transfer, in one save, after the exact duplicates are checked again. A line nobody was recognised for creates an unconfirmed finance counterparty (one per ЄДРПОУ, IBAN or name). The statement becomes Booked and no longer changes. */
+    post: operations['bookBankStatement'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/admin/users': {
     parameters: {
       query?: never;
@@ -5049,6 +5187,220 @@ export interface components {
       version: number;
       /** Format: int32 */
       targetVersion: number;
+    };
+    /** @description A file of an operation; its content is GET /api/accounting/attachments/{id}/content. */
+    FinanceAttachmentResponse: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      transactionId: string;
+      fileName: string;
+      /** @enum {string} */
+      contentType: 'application/pdf' | 'image/jpeg' | 'image/png';
+      /** Format: int64 */
+      sizeBytes: number;
+      createdBy: string;
+      /** Format: date-time */
+      createdAt: string;
+    };
+    /** @enum {string} */
+    LegacyImportKind:
+      'Accounts' | 'Categories' | 'Counterparties' | 'Transactions' | 'Transfers' | 'AuditEntries';
+    /** @description Records of one kind: in the file, to add, already moved earlier (same id), left out on purpose (counterparties: linked to a Brevi client or supplier, or unused; log entries: of records not added now). */
+    LegacyImportCountResponse: {
+      kind: components['schemas']['LegacyImportKind'];
+      /** Format: int32 */
+      inFile: number;
+      /** Format: int32 */
+      toAdd: number;
+      /** Format: int32 */
+      alreadyMoved: number;
+      /** Format: int32 */
+      skipped: number;
+    };
+    /** @description Old clients and suppliers used in operations, linked to Brevi or kept as finance counterparties; unused ones are not moved. */
+    LegacyImportPartiesResponse: {
+      /** Format: int32 */
+      clientsLinked: number;
+      /** Format: int32 */
+      clientsAsFinancial: number;
+      /** Format: int32 */
+      suppliersLinked: number;
+      /** Format: int32 */
+      suppliersAsFinancial: number;
+      /** Format: int32 */
+      unused: number;
+    };
+    /** @enum {string} */
+    LegacyImportMovement: 'Income' | 'Expense' | 'Transfer';
+    /** @description Movements of the file by area, kind and state, in kopecks. */
+    LegacyImportTotalResponse: {
+      scope: components['schemas']['LedgerScope'];
+      movement: components['schemas']['LegacyImportMovement'];
+      status: components['schemas']['MovementStatus'];
+      currency: string;
+      /** Format: int32 */
+      count: number;
+      /** Format: int64 */
+      amountMinor: number;
+    };
+    /** @description An account after the move, from the file: archiveMinor — on 30.09.2026 (opening plus active archive movements); currentMinor — confirmed balance on 01.10 plus the current books, null while not confirmed; differenceMinor — confirmed minus archive balance when they differ. */
+    LegacyImportBalanceResponse: {
+      /** Format: uuid */
+      accountId: string;
+      name: string;
+      currency: string;
+      active: boolean;
+      /** Format: int64 */
+      archiveMinor: number;
+      /** Format: int64 */
+      cutoverMinor: number | null;
+      /** Format: int64 */
+      currentMinor: number | null;
+      /** Format: int64 */
+      differenceMinor: number | null;
+    };
+    /** @description What the move finds (a check) or did (applied). canApply is false while errors is not empty; errorCount counts every error, errors lists the first 100, warnings at most 100. Totals and balances are counted from the file, so they reconcile with the old system. */
+    LegacyFinanceImportReport: {
+      applied: boolean;
+      canApply: boolean;
+      /** Format: date-time */
+      exportedAt: string | null;
+      counts: components['schemas']['LegacyImportCountResponse'][];
+      parties: components['schemas']['LegacyImportPartiesResponse'];
+      totals: components['schemas']['LegacyImportTotalResponse'][];
+      balances: components['schemas']['LegacyImportBalanceResponse'][];
+      /** Format: int32 */
+      errorCount: number;
+      errors: string[];
+      warnings: string[];
+    };
+    /** @enum {string} */
+    BankStatementStatus: 'Preview' | 'Booked';
+    BankStatementResponse: {
+      /** Format: uuid */
+      id: string;
+      /** Format: uuid */
+      accountId: string;
+      accountName: string;
+      fileName: string;
+      status: components['schemas']['BankStatementStatus'];
+      /** Format: int32 */
+      lineCount: number;
+      /** Format: date */
+      firstDate: string | null;
+      /** Format: date */
+      lastDate: string | null;
+      /** Format: int32 */
+      transactionCount: number;
+      /** Format: int32 */
+      transferCount: number;
+      createdBy: string;
+      /** Format: date-time */
+      createdAt: string;
+      bookedBy: string | null;
+      /** Format: date-time */
+      bookedAt: string | null;
+      /** Format: int32 */
+      version: number;
+      /** @description True when the same file was uploaded before and that statement is returned */
+      existing: boolean;
+    };
+    /**
+     * @description Worst first — Error is never booked, Duplicate is already in the books, Transfer goes to another own account, NewCounterparty has nobody recognised (or an unconfirmed finance counterparty), NeedsCategory has no category.
+     * @enum {string}
+     */
+    BankLineState:
+      'Ready' | 'NeedsCategory' | 'NewCounterparty' | 'Transfer' | 'Duplicate' | 'Error';
+    BankLineStateCount: {
+      state: components['schemas']['BankLineState'];
+      /** Format: int32 */
+      count: number;
+    };
+    /** @description Lines book would add now — operations with their income and expense in kopecks, and transfers. */
+    BankStatementTotals: {
+      /** Format: int32 */
+      operations: number;
+      /** Format: int64 */
+      incomeMinor: number;
+      /** Format: int64 */
+      expenseMinor: number;
+      /** Format: int32 */
+      transfers: number;
+    };
+    /**
+     * @description Exact — the same bank id or fingerprint, never booked; Probable — a similar record, excluded at first but may be included.
+     * @enum {string}
+     */
+    BankDuplicate: 'None' | 'Probable' | 'Exact';
+    BankStatementLineResponse: {
+      /** Format: uuid */
+      id: string;
+      /**
+       * Format: int32
+       * @description Row of the file, from 1
+       */
+      rowNumber: number;
+      /** Format: date */
+      date: string | null;
+      /** @description HH:mm:ss from a time column */
+      time: string | null;
+      type: components['schemas']['CategoryDirection'] | null;
+      /** Format: int64 */
+      amountMinor: number | null;
+      currency: string | null;
+      bankName: string;
+      edrpou: string;
+      iban: string;
+      purpose: string;
+      document: string;
+      bankId: string | null;
+      /** @description Why the line cannot be booked; empty when it can */
+      error: string;
+      duplicate: components['schemas']['BankDuplicate'];
+      duplicateNote: string;
+      /** Format: uuid */
+      transferAccountId: string | null;
+      transferAccountName: string | null;
+      counterparty: components['schemas']['FinanceCounterpartyRefResponse'] | null;
+      /** Format: uuid */
+      categoryId: string | null;
+      /** Format: uuid */
+      categoryRootId: string | null;
+      categoryRootName: string | null;
+      subcategoryName: string | null;
+      oneoffName: string;
+      description: string;
+      comment: string;
+      excluded: boolean;
+      state: components['schemas']['BankLineState'];
+      /** @description Whether book turns this line into a record */
+      willBook: boolean;
+      /** Format: uuid */
+      transactionId: string | null;
+      /** Format: uuid */
+      transferId: string | null;
+    };
+    BankStatementDetailsResponse: {
+      statement: components['schemas']['BankStatementResponse'];
+      states: components['schemas']['BankLineStateCount'][];
+      totals: components['schemas']['BankStatementTotals'];
+      lines: components['schemas']['BankStatementLineResponse'][];
+      /** Format: int32 */
+      total: number;
+      /** Format: int32 */
+      page: number;
+      /** Format: int32 */
+      pageSize: number;
+    };
+    BankStatementLineInput: {
+      /** Format: uuid */
+      categoryId?: string | null;
+      counterparty?: components['schemas']['FinanceCounterpartyLinkInput'] | null;
+      oneoffName?: string | null;
+      description?: string | null;
+      comment?: string | null;
+      excluded: boolean;
     };
     /** @enum {string} */
     StaffRole: 'Director' | 'Admin' | 'Accountant' | 'Manager' | 'WorkshopChief';
@@ -12257,6 +12609,530 @@ export interface operations {
       };
       /** @description Not Director */
       403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getFinanceAttachments: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceAttachmentResponse'][];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such operation */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  uploadFinanceAttachment: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'multipart/form-data': {
+          /** Format: binary */
+          file: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceAttachmentResponse'];
+        };
+      };
+      /** @description Wrong type, empty or larger than 10 MiB, or the operation is voided; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such operation */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The file storage is not configured; body is an array of messages */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  deleteFinanceAttachment: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Deleted */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such file */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getFinanceAttachmentContent: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/pdf': string;
+          'image/jpeg': string;
+          'image/png': string;
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such file */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The file storage is not configured; body is an array of messages */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  importLegacyFinance: {
+    parameters: {
+      query?: {
+        dryRun?: boolean;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'multipart/form-data': {
+          /** Format: binary */
+          file: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['LegacyFinanceImportReport'];
+        };
+      };
+      /** @description No file, not JSON, a broken archive or larger than the limit; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Records were added meanwhile; nothing is written, check again */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The request is larger than 32 MiB */
+      413: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getBankStatements: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['BankStatementResponse'][];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  uploadBankStatement: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'multipart/form-data': {
+          /** Format: uuid */
+          accountId: string;
+          /** Format: binary */
+          file: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['BankStatementResponse'];
+        };
+      };
+      /** @description No file, a wrong type, no header, ambiguous columns, a statement of another account, an archived account or larger than the limits; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Account not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The request is larger than 13 MiB */
+      413: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getBankStatement: {
+    parameters: {
+      query?: {
+        state?: components['schemas']['BankLineState'];
+        page?: number;
+      };
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['BankStatementDetailsResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Statement not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateBankStatementLine: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+        lineId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['BankStatementLineInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['BankStatementLineResponse'];
+        };
+      };
+      /** @description A broken rule (the statement is booked, a wrong category, both a counterparty and a one-off name) */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Statement, line, category or counterparty not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  bookBankStatement: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FinanceVersionInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['BankStatementResponse'];
+        };
+      };
+      /** @description Already booked or nothing to book */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Statement not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Stale version */
+      409: {
         headers: {
           [name: string]: unknown;
         };
