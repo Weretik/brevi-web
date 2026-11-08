@@ -37,6 +37,7 @@ const stats: LeadStats = {
     lastSuccessAt: '2026-11-09T07:00:00Z',
     rows: 70,
     error: 'Немає доступу до таблиці',
+    warning: null,
   },
 };
 
@@ -57,8 +58,8 @@ afterEach(() => {
   statsQuery.mockReset();
 });
 
-function renderPage(canSync: boolean) {
-  statsQuery.mockReturnValue({ data: stats, isLoading: false, isError: false });
+function renderPage(canSync: boolean, data: LeadStats = stats) {
+  statsQuery.mockReturnValue({ data, isLoading: false, isError: false });
   return render(
     <MemoryRouter>
       <LeadStatsPage viewer={{ canEdit: canSync, canSync }} />
@@ -73,6 +74,13 @@ describe('«Статистика лідів»', () => {
     expect(screen.getByText('41%')).toBeVisible();
     expect(screen.getByText(/Немає доступу до таблиці/)).toBeVisible();
     expect(statsQuery).toHaveBeenCalledWith(expect.objectContaining({ from: expect.any(String) }));
+  });
+
+  it('shows what a successful sync left out, such as a company written twice', () => {
+    const warning =
+      'Підприємство записано в таблиці кілька разів, взято перший рядок: «Сокіл» — рядки 3, 4.';
+    renderPage(true, { ...stats, sync: { ...stats.sync!, error: null, warning } });
+    expect(screen.getByText(warning)).toBeVisible();
   });
 
   it('shows «Синхронізувати зараз» only with the right to it', () => {
