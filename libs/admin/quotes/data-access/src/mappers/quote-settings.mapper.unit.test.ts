@@ -42,6 +42,18 @@ describe('quote settings mapper', () => {
     expect(input.pdf.labels?.recommended).toBeNull();
   });
 
+  it('shows the client block «Для» unless the settings turned it off', () => {
+    expect(mapQuoteSettings(response).pdf.showClient).toBe(true);
+    const draft = quoteSettingsToDraft(
+      mapQuoteSettings({ ...response, pdf: { title: 'КП', labels: { showClient: false } } }),
+    );
+    expect(draft.pdf.showClient).toBe(false);
+    draft.pdf.labels.clientTitle = 'Замовник';
+
+    const input = toSaveQuoteSettingsInput(draft);
+    expect(input.pdf.labels).toMatchObject({ showClient: false, clientTitle: 'Замовник' });
+  });
+
   it('trims fields and sends empty ones as null', () => {
     const draft = quoteSettingsToDraft(mapQuoteSettings(response));
     draft.company.address = '   ';

@@ -44,6 +44,8 @@ const settings: QuoteSettings = {
       fabricsTitle: 'Варіанти тканини',
       recommended: 'Рекомендуємо',
       commentTitle: 'Коментар до пропозиції',
+      clientTitle: 'Для',
+      showClient: true,
     },
   },
   introduction: {
