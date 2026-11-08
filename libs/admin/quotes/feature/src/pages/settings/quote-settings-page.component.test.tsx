@@ -28,7 +28,23 @@ const settings: QuoteSettings = {
     ctaTitle: null,
     ctaText: null,
     ctaContactTemplate: null,
-    introText: null,
+    intros: {
+      onePpe: 'Підібрали {recipient} {ppeItem}.',
+      oneSewing: 'Підібрали {recipient} {sewingModel} у тканині {fabricName}.',
+      oneSewingOnePpe: 'Підготували {recipient} {sewingModel} та {ppeItem}.',
+      sewing: 'Підібрали {recipient} кілька моделей.',
+      ppe: 'Підібрали {recipient} добірку ЗІЗ.',
+      sewingAndPpe: 'Підготували {recipient} комплексну добірку.',
+      fallback: 'Підготували {recipient} пропозицію.',
+    },
+    labels: {
+      contactLine: 'Контакт для зв’язку: {managerName} {managerPhone}',
+      codeLabel: 'арт.',
+      siteLink: 'Переглянути товар на сайті',
+      fabricsTitle: 'Варіанти тканини',
+      recommended: 'Рекомендуємо',
+      commentTitle: 'Коментар до пропозиції',
+    },
   },
   introduction: {
     logoText: null,
@@ -167,10 +183,10 @@ describe('«Налаштування КП»', () => {
 
     expect(contact).toHaveValue('Ваш менеджер: {managerName}');
     fireEvent.click(screen.getByRole('button', { name: 'Перегляд' }));
-    // The note fills the mark; the footer names the same manager.
+    // The note fills the mark; the contact line and the footer name the same manager.
     expect(
       within(screen.getByRole('img', { name: 'Перегляд PDF КП' })).getAllByText('Ольга'),
-    ).toHaveLength(2);
+    ).toHaveLength(3);
     fireEvent.keyDown(screen.getByRole('img', { name: 'Перегляд PDF КП' }), { key: 'Escape' });
 
     fireEvent.change(contact, { target: { value: 'Ваш менеджер: {managerNmae}' } });
@@ -179,6 +195,17 @@ describe('«Налаштування КП»', () => {
       await screen.findByText('Невідома мітка {managerNmae}. Вставте мітку кнопкою під полем.'),
     ).toBeVisible();
     expect(api.save).not.toHaveBeenCalled();
+  });
+
+  it('edits the opening text of each КП composition with the item marks', () => {
+    renderPage();
+    const pdf = section('PDF КП під запит');
+    const ppe = pdf.getByLabelText('Лише один ЗІЗ');
+    expect(ppe).toHaveValue('Підібрали {recipient} {ppeItem}.');
+    expect(pdf.getByLabelText('Усе інше, наприклад лише вишивка')).toBeInTheDocument();
+    fireEvent.change(ppe, { target: { value: 'Пропонуємо ' } });
+    fireEvent.click(pdf.getByRole('button', { name: 'Вставити «ЗІЗ» у поле «Лише один ЗІЗ»' }));
+    expect(ppe).toHaveValue('Пропонуємо {ppeItem}');
   });
 
   it('puts back the saved text of a field and of the whole page', () => {

@@ -5,7 +5,7 @@ import { useRef } from 'react';
 import { QuoteMarkChips } from './quote-mark-chips';
 import { useQuoteSettingsForm } from './quote-settings-form-context';
 
-import type { QuoteTemplateMark } from '@admin/quotes/model';
+import type { QuoteMark } from '@admin/quotes/model';
 
 interface Props {
   label: string;
@@ -21,8 +21,10 @@ interface Props {
   path?: string;
   /** The saved value: when the field differs, it offers «Повернути як було». */
   saved?: string;
-  /** Shows the mark buttons under the field. */
-  marks?: boolean;
+  /** Shows the mark buttons under the field: the common marks, or the listed ones. */
+  marks?: boolean | readonly QuoteMark[];
+  /** Fewer rows for a long list of short texts. */
+  minRows?: number;
   onChange: (value: string) => void;
 }
 
@@ -39,13 +41,14 @@ export function QuoteSettingsField({
   path,
   saved,
   marks,
+  minRows = 3,
   onChange,
 }: Props) {
   const { onFocusField } = useQuoteSettingsForm();
   const input = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
   const changed = saved !== undefined && saved !== value;
 
-  const insert = (mark: QuoteTemplateMark) => {
+  const insert = (mark: QuoteMark) => {
     const element = input.current;
     const start = element?.selectionStart ?? value.length;
     const end = element?.selectionEnd ?? start;
@@ -67,7 +70,7 @@ export function QuoteSettingsField({
         placeholder={placeholder}
         required={required}
         multiline={multiline}
-        minRows={multiline ? 3 : undefined}
+        minRows={multiline ? minRows : undefined}
         error={Boolean(error)}
         helperText={error ?? helperText}
         inputRef={input}
@@ -83,7 +86,15 @@ export function QuoteSettingsField({
           direction="row"
           sx={{ mt: 0.75, gap: 1, alignItems: 'flex-start', justifyContent: 'space-between' }}
         >
-          {marks ? <QuoteMarkChips fieldLabel={label} onInsert={insert} /> : <span />}
+          {marks ? (
+            <QuoteMarkChips
+              fieldLabel={label}
+              marks={marks === true ? undefined : marks}
+              onInsert={insert}
+            />
+          ) : (
+            <span />
+          )}
           {changed && (
             <Button
               size="small"

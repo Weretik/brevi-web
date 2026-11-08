@@ -22,8 +22,30 @@ export interface QuotePdfTexts {
   ctaTitle: string | null;
   ctaText: string | null;
   ctaContactTemplate: string | null;
-  /** The opening text under the client name; `{client}` is the client. Null means the standard text. */
-  introText: string | null;
+  /** The opening text under the client name, one per КП composition; the server fills empty ones with the standard text. */
+  intros: QuotePdfIntroTexts;
+  /** The short fixed texts of the PDF; the server fills empty ones with the standard text. */
+  labels: QuotePdfLabels;
+}
+
+/** The 7 opening texts of the old calculator, chosen by what the КП holds (R-35). */
+export interface QuotePdfIntroTexts {
+  onePpe: string;
+  oneSewing: string;
+  oneSewingOnePpe: string;
+  sewing: string;
+  ppe: string;
+  sewingAndPpe: string;
+  fallback: string;
+}
+
+export interface QuotePdfLabels {
+  contactLine: string;
+  codeLabel: string;
+  siteLink: string;
+  fabricsTitle: string;
+  recommended: string;
+  commentTitle: string;
 }
 
 export interface QuoteAdvantage {

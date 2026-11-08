@@ -1,7 +1,13 @@
 import { unknownQuoteMarks } from '../mappers/quote-template-marks';
-import { quoteAdvantageCount, quoteMaxLetterVariants } from '../models/quote-settings-draft';
+import {
+  quoteAdvantageCount,
+  quoteMaxLetterVariants,
+  quotePdfIntroCases,
+  quotePdfIntroMarks,
+  quoteTemplateMarks,
+} from '../models/quote-settings-draft';
 
-import type { QuoteSettingsDraft } from '../models/quote-settings-draft';
+import type { QuoteMark, QuoteSettingsDraft } from '../models/quote-settings-draft';
 
 export const quoteSettingsShortMax = 300;
 export const quoteSettingsTextMax = 4000;
@@ -38,9 +44,9 @@ export function quoteSettingsErrors(draft: QuoteSettingsDraft): QuoteSettingsErr
     text && !emailPattern.test(text) ? 'Невірна адреса пошти.' : null;
   /** A typo in a mark reaches the client as it is, so it is an error. */
   const marks =
-    (rule: (text: string) => string | null) =>
+    (rule: (text: string) => string | null, allowed: readonly QuoteMark[] = quoteTemplateMarks) =>
     (text: string): string | null => {
-      const unknown = unknownQuoteMarks(text);
+      const unknown = unknownQuoteMarks(text, allowed);
       return (
         rule(text) ??
         (unknown.length > 0
@@ -76,9 +82,24 @@ export function quoteSettingsErrors(draft: QuoteSettingsDraft): QuoteSettingsErr
   check('email.body', draft.email.body, marks(required(quoteSettingsTextMax)));
 
   check('pdf.title', pdf.title, required(quoteSettingsShortMax));
-  for (const key of ['vatNotice', 'ctaTitle', 'ctaText', 'introText'] as const)
+  for (const key of ['vatNotice', 'ctaTitle', 'ctaText'] as const)
     check(`pdf.${key}`, pdf[key], optional(quoteSettingsTextMax));
   check('pdf.ctaContactTemplate', pdf.ctaContactTemplate, marks(optional(quoteSettingsTextMax)));
+  for (const { key } of quotePdfIntroCases)
+    check(
+      `pdf.intros.${key}`,
+      pdf.intros[key],
+      marks(optional(quoteSettingsTextMax), quotePdfIntroMarks),
+    );
+  check('pdf.labels.contactLine', pdf.labels.contactLine, marks(optional(quoteSettingsShortMax)));
+  for (const key of [
+    'codeLabel',
+    'siteLink',
+    'fabricsTitle',
+    'recommended',
+    'commentTitle',
+  ] as const)
+    check(`pdf.labels.${key}`, pdf.labels[key], optional(quoteSettingsShortMax));
 
   check('introduction.summerBannerUrl', introduction.summerBannerUrl, url);
   check('introduction.winterBannerUrl', introduction.winterBannerUrl, url);

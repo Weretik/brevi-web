@@ -7494,6 +7494,38 @@ export interface components {
       subject: string;
       body: string;
     };
+    /** @description «Вступний текст у КП» (R-35): the PDF takes the one that fits the КП composition. Marks: {recipient} («для <client>» or «для вас»), {sewingModel}, {fabricName}, {ppeItem} and the manager's. The response fills empty ones with the standard text; empty on save means the standard text. */
+    CrmQuotePdfIntroTexts: {
+      /** @description Only one PPE item. */
+      onePpe?: string | null;
+      /** @description One sewing model with one fabric variant. */
+      oneSewing?: string | null;
+      /** @description One sewing model with one fabric variant and one PPE item. */
+      oneSewingOnePpe?: string | null;
+      /** @description Several sewing models or fabric variants, no PPE. */
+      sewing?: string | null;
+      /** @description Several PPE items, no sewing. */
+      ppe?: string | null;
+      /** @description Several items with both sewing and PPE. */
+      sewingAndPpe?: string | null;
+      /** @description None of the above, for example only embroidery. */
+      fallback?: string | null;
+    };
+    /** @description Small texts of the КП PDF (R-35); the response fills empty ones with the standard text. */
+    CrmQuotePdfLabels: {
+      /** @description Under the price note. Marks: {managerName}, {managerPhone}, {managerEmail}. */
+      contactLine?: string | null;
+      /** @description Before the product code, «арт.». */
+      codeLabel?: string | null;
+      /** @description Link to the product on the site. */
+      siteLink?: string | null;
+      /** @description Above the fabric variants of a sewing item. */
+      fabricsTitle?: string | null;
+      /** @description Mark of the recommended variant. */
+      recommended?: string | null;
+      /** @description Above the client comment. */
+      commentTitle?: string | null;
+    };
     CrmQuotePdfTexts: {
       title: string;
       vatNotice?: string | null;
@@ -7501,8 +7533,8 @@ export interface components {
       ctaText?: string | null;
       /** @description Marks: {managerName}, {managerPhone}, {managerEmail}. */
       ctaContactTemplate?: string | null;
-      /** @description Opening text under the client name. Marks: {client}, {managerName}, {managerPhone}, {managerEmail}, {site}, {quoteNumber}. Empty means the standard text. */
-      introText?: string | null;
+      intros?: components['schemas']['CrmQuotePdfIntroTexts'] | null;
+      labels?: components['schemas']['CrmQuotePdfLabels'] | null;
     };
     CrmQuoteAdvantage: {
       title: string;

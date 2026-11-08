@@ -22,6 +22,24 @@ describe('quote settings mapper', () => {
     expect(settings.introduction.accentColor).toBeNull();
     expect(settings.introduction.advantages[0]).toEqual({ title: 'Своє виробництво', text: null });
     expect(settings.staffContacts[0]?.email).toBeNull();
+    expect(settings.pdf.intros.onePpe).toBe('');
+    expect(settings.pdf.labels.codeLabel).toBe('');
+  });
+
+  it('sends an emptied opening text and label as null so the PDF takes the standard one', () => {
+    const draft = quoteSettingsToDraft(
+      mapQuoteSettings({
+        ...response,
+        pdf: { title: 'КП', intros: { sewing: 'Моделі' }, labels: { recommended: 'Радимо' } },
+      }),
+    );
+    expect(draft.pdf.intros.sewing).toBe('Моделі');
+    draft.pdf.labels.recommended = ' ';
+
+    const input = toSaveQuoteSettingsInput(draft);
+    expect(input.pdf.intros?.sewing).toBe('Моделі');
+    expect(input.pdf.intros?.ppe).toBeNull();
+    expect(input.pdf.labels?.recommended).toBeNull();
   });
 
   it('trims fields and sends empty ones as null', () => {

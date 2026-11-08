@@ -1,9 +1,16 @@
-import { Stack } from '@mui/material';
+import { quotePdfIntroCases, quotePdfIntroMarks } from '@admin/quotes/model';
+import { Box, Stack } from '@mui/material';
 
 import { QuoteSettingsField } from '../form/quote-settings-field';
 import { QuoteSettingsGroup, errorsAt } from '../form/quote-settings-layout';
 
-import type { QuotePdfTextsDraft, QuoteSettingsErrors } from '@admin/quotes/model';
+import type {
+  QuotePdfIntroTextsDraft,
+  QuotePdfLabelsDraft,
+  QuotePdfTextsDraft,
+  QuoteMark,
+  QuoteSettingsErrors,
+} from '@admin/quotes/model';
 
 interface Props {
   pdf: QuotePdfTextsDraft;
@@ -12,14 +19,33 @@ interface Props {
   onChange: (patch: Partial<QuotePdfTextsDraft>) => void;
 }
 
-/** «PDF КП під запит»: the title, the opening text, the VAT note and the block at the bottom of the page. */
+type FlatKey = Exclude<keyof QuotePdfTextsDraft, 'intros' | 'labels'>;
+
+interface FieldOptions {
+  required?: boolean;
+  multiline?: boolean;
+  marks?: boolean | readonly QuoteMark[];
+  helperText?: string;
+  minRows?: number;
+}
+
+const standardHint = 'Порожнє поле — стандартний текст.';
+
+const labelFields: readonly { key: keyof QuotePdfLabelsDraft; label: string; hint: string }[] = [
+  { key: 'codeLabel', label: 'Перед кодом товару', hint: 'Наприклад «арт.».' },
+  { key: 'siteLink', label: 'Посилання на товар', hint: 'Під описом, веде на сайт.' },
+  { key: 'fabricsTitle', label: 'Над тканинами моделі', hint: 'Заголовок варіантів тканини.' },
+  { key: 'recommended', label: 'Позначка рекомендованого', hint: 'Коли варіантів кілька.' },
+  { key: 'commentTitle', label: 'Над коментарем', hint: 'Якщо в КП є коментар.' },
+];
+
+/**
+ * «PDF КП під запит»: the title, the opening text for each КП composition, the VAT note, the short texts
+ * of the items and the block at the bottom of the page (R-35).
+ */
 export function QuotePdfSection({ pdf, saved, errors, onChange }: Props) {
   const at = errorsAt(errors, 'pdf');
-  const field = (
-    key: keyof QuotePdfTextsDraft,
-    label: string,
-    options: { required?: boolean; multiline?: boolean; marks?: boolean; helperText?: string } = {},
-  ) => (
+  const field = (key: FlatKey, label: string, options: FieldOptions = {}) => (
     <QuoteSettingsField
       path={`pdf.${key}`}
       label={label}
@@ -30,20 +56,67 @@ export function QuotePdfSection({ pdf, saved, errors, onChange }: Props) {
       onChange={(value) => onChange({ [key]: value })}
     />
   );
+  const intro = (key: keyof QuotePdfIntroTextsDraft, when: string) => (
+    <QuoteSettingsField
+      key={key}
+      path={`pdf.intros.${key}`}
+      label={when}
+      multiline
+      minRows={2}
+      marks={quotePdfIntroMarks}
+      value={pdf.intros[key]}
+      saved={saved.intros[key]}
+      error={at(`intros.${key}`)}
+      onChange={(value) => onChange({ intros: { ...pdf.intros, [key]: value } })}
+    />
+  );
+  const label = (key: keyof QuotePdfLabelsDraft, title: string, options: FieldOptions = {}) => (
+    <QuoteSettingsField
+      key={key}
+      path={`pdf.labels.${key}`}
+      label={title}
+      {...options}
+      value={pdf.labels[key]}
+      saved={saved.labels[key]}
+      error={at(`labels.${key}`)}
+      onChange={(value) => onChange({ labels: { ...pdf.labels, [key]: value } })}
+    />
+  );
   return (
     <>
       <Stack sx={{ gap: 1.5 }}>
         {field('title', 'Заголовок документа', { required: true })}
-        {field('introText', 'Вступ під назвою клієнта', {
-          multiline: true,
-          helperText:
-            '{client} — назва клієнта. Порожнє поле — стандартний текст: «Підібрали для {client} добірку…».',
-        })}
         {field('vatNotice', 'Примітка про ПДВ', {
           multiline: true,
           helperText: 'Під вступом, жирним.',
         })}
+        {label('contactLine', 'Контакт під примітками', {
+          marks: true,
+          helperText: `Під приміткою про ПДВ. ${standardHint}`,
+        })}
       </Stack>
+      <QuoteSettingsGroup title="Вступ під назвою клієнта">
+        <Stack sx={{ gap: 1.5 }}>
+          <Box sx={{ typography: 'body2', color: 'text.secondary' }}>
+            PDF сам вибирає текст за складом КП. «Для кого» стає «для ТОВ …» або «для вас»,
+            «Модель», «Тканина» і «ЗІЗ» беруться з позицій. {standardHint}
+          </Box>
+          {quotePdfIntroCases.map(({ key, when }) => intro(key, when))}
+        </Stack>
+      </QuoteSettingsGroup>
+      <QuoteSettingsGroup title="Підписи позицій">
+        <Box
+          sx={{
+            display: 'grid',
+            gap: 1.5,
+            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))' },
+          }}
+        >
+          {labelFields.map(({ key, label: title, hint }) =>
+            label(key, title, { helperText: `${hint} ${standardHint}` }),
+          )}
+        </Box>
+      </QuoteSettingsGroup>
       <QuoteSettingsGroup title="Блок унизу сторінки">
         <Stack sx={{ gap: 1.5 }}>
           {field('ctaTitle', 'Заголовок блоку')}
