@@ -1,8 +1,8 @@
 # Admin: Бухгалтерія
 
-**Status:** stage 1 («Рахунки і каси», «Категорії»), stage 2 («Огляд», «Операції», «Перекази», archive «Домашня бухгалтерія», balances) stage 3 («Контрагенти», «Потребують перевірки») stage 4 (files of operations) implemented 2026-11-05 stage 5 («Перенесення архіву») 2026-11-08 and stage 6 («Виписки банку») and stage 7 («Відкотити виписку») 2026-11-08; the pages were restyled the same day from the approved [mockup](https://claude.ai/artifact/AotN13KWseQLXkcTX2qoau). Backend decisions and later stages are in the BreviERP specification `docs/sdd/specs/accounting/001-finance`; the consumed contract is [backend/accounting](../../contracts/openapi/backend/accounting/finance.openapi.yaml).
+**Status:** stage 1 («Рахунки і каси», «Категорії»), stage 2 («Огляд», «Операції», «Перекази», archive «Домашня бухгалтерія», balances) stage 3 («Контрагенти», «Потребують перевірки») stage 4 (files of operations) implemented 2026-11-05 stage 5 («Перенесення архіву») 2026-11-08 and stage 6 («Виписки банку») stage 7 («Відкотити виписку») and stage 8 («Звіти», «Журнал змін», «Резервна копія») 2026-11-08; the pages were restyled the same day from the approved [mockup](https://claude.ai/artifact/AotN13KWseQLXkcTX2qoau). Backend decisions and later stages are in the BreviERP specification `docs/sdd/specs/accounting/001-finance`; the consumed contract is [backend/accounting](../../contracts/openapi/backend/accounting/finance.openapi.yaml).
 
-The «Бухгалтерія» menu group is shown only to the director: every item has `requiredRoles: ['Director']`, and the routes are wrapped in `RequireRole` with `canUseAccounting`. The backend allows the same role (policy `CanUseAccounting`). Items of later stages («Звіти», «Журнал змін») are in the menu without a page yet.
+The «Бухгалтерія» menu group is shown only to the director: every item has `requiredRoles: ['Director']`, and the routes are wrapped in `RequireRole` with `canUseAccounting`. The backend allows the same role (policy `CanUseAccounting`).
 
 `/accounting/legacy-import` «Перенесення архіву»: the one-off move of the old Calculator «Фінанси». «Обрати finance.json» gzips the file in the browser (about 40 MB → 3 MB, so it fits the request limit) and the server only checks it. The report shows the errors that stop the move (the first 100 and «і ще N»), warnings, «Що переноситься» per kind (in the file, to add, moved earlier, left out) with how clients and suppliers were found in Brevi, «Суми у файлі» by area and kind, and «Залишки після перенесення» (on 30.09, on 01.10, now) where only a missing confirmed balance or a difference is marked. «Перенести» appears only without errors and with something to add, asks first, and refreshes every list of «Бухгалтерія»; a second run adds only what is missing.
 
@@ -43,6 +43,10 @@ The «Бухгалтерія» menu group is shown only to the director: every i
 - «Разові»: operations with a one-off name of both areas; the row menu «Зробити постійним» creates a confirmed finance counterparty for that operation only; «Переглянути» opens «Перевірка операції».
 
 `/accounting/review` «Потребують перевірки»: active operations of the current books without a category or with an unconfirmed finance counterparty (they already count in balances), one card each, filtered by «Усі / Без категорії / Новий контрагент». A card changes only the counterparty, category and subcategory (date, account and amount stay) and saves on «Підтвердити»; an unconfirmed counterparty is refused until «Підтвердити контрагента» right in the card. «Запамʼятати: наступні операції «X» одразу в «Y»» (on by default, finance counterparties only) makes the category the counterparty's default with auto-apply. «Огляд» shows the count of such operations with a «Перевірити» link.
+
+`/accounting/reports` «Звіти»: pick the report («Зведений», «Структура витрат», «За категоріями», «За рахунками», «За контрагентами», «Журнал операцій»; a line under it says what it answers), the period (this month of the current books at first), the area or the whole books, and optionally an account, a type, a root category (switched-off ones too) and a counterparty. «Сформувати звіт» fixes the settings: editing the form later changes neither the table nor its CSV. Above the table: the period and totals per currency (operations, income, expense, difference; transfers never count). «Структура витрат» shows each root with its subcategories indented and their share; «За рахунками» adds transfers to and from the account and the net movement; «Журнал операцій» shows the first 100 and warns when more exist. «Завантажити CSV» downloads the same report for Excel (up to 50 000 operations). «Резервна копія» downloads every finance record as one JSON file `brevi-finance-YYYY-MM-DD.json`.
+
+`/accounting/audit` «Журнал змін»: every change of accounts, categories, operations, transfers and counterparties, newest first, 50 per page from the server, filtered by kind of record and action. A row shows when (Kyiv time), the record (its name, or date, sum and description) and its kind, the action and who; a click opens the side panel with each field that changed, its old and new value.
 
 ## Structure diagram
 
@@ -107,9 +111,21 @@ libs/admin/accounting/
 ├── ui/src/tables/statements/bank-{statements,lines}-grid.tsx      # «Історія виписок», lines with «Проводити»
 ├── ui/src/forms/statements/bank-line-form.tsx                     # «Як провести» of a line
 ├── ui/src/details/statements/bank-line-details.tsx                # bank data of a line and its problem
+├── model/src/entities/reports/finance-report.ts                    # report kinds, labels and hints, rows, totals, file names
+├── model/src/queries/reports/finance-report-filters.ts            # «Звіти» form → query params, roots, period check
+├── model/src/entities/audit/finance-audit.ts                      # «Журнал змін» entry, kind labels, changed fields
+├── data-access/src/api/reports/finance-report-endpoints.ts        # report, change log
+├── data-access/src/mappers/accounting-report.mapper.ts            # report and change log pages
+├── data-access/src/files/finance-report-files.ts                  # CSV of a report, backup JSON (blob with the session)
+├── ui/src/forms/reports/finance-report-form.tsx                   # «Звіти» settings
+├── ui/src/tables/reports/finance-report-grid.tsx                  # columns by report kind
+├── ui/src/components/reports/finance-report-totals.tsx            # totals line of a report
+├── ui/src/tables/audit/finance-audit-grid.tsx, ui/src/details/audit/finance-audit-changes.tsx # change log, what changed
 └── feature/src/
-    ├── accounting.routes.tsx                                     # accounts, categories, overview, transactions, transfers, counterparties, review, legacy import, statements
+    ├── accounting.routes.tsx                                     # accounts, categories, overview, transactions, transfers, counterparties, review, legacy import, statements, reports, audit
     ├── pages/statements/, components/statements/bank-line-drawer.tsx, hooks/statements/ # «Виписки банку», statement, line panel
+    ├── pages/reports/, hooks/reports/, hooks/files/save-finance-file.ts # «Звіти», downloads
+    ├── pages/audit/, components/audit/finance-audit-drawer.tsx, hooks/audit/ # «Журнал змін», entry panel
     ├── pages/{accounts,...,transfers,counterparties,review}/     # pages
     ├── components/{accounts,...,transfers,counterparties,review}/ # side panels; review cards
     ├── components/journal/                                       # area tabs, quick bar (search, periods, type, «Ще фільтри»)
@@ -140,5 +156,7 @@ apps/admin-react/src/app/router/{create-admin-router.tsx,legacy-menu.ts,admin-ro
 - `data-access/src/mappers/accounting.mapper.unit.test.ts`, `ui/src/components/history/finance-history-list.component.test.tsx`;
 - `feature/src/pages/import/legacy-finance-import-page.component.test.tsx` — a check first (`dryRun=true`), counts, links, difference and warnings, «Перенести» after a confirmation sends multipart with `dryRun=false`; errors listed with «і ще N» and no move; `data-access/src/mappers/accounting-import.mapper.unit.test.ts`;
 - `feature/src/pages/statements/bank-statements-page.component.test.tsx` — history, account choice without a cash desk, multipart upload opens the statement, a wrong file refused before sending; `bank-statement-page.component.test.tsx` — problems and state counts, «Проводити» in the table, the side panel body, «Провести виписку» with the version after a confirmation, a booked statement read-only, «Відкотити виписку» with the version after a confirmation; `model/src/forms/statements/bank-line-form.unit.test.ts`, `data-access/src/mappers/accounting-statement.mapper.unit.test.ts`;
+- `feature/src/pages/reports/finance-reports-page.component.test.tsx` — the report only on «Сформувати звіт» with its query and totals, CSV with the applied settings, expense structure with subcategories and share, the cut-journal warning, a reversed period refused, the backup download; `model/src/queries/reports/finance-report-filters.unit.test.ts`, `data-access/src/mappers/accounting-report.mapper.unit.test.ts`;
+- `feature/src/pages/audit/finance-audit-page.component.test.tsx` — rows, the side panel with changed fields only, the kind filter; `model/src/entities/audit/finance-audit.unit.test.ts`;
 - the feature tests pin `Date` to 2026-11-05 (`feature/src/test-setup.ts`), the day the API stub answers, so they do not depend on the day they run;
 - `apps/admin-react/src/app/router/navigation-config.unit.test.ts` — the group only for the director.

@@ -797,6 +797,74 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/accounting/reports': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description «Звіти» (stage 8): active income and expense of the inclusive period, grouped by the kind. Totals are per currency and never include transfers; the Accounts kind adds transfers in and out of the period, area and account to each row (type, category and counterparty do not filter them). An ExpenseStructure Group row already holds its Subcategory rows. Operations are oldest first, at most 100 rows (limited = more exist, totalRows = all). */
+    get: operations['getFinanceReport'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/reports/csv': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description The same report as a download: UTF-8 with BOM, «;» separators, CRLF, every field quoted, sums in hryvnias with a decimal comma, dates dd.MM.yyyy; text starting with = + - @ gets a leading apostrophe. The operations report holds up to 50 000 rows. Cache-Control private, no-store. */
+    get: operations['getFinanceReportCsv'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/audit': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description «Журнал змін» (stage 8): changes of all finance records, newest first, 50 per page. */
+    get: operations['getFinanceAudit'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/accounting/export': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description «Резервна копія» (stage 8): one JSON file brevi-finance-YYYY-MM-DD.json (Kyiv day), format brevi-erp-finance-v1, with every stored field of accounts, categories, counterparties, transactions and transfers (cancelled ones too), attachment details (not the files), auditEntries, bankStatements and bankStatementLines. Cache-Control private, no-store. */
+    get: operations['getFinanceExport'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/admin/users': {
     parameters: {
       query?: never;
@@ -5580,6 +5648,90 @@ export interface components {
       description?: string | null;
       comment?: string | null;
       excluded: boolean;
+    };
+    /** @enum {string} */
+    FinanceReportKind:
+      'Summary' | 'ExpenseStructure' | 'Categories' | 'Accounts' | 'Counterparties' | 'Operations';
+    /** @description Income and expense of one currency (kopecks); transfers are never counted. */
+    FinanceReportTotalResponse: {
+      currency: string;
+      /** Format: int32 */
+      operations: number;
+      /** Format: int64 */
+      incomeMinor: number;
+      /** Format: int64 */
+      expenseMinor: number;
+      /** Format: int64 */
+      resultMinor: number;
+    };
+    /** @enum {string} */
+    FinanceReportRowType: 'Group' | 'Subcategory' | 'Operation';
+    /** @description One row; fields the report kind does not use are null. Sums are kopecks; resultMinor of an Accounts row includes transfers. */
+    FinanceReportRowResponse: {
+      rowType: components['schemas']['FinanceReportRowType'];
+      currency: string;
+      /** Format: int32 */
+      operations: number;
+      /** Format: int64 */
+      incomeMinor: number;
+      /** Format: int64 */
+      expenseMinor: number;
+      /** Format: int64 */
+      resultMinor: number;
+      account: string | null;
+      type: components['schemas']['CategoryDirection'] | null;
+      category: string | null;
+      subcategory: string | null;
+      counterparty: string | null;
+      /** Format: int64 */
+      incomingTransfersMinor: number | null;
+      /** Format: int64 */
+      outgoingTransfersMinor: number | null;
+      /** Format: date */
+      date: string | null;
+      /** Format: int64 */
+      amountMinor: number | null;
+      note: string | null;
+      source: components['schemas']['MovementSource'] | null;
+      /** Format: uuid */
+      id: string | null;
+    };
+    FinanceReportResponse: {
+      kind: components['schemas']['FinanceReportKind'];
+      /** Format: date */
+      from: string;
+      /** Format: date */
+      to: string;
+      totals: components['schemas']['FinanceReportTotalResponse'][];
+      rows: components['schemas']['FinanceReportRowResponse'][];
+      /** Format: int32 */
+      totalRows: number;
+      /** @description More rows exist than returned (Operations only) */
+      limited: boolean;
+    };
+    /** @description title names the record as it was: its name, or date, sum and description. Snapshots are the JSON text of the record before and after (null when absent). */
+    FinanceAuditEntryResponse: {
+      /** Format: int64 */
+      id: number;
+      entity: components['schemas']['AuditEntity'];
+      /** Format: uuid */
+      entityId: string;
+      action: components['schemas']['AuditAction'];
+      by: string;
+      /** Format: date-time */
+      at: string;
+      title: string;
+      beforeJson: string | null;
+      afterJson: string | null;
+    };
+    FinanceAuditPageResponse: {
+      items: components['schemas']['FinanceAuditEntryResponse'][];
+      /** Format: int32 */
+      total: number;
+      /** Format: int32 */
+      page: number;
+      /** Format: int32 */
+      pageSize: number;
     };
     /** @description Director, Admin, Accountant, Manager, WorkshopChief or a role made on «Права доступу» (custom-…); an unknown role returns 400 */
     StaffRole: string;
@@ -13663,6 +13815,195 @@ export interface operations {
       };
       /** @description Stale version */
       409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getFinanceReport: {
+    parameters: {
+      query: {
+        kind: components['schemas']['FinanceReportKind'];
+        from: string;
+        to: string;
+        /** @description Omit for both areas */
+        scope?: components['schemas']['LedgerScope'];
+        accountId?: string;
+        /** @description Ignored by ExpenseStructure (always Expense) */
+        type?: components['schemas']['CategoryDirection'];
+        /** @description A root with its subcategories, or one subcategory */
+        categoryId?: string;
+        counterpartyKind?: components['schemas']['CounterpartyKind'];
+        /** @description With counterpartyKind, only operations with exactly that counterparty */
+        counterpartyId?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceReportResponse'];
+        };
+      };
+      /** @description Invalid fields; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getFinanceReportCsv: {
+    parameters: {
+      query: {
+        kind: components['schemas']['FinanceReportKind'];
+        from: string;
+        to: string;
+        /** @description Omit for both areas */
+        scope?: components['schemas']['LedgerScope'];
+        accountId?: string;
+        /** @description Ignored by ExpenseStructure (always Expense) */
+        type?: components['schemas']['CategoryDirection'];
+        /** @description A root with its subcategories, or one subcategory */
+        categoryId?: string;
+        counterpartyKind?: components['schemas']['CounterpartyKind'];
+        /** @description With counterpartyKind, only operations with exactly that counterparty */
+        counterpartyId?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'text/csv': string;
+        };
+      };
+      /** @description Invalid fields; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getFinanceAudit: {
+    parameters: {
+      query?: {
+        entity?: components['schemas']['AuditEntity'];
+        action?: components['schemas']['AuditAction'];
+        page?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FinanceAuditPageResponse'];
+        };
+      };
+      /** @description Invalid fields; body is a list of validation errors */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getFinanceExport: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': string;
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
         headers: {
           [name: string]: unknown;
         };

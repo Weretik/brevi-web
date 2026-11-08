@@ -16,13 +16,17 @@ const FinanceTransfersPage = lazy(() => import('./pages/transfers/finance-transf
 const BankStatementPage = lazy(() => import('./pages/statements/bank-statement-page'));
 const BankStatementsPage = lazy(() => import('./pages/statements/bank-statements-page'));
 const LegacyFinanceImportPage = lazy(() => import('./pages/import/legacy-finance-import-page'));
+const FinanceReportsPage = lazy(() => import('./pages/reports/finance-reports-page'));
+const FinanceAuditPage = lazy(() => import('./pages/audit/finance-audit-page'));
 
 export const bankStatementsPath = '/accounting/statements';
 export const bankStatementPath = (id: string) => `${bankStatementsPath}/${encodeURIComponent(id)}`;
 export const financeAccountsPath = '/accounting/accounts';
+export const financeAuditPath = '/accounting/audit';
 export const financeCategoriesPath = '/accounting/categories';
 export const financeCounterpartiesPath = '/accounting/counterparties';
 export const financeOverviewPath = '/accounting/overview';
+export const financeReportsPath = '/accounting/reports';
 export const financeReviewPath = '/accounting/review';
 export const financeTransactionsPath = '/accounting/transactions';
 export const financeTransfersPath = '/accounting/transfers';
@@ -40,4 +44,6 @@ export const accountingRoutes: (RouteObject & { path: string })[] = [
   { path: bankStatementsPath, element: <BankStatementsPage /> },
   { path: `${bankStatementsPath}/:id`, element: <BankStatementPage /> },
   { path: legacyFinanceImportPath, element: <LegacyFinanceImportPage /> },
+  { path: financeReportsPath, element: <FinanceReportsPage /> },
+  { path: financeAuditPath, element: <FinanceAuditPage /> },
 ];
