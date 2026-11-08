@@ -1,14 +1,5 @@
-import { formatEmbroideryMoney } from '@admin/embroidery/model';
-import {
-  Autocomplete,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
-  Radio,
-  RadioGroup,
-  Stack,
-  TextField,
-} from '@mui/material';
+import { formatEmbroideryUnitPrice } from '@admin/embroidery/model';
+import { Autocomplete, Box, Stack, TextField, Typography } from '@mui/material';
 
 import type { EmbroiderySavedPrice } from '@admin/embroidery/model';
 
@@ -19,13 +10,13 @@ export interface EmbroideryQuoteOption {
 }
 
 export interface EmbroideryAddToQuoteValues {
-  level: string;
   quote: EmbroideryQuoteOption | null;
 }
 
 interface Props {
   values: EmbroideryAddToQuoteValues;
-  prices: readonly EmbroiderySavedPrice[];
+  /** The one saved price category the client sees. */
+  price: EmbroiderySavedPrice | null;
   quotes: readonly EmbroideryQuoteOption[];
   loadingQuotes: boolean;
   disabled: boolean;
@@ -33,10 +24,10 @@ interface Props {
   onChange: (values: EmbroideryAddToQuoteValues) => void;
 }
 
-/** «Додати в КП»: which saved price the client sees, and which КП gets the row. */
+/** «Додати в КП»: the saved price the client sees, and which КП gets the row. */
 export function EmbroideryAddToQuoteForm({
   values,
-  prices,
+  price,
   quotes,
   loadingQuotes,
   disabled,
@@ -45,23 +36,12 @@ export function EmbroideryAddToQuoteForm({
 }: Props) {
   return (
     <Stack sx={{ gap: 2.5 }}>
-      <FormControl disabled={disabled}>
-        <FormLabel id="embroidery-quote-level">Ціна для клієнта</FormLabel>
-        <RadioGroup
-          aria-labelledby="embroidery-quote-level"
-          value={values.level}
-          onChange={(event) => onChange({ ...values, level: event.target.value })}
-        >
-          {prices.map((price) => (
-            <FormControlLabel
-              key={price.name}
-              value={price.name}
-              control={<Radio size="small" />}
-              label={`${price.name} — ${formatEmbroideryMoney(price.unit)} грн за 1 шт`}
-            />
-          ))}
-        </RadioGroup>
-      </FormControl>
+      <Box>
+        <Typography variant="caption" color="text.secondary">
+          Ціна для клієнта
+        </Typography>
+        <Typography variant="body1">{price ? formatEmbroideryUnitPrice(price) : '—'}</Typography>
+      </Box>
       <Autocomplete
         options={quotes as EmbroideryQuoteOption[]}
         value={values.quote}

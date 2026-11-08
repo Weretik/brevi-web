@@ -21,7 +21,7 @@ const mapSummary = (value: Schemas['CrmEmbroiderySavedSummary']): EmbroiderySave
   stitchesPerUnit: value.stitchesPerUnit,
   hoopLabel: value.hoopLabel,
   incomplete: value.incomplete,
-  prices: value.prices.map((price) => ({ ...price })),
+  price: value.price ? { ...value.price } : null,
   createdAt: value.createdAt,
   createdByName: value.createdByName,
   mockup: value.mockup
@@ -68,4 +68,5 @@ export const toSaveEmbroideryCalculationInput = (
   name: request.name.trim() || null,
   customerPublicId: request.customerPublicId,
   calculation: toCalculateEmbroideryInput(request.calculation),
+  category: request.category,
 });

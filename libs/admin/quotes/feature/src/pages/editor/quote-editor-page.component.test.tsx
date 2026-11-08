@@ -159,16 +159,13 @@ vi.mock('@admin/embroidery/data-access', () => ({
           number: 'ВШ-0042',
           name: 'Логотип',
           customerPublicId: null,
-          customerName: null,
+          customerName: 'ТОВ «Агро»',
           mode: 'Garment',
           quantity: 50,
           stitchesPerUnit: 8000,
           hoopLabel: '18 см',
           incomplete: false,
-          prices: [
-            { name: 'Опт', unit: 70, total: 3500, repeatUnit: 60 },
-            { name: 'Стандарт', unit: 80, total: 4000, repeatUnit: 70 },
-          ],
+          price: { name: 'Категорія 1', unit: 80, total: 4000, repeatUnit: 70 },
           createdAt: '2026-11-04T10:00:00Z',
           createdByName: 'Олена',
           mockup: null,
@@ -331,21 +328,23 @@ describe('КП editor', () => {
     expect(await screen.findByRole('dialog', { name: 'Виріб з нуля' })).toBeVisible();
   });
 
-  it('adds a saved embroidery calculation from the «Вишивка» tile', async () => {
+  it('adds a saved embroidery calculation with its one price from the «Вишивка» tile', async () => {
     api.addEmbroidery.mockReturnValue({ ...quote, version: 4 });
     renderEditor();
     fireEvent.click(await screen.findByRole('button', { name: 'Вишивка' }));
     const panel = await screen.findByRole('dialog', { name: 'Додати вишивку' });
     fireEvent.mouseDown(within(panel).getByLabelText(/Розрахунок вишивки/));
-    fireEvent.click(await screen.findByText('ВШ-0042 · Логотип'));
-    expect(within(panel).getByLabelText(/Стандарт — 80,00 грн/)).toBeChecked();
+    expect(await screen.findByText('ТОВ «Агро» · Категорія 1 — 80,00 грн за 1 шт')).toBeVisible();
+    expect(screen.queryByText(/стібків|пʼяльця/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByText('ВШ-0042 · Логотип'));
+    expect(within(panel).queryByRole('radio')).not.toBeInTheDocument();
+    expect(within(panel).getByText('Категорія 1 — 80,00 грн за 1 шт')).toBeVisible();
     fireEvent.click(within(panel).getByRole('button', { name: 'Додати' }));
 
     await waitFor(() =>
       expect(api.addEmbroidery).toHaveBeenCalledWith({
         id: 4,
         calculationId: 42,
-        level: 'Стандарт',
       }),
     );
     expect(api.save).not.toHaveBeenCalled();

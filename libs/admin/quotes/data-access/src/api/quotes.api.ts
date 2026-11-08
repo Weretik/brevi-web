@@ -123,19 +123,17 @@ export const quotesApi = quotesBaseApi.injectEndpoints({
       invalidatesTags: (_result, error) => (error ? [] : list),
     }),
     /** «Додати в КП» from «Ціна вишивки»: appends the saved calculation as one row. */
-    addQuoteEmbroidery: build.mutation<Quote, { id: number; calculationId: number; level: string }>(
-      {
-        query: ({ id, calculationId, level }) => ({
-          url: `/api/crm/quotes/${id}/embroidery`,
-          method: 'POST',
-          body: { calculationId, level },
-        }),
-        transformResponse: mapQuote,
-        transformErrorResponse: errors,
-        invalidatesTags: (_result, error, { id }) =>
-          error ? [] : [...list, { type: 'Quote', id }, { type: 'QuoteHistory', id }],
-      },
-    ),
+    addQuoteEmbroidery: build.mutation<Quote, { id: number; calculationId: number }>({
+      query: ({ id, calculationId }) => ({
+        url: `/api/crm/quotes/${id}/embroidery`,
+        method: 'POST',
+        body: { calculationId },
+      }),
+      transformResponse: mapQuote,
+      transformErrorResponse: errors,
+      invalidatesTags: (_result, error, { id }) =>
+        error ? [] : [...list, { type: 'Quote', id }, { type: 'QuoteHistory', id }],
+    }),
   }),
 });
 

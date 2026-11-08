@@ -2632,7 +2632,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** @description «Додати в КП» from «Ціна вишивки» (EMB-001 R-12): appends a saved embroidery calculation as one `Embroidery` item at the end. Its one row is titled with the chosen level, and that level's saved unit price stands, shown, in all three tiers; it is never repriced. No version is needed: the call only adds, and raises the version. A Manager adds only to own КП (404 otherwise); an introduction is 409; an unknown calculation or level is 400. */
+    /** @description «Додати в КП» from «Ціна вишивки» (EMB-001 R-12): appends a saved embroidery calculation as one `Embroidery` item at the end. Its one row is titled with the saved price category, and that category's unit price stands, shown, in all three tiers; it is never repriced. No version is needed: the call only adds, and raises the version. A Manager adds only to own КП (404 otherwise); an introduction is 409; an unknown calculation or one without a price is 400. */
     post: operations['addCrmQuoteEmbroidery'];
     delete?: never;
     options?: never;
@@ -2946,7 +2946,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** @description Hoops, extra costs and the three price names for the form. No rates are returned. */
+    /** @description Hoops, extra costs and the two price category names for the form. No rates are returned. */
     get: operations['getCrmEmbroideryForm'];
     put?: never;
     post?: never;
@@ -8699,6 +8699,7 @@ export interface components {
     CrmSaveEmbroiderySettingsInput: {
       version: number;
       rates: components['schemas']['CrmEmbroideryRates'];
+      /** @description Exactly two price categories when saving the settings; a row of the old archive has three. */
       markups: components['schemas']['CrmEmbroideryMarkup'][];
       stabilizer: components['schemas']['CrmEmbroideryMaterial'];
       fabric: components['schemas']['CrmEmbroideryMaterial'];
@@ -8736,7 +8737,8 @@ export interface components {
       hoopLabel: string;
       /** @description Some ticked costs had no rate; the prices were «Орієнтовна». */
       incomplete: boolean;
-      prices: components['schemas']['CrmEmbroiderySavedPrice'][];
+      /** @description The one saved price category. A calculation saved before the choice keeps «Стандарт», named «Категорія 1». Null only for a calculation without prices. */
+      price: components['schemas']['CrmEmbroiderySavedPrice'] | null;
       /** Format: date-time */
       createdAt: string;
       createdByName: string;
@@ -8758,10 +8760,13 @@ export interface components {
        */
       customerPublicId?: string | null;
       calculation: components['schemas']['CrmCalculateEmbroideryInput'];
+      /** @description The one price category kept, a price name of the result («Категорія 1» or «Категорія 2»); another name is 400. */
+      category: string;
     };
     CrmEmbroiderySavedCalculation: {
       summary: components['schemas']['CrmEmbroiderySavedSummary'];
       input: components['schemas']['CrmCalculateEmbroideryInput'];
+      /** @description The saved result with only the saved price category in `prices`. */
       result: components['schemas']['CrmEmbroideryCalculation'];
       /** @description The rates frozen at saving; null for a Manager. */
       rates: null | {
@@ -19909,8 +19914,6 @@ export interface operations {
         'application/json': {
           /** Format: int64 */
           calculationId: number;
-          /** @description «Опт» */
-          level: string;
         };
       };
     };

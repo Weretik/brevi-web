@@ -25,7 +25,7 @@ interface Props {
 const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' };
 const numeric = { ...mono, textAlign: 'right', whiteSpace: 'nowrap' } as const;
 
-/** «Збережені»: one row per saved calculation; the middle price is «Стандарт». */
+/** «Збережені»: one row per saved calculation with its one saved price category. */
 export function EmbroiderySavedTable({ rows, onOpen }: Props) {
   return (
     <TableContainer>
@@ -35,7 +35,7 @@ export function EmbroiderySavedTable({ rows, onOpen }: Props) {
             <TableCell>Номер</TableCell>
             <TableCell>Назва і клієнт</TableCell>
             <TableCell>Що вишиваємо</TableCell>
-            <TableCell sx={{ textAlign: 'right' }}>Ціни за 1 шт, грн</TableCell>
+            <TableCell sx={{ textAlign: 'right' }}>Ціна за 1 шт, грн</TableCell>
             <TableCell>Збережено</TableCell>
           </TableRow>
         </TableHead>
@@ -73,7 +73,12 @@ export function EmbroiderySavedTable({ rows, onOpen }: Props) {
                 </Typography>
               </TableCell>
               <TableCell sx={numeric}>
-                {row.prices.map((price) => formatEmbroideryMoney(price.unit)).join(' / ')}
+                {row.price && formatEmbroideryMoney(row.price.unit)}
+                {row.price && (
+                  <Typography component="p" variant="caption" color="text.secondary">
+                    {row.price.name}
+                  </Typography>
+                )}
                 {row.incomplete && (
                   <Typography component="p" variant="caption" color="warning.main">
                     Орієнтовна

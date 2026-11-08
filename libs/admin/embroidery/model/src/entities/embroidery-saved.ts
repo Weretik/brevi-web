@@ -24,7 +24,8 @@ export interface EmbroiderySavedSummary {
   hoopLabel: string;
   /** Some costs had no rate: the prices were «Орієнтовна». */
   incomplete: boolean;
-  prices: readonly EmbroiderySavedPrice[];
+  /** The one price category kept when saving («Категорія 1»); null only for a calculation without prices. */
+  price: EmbroiderySavedPrice | null;
   createdAt: string;
   createdByName: string;
   /** «Макет» from «Медіа»: a photo of the design for the workshop; null when none. */
@@ -65,4 +66,6 @@ export interface EmbroiderySaveRequest {
   name: string;
   customerPublicId: string | null;
   calculation: EmbroideryCalculationRequest;
+  /** The one price category kept: «Категорія 1» or «Категорія 2». */
+  category: string;
 }

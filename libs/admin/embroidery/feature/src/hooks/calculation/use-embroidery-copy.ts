@@ -1,9 +1,12 @@
-import { embroideryPriceText } from '@admin/embroidery/model';
+import { embroideryPriceText, formatEmbroideryMoney } from '@admin/embroidery/model';
 import { useState } from 'react';
 
 import type { EmbroideryPrice } from '@admin/embroidery/model';
 
-/** «Копіювати»: one price or all of them as text for a chat, with a message for the snackbar. */
+/**
+ * «Копіювати»: the icon of a price copies only its unit price («203,04»); «Копіювати ціни» copies all of them as text
+ * for a chat. The message is for the snackbar.
+ */
 export function useEmbroideryCopy() {
   const [message, setMessage] = useState<string | null>(null);
   const copy = async (
@@ -11,12 +14,12 @@ export function useEmbroideryCopy() {
     price: EmbroideryPrice | null,
     quantity: number,
   ) => {
-    const text = (price ? [price] : prices)
-      .map((item) => embroideryPriceText(item, quantity))
-      .join('\n');
+    const text = price
+      ? formatEmbroideryMoney(price.unit)
+      : prices.map((item) => embroideryPriceText(item, quantity)).join('\n');
     try {
       await navigator.clipboard.writeText(text);
-      setMessage(price ? `Ціну «${price.name}» скопійовано.` : 'Ціни скопійовано.');
+      setMessage(price ? `Ціну за 1 шт «${price.name}» скопійовано.` : 'Ціни скопійовано.');
     } catch {
       setMessage('Не вдалося скопіювати. Виділіть ціну вручну.');
     }

@@ -5,7 +5,9 @@ import { EmbroideryPriceCards } from './embroidery-price-cards';
 
 afterEach(cleanup);
 
-const prices = [{ name: 'Опт', markupPercent: 60, unit: 81.54, total: 4077, repeatUnit: 69.64 }];
+const prices = [
+  { name: 'Категорія 1', markupPercent: 90, unit: 96.83, total: 4841.5, repeatUnit: 82.7 },
+];
 
 describe('EmbroideryPriceCards', () => {
   it('shows a server reason instead of prices', () => {
@@ -25,7 +27,7 @@ describe('EmbroideryPriceCards', () => {
     expect(screen.queryByRole('button', { name: 'Копіювати ціни' })).not.toBeInTheDocument();
   });
 
-  it('copies one price level', () => {
+  it('copies the unit price of one category', () => {
     const onCopy = vi.fn();
     render(
       <EmbroideryPriceCards
@@ -39,8 +41,8 @@ describe('EmbroideryPriceCards', () => {
         onCopy={onCopy}
       />,
     );
-    expect(screen.getByText('+60%')).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'Копіювати ціну Опт' }));
+    expect(screen.getByText('+90%')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Копіювати ціну за 1 шт: Категорія 1' }));
     expect(onCopy).toHaveBeenCalledWith(prices[0]);
   });
 });
