@@ -3212,6 +3212,240 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/crm/leads': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Requires access:leads (view). A page of «Усі ліди»: leads still in the sheet first, newest added first. Search matches the number, company, region, industry, contacts and owner. Chip counts follow search, category and stage but not the scope. */
+    get: operations['getCrmLeads'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/leads/my-day': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Requires access:leads (view). «Мій день» of the signed-in user: own open leads due by the end of the Kyiv day or never called (overdue and today first, then new by category), and the next 50 planned later. */
+    get: operations['getCrmLeadsMyDay'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/leads/call-results': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Requires access:leads (view). The active call result buttons, in order. */
+    get: operations['getCrmLeadCallResults'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/leads/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['LeadId'];
+      };
+      cookie?: never;
+    };
+    /** @description Requires access:leads (view). The card of a lead with its calls, newest first. */
+    get: operations['getCrmLead'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/leads/{id}/take': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['LeadId'];
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Requires access:leads (edit). «Взяти собі»: a free open lead becomes the actor's; taking an own lead again changes nothing. */
+    post: operations['takeCrmLead'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/leads/{id}/release': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['LeadId'];
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Requires access:leads (edit). «Повернути у вільні»: the owner, or Director/Admin for anybody's lead. The next contact is cleared and the open «Подзвонити» task is deleted. */
+    post: operations['releaseCrmLead'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/leads/{id}/calls': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['LeadId'];
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Requires access:leads (edit). Records a call by the owner (a free lead is taken first). The lead moves to the result's stage; its open «Подзвонити» task is done; a next contact makes a new task for the actor. A retry without a date is planned the result's `retryDays` later; callback, talking and offer need a date; client and closed results end the work and ignore the date. */
+    post: operations['recordCrmLeadCall'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/lead-stats': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Requires access:lead-stats (view). «Зведення» for a period of Kyiv dates (both included; default the last 7 days): totals now, calls and new leads in the period, a row per manager, call results, industries by category, and the last sync. */
+    get: operations['getCrmLeadStats'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/lead-stats/call-results': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Requires access:lead-stats (view). Every call result, switched-off ones included, in order. */
+    get: operations['getCrmLeadStatsCallResults'];
+    put?: never;
+    /** @description Requires access:lead-stats (edit). Adds a call result (at most 30). */
+    post: operations['createCrmLeadCallResult'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/lead-stats/call-results/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['LeadId'];
+      };
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Requires access:lead-stats (edit). Changes a result. Results are never deleted, only switched off; recorded calls keep the old name. */
+    put: operations['editCrmLeadCallResult'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/lead-stats/categories': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Requires access:lead-stats (view). Category codes met in the sheet with their description and the number of leads. */
+    get: operations['getCrmLeadCategories'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/lead-stats/categories/{code}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        code: string;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Requires access:lead-stats (edit). Writes what a category means. */
+    put: operations['editCrmLeadCategory'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/lead-stats/sync': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Requires access:lead-stats (create). «Синхронізувати зараз»: reads the sheet and applies it in one transaction, the same run as the weekday 09:00 job. Rows are matched by «ID»; the calling work is never touched; rows missing from the sheet only get `inSheet: false`. */
+    post: operations['syncCrmLeads'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/production/staff': {
     parameters: {
       query?: never;
@@ -8932,6 +9166,11 @@ export interface components {
       /** Format: date-time */
       updatedAt: string;
       version: number;
+      /**
+       * Format: int64
+       * @description The lead whose next call this is («Подзвонити», LEAD-001 R-08); null for tasks the director gives.
+       */
+      leadId: number | null;
     };
     CrmTaskBoard: {
       items: components['schemas']['CrmTaskSummary'][];
@@ -8981,6 +9220,225 @@ export interface components {
     CrmMarkTaskStepRequest: {
       version: number;
       isDone: boolean;
+    };
+    /** @enum {string} */
+    CrmLeadScope: 'All' | 'Mine' | 'Free';
+    /** @enum {string} */
+    CrmLeadStage: 'New' | 'InWork' | 'Talking' | 'Offer' | 'Client' | 'Closed';
+    CrmLeadPerson: {
+      userId: number;
+      name: string;
+    };
+    CrmLeadSummary: {
+      /** Format: int64 */
+      id: number;
+      /** @description The «ID» column of the sheet. */
+      sourceId: number;
+      company: string;
+      category: string | null;
+      region: string | null;
+      industry: string | null;
+      callReason: string | null;
+      stage: components['schemas']['CrmLeadStage'];
+      owner: components['schemas']['CrmLeadPerson'] | null;
+      lastResultName: string | null;
+      /** Format: date-time */
+      lastCallAt: string | null;
+      /** Format: date-time */
+      nextContactAt: string | null;
+      isOverdue: boolean;
+      callCount: number;
+      /** Format: date */
+      addedOn: string | null;
+      inSheet: boolean;
+      version: number;
+    };
+    CrmLeadPage: {
+      items: components['schemas']['CrmLeadSummary'][];
+      page: number;
+      pageSize: number;
+      total: number;
+      mine: number;
+      /** @description Open leads nobody took. */
+      free: number;
+      all: number;
+    };
+    CrmLeadMyDay: {
+      queue: components['schemas']['CrmLeadSummary'][];
+      later: components['schemas']['CrmLeadSummary'][];
+      /** @description Calls the user recorded since the start of the Kyiv day. */
+      callsToday: number;
+      /** @description Calls today plus the queue. */
+      plannedToday: number;
+      /** @description Open leads nobody took. */
+      free: number;
+    };
+    /**
+     * @description What a result does: `Retry` plans the next try, `Callback`, `Talking` and `Offer` need a next contact, `Client` and `Closed` end the work.
+     * @enum {string}
+     */
+    CrmLeadOutcome: 'Retry' | 'Callback' | 'Talking' | 'Offer' | 'Client' | 'Closed';
+    CrmLeadCallResult: {
+      /** Format: int64 */
+      id: number;
+      name: string;
+      outcome: components['schemas']['CrmLeadOutcome'];
+      /** @description Only for `Retry`. */
+      retryDays: number | null;
+      isActive: boolean;
+      position: number;
+    };
+    CrmLeadCall: {
+      /** Format: int64 */
+      id: number;
+      by: components['schemas']['CrmLeadPerson'];
+      /** Format: date-time */
+      at: string;
+      /** Format: int64 */
+      resultId: number;
+      resultName: string;
+      outcome: components['schemas']['CrmLeadOutcome'];
+      comment: string | null;
+      /** Format: date-time */
+      nextContactAt: string | null;
+    };
+    CrmLead: {
+      /** Format: int64 */
+      id: number;
+      sourceId: number;
+      company: string;
+      category: string | null;
+      categoryDescription: string | null;
+      /** Format: date */
+      addedOn: string | null;
+      region: string | null;
+      industry: string | null;
+      scale: string | null;
+      signal: string | null;
+      /** Format: date */
+      signalDate: string | null;
+      factOrPlan: string | null;
+      signalUrl: string | null;
+      /** @description «Почему возможны 50+ единиц». */
+      volumeReason: string | null;
+      offer: string | null;
+      website: string | null;
+      /** @description «Открытый контакт» as written (phones and emails). */
+      contacts: string | null;
+      whomToCall: string | null;
+      tenderCheck: string | null;
+      callReason: string | null;
+      reliability: string | null;
+      email: string | null;
+      /** @description The manager columns of the sheet at the first sync, one line per sheet column, its name first. */
+      sheetNotes: string | null;
+      inSheet: boolean;
+      stage: components['schemas']['CrmLeadStage'];
+      owner: components['schemas']['CrmLeadPerson'] | null;
+      /** Format: date-time */
+      takenAt: string | null;
+      lastResultName: string | null;
+      /** Format: date-time */
+      lastCallAt: string | null;
+      /** Format: date-time */
+      nextContactAt: string | null;
+      isOverdue: boolean;
+      callCount: number;
+      /**
+       * Format: int64
+       * @description The open «Подзвонити» task in «Мої завдання».
+       */
+      openTaskId: number | null;
+      calls: components['schemas']['CrmLeadCall'][];
+      version: number;
+    };
+    CrmRecordLeadCallInput: {
+      /** Format: int64 */
+      resultId: number;
+      comment?: string | null;
+      /** Format: date-time */
+      nextContactAt?: string | null;
+      version: number;
+    };
+    CrmLeadManagerStats: {
+      manager: components['schemas']['CrmLeadPerson'];
+      /** @description Own open leads now. */
+      inWork: number;
+      calls: number;
+      /** @description Calls whose result is not a retry, of all calls in the period; null without calls. */
+      reachedPercent: number | null;
+      offers: number;
+      clients: number;
+      /** @description Own open leads whose next contact has passed (now). */
+      overdue: number;
+    };
+    CrmLeadCount: {
+      name: string;
+      count: number;
+    };
+    CrmLeadIndustryStats: {
+      industry: string;
+      categories: components['schemas']['CrmLeadCount'][];
+      total: number;
+    };
+    CrmLeadSyncState: {
+      /** Format: date-time */
+      lastRunAt: string | null;
+      /** Format: date-time */
+      lastSuccessAt: string | null;
+      rows: number;
+      added: number;
+      updated: number;
+      /** @description Why the last run failed; null after a success. */
+      error: string | null;
+    };
+    CrmLeadStats: {
+      /** Format: date */
+      from: string;
+      /** Format: date */
+      to: string;
+      total: number;
+      free: number;
+      inWork: number;
+      offer: number;
+      clients: number;
+      closed: number;
+      overdue: number;
+      callsInPeriod: number;
+      addedInPeriod: number;
+      managers: components['schemas']['CrmLeadManagerStats'][];
+      results: components['schemas']['CrmLeadCount'][];
+      /** @description Up to 20 industries with the most leads. */
+      industries: components['schemas']['CrmLeadIndustryStats'][];
+      /** @description Every category code met, «—» for none. */
+      categories: string[];
+      sync: components['schemas']['CrmLeadSyncState'] | null;
+    };
+    CrmSaveLeadCallResultInput: {
+      name: string;
+      outcome: components['schemas']['CrmLeadOutcome'];
+      retryDays?: number | null;
+      isActive: boolean;
+      position: number;
+    };
+    CrmLeadCategory: {
+      code: string;
+      description: string | null;
+      leads: number;
+    };
+    CrmSaveLeadCategoryInput: {
+      description?: string | null;
+    };
+    CrmLeadSync: {
+      rows: number;
+      added: number;
+      updated: number;
+      /** @description Leads that disappeared from the sheet in this run. */
+      gone: number;
+      /** @description Rows with text but without a whole-number ID or a company. */
+      skipped: number;
+      /** Format: date-time */
+      at: string;
     };
     WorkshopEmployeeResponse: {
       id: number;
@@ -11113,6 +11571,15 @@ export interface components {
         'application/json': string[];
       };
     };
+    /** @description Somebody else took the lead first, the lead was saved in another window (stale version), or a sync is running; errors are Ukrainian strings. */
+    'leads.openapi_components-responses-Conflict': {
+      headers: {
+        [name: string]: unknown;
+      };
+      content: {
+        'application/json': string[];
+      };
+    };
   };
   parameters: {
     /** @description Value of the `brevi.csrf` cookie. Required on every non-GET request made with the session cookie. */
@@ -11135,6 +11602,7 @@ export interface components {
     /** @description Admin only; ignored for a Manager. */
     AssigneeUserId: number;
     TaskId: number;
+    LeadId: number;
     FileId: string;
   };
   requestBodies: never;
@@ -21565,6 +22033,585 @@ export interface operations {
         content?: never;
       };
       409: components['responses']['components-responses-Conflict'];
+    };
+  };
+  getCrmLeads: {
+    parameters: {
+      query?: {
+        search?: string;
+        scope?: components['schemas']['CrmLeadScope'];
+        category?: string;
+        /** @description A stage, or `Open` for every stage still in work. */
+        stage?: 'Open' | 'New' | 'InWork' | 'Talking' | 'Offer' | 'Client' | 'Closed';
+        page?: number;
+        pageSize?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The page. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmLeadPage'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to the page. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmLeadsMyDay: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The day. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmLeadMyDay'];
+        };
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to the page. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmLeadCallResults: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The results. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmLeadCallResult'][];
+        };
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to the page. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmLead: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['LeadId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The lead. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmLead'];
+        };
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to the page. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  takeCrmLead: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['LeadId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The lead. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmLead'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to the page. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['leads.openapi_components-responses-Conflict'];
+    };
+  };
+  releaseCrmLead: {
+    parameters: {
+      query: {
+        version: number;
+      };
+      header?: never;
+      path: {
+        id: components['parameters']['LeadId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The lead. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmLead'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to the page, or somebody else's lead for a manager. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['leads.openapi_components-responses-Conflict'];
+    };
+  };
+  recordCrmLeadCall: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['LeadId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmRecordLeadCallInput'];
+      };
+    };
+    responses: {
+      /** @description The lead. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmLead'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to the page, or the lead is somebody else's. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['leads.openapi_components-responses-Conflict'];
+    };
+  };
+  getCrmLeadStats: {
+    parameters: {
+      query?: {
+        from?: string;
+        to?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The statistics. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmLeadStats'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to the page. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmLeadStatsCallResults: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The results. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmLeadCallResult'][];
+        };
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to the page. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createCrmLeadCallResult: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmSaveLeadCallResultInput'];
+      };
+    };
+    responses: {
+      /** @description The result. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmLeadCallResult'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to change the references. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  editCrmLeadCallResult: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: components['parameters']['LeadId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmSaveLeadCallResultInput'];
+      };
+    };
+    responses: {
+      /** @description The result. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmLeadCallResult'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to change the references. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmLeadCategories: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The categories. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmLeadCategory'][];
+        };
+      };
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to the page. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  editCrmLeadCategory: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        code: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmSaveLeadCategoryInput'];
+      };
+    };
+    responses: {
+      /** @description The category. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmLeadCategory'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to change the references. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  syncCrmLeads: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description What changed. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmLeadSync'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to sync. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      409: components['responses']['leads.openapi_components-responses-Conflict'];
+      /** @description Google cannot be read now (access, network); nothing changed. */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
     };
   };
   getWorkshopStaff: {
