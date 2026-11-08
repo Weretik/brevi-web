@@ -3,6 +3,7 @@ import { quoteLookupErrors, toQuoteApiError } from '../errors/quote-api-error';
 import {
   mapQuoteCatalogPage,
   mapQuoteCustomSewingPrice,
+  mapQuoteFabricFacts,
   mapQuoteModelComposition,
   mapQuoteProductPhotos,
   mapQuoteStaff,
@@ -12,6 +13,7 @@ import type {
   QuoteCatalogPage,
   QuoteCustomSewingPrice,
   QuoteCustomSewingPriceRequest,
+  QuoteFabricFacts,
   QuoteIntroSeason,
   QuoteModelComposition,
   QuoteProductPhoto,
@@ -62,6 +64,12 @@ export const quoteLookupsApi = quotesBaseApi.injectEndpoints({
       transformResponse: mapQuoteProductPhotos,
       transformErrorResponse: (response) => toQuoteApiError(response, quoteLookupErrors),
     }),
+    /** The manager line under each КП fabric: composition, density, price per metre, supplier (R-31). */
+    getQuoteFabricFacts: build.query<QuoteFabricFacts[], readonly number[]>({
+      query: (ids) => ({ url: '/api/crm/quote-lookups/fabrics', params: { ids: [...ids] } }),
+      transformResponse: mapQuoteFabricFacts,
+      transformErrorResponse: (response) => toQuoteApiError(response, quoteLookupErrors),
+    }),
     getQuoteStaff: build.query<QuoteStaff[], void>({
       query: () => '/api/crm/quote-lookups/staff',
       transformResponse: mapQuoteStaff,
@@ -72,6 +80,7 @@ export const quoteLookupsApi = quotesBaseApi.injectEndpoints({
 
 export const {
   useCalculateQuoteCustomSewingMutation,
+  useGetQuoteFabricFactsQuery,
   useGetQuoteModelCompositionQuery,
   useGetQuoteProductPhotosQuery,
   useSearchQuoteCatalogQuery,

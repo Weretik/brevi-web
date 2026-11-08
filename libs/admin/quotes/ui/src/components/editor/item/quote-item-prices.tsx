@@ -5,6 +5,7 @@ import {
   quoteTierLabels,
   quoteTiers,
 } from '@admin/quotes/model';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
 import StarOutlinedIcon from '@mui/icons-material/StarOutlined';
 import {
@@ -18,13 +19,21 @@ import {
   TableHead,
   TableRow,
   TextField,
+  Tooltip,
   Typography,
 } from '@mui/material';
+import { useState } from 'react';
 
-import { QuoteOptionMenu } from './quote-option-menu';
+import { QuoteFabricLine } from './quote-fabric-line';
 import { QuotePriceCell } from './quote-price-cell';
+import { QuoteRemoveLastFabricDialog } from './quote-remove-last-fabric-dialog';
 
-import type { QuoteItemDraft, QuoteOptionDraft, QuoteTier } from '@admin/quotes/model';
+import type {
+  QuoteFabricFacts,
+  QuoteItemDraft,
+  QuoteOptionDraft,
+  QuoteTier,
+} from '@admin/quotes/model';
 
 interface Props {
   item: QuoteItemDraft;
@@ -39,6 +48,9 @@ interface Props {
   onReasonChange: (optionKey: string, reason: string) => void;
   onRecommend: (optionKey: string) => void;
   onRemoveOption: (optionKey: string) => void;
+  /** Removing the last fabric removes the whole item, after a confirmation. */
+  onRemoveItem: () => void;
+  fabricFacts: ReadonlyMap<number, QuoteFabricFacts>;
 }
 
 const firstColumn = (item: QuoteItemDraft) =>
@@ -59,12 +71,18 @@ export function QuoteItemPrices({
   onReasonChange,
   onRecommend,
   onRemoveOption,
+  onRemoveItem,
+  fabricFacts,
 }: Props) {
+  const [confirmLast, setConfirmLast] = useState(false);
   const sewing = isSewingKind(item.kind);
   const fixed = isFixedPriceKind(item.kind);
   const embroidery = item.kind === 'Embroidery';
   const tierHidden = (tier: QuoteTier) => item.options.every((o) => !o.prices[tier].shown);
   const rowLabel = (option: QuoteOptionDraft) => `${itemName}, ${option.title}`;
+  const removable = item.kind === 'Sewing' || item.kind === 'CustomSewing';
+  const remove = (option: QuoteOptionDraft) =>
+    item.options.length > 1 ? onRemoveOption(option.key) : setConfirmLast(true);
   const manualRows = item.options.filter((option) => item.kind === 'Ppe' && hasManualPrice(option));
   return (
     <Box>
@@ -92,8 +110,8 @@ export function QuoteItemPrices({
           <TableBody>
             {item.options.map((option) => (
               <TableRow key={option.key}>
-                <TableCell>
-                  <Stack direction="row" sx={{ gap: 0.5, alignItems: 'center', flexWrap: 'wrap' }}>
+                <TableCell sx={{ verticalAlign: 'top' }}>
+                  <Stack direction="row" sx={{ gap: 0.5, alignItems: 'flex-start' }}>
                     {sewing && (
                       <IconButton
                         size="small"
@@ -107,6 +125,8 @@ export function QuoteItemPrices({
                         onClick={() => onRecommend(option.key)}
                         sx={{
                           ml: -0.75,
+                          mt: -0.25,
+                          flexShrink: 0,
                           color: option.isRecommended ? 'primary.dark' : 'text.disabled',
                         }}
                       >
@@ -117,40 +137,56 @@ export function QuoteItemPrices({
                         )}
                       </IconButton>
                     )}
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      {sewing || embroidery ? option.title : 'За одиницю'}
-                    </Typography>
-                    {option.isRecommended && (
-                      <Typography variant="caption" sx={{ color: 'primary.dark', fontWeight: 600 }}>
-                        рекомендуємо
+                    <Box sx={{ minWidth: 0, flex: 1 }}>
+                      <Typography variant="body2" component="span" sx={{ fontWeight: 600 }}>
+                        {sewing || embroidery ? option.title : 'За одиницю'}
                       </Typography>
-                    )}
+                      {option.isRecommended && (
+                        <Typography
+                          variant="caption"
+                          component="span"
+                          sx={{ color: 'primary.dark', fontWeight: 600, ml: 0.75 }}
+                        >
+                          рекомендуємо
+                        </Typography>
+                      )}
+                      {sewing && <QuoteFabricLine option={option} fabricFacts={fabricFacts} />}
+                      {!sewing && option.details && (
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ display: 'block' }}
+                        >
+                          {option.details}
+                        </Typography>
+                      )}
+                    </Box>
                   </Stack>
-                  {(option.details || option.fabricInfo) && (
-                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                      {[option.details, option.fabricInfo].filter(Boolean).join(' · ')}
-                    </Typography>
-                  )}
                 </TableCell>
                 {quoteTiers.map((tier) => (
-                  <TableCell key={tier} align="right">
+                  <TableCell key={tier} align="right" sx={{ verticalAlign: 'top' }}>
                     <QuotePriceCell
                       tier={tier}
                       price={option.prices[tier]}
                       editable={!fixed}
                       label={rowLabel(option)}
                       onManualChange={(manual) => onTierChange(option.key, tier, { manual })}
+                      onShownChange={(shown) => onTierChange(option.key, tier, { shown })}
                     />
                   </TableCell>
                 ))}
-                <TableCell align="right">
-                  <QuoteOptionMenu
-                    option={option}
-                    label={rowLabel(option)}
-                    canRemove={item.kind === 'Sewing' && item.options.length > 1}
-                    onShownChange={(tier, shown) => onTierChange(option.key, tier, { shown })}
-                    onRemove={() => onRemoveOption(option.key)}
-                  />
+                <TableCell align="right" sx={{ verticalAlign: 'top' }}>
+                  {removable && (
+                    <Tooltip title="Прибрати тканину">
+                      <IconButton
+                        size="small"
+                        aria-label={`Прибрати тканину: ${rowLabel(option)}`}
+                        onClick={() => remove(option)}
+                      >
+                        <DeleteOutlineOutlinedIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                 </TableCell>
               </TableRow>
             ))}
@@ -181,6 +217,15 @@ export function QuoteItemPrices({
           </Box>
         );
       })}
+      <QuoteRemoveLastFabricDialog
+        open={confirmLast}
+        itemName={itemName}
+        onCancel={() => setConfirmLast(false)}
+        onConfirm={() => {
+          setConfirmLast(false);
+          onRemoveItem();
+        }}
+      />
       {item.options.map((option) =>
         optionErrors[`option:${option.key}`] ? (
           <Alert key={option.key} severity="warning" sx={{ mx: 2, mt: 1 }}>

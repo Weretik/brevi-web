@@ -30,6 +30,7 @@ import { QuoteDeleteDialog } from '../../components/editor/quote-delete-dialog';
 import { QuotePreview } from '../../components/preview/quote-preview';
 import { useClientSuggestions } from '../../hooks/clients/use-client-suggestions';
 import { useQuoteEditor } from '../../hooks/editor/use-quote-editor';
+import { useQuoteFabricFacts } from '../../hooks/editor/use-quote-fabric-facts';
 import { useQuoteLifecycle } from '../../hooks/lifecycle/use-quote-lifecycle';
 import { useRouteNotice } from '../../hooks/lifecycle/use-route-notice';
 import { useQuotePreview } from '../../hooks/preview/use-quote-preview';
@@ -69,6 +70,7 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleteQuote, deleting] = useDeleteQuoteMutation();
   const { quote, draft } = editor;
+  const fabricFacts = useQuoteFabricFacts(draft);
   const preview = useQuotePreview({ quote, dirty: editor.dirty, save: editor.save });
   const gmail = useGmailReturnNotice();
   const [sentNotice, setSentNotice] = useState<string | null>(null);
@@ -182,6 +184,7 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
               onChangePhoto={() => setPanel({ kind: 'photo', itemKey: item.key })}
               onMove={(offset) => editor.moveItem(item.key, offset)}
               onRemove={() => editor.removeItem(item.key)}
+              fabricFacts={fabricFacts}
             />
           ))}
           <Box id={addItemsAnchor} sx={{ scrollMarginTop: 96 }}>

@@ -2553,6 +2553,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/crm/quote-lookups/fabrics': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description R-31. The manager line under each КП fabric: composition, density, price per metre and supplier from the current Reference fabric. Not shown in the PDF; unknown ids are left out. */
+    get: operations['getCrmQuoteFabricFacts'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/crm/quote-lookups/introduction': {
     parameters: {
       query?: never;
@@ -5482,6 +5499,11 @@ export interface components {
       comment: string | null;
       /** @description Short description for commercial proposals (КП). */
       proposalDescription: string | null;
+      /**
+       * Format: int32
+       * @description Supplier (Reference) of the fabric.
+       */
+      providerId: number;
     };
     UpdateFabricRequest: {
       name: string;
@@ -7571,6 +7593,8 @@ export interface components {
       prices?: components['schemas']['CrmQuoteTierPrices'] | null;
       /** @description Why it cannot be added; null when it can. */
       problem?: string | null;
+      /** @description Reference fabric of the variant (R-31). */
+      fabricId?: number | null;
     };
     CrmQuoteCatalogProduct: {
       productId: number;
@@ -7656,6 +7680,15 @@ export interface components {
       layout: components['schemas']['CrmQuoteIntroLayout'];
       letterName?: string | null;
       pages: components['schemas']['CrmQuoteIntroPageInput'][];
+    };
+    CrmQuoteFabricFacts: {
+      fabricId: number;
+      name: string;
+      composition: string | null;
+      density: string | null;
+      pricePerMeter: number;
+      supplierId: number | null;
+      supplierName: string | null;
     };
     CrmQuoteIntroMainModel: {
       code: string;
@@ -18610,6 +18643,43 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['CrmQuoteCatalogProduct'][];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmQuoteFabricFacts: {
+    parameters: {
+      query: {
+        ids: number[];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Fabrics. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmQuoteFabricFacts'][];
         };
       };
       400: components['responses']['Invalid'];

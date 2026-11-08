@@ -7,9 +7,10 @@ interface Props {
   onChange?: () => void;
 }
 
+/** About 2.5 times the old 56 px thumbnail, so the model is clearly seen while the КП is made. */
 const frame = {
-  width: 56,
-  height: 56,
+  width: { xs: 96, sm: 140 },
+  height: { xs: 96, sm: 140 },
   borderRadius: 1,
   flexShrink: 0,
   border: 1,

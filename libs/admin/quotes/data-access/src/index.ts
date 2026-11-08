@@ -14,6 +14,7 @@ export {
 } from './api/quotes.api';
 export {
   useCalculateQuoteCustomSewingMutation,
+  useGetQuoteFabricFactsQuery,
   useGetQuoteModelCompositionQuery,
   useGetQuoteProductPhotosQuery,
   useGetQuoteStaffQuery,

@@ -74,6 +74,7 @@ const api = vi.hoisted(() => ({
   copy: vi.fn(),
   addEmbroidery: vi.fn(),
   draft: { current: null as unknown },
+  quote: { current: null as unknown },
   mutation: (fn: (arg: unknown) => unknown) => () => [
     (arg: unknown) => ({ unwrap: () => fn(arg) }),
     { isLoading: false },
@@ -81,7 +82,25 @@ const api = vi.hoisted(() => ({
 }));
 
 vi.mock('@admin/quotes/data-access', () => ({
-  useGetQuoteQuery: () => ({ data: quote, isLoading: false, isError: false, refetch: api.refetch }),
+  useGetQuoteQuery: () => ({
+    data: api.quote.current ?? quote,
+    isLoading: false,
+    isError: false,
+    refetch: api.refetch,
+  }),
+  useGetQuoteFabricFactsQuery: () => ({
+    data: [
+      {
+        fabricId: 31,
+        name: 'Грета',
+        composition: '53% бавовна, 47% поліестер',
+        density: '220 г/м²',
+        pricePerMeter: 133,
+        supplierId: 5,
+        supplierName: 'Спецтекстиль',
+      },
+    ],
+  }),
   useCreateQuoteMutation: api.mutation(vi.fn()),
   useSaveQuoteMutation: api.mutation(api.save),
   useDeleteQuoteMutation: api.mutation(vi.fn()),
@@ -209,6 +228,7 @@ beforeEach(() => {
   api.archive.mockReset();
   api.copy.mockReset();
   api.draft.current = sendDraft;
+  api.quote.current = null;
 });
 afterEach(cleanup);
 
@@ -320,12 +340,54 @@ describe('КП editor', () => {
   it('hides a price from the client', async () => {
     api.save.mockResolvedValue(quote);
     renderEditor();
-    fireEvent.click(await screen.findByRole('button', { name: 'Дії з рядком: Рукавиці, Ціна' }));
-    fireEvent.click(screen.getByRole('menuitemcheckbox', { name: 'Показати в КП: до 9 шт.' }));
+    fireEvent.click(
+      await screen.findByRole('switch', { name: 'Показувати в КП: Рукавиці, Ціна, до 9 шт.' }),
+    );
+    expect(screen.getByText('Сховано')).toBeVisible();
     fireEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
     await waitFor(() => expect(api.save).toHaveBeenCalledTimes(1));
     const sent = api.save.mock.calls[0][0] as { draft: QuoteDraft };
     expect(sent.draft.items[0].options[0].prices.retail.shown).toBe(false);
+  });
+
+  it('shows one fabric line and removes the whole item with its last fabric after a confirmation', async () => {
+    const sewing = {
+      ...quote.items[0],
+      id: 11,
+      kind: 'Sewing' as const,
+      productId: 8,
+      name: 'Костюм «Агат»',
+      options: [
+        {
+          ...quote.items[0].options[0],
+          id: 21,
+          articleId: 40,
+          fabricId: 31,
+          title: 'Тканина «Грета»',
+          details: 'Короткий опис для клієнта',
+        },
+      ],
+    };
+    api.quote.current = { ...quote, items: [sewing] };
+    api.save.mockResolvedValue(quote);
+    renderEditor();
+
+    expect(
+      await screen.findByText(
+        /Склад: 53% бавовна, 47% поліестер · Щільність: 220 г\/м² · 133 грн\/м/,
+      ),
+    ).toBeVisible();
+    expect(screen.getByText('Спецтекстиль')).toBeVisible();
+    expect(screen.queryByText('Короткий опис для клієнта')).not.toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Прибрати тканину: Костюм «Агат», Тканина «Грета»' }),
+    );
+    expect(screen.getByRole('heading', { name: 'Прибрати позицію?' })).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: 'Прибрати позицію' }));
+    await waitFor(() =>
+      expect(screen.queryByRole('heading', { name: /Костюм «Агат»/ })).not.toBeInTheDocument(),
+    );
   });
 
   it('hides one quantity tier in the whole КП with the «Підсумок» switch', async () => {
