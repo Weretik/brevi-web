@@ -106,6 +106,10 @@ export interface LeadSyncResult {
   readonly skipped: number;
   /** Rows left out because their company is already on an earlier row (rows match by company name). */
   readonly duplicates: number;
+  /** Free leads taken for the manager named in «Кто взял в работу». */
+  readonly assigned: number;
+  /** Calls brought into the history from «Результат звонка» of the sheet. */
+  readonly calls: number;
   readonly warning: string | null;
 }
 

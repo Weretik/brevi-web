@@ -9421,7 +9421,7 @@ export interface components {
       updated: number;
       /** @description Why the last run failed; null after a success. */
       error: string | null;
-      /** @description What the last successful run left out (repeated companies); null when nothing. */
+      /** @description What the last successful run left out (repeated companies, sheet owners without a manager); null when nothing. */
       warning: string | null;
     };
     CrmLeadStats: {
@@ -9473,7 +9473,11 @@ export interface components {
       at: string;
       /** @description Rows left out because their company is already on an earlier row (rows match by company name, not ID). */
       duplicates: number;
-      /** @description Which rows were left out and why; null when none. */
+      /** @description Free leads taken for the Brevi manager named in «Кто взял в работу». */
+      assigned: number;
+      /** @description Calls brought into the history from a new «Результат звонка» of the sheet. */
+      calls: number;
+      /** @description Which rows were left out or which sheet owners or call results are unknown; null when none. */
       warning: string | null;
     };
     CrmLeadSyncFailure: {
