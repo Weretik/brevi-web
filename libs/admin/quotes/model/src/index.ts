@@ -69,7 +69,10 @@ export type * from './entities/quote-settings';
 export type * from './models/quote-settings-draft';
 export {
   quoteAdvantageCount,
+  quoteIntroMarks,
   quoteMaxLetterVariants,
+  quotePdfIntroCases,
+  quotePdfIntroMarks,
   quoteTemplateMarkLabels,
   quoteTemplateMarks,
 } from './models/quote-settings-draft';

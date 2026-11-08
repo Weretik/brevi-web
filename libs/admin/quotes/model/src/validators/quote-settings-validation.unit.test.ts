@@ -27,7 +27,23 @@ const settings: QuoteSettings = {
     ctaTitle: null,
     ctaText: null,
     ctaContactTemplate: null,
-    introText: null,
+    intros: {
+      onePpe: 'Підібрали {recipient} {ppeItem}.',
+      oneSewing: 'Підібрали {recipient} {sewingModel} у тканині {fabricName}.',
+      oneSewingOnePpe: 'Підготували {recipient} {sewingModel} та {ppeItem}.',
+      sewing: 'Підібрали {recipient} кілька моделей.',
+      ppe: 'Підібрали {recipient} добірку ЗІЗ.',
+      sewingAndPpe: 'Підготували {recipient} комплексну добірку.',
+      fallback: 'Підготували {recipient} пропозицію.',
+    },
+    labels: {
+      contactLine: 'Контакт для зв’язку: {managerName} {managerPhone}',
+      codeLabel: 'арт.',
+      siteLink: 'Переглянути товар на сайті',
+      fabricsTitle: 'Варіанти тканини',
+      recommended: 'Рекомендуємо',
+      commentTitle: 'Коментар до пропозиції',
+    },
   },
   introduction: {
     logoText: null,
@@ -100,5 +116,17 @@ describe('quoteSettingsErrors', () => {
       'Невідома мітка {managerNmae}. Вставте мітку кнопкою під полем.',
     );
     expect(errors['pdf.ctaContactTemplate']).toBeUndefined();
+  });
+
+  it('lets the opening text use the item marks and keeps them out of the other fields', () => {
+    const draft = quoteSettingsToDraft(settings);
+    draft.pdf.intros.oneSewing = 'Підібрали {recipient} {sewingModel}, менеджер {managerName}.';
+    draft.pdf.intros.ppe = 'Для {client}';
+    draft.pdf.labels.contactLine = 'Пише {sewingModel}';
+
+    const errors = quoteSettingsErrors(draft);
+    expect(errors['pdf.intros.oneSewing']).toBeUndefined();
+    expect(errors['pdf.intros.ppe']).toContain('{client}');
+    expect(errors['pdf.labels.contactLine']).toContain('{sewingModel}');
   });
 });

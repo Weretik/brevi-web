@@ -24,8 +24,38 @@ export interface QuotePdfTextsDraft {
   ctaTitle: string;
   ctaText: string;
   ctaContactTemplate: string;
-  introText: string;
+  intros: QuotePdfIntroTextsDraft;
+  labels: QuotePdfLabelsDraft;
 }
+
+export type QuotePdfIntroCase =
+  'onePpe' | 'oneSewing' | 'oneSewingOnePpe' | 'sewing' | 'ppe' | 'sewingAndPpe' | 'fallback';
+
+/** An empty text is saved as «не вказано», so the PDF uses the standard one. */
+export type QuotePdfIntroTextsDraft = Record<QuotePdfIntroCase, string>;
+
+export interface QuotePdfLabelsDraft {
+  contactLine: string;
+  codeLabel: string;
+  siteLink: string;
+  fabricsTitle: string;
+  recommended: string;
+  commentTitle: string;
+}
+
+/** When the PDF takes each opening text, in the order the settings page shows them. */
+export const quotePdfIntroCases: readonly {
+  readonly key: QuotePdfIntroCase;
+  readonly when: string;
+}[] = [
+  { key: 'onePpe', when: 'Лише один ЗІЗ' },
+  { key: 'oneSewing', when: 'Одна модель з одним варіантом тканини' },
+  { key: 'oneSewingOnePpe', when: 'Одна модель з однією тканиною і один ЗІЗ' },
+  { key: 'sewing', when: 'Кілька моделей або тканин, без ЗІЗ' },
+  { key: 'ppe', when: 'Кілька ЗІЗ, без пошиву' },
+  { key: 'sewingAndPpe', when: 'Кілька позицій: і пошив, і ЗІЗ' },
+  { key: 'fallback', when: 'Усе інше, наприклад лише вишивка' },
+];
 
 export interface QuoteAdvantageDraft {
   title: string;
@@ -89,13 +119,33 @@ export const quoteTemplateMarks = [
 
 export type QuoteTemplateMark = (typeof quoteTemplateMarks)[number];
 
+/** Marks only the PDF opening text understands: they come from the КП items. */
+export const quoteIntroMarks = [
+  '{recipient}',
+  '{sewingModel}',
+  '{fabricName}',
+  '{ppeItem}',
+] as const;
+
+export type QuoteIntroMark = (typeof quoteIntroMarks)[number];
+
+/** Every mark a template can have; each field allows its own list. */
+export type QuoteMark = QuoteTemplateMark | QuoteIntroMark;
+
+/** The opening text understands its own marks and the common ones. */
+export const quotePdfIntroMarks: readonly QuoteMark[] = [...quoteIntroMarks, ...quoteTemplateMarks];
+
 /** Button names of the marks: «+ Номер КП» inserts `{quoteNumber}`. */
-export const quoteTemplateMarkLabels: Readonly<Record<QuoteTemplateMark, string>> = {
+export const quoteTemplateMarkLabels: Readonly<Record<QuoteMark, string>> = {
   '{quoteNumber}': 'Номер КП',
   '{managerName}': 'Менеджер',
   '{managerPhone}': 'Телефон менеджера',
   '{managerEmail}': 'Email менеджера',
   '{site}': 'Сайт',
+  '{recipient}': 'Для кого',
+  '{sewingModel}': 'Модель',
+  '{fabricName}': 'Тканина',
+  '{ppeItem}': 'ЗІЗ',
 };
 
 export const quoteAdvantageCount = 5;
