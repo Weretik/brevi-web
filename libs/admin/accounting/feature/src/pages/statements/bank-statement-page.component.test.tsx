@@ -148,4 +148,34 @@ describe('statement page', () => {
     expect(screen.getByRole('switch', { name: 'Проводити рядок 2' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Переглянути рядок 2' })).toBeVisible();
   });
+
+  it('rolls a booked statement back after the confirmation', async () => {
+    const calls = stubFinanceApi({
+      statementDetails: {
+        ...statementDetails(
+          [bankStatementLine({ transactionId: 't1', state: 'Ready' })],
+          bankStatement({ status: 'Booked', transactionCount: 1, version: 2 }),
+        ),
+        rollback: { transactions: 1, transfers: 0, changed: 1, cancelled: 0 },
+      },
+      written: () => bankStatement({ version: 3 }),
+    });
+    openPage();
+    const user = userEvent.setup();
+
+    await user.click(await screen.findByRole('button', { name: 'Відкотити виписку' }));
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByText(/Буде анульовано 1 операцій і 0 переказів/)).toBeVisible();
+    expect(within(dialog).getByText(/1 з них змінювали вручну/)).toBeVisible();
+    await user.click(within(dialog).getByRole('button', { name: 'Відкотити' }));
+
+    await waitFor(() =>
+      expect(calls.find((call) => call.method === 'POST')).toEqual({
+        method: 'POST',
+        path: '/api/accounting/statements/s1/rollback',
+        body: { version: 2 },
+      }),
+    );
+    expect(await screen.findByText(/Виписку відкочено/)).toBeVisible();
+  });
 });

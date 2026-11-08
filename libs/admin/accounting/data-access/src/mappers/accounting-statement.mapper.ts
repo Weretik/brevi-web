@@ -24,6 +24,7 @@ import type {
   BankStatement,
   BankStatementDetails,
   BankStatementLine,
+  BankStatementRollback,
 } from '@admin/accounting/model';
 
 const nullableDate = (value: unknown, what: string) =>
@@ -115,5 +116,17 @@ export function mapBankStatementDetails(value: unknown): BankStatementDetails {
     total: integer(row['total'], 'кількість рядків'),
     page: integer(row['page'], 'сторінка'),
     pageSize: integer(row['pageSize'], 'розмір сторінки'),
+    rollback: mapRollback(row['rollback']),
+  };
+}
+
+function mapRollback(value: unknown): BankStatementRollback | null {
+  if (value === null || value === undefined) return null;
+  const row = record(value, 'відкат виписки');
+  return {
+    transactions: integer(row['transactions'], 'операцій до анулювання'),
+    transfers: integer(row['transfers'], 'переказів до анулювання'),
+    changed: integer(row['changed'], 'змінено вручну'),
+    cancelled: integer(row['cancelled'], 'уже анульовано'),
   };
 }

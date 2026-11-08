@@ -2,6 +2,7 @@ import {
   bankLineStateLabels,
   bankLineStates,
   bankStatementPeriod,
+  bankStatementRollbackText,
   financeOperationForms,
   formatFinanceCount,
   formatMinor,
@@ -24,8 +25,8 @@ type Filter = BankLineState | 'All';
 const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' };
 
 /**
- * One statement (ACC-001 stage 6): lines by state, each changed in the side panel, and «Провести виписку», which
- * books every line marked «Проводити» in one save.
+ * One statement (ACC-001 stages 6–7): lines by state, each changed in the side panel; «Провести виписку» books every
+ * line marked «Проводити» in one save, and «Відкотити виписку» cancels what a booked statement added.
  */
 export function BankStatementPage() {
   const { id = '' } = useParams();
@@ -33,7 +34,7 @@ export function BankStatementPage() {
   const existing = Boolean((location.state as { existing?: boolean } | null)?.existing);
   const view = useBankStatement(id);
   const [open, setOpen] = useState<BankStatementLine | null>(null);
-  const [confirming, setConfirming] = useState(false);
+  const [confirming, setConfirming] = useState<'book' | 'rollback' | null>(null);
   const details = view.details;
   const statement = details?.statement;
   const booked = statement?.status === 'Booked';
@@ -68,15 +69,24 @@ export function BankStatementPage() {
         }
         actions={
           statement &&
-          !booked && (
+          (booked ? (
+            <Button
+              variant="outlined"
+              color="error"
+              disabled={view.rollingBack || !details?.rollback}
+              onClick={() => setConfirming('rollback')}
+            >
+              Відкотити виписку
+            </Button>
+          ) : (
             <Button
               variant="contained"
               disabled={view.booking || nothingToBook}
-              onClick={() => setConfirming(true)}
+              onClick={() => setConfirming('book')}
             >
               Провести виписку
             </Button>
-          )
+          ))
         }
       />
       <Stack sx={{ gap: 2 }}>
@@ -168,20 +178,32 @@ export function BankStatementPage() {
         />
       )}
       <FinanceDeleteDialog
-        open={confirming}
+        open={confirming === 'book'}
         title="Провести виписку?"
         text={
           totals
-            ? `Буде додано ${formatFinanceCount(totals.operations, financeOperationForms)} і ${totals.transfers} переказів. Нових контрагентів буде створено непідтвердженими. Після проведення виписку не можна змінити; окремі записи можна анулювати в журналі.`
+            ? `Буде додано ${formatFinanceCount(totals.operations, financeOperationForms)} і ${totals.transfers} переказів. Нових контрагентів буде створено непідтвердженими. Помилкове проведення можна скасувати кнопкою «Відкотити виписку».`
             : ''
         }
         deleting={view.booking}
         confirmLabel="Провести"
         confirmColor="primary"
-        onClose={() => setConfirming(false)}
+        onClose={() => setConfirming(null)}
         onConfirm={() => {
-          setConfirming(false);
+          setConfirming(null);
           void view.book();
+        }}
+      />
+      <FinanceDeleteDialog
+        open={confirming === 'rollback'}
+        title="Відкотити виписку?"
+        text={details?.rollback ? bankStatementRollbackText(details.rollback) : ''}
+        deleting={view.rollingBack}
+        confirmLabel="Відкотити"
+        onClose={() => setConfirming(null)}
+        onConfirm={() => {
+          setConfirming(null);
+          view.rollback();
         }}
       />
     </Box>

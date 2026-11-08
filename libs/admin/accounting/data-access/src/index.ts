@@ -30,6 +30,7 @@ export {
   useMergeFinanceCounterpartyMutation,
   usePromoteFinanceOneoffMutation,
   useRestoreFinanceCounterpartyMutation,
+  useRollbackBankStatementMutation,
   useReviewFinanceTransactionMutation,
   useSetFinanceAccountActiveMutation,
   useSetFinanceAccountCutoverMutation,

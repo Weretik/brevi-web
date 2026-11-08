@@ -54,6 +54,7 @@ export const {
   useMergeFinanceCounterpartyMutation,
   usePromoteFinanceOneoffMutation,
   useRestoreFinanceCounterpartyMutation,
+  useRollbackBankStatementMutation,
   useReviewFinanceTransactionMutation,
   useSetFinanceAccountActiveMutation,
   useSetFinanceAccountCutoverMutation,
