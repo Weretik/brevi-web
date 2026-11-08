@@ -5,6 +5,7 @@ import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import { Alert, Box, Button, CircularProgress } from '@mui/material';
 
 import { TaskManagerFilter } from '../../components/board/task-manager-filter';
+import { TaskPeriodFilter } from '../../components/board/task-period-filter';
 import { TaskDrawer } from '../../components/editor/task-drawer';
 import { TaskNotice } from '../../components/notice/task-notice';
 import { useTaskBoard } from '../../hooks/board/use-task-board';
@@ -52,6 +53,7 @@ export default function TaskBoardPage({ viewer }: { viewer: TaskViewer }) {
           onSelect={board.setAssignee}
         />
       )}
+      <TaskPeriodFilter selected={board.period} onSelect={board.setPeriod} />
       <Box
         sx={{
           display: 'grid',

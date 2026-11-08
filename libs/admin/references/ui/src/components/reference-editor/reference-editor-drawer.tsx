@@ -25,6 +25,8 @@ interface Props {
   submitLabel?: string;
   /** Text of the read-only main button; «Редагувати» by default, null hides it. */
   editLabel?: string | null;
+  /** Extra buttons of the read-only footer, between «Закрити» and the main button. */
+  readActions?: ReactNode;
   children: ReactNode;
   onClose: () => void;
   onEdit: () => void;
@@ -42,6 +44,7 @@ export function ReferenceEditorDrawer({
   saveDisabled = false,
   submitLabel = 'Зберегти',
   editLabel = 'Редагувати',
+  readActions,
   children,
   onClose,
   onEdit,
@@ -108,6 +111,7 @@ export function ReferenceEditorDrawer({
           <Button type="button" onClick={onClose} disabled={saving}>
             {readOnly ? 'Закрити' : 'Скасувати'}
           </Button>
+          {readOnly && readActions}
           {readOnly ? (
             editLabel && (
               <Button key="edit" type="button" variant="contained" onClick={onEdit}>

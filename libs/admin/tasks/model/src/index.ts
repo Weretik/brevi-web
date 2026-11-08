@@ -1,5 +1,6 @@
 export type {
   TaskAssignee,
+  TaskBoardPeriod,
   TaskCustomerOption,
   TaskDetail,
   TaskEvent,
@@ -29,7 +30,7 @@ export { taskLimits, validateTaskForm } from './validators/task-form-validation'
 export type { TaskFormErrors, TaskFormField } from './validators/task-form-validation';
 export { formatTaskDue, formatTaskMoment } from './mappers/task-dates';
 export { describeTaskEvent } from './mappers/task-event-text';
-export { taskFilters, taskLanes, taskStatusLabels } from './mappers/task-labels';
+export { taskBoardPeriods, taskFilters, taskLanes, taskStatusLabels } from './mappers/task-labels';
 export { groupTasksByLane, taskMove, tasksForToday } from './mappers/task-board-moves';
 export type { TaskMove } from './mappers/task-board-moves';
 export { taskHomeHint } from './mappers/task-home-hint';

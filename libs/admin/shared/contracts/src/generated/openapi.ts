@@ -3090,7 +3090,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** @description «Мої завдання» kanban: every open task and those done in the last 7 days (at most 500 cards). Open cards come first (urgent, then by due time), done ones newest first; the Admin groups them by `lane`. */
+    /** @description «Мої завдання» kanban: every open task and those done in `period` (at most 500 cards). Open cards come first, then done ones; each group is newest added first; the Admin groups them by `lane`. */
     get: operations['getCrmTaskBoard'];
     put?: never;
     post?: never;
@@ -8859,6 +8859,11 @@ export interface components {
       /** Format: date-time */
       updatedAt: string;
       version: number;
+      /**
+       * Format: date-time
+       * @description When the task was added; the board sorts by it.
+       */
+      createdAt: string;
     };
     CrmTaskPage: {
       items: components['schemas']['CrmTaskSummary'][];
@@ -21180,6 +21185,8 @@ export interface operations {
       query?: {
         /** @description Admin only; ignored for a Manager. */
         assigneeUserId?: components['parameters']['AssigneeUserId'];
+        /** @description Which done tasks are shown, by the time they were done: `Week` («Цей тиждень», since Monday in Kyiv, default), `LastWeek` (the week before), `Month` (30 days), `Quarter` (90 days), `Year` (365 days) or `All`. Open tasks are always shown. */
+        period?: 'Week' | 'LastWeek' | 'Month' | 'Quarter' | 'Year' | 'All';
       };
       header?: never;
       path?: never;

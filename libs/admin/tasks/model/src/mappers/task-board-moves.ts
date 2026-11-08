@@ -24,10 +24,11 @@ export function taskMove(task: TaskSummary, target: TaskLane, viewer: TaskViewer
   return null;
 }
 
-/** Cards grouped by lane, keeping the server order inside each lane. */
+/** Cards grouped by lane, the newest added first inside each lane (round 2, item 11). */
 export function groupTasksByLane(tasks: readonly TaskSummary[]): Record<TaskLane, TaskSummary[]> {
   const lanes: Record<TaskLane, TaskSummary[]> = { Overdue: [], Urgent: [], Active: [], Done: [] };
-  for (const task of tasks) lanes[task.lane].push(task);
+  const newest = [...tasks].sort((a, b) => b.createdAt.localeCompare(a.createdAt) || b.id - a.id);
+  for (const task of newest) lanes[task.lane].push(task);
   return lanes;
 }
 

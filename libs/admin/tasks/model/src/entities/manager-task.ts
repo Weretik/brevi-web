@@ -4,6 +4,9 @@ export type TaskStatus = 'New' | 'InProgress' | 'Done';
 /** Kanban column: overdue wins over urgent (R-06). */
 export type TaskLane = 'Overdue' | 'Urgent' | 'Active' | 'Done';
 
+/** «Період» of «Мої завдання»: which done tasks the board shows; open tasks always stay. */
+export type TaskBoardPeriod = 'Week' | 'LastWeek' | 'Month' | 'Quarter' | 'Year' | 'All';
+
 /** Filter chips of «Завдання менеджерам». */
 export type TaskListFilter = 'Open' | 'Overdue' | 'Urgent' | 'New' | 'InProgress' | 'Done';
 
@@ -39,6 +42,8 @@ export interface TaskSummary {
   readonly completedAt: string | null;
   readonly updatedAt: string;
   readonly version: number;
+  /** When the task was added; the board shows the newest first. */
+  readonly createdAt: string;
 }
 
 export interface TaskPage {

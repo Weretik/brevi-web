@@ -114,6 +114,15 @@ export function useTaskEditor(viewer: TaskViewer, notify: (message: string) => v
         () => changeStatus({ id: task.id, version: task.version, status }).unwrap(),
         status === 'Done' ? `Завдання ${task.number} виконано` : null,
       ),
+    /** «Виконано» in the panel footer: marks the task done and closes the panel (round 2, item 9). */
+    complete: async () => {
+      if (!task) return;
+      const done = await run(
+        () => changeStatus({ id: task.id, version: task.version, status: 'Done' }).unwrap(),
+        `Завдання ${task.number} виконано`,
+      );
+      if (done) reset(null);
+    },
     setStep: (stepId: number, isDone: boolean) =>
       task &&
       void run(

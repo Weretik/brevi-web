@@ -20,6 +20,7 @@ const base: TaskSummary = {
   stepsDone: 0,
   completedAt: null,
   updatedAt: '2026-11-04T10:00:00Z',
+  createdAt: '2026-11-04T09:00:00Z',
   version: 1,
 };
 

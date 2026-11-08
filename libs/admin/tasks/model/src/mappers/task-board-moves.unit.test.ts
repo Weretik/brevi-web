@@ -22,6 +22,7 @@ const card = (patch: Partial<TaskSummary> = {}): TaskSummary => ({
   stepsDone: 0,
   completedAt: null,
   updatedAt: '2026-11-04T10:00:00Z',
+  createdAt: '2026-11-04T09:00:00Z',
   version: 1,
   ...patch,
 });
@@ -54,13 +55,13 @@ describe('taskMove', () => {
 });
 
 describe('board helpers', () => {
-  it('groups by lane in server order', () => {
+  it('groups by lane, the newest added first', () => {
     const lanes = groupTasksByLane([
       card({ id: 1, lane: 'Done' }),
-      card({ id: 2 }),
-      card({ id: 3 }),
+      card({ id: 2, createdAt: '2026-11-03T09:00:00Z' }),
+      card({ id: 3, createdAt: '2026-11-05T09:00:00Z' }),
     ]);
-    expect(lanes.Active.map((x) => x.id)).toEqual([2, 3]);
+    expect(lanes.Active.map((x) => x.id)).toEqual([3, 2]);
     expect(lanes.Done.map((x) => x.id)).toEqual([1]);
   });
 
