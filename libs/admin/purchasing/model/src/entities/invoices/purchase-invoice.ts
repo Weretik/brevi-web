@@ -1,4 +1,5 @@
 import type { PurchaseDocument, PurchaseRecognitionAttempt } from './purchase-document';
+import type { PurchaseInvoicePayment } from './purchase-payment';
 
 /** A link from the sheet to an original document; only safe (HTTPS Dropbox) links are opened. */
 export interface PurchaseInvoiceLink {
@@ -41,12 +42,18 @@ export interface PurchaseInvoice {
   reviewNote: string | null;
   /** Sent back with the next review save. */
   reviewVersion: number;
-  /** E-mail of who last changed the supplier link or note. */
+  /** E-mail of who last changed the supplier link, note or payments. */
   reviewedBy: string | null;
   reviewedAt: string | null;
   state: PurchaseInvoiceState;
   issues: readonly string[];
   links: readonly PurchaseInvoiceLink[];
+  /** Sum of «До сплати» of the checked documents in kopecks; null without a document. */
+  totalPayableMinor: number | null;
+  /** Expenses of «Бухгалтерія» linked as payments, oldest link first. */
+  payments: readonly PurchaseInvoicePayment[];
+  /** Payment problems (voided, not found, another amount); they do not change `state`. */
+  paymentIssues: readonly string[];
 }
 
 export interface PurchaseInvoicePage {

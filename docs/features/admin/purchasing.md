@@ -1,6 +1,6 @@
 # Admin: Рахунки на закупку
 
-**Status:** stage 1 (register), stage 2 (supplier link and note) and stage 3 (invoice recognition) implemented 2026-11-05. Backend decisions and later stages are in the BreviERP specification `docs/sdd/specs/purchasing/001-purchase-invoices`; the consumed contract is [backend/purchasing](../../contracts/openapi/backend/purchasing/purchase-invoices.openapi.yaml).
+**Status:** stage 1 (register), stage 2 (supplier link and note) and stage 3 (invoice recognition) implemented 2026-11-05; payment links («Оплата», accounting stage 9) 2026-11-08. Backend decisions and later stages are in the BreviERP specification `docs/sdd/specs/purchasing/001-purchase-invoices`; the consumed contract is [backend/purchasing](../../contracts/openapi/backend/purchasing/purchase-invoices.openapi.yaml).
 
 `/accounting/purchase-invoices` («Бухгалтерія → Рахунки на закупку», its own menu item since client corrections item 10, 2026-11-08) shows the purchase invoices that staff post to Telegram and the Google sheet «финансы» collects. Only the Director sees it, and the supplier card tab with the supplier's invoices; the backend allows the same role (policy `CanUsePurchaseInvoices`). The old link `/references/counterparties?tab=purchases` takes the Director to the new page with the same filters.
 
@@ -28,6 +28,8 @@ The page has:
   - a line up to 30 % below quantity × price is shown as a discount;
   - «Зберегти» sends the facts only when they add up; they replace the earlier facts, which the server keeps in history.
 - The side panel (`ReferenceEditorDrawer`) for the supplier and note: problems, supplier and note with who changed them and when, the message, originals with their state and the same buttons. «Редагувати» shows the form: an active supplier from `GET /api/purchasing/invoices/suppliers` (the accountant cannot read the Reference list) and a note up to 1000 characters. The save sends the version the user opened; if someone saved first, the panel stays open with the backend reason.
+
+- The side panel section «Оплата» (`PurchaseInvoicePayments`): «Сума рахунку» from the checked documents, the linked expenses of «Бухгалтерія» (date, sum, account, description; a voided one struck through) with «Відвʼязати», and only the problems: a voided or missing operation, another currency, paid hryvnias that differ from the invoice. «Привʼязати оплату» lists the supplier's expenses (or, without a supplier, those equal to the invoice sum), «сума як у рахунку» first; «Знайти витрату» searches any expense by description or sum. Each change sends the `reviewVersion` the user saw; a 409 shows the server message. The sheet «СПЛАЧЕНО» stays a note and is not compared.
 
 Search, the filter and the page are kept in the URL. The OpenAI key, models and limit are set on [«Налаштування ШІ»](ai.md). Supplier and client card tabs (stage 4) and CDN copies with previews (stage 5) come later.
 
@@ -108,5 +110,6 @@ libs/admin/core/auth/src/session/session-user.ts                                
 - `model/src/validators/review/purchase-review-validation.unit.test.ts` — note limit and request;
 - `ui/src/tables/invoices/purchase-invoices-table.component.test.tsx` — empty and nothing-found texts, state, «Без ПДВ», arrow;
 - `data-access/src/mappers/invoices/purchase-invoice.mapper.unit.test.ts`, `model/src/mappers/invoices/describe-purchase-sync.unit.test.ts`;
+- `feature/src/components/payments/purchase-invoice-payments.component.test.tsx` — «Привʼязати оплату» with the version the user saw, the linked payment, a voided payment problem and a failed unlink; `data-access/src/mappers/invoices/purchase-payment.mapper.unit.test.ts`, `model/src/entities/invoices/purchase-payment.unit.test.ts`;
 - `references/feature/src/pages/counterparties/counterparties-tab.unit.test.ts` — «Контрагенти» tabs without the register;
 - `apps/admin-react/src/app/router/navigation-config.unit.test.ts` — the menu item in «Бухгалтерія», Director only.

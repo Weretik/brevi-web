@@ -22,11 +22,15 @@ interface Props {
   keepinCrmId?: string | null;
   /** Tab «Рахунки на закупку» of the viewed card; the feature passes it to those who may see invoices. */
   invoices?: ReactNode;
+  /** Tab «Фінанси» of the viewed card; the feature passes it to those with the «Бухгалтерія» right. */
+  finance?: ReactNode;
   onChange: (field: SupplierField, value: string | boolean) => void;
   onSave: () => void;
   onEnableEditing: () => void;
   onClose: () => void;
 }
+
+type SupplierCardTab = 'card' | 'invoices' | 'finance';
 
 /** Supplier create/view/edit side panel, the same panel as the other reference tables. */
 export function SupplierEditorDrawer({
@@ -37,6 +41,7 @@ export function SupplierEditorDrawer({
   saving,
   keepinCrmId = null,
   invoices,
+  finance,
   onChange,
   onSave,
   onEnableEditing,
@@ -50,9 +55,11 @@ export function SupplierEditorDrawer({
   }
 
   const readOnly = mode === 'view';
-  const [tab, setTab] = useState<'card' | 'invoices'>('card');
-  const withTabs = readOnly && invoices !== undefined;
-  const showInvoices = withTabs && tab === 'invoices';
+  const [tab, setTab] = useState<SupplierCardTab>('card');
+  const withTabs = readOnly && (invoices !== undefined || finance !== undefined);
+  const showInvoices = withTabs && tab === 'invoices' && invoices !== undefined;
+  const showFinance = withTabs && tab === 'finance' && finance !== undefined;
+  const showOther = showInvoices || showFinance;
   const linkHref = supplierLinkHref(draft.link);
   const title =
     mode === 'create'
@@ -87,7 +94,7 @@ export function SupplierEditorDrawer({
           : 'Постачальник для ЗІЗ і матеріалів.'
       }
       formId="supplier-form"
-      paperWidth={withTabs ? 640 : 520}
+      paperWidth={finance !== undefined && readOnly ? 860 : withTabs ? 640 : 520}
       readOnly={readOnly}
       saving={saving}
       onClose={onClose}
@@ -98,15 +105,17 @@ export function SupplierEditorDrawer({
         <Tabs
           value={tab}
           aria-label="Картка постачальника"
-          onChange={(_, next: 'card' | 'invoices') => setTab(next)}
+          onChange={(_, next: SupplierCardTab) => setTab(next)}
           sx={{ mt: -2, mb: 2, borderBottom: 1, borderColor: 'divider' }}
         >
           <Tab value="card" label="Картка" />
-          <Tab value="invoices" label="Рахунки на закупку" />
+          {invoices !== undefined && <Tab value="invoices" label="Рахунки на закупку" />}
+          {finance !== undefined && <Tab value="finance" label="Фінанси" />}
         </Tabs>
       )}
       {showInvoices && invoices}
-      <Stack sx={{ gap: 2, display: showInvoices ? 'none' : undefined }}>
+      {showFinance && finance}
+      <Stack sx={{ gap: 2, display: showOther ? 'none' : undefined }}>
         {message && <Alert severity="error">{message}</Alert>}
         {keepinCrmId && (
           <Alert severity="info">

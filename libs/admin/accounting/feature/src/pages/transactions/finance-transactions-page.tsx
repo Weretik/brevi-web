@@ -1,17 +1,11 @@
-import {
-  useGetFinanceTransactionsQuery,
-  useVoidFinanceTransactionMutation,
-} from '@admin/accounting/data-access';
+import { useGetFinanceTransactionsQuery } from '@admin/accounting/data-access';
 import {
   financeTransactionParams,
-  formatLedgerDate,
-  formatSignedMinor,
   ledgerScopeOfTab,
   ledgerTabOfScope,
   previousDay,
 } from '@admin/accounting/model';
 import {
-  FinanceDeleteDialog,
   FinanceJournalFilters,
   FinanceTransactionTotals,
   FinanceTransactionsGrid,
@@ -31,6 +25,7 @@ import { useAccountingSettings } from '../../hooks/accounts/use-accounting-setti
 import { useFinanceChoices } from '../../hooks/journal/use-finance-choices';
 import { useFinanceJournal } from '../../hooks/journal/use-finance-journal';
 import { canEditTransaction } from '../../hooks/transactions/use-finance-transaction-editor';
+import { useFinanceTransactionVoid } from '../../hooks/transactions/use-finance-transaction-void';
 
 import type { FinanceMovementEditorMode } from '../../hooks/transactions/use-finance-transaction-editor';
 import type { CategoryDirection, FinanceTransaction, LedgerScope } from '@admin/accounting/model';
@@ -76,9 +71,8 @@ function TransactionsJournal({ scope, cutoverDate, today, onScopeChange }: Journ
     transaction: FinanceTransaction | null;
     type: CategoryDirection;
   } | null>(null);
-  const [pendingVoid, setPendingVoid] = useState<FinanceTransaction | null>(null);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
-  const [voidTransaction, voidState] = useVoidFinanceTransactionMutation();
+  const voiding = useFinanceTransactionVoid(setActionMessage);
   const rows = page?.items ?? [];
   const newDate =
     scope === 'Current' ? (today < cutoverDate ? cutoverDate : today) : previousDay(cutoverDate);
@@ -93,24 +87,7 @@ function TransactionsJournal({ scope, cutoverDate, today, onScopeChange }: Journ
 
   function requestVoid(transaction: FinanceTransaction) {
     setActive(null);
-    if (!canEditTransaction(transaction)) {
-      setActionMessage('Цю операцію вже анульовано або вона з банківської виписки.');
-      return;
-    }
-    setPendingVoid(transaction);
-  }
-
-  async function confirmVoid() {
-    if (!pendingVoid) return;
-    try {
-      await voidTransaction({ id: pendingVoid.id, version: pendingVoid.version }).unwrap();
-      setActionMessage('Операцію анульовано.');
-    } catch (failure) {
-      setActionMessage(
-        `Не вдалося анулювати операцію. ${adminApiErrorMessage(failure, 'Спробуйте ще раз.')}`,
-      );
-    }
-    setPendingVoid(null);
+    voiding.request(transaction);
   }
 
   const add = (type: CategoryDirection) => setActive({ mode: 'create', transaction: null, type });
@@ -214,19 +191,7 @@ function TransactionsJournal({ scope, cutoverDate, today, onScopeChange }: Journ
           onVoid={requestVoid}
         />
       )}
-      <FinanceDeleteDialog
-        open={Boolean(pendingVoid)}
-        title="Анулювати операцію?"
-        text={
-          pendingVoid
-            ? `${formatLedgerDate(pendingVoid.date)}, ${formatSignedMinor(pendingVoid.type, pendingVoid.amountMinor, pendingVoid.currency)}. Операція залишиться в журналі й історії, але більше не впливатиме на залишки й підсумки. Повернути її не можна.`
-            : ''
-        }
-        confirmLabel="Анулювати"
-        deleting={voidState.isLoading}
-        onClose={() => setPendingVoid(null)}
-        onConfirm={() => void confirmVoid()}
-      />
+      {voiding.dialog}
     </>
   );
 }

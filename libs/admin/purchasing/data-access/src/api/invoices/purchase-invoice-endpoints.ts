@@ -11,6 +11,10 @@ import {
 } from '../../mappers/invoices/purchase-document.mapper';
 import { mapPurchaseInvoicePage } from '../../mappers/invoices/purchase-invoice.mapper';
 import {
+  mapPurchaseInvoicePayments,
+  mapPurchasePaymentCandidates,
+} from '../../mappers/invoices/purchase-payment.mapper';
+import {
   mapPurchaseInvoiceReview,
   mapPurchaseSupplierOptions,
 } from '../../mappers/invoices/purchase-review.mapper';
@@ -24,7 +28,10 @@ import type {
   PurchaseDocumentSave,
   PurchaseDocumentUpload,
   PurchaseInvoicePage,
+  PurchaseInvoicePayments,
   PurchaseInvoiceQuery,
+  PurchasePaymentCandidate,
+  PurchasePaymentInput,
   PurchaseInvoiceReview,
   PurchaseRecognition,
   PurchaseRecognitionBatch,
@@ -83,6 +90,40 @@ export function purchaseInvoiceEndpoints(build: PurchasingEndpointBuilder) {
       transformResponse: mapPurchaseInvoiceReview,
       transformErrorResponse: purchaseApiError,
       // A stale version means someone else saved: reload the list either way.
+      invalidatesTags: [purchaseInvoicesTag],
+    }),
+    /** «Прив'язати оплату»: expenses of «Бухгалтерія» for one invoice (at most 20). */
+    getPurchasePaymentCandidates: build.query<
+      PurchasePaymentCandidate[],
+      { messageId: string; search: string }
+    >({
+      query: ({ messageId, search }) => ({
+        url: `/api/purchasing/invoices/${encodeURIComponent(messageId)}/payments/candidates`,
+        params: search.trim() ? { search: search.trim() } : undefined,
+      }),
+      transformResponse: mapPurchasePaymentCandidates,
+      transformErrorResponse: purchaseApiError,
+      providesTags: [purchaseInvoicesTag],
+    }),
+    linkPurchasePayment: build.mutation<PurchaseInvoicePayments, PurchasePaymentInput>({
+      query: ({ messageId, ...body }) => ({
+        url: `/api/purchasing/invoices/${encodeURIComponent(messageId)}/payments`,
+        method: 'POST',
+        body,
+      }),
+      transformResponse: mapPurchaseInvoicePayments,
+      transformErrorResponse: purchaseApiError,
+      // A stale version means someone else saved: reload the list either way.
+      invalidatesTags: [purchaseInvoicesTag],
+    }),
+    unlinkPurchasePayment: build.mutation<PurchaseInvoicePayments, PurchasePaymentInput>({
+      query: ({ messageId, ...body }) => ({
+        url: `/api/purchasing/invoices/${encodeURIComponent(messageId)}/payments/unlink`,
+        method: 'POST',
+        body,
+      }),
+      transformResponse: mapPurchaseInvoicePayments,
+      transformErrorResponse: purchaseApiError,
       invalidatesTags: [purchaseInvoicesTag],
     }),
     recognizePurchaseFile: build.mutation<PurchaseRecognition, string>({

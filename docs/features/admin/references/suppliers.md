@@ -37,6 +37,8 @@ editor disables the card fields and saves only «Використовувати 
 through `PUT /api/reference/suppliers/{id}/brevi-fields`; a manual supplier keeps
 full editing. The subtitle shows the last sync time.
 
+**«Фінанси» tab.** For those with the «Бухгалтерія» right the viewed supplier card gets the tab «Фінанси» (`CounterpartyFinance` from `@admin/accounting/feature`, see [«Бухгалтерія»](../accounting.md)); the panel then widens to 860 px. The app passes `useCanSeeFinance` to `createReferencesRoutes`.
+
 **Supplier card from other screens.** A supplier name in materials, price import, a PPE card or under a
 КП fabric opens `useSupplierPreview()` (feature): the read-only right side panel `SupplierViewPanel`
 (ui, owner's variant B of 2026-11-08) with the name, «Що закуповуємо», a «Не використовується в проєкті»

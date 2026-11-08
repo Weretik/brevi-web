@@ -4466,6 +4466,57 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/purchasing/invoices/{messageId}/payments/candidates': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Expenses of «Бухгалтерія» for «Прив'язати оплату» (accounting stage 9), at most 20, active, of both scopes. Without search — the expenses of the linked supplier, or without a supplier those equal to the invoice total; with search — any expense whose description, note or one-off name contains it, or whose amount equals it. Already linked ones are left out; those equal to the invoice total come first (sameAmount). */
+    get: operations['getPurchasePaymentCandidates'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/purchasing/invoices/{messageId}/payments': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Links an active expense of «Бухгалтерія» as a payment of the invoice and adds 1 to reviewVersion. The same operation may pay several invoices; nothing is booked in «Бухгалтерія». */
+    post: operations['linkPurchasePayment'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/purchasing/invoices/{messageId}/payments/unlink': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Removes an active payment link and adds 1 to reviewVersion; the link stays in the history with who removed it and when. */
+    post: operations['unlinkPurchasePayment'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/purchasing/invoices/sync-state': {
     parameters: {
       query?: never;
@@ -10601,6 +10652,25 @@ export interface components {
       /** @description The last recognition while there are no checked facts; null otherwise. */
       recognition?: components['schemas']['PurchaseRecognitionAttemptResponse'] | null;
     };
+    PurchaseInvoicePaymentResponse: {
+      /** Format: uuid */
+      transactionId: string;
+      /** Format: date */
+      date?: string | null;
+      /** Format: int64 */
+      amountMinor?: number | null;
+      currency?: string | null;
+      accountName?: string | null;
+      description?: string | null;
+      counterpartyName?: string | null;
+      /** @description The operation is not found in «Бухгалтерія»; its fields are null. */
+      missing: boolean;
+      /** @description The operation was voided after linking. */
+      voided: boolean;
+      linkedBy: string;
+      /** Format: date-time */
+      linkedAt: string;
+    };
     PurchaseInvoiceResponse: {
       messageId: string;
       /** @description ChatId:MessageId. */
@@ -10639,7 +10709,7 @@ export interface components {
        * @description Send it back with the next review.
        */
       reviewVersion: number;
-      /** @description E-mail of who last changed the supplier link or note. */
+      /** @description E-mail of who last changed the supplier link, note or payments. */
       reviewedBy?: string | null;
       /** Format: date-time */
       reviewedAt?: string | null;
@@ -10647,6 +10717,15 @@ export interface components {
       /** @description Reasons for a manual check, in Ukrainian. */
       issues: string[];
       links: components['schemas']['PurchaseInvoiceLinkResponse'][];
+      /**
+       * Format: int64
+       * @description Sum of «До сплати» of the checked documents in kopecks; null without a document.
+       */
+      totalPayableMinor?: number | null;
+      /** @description Expenses of «Бухгалтерія» linked as payments, oldest link first. */
+      payments: components['schemas']['PurchaseInvoicePaymentResponse'][];
+      /** @description Payment problems in Ukrainian (voided, not found, not in hryvnias, another amount); they do not change state. */
+      paymentIssues: string[];
     };
     PurchaseInvoicePage: {
       items: components['schemas']['PurchaseInvoiceResponse'][];
@@ -10684,6 +10763,41 @@ export interface components {
       reviewedBy?: string | null;
       /** Format: date-time */
       reviewedAt?: string | null;
+    };
+    PurchasePaymentCandidateResponse: {
+      /** Format: uuid */
+      transactionId: string;
+      /** Format: date */
+      date: string;
+      /** Format: int64 */
+      amountMinor: number;
+      currency: string;
+      accountName: string;
+      description: string;
+      counterpartyName?: string | null;
+      /** @description Equals the invoice total. */
+      sameAmount: boolean;
+    };
+    PurchasePaymentRequest: {
+      /**
+       * Format: uuid
+       * @description Operation id in «Бухгалтерія».
+       */
+      transactionId: string;
+      /**
+       * Format: int32
+       * @description The reviewVersion the user saw.
+       */
+      version: number;
+    };
+    PurchaseInvoicePaymentsResponse: {
+      messageId: string;
+      /** Format: int32 */
+      reviewVersion: number;
+      /** Format: int64 */
+      totalPayableMinor?: number | null;
+      payments: components['schemas']['PurchaseInvoicePaymentResponse'][];
+      paymentIssues: string[];
     };
     PurchaseSyncStateResponse: {
       /** Format: date-time */
@@ -25322,6 +25436,166 @@ export interface operations {
         content?: never;
       };
       /** @description The version is stale (someone saved first) or the sheet sync is running; body is an array of messages */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getPurchasePaymentCandidates: {
+    parameters: {
+      query?: {
+        search?: string;
+      };
+      header?: never;
+      path: {
+        messageId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PurchasePaymentCandidateResponse'][];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No «Рахунки на закупку» right */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Card not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  linkPurchasePayment: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        messageId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PurchasePaymentRequest'];
+      };
+    };
+    responses: {
+      /** @description Linked; the payments of the invoice now */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PurchaseInvoicePaymentsResponse'];
+        };
+      };
+      /** @description The operation is not an active expense */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No «Рахунки на закупку» right */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Card not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The version is stale, the operation is already linked or the sheet sync is running */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  unlinkPurchasePayment: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        messageId: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PurchasePaymentRequest'];
+      };
+    };
+    responses: {
+      /** @description Removed; the payments of the invoice now */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PurchaseInvoicePaymentsResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No «Рахунки на закупку» right */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Card not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The version is stale, the link is already removed or the sheet sync is running */
       409: {
         headers: {
           [name: string]: unknown;

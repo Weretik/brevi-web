@@ -1,3 +1,4 @@
+import { CounterpartyFinance } from '@admin/accounting/feature';
 import { SupplierPurchaseInvoices } from '@admin/purchasing/feature';
 import { SupplierEditorDrawer } from '@admin/references/ui';
 
@@ -13,6 +14,8 @@ interface Props {
   onSaved: () => void;
   /** Accountant, Admin and Director: the viewed card gets the tab «Рахунки на закупку». */
   canSeePurchaseInvoices?: boolean;
+  /** The «Бухгалтерія» right: the viewed card gets the tab «Фінанси». */
+  canSeeFinance?: boolean;
 }
 
 export function SupplierDrawer({
@@ -22,6 +25,7 @@ export function SupplierDrawer({
   onClose,
   onSaved,
   canSeePurchaseInvoices = false,
+  canSeeFinance = false,
 }: Props) {
   const editor = useSupplierEditor(mode, supplier, nextId, onSaved);
   return (
@@ -35,6 +39,11 @@ export function SupplierDrawer({
       invoices={
         canSeePurchaseInvoices && supplier ? (
           <SupplierPurchaseInvoices supplierId={supplier.id} />
+        ) : undefined
+      }
+      finance={
+        canSeeFinance && supplier ? (
+          <CounterpartyFinance kind="Supplier" id={String(supplier.id)} />
         ) : undefined
       }
       onChange={editor.change}

@@ -7,6 +7,17 @@ export type {
 } from './entities/invoices/purchase-invoice';
 export type { PurchaseSyncResult, PurchaseSyncState } from './entities/invoices/purchase-sync';
 export {
+  describePurchasePayment,
+  formatPurchaseMinor,
+  formatPurchasePaymentDate,
+} from './entities/invoices/purchase-payment';
+export type {
+  PurchaseInvoicePayment,
+  PurchaseInvoicePayments,
+  PurchasePaymentCandidate,
+  PurchasePaymentInput,
+} from './entities/invoices/purchase-payment';
+export {
   purchaseDocumentSources,
   purchaseDocumentVats,
   purchaseRecognitionResults,

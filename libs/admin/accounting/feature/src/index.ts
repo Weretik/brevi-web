@@ -13,3 +13,4 @@ export {
   financeTransfersPath,
   legacyFinanceImportPath,
 } from './accounting.routes';
+export { CounterpartyFinance } from './components/counterparties/counterparty-finance';

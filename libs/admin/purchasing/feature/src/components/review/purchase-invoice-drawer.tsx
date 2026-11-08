@@ -5,6 +5,7 @@ import { Alert, Stack } from '@mui/material';
 import { usePurchaseFileActions } from '../../hooks/documents/use-purchase-file-actions';
 import { usePurchaseReviewEditor } from '../../hooks/review/use-purchase-review-editor';
 import { PurchaseFileActions } from '../documents/purchase-file-actions';
+import { PurchaseInvoicePayments } from '../payments/purchase-invoice-payments';
 
 import type {
   PurchaseInvoice,
@@ -34,7 +35,7 @@ export function PurchaseInvoiceDrawer({ invoice, onFix, onClose, onSaved }: Prop
       title={readOnly ? 'Рахунок на закупку' : 'Постачальник і примітка'}
       description={
         readOnly
-          ? 'Повідомлення з таблиці «финансы». Постачальника і примітку можна змінити.'
+          ? 'Повідомлення з таблиці «финансы». Постачальника, примітку й оплату можна змінити.'
           : 'Оберіть постачальника з довідника і за потреби напишіть примітку.'
       }
       formId="purchase-invoice-review-form"
@@ -53,6 +54,7 @@ export function PurchaseInvoiceDrawer({ invoice, onFix, onClose, onSaved }: Prop
         {readOnly ? (
           <PurchaseInvoiceDetails
             invoice={invoice}
+            payments={<PurchaseInvoicePayments invoice={invoice} />}
             renderLinkActions={(link) => (
               <PurchaseFileActions
                 link={link}

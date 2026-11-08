@@ -7,3 +7,4 @@ export * from './components/documents/purchase-draft-view';
 export * from './forms/documents/purchase-document-form';
 export * from './tables/suppliers/supplier-purchase-invoices-table';
 export * from './components/filters/purchase-invoice-narrowing';
+export * from './components/payments/purchase-payments-view';
