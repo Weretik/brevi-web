@@ -26,10 +26,16 @@ import type {
 
 const noErrors: CreateOrderErrors = { header: {}, lines: {} };
 
-/** «Нове завдання»: pick a sent КП, fill in its items, pass it to the workshop once. */
-export function useProductionOrderCreate(onCreated: (order: ProductionOrder) => void) {
+/**
+ * «Нове завдання»: pick a КП «під запит» (or come with one from the КП editor), fill in its items, pass it to the
+ * workshop once.
+ */
+export function useProductionOrderCreate(
+  onCreated: (order: ProductionOrder) => void,
+  initialQuoteId: number | null = null,
+) {
   const [search, setSearch] = useState('');
-  const [quoteId, setQuoteId] = useState<number | null>(null);
+  const [quoteId, setQuoteId] = useState<number | null>(initialQuoteId);
   const [form, setForm] = useState<{ quoteId: number; values: CreateOrderFormValues } | null>(null);
   const [errors, setErrors] = useState<CreateOrderErrors>(noErrors);
   const [message, setMessage] = useState<string | null>(null);

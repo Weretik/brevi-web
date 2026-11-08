@@ -7,6 +7,7 @@ import {
   createProductionOrderRoutes,
   createProductionReportRoutes,
   createProductionRoutes,
+  QuoteProductionOrders,
 } from '@admin/production/feature';
 import { productsRoutes } from '@admin/products/feature';
 import { createQuotesRoutes } from '@admin/quotes/feature';
@@ -26,7 +27,11 @@ export const adminRouteDefinitions = [
   ...createDashboardRoutes({ useViewer: useDashboardViewer }),
   ...createReferencesRoutes({ useCanSeePurchaseInvoices }),
   ...clientsRoutes,
-  ...createQuotesRoutes({ useQuoteActor, useSupplierCard: useQuoteSupplierCard }),
+  ...createQuotesRoutes({
+    useQuoteActor,
+    useSupplierCard: useQuoteSupplierCard,
+    workshopCard: QuoteProductionOrders,
+  }),
   ...productsRoutes,
   ...remindersRoutes,
   ...mediaRoutes,

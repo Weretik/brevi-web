@@ -2,7 +2,7 @@ import { ProductionQuoteSources } from '@admin/production/ui';
 import { ReferencePageHeader, ReferenceSearchBar } from '@admin/references/ui';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Alert, Box, Button, CircularProgress, LinearProgress, Stack } from '@mui/material';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 
 import { ProductionOrderCreateHeader } from '../../components/orders/production-order-create-header';
 import { ProductionOrderCreateLine } from '../../components/orders/production-order-create-line';
@@ -14,12 +14,16 @@ interface Props {
   useOrderActor: () => ProductionOrderActor;
 }
 
-/** «Нове завдання»: a sent КП, then what the workshop needs for each of its items. */
+/** «Нове завдання»: a КП «під запит», then what the workshop needs for each of its items. */
 export function ProductionOrderCreatePage({ useOrderActor }: Props) {
   const actor = useOrderActor();
   const navigate = useNavigate();
-  const create = useProductionOrderCreate((order) =>
-    navigate(`/production/orders/${order.id}`, { replace: true }),
+  const [params] = useSearchParams();
+  // «Передати в цех» in the КП editor opens this page with the КП already picked.
+  const fromQuote = Number(params.get('quote'));
+  const create = useProductionOrderCreate(
+    (order) => navigate(`/production/orders/${order.id}`, { replace: true }),
+    Number.isInteger(fromQuote) && fromQuote > 0 ? fromQuote : null,
   );
   if (!actor.canCreate) return <Navigate to="/production/orders" replace />;
 
@@ -33,7 +37,7 @@ export function ProductionOrderCreatePage({ useOrderActor }: Props) {
         subtitle={
           draft
             ? `КП ${draft.number} · ${draft.clientName} · ${draft.managerName}`
-            : 'Оберіть відправлене КП, з якого шити'
+            : 'Оберіть КП під запит, з якого шити'
         }
         actions={
           <Button

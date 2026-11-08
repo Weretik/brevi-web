@@ -3299,7 +3299,7 @@ export interface paths {
     /** Not deleted orders, newest number first; counts by status ignore the status filter */
     get: operations['getProductionOrders'];
     put?: never;
-    /** «Передати в цех»: an order from a sent КП; a repeat with the same requestId returns the same order */
+    /** «Передати в цех»: an order from a КП «під запит» (saved or sent); a repeat with the same requestId returns the same order */
     post: operations['createProductionOrder'];
     delete?: never;
     options?: never;
@@ -3314,7 +3314,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Sent КП «під запит» the person may pass to the workshop (Manager: own; Admin: all) */
+    /** КП «під запит» (saved or sent) the person may pass to the workshop (Manager: own; Admin: all) */
     get: operations['getProductionQuoteSources'];
     put?: never;
     post?: never;
@@ -21468,6 +21468,8 @@ export interface operations {
           | 'Complete';
         /** @description The client card tab «Завдання в цех»; only orders made from this client's КП. */
         customerId?: number;
+        /** @description The КП editor; only orders made from this КП. */
+        quoteId?: number;
         page?: number;
         pageSize?: number;
       };

@@ -1,13 +1,14 @@
 import { lazy } from 'react';
 import { Navigate } from 'react-router-dom';
 
-import type { QuoteSupplierCard } from './pages/editor/quote-supplier-card';
+import type { QuoteSupplierCard, QuoteWorkshopCard } from './pages/editor/quote-supplier-card';
 import type { QuoteActor } from '@admin/quotes/model';
 import type { RouteObject } from 'react-router-dom';
 
 export type {
   QuoteSupplierCard,
   QuoteSupplierCardTarget,
+  QuoteWorkshopCard,
 } from './pages/editor/quote-supplier-card';
 
 const QuotesPage = lazy(() => import('./pages/list/quotes-page'));
@@ -20,6 +21,8 @@ export interface QuotesRouteOptions {
   useQuoteActor: () => QuoteActor;
   /** The supplier card opened from a fabric (R-32); the app supplies it from «Контрагенти». */
   useSupplierCard?: () => QuoteSupplierCard;
+  /** «Цех» in the КП editor: its orders and «Передати в цех»; the app supplies it from «Виробничі завдання». */
+  workshopCard?: QuoteWorkshopCard;
 }
 
 const noSupplierCard: QuoteSupplierCard = { open: null, element: null };
@@ -32,12 +35,19 @@ const useNoSupplierCard = () => noSupplierCard;
 export function createQuotesRoutes({
   useQuoteActor,
   useSupplierCard = useNoSupplierCard,
+  workshopCard,
 }: QuotesRouteOptions): (RouteObject & { path: string })[] {
   function List() {
     return <QuotesPage actor={useQuoteActor()} />;
   }
   function Editor() {
-    return <QuoteEditorPage actor={useQuoteActor()} supplierCard={useSupplierCard()} />;
+    return (
+      <QuoteEditorPage
+        actor={useQuoteActor()}
+        supplierCard={useSupplierCard()}
+        workshopCard={workshopCard}
+      />
+    );
   }
   function Introduction() {
     return <QuoteIntroductionPage actor={useQuoteActor()} />;
