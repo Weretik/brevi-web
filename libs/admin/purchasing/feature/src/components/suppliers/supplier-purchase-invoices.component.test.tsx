@@ -59,9 +59,7 @@ afterEach(() => {
 
 function renderTab() {
   const router = createMemoryRouter(
-    [
-      { path: '/references/counterparties', element: <SupplierPurchaseInvoices supplierId={7} /> },
-    ],
+    [{ path: '/references/counterparties', element: <SupplierPurchaseInvoices supplierId={7} /> }],
     { initialEntries: ['/references/counterparties'] },
   );
   render(<RouterProvider router={router} />);
@@ -82,7 +80,8 @@ describe('SupplierPurchaseInvoices', () => {
     await userEvent.click(
       screen.getByRole('row', { name: /Відкрити рахунок UID 391813915 у реєстрі/ }),
     );
-    expect(router.state.location.search).toBe('?tab=purchases&search=391813915');
+    expect(router.state.location.pathname).toBe('/accounting/purchase-invoices');
+    expect(router.state.location.search).toBe('?search=391813915');
   });
 
   it('explains how invoices get linked when there are none', () => {

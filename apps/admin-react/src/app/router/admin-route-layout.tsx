@@ -2,6 +2,7 @@ import { accountingRoutes } from '@admin/accounting/feature';
 import { aiSettingsPath } from '@admin/ai/feature';
 import { sessionRoleLabel } from '@admin/core/auth';
 import { AdminLayout } from '@admin/core/shell';
+import { purchasingRoutes } from '@admin/purchasing/feature';
 import { profilePath, usersPath } from '@admin/users/feature';
 
 import {
@@ -28,6 +29,7 @@ const registeredPaths = new Set([
     ...productionOrderRoutes,
     ...productionReportRoutes,
     ...accountingRoutes,
+    ...purchasingRoutes,
   ].map((route) => route.path),
   usersPath,
   aiSettingsPath,

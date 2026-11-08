@@ -22,22 +22,16 @@ import { PurchaseFileActions } from '../documents/purchase-file-actions';
 import { PurchaseInvoiceDrawer } from '../review/purchase-invoice-drawer';
 
 import type { PurchaseInvoice, PurchaseInvoiceLink } from '@admin/purchasing/model';
-import type { ReactNode } from 'react';
-
-interface Props {
-  /** Tabs of the «Контрагенти» page, shown above the header. */
-  tabs?: ReactNode;
-}
 
 const formatTime = (value: string) =>
   new Date(value).toLocaleString('uk-UA', { dateStyle: 'short', timeStyle: 'short' });
 
 /**
- * «Контрагенти → Рахунки на закупку»: messages of the Google sheet «финансы», refreshed daily
+ * «Бухгалтерія → Рахунки на закупку»: messages of the Google sheet «финансы», refreshed daily
  * and by «Оновити зараз». «Розпізнати всі нові» reads new originals by AI in batches; only
  * problems are marked.
  */
-export function PurchaseInvoicesContent({ tabs }: Props) {
+export function PurchaseInvoicesContent() {
   const state = usePurchaseInvoiceList();
   const [notice, setNotice] = useState<{ text: string; ok: boolean } | null>(null);
   const [openedRow, setOpenedRow] = useState<PurchaseInvoice | null>(null);
@@ -58,7 +52,6 @@ export function PurchaseInvoicesContent({ tabs }: Props) {
 
   return (
     <Box sx={{ minWidth: 0 }}>
-      {tabs}
       <ReferencePageHeader
         title="Рахунки на закупку"
         subtitle={

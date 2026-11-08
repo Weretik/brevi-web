@@ -176,6 +176,7 @@ describe('legacy Admin navigation', () => {
       '/accounting/accounts',
       '/accounting/categories',
       '/accounting/counterparties',
+      '/accounting/purchase-invoices',
       '/accounting/review',
       '/accounting/statements',
       '/accounting/legacy-import',
@@ -190,6 +191,11 @@ describe('legacy Admin navigation', () => {
       { id: 'finance-accounts', label: 'Рахунки і каси', to: '/accounting/accounts' },
       { id: 'finance-categories', label: 'Категорії', to: '/accounting/categories' },
       { id: 'finance-counterparties', label: 'Контрагенти', to: '/accounting/counterparties' },
+      {
+        id: 'purchase-invoices',
+        label: 'Рахунки на закупку',
+        to: '/accounting/purchase-invoices',
+      },
       { id: 'finance-review', label: 'Потребують перевірки', to: '/accounting/review' },
       { id: 'finance-import', label: 'Виписки банку', to: '/accounting/statements' },
       {
@@ -198,7 +204,7 @@ describe('legacy Admin navigation', () => {
         to: '/accounting/legacy-import',
       },
     ]);
-    expect(accounting(['Director'])?.items).toHaveLength(11);
+    expect(accounting(['Director'])?.items).toHaveLength(12);
     expect(accounting(['Admin'])).toBeUndefined();
     expect(accounting(['Accountant'])).toBeUndefined();
   });

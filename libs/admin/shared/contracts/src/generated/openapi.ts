@@ -24414,7 +24414,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Not Director, Accountant or Admin */
+      /** @description Not the Director */
       403: {
         headers: {
           [name: string]: unknown;
@@ -24448,7 +24448,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Not Director, Accountant or Admin */
+      /** @description Not the Director */
       403: {
         headers: {
           [name: string]: unknown;
@@ -24495,7 +24495,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Not Director, Accountant or Admin */
+      /** @description Not the Director */
       403: {
         headers: {
           [name: string]: unknown;
@@ -24543,7 +24543,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Not Director, Accountant or Admin */
+      /** @description Not the Director */
       403: {
         headers: {
           [name: string]: unknown;
@@ -24577,7 +24577,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Not Director, Accountant or Admin */
+      /** @description Not the Director */
       403: {
         headers: {
           [name: string]: unknown;
@@ -24645,7 +24645,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Not Director, Accountant or Admin */
+      /** @description Not the Director */
       403: {
         headers: {
           [name: string]: unknown;
@@ -24702,7 +24702,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Not Director, Accountant or Admin */
+      /** @description Not the Director */
       403: {
         headers: {
           [name: string]: unknown;
@@ -24749,7 +24749,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Not Director, Accountant or Admin */
+      /** @description Not the Director */
       403: {
         headers: {
           [name: string]: unknown;
@@ -24799,7 +24799,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Not Director, Accountant or Admin */
+      /** @description Not the Director */
       403: {
         headers: {
           [name: string]: unknown;
