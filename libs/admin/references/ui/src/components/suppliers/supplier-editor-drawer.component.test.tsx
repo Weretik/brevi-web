@@ -74,6 +74,30 @@ describe('SupplierEditorDrawer without API providers', () => {
     expect(screen.getByRole('textbox', { name: 'Назва' })).toBeDisabled();
   });
 
+  it('adds «Фінанси» to the viewed card only when the feature passes it', async () => {
+    const user = userEvent.setup();
+    const props = {
+      draft,
+      errors: {},
+      message: null,
+      saving: false,
+      onChange: vi.fn(),
+      onSave: vi.fn(),
+      onClose: vi.fn(),
+      onEnableEditing: vi.fn(),
+    };
+    const { rerender } = render(<SupplierEditorDrawer mode="view" {...props} />);
+    expect(screen.queryByRole('tab', { name: 'Фінанси' })).not.toBeInTheDocument();
+
+    rerender(
+      <SupplierEditorDrawer mode="view" {...props} finance={<p>Операції постачальника</p>} />,
+    );
+    expect(screen.queryByRole('tab', { name: 'Рахунки на закупку' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('tab', { name: 'Фінанси' }));
+    expect(screen.getByText('Операції постачальника')).toBeVisible();
+    expect(screen.getByRole('textbox', { name: 'Назва', hidden: true })).not.toBeVisible();
+  });
+
   it('renders feature errors and disables submission while saving', () => {
     render(
       <SupplierEditorDrawer

@@ -26,6 +26,23 @@ const card = {
   reviewedAt: '2026-11-05T08:00:00+00:00',
   state: 'NeedsReview',
   issues: ['Немає посилання на оригінал'],
+  totalPayableMinor: 156_000,
+  payments: [
+    {
+      transactionId: '0193a8a0-0000-7000-8000-000000000001',
+      date: '2026-11-06',
+      amountMinor: 50_000,
+      currency: 'UAH',
+      accountName: 'Банк',
+      description: 'Нитки',
+      counterpartyName: 'Текстиль-Контакт',
+      missing: false,
+      voided: false,
+      linkedBy: 'director@brevi.com.ua',
+      linkedAt: '2026-11-08T10:00:00+00:00',
+    },
+  ],
+  paymentIssues: ['Оплачено 500,00 ₴, а сума рахунку 1 560,00 ₴.'],
   links: [
     {
       id: 'f'.repeat(64),

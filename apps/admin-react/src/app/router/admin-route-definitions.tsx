@@ -1,4 +1,4 @@
-import { clientsRoutes } from '@admin/clients/feature';
+import { createClientsRoutes } from '@admin/clients/feature';
 import { contentRoutes } from '@admin/content/feature';
 import { createDashboardRoutes } from '@admin/dashboard/feature';
 import { createEmbroideryRoutes } from '@admin/embroidery/feature';
@@ -15,6 +15,7 @@ import { createReferencesRoutes } from '@admin/references/feature';
 import { remindersRoutes } from '@admin/reminders/feature';
 import { createTasksRoutes } from '@admin/tasks/feature';
 
+import { useCanSeeFinance } from './use-can-see-finance';
 import { useCanSeePurchaseInvoices } from './use-can-see-purchase-invoices';
 import { useDashboardViewer } from './use-dashboard-viewer';
 import { useEmbroideryViewer } from './use-embroidery-viewer';
@@ -25,8 +26,8 @@ import { useTaskViewer } from './use-task-viewer';
 
 export const adminRouteDefinitions = [
   ...createDashboardRoutes({ useViewer: useDashboardViewer }),
-  ...createReferencesRoutes({ useCanSeePurchaseInvoices }),
-  ...clientsRoutes,
+  ...createReferencesRoutes({ useCanSeePurchaseInvoices, useCanSeeFinance }),
+  ...createClientsRoutes({ useCanSeeFinance }),
   ...createQuotesRoutes({
     useQuoteActor,
     useSupplierCard: useQuoteSupplierCard,

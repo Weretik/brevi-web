@@ -26,6 +26,8 @@ interface Props {
   /** The page tabs shown above the header. */
   tabs?: ReactNode;
   canSeePurchaseInvoices?: boolean;
+  /** The «Бухгалтерія» right: the viewed card gets «Фінанси». */
+  canSeeFinance?: boolean;
   /** A supplier to open once the list is loaded («Відкрити в контрагентах»). */
   openSupplierId?: number | null;
   /** Called once the requested supplier is handled, so the page can drop it from the URL. */
@@ -36,6 +38,7 @@ interface Props {
 export function SuppliersPage({
   tabs,
   canSeePurchaseInvoices = false,
+  canSeeFinance = false,
   openSupplierId = null,
   onSupplierOpened,
 }: Props = {}) {
@@ -158,6 +161,7 @@ export function SuppliersPage({
           supplier={active.supplier}
           nextId={nextId}
           canSeePurchaseInvoices={canSeePurchaseInvoices}
+          canSeeFinance={canSeeFinance}
           onClose={() => setActive(null)}
           onSaved={() => {
             setActive(null);

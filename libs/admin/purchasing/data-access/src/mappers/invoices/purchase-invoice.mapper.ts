@@ -1,6 +1,7 @@
 import { purchaseInvoiceStates } from '@admin/purchasing/model';
 
 import { mapPurchaseDocument, mapPurchaseRecognitionAttempt } from './purchase-document.mapper';
+import { mapPurchaseInvoicePayment, mapPurchasePaymentIssues } from './purchase-payment.mapper';
 import {
   flag,
   integer,
@@ -55,6 +56,9 @@ export function mapPurchaseInvoice(value: unknown): PurchaseInvoice {
     state: oneOf(row['state'], purchaseInvoiceStates, 'стан'),
     issues: list(row['issues'], 'проблеми').map((item) => text(item, 'проблема')),
     links: list(row['links'], 'посилання').map(mapLink),
+    totalPayableMinor: nullableInteger(row['totalPayableMinor'], 'сума рахунку'),
+    payments: list(row['payments'], 'оплати').map(mapPurchaseInvoicePayment),
+    paymentIssues: mapPurchasePaymentIssues(row['paymentIssues']),
   };
 }
 

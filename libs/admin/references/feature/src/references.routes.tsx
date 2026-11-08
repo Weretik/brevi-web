@@ -30,13 +30,21 @@ function GarmentAccessoriesRedirect() {
 export interface ReferencesRouteOptions {
   /** Whether the signed-in user may see a supplier's «Рахунки на закупку» (the Director). */
   useCanSeePurchaseInvoices: () => boolean;
+  /** Whether the signed-in user has the «Бухгалтерія» right: the supplier card gets «Фінанси». */
+  useCanSeeFinance: () => boolean;
 }
 
 export function createReferencesRoutes({
   useCanSeePurchaseInvoices,
+  useCanSeeFinance,
 }: ReferencesRouteOptions): (RouteObject & { path: string })[] {
   function Counterparties() {
-    return <CounterpartiesPage canSeePurchaseInvoices={useCanSeePurchaseInvoices()} />;
+    return (
+      <CounterpartiesPage
+        canSeePurchaseInvoices={useCanSeePurchaseInvoices()}
+        canSeeFinance={useCanSeeFinance()}
+      />
+    );
   }
   return [
     { path: '/references/counterparties', element: <Counterparties /> },

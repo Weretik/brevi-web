@@ -13,6 +13,8 @@ interface Props {
   invoice: PurchaseInvoice;
   /** Buttons of one safe link («Розпізнати», JSON), given by the feature. */
   renderLinkActions?: (link: PurchaseInvoiceLink) => ReactNode;
+  /** Section «Оплата» (linked expenses of «Бухгалтерія»), given by the feature. */
+  payments?: ReactNode;
 }
 
 const formatTime = (value: string) =>
@@ -22,7 +24,7 @@ const formatTime = (value: string) =>
  * Read-only card of one purchase invoice in the side panel: the message from the sheet, originals,
  * the source payment mark, problems (only when there are any) and the manual supplier and note.
  */
-export function PurchaseInvoiceDetails({ invoice, renderLinkActions }: Props) {
+export function PurchaseInvoiceDetails({ invoice, renderLinkActions, payments }: Props) {
   const supplier =
     invoice.supplierId !== null && invoice.supplierName === null
       ? 'Постачальника не знайдено або видалено з довідника'
@@ -56,6 +58,7 @@ export function PurchaseInvoiceDetails({ invoice, renderLinkActions }: Props) {
           ]}
         />
       </ReferenceFormSection>
+      {payments && <ReferenceFormSection title="Оплата">{payments}</ReferenceFormSection>}
       <ReferenceFormSection title="Повідомлення">
         <ReferenceDetailsList
           items={[

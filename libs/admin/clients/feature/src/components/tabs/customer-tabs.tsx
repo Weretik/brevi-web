@@ -5,10 +5,12 @@ import type { CustomerTab } from '../../hooks/customers/use-customer-tab';
 interface Props {
   tab: CustomerTab;
   disabled: boolean;
+  /** «Фінанси» for those with the «Бухгалтерія» right. */
+  canSeeFinance?: boolean;
   onChange: (tab: CustomerTab) => void;
 }
 
-export function CustomerTabs({ tab, disabled, onChange }: Props) {
+export function CustomerTabs({ tab, disabled, canSeeFinance = false, onChange }: Props) {
   return (
     <Tabs
       value={tab}
@@ -19,6 +21,7 @@ export function CustomerTabs({ tab, disabled, onChange }: Props) {
       <Tab value="card" label="Картка" />
       <Tab value="quotes" label="КП" disabled={disabled} />
       <Tab value="orders" label="Завдання в цех" disabled={disabled} />
+      {canSeeFinance && <Tab value="finance" label="Фінанси" disabled={disabled} />}
     </Tabs>
   );
 }

@@ -1,3 +1,4 @@
+import { CounterpartyFinance } from '@admin/accounting/feature';
 import { CustomerContacts } from '@admin/clients/ui';
 import { CustomerProductionOrders } from '@admin/production/feature';
 import { CustomerQuotes } from '@admin/quotes/feature';
@@ -14,7 +15,12 @@ import { customerError } from '../../../errors/customer-error';
 import { useCustomerDetail } from '../../../hooks/customers/use-customer-detail';
 import { useCustomerTab } from '../../../hooks/customers/use-customer-tab';
 
-export default function CustomerDetailPage() {
+interface Props {
+  /** The app passes the «Бухгалтерія» right: it adds the tab «Фінанси». */
+  canSeeFinance?: boolean;
+}
+
+export default function CustomerDetailPage({ canSeeFinance = false }: Props) {
   const {
     customerId,
     query,
@@ -41,7 +47,7 @@ export default function CustomerDetailPage() {
     save,
     pending,
   } = useCustomerDetail();
-  const { tab, setTab } = useCustomerTab();
+  const { tab, setTab } = useCustomerTab(canSeeFinance);
   const numericId = Number(customerId);
   return (
     <Box sx={{ p: { xs: 2, md: 3 }, maxWidth: 1100 }}>
@@ -66,9 +72,15 @@ export default function CustomerDetailPage() {
               {customer.displayName}
             </Typography>
             {/* Unsaved changes stay on «Картка»: the other tabs open after saving. */}
-            <CustomerTabs tab={tab} disabled={dirty} onChange={setTab} />
+            <CustomerTabs
+              tab={tab}
+              disabled={dirty}
+              canSeeFinance={canSeeFinance}
+              onChange={setTab}
+            />
             {tab === 'quotes' && <CustomerQuotes customerId={numericId} />}
             {tab === 'orders' && <CustomerProductionOrders customerId={numericId} />}
+            {tab === 'finance' && <CounterpartyFinance kind="Client" id={customer.publicId} />}
           </>
         )}
         {!query.error && customer && tab === 'card' && (

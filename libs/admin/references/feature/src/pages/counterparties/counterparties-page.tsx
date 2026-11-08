@@ -9,6 +9,8 @@ import { SuppliersPage } from '../suppliers/suppliers-page';
 interface Props {
   /** The app passes the role check: only the Director sees «Рахунки на закупку» of a supplier. */
   canSeePurchaseInvoices?: boolean;
+  /** The «Бухгалтерія» right: the supplier card gets «Фінанси». */
+  canSeeFinance?: boolean;
 }
 
 export type CounterpartiesTab = 'suppliers' | 'clients';
@@ -22,7 +24,10 @@ export function counterpartiesTabOf(value: string | null): CounterpartiesTab {
  * «Загальні довідники → Контрагенти»: suppliers and clients from KeepinCRM, switched by `?tab=`.
  * The old `?tab=purchases` link leads the Director to «Бухгалтерія → Рахунки на закупку».
  */
-export function CounterpartiesPage({ canSeePurchaseInvoices = false }: Props) {
+export function CounterpartiesPage({
+  canSeePurchaseInvoices = false,
+  canSeeFinance = false,
+}: Props) {
   const [searchParams, setSearchParams] = useSearchParams();
   const purchases = canSeePurchaseInvoices;
   const tab = counterpartiesTabOf(searchParams.get('tab'));
@@ -63,6 +68,7 @@ export function CounterpartiesPage({ canSeePurchaseInvoices = false }: Props) {
     <SuppliersPage
       tabs={tabs}
       canSeePurchaseInvoices={purchases}
+      canSeeFinance={canSeeFinance}
       openSupplierId={openSupplierId}
       onSupplierOpened={dropOpenSupplier}
     />

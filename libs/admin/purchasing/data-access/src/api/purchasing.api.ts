@@ -10,6 +10,9 @@ export const purchasingApi = purchasingBaseApi.injectEndpoints({
 export const {
   useGetPurchaseInvoicesQuery,
   useGetPurchaseDocumentTemplateQuery,
+  useGetPurchasePaymentCandidatesQuery,
+  useLinkPurchasePaymentMutation,
+  useUnlinkPurchasePaymentMutation,
   useRecognizeNewPurchaseFilesMutation,
   useRecognizePurchaseFileMutation,
   useSavePurchaseDocumentMutation,

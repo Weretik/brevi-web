@@ -39,6 +39,40 @@ vi.mock('@admin/clients/data-access', () => ({
   useListCustomersQuery: () => ({ data: undefined, isLoading: false }),
 }));
 
+vi.mock('@admin/accounting/feature', () => ({
+  CounterpartyFinance: ({ kind, id }: { kind: string; id: string }) => (
+    <p>
+      Фінанси {kind} {id}
+    </p>
+  ),
+}));
+
+describe('customer detail «Фінанси»', () => {
+  afterEach(cleanup);
+  const openCard = (canSeeFinance: boolean) => {
+    const router = createMemoryRouter(
+      [
+        {
+          path: '/crm/clients/:customerId',
+          element: <CustomerDetailPage canSeeFinance={canSeeFinance} />,
+        },
+      ],
+      { initialEntries: [`/crm/clients/${fixture.customer.publicId}?tab=finance`] },
+    );
+    render(<RouterProvider router={router} />);
+  };
+  it('shows the tab and this client operations with the «Бухгалтерія» right', () => {
+    openCard(true);
+    expect(screen.getByRole('tab', { name: 'Фінанси' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByText(`Фінанси Client ${fixture.customer.publicId}`)).toBeInTheDocument();
+  });
+  it('hides the tab without the right, even from the link', () => {
+    openCard(false);
+    expect(screen.queryByRole('tab', { name: 'Фінанси' })).not.toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Картка' })).toHaveAttribute('aria-selected', 'true');
+  });
+});
+
 describe('customer detail conflicts', () => {
   afterEach(cleanup);
   beforeEach(() => {

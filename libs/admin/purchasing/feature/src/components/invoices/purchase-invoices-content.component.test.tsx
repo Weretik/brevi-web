@@ -37,6 +37,9 @@ const invoice = {
   reviewedBy: null,
   reviewedAt: null,
   state: 'AwaitingRecognition',
+  totalPayableMinor: null,
+  payments: [],
+  paymentIssues: [],
   issues: [],
   links: [
     {
@@ -102,6 +105,9 @@ vi.mock('@admin/purchasing/data-access', () => ({
   useRecognizePurchaseFileMutation: () => [fixture.recognize, { isLoading: false }],
   useRecognizeNewPurchaseFilesMutation: () => [fixture.recognizeNew, { isLoading: false }],
   useSavePurchaseDocumentMutation: () => [fixture.save, { isLoading: false }],
+  useGetPurchasePaymentCandidatesQuery: () => ({ data: [], isFetching: false, error: undefined }),
+  useLinkPurchasePaymentMutation: () => [vi.fn(), { isLoading: false }],
+  useUnlinkPurchasePaymentMutation: () => [vi.fn(), { isLoading: false }],
   useGetPurchaseDocumentTemplateQuery: () => ({
     data: fixture.draft,
     isFetching: false,
