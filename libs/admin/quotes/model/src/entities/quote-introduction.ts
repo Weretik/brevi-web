@@ -10,6 +10,10 @@ export interface QuoteIntroduction {
   readonly layout: QuoteIntroLayout;
   readonly recipientEmail: string | null;
   readonly letterName: string | null;
+  /** The letter subject changed for this КП; null keeps the variant's. */
+  readonly letterSubject: string | null;
+  /** The letter text changed for this КП; null keeps the variant's. */
+  readonly letterBody: string | null;
 }
 
 /** The fixed first model of a season page; `problem` says why the page cannot be built. */
@@ -19,9 +23,11 @@ export interface QuoteIntroMainModel {
   readonly problem: string | null;
 }
 
+/** A letter variant as written in «Налаштування КП»; its {marks} are filled when sending. */
 export interface QuoteIntroLetter {
   readonly name: string;
   readonly subject: string;
+  readonly body: string;
 }
 
 /** What the introduction editor starts from. */

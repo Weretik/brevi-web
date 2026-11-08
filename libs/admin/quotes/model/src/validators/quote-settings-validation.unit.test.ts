@@ -59,6 +59,7 @@ const settings: QuoteSettings = {
     assortmentUrl: null,
     productButtonText: null,
     nextStepText: null,
+    pricesNote: null,
     accentColor: '#E8780F',
     summerMainCode: '',
     winterMainCode: '',

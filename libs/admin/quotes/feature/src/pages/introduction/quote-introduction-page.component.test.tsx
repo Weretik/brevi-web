@@ -33,8 +33,12 @@ const setupQuery = {
     summer: { code: 'MOD-1', product: product(1), problem: null },
     winter: { code: 'MOD-5', product: product(5, 'Зима'), problem: null },
     letters: [
-      { name: 'Запит на коротку відповідь', subject: 'Чи можемо бути корисними?' },
-      { name: 'Після розмови', subject: 'Добірка спецодягу' },
+      {
+        name: 'Запит на коротку відповідь',
+        subject: 'Чи можемо бути корисними?',
+        body: 'Добрий день, {clientName}!',
+      },
+      { name: 'Після розмови', subject: 'Добірка спецодягу', body: 'Дякуємо за розмову.' },
     ],
   },
   isLoading: false,
@@ -154,7 +158,13 @@ describe('КП для знайомства', () => {
       lastSentAt: null,
       version: 1,
       items: [],
-      introduction: { layout: 'Summer', recipientEmail: null, letterName: null },
+      introduction: {
+        layout: 'Summer',
+        recipientEmail: null,
+        letterName: null,
+        letterSubject: null,
+        letterBody: null,
+      },
     });
     renderPage();
     fireEvent.click(screen.getByRole('radio', { name: /Літній спецодяг/ }));
@@ -183,11 +193,19 @@ describe('КП для знайомства', () => {
       );
     }
     expect(screen.getByText('Модель 4')).toBeVisible();
+    expect(screen.getByRole('textbox', { name: 'Текст листа' })).toHaveValue(
+      'Добрий день, {clientName}!',
+    );
+    fireEvent.change(screen.getByRole('textbox', { name: 'Тема листа' }), {
+      target: { value: 'Своя тема' },
+    });
+    expect(screen.getByText('Лист змінено для цього КП.')).toBeVisible();
 
     fireEvent.click(screen.getByRole('button', { name: 'Зберегти і закрити' }));
     await waitFor(() => expect(api.create).toHaveBeenCalledTimes(1));
     const draft = api.create.mock.calls[0][0] as QuoteIntroDraft;
     expect(draft.layout).toBe('Summer');
+    expect([draft.letterSubject, draft.letterBody]).toEqual(['Своя тема', null]);
     expect(draft.pages[0].slots.map((slot) => [slot.productId, slot.articleId])).toEqual([
       [1, 100],
       [2, 200],

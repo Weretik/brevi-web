@@ -7958,6 +7958,10 @@ export interface components {
       layout: components['schemas']['CrmQuoteIntroLayout'];
       recipientEmail?: string | null;
       letterName?: string | null;
+      /** @description The letter subject changed for this КП; null keeps the variant's. */
+      letterSubject?: string | null;
+      /** @description The letter text changed for this КП; null keeps the variant's. */
+      letterBody?: string | null;
     };
     CrmQuote: {
       /** Format: int64 */
@@ -8267,12 +8271,20 @@ export interface components {
     /** @description «КП для знайомства — рекламний каталог». */
     CrmQuoteIntroductionTexts: {
       logoText?: string | null;
+      /** @description A word in *asterisks* is printed in the accent colour. */
       summerTitle?: string | null;
+      /** @description A word in *asterisks* is printed in the accent colour. */
       winterTitle?: string | null;
       subtitle?: string | null;
-      /** Format: uri */
+      /**
+       * Format: uri
+       * @description 1600×640 JPG; null prints the built-in summer banner.
+       */
       summerBannerUrl?: string | null;
-      /** Format: uri */
+      /**
+       * Format: uri
+       * @description 1600×640 JPG; null prints the built-in winter banner.
+       */
       winterBannerUrl?: string | null;
       modelsTitle?: string | null;
       assortmentLinkText?: string | null;
@@ -8280,6 +8292,8 @@ export interface components {
       assortmentUrl?: string | null;
       productButtonText?: string | null;
       nextStepText?: string | null;
+      /** @description The line under the models; null hides it. */
+      pricesNote?: string | null;
       accentColor?: string | null;
       /** @description Main summer model code; null means MOD-166 «Імпульс». */
       summerMainCode?: string | null;
@@ -8399,6 +8413,10 @@ export interface components {
       managerNote?: string | null;
       layout: components['schemas']['CrmQuoteIntroLayout'];
       letterName?: string | null;
+      /** @description The variant's subject changed for this КП only; null keeps the variant's. */
+      letterSubject?: string | null;
+      /** @description The variant's text changed for this КП only; null keeps the variant's. */
+      letterBody?: string | null;
       /** @description One page per season of the layout, summer first; a model only once. */
       pages: components['schemas']['CrmQuoteIntroPageInput'][];
     };
@@ -8455,6 +8473,8 @@ export interface components {
     CrmQuoteIntroLetter: {
       name: string;
       subject: string;
+      /** @description As written in the settings; {marks} are filled when sending. */
+      body: string;
     };
     CrmQuoteIntroductionSetup: {
       summer: components['schemas']['CrmQuoteIntroMainModel'];

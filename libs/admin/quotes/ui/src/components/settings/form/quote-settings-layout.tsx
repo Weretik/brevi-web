@@ -9,6 +9,10 @@ export type QuoteImageFieldRender = (field: {
   value: string;
   error: string | undefined;
   onChange: (value: string) => void;
+  /** What the picture should be, under the field. */
+  hint?: string;
+  /** Shows «Завантажити» for a file from the computer. */
+  upload?: boolean;
 }) => ReactNode;
 
 /** The page anchor of a section, used by the section list. */

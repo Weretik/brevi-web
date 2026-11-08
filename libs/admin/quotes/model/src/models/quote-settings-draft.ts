@@ -76,6 +76,7 @@ export interface QuoteIntroductionDraft {
   assortmentUrl: string;
   productButtonText: string;
   nextStepText: string;
+  pricesNote: string;
   accentColor: string;
   summerMainCode: string;
   winterMainCode: string;

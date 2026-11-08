@@ -67,6 +67,8 @@ export function toSaveQuoteIntroductionInput(
     managerNote: text(draft.managerNote),
     layout: draft.layout,
     letterName: text(draft.letterName),
+    letterSubject: draft.letterSubject === null ? null : text(draft.letterSubject),
+    letterBody: draft.letterBody === null ? null : text(draft.letterBody),
     pages: pages(draft),
   };
 }

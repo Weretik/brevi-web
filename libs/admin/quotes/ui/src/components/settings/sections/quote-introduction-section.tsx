@@ -53,12 +53,24 @@ const seasons = [
   },
 ] as const;
 
-const texts: { key: TextKey; label: string; multiline?: boolean; wide?: boolean }[] = [
+const texts: {
+  key: TextKey;
+  label: string;
+  multiline?: boolean;
+  wide?: boolean;
+  hint?: string;
+}[] = [
   { key: 'subtitle', label: 'Підзаголовок', multiline: true, wide: true },
   { key: 'modelsTitle', label: 'Заголовок блоку моделей' },
   { key: 'productButtonText', label: 'Текст кнопки товару' },
   { key: 'assortmentLinkText', label: 'Текст посилання на асортимент' },
   { key: 'assortmentUrl', label: 'Посилання на асортимент' },
+  {
+    key: 'pricesNote',
+    label: 'Примітка під моделями',
+    wide: true,
+    hint: 'Порожньо — рядка в PDF не буде.',
+  },
   { key: 'nextStepText', label: 'Наступний крок', multiline: true, wide: true },
 ];
 
@@ -74,12 +86,17 @@ export function QuoteIntroductionSection({
   onAdvantageMove,
 }: Props) {
   const at = errorsAt(errors, 'introduction');
-  const text = (key: TextKey, label: string, options: { multiline?: boolean; wide?: boolean }) => (
+  const text = (
+    key: TextKey,
+    label: string,
+    { hint, ...options }: { multiline?: boolean; wide?: boolean; hint?: string },
+  ) => (
     <QuoteSettingsField
       key={key}
       path={`introduction.${key}`}
       label={label}
       {...options}
+      helperText={hint}
       value={introduction[key]}
       saved={saved[key]}
       error={at(key)}
@@ -115,11 +132,15 @@ export function QuoteIntroductionSection({
               <Stack sx={{ gap: 1.5 }}>
                 {imageField({
                   label: `Банер — ${season.title.toLowerCase()}`,
+                  hint: '1600×640 px, JPG. Без банера PDF бере вбудований.',
+                  upload: true,
                   value: introduction[season.bannerKey],
                   error: at(season.bannerKey),
                   onChange: (value) => onChange({ [season.bannerKey]: value }),
                 })}
-                {text(season.titleKey, `Заголовок — ${season.title.toLowerCase()}`, {})}
+                {text(season.titleKey, `Заголовок — ${season.title.toLowerCase()}`, {
+                  hint: 'Слово в *зірочках* буде помаранчевим.',
+                })}
                 {modelField({
                   season: season.season,
                   label: `Головна модель — ${season.title.toLowerCase()}`,

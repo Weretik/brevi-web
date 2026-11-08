@@ -70,6 +70,8 @@ export interface QuoteIntroductionTexts {
   assortmentUrl: string | null;
   productButtonText: string | null;
   nextStepText: string | null;
+  /** The line under the models; null hides it. */
+  pricesNote: string | null;
   accentColor: string | null;
   /** Main summer model; null means MOD-166 «Імпульс». */
   summerMainCode: string | null;

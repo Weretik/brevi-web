@@ -182,7 +182,13 @@ export default function QuoteIntroductionPage({ actor }: { actor: QuoteActor }) 
         <QuoteIntroLetterStep
           letters={setup.letters}
           letterName={draft.letterName}
-          onChange={(letterName) => editor.change({ letterName })}
+          letterSubject={draft.letterSubject}
+          letterBody={draft.letterBody}
+          onChange={(letterName) => {
+            if (letterName !== draft.letterName)
+              editor.change({ letterName, letterSubject: null, letterBody: null });
+          }}
+          onEditLetter={editor.change}
         />
         <Box id={pagesAnchor} sx={{ scrollMarginTop: 96 }}>
           <QuoteIntroPagesStep
