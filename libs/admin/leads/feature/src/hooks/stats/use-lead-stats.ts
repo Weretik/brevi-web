@@ -32,7 +32,8 @@ export function useLeadStats(notify: (message: string) => void) {
         notify(
           `Таблицю прочитано: рядків ${result.rows}, нових ${result.added}, оновлено ${result.updated}` +
             (result.gone ? `, зникло ${result.gone}` : '') +
-            (result.skipped ? `, пропущено ${result.skipped}` : ''),
+            (result.skipped ? `, пропущено ${result.skipped}` : '') +
+            (result.duplicates ? `, повторів підприємств ${result.duplicates}` : ''),
         );
       } catch (error) {
         setSyncError(adminApiErrorMessage(error, 'Не вдалося синхронізувати таблицю.'));

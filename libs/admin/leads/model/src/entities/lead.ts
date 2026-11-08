@@ -104,6 +104,9 @@ export interface LeadSyncResult {
   readonly updated: number;
   readonly gone: number;
   readonly skipped: number;
+  /** Rows left out because their company is already on an earlier row (rows match by company name). */
+  readonly duplicates: number;
+  readonly warning: string | null;
 }
 
 export interface LeadSyncState {
@@ -111,6 +114,8 @@ export interface LeadSyncState {
   readonly lastSuccessAt: string | null;
   readonly rows: number;
   readonly error: string | null;
+  /** What the last successful run left out, such as a company written twice. */
+  readonly warning: string | null;
 }
 
 export interface LeadManagerStats {

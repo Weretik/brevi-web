@@ -9262,7 +9262,7 @@ export interface components {
     CrmLeadSummary: {
       /** Format: int64 */
       id: number;
-      /** @description The «ID» column of the sheet. */
+      /** @description The «ID» column of the sheet; not unique, leads match by company name. */
       sourceId: number;
       company: string;
       category: string | null;
@@ -9421,6 +9421,8 @@ export interface components {
       updated: number;
       /** @description Why the last run failed; null after a success. */
       error: string | null;
+      /** @description What the last successful run left out (repeated companies); null when nothing. */
+      warning: string | null;
     };
     CrmLeadStats: {
       /** Format: date */
@@ -9469,6 +9471,14 @@ export interface components {
       skipped: number;
       /** Format: date-time */
       at: string;
+      /** @description Rows left out because their company is already on an earlier row (rows match by company name, not ID). */
+      duplicates: number;
+      /** @description Which rows were left out and why; null when none. */
+      warning: string | null;
+    };
+    CrmLeadSyncFailure: {
+      /** @description Ukrainian messages for the Admin, also saved as the last sync error. */
+      errors: string[];
     };
     WorkshopEmployeeResponse: {
       id: number;
@@ -22635,12 +22645,23 @@ export interface operations {
         content?: never;
       };
       409: components['responses']['leads.openapi_components-responses-Conflict'];
+      /** @description The sheet has an unexpected shape (no tab with the saved id, too many rows); nothing changed. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmLeadSyncFailure'];
+        };
+      };
       /** @description Google cannot be read now (access, network); nothing changed. */
       503: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['CrmLeadSyncFailure'];
+        };
       };
     };
   };

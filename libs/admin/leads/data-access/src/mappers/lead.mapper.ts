@@ -144,6 +144,7 @@ export const mapLeadStats = (value: Schemas['CrmLeadStats']): LeadStats => ({
         lastSuccessAt: value.sync.lastSuccessAt ?? null,
         rows: value.sync.rows,
         error: value.sync.error ?? null,
+        warning: value.sync.warning ?? null,
       }
     : null,
 });
@@ -154,4 +155,6 @@ export const mapLeadSync = (value: Schemas['CrmLeadSync']): LeadSyncResult => ({
   updated: value.updated,
   gone: value.gone,
   skipped: value.skipped,
+  duplicates: value.duplicates,
+  warning: value.warning ?? null,
 });

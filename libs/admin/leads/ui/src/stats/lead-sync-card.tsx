@@ -13,7 +13,7 @@ interface Props {
   action?: ReactNode;
 }
 
-/** The Google Sheet «Лиды Brevi»: when it was read and, only on a failure, why. */
+/** The Google Sheet «Лиды Brevi»: when it was read and, only on a problem, what went wrong. */
 export function LeadSyncCard({ sync, action }: Props) {
   return (
     <LeadStatsCard title="Таблиця «Лиды Brevi»" action={action}>
@@ -21,6 +21,7 @@ export function LeadSyncCard({ sync, action }: Props) {
         {sync?.error && (
           <Alert severity="error">Остання синхронізація не вдалася: {sync.error}</Alert>
         )}
+        {!sync?.error && sync?.warning && <Alert severity="warning">{sync.warning}</Alert>}
         <Typography variant="body2">
           {sync?.lastSuccessAt ? (
             <>
