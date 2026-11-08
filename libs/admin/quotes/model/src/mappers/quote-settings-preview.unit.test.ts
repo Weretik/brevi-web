@@ -26,6 +26,8 @@ describe('quoteSettingsPreviewSample', () => {
     expect(sample.number).toBe('12-11-2026');
     expect(sample.marks).toEqual({
       '{quoteNumber}': '12-11-2026',
+      '{clientName}': 'Олена Коваль',
+      '{companyName}': 'ТОВ «Приклад»',
       '{managerName}': 'Оля',
       '{managerPhone}': '+380 44 000 00 00',
       '{managerEmail}': 'olia@brevi.ua',

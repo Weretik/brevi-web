@@ -24,4 +24,8 @@ describe('quote template marks', () => {
   it('lists each unknown mark once and ignores braces with spaces', () => {
     expect(unknownQuoteMarks('{site} {x} {x} { not a mark }')).toEqual(['{x}']);
   });
+
+  it('knows the client and company of the КП', () => {
+    expect(unknownQuoteMarks('Добрий день, {clientName} ({companyName})')).toEqual([]);
+  });
 });
