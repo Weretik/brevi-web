@@ -1,5 +1,5 @@
 import type { QuoteSupplierFabric } from '@admin/quotes/model';
-import type { ReactNode } from 'react';
+import type { ComponentType, ReactNode } from 'react';
 
 /** The supplier of a fabric in the КП and the КП fabrics bought from it. */
 export interface QuoteSupplierCardTarget {
@@ -14,3 +14,10 @@ export interface QuoteSupplierCard {
   /** Rendered once by the page. */
   element: ReactNode;
 }
+
+/** The КП's orders and «Передати в цех» (client corrections item 9); `onPass` saves the КП first. */
+export type QuoteWorkshopCard = ComponentType<{
+  quoteId: number | null;
+  canCreate: boolean;
+  onPass: () => void;
+}>;

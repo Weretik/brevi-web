@@ -13,6 +13,7 @@ export function useQuoteActor(): QuoteActor {
         userId: Number(session.user.id),
         canSeeAll: session.user.roles.includes('Admin'),
         canDelete: canAccess(session.user, 'quotes', 'delete'),
+        canPassToWorkshop: canAccess(session.user, 'production-orders', 'create'),
       }
-    : { userId: null, canSeeAll: false, canDelete: false };
+    : { userId: null, canSeeAll: false, canDelete: false, canPassToWorkshop: false };
 }

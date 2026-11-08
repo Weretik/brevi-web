@@ -52,7 +52,7 @@ export function ProductionOrdersPage({ useOrderActor }: Props) {
       <ReferencePageHeader
         overline="Швейний цех"
         title="Виробничі завдання"
-        subtitle="Що шиє цех: завдання створюється з відправленого КП"
+        subtitle="Що шиє цех: завдання створюється з КП під запит"
         actions={
           <>
             <Button

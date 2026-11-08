@@ -40,7 +40,7 @@ import { useGmailReturnNotice } from '../../hooks/sending/use-gmail-return-notic
 import { useQuoteStartPrefill } from '../../hooks/start/use-quote-start-prefill';
 
 import type { QuoteEditorPanel } from './quote-editor-panels';
-import type { QuoteSupplierCard } from './quote-supplier-card';
+import type { QuoteSupplierCard, QuoteWorkshopCard } from './quote-supplier-card';
 import type { QuoteActor, QuoteFabricFacts } from '@admin/quotes/model';
 
 const addItemsAnchor = 'quote-add-items';
@@ -59,9 +59,12 @@ const scrollTo = (target: string) => {
 export default function QuoteEditorPage({
   actor,
   supplierCard,
+  workshopCard: WorkshopCard,
 }: {
   actor: QuoteActor;
   supplierCard?: QuoteSupplierCard;
+  /** «Цех» in the right column (client corrections item 9); the app supplies it from «Виробничі завдання». */
+  workshopCard?: QuoteWorkshopCard;
 }) {
   const params = useParams();
   const id = params['quoteId'] ? Number(params['quoteId']) : null;
@@ -223,13 +226,24 @@ export default function QuoteEditorPage({
           />
         </Stack>
         <Box sx={{ position: { lg: 'sticky' }, top: { lg: 88 } }}>
-          <QuoteEditorAside
-            draft={draft}
-            withActions={wide}
-            onTierShown={editor.setTierShown}
-            onGo={scrollTo}
-            {...actions}
-          />
+          <Stack sx={{ gap: 2 }}>
+            <QuoteEditorAside
+              draft={draft}
+              withActions={wide}
+              onTierShown={editor.setTierShown}
+              onGo={scrollTo}
+              {...actions}
+            />
+            {WorkshopCard && (
+              <WorkshopCard
+                quoteId={quote?.id ?? null}
+                canCreate={actor.canPassToWorkshop === true && draft.items.length > 0}
+                onPass={() =>
+                  saveFirst.run((saved) => navigate(`/production/orders/new?quote=${saved.id}`))
+                }
+              />
+            )}
+          </Stack>
         </Box>
       </Box>
       {!wide && <QuoteSendActions layout="bar" {...actions} />}
