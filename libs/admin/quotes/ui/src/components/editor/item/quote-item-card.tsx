@@ -98,7 +98,6 @@ export function QuoteItemCard({
     item.kind === 'Embroidery'
       ? (item.subtitle ?? '')
       : [item.season, item.code].filter(Boolean).join(' · ');
-  const changePhoto = item.productId !== null && onChangePhoto ? onChangePhoto : undefined;
   return (
     <Card
       variant="outlined"
@@ -107,7 +106,7 @@ export function QuoteItemCard({
       sx={{ scrollMarginTop: 96, borderColor: itemError ? 'warning.main' : undefined }}
     >
       <Stack direction="row" sx={{ gap: 2, alignItems: 'flex-start', p: 2, pb: 1.5 }}>
-        <QuoteItemPhoto photoUrl={item.photoUrl} label={label} onChange={changePhoto} />
+        <QuoteItemPhoto photoUrl={item.photoUrl} label={label} onChange={onChangePhoto} />
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Stack direction="row" sx={{ gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
             <Typography
@@ -170,7 +169,7 @@ export function QuoteItemCard({
         )}
         <QuoteItemMenu
           label={label}
-          onChangePhoto={changePhoto}
+          onChangePhoto={onChangePhoto}
           isFirst={isFirst}
           isLast={isLast}
           onMove={onMove}

@@ -9,15 +9,14 @@ interface Props {
   /** The client or request typed in «Кому»; the page title. */
   name: string;
   dirty: boolean;
-  archived: boolean;
   busy: boolean;
   canAssign: boolean;
   onHistory: () => void;
   onCopy: () => void;
-  onArchive: (archived: boolean) => void;
   onAssign: () => void;
   onReprice: () => void;
-  onDelete: () => void;
+  /** Left out for who may not delete a КП (the Director for now). */
+  onDelete?: () => void;
 }
 
 /** The КП header: kind and status, the client as the title, number and owner; «Історія» and «Ще». */
@@ -25,12 +24,10 @@ export function QuoteEditorHeader({
   quote,
   name,
   dirty,
-  archived,
   busy,
   canAssign,
   onHistory,
   onCopy,
-  onArchive,
   onAssign,
   onReprice,
   onDelete,
@@ -45,13 +42,7 @@ export function QuoteEditorHeader({
           <Typography variant="overline" color="text.secondary">
             КП під запит
           </Typography>
-          {quote && (
-            <QuoteStatusPill
-              status={quote.status}
-              lastSentAt={quote.lastSentAt}
-              archived={archived}
-            />
-          )}
+          {quote && <QuoteStatusPill status={quote.status} lastSentAt={quote.lastSentAt} />}
         </Stack>
         <Typography variant="h1" sx={{ overflowWrap: 'anywhere' }}>
           {name.trim() || 'Нове КП'}
@@ -78,14 +69,12 @@ export function QuoteEditorHeader({
             Історія
           </Button>
           <QuoteMoreMenu
-            archived={archived}
             dirty={dirty}
             busy={busy}
             onCopy={onCopy}
-            onArchive={onArchive}
             onAssign={canAssign ? onAssign : undefined}
             onReprice={onReprice}
-            onDelete={quote.status === 'Draft' ? onDelete : undefined}
+            onDelete={onDelete}
           />
         </Stack>
       )}

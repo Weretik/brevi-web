@@ -8,21 +8,24 @@ interface Props {
   dirty: boolean;
   saving: boolean;
   generating: boolean;
-  /** An archived КП: nothing is saved or sent until it is restored. */
-  locked?: boolean;
   onSave: () => void;
+  /** «Скасувати»: leaves without saving. */
+  onCancel: () => void;
   onPdf: () => void;
   onSend: () => void;
 }
 
-/** The КП actions in one place: the main «Надіслати КП», then «Переглянути PDF» and «Зберегти». */
+/**
+ * The КП actions in one place: the main «Надіслати КП», then «Переглянути PDF», «Зберегти» (saves and closes) and
+ * «Скасувати» (closes without saving).
+ */
 export function QuoteSendActions({
   layout,
   dirty,
   saving,
   generating,
-  locked = false,
   onSave,
+  onCancel,
   onPdf,
   onSend,
 }: Props) {
@@ -32,7 +35,7 @@ export function QuoteSendActions({
     <Button
       variant="contained"
       startIcon={<SendOutlinedIcon />}
-      disabled={busy || locked}
+      disabled={busy}
       onClick={onSend}
       fullWidth={card}
     >
@@ -50,8 +53,13 @@ export function QuoteSendActions({
     </Button>
   );
   const save = (
-    <Button variant="outlined" onClick={onSave} disabled={busy || locked}>
+    <Button variant="outlined" onClick={onSave} disabled={busy}>
       {saving && !generating ? 'Зберігаємо…' : 'Зберегти'}
+    </Button>
+  );
+  const cancel = (
+    <Button variant="text" color="inherit" onClick={onCancel} disabled={busy} fullWidth={card}>
+      Скасувати
     </Button>
   );
   const status = dirty && (
@@ -72,6 +80,7 @@ export function QuoteSendActions({
           {pdf}
           {save}
         </Box>
+        {cancel}
         {status}
       </Paper>
     );
@@ -92,6 +101,7 @@ export function QuoteSendActions({
       }}
     >
       <Box sx={{ mr: 'auto' }}>{status}</Box>
+      {cancel}
       {save}
       {pdf}
       {send}

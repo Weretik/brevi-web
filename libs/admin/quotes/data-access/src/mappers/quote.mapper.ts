@@ -90,8 +90,6 @@ export const mapQuote = (value: Schemas['CrmQuote']): Quote => ({
   createdAt: value.createdAt,
   updatedAt: value.updatedAt,
   lastSentAt: value.lastSentAt ?? null,
-  archivedAt: value.archivedAt ?? null,
-  archivedByName: value.archivedByName ?? null,
   version: value.version,
   items: value.items.map(item),
   introduction: value.introduction
@@ -123,7 +121,7 @@ export const mapQuotePage = (value: Schemas['CrmQuotePage']): QuotePage => ({
     itemsCount: row.itemsCount,
     updatedAt: row.updatedAt,
     lastSentAt: row.lastSentAt ?? null,
-    archivedAt: row.archivedAt ?? null,
+    version: row.version,
   })),
   page: value.page,
   pageSize: value.pageSize,

@@ -17,7 +17,7 @@ interface Props {
   client: QuoteClientSuggestion | null;
   clients: readonly QuoteClientSuggestion[];
   kind: QuoteStartKind;
-  nameError: string | undefined;
+  nameError?: string;
   onNameChange: (name: string) => void;
   onClientChange: (client: QuoteClientSuggestion | null) => void;
   onKindChange: (kind: QuoteStartKind) => void;
@@ -83,7 +83,6 @@ export function QuoteStartForm({
             <TextField
               {...params}
               autoFocus
-              required
               label="Клієнт або запит"
               placeholder="Почніть вводити назву клієнта з KeepinCRM"
               error={Boolean(nameError)}

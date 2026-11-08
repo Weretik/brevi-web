@@ -11,10 +11,10 @@ interface Props {
   dirty: boolean;
   saving: boolean;
   generating: boolean;
-  locked: boolean;
   onTierShown: (tier: QuoteTier, shown: boolean) => void;
   onGo: (target: string) => void;
   onSave: () => void;
+  onCancel: () => void;
   onPdf: () => void;
   onSend: () => void;
 }
@@ -26,10 +26,10 @@ export function QuoteEditorAside({
   dirty,
   saving,
   generating,
-  locked,
   onTierShown,
   onGo,
   onSave,
+  onCancel,
   onPdf,
   onSend,
 }: Props) {
@@ -43,7 +43,7 @@ export function QuoteEditorAside({
           wholesale: quoteTierVisibility(draft, 'wholesale'),
           large: quoteTierVisibility(draft, 'large'),
         }}
-        disabled={locked || draft.items.length === 0}
+        disabled={draft.items.length === 0}
         onTierShown={onTierShown}
       />
       <QuoteProblemsCard problems={quoteDraftProblems(draft)} onGo={onGo} />
@@ -53,8 +53,8 @@ export function QuoteEditorAside({
           dirty={dirty}
           saving={saving}
           generating={generating}
-          locked={locked}
           onSave={onSave}
+          onCancel={onCancel}
           onPdf={onPdf}
           onSend={onSend}
         />

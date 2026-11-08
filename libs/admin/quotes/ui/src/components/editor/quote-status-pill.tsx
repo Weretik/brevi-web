@@ -5,20 +5,18 @@ import type { QuoteStatus } from '@admin/quotes/model';
 interface Props {
   status: QuoteStatus;
   lastSentAt: string | null;
-  archived: boolean;
 }
 
-/** «Чернетка», «Надіслано 04.11.2026» or «В архіві»: a pill next to the КП title. */
-export function QuoteStatusPill({ status, lastSentAt, archived }: Props) {
+/** «Чернетка» or «Надіслано 04.11.2026»: a pill next to the КП title. */
+export function QuoteStatusPill({ status, lastSentAt }: Props) {
   const sent = status === 'Sent';
-  const label = archived
-    ? 'В архіві'
-    : sent && lastSentAt
+  const label =
+    sent && lastSentAt
       ? `Надіслано ${new Date(lastSentAt).toLocaleDateString('uk-UA')}`
       : sent
         ? 'Надіслано'
         : 'Чернетка';
-  const tone = archived ? 'warning' : sent ? 'info' : null;
+  const tone = sent ? 'info' : null;
   return (
     <Box
       component="span"

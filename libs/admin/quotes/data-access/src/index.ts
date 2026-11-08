@@ -4,12 +4,13 @@ export {
   useCreateQuoteMutation,
   useDeleteQuoteMutation,
   useGetQuoteHistoryQuery,
+  useGetQuoteLegacyArchiveQuery,
   useGetQuoteQuery,
   useLazyGetQuoteQuery,
   useListQuotesQuery,
+  usePurgeQuoteLegacyArchiveMutation,
   useRepriceQuoteMutation,
   useSaveQuoteMutation,
-  useSetQuoteArchivedMutation,
   useSetQuoteResponsibleMutation,
 } from './api/quotes.api';
 export {
@@ -19,6 +20,7 @@ export {
   useGetQuoteProductPhotosQuery,
   useGetQuoteStaffQuery,
   useSearchQuoteCatalogQuery,
+  useUploadQuotePhotoMutation,
 } from './api/quote-lookups.api';
 export type { QuoteCatalogQuery } from './api/quote-lookups.api';
 export { toSaveQuoteInput } from './mappers/quote-input.mapper';

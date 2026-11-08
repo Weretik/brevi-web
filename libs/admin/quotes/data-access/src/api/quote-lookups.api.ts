@@ -1,5 +1,5 @@
 import { quotesBaseApi } from './quotes-base-api';
-import { quoteLookupErrors, toQuoteApiError } from '../errors/quote-api-error';
+import { quoteLookupErrors, quotePhotoErrors, toQuoteApiError } from '../errors/quote-api-error';
 import {
   mapQuoteCatalogPage,
   mapQuoteCustomSewingPrice,
@@ -75,6 +75,16 @@ export const quoteLookupsApi = quotesBaseApi.injectEndpoints({
       transformResponse: mapQuoteStaff,
       transformErrorResponse: (response) => toQuoteApiError(response, quoteLookupErrors),
     }),
+    /** «Змінити фото → Завантажити своє»: the photo goes to the CDN folder «Фото КП» (crm R-34). */
+    uploadQuotePhoto: build.mutation<string, File>({
+      query: (file) => {
+        const body = new FormData();
+        body.set('file', file);
+        return { url: '/api/crm/quote-lookups/photos', method: 'POST', body };
+      },
+      transformResponse: (value: { url: string }) => value.url,
+      transformErrorResponse: (response) => toQuoteApiError(response, quotePhotoErrors),
+    }),
   }),
 });
 
@@ -85,4 +95,5 @@ export const {
   useGetQuoteProductPhotosQuery,
   useSearchQuoteCatalogQuery,
   useGetQuoteStaffQuery,
+  useUploadQuotePhotoMutation,
 } = quoteLookupsApi;

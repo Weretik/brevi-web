@@ -27,8 +27,6 @@ interface Props {
   loading: boolean;
   error: string | null;
   warnings: readonly QuotePreviewWarning[];
-  /** An archived КП is not sent until it is restored. */
-  sendDisabled?: boolean;
   onClose: () => void;
   onSend: () => void;
   onDownload: () => void;
@@ -46,7 +44,6 @@ export function QuotePreviewDialog({
   loading,
   error,
   warnings,
-  sendDisabled = false,
   onClose,
   onSend,
   onDownload,
@@ -141,7 +138,7 @@ export function QuotePreviewDialog({
             variant="contained"
             size="large"
             startIcon={<SendOutlinedIcon />}
-            disabled={!ready || sendDisabled}
+            disabled={!ready}
             onClick={onSend}
           >
             Надіслати КП

@@ -5,14 +5,12 @@ import type { useQuotePreview } from '../../hooks/preview/use-quote-preview';
 
 interface Props {
   preview: ReturnType<typeof useQuotePreview>;
-  /** An archived КП is not sent until it is restored. */
-  locked: boolean;
   /** Opens the letter panel for the previewed КП. */
   onSend: () => void;
 }
 
 /** The PDF preview of the saved КП with its problems; shown while `preview.shown` is set. */
-export function QuotePreview({ preview, locked, onSend }: Props) {
+export function QuotePreview({ preview, onSend }: Props) {
   const shown = preview.shown;
   if (!shown) return null;
   const { quote } = shown;
@@ -27,7 +25,6 @@ export function QuotePreview({ preview, locked, onSend }: Props) {
       loading={!shown.url && !shown.error}
       error={shown.error}
       warnings={quote.kind === 'Introduction' ? [] : quotePreviewWarnings(quote)}
-      sendDisabled={locked}
       onClose={preview.close}
       onDownload={preview.download}
       onSend={() => {
