@@ -27,6 +27,7 @@ export const mapTaskSummary = (value: Schemas['CrmTaskSummary']): TaskSummary =>
   completedAt: value.completedAt ?? null,
   updatedAt: value.updatedAt,
   version: value.version,
+  createdAt: value.createdAt,
 });
 
 export const mapTaskPage = (value: Schemas['CrmTaskPage']): TaskPage => ({

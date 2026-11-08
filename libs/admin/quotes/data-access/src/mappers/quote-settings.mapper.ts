@@ -63,6 +63,7 @@ const introductionKeys = [
   'assortmentUrl',
   'productButtonText',
   'nextStepText',
+  'pricesNote',
   'accentColor',
   'summerMainCode',
   'winterMainCode',

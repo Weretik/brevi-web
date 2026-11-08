@@ -97,6 +97,8 @@ export const mapQuote = (value: Schemas['CrmQuote']): Quote => ({
         layout: value.introduction.layout,
         recipientEmail: value.introduction.recipientEmail ?? null,
         letterName: value.introduction.letterName ?? null,
+        letterSubject: value.introduction.letterSubject ?? null,
+        letterBody: value.introduction.letterBody ?? null,
       }
     : null,
 });

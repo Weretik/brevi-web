@@ -8,17 +8,19 @@ import {
 } from '@admin/tasks/data-access';
 import { useState } from 'react';
 
-import type { TaskMove, TaskSummary, TaskViewer } from '@admin/tasks/model';
+import type { TaskBoardPeriod, TaskMove, TaskSummary, TaskViewer } from '@admin/tasks/model';
 
 /**
  * «Мої завдання»: a Manager sees own cards; Director and Admin see everyone's and switch the
- * manager filter (TSK-001 R-02). A drop calls the status or urgent endpoint with the card version.
+ * manager filter (TSK-001 R-02). «Період» narrows only the done cards (open ones always stay); every column is
+ * newest added first. A drop calls the status or urgent endpoint with the card version.
  */
 export function useTaskBoard(viewer: TaskViewer, notify: (message: string) => void) {
   const [assigneeUserId, setAssignee] = useState<number | null>(null);
   const [moveError, setMoveError] = useState<string | null>(null);
+  const [period, setPeriod] = useState<TaskBoardPeriod>('Week');
   const filter = viewer.isAdmin ? assigneeUserId : null;
-  const board = useGetTaskBoardQuery({ assigneeUserId: filter });
+  const board = useGetTaskBoardQuery({ assigneeUserId: filter, period });
   const overview = useGetTaskOverviewQuery({ assigneeUserId: filter });
   const assignees = useGetTaskAssigneesQuery(undefined, { skip: !viewer.isAdmin });
   const [changeStatus] = useChangeTaskStatusMutation();
@@ -41,6 +43,8 @@ export function useTaskBoard(viewer: TaskViewer, notify: (message: string) => vo
   return {
     assigneeUserId: filter,
     setAssignee,
+    period,
+    setPeriod,
     assignees: assignees.data ?? [],
     tasks: board.data ?? [],
     overview: overview.data,

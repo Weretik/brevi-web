@@ -51,9 +51,7 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         path: '/crm/embroidery',
         access: 'embroidery',
       },
-      { id: 'price-list', label: 'Прайс' },
       { id: 'tasks', label: 'Мої завдання', path: '/crm/tasks', access: 'tasks' },
-      { id: 'deals', label: 'Угоди' },
     ],
   },
   {

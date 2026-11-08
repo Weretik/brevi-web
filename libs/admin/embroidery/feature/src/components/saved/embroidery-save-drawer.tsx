@@ -6,18 +6,31 @@ import { useState } from 'react';
 
 import { useEmbroideryCustomers } from '../../hooks/saved/use-embroidery-customers';
 
-import type { EmbroideryCalculationRequest, EmbroiderySavedSummary } from '@admin/embroidery/model';
+import type {
+  EmbroideryCalculationRequest,
+  EmbroideryPrice,
+  EmbroiderySavedSummary,
+} from '@admin/embroidery/model';
 import type { EmbroiderySaveValues } from '@admin/embroidery/ui';
 
 interface Props {
   request: EmbroideryCalculationRequest;
+  /** The current prices; the person keeps one category. */
+  prices: readonly EmbroideryPrice[];
   onClose: () => void;
   onSaved: (summary: EmbroiderySavedSummary) => void;
 }
 
-/** «Зберегти розрахунок»: the server prices the same form again with the current rates and keeps them. */
-export function EmbroiderySaveDrawer({ request, onClose, onSaved }: Props) {
-  const [values, setValues] = useState<EmbroiderySaveValues>({ name: '', customer: null });
+/**
+ * «Зберегти розрахунок»: the server prices the same form again with the current rates and keeps only the chosen
+ * category's price.
+ */
+export function EmbroiderySaveDrawer({ request, prices, onClose, onSaved }: Props) {
+  const [values, setValues] = useState<EmbroiderySaveValues>({
+    name: '',
+    customer: null,
+    category: prices[0]?.name ?? '',
+  });
   const customers = useEmbroideryCustomers(true);
   const [save, state] = useSaveEmbroideryCalculationMutation();
 
@@ -26,6 +39,7 @@ export function EmbroiderySaveDrawer({ request, onClose, onSaved }: Props) {
       name: values.name,
       customerPublicId: values.customer?.publicId ?? null,
       calculation: request,
+      category: values.category,
     });
     if ('data' in result && result.data) onSaved(result.data.summary);
   };
@@ -34,7 +48,7 @@ export function EmbroiderySaveDrawer({ request, onClose, onSaved }: Props) {
     <ReferenceEditorDrawer
       titleId="embroidery-save-title"
       title="Зберегти розрахунок"
-      description="Ціни і ставки збережуться такими, як зараз, і не зміняться пізніше."
+      description="Збережеться ціна обраної категорії зі ставками, як зараз; пізніше вона не зміниться."
       formId="embroidery-save-form"
       paperWidth={440}
       readOnly={false}
@@ -52,6 +66,7 @@ export function EmbroiderySaveDrawer({ request, onClose, onSaved }: Props) {
         )}
         <EmbroiderySaveForm
           values={values}
+          prices={prices}
           disabled={state.isLoading}
           customers={customers.options}
           onCustomerSearch={customers.search}

@@ -94,6 +94,8 @@ export function emptyIntroDraft(setup: QuoteIntroductionSetup): QuoteIntroDraft 
     managerNote: '',
     layout: 'General',
     letterName: setup.letters[0]?.name ?? '',
+    letterSubject: null,
+    letterBody: null,
     pages: quoteIntroSeasons('General').map((season) => newPage(season, main[season])),
   };
 }
@@ -111,6 +113,8 @@ export function introToDraft(quote: Quote): QuoteIntroDraft {
     managerNote: quote.managerNote ?? '',
     layout,
     letterName: quote.introduction?.letterName ?? '',
+    letterSubject: quote.introduction?.letterSubject ?? null,
+    letterBody: quote.introduction?.letterBody ?? null,
     pages: quoteIntroSeasons(layout).map((season, index) => {
       const items = quote.items.slice(
         index * quoteIntroModelsPerPage,
@@ -182,10 +186,14 @@ export function applyIntroTemplate(
   template: QuoteIntroTemplate,
   products: ReadonlyMap<number, QuoteCatalogProduct>,
 ): QuoteIntroDraft {
+  const letterName = template.letterName ?? draft.letterName;
+  const sameLetter = letterName === draft.letterName;
   return {
     ...draft,
     layout: template.layout,
-    letterName: template.letterName ?? draft.letterName,
+    letterName,
+    letterSubject: sameLetter ? draft.letterSubject : null,
+    letterBody: sameLetter ? draft.letterBody : null,
     pages: template.pages.map((page) => ({
       season: page.season,
       slots: page.models.map((model) => {

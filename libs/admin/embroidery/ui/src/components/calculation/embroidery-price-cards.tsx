@@ -35,7 +35,7 @@ interface Props {
 
 const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' };
 
-/** The right column of «Розрахунок»: three prices per unit with the order and repeat. */
+/** The right column of «Розрахунок»: a price per unit of each category with the order and repeat. */
 export function EmbroideryPriceCards({
   prices,
   quantity,
@@ -87,8 +87,8 @@ export function EmbroideryPriceCards({
                   p: 1.5,
                   borderRadius: 1.5,
                   border: 1,
-                  borderColor: index === 1 ? 'primary.main' : 'divider',
-                  bgcolor: index === 1 ? 'primary.light' : 'background.paper',
+                  borderColor: index === 0 ? 'primary.main' : 'divider',
+                  bgcolor: index === 0 ? 'primary.light' : 'background.paper',
                 }}
               >
                 <Stack
@@ -113,10 +113,10 @@ export function EmbroideryPriceCards({
                     <Typography sx={{ ...mono, fontSize: 22, fontWeight: 600 }}>
                       {formatEmbroideryMoney(price.unit)}
                     </Typography>
-                    <Tooltip title="Копіювати">
+                    <Tooltip title="Копіювати ціну за 1 шт">
                       <IconButton
                         size="small"
-                        aria-label={`Копіювати ціну ${price.name}`}
+                        aria-label={`Копіювати ціну за 1 шт: ${price.name}`}
                         onClick={() => onCopy(price)}
                       >
                         <ContentCopyOutlinedIcon fontSize="inherit" />

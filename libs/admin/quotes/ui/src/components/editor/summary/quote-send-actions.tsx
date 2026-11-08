@@ -8,7 +8,10 @@ interface Props {
   dirty: boolean;
   saving: boolean;
   generating: boolean;
+  /** «Зберегти»: saves and stays in the КП. */
   onSave: () => void;
+  /** «Зберегти і закрити»: saves and goes back to the list. */
+  onSaveAndClose: () => void;
   /** «Скасувати»: leaves without saving. */
   onCancel: () => void;
   onPdf: () => void;
@@ -16,8 +19,8 @@ interface Props {
 }
 
 /**
- * The КП actions in one place: the main «Надіслати КП», then «Переглянути PDF», «Зберегти» (saves and closes) and
- * «Скасувати» (closes without saving).
+ * The КП actions in one place: the main «Надіслати КП», then «Переглянути PDF», «Зберегти» (saves and stays),
+ * «Зберегти і закрити» and the red «Скасувати» (closes without saving).
  */
 export function QuoteSendActions({
   layout,
@@ -25,6 +28,7 @@ export function QuoteSendActions({
   saving,
   generating,
   onSave,
+  onSaveAndClose,
   onCancel,
   onPdf,
   onSend,
@@ -57,8 +61,13 @@ export function QuoteSendActions({
       {saving && !generating ? 'Зберігаємо…' : 'Зберегти'}
     </Button>
   );
+  const saveAndClose = (
+    <Button variant="outlined" onClick={onSaveAndClose} disabled={busy} fullWidth={card}>
+      Зберегти і закрити
+    </Button>
+  );
   const cancel = (
-    <Button variant="text" color="inherit" onClick={onCancel} disabled={busy} fullWidth={card}>
+    <Button variant="outlined" color="error" onClick={onCancel} disabled={busy} fullWidth={card}>
       Скасувати
     </Button>
   );
@@ -80,6 +89,7 @@ export function QuoteSendActions({
           {pdf}
           {save}
         </Box>
+        {saveAndClose}
         {cancel}
         {status}
       </Paper>
@@ -103,6 +113,7 @@ export function QuoteSendActions({
       <Box sx={{ mr: 'auto' }}>{status}</Box>
       {cancel}
       {save}
+      {saveAndClose}
       {pdf}
       {send}
     </Paper>

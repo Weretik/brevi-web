@@ -15,6 +15,7 @@ import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { QuoteIntroductionActions } from './quote-introduction-actions';
 import { QuoteDeleteDialog } from '../../components/editor/quote-delete-dialog';
 import { QuoteSaveFirstDialog } from '../../components/editor/quote-save-first-dialog';
+import { QuoteSaveProblemsDialog } from '../../components/editor/quote-save-problems-dialog';
 import { QuoteIntroModelPickerDrawer } from '../../components/introduction/quote-intro-model-picker-drawer';
 import { QuoteIntroTemplateSaveDrawer } from '../../components/introduction/quote-intro-template-save-drawer';
 import { QuoteIntroTemplatesDrawer } from '../../components/introduction/quote-intro-templates-drawer';
@@ -38,6 +39,17 @@ type Panel =
   | { kind: 'save-template' }
   | { kind: 'history' }
   | { kind: 'send' };
+
+const recipientAnchor = 'quote-intro-recipient';
+const pagesAnchor = 'quote-intro-pages';
+
+/** Scrolls to the step of a save problem: the recipient fields or the pages with models. */
+const scrollToProblem = (target: string) =>
+  document
+    .getElementById(
+      target.startsWith('slot:') || target === 'pages' ? pagesAnchor : recipientAnchor,
+    )
+    ?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
 
 const sentLabel = (at: string | null) =>
   at ? ` · надіслано ${new Date(at).toLocaleDateString('uk-UA')}` : '';
@@ -164,21 +176,31 @@ export default function QuoteIntroductionPage({ actor }: { actor: QuoteActor }) 
       )}
       <Stack sx={{ gap: 2 }}>
         <QuoteIntroLayoutStep layout={draft.layout} onChange={editor.setLayout} />
-        <QuoteIntroRecipientStep draft={draft} errors={editor.errors} onChange={editor.change} />
+        <Box id={recipientAnchor} sx={{ scrollMarginTop: 96 }}>
+          <QuoteIntroRecipientStep draft={draft} errors={editor.errors} onChange={editor.change} />
+        </Box>
         <QuoteIntroLetterStep
           letters={setup.letters}
           letterName={draft.letterName}
-          onChange={(letterName) => editor.change({ letterName })}
+          letterSubject={draft.letterSubject}
+          letterBody={draft.letterBody}
+          onChange={(letterName) => {
+            if (letterName !== draft.letterName)
+              editor.change({ letterName, letterSubject: null, letterBody: null });
+          }}
+          onEditLetter={editor.change}
         />
-        <QuoteIntroPagesStep
-          pages={draft.pages}
-          products={editor.products}
-          errors={editor.errors}
-          mainProblems={mainProblems}
-          onPick={(season, slot) => setPanel({ kind: 'pick', season, slot })}
-          onFabric={editor.chooseFabric}
-          onClear={editor.clearSlot}
-        />
+        <Box id={pagesAnchor} sx={{ scrollMarginTop: 96 }}>
+          <QuoteIntroPagesStep
+            pages={draft.pages}
+            products={editor.products}
+            errors={editor.errors}
+            mainProblems={mainProblems}
+            onPick={(season, slot) => setPanel({ kind: 'pick', season, slot })}
+            onFabric={editor.chooseFabric}
+            onClear={editor.clearSlot}
+          />
+        </Box>
       </Stack>
 
       <QuoteSendActions
@@ -187,6 +209,11 @@ export default function QuoteIntroductionPage({ actor }: { actor: QuoteActor }) 
         saving={editor.saving}
         generating={preview.preparing}
         onSave={() =>
+          void editor.save().then((saved) => {
+            if (saved) setNotice({ severity: 'success', text: 'КП збережено.' });
+          })
+        }
+        onSaveAndClose={() =>
           void editor.save().then((saved) => {
             if (saved) navigate('/crm/quotes', { state: { notice: 'КП збережено' } });
           })
@@ -204,6 +231,13 @@ export default function QuoteIntroductionPage({ actor }: { actor: QuoteActor }) 
           saving={editor.saving}
           onCancel={saveFirst.cancel}
           onSave={() => void saveFirst.confirm()}
+        />
+      )}
+      {editor.saveProblems.length > 0 && (
+        <QuoteSaveProblemsDialog
+          problems={editor.saveProblems}
+          onGo={scrollToProblem}
+          onClose={editor.closeSaveProblems}
         />
       )}
 

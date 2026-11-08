@@ -15,27 +15,19 @@ interface Props {
   onAdded: (quote: { id: number; number: string }) => void;
 }
 
-/** The standard price unless the person picks another. */
-const defaultLevel = (summary: EmbroiderySavedSummary) =>
-  summary.prices[1]?.name ?? summary.prices[0]?.name ?? '';
-
-/** «Додати в КП»: one row with the chosen saved price in all three columns of the КП. */
+/** «Додати в КП»: one row with the saved price category in all three columns of the КП. */
 export function EmbroideryAddToQuoteDrawer({ summary, onClose, onAdded }: Props) {
-  const [values, setValues] = useState<EmbroideryAddToQuoteValues>({
-    level: defaultLevel(summary),
-    quote: null,
-  });
+  const [values, setValues] = useState<EmbroideryAddToQuoteValues>({ quote: null });
   const [tried, setTried] = useState(false);
   const quotes = useEmbroideryQuotes();
   const [add, state] = useAddQuoteEmbroideryMutation();
 
   const submit = async () => {
     setTried(true);
-    if (!values.quote || !values.level) return;
+    if (!values.quote || !summary.price) return;
     const result = await add({
       id: values.quote.id,
       calculationId: summary.id,
-      level: values.level,
     });
     if ('data' in result && result.data)
       onAdded({ id: result.data.id, number: result.data.number });
@@ -65,7 +57,7 @@ export function EmbroideryAddToQuoteDrawer({ summary, onClose, onAdded }: Props)
         {tried && !values.quote && <Alert severity="warning">Оберіть КП.</Alert>}
         <EmbroideryAddToQuoteForm
           values={values}
-          prices={summary.prices}
+          price={summary.price}
           quotes={quotes.options}
           loadingQuotes={quotes.loading}
           disabled={state.isLoading}

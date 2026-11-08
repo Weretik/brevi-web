@@ -11,6 +11,7 @@ import {
 
 import type {
   TaskAssignee,
+  TaskBoardPeriod,
   TaskDetail,
   TaskFormValues,
   TaskListQuery,
@@ -42,10 +43,13 @@ export const tasksApi = tasksBaseApi.injectEndpoints({
       transformErrorResponse: toTaskApiError,
       providesTags: list,
     }),
-    getTaskBoard: build.query<readonly TaskSummary[], { assigneeUserId: number | null }>({
-      query: ({ assigneeUserId }) => ({
+    getTaskBoard: build.query<
+      readonly TaskSummary[],
+      { assigneeUserId: number | null; period: TaskBoardPeriod }
+    >({
+      query: ({ assigneeUserId, period }) => ({
         url: '/api/crm/tasks/board',
-        params: { assigneeUserId: assigneeUserId ?? undefined },
+        params: { assigneeUserId: assigneeUserId ?? undefined, period },
       }),
       transformResponse: mapTaskBoard,
       transformErrorResponse: toTaskApiError,

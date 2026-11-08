@@ -1,5 +1,6 @@
 import { ReferenceEditorDrawer } from '@admin/references/ui';
 import { TaskDeleteDialog, TaskDetails, TaskFormFields } from '@admin/tasks/ui';
+import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import { Alert, Box, Button, CircularProgress } from '@mui/material';
 
@@ -43,6 +44,20 @@ export function TaskDrawer({ editor, viewer }: Props) {
         saving={editor.saving}
         submitLabel={editor.mode.kind === 'create' ? 'Поставити завдання' : 'Зберегти'}
         editLabel={viewer.isAdmin && task ? 'Редагувати' : null}
+        readActions={
+          task &&
+          task.status !== 'Done' && (
+            <Button
+              variant="contained"
+              color="success"
+              startIcon={<CheckCircleOutlinedIcon />}
+              disabled={editor.busy}
+              onClick={() => void editor.complete()}
+            >
+              Виконано
+            </Button>
+          )
+        }
         onClose={editor.close}
         onEdit={editor.edit}
         onSubmit={editor.submit}

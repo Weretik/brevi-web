@@ -13,6 +13,12 @@ export {
 export type * from './entities/quote-custom-sewing';
 export type * from './models/quote-custom-sewing-draft';
 export { quoteCustomLineKindLabels } from './models/quote-custom-sewing-draft';
+export { quoteModelChanges } from './mappers/quote-model-changes';
+export type {
+  QuoteModelChange,
+  QuoteModelChangeGroup,
+  QuoteModelChangeKind,
+} from './mappers/quote-model-changes';
 export {
   addCustomFabric,
   addCustomLine,
@@ -148,3 +154,5 @@ export {
   quoteTierVisibility,
 } from './validators/quote-draft-problems';
 export type { QuoteDraftProblem, QuoteTierVisibility } from './validators/quote-draft-problems';
+export { quoteIntroSaveProblems, quoteSaveProblems } from './validators/quote-save-problems';
+export type { QuoteSaveProblem } from './validators/quote-save-problems';

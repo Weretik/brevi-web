@@ -30,6 +30,8 @@ const draft: QuoteIntroDraft = {
   managerNote: '',
   layout: 'Summer',
   letterName: 'Після розмови',
+  letterSubject: null,
+  letterBody: ' Свій текст ',
   pages: [{ season: 'Summer', slots: [slot(1, 10), slot(2), slot(3), slot(4)] }],
 };
 
@@ -38,6 +40,7 @@ describe('introduction input', () => {
     const input = toSaveQuoteIntroductionInput(draft);
     expect(input.internalName).toBe('ТОВ «Агро»');
     expect(input.recipientEmail).toBeNull();
+    expect([input.letterSubject, input.letterBody]).toEqual([null, 'Свій текст']);
     expect(input.pages[0].models[0]).toEqual({ itemId: 10, productId: 1, articleId: 100 });
     expect(JSON.stringify(input)).not.toContain('900');
   });

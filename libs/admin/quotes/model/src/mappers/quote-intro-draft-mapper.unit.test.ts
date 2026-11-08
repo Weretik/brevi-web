@@ -39,7 +39,7 @@ const product = (id: number, season: string, large = 1000 + id): QuoteCatalogPro
 const setup: QuoteIntroductionSetup = {
   summer: { code: 'MOD-1', product: product(1, 'Літо'), problem: null },
   winter: { code: 'MOD-5', product: product(5, 'Зима'), problem: null },
-  letters: [{ name: 'Після розмови', subject: 'Добірка спецодягу' }],
+  letters: [{ name: 'Після розмови', subject: 'Добірка спецодягу', body: 'Дякуємо.' }],
 };
 
 describe('introduction draft', () => {
@@ -135,7 +135,13 @@ describe('introduction draft', () => {
       recipientName: null,
       companyName: null,
       managerNote: null,
-      introduction: { layout: 'Summer', recipientEmail: 'a@b.ua', letterName: null },
+      introduction: {
+        layout: 'Summer',
+        recipientEmail: 'a@b.ua',
+        letterName: null,
+        letterSubject: null,
+        letterBody: 'Свій текст',
+      },
       items: [1, 2, 3, 4].map((id) => ({
         id: id * 10,
         productId: id,
@@ -153,6 +159,7 @@ describe('introduction draft', () => {
     const draft = introToDraft(quote);
     const slot = draft.pages[0].slots[1];
     expect(draft.recipientEmail).toBe('a@b.ua');
+    expect([draft.letterSubject, draft.letterBody]).toEqual([null, 'Свій текст']);
     expect(introSlotPrice(slot, product(2, 'Літо'))).toBe(500);
     expect(introSlotPrice({ ...slot, articleId: null }, product(2, 'Літо'))).toBeNull();
     const changed = chooseIntroModel(slot, product(3, 'Літо'), product(3, 'Літо').variants[0]);

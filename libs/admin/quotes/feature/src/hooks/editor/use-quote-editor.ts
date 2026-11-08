@@ -3,13 +3,18 @@ import {
   useGetQuoteQuery,
   useSaveQuoteMutation,
 } from '@admin/quotes/data-access';
-import { emptyQuoteDraft, quoteDraftErrors, quoteToDraft } from '@admin/quotes/model';
+import {
+  emptyQuoteDraft,
+  quoteDraftErrors,
+  quoteSaveProblems,
+  quoteToDraft,
+} from '@admin/quotes/model';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useQuoteDraft } from './use-quote-draft';
 
-import type { Quote, QuoteStartPrefill } from '@admin/quotes/model';
+import type { Quote, QuoteSaveProblem, QuoteStartPrefill } from '@admin/quotes/model';
 
 const messageOf = (error: unknown, fallback: string) =>
   (error as { message?: string } | undefined)?.message ?? fallback;
@@ -27,6 +32,8 @@ export function useQuoteEditor(id: number | null, prefill: QuoteStartPrefill | n
   const [showErrors, setShowErrors] = useState(false);
   const [saveError, setSaveError] = useState<{ message: string; stale: boolean } | null>(null);
   const [savedAt, setSavedAt] = useState<number | null>(null);
+  /** Why the last save failed, for «КП не збережено» (round 2, item 13); empty after closing it. */
+  const [saveProblems, setSaveProblems] = useState<readonly QuoteSaveProblem[]>([]);
   const draft = useQuoteDraft({ ...emptyQuoteDraft(), ...(id === null ? prefill : null) });
   const { reset } = draft;
 
@@ -43,7 +50,10 @@ export function useQuoteEditor(id: number | null, prefill: QuoteStartPrefill | n
   const save = async (): Promise<Quote | null> => {
     setShowErrors(true);
     setSaveError(null);
-    if (hasErrors) return null;
+    if (hasErrors) {
+      setSaveProblems(quoteSaveProblems(draft.draft, errors));
+      return null;
+    }
     try {
       const saved =
         quote === null
@@ -57,10 +67,10 @@ export function useQuoteEditor(id: number | null, prefill: QuoteStartPrefill | n
       return saved;
     } catch (error) {
       const status = (error as { status?: number }).status;
-      setSaveError({
-        message: messageOf(error, 'Не вдалося зберегти КП.'),
-        stale: status === 409 && quote !== null,
-      });
+      const message = messageOf(error, 'Не вдалося зберегти КП.');
+      // A newer version saved elsewhere keeps the notice with «Оновити»; other refusals list their reason.
+      if (status === 409 && quote !== null) setSaveError({ message, stale: true });
+      else setSaveProblems([{ text: message, target: null }]);
       return null;
     }
   };
@@ -88,5 +98,7 @@ export function useQuoteEditor(id: number | null, prefill: QuoteStartPrefill | n
     saving: creating.isLoading || saving.isLoading,
     saveError,
     savedAt,
+    saveProblems,
+    closeSaveProblems: () => setSaveProblems([]),
   };
 }

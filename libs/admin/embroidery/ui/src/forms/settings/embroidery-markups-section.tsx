@@ -11,7 +11,7 @@ interface Props {
   onChange: (index: number, patch: Partial<EmbroiderySettingsDraft['markups'][number]>) => void;
 }
 
-/** «Націнки»: always three price levels; a Manager sees only their names. */
+/** «Націнки»: always two price categories («Категорія 1», «Категорія 2»); a Manager sees only their names. */
 export function EmbroideryMarkupsSection({ markups, errors, onChange }: Props) {
   return (
     <EmbroideryFormCard title="Націнки" id="embroidery-settings-markups">

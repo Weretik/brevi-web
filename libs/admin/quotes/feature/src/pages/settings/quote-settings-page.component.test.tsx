@@ -60,6 +60,7 @@ const settings: QuoteSettings = {
     assortmentUrl: null,
     productButtonText: null,
     nextStepText: null,
+    pricesNote: null,
     accentColor: null,
     summerMainCode: null,
     winterMainCode: null,
@@ -87,6 +88,7 @@ const api = vi.hoisted(() => ({
   refetch: vi.fn(),
   connect: vi.fn(),
   disconnect: vi.fn(),
+  upload: vi.fn(),
 }));
 
 vi.mock('@admin/quotes/data-access', () => ({
@@ -111,6 +113,12 @@ vi.mock('@admin/quotes/data-access', () => ({
   ],
 }));
 vi.mock('@admin/media/feature', () => ({ MediaPickerDrawer: () => null }));
+vi.mock('@admin/media/data-access', () => ({
+  useUploadMediaFileMutation: () => [
+    (args: unknown) => ({ unwrap: () => api.upload(args) }),
+    { isLoading: false },
+  ],
+}));
 
 const renderPage = () =>
   render(
@@ -126,6 +134,7 @@ beforeEach(() => {
   api.refetch.mockReset();
   api.connect.mockReset();
   api.disconnect.mockReset();
+  api.upload.mockReset();
 });
 afterEach(() => {
   cleanup();
@@ -162,6 +171,27 @@ describe('«Налаштування КП»', () => {
     expect(sent.version).toBe(2);
     expect(sent.staffContacts[0]?.phone).toBe('+380 50 111 22 33');
     expect(sent.letterVariants[0]).toMatchObject({ name: 'Короткий', subject: 'КП Brevi' });
+  });
+
+  it('uploads a season banner from the computer and keeps its link', async () => {
+    api.upload.mockResolvedValue({ publicUrl: 'https://cdn.brevi.com.ua/banners/summer.jpg' });
+    api.save.mockResolvedValue({ ...settings, version: 3 });
+    renderPage();
+    const intro = section('КП для знайомства');
+    expect(intro.getAllByText('1600×640 px, JPG. Без банера PDF бере вбудований.')).toHaveLength(2);
+    const file = new File(['jpg'], 'summer.jpg', { type: 'image/jpeg' });
+    fireEvent.change(intro.getByTestId('Банер — літо: файл'), { target: { files: [file] } });
+
+    await waitFor(() =>
+      expect(intro.getByLabelText('Банер — літо')).toHaveValue(
+        'https://cdn.brevi.com.ua/banners/summer.jpg',
+      ),
+    );
+    expect(api.upload).toHaveBeenCalledWith({ file, folderId: null });
+    fireEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
+    await waitFor(() => expect(api.save).toHaveBeenCalledTimes(1));
+    const sent = api.save.mock.calls[0][0] as QuoteSettingsDraft;
+    expect(sent.introduction.summerBannerUrl).toBe('https://cdn.brevi.com.ua/banners/summer.jpg');
   });
 
   it('shows the rules next to the field and which section has them, and does not save', async () => {

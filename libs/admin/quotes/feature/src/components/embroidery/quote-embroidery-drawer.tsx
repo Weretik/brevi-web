@@ -1,20 +1,8 @@
 import { useGetEmbroideryCalculationsQuery } from '@admin/embroidery/data-access';
-import { embroiderySavedTitle, formatEmbroideryMoney } from '@admin/embroidery/model';
+import { embroiderySavedTitle, formatEmbroideryUnitPrice } from '@admin/embroidery/model';
 import { useAddQuoteEmbroideryMutation } from '@admin/quotes/data-access';
 import { ReferenceEditorDrawer } from '@admin/references/ui';
-import {
-  Alert,
-  Autocomplete,
-  Box,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
-  Radio,
-  RadioGroup,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Alert, Autocomplete, Box, Stack, TextField, Typography } from '@mui/material';
 import { useDeferredValue, useState } from 'react';
 
 import type { EmbroiderySavedSummary } from '@admin/embroidery/model';
@@ -27,48 +15,36 @@ interface Props {
   onAdded: (quote: Quote) => void;
 }
 
-const count = new Intl.NumberFormat('uk-UA');
-
 const label = (x: EmbroiderySavedSummary) => `${x.number} · ${embroiderySavedTitle(x.name)}`;
 
+/** Only what a manager needs: the client and the one saved price, no stitches or hoops. */
 const details = (x: EmbroiderySavedSummary) =>
-  [
-    `${count.format(x.quantity)} шт`,
-    `${count.format(x.stitchesPerUnit)} стібків`,
-    `пʼяльця ${x.hoopLabel}`,
-    x.customerName,
-  ]
-    .filter(Boolean)
-    .join(' · ');
-
-/** The standard price unless the person picks another. */
-const defaultLevel = (x: EmbroiderySavedSummary) => x.prices[1]?.name ?? x.prices[0]?.name ?? '';
+  [x.customerName, x.price && formatEmbroideryUnitPrice(x.price)].filter(Boolean).join(' · ');
 
 /**
- * «+ Вишивка» inside the КП: picks a saved «Ціна вишивки» calculation and its price level and adds it as
+ * «+ Вишивка» inside the КП: picks a saved «Ціна вишивки» calculation and adds it with its one saved price as
  * one row at the end, the same as «Додати в КП» on «Збережені».
  */
 export function QuoteEmbroideryDrawer({ ensureSaved, onClose, onAdded }: Props) {
   const [search, setSearch] = useState('');
   const [calculation, setCalculation] = useState<EmbroiderySavedSummary | null>(null);
-  const [level, setLevel] = useState('');
   const [tried, setTried] = useState(false);
   const [saveFailed, setSaveFailed] = useState(false);
   const deferred = useDeferredValue(search);
   const list = useGetEmbroideryCalculationsQuery({ search: deferred, page: 1, pageSize: 25 });
   const [add, adding] = useAddQuoteEmbroideryMutation();
-  const options = (list.data?.items ?? []).filter((x) => x.prices.length > 0);
+  const options = (list.data?.items ?? []).filter((x) => x.price !== null);
 
   const submit = async () => {
     setTried(true);
     setSaveFailed(false);
-    if (!calculation || !level) return;
+    if (!calculation) return;
     const quote = await ensureSaved();
     if (!quote) {
       setSaveFailed(true);
       return;
     }
-    const result = await add({ id: quote.id, calculationId: calculation.id, level });
+    const result = await add({ id: quote.id, calculationId: calculation.id });
     if ('data' in result && result.data) onAdded(result.data);
   };
 
@@ -111,17 +87,16 @@ export function QuoteEmbroideryDrawer({ ensureSaved, onClose, onAdded }: Props) 
           onInputChange={(_event, text, reason) => {
             if (reason === 'input') setSearch(text);
           }}
-          onChange={(_event, next) => {
-            setCalculation(next);
-            setLevel(next ? defaultLevel(next) : '');
-          }}
+          onChange={(_event, next) => setCalculation(next)}
           renderOption={({ key, ...props }, option) => (
             <li key={key} {...props}>
               <Box>
                 <Typography variant="body2">{label(option)}</Typography>
-                <Typography variant="caption" color="text.secondary">
-                  {details(option)}
-                </Typography>
+                {details(option) && (
+                  <Typography variant="caption" color="text.secondary">
+                    {details(option)}
+                  </Typography>
+                )}
               </Box>
             </li>
           )}
@@ -139,24 +114,13 @@ export function QuoteEmbroideryDrawer({ ensureSaved, onClose, onAdded }: Props) 
             />
           )}
         />
-        {calculation && (
-          <FormControl disabled={adding.isLoading}>
-            <FormLabel id="quote-embroidery-level">Ціна для клієнта</FormLabel>
-            <RadioGroup
-              aria-labelledby="quote-embroidery-level"
-              value={level}
-              onChange={(event) => setLevel(event.target.value)}
-            >
-              {calculation.prices.map((price) => (
-                <FormControlLabel
-                  key={price.name}
-                  value={price.name}
-                  control={<Radio size="small" />}
-                  label={`${price.name} — ${formatEmbroideryMoney(price.unit)} грн за 1 шт`}
-                />
-              ))}
-            </RadioGroup>
-          </FormControl>
+        {calculation?.price && (
+          <Box>
+            <Typography variant="caption" color="text.secondary">
+              Ціна для клієнта
+            </Typography>
+            <Typography variant="body1">{formatEmbroideryUnitPrice(calculation.price)}</Typography>
+          </Box>
         )}
       </Stack>
     </ReferenceEditorDrawer>

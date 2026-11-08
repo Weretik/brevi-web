@@ -33,6 +33,10 @@ export interface QuoteIntroDraft {
   readonly managerNote: string;
   readonly layout: QuoteIntroLayout;
   readonly letterName: string;
+  /** The chosen letter's subject changed for this КП; null keeps the variant's (round 2, item 14). */
+  readonly letterSubject: string | null;
+  /** The chosen letter's text changed for this КП; null keeps the variant's. */
+  readonly letterBody: string | null;
   readonly pages: readonly QuoteIntroPageDraft[];
 }
 

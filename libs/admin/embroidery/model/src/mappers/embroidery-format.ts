@@ -18,7 +18,11 @@ export function formatEmbroideryMinutes(minutes: number): string {
   return rest === 0 ? `${hours} год` : `${hours} год ${rest} хв`;
 }
 
-/** What «Копіювати ціну» puts on the clipboard for one price level. */
+/** «80,00 грн за 1 шт» for a saved category. */
+export const formatEmbroideryUnitPrice = (price: { name: string; unit: number }): string =>
+  `${price.name} — ${formatEmbroideryMoney(price.unit)} грн за 1 шт`;
+
+/** What «Копіювати ціни» puts on the clipboard for each price category. */
 export function embroideryPriceText(
   price: { name: string; unit: number; total: number },
   quantity: number,

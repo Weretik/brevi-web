@@ -2632,7 +2632,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** @description «Додати в КП» from «Ціна вишивки» (EMB-001 R-12): appends a saved embroidery calculation as one `Embroidery` item at the end. Its one row is titled with the chosen level, and that level's saved unit price stands, shown, in all three tiers; it is never repriced. No version is needed: the call only adds, and raises the version. A Manager adds only to own КП (404 otherwise); an introduction is 409; an unknown calculation or level is 400. */
+    /** @description «Додати в КП» from «Ціна вишивки» (EMB-001 R-12): appends a saved embroidery calculation as one `Embroidery` item at the end. Its one row is titled with the saved price category, and that category's unit price stands, shown, in all three tiers; it is never repriced. No version is needed: the call only adds, and raises the version. A Manager adds only to own КП (404 otherwise); an introduction is 409; an unknown calculation or one without a price is 400. */
     post: operations['addCrmQuoteEmbroidery'];
     delete?: never;
     options?: never;
@@ -2946,7 +2946,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** @description Hoops, extra costs and the three price names for the form. No rates are returned. */
+    /** @description Hoops, extra costs and the two price category names for the form. No rates are returned. */
     get: operations['getCrmEmbroideryForm'];
     put?: never;
     post?: never;
@@ -3090,7 +3090,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** @description «Мої завдання» kanban: every open task and those done in the last 7 days (at most 500 cards). Open cards come first (urgent, then by due time), done ones newest first; the Admin groups them by `lane`. */
+    /** @description «Мої завдання» kanban: every open task and those done in `period` (at most 500 cards). Open cards come first, then done ones; each group is newest added first; the Admin groups them by `lane`. */
     get: operations['getCrmTaskBoard'];
     put?: never;
     post?: never;
@@ -8192,6 +8192,10 @@ export interface components {
       layout: components['schemas']['CrmQuoteIntroLayout'];
       recipientEmail?: string | null;
       letterName?: string | null;
+      /** @description The letter subject changed for this КП; null keeps the variant's. */
+      letterSubject?: string | null;
+      /** @description The letter text changed for this КП; null keeps the variant's. */
+      letterBody?: string | null;
     };
     CrmQuote: {
       /** Format: int64 */
@@ -8501,12 +8505,20 @@ export interface components {
     /** @description «КП для знайомства — рекламний каталог». */
     CrmQuoteIntroductionTexts: {
       logoText?: string | null;
+      /** @description A word in *asterisks* is printed in the accent colour. */
       summerTitle?: string | null;
+      /** @description A word in *asterisks* is printed in the accent colour. */
       winterTitle?: string | null;
       subtitle?: string | null;
-      /** Format: uri */
+      /**
+       * Format: uri
+       * @description 1600×640 JPG; null prints the built-in summer banner.
+       */
       summerBannerUrl?: string | null;
-      /** Format: uri */
+      /**
+       * Format: uri
+       * @description 1600×640 JPG; null prints the built-in winter banner.
+       */
       winterBannerUrl?: string | null;
       modelsTitle?: string | null;
       assortmentLinkText?: string | null;
@@ -8514,6 +8526,8 @@ export interface components {
       assortmentUrl?: string | null;
       productButtonText?: string | null;
       nextStepText?: string | null;
+      /** @description The line under the models; null hides it. */
+      pricesNote?: string | null;
       accentColor?: string | null;
       /** @description Main summer model code; null means MOD-166 «Імпульс». */
       summerMainCode?: string | null;
@@ -8633,6 +8647,10 @@ export interface components {
       managerNote?: string | null;
       layout: components['schemas']['CrmQuoteIntroLayout'];
       letterName?: string | null;
+      /** @description The variant's subject changed for this КП only; null keeps the variant's. */
+      letterSubject?: string | null;
+      /** @description The variant's text changed for this КП only; null keeps the variant's. */
+      letterBody?: string | null;
       /** @description One page per season of the layout, summer first; a model only once. */
       pages: components['schemas']['CrmQuoteIntroPageInput'][];
     };
@@ -8689,6 +8707,8 @@ export interface components {
     CrmQuoteIntroLetter: {
       name: string;
       subject: string;
+      /** @description As written in the settings; {marks} are filled when sending. */
+      body: string;
     };
     CrmQuoteIntroductionSetup: {
       summer: components['schemas']['CrmQuoteIntroMainModel'];
@@ -8933,6 +8953,7 @@ export interface components {
     CrmSaveEmbroiderySettingsInput: {
       version: number;
       rates: components['schemas']['CrmEmbroideryRates'];
+      /** @description Exactly two price categories when saving the settings; a row of the old archive has three. */
       markups: components['schemas']['CrmEmbroideryMarkup'][];
       stabilizer: components['schemas']['CrmEmbroideryMaterial'];
       fabric: components['schemas']['CrmEmbroideryMaterial'];
@@ -8970,7 +8991,8 @@ export interface components {
       hoopLabel: string;
       /** @description Some ticked costs had no rate; the prices were «Орієнтовна». */
       incomplete: boolean;
-      prices: components['schemas']['CrmEmbroiderySavedPrice'][];
+      /** @description The one saved price category. A calculation saved before the choice keeps «Стандарт», named «Категорія 1». Null only for a calculation without prices. */
+      price: components['schemas']['CrmEmbroiderySavedPrice'] | null;
       /** Format: date-time */
       createdAt: string;
       createdByName: string;
@@ -8992,10 +9014,13 @@ export interface components {
        */
       customerPublicId?: string | null;
       calculation: components['schemas']['CrmCalculateEmbroideryInput'];
+      /** @description The one price category kept, a price name of the result («Категорія 1» or «Категорія 2»); another name is 400. */
+      category: string;
     };
     CrmEmbroiderySavedCalculation: {
       summary: components['schemas']['CrmEmbroiderySavedSummary'];
       input: components['schemas']['CrmCalculateEmbroideryInput'];
+      /** @description The saved result with only the saved price category in `prices`. */
       result: components['schemas']['CrmEmbroideryCalculation'];
       /** @description The rates frozen at saving; null for a Manager. */
       rates: null | {
@@ -9088,6 +9113,11 @@ export interface components {
       /** Format: date-time */
       updatedAt: string;
       version: number;
+      /**
+       * Format: date-time
+       * @description When the task was added; the board sorts by it.
+       */
+      createdAt: string;
     };
     CrmTaskPage: {
       items: components['schemas']['CrmTaskSummary'][];
@@ -20377,8 +20407,6 @@ export interface operations {
         'application/json': {
           /** Format: int64 */
           calculationId: number;
-          /** @description «Опт» */
-          level: string;
         };
       };
     };
@@ -21645,6 +21673,8 @@ export interface operations {
       query?: {
         /** @description Admin only; ignored for a Manager. */
         assigneeUserId?: components['parameters']['AssigneeUserId'];
+        /** @description Which done tasks are shown, by the time they were done: `Week` («Цей тиждень», since Monday in Kyiv, default), `LastWeek` (the week before), `Month` (30 days), `Quarter` (90 days), `Year` (365 days) or `All`. Open tasks are always shown. */
+        period?: 'Week' | 'LastWeek' | 'Month' | 'Quarter' | 'Year' | 'All';
       };
       header?: never;
       path?: never;

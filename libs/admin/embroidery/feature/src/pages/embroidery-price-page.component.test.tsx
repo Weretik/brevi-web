@@ -29,7 +29,7 @@ const setup: EmbroideryFormSetup = {
       hasRate: false,
     },
   ],
-  markupNames: ['Опт', 'Стандарт', 'Терміново'],
+  markupNames: ['Категорія 1', 'Категорія 2'],
   settingsUpdatedAt: null,
 };
 
@@ -41,9 +41,8 @@ const calculation: EmbroideryCalculation = {
   lastHoopUnits: 1,
   freeInLastHoop: 0,
   prices: [
-    { name: 'Опт', markupPercent: null, unit: 81.54, total: 4077, repeatUnit: 69.64 },
-    { name: 'Стандарт', markupPercent: null, unit: 96.83, total: 4841.5, repeatUnit: 82.7 },
-    { name: 'Терміново', markupPercent: null, unit: 112.12, total: 5606, repeatUnit: 95.75 },
+    { name: 'Категорія 1', markupPercent: null, unit: 96.83, total: 4841.5, repeatUnit: 82.7 },
+    { name: 'Категорія 2', markupPercent: null, unit: 112.12, total: 5606, repeatUnit: 95.75 },
   ],
   cost: null,
   stabilizer: null,
@@ -57,9 +56,8 @@ const settings: EmbroiderySettings = {
   stitchRate: { value: 1, updatedOn: null },
   rates: { threadRate: 0.3, hoopingRate: 10, programHourRate: 300, taxPercent: 24 },
   markups: [
-    { name: 'Опт', percent: 60 },
-    { name: 'Стандарт', percent: 90 },
-    { name: 'Терміново', percent: 120 },
+    { name: 'Категорія 1', percent: 90 },
+    { name: 'Категорія 2', percent: 120 },
   ],
   stabilizer: { pricePerMetre: 20, widthCm: 90 },
   fabric: { pricePerMetre: 80, widthCm: 150 },
@@ -122,7 +120,7 @@ const summary: EmbroiderySavedSummary = {
   stitchesPerUnit: 8000,
   hoopLabel: '18 см',
   incomplete: true,
-  prices: calculation.prices,
+  price: { name: 'Категорія 2', unit: 112.12, total: 5606, repeatUnit: 95.75 },
   createdAt: '2026-11-04T19:52:00Z',
   createdByName: 'Олена',
   mockup: null,
@@ -185,7 +183,8 @@ describe('«Ціна вишивки»', () => {
       expect.objectContaining({ quantity: 50, stitchesPerUnit: 10_000, hoopId: '15' }),
     );
     const prices = screen.getByRole('region', { name: 'Ціна' });
-    expect(within(prices).getByText('81,54')).toBeInTheDocument();
+    expect(within(prices).getByText('96,83')).toBeInTheDocument();
+    expect(within(prices).queryByText(/Опт/)).not.toBeInTheDocument();
     expect(screen.queryByRole('region', { name: 'Собівартість' })).not.toBeInTheDocument();
   });
 
@@ -251,7 +250,7 @@ describe('«Ціна вишивки»', () => {
     expect(screen.getByText(/Виправте:/)).toBeInTheDocument();
   });
 
-  it('saves the priced form with a name', async () => {
+  it('saves the priced form with a name and one chosen category', async () => {
     saveCalculation.mockResolvedValue({ data: { summary } });
     renderPage(false);
     type('Кількість, шт', '50');
@@ -262,6 +261,8 @@ describe('«Ціна вишивки»', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Зберегти розрахунок' }));
     type('Назва', 'Поло');
+    expect(screen.getByRole('radio', { name: /Категорія 1 — 96,83/ })).toBeChecked();
+    fireEvent.click(screen.getByRole('radio', { name: /Категорія 2 — 112,12/ }));
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
     });
@@ -270,6 +271,7 @@ describe('«Ціна вишивки»', () => {
       name: 'Поло',
       customerPublicId: null,
       calculation: expect.objectContaining({ quantity: 50, stitchesPerUnit: 10_000 }),
+      category: 'Категорія 2',
     });
     expect(screen.getByText('Збережено як ВШ-0007.')).toBeInTheDocument();
   });
@@ -320,7 +322,7 @@ describe('«Ціна вишивки»', () => {
     expect(screen.getByLabelText('Шевронів в одних п’яльцях')).toHaveValue('4');
   });
 
-  it('adds a saved calculation to a КП with the chosen price', async () => {
+  it('adds a saved calculation to a КП with its one saved price', async () => {
     addToQuote.mockResolvedValue({ data: { id: 31, number: 'КП-2026-11-0031' } });
     listQuery.mockReturnValue({
       data: { items: [summary], page: 1, pageSize: 25, total: 1 },
@@ -354,8 +356,8 @@ describe('«Ціна вишивки»', () => {
     fireEvent.click(within(screen.getByRole('table')).getByText('Поло'));
     fireEvent.click(screen.getByRole('button', { name: 'Додати в КП' }));
 
-    expect(screen.getByRole('radio', { name: /Стандарт — 96,83/ })).toBeChecked();
-    fireEvent.click(screen.getByRole('radio', { name: /Терміново/ }));
+    expect(screen.queryByRole('radio')).not.toBeInTheDocument();
+    expect(screen.getByText('Категорія 2 — 112,12 грн за 1 шт')).toBeInTheDocument();
     fireEvent.mouseDown(screen.getByRole('combobox', { name: 'КП' }));
     expect(screen.queryByText(/Знайомство/)).not.toBeInTheDocument();
     fireEvent.click(screen.getByText('КП-2026-11-0031 · ТОВ «Агро»'));
@@ -363,7 +365,7 @@ describe('«Ціна вишивки»', () => {
       fireEvent.click(screen.getByRole('button', { name: 'Додати' }));
     });
 
-    expect(addToQuote).toHaveBeenCalledWith({ id: 31, calculationId: 7, level: 'Терміново' });
+    expect(addToQuote).toHaveBeenCalledWith({ id: 31, calculationId: 7 });
     expect(screen.getByText('Вишивку додано в КП-2026-11-0031.')).toBeInTheDocument();
   });
 });

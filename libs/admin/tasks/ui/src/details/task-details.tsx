@@ -57,11 +57,7 @@ export function TaskDetails({ task, busy, onStatus, onStep, assignees, onReassig
             Взяти в роботу
           </Button>
         )}
-        {task.status !== 'Done' ? (
-          <Button size="small" variant="outlined" disabled={busy} onClick={() => onStatus('Done')}>
-            Позначити виконаним
-          </Button>
-        ) : (
+        {task.status === 'Done' && (
           <Button
             size="small"
             variant="outlined"

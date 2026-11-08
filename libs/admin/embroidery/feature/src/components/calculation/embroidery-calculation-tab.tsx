@@ -146,6 +146,7 @@ export function EmbroideryCalculationTab({
       {saving && calculator.priced && (
         <EmbroiderySaveDrawer
           request={calculator.priced}
+          prices={calculation?.prices ?? []}
           onClose={() => setSaving(false)}
           onSaved={(summary) => {
             setSaving(false);
