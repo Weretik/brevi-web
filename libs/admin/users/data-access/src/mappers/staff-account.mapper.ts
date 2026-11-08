@@ -1,12 +1,14 @@
-import { staffRoles } from '@admin/users/model';
-
 import type { components } from '@admin/shared/contracts';
-import type { StaffAccount, StaffRole } from '@admin/users/model';
+import type { StaffAccount, StaffRole, StaffRoleOption } from '@admin/users/model';
 
 type StaffAccountResponse = components['schemas']['StaffAccountResponse'];
 
 export const isNullableString = (value: unknown): value is string | null =>
   value === null || typeof value === 'string';
+
+/** A built-in role or one made on «Права доступу»; the server checks it is known. */
+export const isRoleName = (value: unknown): value is StaffRole =>
+  typeof value === 'string' && value.trim().length > 0;
 
 const isStaffAccountResponse = (value: unknown): value is StaffAccountResponse => {
   if (!value || typeof value !== 'object') return false;
@@ -18,7 +20,7 @@ const isStaffAccountResponse = (value: unknown): value is StaffAccountResponse =
     typeof row.isBlocked === 'boolean' &&
     isNullableString(row.avatarUrl) &&
     isNullableString(row.phoneNumber) &&
-    staffRoles.includes(row.role as StaffRole)
+    isRoleName(row.role)
   );
 };
 
@@ -39,4 +41,20 @@ export const mapStaffAccount = (value: unknown): StaffAccount => {
 export const mapStaffAccounts = (value: unknown): StaffAccount[] => {
   if (!Array.isArray(value)) throw new Error('Некоректний список користувачів.');
   return value.map(mapStaffAccount);
+};
+
+const isRoleOption = (value: unknown): value is StaffRoleOption => {
+  if (!value || typeof value !== 'object') return false;
+  const row = value as Partial<StaffRoleOption>;
+  return isRoleName(row.name) && typeof row.title === 'string' && typeof row.locked === 'boolean';
+};
+
+/** Roles from GET /api/admin/access, in the server order, reduced to what the users page needs. */
+export const mapStaffRoleOptions = (value: unknown): StaffRoleOption[] => {
+  const roles = (value as { roles?: unknown } | null)?.roles;
+  if (!Array.isArray(roles)) throw new Error('Некоректний список ролей.');
+  return roles.map((role) => {
+    if (!isRoleOption(role)) throw new Error('Некоректна роль.');
+    return { name: role.name, title: role.title, locked: role.locked };
+  });
 };

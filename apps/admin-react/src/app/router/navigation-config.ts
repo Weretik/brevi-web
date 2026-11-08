@@ -1,10 +1,18 @@
+import { canAccess } from '@admin/core/auth';
+
 import { legacyGroups } from './legacy-menu';
 
+import type { SessionUser } from '@admin/core/auth';
 import type { AdminNavigationGroup } from '@admin/core/shell';
+
+/** What the menu needs to know about the signed-in person. */
+export type NavigationViewer = Pick<SessionUser, 'roles' | 'access'>;
+
+const nobody: NavigationViewer = { roles: [], access: { allowAll: false, roles: [], grants: {} } };
 
 export function createNavigation(
   registeredPaths: ReadonlySet<string>,
-  roles: readonly string[] = [],
+  viewer: NavigationViewer = nobody,
 ): readonly AdminNavigationGroup[] {
   return legacyGroups
     .map((group) => ({
@@ -14,7 +22,10 @@ export function createNavigation(
       section: group.section,
       items: group.items
         .filter(
-          (item) => !item.requiredRoles || item.requiredRoles.some((role) => roles.includes(role)),
+          (item) =>
+            (!item.requiredRoles ||
+              item.requiredRoles.some((role) => viewer.roles.includes(role))) &&
+            (!item.access || canAccess(viewer, item.access)),
         )
         .map((item) => ({
           id: item.id,

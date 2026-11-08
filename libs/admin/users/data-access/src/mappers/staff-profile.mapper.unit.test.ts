@@ -16,9 +16,12 @@ describe('staff profile mapper', () => {
     expect(mapStaffProfile(profile)).toEqual(profile);
   });
 
-  it('rejects a missing photo field or an unknown role', () => {
+  it('rejects a missing photo field or an empty role', () => {
     expect(() => mapStaffProfile({ ...profile, avatarUrl: undefined })).toThrow();
-    expect(() => mapStaffProfile({ ...profile, role: 'User' })).toThrow();
+    expect(() => mapStaffProfile({ ...profile, role: '' })).toThrow();
+    expect(mapStaffProfile({ ...profile, role: 'custom-0123456789ab' }).role).toBe(
+      'custom-0123456789ab',
+    );
   });
 
   it('sends an empty phone as null', () => {

@@ -1,5 +1,18 @@
-/** Director is the single owner account; the server also gives it Admin. */
-export type StaffRole = 'Director' | 'Admin' | 'Accountant' | 'Manager' | 'WorkshopChief';
+/**
+ * A built-in role (Director, Admin, Accountant, Manager, WorkshopChief) or a role made on
+ * «Права доступу» (`custom-…`). Director is the single owner account; the server also gives it Admin.
+ */
+export type StaffRole = string;
+
+export const directorRole: StaffRole = 'Director';
+
+/** A role the users page may assign, with its title from «Права доступу». */
+export interface StaffRoleOption {
+  name: StaffRole;
+  title: string;
+  /** The director: every right, not editable. */
+  locked: boolean;
+}
 
 export interface StaffAccount {
   id: number;
@@ -27,6 +40,7 @@ export interface CreateStaffAccountInput {
   phoneNumber: string;
 }
 
+/** Built-in roles; used while the server list of roles is not loaded. */
 export const staffRoles: readonly StaffRole[] = [
   'Manager',
   'WorkshopChief',
@@ -35,10 +49,24 @@ export const staffRoles: readonly StaffRole[] = [
   'Director',
 ];
 
-export const staffRoleLabels: Record<StaffRole, string> = {
+/** Titles of the built-in roles; a fallback when the server title is not known. */
+export const staffRoleLabels: Readonly<Partial<Record<StaffRole, string>>> = {
   Director: 'Директор',
   Admin: 'Адміністратор',
   Accountant: 'Бухгалтер',
   Manager: 'Менеджер',
   WorkshopChief: 'Начальник цеху',
 };
+
+/** The built-in roles as options, for when the server list is unavailable. */
+export const builtInStaffRoleOptions: readonly StaffRoleOption[] = staffRoles.map((name) => ({
+  name,
+  title: staffRoleLabels[name] ?? name,
+  locked: name === directorRole,
+}));
+
+/** Server title, then the built-in label, then the role name itself. */
+export const getStaffRoleTitle = (
+  role: StaffRole,
+  options: readonly StaffRoleOption[] = [],
+): string => options.find((option) => option.name === role)?.title || staffRoleLabels[role] || role;

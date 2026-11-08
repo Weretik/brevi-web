@@ -1,6 +1,6 @@
-import { staffRoles } from '../entities/staff-account';
+import { directorRole } from '../entities/staff-account';
 
-import type { StaffAccount, StaffRole } from '../entities/staff-account';
+import type { StaffAccount, StaffRoleOption } from '../entities/staff-account';
 
 /** The signed-in staff member who opens the menu. */
 export interface StaffActor {
@@ -9,7 +9,8 @@ export interface StaffActor {
 }
 
 export interface StaffAccountPermissions {
-  roleChoices: readonly StaffRole[];
+  /** Roles this account may be moved to, in the server order. */
+  roleChoices: readonly StaffRoleOption[];
   canSetPassword: boolean;
   /** Name, email and phone. */
   canEditDetails: boolean;
@@ -18,7 +19,7 @@ export interface StaffAccountPermissions {
 }
 
 export const hasDirector = (accounts: readonly StaffAccount[]): boolean =>
-  accounts.some((account) => account.role === 'Director');
+  accounts.some((account) => account.role === directorRole);
 
 /**
  * Mirrors the server rules: one director; only the director changes the director;
@@ -28,15 +29,16 @@ export const getStaffAccountPermissions = (
   account: StaffAccount,
   actor: StaffActor,
   directorExists: boolean,
+  roleOptions: readonly StaffRoleOption[],
 ): StaffAccountPermissions => {
   const isSelf = account.id === actor.id;
-  const canChange = account.role !== 'Director' || actor.isDirector;
+  const canChange = account.role !== directorRole || actor.isDirector;
   const canChangeRole = canChange && (!isSelf || actor.isDirector);
 
   return {
     roleChoices: canChangeRole
-      ? staffRoles.filter(
-          (role) => role !== account.role && (role !== 'Director' || !directorExists),
+      ? roleOptions.filter(
+          (role) => role.name !== account.role && (role.name !== directorRole || !directorExists),
         )
       : [],
     canSetPassword: canChange,

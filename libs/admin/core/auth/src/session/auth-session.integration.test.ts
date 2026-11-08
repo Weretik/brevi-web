@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { initializeAdminAuth, login, logout } from './auth-session';
 import { getSessionState, setSessionState } from './session-store';
 import { requestCurrentUser, requestLogin, requestLogout } from './session-transport';
+import { noAccess } from './session-user';
 
 import type { SessionUser } from './session-user';
 
@@ -23,6 +24,7 @@ const manager: SessionUser = {
   fullName: 'Олена',
   roles: ['Manager'],
   avatarUrl: null,
+  access: noAccess,
 };
 
 describe('admin cookie session lifecycle', () => {

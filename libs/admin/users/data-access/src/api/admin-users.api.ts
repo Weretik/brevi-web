@@ -1,6 +1,10 @@
 import { adminApi } from '@admin/shared/api-client';
 
-import { mapStaffAccount, mapStaffAccounts } from '../mappers/staff-account.mapper';
+import {
+  mapStaffAccount,
+  mapStaffAccounts,
+  mapStaffRoleOptions,
+} from '../mappers/staff-account.mapper';
 import { toPhoneBody } from '../mappers/staff-profile.mapper';
 
 import type { components } from '@admin/shared/contracts';
@@ -9,12 +13,14 @@ import type {
   StaffAccount,
   StaffDetailsInput,
   StaffRole,
+  StaffRoleOption,
 } from '@admin/users/model';
 
 type CreateStaffAccountBody = components['schemas']['CreateStaffAccountRequest'];
 type UpdateStaffDetailsBody = components['schemas']['UpdateStaffDetailsRequest'];
 
 const root = '/api/admin/users';
+const accessRoot = '/api/admin/access';
 const userUrl = (userId: number, action: string) => `${root}/${userId}/${action}`;
 
 export const adminUsersApi = adminApi.injectEndpoints({
@@ -23,6 +29,12 @@ export const adminUsersApi = adminApi.injectEndpoints({
       query: () => ({ url: root, method: 'GET' }),
       transformResponse: mapStaffAccounts,
       providesTags: ['StaffAccount'],
+    }),
+    /** Assignable roles with their titles; «Права доступу» invalidates 'AccessRights' on change. */
+    getStaffRoleOptions: build.query<StaffRoleOption[], void>({
+      query: () => ({ url: accessRoot, method: 'GET' }),
+      transformResponse: mapStaffRoleOptions,
+      providesTags: ['AccessRights'],
     }),
     createStaffAccount: build.mutation<StaffAccount, CreateStaffAccountInput>({
       query: (input) => ({
@@ -87,6 +99,7 @@ export const {
   useCreateStaffAccountMutation,
   useDeleteStaffAccountMutation,
   useGetStaffAccountsQuery,
+  useGetStaffRoleOptionsQuery,
   useSetStaffBlockedMutation,
   useSetStaffPasswordMutation,
   useUpdateStaffDetailsMutation,
