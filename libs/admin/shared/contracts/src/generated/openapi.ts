@@ -9470,6 +9470,10 @@ export interface components {
       /** Format: date-time */
       at: string;
     };
+    CrmLeadSyncFailure: {
+      /** @description Ukrainian messages for the Admin, also saved as the last sync error. */
+      errors: string[];
+    };
     WorkshopEmployeeResponse: {
       id: number;
       fullName: string;
@@ -22635,12 +22639,23 @@ export interface operations {
         content?: never;
       };
       409: components['responses']['leads.openapi_components-responses-Conflict'];
+      /** @description The sheet has an unexpected shape (no tab with the saved id, too many rows); nothing changed. */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmLeadSyncFailure'];
+        };
+      };
       /** @description Google cannot be read now (access, network); nothing changed. */
       503: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['CrmLeadSyncFailure'];
+        };
       };
     };
   };

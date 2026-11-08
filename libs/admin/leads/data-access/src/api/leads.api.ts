@@ -144,7 +144,8 @@ export const leadsApi = leadsBaseApi.injectEndpoints({
       query: () => ({ url: '/api/crm/lead-stats/sync', method: 'POST' }),
       transformResponse: mapLeadSync,
       transformErrorResponse: toLeadApiError,
-      invalidatesTags: (_result, error) => (error ? [] : [...list, ...references]),
+      // A failed run is saved as the last sync error, so the statistics reload either way.
+      invalidatesTags: (_result, error) => (error ? list : [...list, ...references]),
     }),
   }),
 });
