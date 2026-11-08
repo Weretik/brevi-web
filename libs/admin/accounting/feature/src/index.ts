@@ -1,5 +1,7 @@
 export {
   accountingRoutes,
+  bankStatementPath,
+  bankStatementsPath,
   financeAccountsPath,
   financeCategoriesPath,
   financeCounterpartiesPath,

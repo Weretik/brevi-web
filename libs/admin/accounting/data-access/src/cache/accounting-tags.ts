@@ -9,6 +9,8 @@ export const financeHistoryTag = (id: string) => ({ type: 'FinanceHistory' as co
 export const financeTransactionsTag = { type: 'FinanceTransaction' as const, id: 'LIST' };
 export const financeTransfersTag = { type: 'FinanceTransfer' as const, id: 'LIST' };
 export const financeOverviewTag = { type: 'FinanceOverview' as const, id: 'LIST' };
+export const bankStatementsTag = { type: 'BankStatement' as const, id: 'LIST' };
+export const bankStatementTag = (id: string) => ({ type: 'BankStatement' as const, id });
 
 /** A movement changes balances, the overview and the journals that show names. */
 export const financeMovementTags = [

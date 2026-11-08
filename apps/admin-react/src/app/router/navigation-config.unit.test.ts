@@ -178,6 +178,7 @@ describe('legacy Admin navigation', () => {
       '/accounting/counterparties',
       '/accounting/purchase-invoices',
       '/accounting/review',
+      '/accounting/statements',
       '/accounting/legacy-import',
     ]);
     const accounting = (roles: string[]) =>
@@ -196,6 +197,7 @@ describe('legacy Admin navigation', () => {
         to: '/accounting/purchase-invoices',
       },
       { id: 'finance-review', label: 'Потребують перевірки', to: '/accounting/review' },
+      { id: 'finance-import', label: 'Виписки банку', to: '/accounting/statements' },
       {
         id: 'finance-legacy-import',
         label: 'Перенесення архіву',

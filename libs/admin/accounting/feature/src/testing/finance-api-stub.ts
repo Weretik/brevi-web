@@ -124,6 +124,61 @@ export const financeAttachment = (overrides: Record<string, unknown> = {}) => ({
   ...overrides,
 });
 
+export const bankStatement = (overrides: Record<string, unknown> = {}) => ({
+  id: 's1',
+  accountId: 'a1',
+  accountName: 'Банк',
+  fileName: 'Виписка жовтень.xlsx',
+  status: 'Preview',
+  lineCount: 2,
+  firstDate: '2026-10-01',
+  lastDate: '2026-10-31',
+  transactionCount: 0,
+  transferCount: 0,
+  createdBy: 'director@brevi.com.ua',
+  createdAt: '2026-11-08T08:00:00+00:00',
+  bookedBy: null,
+  bookedAt: null,
+  version: 1,
+  existing: false,
+  ...overrides,
+});
+
+export const bankStatementLine = (overrides: Record<string, unknown> = {}) => ({
+  id: 'l1',
+  rowNumber: 2,
+  date: '2026-10-15',
+  time: '10:15:00',
+  type: 'Expense',
+  amountMinor: 125_040,
+  currency: 'UAH',
+  bankName: 'ТОВ Тканини',
+  edrpou: '12345678',
+  iban: 'UA213223130000026007233566001',
+  purpose: 'Оплата за тканину згідно рах. 15',
+  document: '15',
+  bankId: null,
+  error: '',
+  duplicate: 'None',
+  duplicateNote: '',
+  transferAccountId: null,
+  transferAccountName: null,
+  counterparty: null,
+  categoryId: null,
+  categoryRootId: null,
+  categoryRootName: null,
+  subcategoryName: null,
+  oneoffName: '',
+  description: '',
+  comment: '',
+  excluded: false,
+  state: 'NewCounterparty',
+  willBook: true,
+  transactionId: null,
+  transferId: null,
+  ...overrides,
+});
+
 /** JSON of most writes; a file upload stays as sent (multipart text or FormData). */
 function readBody(body: BodyInit): unknown {
   if (typeof body !== 'string') return body;
@@ -132,6 +187,41 @@ function readBody(body: BodyInit): unknown {
   } catch {
     return body;
   }
+}
+
+/** A statement page from its lines: counts by state and the totals of lines that will be booked. */
+export function statementDetails(lines: unknown[], statement = bankStatement()) {
+  const rows = lines as {
+    state: string;
+    willBook: boolean;
+    type: string;
+    amountMinor: number;
+    transferAccountId: string | null;
+  }[];
+  const states = [...new Set(rows.map((row) => row.state))].map((state) => ({
+    state,
+    count: rows.filter((row) => row.state === state).length,
+  }));
+  const booked = rows.filter((row) => row.willBook);
+  const operations = booked.filter((row) => !row.transferAccountId);
+  const sum = (type: string) =>
+    operations
+      .filter((row) => row.type === type)
+      .reduce((total, row) => total + row.amountMinor, 0);
+  return {
+    statement,
+    states,
+    totals: {
+      operations: operations.length,
+      incomeMinor: sum('Income'),
+      expenseMinor: sum('Expense'),
+      transfers: booked.length - operations.length,
+    },
+    lines,
+    total: lines.length,
+    page: 1,
+    pageSize: 100,
+  };
 }
 
 export interface StubCall {
@@ -156,6 +246,10 @@ export function stubFinanceApi(data: {
   oneoffs?: unknown[];
   choices?: unknown[];
   attachments?: unknown[];
+  statements?: unknown[];
+  /** The statement page: its lines and counts by state; built from `lines` when left out. */
+  statementDetails?: unknown;
+  lines?: unknown[];
   written?: (call: StubCall) => unknown;
 }) {
   const calls: StubCall[] = [];
@@ -196,6 +290,9 @@ export function stubFinanceApi(data: {
       });
     }
     if (path.includes('/attachments')) return json(data.attachments ?? []);
+    if (path.startsWith('/api/accounting/statements/'))
+      return json(data.statementDetails ?? statementDetails(data.lines ?? [bankStatementLine()]));
+    if (path.startsWith('/api/accounting/statements')) return json(data.statements ?? []);
     const page = (items: unknown[], totals: unknown[]) =>
       json({ items, total: items.length, page: 1, pageSize: 50, totals });
     if (path.startsWith('/api/accounting/transactions'))

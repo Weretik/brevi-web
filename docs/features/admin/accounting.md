@@ -1,10 +1,14 @@
 # Admin: Бухгалтерія
 
-**Status:** stage 1 («Рахунки і каси», «Категорії»), stage 2 («Огляд», «Операції», «Перекази», archive «Домашня бухгалтерія», balances) stage 3 («Контрагенти», «Потребують перевірки») stage 4 (files of operations) implemented 2026-11-05 and stage 5 («Перенесення архіву») 2026-11-08; the pages were restyled the same day from the approved [mockup](https://claude.ai/artifact/AotN13KWseQLXkcTX2qoau). Backend decisions and later stages are in the BreviERP specification `docs/sdd/specs/accounting/001-finance`; the consumed contract is [backend/accounting](../../contracts/openapi/backend/accounting/finance.openapi.yaml).
+**Status:** stage 1 («Рахунки і каси», «Категорії»), stage 2 («Огляд», «Операції», «Перекази», archive «Домашня бухгалтерія», balances) stage 3 («Контрагенти», «Потребують перевірки») stage 4 (files of operations) implemented 2026-11-05 stage 5 («Перенесення архіву») 2026-11-08 and stage 6 («Виписки банку») 2026-11-08; the pages were restyled the same day from the approved [mockup](https://claude.ai/artifact/AotN13KWseQLXkcTX2qoau). Backend decisions and later stages are in the BreviERP specification `docs/sdd/specs/accounting/001-finance`; the consumed contract is [backend/accounting](../../contracts/openapi/backend/accounting/finance.openapi.yaml).
 
-The «Бухгалтерія» menu group is shown only to the director: every item has `requiredRoles: ['Director']`, and the routes are wrapped in `RequireRole` with `canUseAccounting`. The backend allows the same role (policy `CanUseAccounting`). Items of later stages («Імпорт виписок», «Звіти», «Журнал змін») are in the menu without a page yet.
+The «Бухгалтерія» menu group is shown only to the director: every item has `requiredRoles: ['Director']`, and the routes are wrapped in `RequireRole` with `canUseAccounting`. The backend allows the same role (policy `CanUseAccounting`). Items of later stages («Звіти», «Журнал змін») are in the menu without a page yet.
 
 `/accounting/legacy-import` «Перенесення архіву»: the one-off move of the old Calculator «Фінанси». «Обрати finance.json» gzips the file in the browser (about 40 MB → 3 MB, so it fits the request limit) and the server only checks it. The report shows the errors that stop the move (the first 100 and «і ще N»), warnings, «Що переноситься» per kind (in the file, to add, moved earlier, left out) with how clients and suppliers were found in Brevi, «Суми у файлі» by area and kind, and «Залишки після перенесення» (on 30.09, on 01.10, now) where only a missing confirmed balance or a difference is marked. «Перенести» appears only without errors and with something to add, asks first, and refreshes every list of «Бухгалтерія»; a second run adds only what is missing.
+
+`/accounting/statements` «Виписки банку»: pick an active bank account or card (one is picked by itself) and «Завантажити виписку» (XLSX, XLS or CSV up to 12 МБ, checked before sending). The server reads the file into a preview and the page opens it; the same file of the same account opens the statement uploaded before with a note. «Історія виписок» lists the last 100 uploads with the account, period, line count and what was booked; only a statement not booked yet is marked «Не проведено».
+
+`/accounting/statements/:id` one statement: «Буде проведено» (operations with income and expense sums, transfers), chips by line state with counts («Помилки», «Дублікати», «Без категорії», «Новий контрагент», «Перекази», «Готові до проведення»), and the lines 100 per page from the server. A line shows who it is with (the picked counterparty, a one-off name, the own account of a transfer, or the bank name with ЄДРПОУ), the purpose or the error, category and signed amount; only problems are marked («Помилка», «Схоже на дублікат», «Уже в обліку», «Без категорії», «Новий контрагент»). «Проводити» switches a line in the table (a probable duplicate starts off; an error or a record already in the books cannot be switched on). The pencil or a click opens the side panel: the bank data read-only with the reason of the problem, then counterparty or «Разовий контрагент», category, description, note and «Проводити»; a transfer has only the note and «Проводити». «Провести виписку» asks first, sends the version the page loaded and refreshes the journals, balances and counterparties; a booked statement is read-only and points to «Потребують перевірки».
 
 `/accounting/accounts` «Рахунки і каси»:
 
@@ -45,8 +49,8 @@ The «Бухгалтерія» menu group is shown only to the director: every i
 ```mermaid
 flowchart LR
   App["admin-react: RequireRole canUseAccounting, legacy menu"] --> Routes["accounting/feature: accountingRoutes"]
-  Routes --> Pages["pages: accounts, categories, overview, transactions, transfers, counterparties, review, legacy import"]
-  Pages --> Drawers["components: account, category, operation, counterparty, review drawers"]
+  Routes --> Pages["pages: accounts, categories, overview, transactions, transfers, counterparties, review, legacy import, statements"]
+  Pages --> Drawers["components: account, category, operation, counterparty, review, statement line drawers"]
   Drawers --> Hooks["hooks: editors with version, journal, choices, counterparty search, review"]
   Pages --> UI["accounting/ui: grids, forms, details, history"]
   UI --> RefUI["references/ui: ReferenceDataGrid, ReferenceEditorDrawer"]
@@ -64,6 +68,8 @@ libs/admin/accounting/
 ├── model/src/entities/attachments/finance-attachment.ts            # file of an operation, types, 10 МБ
 ├── model/src/entities/import/legacy-finance-import.ts             # report of «Перенесення архіву», kind and movement labels
 ├── model/src/validators/attachments/finance-attachment-validation.ts # check of a picked file
+├── model/src/entities/statements/bank-statement.ts                # statement, line, states and labels, file check, period
+├── model/src/forms/statements/bank-line-form.ts                   # line form values ↔ request body
 ├── model/src/entities/counterparties/finance-counterparty.ts      # kinds, tabs, counterparty, choice, row label
 ├── model/src/mappers/money/finance-money.ts                       # «62 546,40» ↔ kopecks, dates
 ├── model/src/forms/{accounts,...,transfers}/                     # form values ↔ request bodies
@@ -83,6 +89,8 @@ libs/admin/accounting/
 ├── data-access/src/mappers/accounting-attachment.mapper.ts       # files of an operation
 ├── data-access/src/api/import/legacy-finance-import-endpoints.ts  # check or move of finance.json (gzip, multipart)
 ├── data-access/src/files/compress-finance-file.ts                # gzip in the browser
+├── data-access/src/api/statements/bank-statement-endpoints.ts     # history, upload (multipart), one statement, line, book
+├── data-access/src/mappers/accounting-statement.mapper.ts         # statements and lines
 ├── data-access/src/mappers/accounting-import.mapper.ts           # import report
 ├── data-access/src/files/finance-attachment-content.ts           # file content with the session (blob)
 ├── data-access/src/errors/accounting-api-error.ts                # keeps backend reasons (409)
@@ -96,8 +104,12 @@ libs/admin/accounting/
 ├── ui/src/components/import/legacy-import-report.tsx             # errors, warnings, counts, totals, balances of the move
 ├── ui/src/components/{history,status,journal,overview}/          # history, problem pill and warning line, filters, segmented buttons, totals line, overview strip, «Куди пішли гроші»
 ├── ui/src/dialogs/finance-{delete,merge}-dialog.tsx               # confirmations, «Обʼєднати»
+├── ui/src/tables/statements/bank-{statements,lines}-grid.tsx      # «Історія виписок», lines with «Проводити»
+├── ui/src/forms/statements/bank-line-form.tsx                     # «Як провести» of a line
+├── ui/src/details/statements/bank-line-details.tsx                # bank data of a line and its problem
 └── feature/src/
-    ├── accounting.routes.tsx                                     # accounts, categories, overview, transactions, transfers, counterparties, review, legacy import
+    ├── accounting.routes.tsx                                     # accounts, categories, overview, transactions, transfers, counterparties, review, legacy import, statements
+    ├── pages/statements/, components/statements/bank-line-drawer.tsx, hooks/statements/ # «Виписки банку», statement, line panel
     ├── pages/{accounts,...,transfers,counterparties,review}/     # pages
     ├── components/{accounts,...,transfers,counterparties,review}/ # side panels; review cards
     ├── components/journal/                                       # area tabs, quick bar (search, periods, type, «Ще фільтри»)
@@ -127,5 +139,6 @@ apps/admin-react/src/app/router/{create-admin-router.tsx,legacy-menu.ts,admin-ro
 - `model/src/mappers/money/finance-money.unit.test.ts`, `model/src/validators/accounts/finance-account-validation.unit.test.ts`, `model/src/queries/categories/finance-category-tree.unit.test.ts`;
 - `data-access/src/mappers/accounting.mapper.unit.test.ts`, `ui/src/components/history/finance-history-list.component.test.tsx`;
 - `feature/src/pages/import/legacy-finance-import-page.component.test.tsx` — a check first (`dryRun=true`), counts, links, difference and warnings, «Перенести» after a confirmation sends multipart with `dryRun=false`; errors listed with «і ще N» and no move; `data-access/src/mappers/accounting-import.mapper.unit.test.ts`;
+- `feature/src/pages/statements/bank-statements-page.component.test.tsx` — history, account choice without a cash desk, multipart upload opens the statement, a wrong file refused before sending; `bank-statement-page.component.test.tsx` — problems and state counts, «Проводити» in the table, the side panel body, «Провести виписку» with the version after a confirmation, a booked statement read-only; `model/src/forms/statements/bank-line-form.unit.test.ts`, `data-access/src/mappers/accounting-statement.mapper.unit.test.ts`;
 - the feature tests pin `Date` to 2026-11-05 (`feature/src/test-setup.ts`), the day the API stub answers, so they do not depend on the day they run;
 - `apps/admin-react/src/app/router/navigation-config.unit.test.ts` — the group only for the director.
