@@ -193,6 +193,12 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         path: '/accounting/review',
         requiredRoles: accounting,
       },
+      {
+        id: 'finance-legacy-import',
+        label: 'Перенесення архіву',
+        path: '/accounting/legacy-import',
+        requiredRoles: accounting,
+      },
       { id: 'finance-import', label: 'Імпорт виписок', requiredRoles: accounting },
       { id: 'finance-reports', label: 'Звіти', requiredRoles: accounting },
       { id: 'finance-audit', label: 'Журнал змін', requiredRoles: accounting },
