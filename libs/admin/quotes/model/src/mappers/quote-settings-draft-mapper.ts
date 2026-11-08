@@ -17,7 +17,7 @@ export function emptyLetterVariantDraft(): QuoteLetterVariantDraft {
 
 export function quoteSettingsToDraft(settings: QuoteSettings): QuoteSettingsDraft {
   const { advantages, ...introduction } = settings.introduction;
-  const { intros, labels, ...pdfTexts } = settings.pdf;
+  const { intros, labels, showClient, ...pdfTexts } = settings.pdf;
   return {
     version: settings.version,
     company: texts(settings.company),
@@ -26,6 +26,7 @@ export function quoteSettingsToDraft(settings: QuoteSettings): QuoteSettingsDraf
       ...texts(pdfTexts),
       intros: texts(intros),
       labels: texts(labels),
+      showClient,
     },
     introduction: { ...texts(introduction), advantages: advantages.map(texts) },
     letterVariants: settings.letterVariants.map((variant) => ({

@@ -44,7 +44,9 @@ const draft = (): QuoteSettingsDraft => ({
       fabricsTitle: '',
       recommended: '',
       commentTitle: '',
+      clientTitle: '',
     },
+    showClient: true,
   },
   introduction: {
     logoText: '',

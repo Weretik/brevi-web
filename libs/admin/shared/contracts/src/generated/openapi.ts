@@ -8194,6 +8194,10 @@ export interface components {
       recommended?: string | null;
       /** @description Above the client comment. */
       commentTitle?: string | null;
+      /** @description Small heading over the client, «Для». */
+      clientTitle?: string | null;
+      /** @description False leaves the client block («Для», company and recipient) out of the PDF; null means shown. */
+      showClient?: boolean | null;
     };
     CrmQuotePdfTexts: {
       title: string;

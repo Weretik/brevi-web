@@ -9,6 +9,8 @@ import type { QuoteMark } from '@admin/quotes/model';
 
 interface Props {
   label: string;
+  /** The field's name for screen readers and buttons when the visible label is short (a heading names it). */
+  name?: string;
   value: string;
   error?: string | undefined;
   helperText?: string;
@@ -31,6 +33,7 @@ interface Props {
 /** A text field of «Налаштування КП» with mark buttons and a way back to the saved text. */
 export function QuoteSettingsField({
   label,
+  name = label,
   value,
   error,
   helperText,
@@ -77,7 +80,10 @@ export function QuoteSettingsField({
         onFocus={() => path && onFocusField(path)}
         onChange={(event) => onChange(event.target.value)}
         slotProps={{
-          htmlInput: { maxLength: multiline ? quoteSettingsTextMax : quoteSettingsShortMax },
+          htmlInput: {
+            maxLength: multiline ? quoteSettingsTextMax : quoteSettingsShortMax,
+            ...(name !== label && { 'aria-label': name }),
+          },
           inputLabel: placeholder ? { shrink: true } : undefined,
         }}
       />
@@ -88,7 +94,7 @@ export function QuoteSettingsField({
         >
           {marks ? (
             <QuoteMarkChips
-              fieldLabel={label}
+              fieldLabel={name}
               marks={marks === true ? undefined : marks}
               onInsert={insert}
             />
@@ -99,7 +105,7 @@ export function QuoteSettingsField({
             <Button
               size="small"
               onClick={() => onChange(saved)}
-              aria-label={`Повернути як було: ${label}`}
+              aria-label={`Повернути як було: ${name}`}
               sx={{ flexShrink: 0, whiteSpace: 'nowrap' }}
             >
               Повернути як було

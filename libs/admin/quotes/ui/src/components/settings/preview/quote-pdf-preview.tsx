@@ -131,10 +131,22 @@ export function QuotePdfPreview({ draft, sample, focused }: Props) {
       </Box>
 
       <Stack direction="row" sx={{ px: 2.25, pt: 1.5, gap: 1.5 }}>
-        <Box sx={{ flex: '0 0 30%' }}>
-          <Box sx={{ fontSize: 7, color: muted, letterSpacing: '.08em' }}>ДЛЯ</Box>
-          <Box sx={{ fontWeight: 700, fontSize: 11 }}>{sample.client}</Box>
-        </Box>
+        {pdf.showClient && (
+          <Box sx={{ flex: '0 0 30%' }}>
+            <Box
+              sx={{
+                fontSize: 7,
+                color: muted,
+                letterSpacing: '.08em',
+                textTransform: 'uppercase',
+                ...hl('pdf.labels.clientTitle'),
+              }}
+            >
+              {labels.clientTitle.trim() || 'Для'}
+            </Box>
+            <Box sx={{ fontWeight: 700, fontSize: 11 }}>{sample.client}</Box>
+          </Box>
+        )}
         <Box sx={{ flex: 1 }}>
           <Box sx={hl('pdf.intros.')}>
             <Standard text={pdf.intros.oneSewing} marks={sample.marks} />

@@ -26,6 +26,8 @@ export interface QuotePdfTexts {
   intros: QuotePdfIntroTexts;
   /** The short fixed texts of the PDF; the server fills empty ones with the standard text. */
   labels: QuotePdfLabels;
+  /** False leaves the client block («Для», company and recipient) out; the opening text then takes the full width. */
+  showClient: boolean;
 }
 
 /** The 7 opening texts of the old calculator, chosen by what the КП holds (R-35). */
@@ -46,6 +48,8 @@ export interface QuotePdfLabels {
   fabricsTitle: string;
   recommended: string;
   commentTitle: string;
+  /** The small heading over the client, «Для». */
+  clientTitle: string;
 }
 
 export interface QuoteAdvantage {

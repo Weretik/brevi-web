@@ -26,6 +26,7 @@ export interface QuotePdfTextsDraft {
   ctaContactTemplate: string;
   intros: QuotePdfIntroTextsDraft;
   labels: QuotePdfLabelsDraft;
+  showClient: boolean;
 }
 
 export type QuotePdfIntroCase =
@@ -41,6 +42,7 @@ export interface QuotePdfLabelsDraft {
   fabricsTitle: string;
   recommended: string;
   commentTitle: string;
+  clientTitle: string;
 }
 
 /** When the PDF takes each opening text, in the order the settings page shows them. */
