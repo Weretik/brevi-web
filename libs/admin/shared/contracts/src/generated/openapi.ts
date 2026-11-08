@@ -17652,7 +17652,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Admin or Manager role required */
+      /** @description Admin or Manager role required, and only the Director deletes. */
       403: {
         headers: {
           [name: string]: unknown;
