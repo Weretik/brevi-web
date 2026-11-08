@@ -1,3 +1,4 @@
+export * from './components/attachments/finance-attachment-list';
 export * from './components/history/finance-history-list';
 export * from './components/journal/finance-journal-filters';
 export * from './components/journal/finance-segmented-buttons';

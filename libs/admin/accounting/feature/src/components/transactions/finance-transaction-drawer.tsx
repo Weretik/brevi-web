@@ -1,4 +1,6 @@
 import {
+  FinanceAttachmentList,
+  FinanceDeleteDialog,
   FinanceHistoryList,
   FinanceTransactionDetails,
   FinanceTransactionForm,
@@ -6,6 +8,7 @@ import {
 import { ReferenceEditorDrawer, ReferenceFormSection } from '@admin/references/ui';
 import { Alert, Button, Stack } from '@mui/material';
 
+import { useFinanceAttachments } from '../../hooks/attachments/use-finance-attachments';
 import { useFinanceCounterpartySearch } from '../../hooks/counterparties/use-finance-counterparty-search';
 import {
   canEditTransaction,
@@ -60,6 +63,7 @@ export function FinanceTransactionDrawer({
     editor.change('counterparty', choice),
   );
   const transaction = editor.transaction;
+  const attachments = useFinanceAttachments(transaction);
   const readOnly = editor.mode === 'view';
   const editable = transaction ? canEditTransaction(transaction) : true;
   const keepCategory = transaction?.categoryId ?? '';
@@ -89,6 +93,9 @@ export function FinanceTransactionDrawer({
         {readOnly && transaction ? (
           <>
             <FinanceTransactionDetails transaction={transaction} />
+            <ReferenceFormSection title="Файли">
+              <FinanceAttachmentList {...attachments.list} />
+            </ReferenceFormSection>
             <ReferenceFormSection title="Історія змін">
               <FinanceHistoryList {...editor.history} />
             </ReferenceFormSection>
@@ -121,6 +128,18 @@ export function FinanceTransactionDrawer({
           />
         )}
       </Stack>
+      <FinanceDeleteDialog
+        open={Boolean(attachments.pendingDelete)}
+        title="Видалити файл?"
+        text={
+          attachments.pendingDelete
+            ? `«${attachments.pendingDelete.fileName}» зникне з операції і зі сховища. В історії залишиться запис про це.`
+            : ''
+        }
+        deleting={attachments.deleting}
+        onClose={attachments.cancelDelete}
+        onConfirm={attachments.confirmDelete}
+      />
     </ReferenceEditorDrawer>
   );
 }

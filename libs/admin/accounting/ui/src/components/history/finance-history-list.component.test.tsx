@@ -40,6 +40,28 @@ describe('finance history list', () => {
     expect(items[1]).toHaveTextContent('Створено');
   });
 
+  it('names the file an added or deleted file entry is about', () => {
+    render(
+      <FinanceHistoryList
+        loading={false}
+        error={null}
+        entries={[
+          {
+            id: 3,
+            entity: 'Transaction',
+            entityId: 't1',
+            action: 'AttachmentDelete',
+            by: 'director@brevi.com.ua',
+            at: '2026-11-05T09:00:00+00:00',
+            beforeJson: '{"fileName":"Рахунок 12.pdf"}',
+            afterJson: null,
+          },
+        ]}
+      />,
+    );
+    expect(screen.getByText('Видалено файл · Рахунок 12.pdf')).toBeVisible();
+  });
+
   it('says when there are no changes yet', () => {
     render(<FinanceHistoryList loading={false} error={null} entries={[]} />);
     expect(screen.getByText('Змін ще немає.')).toBeVisible();

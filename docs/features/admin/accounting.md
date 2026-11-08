@@ -1,6 +1,6 @@
 # Admin: Бухгалтерія
 
-**Status:** stage 1 («Рахунки і каси», «Категорії»), stage 2 («Огляд», «Операції», «Перекази», archive «Домашня бухгалтерія», balances) and stage 3 («Контрагенти», «Потребують перевірки») implemented 2026-11-05; the pages were restyled the same day from the approved [mockup](https://claude.ai/artifact/AotN13KWseQLXkcTX2qoau). Backend decisions and later stages are in the BreviERP specification `docs/sdd/specs/accounting/001-finance`; the consumed contract is [backend/accounting](../../contracts/openapi/backend/accounting/finance.openapi.yaml).
+**Status:** stage 1 («Рахунки і каси», «Категорії»), stage 2 («Огляд», «Операції», «Перекази», archive «Домашня бухгалтерія», balances) stage 3 («Контрагенти», «Потребують перевірки») and stage 4 (files of operations) implemented 2026-11-05; the pages were restyled the same day from the approved [mockup](https://claude.ai/artifact/AotN13KWseQLXkcTX2qoau). Backend decisions and later stages are in the BreviERP specification `docs/sdd/specs/accounting/001-finance`; the consumed contract is [backend/accounting](../../contracts/openapi/backend/accounting/finance.openapi.yaml).
 
 The «Бухгалтерія» menu group is shown only to the director: every item has `requiredRoles: ['Director']`, and the routes are wrapped in `RequireRole` with `canUseAccounting`. The backend allows the same role (policy `CanUseAccounting`). Items of later stages («Імпорт виписок», «Звіти», «Журнал змін») are in the menu without a page yet.
 
@@ -26,6 +26,7 @@ The «Бухгалтерія» menu group is shown only to the director: every i
 - both share the area tabs (`?tab=archive` for «Домашня бухгалтерія», which opens on its own period ending the day before 01.10), a search field, quick periods and (operations) «Усі / Надходження / Витрати» applied at once, «Ще фільтри» (account, category, amounts, cancelled) applied on «Застосувати», server paging (50) and sorting, and one line of totals of the whole selection;
 - operations: date, «Опис і контрагент» (description, and under it the counterparty with «Клієнт», «Постачальник», «Фінансовий» or «Разовий»; pills «Перевірити контрагента», «Немає в довіднику», «Анульовано»), «Категорія › Підкатегорія» or «Без категорії», account, signed amount; the side panel creates, edits («Зберегти і додати ще» keeps account and date) and cancels with the opened version;
 - the «Контрагент» field searches finance counterparties, clients and suppliers in one list grouped by kind (an unconfirmed one carries «Не підтверджено»); «Додати «X» як фінансового контрагента» creates a confirmed one and picks it; a picked counterparty fills an empty category with its default; the switch «Разовий контрагент» replaces the field with a name for this operation only (the two never go together);
+- «Файли» in the view of an operation: PDF, JPG or PNG up to 10 МБ, several at once (each is checked before sending and the server checks the content), «Відкрити» in a new tab through the session (the files are private, never a public link), «Видалити» after a confirmation; a cancelled operation only shows its files. «Історія змін» names the added or removed file. While the storage is not set up the server answers «Сховище файлів бухгалтерії ще не налаштоване»;
 - transfers: from / to account, amount; a transfer between accounts of different currencies is refused before saving.
 
 `/accounting/counterparties` «Контрагенти»:
@@ -58,6 +59,8 @@ flowchart LR
 libs/admin/accounting/
 ├── model/src/entities/{accounts,categories,history,settings}/   # account, category, log entry, cutover date
 ├── model/src/entities/{movements,transactions,transfers,overview}/ # operations, transfers, totals, overview
+├── model/src/entities/attachments/finance-attachment.ts            # file of an operation, types, 10 МБ
+├── model/src/validators/attachments/finance-attachment-validation.ts # check of a picked file
 ├── model/src/entities/counterparties/finance-counterparty.ts      # kinds, tabs, counterparty, choice, row label
 ├── model/src/mappers/money/finance-money.ts                       # «62 546,40» ↔ kopecks, dates
 ├── model/src/forms/{accounts,...,transfers}/                     # form values ↔ request bodies
@@ -66,13 +69,16 @@ libs/admin/accounting/
 ├── model/src/queries/categories/finance-category-tree.ts         # root + subcategory rows, parents
 ├── model/src/queries/journal/finance-journal-filters.ts          # area tabs, journal filters → query params
 ├── model/src/queries/overview/finance-overview-periods.ts        # quick periods «Листопад», «З 01.10»
-├── model/src/mappers/text/finance-count.ts                       # «3 операції»
+├── model/src/mappers/text/finance-{count,file-size}.ts           # «3 операції», «245 КБ»
 ├── model/src/queries/counterparties/finance-counterparty-filters.ts # `?tab=`, search → query params
 ├── data-access/src/api/{accounts,...,overview}/                  # endpoints; accounting.api.ts joins them
 ├── data-access/src/validators/accounting-response.ts             # runtime response checks
 ├── data-access/src/mappers/accounting.mapper.ts                  # response → model
 ├── data-access/src/mappers/accounting-movement.mapper.ts         # operations (with counterparty), transfers, overview
 ├── data-access/src/mappers/accounting-counterparty.mapper.ts     # counterparty pages and choices
+├── data-access/src/api/attachments/finance-attachment-endpoints.ts # list, upload (multipart), delete
+├── data-access/src/mappers/accounting-attachment.mapper.ts       # files of an operation
+├── data-access/src/files/finance-attachment-content.ts           # file content with the session (blob)
 ├── data-access/src/errors/accounting-api-error.ts                # keeps backend reasons (409)
 ├── ui/src/tables/{accounts,...,overview,counterparties}/         # «Цех» grids, balances, counterparties, parties
 ├── ui/src/forms/{accounts,categories,transactions,transfers}/   # account, balance, category, operation, review, transfer forms
@@ -80,6 +86,7 @@ libs/admin/accounting/
 ├── ui/src/forms/counterparties/                                  # counterparty form, counterparty picker
 ├── ui/src/forms/overview/finance-period-form.tsx                 # «Свій період…»
 ├── ui/src/details/{accounts,...,transfers,counterparties}/       # read-only views in the side panel
+├── ui/src/components/attachments/finance-attachment-list.tsx     # «Файли»: open, add, delete
 ├── ui/src/components/{history,status,journal,overview}/          # history, problem pill and warning line, filters, segmented buttons, totals line, overview strip, «Куди пішли гроші»
 ├── ui/src/dialogs/finance-{delete,merge}-dialog.tsx               # confirmations, «Обʼєднати»
 └── feature/src/
@@ -87,7 +94,7 @@ libs/admin/accounting/
     ├── pages/{accounts,...,transfers,counterparties,review}/     # pages
     ├── components/{accounts,...,transfers,counterparties,review}/ # side panels; review cards
     ├── components/journal/                                       # area tabs, quick bar (search, periods, type, «Ще фільтри»)
-    ├── hooks/                                                    # editors, journal, choices, settings
+    ├── hooks/                                                    # editors, journal, choices, settings, files of an operation
     └── testing/{render.tsx,finance-api-stub.ts}                  # render with the API store, stubbed API
 libs/admin/core/auth/src/session/session-user.ts                  # canUseAccounting
 apps/admin-react/src/app/router/{create-admin-router.tsx,legacy-menu.ts,admin-route-layout.tsx}
@@ -103,7 +110,7 @@ apps/admin-react/src/app/router/{create-admin-router.tsx,legacy-menu.ts,admin-ro
 - `feature/src/pages/accounts/finance-accounts-page.component.test.tsx` also checks that an account with movements offers only the archive;
 - `feature/src/pages/categories/finance-categories-page.component.test.tsx` — root with subcategories, direction and area switch, subcategory from the root panel, delete warning;
 - `feature/src/pages/overview/finance-overview-page.component.test.tsx` — warning line with reasons, period figures and counts, «Куди пішли гроші», problem mark only without the balance on 01.10, quick period and area switch;
-- `feature/src/pages/transactions/finance-transactions-page.component.test.tsx` — signed amounts and totals, expense in kopecks with a subcategory, cancel with the version, archive period, quick type and «Ще фільтри», quick period and typed search;
+- `feature/src/pages/transactions/finance-transactions-page.component.test.tsx` — signed amounts and totals, expense in kopecks with a subcategory, cancel with the version, archive period, quick type and «Ще фільтри», quick period and typed search, files of an operation (list, a wrong file refused before sending, multipart upload, delete after a confirmation);
 - `feature/src/pages/transfers/finance-transfers-page.component.test.tsx` — totals, currency mismatch refused before saving;
 - `feature/src/pages/transactions/finance-transactions-page.component.test.tsx` also: a picked counterparty brings its default category, a typed name becomes a confirmed finance counterparty;
 - `feature/src/pages/counterparties/finance-counterparties-page.component.test.tsx` — «Не підтверджено» only on unconfirmed rows, «Підтвердити» with the version, create with other names, «Зробити постійним», read-only suppliers;
