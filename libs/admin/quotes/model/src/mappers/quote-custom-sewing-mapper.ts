@@ -301,6 +301,7 @@ export function pricedOptionDraft(
     key: row.key ?? nextKey('option'),
     id: row.id ?? null,
     articleId: null,
+    fabricId: named[0]?.fabricId ?? null,
     title: priced?.title ?? named.map((x) => x.name).join(' + '),
     details:
       named.length === 1

@@ -12,6 +12,8 @@ export interface QuoteOptionDraft {
   readonly key: string;
   readonly id: number | null;
   readonly articleId: number | null;
+  /** Reference fabric of the row (the first one of a multi-fabric variant); null for a PPE. */
+  readonly fabricId: number | null;
   readonly title: string;
   readonly details: string | null;
   readonly fabricInfo: string | null;

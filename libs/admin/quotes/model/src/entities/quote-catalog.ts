@@ -10,9 +10,22 @@ export interface QuoteCatalogVariant {
   readonly title: string;
   /** For the manager only: fabric price and supplier. */
   readonly fabricInfo: string | null;
+  /** Reference fabric of the variant, for the manager fabric line (R-31). */
+  readonly fabricId: number | null;
   readonly prices: QuoteTierPrices | null;
   /** Why it cannot be added; null when it can. */
   readonly problem: string | null;
+}
+
+/** The manager line under a КП fabric (R-31): never in the PDF. */
+export interface QuoteFabricFacts {
+  readonly fabricId: number;
+  readonly name: string;
+  readonly composition: string | null;
+  readonly density: string | null;
+  readonly pricePerMeter: number;
+  readonly supplierId: number | null;
+  readonly supplierName: string | null;
 }
 
 export interface QuoteCatalogProduct {

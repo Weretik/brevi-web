@@ -5,14 +5,12 @@ import type { GridPaginationModel } from '@mui/x-data-grid';
 
 /** «КП» list state: search, responsible filter (Director/Admin) and the server page. */
 export function useQuoteList() {
-  const [archived, setArchivedTab] = useState(false);
   const [search, setSearchText] = useState('');
   const [responsibleUserId, setResponsible] = useState<number | null>(null);
   const [pagination, setPagination] = useState<GridPaginationModel>({ page: 0, pageSize: 50 });
   const deferredSearch = useDeferredValue(search);
 
   const query = useListQuotesQuery({
-    archived,
     search: deferredSearch,
     responsibleUserId,
     page: pagination.page + 1,
@@ -20,11 +18,6 @@ export function useQuoteList() {
   });
 
   return {
-    archived,
-    setArchived: (value: boolean) => {
-      setArchivedTab(value);
-      setPagination((current) => ({ ...current, page: 0 }));
-    },
     search,
     setSearch: (value: string) => {
       setSearchText(value);

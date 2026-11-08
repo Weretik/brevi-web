@@ -1,13 +1,10 @@
-import { QuoteArchivedNotice } from '@admin/quotes/ui';
 import { Alert, Button } from '@mui/material';
 
 import type { useQuoteLifecycle } from '../../hooks/lifecycle/use-quote-lifecycle';
 import type { useRouteNotice } from '../../hooks/lifecycle/use-route-notice';
 import type { useGmailReturnNotice } from '../../hooks/sending/use-gmail-return-notice';
-import type { Quote } from '@admin/quotes/model';
 
 interface Props {
-  quote: Quote | null;
   lifecycle: ReturnType<typeof useQuoteLifecycle>;
   routeNotice: ReturnType<typeof useRouteNotice>;
   saveError: { message: string; stale: boolean } | null;
@@ -17,9 +14,8 @@ interface Props {
   onSentNoticeClose: () => void;
 }
 
-/** The notices above the КП editor: archive, errors, Gmail return, sent and copy notices. */
+/** The notices above the КП editor: errors, Gmail return, sent and copy notices. */
 export function QuoteEditorNotices({
-  quote,
   lifecycle,
   routeNotice,
   saveError,
@@ -30,14 +26,6 @@ export function QuoteEditorNotices({
 }: Props) {
   return (
     <>
-      {quote?.archivedAt && (
-        <QuoteArchivedNotice
-          archivedAt={quote.archivedAt}
-          archivedByName={quote.archivedByName}
-          busy={lifecycle.busy}
-          onRestore={() => void lifecycle.setArchived(false)}
-        />
-      )}
       {lifecycle.error && (
         <Alert severity="error" sx={{ mb: 2 }} onClose={lifecycle.clearError}>
           {lifecycle.error}

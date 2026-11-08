@@ -2159,7 +2159,7 @@ export interface paths {
     /** @description Saves the whole editor content. Saved rows keep their prices; only the shown flags and PPE manual prices change. */
     put: operations['saveCrmQuote'];
     post?: never;
-    /** @description Deletes a draft. */
+    /** @description R-33. «Видалити КП»: a КП of any status with its items and history. Only the Director for now; a КП with a production order that is not deleted stays (409). */
     delete: operations['deleteCrmQuote'];
     options?: never;
     head?: never;
@@ -2270,7 +2270,7 @@ export interface paths {
       };
       cookie?: never;
     };
-    /** @description «Історія змін»: who created, saved, sent, repriced, passed, archived, restored or copied the КП; newest first, at most 500 lines. */
+    /** @description «Історія змін»: who created, saved, sent, repriced, passed, copied or (before R-23) archived the КП; newest first, at most 500 lines. */
     get: operations['getCrmQuoteHistory'];
     put?: never;
     post?: never;
@@ -2280,39 +2280,19 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/crm/quotes/{id}/archive': {
+  '/api/crm/quotes/legacy-archive': {
     parameters: {
       query?: never;
       header?: never;
-      path: {
-        id: components['parameters']['QuoteId'];
-      };
+      path?: never;
       cookie?: never;
     };
-    get?: never;
+    /** @description R-23. «Архів» is removed; its КП are no longer listed. How many are left, shown to the Director before deleting them. */
+    get: operations['getCrmLegacyArchivedQuotes'];
     put?: never;
-    /** @description «В архів»: the КП of any status leaves the working list. Save, send, reprice and passing it to another manager return 409 until it is restored; it can still be opened, printed, copied and deleted (a draft). */
-    post: operations['archiveCrmQuote'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/crm/quotes/{id}/restore': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: components['parameters']['QuoteId'];
-      };
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** @description «Повернути з архіву»; the version grows. */
-    post: operations['restoreCrmQuote'];
-    delete?: never;
+    post?: never;
+    /** @description R-23. Deletes every КП left from «Архів» with its items and history; one with a production order returns to the list instead. */
+    delete: operations['purgeCrmLegacyArchivedQuotes'];
     options?: never;
     head?: never;
     patch?: never;
@@ -2329,7 +2309,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** @description «Копіювати»: a new draft with the next number, the same header, introduction and items with their saved prices. The actor becomes its author and responsible. An archived КП can be copied. */
+    /** @description «Копіювати»: a new draft with the next number, the same header, introduction and items with their saved prices. The actor becomes its author and responsible. */
     post: operations['copyCrmQuote'];
     delete?: never;
     options?: never;
@@ -2348,7 +2328,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** @description «Додати в КП» from «Ціна вишивки» (EMB-001 R-12): appends a saved embroidery calculation as one `Embroidery` item at the end. Its one row is titled with the chosen level, and that level's saved unit price stands, shown, in all three tiers; it is never repriced. No version is needed: the call only adds, and raises the version. A Manager adds only to own КП (404 otherwise); an archived КП or an introduction is 409; an unknown calculation or level is 400. */
+    /** @description «Додати в КП» from «Ціна вишивки» (EMB-001 R-12): appends a saved embroidery calculation as one `Embroidery` item at the end. Its one row is titled with the chosen level, and that level's saved unit price stands, shown, in all three tiers; it is never repriced. No version is needed: the call only adds, and raises the version. A Manager adds only to own КП (404 otherwise); an introduction is 409; an unknown calculation or level is 400. */
     post: operations['addCrmQuoteEmbroidery'];
     delete?: never;
     options?: never;
@@ -2547,6 +2527,40 @@ export interface paths {
     get: operations['getCrmQuoteCatalogProducts'];
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quote-lookups/fabrics': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description R-31. The manager line under each КП fabric: composition, density, price per metre and supplier from the current Reference fabric. Not shown in the PDF; unknown ids are left out. */
+    get: operations['getCrmQuoteFabricFacts'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/quote-lookups/photos': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description R-34. «Змінити фото → Завантажити своє»: stores a JPG, PNG or WebP photo in the media library folder «Фото КП» (its CDN path) and returns its address. The editor puts it into one item; it is not added to the product. */
+    post: operations['uploadCrmQuotePhoto'];
     delete?: never;
     options?: never;
     head?: never;
@@ -5482,6 +5496,11 @@ export interface components {
       comment: string | null;
       /** @description Short description for commercial proposals (КП). */
       proposalDescription: string | null;
+      /**
+       * Format: int32
+       * @description Supplier (Reference) of the fabric.
+       */
+      providerId: number;
     };
     UpdateFabricRequest: {
       name: string;
@@ -7055,8 +7074,8 @@ export interface components {
       updatedAt: string;
       /** Format: date-time */
       lastSentAt?: string | null;
-      /** Format: date-time */
-      archivedAt?: string | null;
+      /** @description For «Видалити» from the list. */
+      version: number;
     };
     CrmQuotePage: {
       items: components['schemas']['CrmQuoteSummary'][];
@@ -7245,12 +7264,6 @@ export interface components {
        * @description Last time Gmail accepted the КП.
        */
       lastSentAt?: string | null;
-      /**
-       * Format: date-time
-       * @description Set while the КП is in «Архів».
-       */
-      archivedAt?: string | null;
-      archivedByName?: string | null;
       version: number;
       items: components['schemas']['CrmQuoteItem'][];
       /** @description Only a «КП для знайомства» has it; its items go page by page, 4 per page. */
@@ -7331,8 +7344,13 @@ export interface components {
       /** @description For example the recipients of a letter, the old and new responsible, or the source КП number. */
       details?: string | null;
     };
-    CrmQuoteVersionRequest: {
-      version: number;
+    CrmLegacyArchivedQuotes: {
+      count: number;
+    };
+    CrmLegacyArchivePurge: {
+      deleted: number;
+      /** @description Kept by a production order; back in the list. */
+      returned: number;
     };
     CrmImportPerson: {
       /** @description Found among Brevi staff by e-mail. */
@@ -7571,6 +7589,8 @@ export interface components {
       prices?: components['schemas']['CrmQuoteTierPrices'] | null;
       /** @description Why it cannot be added; null when it can. */
       problem?: string | null;
+      /** @description Reference fabric of the variant (R-31). */
+      fabricId?: number | null;
     };
     CrmQuoteCatalogProduct: {
       productId: number;
@@ -7656,6 +7676,19 @@ export interface components {
       layout: components['schemas']['CrmQuoteIntroLayout'];
       letterName?: string | null;
       pages: components['schemas']['CrmQuoteIntroPageInput'][];
+    };
+    CrmQuoteFabricFacts: {
+      fabricId: number;
+      name: string;
+      composition: string | null;
+      density: string | null;
+      pricePerMeter: number;
+      supplierId: number | null;
+      supplierName: string | null;
+    };
+    CrmQuotePhoto: {
+      /** Format: uri */
+      url: string;
     };
     CrmQuoteIntroMainModel: {
       code: string;
@@ -17424,9 +17457,7 @@ export interface operations {
         responsibleUserId?: number;
         page?: number;
         pageSize?: number;
-        /** @description True lists only «Архів», false (default) only КП in work. */
-        archived?: boolean;
-        /** @description The client card tab «КП»; only this client's КП, in work and archived together (archived is ignored). */
+        /** @description The client card tab «КП»; only this client's КП. */
         customerId?: number;
       };
       header?: never;
@@ -17621,7 +17652,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Admin or Manager role required. */
+      /** @description Admin or Manager role required, and only the Director deletes. */
       403: {
         headers: {
           [name: string]: unknown;
@@ -17920,31 +17951,24 @@ export interface operations {
       };
     };
   };
-  archiveCrmQuote: {
+  getCrmLegacyArchivedQuotes: {
     parameters: {
       query?: never;
       header?: never;
-      path: {
-        id: components['parameters']['QuoteId'];
-      };
+      path?: never;
       cookie?: never;
     };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CrmQuoteVersionRequest'];
-      };
-    };
+    requestBody?: never;
     responses: {
-      /** @description Archived; the version grows. */
+      /** @description The count. */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['CrmQuote'];
+          'application/json': components['schemas']['CrmLegacyArchivedQuotes'];
         };
       };
-      400: components['responses']['Invalid'];
       /** @description Authentication required. */
       401: {
         headers: {
@@ -17952,48 +17976,33 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Admin or Manager role and a numeric actor claim required. */
+      /** @description Only the Director. */
       403: {
         headers: {
           [name: string]: unknown;
         };
         content?: never;
       };
-      /** @description Not found. */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      409: components['responses']['Conflict'];
     };
   };
-  restoreCrmQuote: {
+  purgeCrmLegacyArchivedQuotes: {
     parameters: {
       query?: never;
       header?: never;
-      path: {
-        id: components['parameters']['QuoteId'];
-      };
+      path?: never;
       cookie?: never;
     };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CrmQuoteVersionRequest'];
-      };
-    };
+    requestBody?: never;
     responses: {
-      /** @description Back in work. */
+      /** @description What was deleted and returned. */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['CrmQuote'];
+          'application/json': components['schemas']['CrmLegacyArchivePurge'];
         };
       };
-      400: components['responses']['Invalid'];
       /** @description Authentication required. */
       401: {
         headers: {
@@ -18001,15 +18010,8 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Admin or Manager role and a numeric actor claim required. */
+      /** @description Only the Director. */
       403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Not found. */
-      404: {
         headers: {
           [name: string]: unknown;
         };
@@ -18610,6 +18612,85 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['CrmQuoteCatalogProduct'][];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getCrmQuoteFabricFacts: {
+    parameters: {
+      query: {
+        ids: number[];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Fabrics. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmQuoteFabricFacts'][];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  uploadCrmQuotePhoto: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'multipart/form-data': {
+          /** Format: binary */
+          file: string;
+        };
+      };
+    };
+    responses: {
+      /** @description Stored. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmQuotePhoto'];
         };
       };
       400: components['responses']['Invalid'];

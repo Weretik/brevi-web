@@ -4,7 +4,9 @@ import {
   priceInputText,
   quoteTierLabels,
 } from '@admin/quotes/model';
-import { Box, InputAdornment, TextField, Tooltip, Typography } from '@mui/material';
+import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import { Box, ButtonBase, InputAdornment, TextField, Typography } from '@mui/material';
 
 import type { QuotePriceDraft, QuoteTier } from '@admin/quotes/model';
 
@@ -16,56 +18,65 @@ interface Props {
   /** Row name for screen readers, «Рукавиці, Ціна»; the tier is added here. */
   label: string;
   onManualChange: (manual: string) => void;
+  /** «Показувати / Сховати» right under the price: whether the client sees it in the КП and PDF. */
+  onShownChange: (shown: boolean) => void;
 }
 
 const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' };
 
-/** One quantity price in the item table; a price hidden from the client is grey. */
-export function QuotePriceCell({ tier, price, editable, label, onManualChange }: Props) {
+/** One quantity price in the item table with its visibility switch; a price hidden from the client is grey. */
+export function QuotePriceCell({
+  tier,
+  price,
+  editable,
+  label,
+  onManualChange,
+  onShownChange,
+}: Props) {
   const name = `${label}, ${quoteTierLabels[tier]}`;
   const typed = price.manual.trim();
   const manual = typed !== '' && parseQuotePrice(typed) !== price.source;
-  const hiddenHint = price.shown ? '' : 'Не показується в КП';
 
-  if (!editable)
-    return (
-      <Tooltip title={hiddenHint}>
+  return (
+    <Box sx={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'flex-end', gap: 0.5 }}>
+      {editable ? (
+        <TextField
+          size="small"
+          value={price.manual}
+          placeholder={price.source === null ? '0,00' : priceInputText(price.source)}
+          onChange={(event) => onManualChange(event.target.value)}
+          slotProps={{
+            htmlInput: { inputMode: 'decimal', 'aria-label': `Ціна: ${name}` },
+            input: {
+              startAdornment: manual ? (
+                <InputAdornment position="start">
+                  <Typography variant="caption" sx={{ color: 'primary.dark', fontWeight: 600 }}>
+                    вручну
+                  </Typography>
+                </InputAdornment>
+              ) : undefined,
+            },
+          }}
+          sx={{
+            width: 150,
+            opacity: price.shown ? 1 : 0.6,
+            '& input': { ...mono, textAlign: 'right' },
+            ...(manual && { '& .MuiOutlinedInput-root': { bgcolor: 'primary.light' } }),
+          }}
+        />
+      ) : (
         <Typography
           component="span"
-          sx={{ ...mono, color: price.shown ? 'text.primary' : 'text.disabled' }}
+          sx={{
+            ...mono,
+            color: price.shown ? 'text.primary' : 'text.disabled',
+            textDecoration: price.shown ? undefined : 'line-through',
+          }}
         >
           {formatQuotePrice(price.source)}
         </Typography>
-      </Tooltip>
-    );
-
-  return (
-    <Box sx={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-      <TextField
-        size="small"
-        value={price.manual}
-        placeholder={price.source === null ? '0,00' : priceInputText(price.source)}
-        onChange={(event) => onManualChange(event.target.value)}
-        slotProps={{
-          htmlInput: { inputMode: 'decimal', 'aria-label': `Ціна: ${name}` },
-          input: {
-            startAdornment: manual ? (
-              <InputAdornment position="start">
-                <Typography variant="caption" sx={{ color: 'primary.dark', fontWeight: 600 }}>
-                  вручну
-                </Typography>
-              </InputAdornment>
-            ) : undefined,
-          },
-        }}
-        sx={{
-          width: 150,
-          opacity: price.shown ? 1 : 0.6,
-          '& input': { ...mono, textAlign: 'right' },
-          ...(manual && { '& .MuiOutlinedInput-root': { bgcolor: 'primary.light' } }),
-        }}
-      />
-      {manual && price.source !== null && (
+      )}
+      {editable && manual && price.source !== null && (
         <Typography
           variant="caption"
           color="text.secondary"
@@ -75,6 +86,32 @@ export function QuotePriceCell({ tier, price, editable, label, onManualChange }:
           {formatQuotePrice(price.source)}
         </Typography>
       )}
+      <ButtonBase
+        role="switch"
+        aria-checked={price.shown}
+        aria-label={`Показувати в КП: ${name}`}
+        onClick={() => onShownChange(!price.shown)}
+        sx={{
+          gap: 0.5,
+          px: 0.75,
+          py: 0.25,
+          borderRadius: 1,
+          typography: 'caption',
+          fontWeight: 600,
+          border: 1,
+          borderColor: price.shown ? 'divider' : 'transparent',
+          color: price.shown ? 'text.secondary' : 'text.primary',
+          bgcolor: price.shown ? 'transparent' : 'action.selected',
+          '&:hover, &.Mui-focusVisible': { borderColor: 'primary.main' },
+        }}
+      >
+        {price.shown ? (
+          <VisibilityOutlinedIcon sx={{ fontSize: 14 }} />
+        ) : (
+          <VisibilityOffOutlinedIcon sx={{ fontSize: 14 }} />
+        )}
+        {price.shown ? 'Показувати' : 'Сховано'}
+      </ButtonBase>
     </Box>
   );
 }

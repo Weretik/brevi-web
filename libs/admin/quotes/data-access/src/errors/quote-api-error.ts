@@ -14,6 +14,11 @@ export const quoteLookupErrors = {
   fallback: 'Не вдалося завантажити список. Спробуйте ще раз.',
 } satisfies AdminApiErrorMessages;
 
+export const quotePhotoErrors = {
+  unauthorized: 'Немає доступу.',
+  fallback: 'Не вдалося завантажити фото. Спробуйте ще раз.',
+} satisfies AdminApiErrorMessages;
+
 /** A 400 shows the server's first message (price and item rules live on the server too). */
 export function toQuoteApiError(response: unknown, messages: AdminApiErrorMessages = quoteErrors) {
   const error = toAdminApiError(response, messages);

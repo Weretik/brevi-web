@@ -47,6 +47,13 @@ export {
   updateQuoteOption,
 } from './mappers/quote-draft-edits';
 export { formatQuotePrice, parseQuotePrice, priceInputText } from './mappers/quote-price-text';
+export {
+  quoteDraftFabricIds,
+  quoteFabricFactsParts,
+  quoteOptionFabrics,
+  quoteSupplierFabrics,
+} from './mappers/quote-fabric-facts';
+export type { QuoteOptionFabricRef, QuoteSupplierFabric } from './mappers/quote-fabric-facts';
 export { quotePreviewWarnings } from './mappers/quote-preview-warnings';
 export type { QuotePreviewWarning } from './mappers/quote-preview-warnings';
 export {

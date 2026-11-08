@@ -1,5 +1,4 @@
-import { useDeleteQuoteMutation } from '@admin/quotes/data-access';
-import { oneOffItemDraft } from '@admin/quotes/model';
+import { oneOffItemDraft, quoteSupplierFabrics } from '@admin/quotes/model';
 import {
   QuoteAddItems,
   QuoteItemCard,
@@ -27,9 +26,13 @@ import { QuoteEditorHeader } from './quote-editor-header';
 import { QuoteEditorNotices } from './quote-editor-notices';
 import { QuoteEditorPanels } from './quote-editor-panels';
 import { QuoteDeleteDialog } from '../../components/editor/quote-delete-dialog';
+import { QuoteSaveFirstDialog } from '../../components/editor/quote-save-first-dialog';
 import { QuotePreview } from '../../components/preview/quote-preview';
 import { useClientSuggestions } from '../../hooks/clients/use-client-suggestions';
 import { useQuoteEditor } from '../../hooks/editor/use-quote-editor';
+import { useQuoteFabricFacts } from '../../hooks/editor/use-quote-fabric-facts';
+import { useQuoteSaveFirst } from '../../hooks/editor/use-quote-save-first';
+import { useQuoteDelete } from '../../hooks/lifecycle/use-quote-delete';
 import { useQuoteLifecycle } from '../../hooks/lifecycle/use-quote-lifecycle';
 import { useRouteNotice } from '../../hooks/lifecycle/use-route-notice';
 import { useQuotePreview } from '../../hooks/preview/use-quote-preview';
@@ -37,7 +40,8 @@ import { useGmailReturnNotice } from '../../hooks/sending/use-gmail-return-notic
 import { useQuoteStartPrefill } from '../../hooks/start/use-quote-start-prefill';
 
 import type { QuoteEditorPanel } from './quote-editor-panels';
-import type { QuoteActor } from '@admin/quotes/model';
+import type { QuoteSupplierCard } from './quote-supplier-card';
+import type { QuoteActor, QuoteFabricFacts } from '@admin/quotes/model';
 
 const addItemsAnchor = 'quote-add-items';
 
@@ -52,7 +56,13 @@ const scrollTo = (target: string) => {
 };
 
 /** A КП «під запит»: who it is for, its items with prices, and a right column with the summary and actions. */
-export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
+export default function QuoteEditorPage({
+  actor,
+  supplierCard,
+}: {
+  actor: QuoteActor;
+  supplierCard?: QuoteSupplierCard;
+}) {
   const params = useParams();
   const id = params['quoteId'] ? Number(params['quoteId']) : null;
   const navigate = useNavigate();
@@ -66,13 +76,23 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
   const [panel, setPanel] = useState<QuoteEditorPanel | null>(() =>
     id === null && search.get('custom') === '1' ? { kind: 'custom' } : null,
   );
-  const [confirmDelete, setConfirmDelete] = useState(false);
-  const [deleteQuote, deleting] = useDeleteQuoteMutation();
   const { quote, draft } = editor;
-  const preview = useQuotePreview({ quote, dirty: editor.dirty, save: editor.save });
+  const fabricFacts = useQuoteFabricFacts(draft);
+  const openSupplierCard = supplierCard?.open;
+  const openSupplier = openSupplierCard
+    ? (facts: QuoteFabricFacts) =>
+        openSupplierCard({
+          id: facts.supplierId,
+          name: facts.supplierName ?? '',
+          fabrics: quoteSupplierFabrics(facts, fabricFacts),
+        })
+    : undefined;
+  const preview = useQuotePreview();
+  const saveFirst = useQuoteSaveFirst({ quote, dirty: editor.dirty, save: editor.save });
+  const removal = useQuoteDelete(() => navigate('/crm/quotes'));
   const gmail = useGmailReturnNotice();
   const [sentNotice, setSentNotice] = useState<string | null>(null);
-  const lifecycle = useQuoteLifecycle(quote, editor.applyServerQuote);
+  const lifecycle = useQuoteLifecycle(quote);
   const routeNotice = useRouteNotice();
 
   if (editor.loading)
@@ -97,13 +117,17 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
     dirty: editor.dirty,
     saving: editor.saving,
     generating: preview.preparing,
-    locked: lifecycle.archived,
-    onSave: () => void editor.save(),
-    onPdf: () => void preview.open(),
+    // «Зберегти» saves and closes the КП; «Скасувати» closes it without saving (crm R-33).
+    onSave: () =>
+      void editor.save().then((saved) => {
+        if (saved) navigate('/crm/quotes', { state: { notice: 'КП збережено' } });
+      }),
+    onCancel: () => navigate('/crm/quotes'),
+    onPdf: () => saveFirst.run((saved) => void preview.open(saved)),
     // The manager sees the PDF first and sends it from the preview (crm R-30).
     onSend: () => {
       setSentNotice(null);
-      void preview.open();
+      saveFirst.run((saved) => void preview.open(saved));
     },
   };
 
@@ -113,18 +137,15 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
         quote={quote}
         name={draft.internalName}
         dirty={editor.dirty}
-        archived={lifecycle.archived}
         busy={lifecycle.busy}
         canAssign={actor.canSeeAll}
         onHistory={() => setPanel({ kind: 'history' })}
         onCopy={() => void lifecycle.copy()}
-        onArchive={(archived) => void lifecycle.setArchived(archived)}
         onAssign={() => setPanel({ kind: 'responsible' })}
         onReprice={() => setPanel({ kind: 'reprice' })}
-        onDelete={() => setConfirmDelete(true)}
+        onDelete={actor.canDelete && quote ? () => removal.ask(quote) : undefined}
       />
       <QuoteEditorNotices
-        quote={quote}
         lifecycle={lifecycle}
         routeNotice={routeNotice}
         saveError={editor.saveError}
@@ -182,6 +203,8 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
               onChangePhoto={() => setPanel({ kind: 'photo', itemKey: item.key })}
               onMove={(offset) => editor.moveItem(item.key, offset)}
               onRemove={() => editor.removeItem(item.key)}
+              fabricFacts={fabricFacts}
+              onOpenSupplier={openSupplier}
             />
           ))}
           <Box id={addItemsAnchor} sx={{ scrollMarginTop: 96 }}>
@@ -210,11 +233,7 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
         </Box>
       </Box>
       {!wide && <QuoteSendActions layout="bar" {...actions} />}
-      <QuotePreview
-        preview={preview}
-        locked={lifecycle.archived}
-        onSend={() => setPanel({ kind: 'send' })}
-      />
+      <QuotePreview preview={preview} onSend={() => setPanel({ kind: 'send' })} />
 
       <QuoteEditorPanels
         panel={panel}
@@ -224,21 +243,15 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
         onHandedOver={() => navigate('/crm/quotes')}
         onSent={(next) => setSentNotice(`КП ${next.number} надіслано.`)}
       />
-      {confirmDelete && quote && (
-        <QuoteDeleteDialog
-          number={quote.number}
-          deleting={deleting.isLoading}
-          onCancel={() => setConfirmDelete(false)}
-          onConfirm={async () => {
-            try {
-              await deleteQuote({ id: quote.id, version: quote.version }).unwrap();
-              navigate('/crm/quotes');
-            } catch {
-              setConfirmDelete(false);
-            }
-          }}
+      {saveFirst.asking && (
+        <QuoteSaveFirstDialog
+          saving={editor.saving}
+          onCancel={saveFirst.cancel}
+          onSave={() => void saveFirst.confirm()}
         />
       )}
+      <QuoteDeleteDialog flow={removal} />
+      {supplierCard?.element}
     </Box>
   );
 }

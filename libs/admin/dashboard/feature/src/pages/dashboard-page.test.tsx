@@ -58,7 +58,7 @@ vi.mock('@admin/quotes/data-access', () => ({
                 itemsCount: 2,
                 updatedAt: '2026-11-04T10:00:00Z',
                 lastSentAt: '2026-11-04T10:00:00Z',
-                archivedAt: null,
+                version: 1,
               },
             ],
             page: 1,

@@ -11,14 +11,13 @@ interface Props {
 }
 
 /**
- * Client card tab «КП»: this client's КП, in work and archived together, newest change first.
+ * Client card tab «КП»: this client's КП, newest change first.
  * A Manager sees only own КП, as in «КП». A row opens the editor.
  */
 export function CustomerQuotes({ customerId }: Props) {
   const navigate = useNavigate();
   const [pagination, setPagination] = useState<GridPaginationModel>({ page: 0, pageSize: 25 });
   const list = useListQuotesQuery({
-    archived: false,
     search: '',
     responsibleUserId: null,
     page: pagination.page + 1,

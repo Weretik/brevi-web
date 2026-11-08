@@ -1,40 +1,34 @@
-import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import AutorenewOutlinedIcon from '@mui/icons-material/AutorenewOutlined';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import ForwardToInboxOutlinedIcon from '@mui/icons-material/ForwardToInboxOutlined';
 import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
-import UnarchiveOutlinedIcon from '@mui/icons-material/UnarchiveOutlined';
 import { Button, Divider, ListItemIcon, ListItemText, Menu, MenuItem } from '@mui/material';
 import { useState } from 'react';
 
 import type { ReactNode } from 'react';
 
 interface Props {
-  archived: boolean;
-  /** Unsaved changes: copy, archive, assign and reprice work with the saved КП only. */
+  /** Unsaved changes: copy, assign and reprice work with the saved КП only. */
   dirty: boolean;
   busy: boolean;
   /** Shown in the menu when the page has no own «Історія» button. */
   onHistory?: () => void;
   onCopy: () => void;
-  onArchive: (archived: boolean) => void;
   /** Director and Admin: «Передати іншому менеджеру». */
   onAssign?: () => void;
   onReprice?: () => void;
-  /** Only a draft can be deleted. */
+  /** «Видалити КП»: only for who may delete (the Director for now). */
   onDelete?: () => void;
 }
 
 /** «Ще» of a saved КП: every rare action in one menu, the destructive ones last. */
 export function QuoteMoreMenu({
-  archived,
   dirty,
   busy,
   onHistory,
   onCopy,
-  onArchive,
   onAssign,
   onReprice,
   onDelete,
@@ -84,7 +78,6 @@ export function QuoteMoreMenu({
           disabled: locked,
         })}
         {onAssign &&
-          !archived &&
           item(
             'Передати іншому менеджеру',
             <ForwardToInboxOutlinedIcon fontSize="small" />,
@@ -95,7 +88,6 @@ export function QuoteMoreMenu({
             },
           )}
         {onReprice &&
-          !archived &&
           item(
             'Перерахувати за новими цінами',
             <AutorenewOutlinedIcon fontSize="small" />,
@@ -105,19 +97,9 @@ export function QuoteMoreMenu({
               disabled: locked,
             },
           )}
-        <Divider />
-        {item(
-          archived ? 'Повернути з архіву' : 'В архів',
-          archived ? (
-            <UnarchiveOutlinedIcon fontSize="small" />
-          ) : (
-            <ArchiveOutlinedIcon fontSize="small" />
-          ),
-          () => onArchive(!archived),
-          { secondary: saveFirst, disabled: locked },
-        )}
+        {onDelete && <Divider />}
         {onDelete &&
-          item('Видалити чернетку', <DeleteOutlineOutlinedIcon fontSize="small" />, onDelete, {
+          item('Видалити КП', <DeleteOutlineOutlinedIcon fontSize="small" />, onDelete, {
             danger: true,
             disabled: busy,
           })}

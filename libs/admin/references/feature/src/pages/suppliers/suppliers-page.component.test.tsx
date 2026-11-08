@@ -577,4 +577,33 @@ describe('suppliers from KeepinCRM', () => {
     await waitFor(() => expect(screen.queryByText(/отримано 43/)).not.toBeInTheDocument());
     expect(screen.getByRole('alert')).toHaveTextContent(/KeepinCRM/);
   });
+
+  it('opens the supplier asked by «Відкрити в контрагентах»', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => [
+          {
+            email: null,
+            purchaseCategories: null,
+            tags: null,
+            isActive: true,
+            keepinCrmId: null,
+            keepinSyncedAt: null,
+            id: 7,
+            name: 'Атлас',
+            link: null,
+            contactPerson: null,
+            phoneNumber: null,
+            notes: null,
+          },
+        ],
+      }),
+    );
+    const opened = vi.fn();
+    render(<SuppliersPage openSupplierId={7} onSupplierOpened={opened} />);
+    expect(await screen.findByRole('dialog', { name: 'Перегляд постачальника' })).toBeVisible();
+    expect(opened).toHaveBeenCalled();
+  });
 });

@@ -27,7 +27,7 @@ vi.mock('@admin/quotes/data-access', () => ({
             itemsCount: 2,
             updatedAt: '2026-11-04T10:00:00Z',
             lastSentAt: '2026-11-04T10:00:00Z',
-            archivedAt: '2026-11-05T10:00:00Z',
+            version: 2,
           },
         ],
         page: 1,
@@ -44,7 +44,7 @@ afterEach(() => {
 });
 
 describe('CustomerQuotes', () => {
-  it("lists the client's КП with archived ones marked and opens the editor", async () => {
+  it("lists the client's КП and opens the editor", async () => {
     const router = createMemoryRouter(
       [{ path: '/crm/clients/:id', element: <CustomerQuotes customerId={40} /> }],
       { initialEntries: ['/crm/clients/40'] },
@@ -53,7 +53,6 @@ describe('CustomerQuotes', () => {
 
     expect(fixture.queries[0]).toEqual(expect.objectContaining({ customerId: 40, page: 1 }));
     expect(await screen.findByText('Школа №5')).toBeVisible();
-    expect(screen.getByText('В архіві')).toBeVisible();
 
     await userEvent.click(screen.getByText('Школа №5'));
     expect(router.state.location.pathname).toBe('/crm/quotes/12');

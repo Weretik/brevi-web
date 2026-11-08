@@ -95,9 +95,6 @@ export interface Quote {
   readonly updatedAt: string;
   /** Last time Gmail accepted the КП; null for a draft. */
   readonly lastSentAt: string | null;
-  /** Set while the КП is in «Архів»: it opens read-only until restored. */
-  readonly archivedAt: string | null;
-  readonly archivedByName: string | null;
   readonly version: number;
   readonly items: readonly QuoteItem[];
   /** Only a «КП для знайомства» has it; its items go page by page, 4 per page. */
@@ -115,7 +112,8 @@ export interface QuoteSummary {
   readonly itemsCount: number;
   readonly updatedAt: string;
   readonly lastSentAt: string | null;
-  readonly archivedAt: string | null;
+  /** For «Видалити» from the list. */
+  readonly version: number;
 }
 
 export interface QuotePage {
@@ -126,13 +124,11 @@ export interface QuotePage {
 }
 
 export interface QuoteListQuery {
-  /** True lists only «Архів», false only КП in work. */
-  readonly archived: boolean;
   readonly search: string;
   readonly responsibleUserId: number | null;
   readonly page: number;
   readonly pageSize: number;
-  /** The client card tab «КП»: only this client's КП, in work and archived together. */
+  /** The client card tab «КП»: only this client's КП. */
   readonly customerId?: number;
 }
 
@@ -161,6 +157,19 @@ export interface QuoteEvent {
 export interface QuoteActor {
   readonly userId: number | null;
   readonly canSeeAll: boolean;
+  /** «КП: видалення»: only the Director for now (crm R-33). */
+  readonly canDelete?: boolean;
+}
+
+/** КП left from the removed «Архів» (crm R-23). */
+export interface QuoteLegacyArchive {
+  readonly count: number;
+}
+
+export interface QuoteLegacyArchivePurge {
+  readonly deleted: number;
+  /** Kept by a production order; back in the list. */
+  readonly returned: number;
 }
 
 export interface QuoteStaff {

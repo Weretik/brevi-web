@@ -39,7 +39,7 @@ describe('Admin navigation session role', () => {
     const view = render(<AdminRouteLayout user={user(['Manager'])} />);
     expect(screen.queryByText('Налаштування КП')).not.toBeInTheDocument();
     expect(screen.queryByText('Користувачі')).not.toBeInTheDocument();
-    expect(screen.getByText('КП')).toBeInTheDocument();
+    expect(screen.getByText('Комерційні пропозиції')).toBeInTheDocument();
 
     view.rerender(<AdminRouteLayout user={user(['Admin'])} />);
     expect(screen.getByText('Налаштування КП')).toBeInTheDocument();
