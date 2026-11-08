@@ -221,6 +221,15 @@ export function statementDetails(lines: unknown[], statement = bankStatement()) 
     total: lines.length,
     page: 1,
     pageSize: 100,
+    rollback:
+      statement.status === 'Booked'
+        ? {
+            transactions: operations.length,
+            transfers: booked.length - operations.length,
+            changed: 0,
+            cancelled: 0,
+          }
+        : null,
   };
 }
 

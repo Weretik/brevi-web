@@ -122,6 +122,17 @@ export interface BankStatementTotals {
   transfers: number;
 }
 
+/**
+ * What «Відкотити виписку» would do to a booked statement: active operations and transfers to cancel, how many of
+ * them were changed by hand after the booking, and how many are cancelled already.
+ */
+export interface BankStatementRollback {
+  transactions: number;
+  transfers: number;
+  changed: number;
+  cancelled: number;
+}
+
 /** One page of a statement's lines, filtered by state, with counts of every state. */
 export interface BankStatementDetails {
   statement: BankStatement;
@@ -131,6 +142,8 @@ export interface BankStatementDetails {
   total: number;
   page: number;
   pageSize: number;
+  /** Only for a booked statement. */
+  rollback: BankStatementRollback | null;
 }
 
 /** Body of «Зберегти» of one line. */
@@ -160,4 +173,21 @@ export function bankStatementFileProblem(file: Pick<File, 'name' | 'size'>): str
   if (file.size > bankStatementFileLimits.maxBytes)
     return 'Файл більший за 12 МБ. Розділіть виписку на частини.';
   return null;
+}
+
+/** The confirmation of «Відкотити виписку»: what is cancelled, what was changed by hand, what stays. */
+export function bankStatementRollbackText(rollback: BankStatementRollback): string {
+  const parts = [
+    `Буде анульовано ${rollback.transactions} операцій і ${rollback.transfers} переказів цієї виписки; у журналі вони лишаться закресленими.`,
+  ];
+  if (rollback.changed > 0)
+    parts.push(
+      `${rollback.changed} з них змінювали вручну після проведення — ці зміни теж буде анульовано.`,
+    );
+  if (rollback.cancelled > 0)
+    parts.push(`${rollback.cancelled} уже анульовано раніше; їх не чіпаємо.`);
+  parts.push(
+    'Нові непідтверджені контрагенти виписки підуть в архів, якщо їх більше ніде не використано. Виписка знову стане чернеткою: її можна виправити й провести заново.',
+  );
+  return parts.join(' ');
 }
