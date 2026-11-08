@@ -51,6 +51,7 @@ interface Props {
   /** Removing the last fabric removes the whole item, after a confirmation. */
   onRemoveItem: () => void;
   fabricFacts: ReadonlyMap<number, QuoteFabricFacts>;
+  onOpenSupplier?: (facts: QuoteFabricFacts) => void;
 }
 
 const firstColumn = (item: QuoteItemDraft) =>
@@ -73,6 +74,7 @@ export function QuoteItemPrices({
   onRemoveOption,
   onRemoveItem,
   fabricFacts,
+  onOpenSupplier,
 }: Props) {
   const [confirmLast, setConfirmLast] = useState(false);
   const sewing = isSewingKind(item.kind);
@@ -150,7 +152,13 @@ export function QuoteItemPrices({
                           рекомендуємо
                         </Typography>
                       )}
-                      {sewing && <QuoteFabricLine option={option} fabricFacts={fabricFacts} />}
+                      {sewing && (
+                        <QuoteFabricLine
+                          option={option}
+                          fabricFacts={fabricFacts}
+                          onOpenSupplier={onOpenSupplier}
+                        />
+                      )}
                       {!sewing && option.details && (
                         <Typography
                           variant="caption"

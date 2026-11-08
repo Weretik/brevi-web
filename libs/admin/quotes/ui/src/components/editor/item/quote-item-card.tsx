@@ -54,6 +54,8 @@ interface Props {
   onRemove: () => void;
   /** Current Reference fabrics for the manager line under each fabric (R-31). */
   fabricFacts: ReadonlyMap<number, QuoteFabricFacts>;
+  /** Opens the card of a fabric's supplier (R-32). */
+  onOpenSupplier?: (facts: QuoteFabricFacts) => void;
 }
 
 /** The anchor the «Перед надсиланням» links scroll to. */
@@ -85,6 +87,7 @@ export function QuoteItemCard({
   onMove,
   onRemove,
   fabricFacts,
+  onOpenSupplier,
 }: Props) {
   const oneOff = item.kind === 'OneOffPpe';
   const custom = item.kind === 'CustomSewing';
@@ -187,6 +190,7 @@ export function QuoteItemCard({
         onRemoveOption={onRemoveOption}
         onRemoveItem={onRemove}
         fabricFacts={fabricFacts}
+        onOpenSupplier={onOpenSupplier}
       />
 
       <Box sx={{ px: 2, pt: 1.5 }}>

@@ -4,8 +4,10 @@ import {
   quoteDraftFabricIds,
   quoteFabricFactsParts,
   quoteOptionFabrics,
+  quoteSupplierFabrics,
 } from './quote-fabric-facts';
 
+import type { QuoteFabricFacts } from '../entities/quote-catalog';
 import type { QuoteDraft, QuoteOptionDraft } from '../models/quote-draft';
 
 const option = (patch: Partial<QuoteOptionDraft>): QuoteOptionDraft => ({
@@ -80,5 +82,43 @@ describe('quote fabric facts (R-31)', () => {
     expect(
       quoteFabricFactsParts({ ...facts, composition: null, density: null, pricePerMeter: 98.5 }),
     ).toEqual(['98,5 грн/м']);
+  });
+});
+
+describe('quoteSupplierFabrics', () => {
+  const fabric = (
+    id: number,
+    name: string,
+    supplierId: number | null,
+    supplierName: string | null,
+  ) =>
+    ({
+      fabricId: id,
+      name,
+      composition: null,
+      density: null,
+      pricePerMeter: 100 + id,
+      supplierId,
+      supplierName,
+    }) satisfies QuoteFabricFacts;
+
+  it('lists the КП fabrics of the same supplier, by name', () => {
+    const all = new Map([
+      [1, fabric(1, 'Саржа', 5, 'Поділля')],
+      [2, fabric(2, 'Габардин', 5, 'Поділля')],
+      [3, fabric(3, 'Ріп-стоп', 6, 'Схід')],
+    ]);
+    expect(quoteSupplierFabrics(all.get(1)!, all)).toEqual([
+      { fabricId: 2, name: 'Габардин', pricePerMeter: '102 грн/м' },
+      { fabricId: 1, name: 'Саржа', pricePerMeter: '101 грн/м' },
+    ]);
+  });
+
+  it('matches by name when the supplier has no id', () => {
+    const all = new Map([
+      [1, fabric(1, 'Саржа', null, 'Поділля')],
+      [2, fabric(2, 'Габардин', null, 'Інший')],
+    ]);
+    expect(quoteSupplierFabrics(all.get(1)!, all).map((x) => x.fabricId)).toEqual([1]);
   });
 });

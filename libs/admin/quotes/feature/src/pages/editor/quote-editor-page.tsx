@@ -1,5 +1,5 @@
 import { useDeleteQuoteMutation } from '@admin/quotes/data-access';
-import { oneOffItemDraft } from '@admin/quotes/model';
+import { oneOffItemDraft, quoteSupplierFabrics } from '@admin/quotes/model';
 import {
   QuoteAddItems,
   QuoteItemCard,
@@ -38,7 +38,8 @@ import { useGmailReturnNotice } from '../../hooks/sending/use-gmail-return-notic
 import { useQuoteStartPrefill } from '../../hooks/start/use-quote-start-prefill';
 
 import type { QuoteEditorPanel } from './quote-editor-panels';
-import type { QuoteActor } from '@admin/quotes/model';
+import type { QuoteSupplierCard } from './quote-supplier-card';
+import type { QuoteActor, QuoteFabricFacts } from '@admin/quotes/model';
 
 const addItemsAnchor = 'quote-add-items';
 
@@ -53,7 +54,13 @@ const scrollTo = (target: string) => {
 };
 
 /** A КП «під запит»: who it is for, its items with prices, and a right column with the summary and actions. */
-export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
+export default function QuoteEditorPage({
+  actor,
+  supplierCard,
+}: {
+  actor: QuoteActor;
+  supplierCard?: QuoteSupplierCard;
+}) {
   const params = useParams();
   const id = params['quoteId'] ? Number(params['quoteId']) : null;
   const navigate = useNavigate();
@@ -71,6 +78,15 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
   const [deleteQuote, deleting] = useDeleteQuoteMutation();
   const { quote, draft } = editor;
   const fabricFacts = useQuoteFabricFacts(draft);
+  const openSupplierCard = supplierCard?.open;
+  const openSupplier = openSupplierCard
+    ? (facts: QuoteFabricFacts) =>
+        openSupplierCard({
+          id: facts.supplierId,
+          name: facts.supplierName ?? '',
+          fabrics: quoteSupplierFabrics(facts, fabricFacts),
+        })
+    : undefined;
   const preview = useQuotePreview({ quote, dirty: editor.dirty, save: editor.save });
   const gmail = useGmailReturnNotice();
   const [sentNotice, setSentNotice] = useState<string | null>(null);
@@ -185,6 +201,7 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
               onMove={(offset) => editor.moveItem(item.key, offset)}
               onRemove={() => editor.removeItem(item.key)}
               fabricFacts={fabricFacts}
+              onOpenSupplier={openSupplier}
             />
           ))}
           <Box id={addItemsAnchor} sx={{ scrollMarginTop: 96 }}>
@@ -242,6 +259,7 @@ export default function QuoteEditorPage({ actor }: { actor: QuoteActor }) {
           }}
         />
       )}
+      {supplierCard?.element}
     </Box>
   );
 }

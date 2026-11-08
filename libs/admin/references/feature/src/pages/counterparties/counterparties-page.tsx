@@ -1,6 +1,7 @@
 import { CustomersReferenceContent } from '@admin/clients/feature';
 import { PurchaseInvoicesContent } from '@admin/purchasing/feature';
 import { Tab, Tabs } from '@mui/material';
+import { useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { SuppliersPage } from '../suppliers/suppliers-page';
@@ -27,6 +28,18 @@ export function CounterpartiesPage({ canSeePurchaseInvoices = false }: Props) {
   const [searchParams, setSearchParams] = useSearchParams();
   const purchases = canSeePurchaseInvoices;
   const tab = counterpartiesTabOf(searchParams.get('tab'), purchases);
+  const openSupplierId = Number(searchParams.get('supplier')) || null;
+  const dropOpenSupplier = useCallback(
+    () =>
+      setSearchParams(
+        (params) => {
+          params.delete('supplier');
+          return params;
+        },
+        { replace: true },
+      ),
+    [setSearchParams],
+  );
   const tabs = (
     <Tabs
       value={tab}
@@ -43,7 +56,12 @@ export function CounterpartiesPage({ canSeePurchaseInvoices = false }: Props) {
   );
   if (tab === 'purchases') return <PurchaseInvoicesContent tabs={tabs} />;
   return tab === 'suppliers' ? (
-    <SuppliersPage tabs={tabs} canSeePurchaseInvoices={purchases} />
+    <SuppliersPage
+      tabs={tabs}
+      canSeePurchaseInvoices={purchases}
+      openSupplierId={openSupplierId}
+      onSupplierOpened={dropOpenSupplier}
+    />
   ) : (
     <CustomersReferenceContent tabs={tabs} />
   );

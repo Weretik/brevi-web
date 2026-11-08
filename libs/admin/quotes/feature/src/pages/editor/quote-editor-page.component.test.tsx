@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import QuoteEditorPage from './quote-editor-page';
 
+import type { QuoteSupplierCard } from './quote-supplier-card';
 import type { Quote, QuoteDraft } from '@admin/quotes/model';
 
 const price = (amount: number) => ({ amount, source: amount, isManual: false, shown: true });
@@ -188,13 +189,15 @@ vi.mock('@admin/clients/data-access', () => ({
   useListCustomersQuery: () => ({ data: undefined }),
 }));
 
-function renderEditor() {
+function renderEditor(supplierCard?: QuoteSupplierCard) {
   return render(
     <MemoryRouter initialEntries={['/crm/quotes/4']}>
       <Routes>
         <Route
           path="/crm/quotes/:quoteId"
-          element={<QuoteEditorPage actor={{ userId: 2, canSeeAll: false }} />}
+          element={
+            <QuoteEditorPage actor={{ userId: 2, canSeeAll: false }} supplierCard={supplierCard} />
+          }
         />
       </Routes>
     </MemoryRouter>,
@@ -370,14 +373,20 @@ describe('КП editor', () => {
     };
     api.quote.current = { ...quote, items: [sewing] };
     api.save.mockResolvedValue(quote);
-    renderEditor();
+    const openSupplier = vi.fn();
+    renderEditor({ open: openSupplier, element: null });
 
     expect(
       await screen.findByText(
         /Склад: 53% бавовна, 47% поліестер · Щільність: 220 г\/м² · 133 грн\/м/,
       ),
     ).toBeVisible();
-    expect(screen.getByText('Спецтекстиль')).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: 'Постачальник: Спецтекстиль' }));
+    expect(openSupplier).toHaveBeenCalledWith({
+      id: 5,
+      name: 'Спецтекстиль',
+      fabrics: [{ fabricId: 31, name: 'Грета', pricePerMeter: '133 грн/м' }],
+    });
     expect(screen.queryByText('Короткий опис для клієнта')).not.toBeInTheDocument();
 
     fireEvent.click(

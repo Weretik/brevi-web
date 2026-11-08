@@ -37,6 +37,14 @@ editor disables the card fields and saves only «Використовувати 
 through `PUT /api/reference/suppliers/{id}/brevi-fields`; a manual supplier keeps
 full editing. The subtitle shows the last sync time.
 
+**Supplier card from other screens.** A supplier name in materials, price import, a PPE card or under a
+КП fabric opens `useSupplierPreview()` (feature): the read-only right side panel `SupplierViewPanel`
+(ui, owner's variant B of 2026-11-08) with the name, «Що закуповуємо», a «Не використовується в проєкті»
+mark only for an inactive supplier, contact links (call, letter, site), an optional extra section (the КП
+passes «Тканини цього постачальника в КП») and notes. «Відкрити в контрагентах» goes to
+`/references/counterparties?supplier=<id>`, where the suppliers tab opens that supplier's card and drops
+the parameter; `canOpenCounterparties: false` hides the button.
+
 ## Structure diagram
 
 ```mermaid

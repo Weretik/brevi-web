@@ -38,3 +38,29 @@ export function quoteFabricFactsParts(facts: QuoteFabricFacts): readonly string[
     `${perMeter.format(facts.pricePerMeter)} грн/м`,
   ].filter((part): part is string => part !== null);
 }
+
+/** A fabric of one supplier in the КП, for «Тканини цього постачальника в КП» of the supplier card. */
+export interface QuoteSupplierFabric {
+  readonly fabricId: number;
+  readonly name: string;
+  readonly pricePerMeter: string;
+}
+
+/** The КП fabrics bought from the supplier of `facts`, by name. */
+export function quoteSupplierFabrics(
+  facts: QuoteFabricFacts,
+  all: ReadonlyMap<number, QuoteFabricFacts>,
+): readonly QuoteSupplierFabric[] {
+  const same = (other: QuoteFabricFacts) =>
+    facts.supplierId !== null
+      ? other.supplierId === facts.supplierId
+      : other.supplierId === null && other.supplierName === facts.supplierName;
+  return [...all.values()]
+    .filter(same)
+    .sort((a, b) => a.name.localeCompare(b.name, 'uk'))
+    .map((fabric) => ({
+      fabricId: fabric.fabricId,
+      name: fabric.name,
+      pricePerMeter: `${perMeter.format(fabric.pricePerMeter)} грн/м`,
+    }));
+}
