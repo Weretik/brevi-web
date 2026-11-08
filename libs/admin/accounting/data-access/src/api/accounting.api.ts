@@ -5,6 +5,7 @@ import { financeCategoryEndpoints } from './categories/finance-category-endpoint
 import { financeCounterpartyEndpoints } from './counterparties/finance-counterparty-endpoints';
 import { legacyFinanceImportEndpoints } from './import/legacy-finance-import-endpoints';
 import { financeOverviewEndpoints } from './overview/finance-overview-endpoints';
+import { financeReportEndpoints } from './reports/finance-report-endpoints';
 import { bankStatementEndpoints } from './statements/bank-statement-endpoints';
 import { financeTransactionEndpoints } from './transactions/finance-transaction-endpoints';
 import { financeTransferEndpoints } from './transfers/finance-transfer-endpoints';
@@ -16,6 +17,7 @@ export const accountingApi = accountingBaseApi.injectEndpoints({
     ...financeCategoryEndpoints(build),
     ...financeCounterpartyEndpoints(build),
     ...financeOverviewEndpoints(build),
+    ...financeReportEndpoints(build),
     ...financeTransactionEndpoints(build),
     ...financeTransferEndpoints(build),
     ...legacyFinanceImportEndpoints(build),
@@ -40,12 +42,14 @@ export const {
   useGetFinanceAccountHistoryQuery,
   useGetFinanceAccountsQuery,
   useGetFinanceAttachmentsQuery,
+  useGetFinanceAuditQuery,
   useGetFinanceCategoriesQuery,
   useGetFinanceCategoryHistoryQuery,
   useGetFinanceCounterpartiesQuery,
   useGetFinanceCounterpartyChoicesQuery,
   useGetFinanceCounterpartyHistoryQuery,
   useGetFinanceOverviewQuery,
+  useGetFinanceReportQuery,
   useGetFinanceTransactionHistoryQuery,
   useGetFinanceTransactionsQuery,
   useGetFinanceTransferHistoryQuery,

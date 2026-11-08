@@ -233,6 +233,67 @@ export function statementDetails(lines: unknown[], statement = bankStatement()) 
   };
 }
 
+export const financeReportRow = (overrides: Record<string, unknown> = {}) => ({
+  rowType: 'Group',
+  currency: 'UAH',
+  operations: 0,
+  incomeMinor: 0,
+  expenseMinor: 0,
+  resultMinor: 0,
+  account: null,
+  type: null,
+  category: null,
+  subcategory: null,
+  counterparty: null,
+  incomingTransfersMinor: null,
+  outgoingTransfersMinor: null,
+  date: null,
+  amountMinor: null,
+  note: null,
+  source: null,
+  id: null,
+  ...overrides,
+});
+
+export const financeReport = (overrides: Record<string, unknown> = {}) => ({
+  kind: 'Summary',
+  from: '2026-11-01',
+  to: '2026-11-05',
+  totals: [
+    {
+      currency: 'UAH',
+      operations: 3,
+      incomeMinor: 90_000,
+      expenseMinor: 30_000,
+      resultMinor: 60_000,
+    },
+  ],
+  rows: [
+    financeReportRow({
+      operations: 3,
+      incomeMinor: 90_000,
+      expenseMinor: 30_000,
+      resultMinor: 60_000,
+    }),
+  ],
+  totalRows: 1,
+  limited: false,
+  ...overrides,
+});
+
+export const financeAuditEntry = (overrides: Record<string, unknown> = {}) => ({
+  id: 7,
+  entity: 'Transaction',
+  entityId: 't1',
+  action: 'Update',
+  by: 'director@brevi.com.ua',
+  at: '2026-11-05T08:00:00+00:00',
+  title: '15.10.2026 · 300,00 UAH · Нитки',
+  beforeJson: JSON.stringify({ amountMinor: 20_000, description: 'Нитки', date: '2026-10-15' }),
+  afterJson: JSON.stringify({ amountMinor: 30_000, description: 'Нитки', date: '2026-10-15' }),
+  ...overrides,
+});
+
 export interface StubCall {
   method: string;
   path: string;
@@ -259,6 +320,8 @@ export function stubFinanceApi(data: {
   /** The statement page: its lines and counts by state; built from `lines` when left out. */
   statementDetails?: unknown;
   lines?: unknown[];
+  report?: unknown;
+  audit?: unknown[];
   written?: (call: StubCall) => unknown;
 }) {
   const calls: StubCall[] = [];
@@ -271,6 +334,11 @@ export function stubFinanceApi(data: {
     if (path.startsWith('/api/accounting/settings'))
       return json({ cutoverDate: '2026-10-01', timeZone: 'Europe/Kyiv', today: '2026-11-05' });
     if (path.includes('/history')) return json([]);
+    if (path.startsWith('/api/accounting/reports')) return json(data.report ?? financeReport());
+    if (path.startsWith('/api/accounting/audit')) {
+      const items = data.audit ?? [];
+      return json({ items, total: items.length, page: 1, pageSize: 50 });
+    }
     if (path.startsWith('/api/accounting/accounts'))
       return json(data.accounts ?? [financeAccount()]);
     if (path.startsWith('/api/accounting/categories')) return json(data.categories ?? []);

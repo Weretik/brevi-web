@@ -16,12 +16,14 @@ export {
   useGetFinanceAccountHistoryQuery,
   useGetFinanceAccountsQuery,
   useGetFinanceAttachmentsQuery,
+  useGetFinanceAuditQuery,
   useGetFinanceCategoriesQuery,
   useGetFinanceCategoryHistoryQuery,
   useGetFinanceCounterpartiesQuery,
   useGetFinanceCounterpartyChoicesQuery,
   useGetFinanceCounterpartyHistoryQuery,
   useGetFinanceOverviewQuery,
+  useGetFinanceReportQuery,
   useGetFinanceTransactionHistoryQuery,
   useGetFinanceTransactionsQuery,
   useGetFinanceTransferHistoryQuery,
@@ -47,3 +49,4 @@ export {
   useVoidFinanceTransferMutation,
 } from './api/accounting.api';
 export { fetchFinanceAttachmentContent } from './files/finance-attachment-content';
+export { fetchFinanceExport, fetchFinanceReportCsv } from './files/finance-report-files';

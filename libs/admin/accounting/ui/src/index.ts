@@ -37,3 +37,8 @@ export * from './tables/statements/bank-lines-grid';
 export * from './tables/statements/bank-statements-grid';
 export * from './tables/transactions/finance-transactions-grid';
 export * from './tables/transfers/finance-transfers-grid';
+export * from './components/reports/finance-report-totals';
+export * from './details/audit/finance-audit-changes';
+export * from './forms/reports/finance-report-form';
+export * from './tables/audit/finance-audit-grid';
+export * from './tables/reports/finance-report-grid';

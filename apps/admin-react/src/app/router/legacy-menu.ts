@@ -211,8 +211,18 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         path: '/accounting/legacy-import',
         requiredRoles: accounting,
       },
-      { id: 'finance-reports', label: 'Звіти', requiredRoles: accounting },
-      { id: 'finance-audit', label: 'Журнал змін', requiredRoles: accounting },
+      {
+        id: 'finance-reports',
+        label: 'Звіти',
+        path: '/accounting/reports',
+        requiredRoles: accounting,
+      },
+      {
+        id: 'finance-audit',
+        label: 'Журнал змін',
+        path: '/accounting/audit',
+        requiredRoles: accounting,
+      },
     ],
   },
   {

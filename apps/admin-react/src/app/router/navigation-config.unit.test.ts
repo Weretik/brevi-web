@@ -180,6 +180,8 @@ describe('legacy Admin navigation', () => {
       '/accounting/review',
       '/accounting/statements',
       '/accounting/legacy-import',
+      '/accounting/reports',
+      '/accounting/audit',
     ]);
     const accounting = (roles: string[]) =>
       createNavigation(paths, roles).find((group) => group.id === 'accounting');
@@ -203,6 +205,8 @@ describe('legacy Admin navigation', () => {
         label: 'Перенесення архіву',
         to: '/accounting/legacy-import',
       },
+      { id: 'finance-reports', label: 'Звіти', to: '/accounting/reports' },
+      { id: 'finance-audit', label: 'Журнал змін', to: '/accounting/audit' },
     ]);
     expect(accounting(['Director'])?.items).toHaveLength(12);
     expect(accounting(['Admin'])).toBeUndefined();
