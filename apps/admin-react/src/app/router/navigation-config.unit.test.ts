@@ -49,8 +49,8 @@ describe('legacy Admin navigation', () => {
       'Загальні звіти',
       'Адміністрування',
     ]);
-    expect(groups.map((group) => group.items.length)).toEqual([5, 15, 4, 8, 1, 2, 1, 4]);
-    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(40);
+    expect(groups.map((group) => group.items.length)).toEqual([5, 15, 4, 8, 1, 2, 1, 5]);
+    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(41);
     expect(groups[0].items.map((item) => item.id)).not.toContain('clients');
   });
   it('shows «Налаштування КП» only for the server Admin role', () => {
@@ -90,7 +90,13 @@ describe('legacy Admin navigation', () => {
   });
 
   it('shows «Користувачі», «Завдання менеджерам», «Налаштування ШІ» and «Права доступу» only to Admin', () => {
-    const paths = new Set(['/admin/users', '/admin/tasks', '/admin/ai', '/admin/access']);
+    const paths = new Set([
+      '/admin/users',
+      '/admin/tasks',
+      '/admin/leads',
+      '/admin/ai',
+      '/admin/access',
+    ]);
     const admin = createNavigation(paths, as('Admin')).find(
       (group) => group.id === 'administration',
     );
@@ -98,12 +104,26 @@ describe('legacy Admin navigation', () => {
     expect(admin?.items).toEqual([
       { id: 'users', label: 'Користувачі', to: '/admin/users' },
       { id: 'manager-tasks', label: 'Завдання менеджерам', to: '/admin/tasks' },
+      { id: 'lead-stats', label: 'Статистика лідів', to: '/admin/leads' },
       { id: 'ai-settings', label: 'Налаштування ШІ', to: '/admin/ai' },
       { id: 'access-rights', label: 'Права доступу', to: '/admin/access' },
     ]);
     expect(
       createNavigation(paths, as('Manager')).some((group) => group.id === 'administration'),
     ).toBe(false);
+  });
+
+  it('shows «Ліди» to Manager and Admin and «Статистика лідів» to Admin by default', () => {
+    const paths = new Set(['/crm/leads', '/admin/leads']);
+    const item = (roles: string[], group: string, id: string) =>
+      createNavigation(paths, as(...roles))
+        .find((x) => x.id === group)
+        ?.items.find((x) => x.id === id);
+
+    expect(item(['Manager'], 'service-manager', 'leads')?.to).toBe('/crm/leads');
+    expect(item(['Admin'], 'administration', 'lead-stats')?.to).toBe('/admin/leads');
+    expect(item(['Manager'], 'administration', 'lead-stats')).toBeUndefined();
+    expect(item(['Accountant'], 'service-manager', 'leads')).toBeUndefined();
   });
 
   it('shows the «Швейний цех» pages to the head of the workshop and Admin only', () => {

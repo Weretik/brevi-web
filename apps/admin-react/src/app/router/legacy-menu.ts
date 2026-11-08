@@ -37,7 +37,7 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
     section: 'Робота',
     label: 'Менеджер сервісу',
     items: [
-      { id: 'leads', label: 'Ліди' },
+      { id: 'leads', label: 'Ліди', path: '/crm/leads', access: 'leads' },
       { id: 'quotes', label: 'Комерційні пропозиції', path: '/crm/quotes', access: 'quotes' },
       {
         id: 'quote-settings',
@@ -322,6 +322,7 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         path: '/admin/tasks',
         requiredRoles: admin,
       },
+      { id: 'lead-stats', label: 'Статистика лідів', path: '/admin/leads', access: 'lead-stats' },
       { id: 'ai-settings', label: 'Налаштування ШІ', path: '/admin/ai', requiredRoles: admin },
       { id: 'access-rights', label: 'Права доступу', path: '/admin/access', requiredRoles: admin },
     ],

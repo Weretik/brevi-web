@@ -54,6 +54,7 @@ export const mapTaskDetail = (value: Schemas['CrmTask']): TaskDetail => ({
   description: value.description ?? null,
   author: { userId: value.author.userId, name: value.author.name },
   customerPublicId: value.customerPublicId ?? null,
+  leadId: value.leadId ?? null,
   steps: [...value.steps]
     .sort((a, b) => a.position - b.position)
     .map((step) => ({ id: step.id, text: step.text, isDone: step.isDone })),

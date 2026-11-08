@@ -2,6 +2,7 @@ import { createClientsRoutes } from '@admin/clients/feature';
 import { contentRoutes } from '@admin/content/feature';
 import { createDashboardRoutes } from '@admin/dashboard/feature';
 import { createEmbroideryRoutes } from '@admin/embroidery/feature';
+import { createLeadsRoutes } from '@admin/leads/feature';
 import { mediaRoutes } from '@admin/media/feature';
 import {
   createProductionOrderRoutes,
@@ -19,6 +20,7 @@ import { useCanSeeFinance } from './use-can-see-finance';
 import { useCanSeePurchaseInvoices } from './use-can-see-purchase-invoices';
 import { useDashboardViewer } from './use-dashboard-viewer';
 import { useEmbroideryViewer } from './use-embroidery-viewer';
+import { useLeadStatsViewer, useLeadViewer } from './use-lead-viewer';
 import { useProductionOrderActor } from './use-production-order-actor';
 import { useQuoteActor } from './use-quote-actor';
 import { useQuoteSupplierCard } from './use-quote-supplier-card';
@@ -33,6 +35,7 @@ export const adminRouteDefinitions = [
     useSupplierCard: useQuoteSupplierCard,
     workshopCard: QuoteProductionOrders,
   }),
+  ...createLeadsRoutes({ useLeadViewer, useLeadStatsViewer }),
   ...productsRoutes,
   ...remindersRoutes,
   ...mediaRoutes,

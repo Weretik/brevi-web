@@ -89,7 +89,11 @@
       "@admin/accounting/model": ["libs/admin/accounting/model/src/index.ts"],
       "@admin/accounting/data-access": ["libs/admin/accounting/data-access/src/index.ts"],
       "@admin/accounting/ui": ["libs/admin/accounting/ui/src/index.ts"],
-      "@admin/accounting/feature": ["libs/admin/accounting/feature/src/index.ts"]
+      "@admin/accounting/feature": ["libs/admin/accounting/feature/src/index.ts"],
+      "@admin/leads/model": ["libs/admin/leads/model/src/index.ts"],
+      "@admin/leads/data-access": ["libs/admin/leads/data-access/src/index.ts"],
+      "@admin/leads/ui": ["libs/admin/leads/ui/src/index.ts"],
+      "@admin/leads/feature": ["libs/admin/leads/feature/src/index.ts"]
     }
   }
 }

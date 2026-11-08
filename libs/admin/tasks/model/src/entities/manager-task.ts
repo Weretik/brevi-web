@@ -68,6 +68,8 @@ export interface TaskDetail extends TaskSummary {
   readonly description: string | null;
   readonly author: TaskPerson;
   readonly customerPublicId: string | null;
+  /** The lead whose next call this is (LEAD-001 R-08); null for tasks the director gives. */
+  readonly leadId: number | null;
   readonly steps: readonly TaskStep[];
   readonly history: readonly TaskEvent[];
   readonly createdAt: string;

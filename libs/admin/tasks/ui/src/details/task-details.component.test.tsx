@@ -1,5 +1,6 @@
 import { cleanup, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { TaskDetails } from './task-details';
@@ -25,6 +26,7 @@ const task: TaskDetail = {
   description: null,
   author: { userId: 1, name: 'Директор' },
   customerPublicId: null,
+  leadId: null,
   steps: [],
   history: [],
   createdAt: '2026-11-04T10:00:00Z',
@@ -61,5 +63,23 @@ describe('TaskDetails', () => {
 
     expect(screen.queryByRole('combobox', { name: 'Виконавець' })).toBeNull();
     expect(screen.getByText('Олена')).toBeVisible();
+  });
+
+  it('links a «Подзвонити» task to its lead', () => {
+    render(
+      <MemoryRouter>
+        <TaskDetails
+          task={{ ...task, leadId: 42 }}
+          busy={false}
+          onStatus={vi.fn()}
+          onStep={vi.fn()}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole('link', { name: 'Відкрити в «Ліди › Мій день»' })).toHaveAttribute(
+      'href',
+      '/crm/leads?lead=42',
+    );
   });
 });

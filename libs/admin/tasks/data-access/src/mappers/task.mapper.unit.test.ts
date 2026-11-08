@@ -19,6 +19,7 @@ describe('task mappers', () => {
       author: { userId: 1, name: 'Віталій' },
       customerPublicId: null,
       customerName: null,
+      leadId: 7,
       steps: [
         { id: 2, position: 1, text: 'Надіслати', isDone: false },
         { id: 1, position: 0, text: 'Розрахувати', isDone: true },
@@ -31,6 +32,7 @@ describe('task mappers', () => {
     });
     expect(task.steps.map((x) => x.text)).toEqual(['Розрахувати', 'Надіслати']);
     expect([task.stepsDone, task.stepsTotal]).toEqual([1, 2]);
+    expect(task.leadId).toBe(7);
   });
 
   it('sends trimmed text, the client id and an ISO due time', () => {

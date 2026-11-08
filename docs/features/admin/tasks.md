@@ -14,6 +14,7 @@
 - A Manager sees own tasks only (the server enforces it), drags cards to «У роботі» or «Виконано», and checks steps in the side panel.
 - «Мої завдання» shows every open task and the tasks done in the chosen «Виконані за» period («Цей тиждень» from Monday by default, «Минулий тиждень», «Останній місяць», «Квартал», «Рік», «Усі»); every column is newest added first. The side panel of an open task has a green «Виконано» next to «Закрити»: it marks the task done and closes the panel (client corrections round 2, 2026-11-08).
 - Both pages open the same side panel (`ReferenceEditorDrawer`): view with status, steps and history; the form for Director and Admin. In the view Director and Admin pick another manager in «Виконавець» to pass the task on at once (saved as an edit; history shows the transfer).
+- A «Подзвонити» task made from a lead call (LEAD-001 R-08) shows «Лід» in the side panel with a link to the lead in «Мій день»; see [leads](leads.md).
 - The sidebar «Робочий стіл» tile shows «Завдання: прострочено N · терміново M» from the overview, or a neutral line when nothing burns.
 
 ## Structure diagram
