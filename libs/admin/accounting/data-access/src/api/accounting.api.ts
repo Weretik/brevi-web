@@ -3,6 +3,7 @@ import { financeAccountEndpoints } from './accounts/finance-account-endpoints';
 import { financeAttachmentEndpoints } from './attachments/finance-attachment-endpoints';
 import { financeCategoryEndpoints } from './categories/finance-category-endpoints';
 import { financeCounterpartyEndpoints } from './counterparties/finance-counterparty-endpoints';
+import { legacyFinanceImportEndpoints } from './import/legacy-finance-import-endpoints';
 import { financeOverviewEndpoints } from './overview/finance-overview-endpoints';
 import { financeTransactionEndpoints } from './transactions/finance-transaction-endpoints';
 import { financeTransferEndpoints } from './transfers/finance-transfer-endpoints';
@@ -16,6 +17,7 @@ export const accountingApi = accountingBaseApi.injectEndpoints({
     ...financeOverviewEndpoints(build),
     ...financeTransactionEndpoints(build),
     ...financeTransferEndpoints(build),
+    ...legacyFinanceImportEndpoints(build),
   }),
 });
 
@@ -43,6 +45,7 @@ export const {
   useGetFinanceTransactionsQuery,
   useGetFinanceTransferHistoryQuery,
   useGetFinanceTransfersQuery,
+  useImportLegacyFinanceMutation,
   useMergeFinanceCounterpartyMutation,
   usePromoteFinanceOneoffMutation,
   useRestoreFinanceCounterpartyMutation,

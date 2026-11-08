@@ -1,5 +1,6 @@
 export * from './components/attachments/finance-attachment-list';
 export * from './components/history/finance-history-list';
+export * from './components/import/legacy-import-report';
 export * from './components/journal/finance-journal-filters';
 export * from './components/journal/finance-segmented-buttons';
 export * from './components/journal/finance-totals-bar';

@@ -1,8 +1,10 @@
 # Admin: Бухгалтерія
 
-**Status:** stage 1 («Рахунки і каси», «Категорії»), stage 2 («Огляд», «Операції», «Перекази», archive «Домашня бухгалтерія», balances) stage 3 («Контрагенти», «Потребують перевірки») and stage 4 (files of operations) implemented 2026-11-05; the pages were restyled the same day from the approved [mockup](https://claude.ai/artifact/AotN13KWseQLXkcTX2qoau). Backend decisions and later stages are in the BreviERP specification `docs/sdd/specs/accounting/001-finance`; the consumed contract is [backend/accounting](../../contracts/openapi/backend/accounting/finance.openapi.yaml).
+**Status:** stage 1 («Рахунки і каси», «Категорії»), stage 2 («Огляд», «Операції», «Перекази», archive «Домашня бухгалтерія», balances) stage 3 («Контрагенти», «Потребують перевірки») stage 4 (files of operations) implemented 2026-11-05 and stage 5 («Перенесення архіву») 2026-11-08; the pages were restyled the same day from the approved [mockup](https://claude.ai/artifact/AotN13KWseQLXkcTX2qoau). Backend decisions and later stages are in the BreviERP specification `docs/sdd/specs/accounting/001-finance`; the consumed contract is [backend/accounting](../../contracts/openapi/backend/accounting/finance.openapi.yaml).
 
 The «Бухгалтерія» menu group is shown only to the director: every item has `requiredRoles: ['Director']`, and the routes are wrapped in `RequireRole` with `canUseAccounting`. The backend allows the same role (policy `CanUseAccounting`). Items of later stages («Імпорт виписок», «Звіти», «Журнал змін») are in the menu without a page yet.
+
+`/accounting/legacy-import` «Перенесення архіву»: the one-off move of the old Calculator «Фінанси». «Обрати finance.json» gzips the file in the browser (about 40 MB → 3 MB, so it fits the request limit) and the server only checks it. The report shows the errors that stop the move (the first 100 and «і ще N»), warnings, «Що переноситься» per kind (in the file, to add, moved earlier, left out) with how clients and suppliers were found in Brevi, «Суми у файлі» by area and kind, and «Залишки після перенесення» (on 30.09, on 01.10, now) where only a missing confirmed balance or a difference is marked. «Перенести» appears only without errors and with something to add, asks first, and refreshes every list of «Бухгалтерія»; a second run adds only what is missing.
 
 `/accounting/accounts` «Рахунки і каси»:
 
@@ -43,7 +45,7 @@ The «Бухгалтерія» menu group is shown only to the director: every i
 ```mermaid
 flowchart LR
   App["admin-react: RequireRole canUseAccounting, legacy menu"] --> Routes["accounting/feature: accountingRoutes"]
-  Routes --> Pages["pages: accounts, categories, overview, transactions, transfers, counterparties, review"]
+  Routes --> Pages["pages: accounts, categories, overview, transactions, transfers, counterparties, review, legacy import"]
   Pages --> Drawers["components: account, category, operation, counterparty, review drawers"]
   Drawers --> Hooks["hooks: editors with version, journal, choices, counterparty search, review"]
   Pages --> UI["accounting/ui: grids, forms, details, history"]
@@ -60,6 +62,7 @@ libs/admin/accounting/
 ├── model/src/entities/{accounts,categories,history,settings}/   # account, category, log entry, cutover date
 ├── model/src/entities/{movements,transactions,transfers,overview}/ # operations, transfers, totals, overview
 ├── model/src/entities/attachments/finance-attachment.ts            # file of an operation, types, 10 МБ
+├── model/src/entities/import/legacy-finance-import.ts             # report of «Перенесення архіву», kind and movement labels
 ├── model/src/validators/attachments/finance-attachment-validation.ts # check of a picked file
 ├── model/src/entities/counterparties/finance-counterparty.ts      # kinds, tabs, counterparty, choice, row label
 ├── model/src/mappers/money/finance-money.ts                       # «62 546,40» ↔ kopecks, dates
@@ -78,6 +81,9 @@ libs/admin/accounting/
 ├── data-access/src/mappers/accounting-counterparty.mapper.ts     # counterparty pages and choices
 ├── data-access/src/api/attachments/finance-attachment-endpoints.ts # list, upload (multipart), delete
 ├── data-access/src/mappers/accounting-attachment.mapper.ts       # files of an operation
+├── data-access/src/api/import/legacy-finance-import-endpoints.ts  # check or move of finance.json (gzip, multipart)
+├── data-access/src/files/compress-finance-file.ts                # gzip in the browser
+├── data-access/src/mappers/accounting-import.mapper.ts           # import report
 ├── data-access/src/files/finance-attachment-content.ts           # file content with the session (blob)
 ├── data-access/src/errors/accounting-api-error.ts                # keeps backend reasons (409)
 ├── ui/src/tables/{accounts,...,overview,counterparties}/         # «Цех» grids, balances, counterparties, parties
@@ -87,14 +93,15 @@ libs/admin/accounting/
 ├── ui/src/forms/overview/finance-period-form.tsx                 # «Свій період…»
 ├── ui/src/details/{accounts,...,transfers,counterparties}/       # read-only views in the side panel
 ├── ui/src/components/attachments/finance-attachment-list.tsx     # «Файли»: open, add, delete
+├── ui/src/components/import/legacy-import-report.tsx             # errors, warnings, counts, totals, balances of the move
 ├── ui/src/components/{history,status,journal,overview}/          # history, problem pill and warning line, filters, segmented buttons, totals line, overview strip, «Куди пішли гроші»
 ├── ui/src/dialogs/finance-{delete,merge}-dialog.tsx               # confirmations, «Обʼєднати»
 └── feature/src/
-    ├── accounting.routes.tsx                                     # accounts, categories, overview, transactions, transfers, counterparties, review
+    ├── accounting.routes.tsx                                     # accounts, categories, overview, transactions, transfers, counterparties, review, legacy import
     ├── pages/{accounts,...,transfers,counterparties,review}/     # pages
     ├── components/{accounts,...,transfers,counterparties,review}/ # side panels; review cards
     ├── components/journal/                                       # area tabs, quick bar (search, periods, type, «Ще фільтри»)
-    ├── hooks/                                                    # editors, journal, choices, settings, files of an operation
+    ├── hooks/                                                    # editors, journal, choices, settings, files of an operation, archive move
     └── testing/{render.tsx,finance-api-stub.ts}                  # render with the API store, stubbed API
 libs/admin/core/auth/src/session/session-user.ts                  # canUseAccounting
 apps/admin-react/src/app/router/{create-admin-router.tsx,legacy-menu.ts,admin-route-layout.tsx}
@@ -119,4 +126,6 @@ apps/admin-react/src/app/router/{create-admin-router.tsx,legacy-menu.ts,admin-ro
 - `model/src/queries/overview/finance-overview-periods.unit.test.ts`, `model/src/mappers/text/finance-count.unit.test.ts`, `model/src/queries/journal/finance-journal-filters.unit.test.ts`, `model/src/validators/transactions/finance-transaction-validation.unit.test.ts`, `data-access/src/mappers/accounting-movement.mapper.unit.test.ts`;
 - `model/src/mappers/money/finance-money.unit.test.ts`, `model/src/validators/accounts/finance-account-validation.unit.test.ts`, `model/src/queries/categories/finance-category-tree.unit.test.ts`;
 - `data-access/src/mappers/accounting.mapper.unit.test.ts`, `ui/src/components/history/finance-history-list.component.test.tsx`;
+- `feature/src/pages/import/legacy-finance-import-page.component.test.tsx` — a check first (`dryRun=true`), counts, links, difference and warnings, «Перенести» after a confirmation sends multipart with `dryRun=false`; errors listed with «і ще N» and no move; `data-access/src/mappers/accounting-import.mapper.unit.test.ts`;
+- the feature tests pin `Date` to 2026-11-05 (`feature/src/test-setup.ts`), the day the API stub answers, so they do not depend on the day they run;
 - `apps/admin-react/src/app/router/navigation-config.unit.test.ts` — the group only for the director.

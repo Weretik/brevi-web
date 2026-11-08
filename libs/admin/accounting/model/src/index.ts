@@ -3,6 +3,7 @@ export * from './entities/attachments/finance-attachment';
 export * from './entities/categories/finance-category';
 export * from './entities/counterparties/finance-counterparty';
 export * from './entities/history/finance-history-entry';
+export * from './entities/import/legacy-finance-import';
 export * from './entities/movements/finance-movement';
 export * from './entities/overview/finance-overview';
 export * from './entities/settings/accounting-settings';

@@ -23,6 +23,7 @@ export {
   useGetFinanceTransactionsQuery,
   useGetFinanceTransferHistoryQuery,
   useGetFinanceTransfersQuery,
+  useImportLegacyFinanceMutation,
   useMergeFinanceCounterpartyMutation,
   usePromoteFinanceOneoffMutation,
   useRestoreFinanceCounterpartyMutation,

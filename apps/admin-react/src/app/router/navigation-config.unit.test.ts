@@ -177,6 +177,7 @@ describe('legacy Admin navigation', () => {
       '/accounting/categories',
       '/accounting/counterparties',
       '/accounting/review',
+      '/accounting/legacy-import',
     ]);
     const accounting = (roles: string[]) =>
       createNavigation(paths, roles).find((group) => group.id === 'accounting');
@@ -189,8 +190,13 @@ describe('legacy Admin navigation', () => {
       { id: 'finance-categories', label: 'Категорії', to: '/accounting/categories' },
       { id: 'finance-counterparties', label: 'Контрагенти', to: '/accounting/counterparties' },
       { id: 'finance-review', label: 'Потребують перевірки', to: '/accounting/review' },
+      {
+        id: 'finance-legacy-import',
+        label: 'Перенесення архіву',
+        to: '/accounting/legacy-import',
+      },
     ]);
-    expect(accounting(['Director'])?.items).toHaveLength(10);
+    expect(accounting(['Director'])?.items).toHaveLength(11);
     expect(accounting(['Admin'])).toBeUndefined();
     expect(accounting(['Accountant'])).toBeUndefined();
   });
