@@ -2,6 +2,7 @@ import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { AdminRouteLayout } from './admin-route-layout';
+import { defaultAccess } from '../../test/default-access';
 
 import type { SessionRole, SessionUser } from '@admin/core/auth';
 
@@ -11,6 +12,7 @@ const user = (roles: SessionRole[]): SessionUser => ({
   fullName: 'Олена',
   roles,
   avatarUrl: null,
+  access: defaultAccess(roles),
 });
 vi.mock('@admin/core/shell', () => ({
   AdminLayout: ({

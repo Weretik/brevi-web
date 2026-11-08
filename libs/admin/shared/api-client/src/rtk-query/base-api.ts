@@ -6,6 +6,7 @@ export const adminApi = createApi({
   reducerPath: 'adminApi',
   baseQuery: axiosBaseQuery,
   tagTypes: [
+    'AccessRights',
     'PricingParameter',
     'PpeMarkupRule',
     'PriceSource',

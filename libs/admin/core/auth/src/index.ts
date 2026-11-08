@@ -6,8 +6,8 @@ export { RequireRole } from './routes/require-role';
 export { initializeAdminAuth, login, logout, refreshSession } from './session/auth-session';
 export { useGetAdminSessionRolesQuery } from './session/session-roles.api';
 export {
+  canAccess,
   canManageUsers,
-  canManageWorkshop,
   canUseAccounting,
   canUsePurchaseInvoices,
   isStaff,
@@ -16,4 +16,11 @@ export {
 export { useAdminSession } from './session/use-admin-session';
 
 export type { LoginRequest } from './session/session-transport';
-export type { SessionRole, SessionUser } from './session/session-user';
+export { noAccess } from './session/session-user';
+export type {
+  AccessAction,
+  SessionAccess,
+  SessionRole,
+  SessionRoleTitle,
+  SessionUser,
+} from './session/session-user';

@@ -1,5 +1,3 @@
-import { staffRoleLabels } from '@admin/users/model';
-
 import type { StaffAccount } from '@admin/users/model';
 import type { StaffAccountAction } from '@admin/users/ui';
 
@@ -27,7 +25,7 @@ export const describeConfirmation = (
       account,
       action,
       title: 'Змінити роль?',
-      description: `${account.email} отримає роль «${staffRoleLabels[action.role]}». Нова роль діятиме протягом 5 хвилин.`,
+      description: `${account.email} отримає роль «${action.roleTitle}». Нова роль діятиме протягом 5 хвилин.`,
       confirmLabel: 'Змінити роль',
       destructive: false,
     };

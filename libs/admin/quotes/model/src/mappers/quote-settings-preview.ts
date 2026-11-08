@@ -37,6 +37,8 @@ export function quoteSettingsPreviewSample(
     managerEmail,
     marks: {
       '{quoteNumber}': number,
+      '{clientName}': 'Олена Коваль',
+      '{companyName}': 'ТОВ «Приклад»',
       '{managerName}': managerName,
       '{managerPhone}': managerPhone,
       '{managerEmail}': managerEmail,

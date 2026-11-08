@@ -1,3 +1,4 @@
+import { builtInStaffRoleOptions } from '@admin/users/model';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -33,6 +34,20 @@ const accounts: StaffAccount[] = [
     avatarUrl: null,
     phoneNumber: '+380 50 123 45 67',
   },
+  {
+    id: 4,
+    email: 'store@brevi.com.ua',
+    fullName: 'Петро',
+    role: 'custom-0123456789ab',
+    isBlocked: false,
+    avatarUrl: null,
+    phoneNumber: null,
+  },
+];
+
+const roleOptions = [
+  ...builtInStaffRoleOptions,
+  { name: 'custom-0123456789ab', title: 'Склад', locked: false },
 ];
 
 const renderTable = (onAction = vi.fn(), actor = { id: 1, isDirector: false }) =>
@@ -44,6 +59,7 @@ const renderTable = (onAction = vi.fn(), actor = { id: 1, isDirector: false }) =
       loading={false}
       onAction={onAction}
       onRetry={vi.fn()}
+      roleOptions={roleOptions}
     />,
   );
 
@@ -93,5 +109,21 @@ describe('StaffAccountsTable', () => {
     fireEvent.click(screen.getByRole('menuitem', { name: 'Розблокувати' }));
 
     expect(onAction).toHaveBeenCalledWith(accounts[2], { type: 'setBlocked', blocked: false });
+  });
+
+  it('shows the server title of a custom role and offers it in the menu', () => {
+    const onAction = vi.fn();
+    renderTable(onAction);
+
+    const storeRow = screen.getByText('store@brevi.com.ua').closest('tr') as HTMLElement;
+    expect(within(storeRow).getByText('Склад')).toBeTruthy();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Дії для manager@brevi.com.ua' }));
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Зробити: склад' }));
+    expect(onAction).toHaveBeenCalledWith(accounts[2], {
+      type: 'changeRole',
+      role: 'custom-0123456789ab',
+      roleTitle: 'Склад',
+    });
   });
 });

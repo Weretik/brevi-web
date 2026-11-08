@@ -1,4 +1,4 @@
-import { canChangeOwnCredentials, staffRoleLabels } from '@admin/users/model';
+import { canChangeOwnCredentials, getStaffRoleTitle } from '@admin/users/model';
 import { Box, Button, Divider, Stack, Typography } from '@mui/material';
 import { Fragment } from 'react';
 
@@ -37,7 +37,7 @@ export function ProfileDetailsCard({ onEdit, profile }: ProfileDetailsCardProps)
       value: profile.email,
       field: canEditCredentials ? 'email' : undefined,
     },
-    { label: 'Роль', value: staffRoleLabels[profile.role] },
+    { label: 'Роль', value: getStaffRoleTitle(profile.role) },
     ...(canEditCredentials
       ? [{ label: 'Пароль', value: '••••••••', field: 'password' as const }]
       : []),

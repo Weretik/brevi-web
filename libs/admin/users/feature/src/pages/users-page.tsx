@@ -1,5 +1,5 @@
-import { useGetStaffAccountsQuery } from '@admin/users/data-access';
-import { hasDirector } from '@admin/users/model';
+import { useGetStaffAccountsQuery, useGetStaffRoleOptionsQuery } from '@admin/users/data-access';
+import { builtInStaffRoleOptions, hasDirector } from '@admin/users/model';
 import {
   ConfirmActionDialog,
   CreateStaffPanel,
@@ -22,6 +22,8 @@ interface UsersPageProps {
 export default function UsersPage({ actor }: UsersPageProps) {
   const accountsQuery = useGetStaffAccountsQuery();
   const accounts = accountsQuery.currentData ?? [];
+  // Built-in roles stand in until «Права доступу» answers, so the page still works without it.
+  const roleOptions = useGetStaffRoleOptionsQuery().data ?? builtInStaffRoleOptions;
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const actions = useStaffAccountActions(setSuccessMessage);
 
@@ -36,9 +38,8 @@ export default function UsersPage({ actor }: UsersPageProps) {
             Користувачі
           </Typography>
           <Typography sx={{ color: 'text.secondary', mt: 0.5 }} variant="body2">
-            Директор і адміністратори керують користувачами та бачать усі розділи; директора змінює
-            лише директор. Менеджери працюють з довідниками, товарами та клієнтами. Бухгалтер поки
-            лише переглядає каталог.
+            Директор і адміністратори керують користувачами; директора змінює лише директор. Що
+            бачить і змінює кожна роль, налаштовується на сторінці «Права доступу».
           </Typography>
         </div>
         <Button onClick={actions.openCreate} startIcon={<AddIcon />} variant="contained">
@@ -53,6 +54,7 @@ export default function UsersPage({ actor }: UsersPageProps) {
           loading={accountsQuery.isFetching}
           onAction={actions.startAction}
           onRetry={() => void accountsQuery.refetch()}
+          roleOptions={roleOptions}
         />
       </Card>
       <CreateStaffPanel
@@ -61,6 +63,7 @@ export default function UsersPage({ actor }: UsersPageProps) {
         onClose={actions.closeDialogs}
         onSubmit={actions.submitCreate}
         open={actions.isCreateOpen}
+        roleOptions={roleOptions}
         submitting={actions.creating}
       />
       <SetPasswordPanel

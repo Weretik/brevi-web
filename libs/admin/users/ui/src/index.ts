@@ -12,3 +12,6 @@ export type { ProfileField } from './profile/profile-details-card';
 export { ProfilePhotoCard } from './profile/profile-photo-card';
 export { StaffAccountsTable } from './tables/staff-accounts-table';
 export type { StaffAccountAction } from './tables/staff-account-actions-menu';
+export { AccessGroupCard } from './components/access-rights/access-group-card';
+export { AccessRoleTabs } from './components/access-rights/access-role-tabs';
+export { NewRolePanel } from './panels/new-role-panel';

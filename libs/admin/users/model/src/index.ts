@@ -1,9 +1,16 @@
-export { staffRoleLabels, staffRoles } from './entities/staff-account';
+export {
+  builtInStaffRoleOptions,
+  directorRole,
+  getStaffRoleTitle,
+  staffRoleLabels,
+  staffRoles,
+} from './entities/staff-account';
 export type {
   CreateStaffAccountInput,
   StaffAccount,
   StaffDetailsInput,
   StaffRole,
+  StaffRoleOption,
 } from './entities/staff-account';
 export { canChangeOwnCredentials } from './entities/staff-profile';
 export type { StaffProfile } from './entities/staff-profile';
@@ -32,3 +39,27 @@ export {
   validateStaffPassword,
 } from './validators/staff-account-rules';
 export type { StaffAccountFieldErrors } from './validators/staff-account-rules';
+export {
+  accessActionLabels,
+  accessActions,
+  accessChangeActions,
+  roleTitleMaxLength,
+} from './entities/access-rights';
+export type {
+  AccessAction,
+  AccessArea,
+  AccessAreaGroup,
+  AccessGrants,
+  AccessRights,
+  AccessRole,
+} from './entities/access-rights';
+export {
+  areAccessGrantsEqual,
+  describeGroupAccess,
+  groupAccessAreas,
+  hasAccessAction,
+  normalizeAccessGrants,
+  setAccessAction,
+  setAccessView,
+} from './mappers/access-grants';
+export { validateRoleTitle } from './validators/role-title-rules';
