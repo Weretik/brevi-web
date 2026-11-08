@@ -7,4 +7,5 @@ export {
   financeReviewPath,
   financeTransactionsPath,
   financeTransfersPath,
+  legacyFinanceImportPath,
 } from './accounting.routes';

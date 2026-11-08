@@ -13,6 +13,7 @@ const FinanceTransactionsPage = lazy(
   () => import('./pages/transactions/finance-transactions-page'),
 );
 const FinanceTransfersPage = lazy(() => import('./pages/transfers/finance-transfers-page'));
+const LegacyFinanceImportPage = lazy(() => import('./pages/import/legacy-finance-import-page'));
 
 export const financeAccountsPath = '/accounting/accounts';
 export const financeCategoriesPath = '/accounting/categories';
@@ -21,6 +22,7 @@ export const financeOverviewPath = '/accounting/overview';
 export const financeReviewPath = '/accounting/review';
 export const financeTransactionsPath = '/accounting/transactions';
 export const financeTransfersPath = '/accounting/transfers';
+export const legacyFinanceImportPath = '/accounting/legacy-import';
 
 /** Director only: the app wraps these routes in its role check (ACC-001). */
 export const accountingRoutes: (RouteObject & { path: string })[] = [
@@ -31,4 +33,5 @@ export const accountingRoutes: (RouteObject & { path: string })[] = [
   { path: financeCounterpartiesPath, element: <FinanceCounterpartiesPage /> },
   { path: financeAccountsPath, element: <FinanceAccountsPage /> },
   { path: financeCategoriesPath, element: <FinanceCategoriesPage /> },
+  { path: legacyFinanceImportPath, element: <LegacyFinanceImportPage /> },
 ];
