@@ -1,6 +1,7 @@
 import { quoteTextMaxLength } from '@admin/quotes/model';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined';
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import {
   Alert,
@@ -50,6 +51,8 @@ interface Props {
   onEditComposition: () => void;
   /** «Змінити фото»: another photo of the item's product (CAT-018). */
   onChangePhoto?: () => void;
+  /** «Що змінено» of a changed Catalog model: its differences from the Catalog composition. */
+  onShowChanges?: () => void;
   onMove: (offset: -1 | 1) => void;
   onRemove: () => void;
   /** Current Reference fabrics for the manager line under each fabric (R-31). */
@@ -84,6 +87,7 @@ export function QuoteItemCard({
   onAddFabric,
   onEditComposition,
   onChangePhoto,
+  onShowChanges,
   onMove,
   onRemove,
   fabricFacts,
@@ -146,6 +150,16 @@ export function QuoteItemCard({
             >
               {kindLabel(item)}
             </Box>
+            {onShowChanges && item.kind === 'CustomSewing' && item.productId !== null && (
+              <Button
+                size="small"
+                startIcon={<HistoryOutlinedIcon />}
+                onClick={onShowChanges}
+                sx={{ py: 0, minHeight: 0 }}
+              >
+                Що змінено
+              </Button>
+            )}
           </Stack>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25 }}>
             {meta}

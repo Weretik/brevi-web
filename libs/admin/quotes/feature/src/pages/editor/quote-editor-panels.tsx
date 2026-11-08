@@ -1,5 +1,6 @@
 import { QuoteChangeModelDrawer } from '../../components/custom-sewing/quote-change-model-drawer';
 import { QuoteCustomSewingDrawer } from '../../components/custom-sewing/quote-custom-sewing-drawer';
+import { QuoteModelChangesDrawer } from '../../components/custom-sewing/quote-model-changes-drawer';
 import { QuoteRepriceDrawer } from '../../components/editor/quote-reprice-drawer';
 import { QuoteResponsibleDrawer } from '../../components/editor/quote-responsible-drawer';
 import { QuoteEmbroideryDrawer } from '../../components/embroidery/quote-embroidery-drawer';
@@ -18,6 +19,7 @@ export type QuoteEditorPanel =
   | { kind: 'fabric'; itemKey: string }
   | { kind: 'custom'; itemKey?: string }
   | { kind: 'photo'; itemKey: string }
+  | { kind: 'changes'; itemKey: string }
   | { kind: 'responsible' }
   | { kind: 'reprice' }
   | { kind: 'history' }
@@ -53,6 +55,8 @@ export function QuoteEditorPanels({ panel, editor, actor, onClose, onHandedOver,
           }}
         />
       );
+    case 'changes':
+      return item ? <QuoteModelChangesDrawer item={item} onClose={onClose} /> : null;
     case 'fabric':
       return item ? (
         <QuoteFabricPickerDrawer

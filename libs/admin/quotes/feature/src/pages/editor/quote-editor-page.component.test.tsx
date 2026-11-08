@@ -251,15 +251,23 @@ describe('КП editor', () => {
     expect(panel).toHaveTextContent('Створено');
   });
 
-  it('«Зберегти» saves and closes the КП with «КП збережено»; «Скасувати» closes without saving', async () => {
+  it('«Зберегти» keeps the КП open, «Зберегти і закрити» closes it, «Скасувати» closes without saving', async () => {
     api.save.mockResolvedValue({ ...quote, version: 4 });
     renderEditor();
     fireEvent.change(await screen.findByLabelText('Коментар для клієнта'), {
       target: { value: 'Інше' },
     });
     fireEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
-    expect(await screen.findByText('Список КП: КП збережено')).toBeVisible();
+    expect(await screen.findByText('КП збережено.')).toBeVisible();
+    expect(screen.queryByText(/Список КП/)).not.toBeInTheDocument();
     expect(api.save).toHaveBeenCalledTimes(1);
+
+    fireEvent.change(screen.getByLabelText('Коментар для клієнта'), {
+      target: { value: 'Ще інше' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Зберегти і закрити' }));
+    expect(await screen.findByText('Список КП: КП збережено')).toBeVisible();
+    expect(api.save).toHaveBeenCalledTimes(2);
     cleanup();
 
     renderEditor();
@@ -268,7 +276,7 @@ describe('КП editor', () => {
     });
     fireEvent.click(screen.getByRole('button', { name: 'Скасувати' }));
     expect(await screen.findByText('Список КП:')).toBeVisible();
-    expect(api.save).toHaveBeenCalledTimes(1);
+    expect(api.save).toHaveBeenCalledTimes(2);
   });
 
   it('offers «Видалити КП» in «Ще» only to who may delete, and shows why the server refused', async () => {
@@ -350,7 +358,14 @@ describe('КП editor', () => {
 
     typeRetail('95');
     fireEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
-    expect(await screen.findByText('Вкажіть причину ручної ціни.')).toBeVisible();
+    const problems = await screen.findByRole('dialog', { name: 'КП не збережено' });
+    expect(problems).toHaveTextContent('Позиція 01 «Рукавиці»');
+    expect(problems).toHaveTextContent('Вкажіть причину ручної ціни.');
+    fireEvent.click(within(problems).getByRole('button', { name: 'Зрозуміло' }));
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog', { name: 'КП не збережено' })).toBeNull(),
+    );
+    expect(screen.getAllByText('Вкажіть причину ручної ціни.')[0]).toBeVisible();
     expect(api.save).not.toHaveBeenCalled();
 
     fireEvent.change(screen.getByLabelText(/Причина ручної ціни/), {

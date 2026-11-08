@@ -14,6 +14,7 @@ interface Props {
   onTierShown: (tier: QuoteTier, shown: boolean) => void;
   onGo: (target: string) => void;
   onSave: () => void;
+  onSaveAndClose: () => void;
   onCancel: () => void;
   onPdf: () => void;
   onSend: () => void;
@@ -29,6 +30,7 @@ export function QuoteEditorAside({
   onTierShown,
   onGo,
   onSave,
+  onSaveAndClose,
   onCancel,
   onPdf,
   onSend,
@@ -54,6 +56,7 @@ export function QuoteEditorAside({
           saving={saving}
           generating={generating}
           onSave={onSave}
+          onSaveAndClose={onSaveAndClose}
           onCancel={onCancel}
           onPdf={onPdf}
           onSend={onSend}

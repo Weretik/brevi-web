@@ -14,6 +14,7 @@ import {
   introToDraft,
   mainProductsOf,
   quoteIntroErrors,
+  quoteIntroSaveProblems,
   setIntroLayout,
   updateIntroSlot,
 } from '@admin/quotes/model';
@@ -30,6 +31,7 @@ import type {
   QuoteIntroLayout,
   QuoteIntroSlotDraft,
   QuoteIntroTemplate,
+  QuoteSaveProblem,
   QuoteStartPrefill,
 } from '@admin/quotes/model';
 
@@ -58,6 +60,8 @@ export function useQuoteIntroductionEditor(
   const [baseline, setBaseline] = useState('');
   const [showErrors, setShowErrors] = useState(false);
   const [saveError, setSaveError] = useState<{ message: string; stale: boolean } | null>(null);
+  /** Why the last save failed, for «КП не збережено» (round 2, item 13); empty after closing it. */
+  const [saveProblems, setSaveProblems] = useState<readonly QuoteSaveProblem[]>([]);
   const { products, remember } = useIntroProducts(setup.data, draft);
 
   const start = (next: QuoteIntroDraft, saved: Quote | null) => {
@@ -88,7 +92,10 @@ export function useQuoteIntroductionEditor(
     if (!draft) return null;
     setShowErrors(true);
     setSaveError(null);
-    if (Object.keys(errors).length > 0) return null;
+    if (Object.keys(errors).length > 0) {
+      setSaveProblems(quoteIntroSaveProblems(draft, errors));
+      return null;
+    }
     try {
       const saved =
         quote === null
@@ -99,13 +106,13 @@ export function useQuoteIntroductionEditor(
       return saved;
     } catch (error) {
       const message = messageOf(error, 'Не вдалося зберегти КП.');
-      setSaveError({
-        message,
-        stale:
-          (error as { status?: number }).status === 409 &&
-          quote !== null &&
-          /іншому вікні/.test(message),
-      });
+      const stale =
+        (error as { status?: number }).status === 409 &&
+        quote !== null &&
+        /іншому вікні/.test(message);
+      // A newer version saved elsewhere keeps the notice with «Оновити»; other refusals list their reason.
+      if (stale) setSaveError({ message, stale });
+      else setSaveProblems([{ text: message, target: null }]);
       return null;
     }
   };
@@ -182,5 +189,7 @@ export function useQuoteIntroductionEditor(
     save,
     saving: creating.isLoading || saving.isLoading,
     saveError,
+    saveProblems,
+    closeSaveProblems: () => setSaveProblems([]),
   };
 }

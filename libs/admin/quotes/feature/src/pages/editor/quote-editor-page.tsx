@@ -27,6 +27,7 @@ import { QuoteEditorNotices } from './quote-editor-notices';
 import { QuoteEditorPanels } from './quote-editor-panels';
 import { QuoteDeleteDialog } from '../../components/editor/quote-delete-dialog';
 import { QuoteSaveFirstDialog } from '../../components/editor/quote-save-first-dialog';
+import { QuoteSaveProblemsDialog } from '../../components/editor/quote-save-problems-dialog';
 import { QuotePreview } from '../../components/preview/quote-preview';
 import { useClientSuggestions } from '../../hooks/clients/use-client-suggestions';
 import { useQuoteEditor } from '../../hooks/editor/use-quote-editor';
@@ -120,8 +121,12 @@ export default function QuoteEditorPage({
     dirty: editor.dirty,
     saving: editor.saving,
     generating: preview.preparing,
-    // «Зберегти» saves and closes the КП; «Скасувати» closes it without saving (crm R-33).
+    // «Зберегти» saves and stays, «Зберегти і закрити» goes back to the list; «Скасувати» closes without saving.
     onSave: () =>
+      void editor.save().then((saved) => {
+        if (saved) setSentNotice('КП збережено.');
+      }),
+    onSaveAndClose: () =>
       void editor.save().then((saved) => {
         if (saved) navigate('/crm/quotes', { state: { notice: 'КП збережено' } });
       }),
@@ -204,6 +209,7 @@ export default function QuoteEditorPage({
               onAddFabric={() => setPanel({ kind: 'fabric', itemKey: item.key })}
               onEditComposition={() => setPanel({ kind: 'custom', itemKey: item.key })}
               onChangePhoto={() => setPanel({ kind: 'photo', itemKey: item.key })}
+              onShowChanges={() => setPanel({ kind: 'changes', itemKey: item.key })}
               onMove={(offset) => editor.moveItem(item.key, offset)}
               onRemove={() => editor.removeItem(item.key)}
               fabricFacts={fabricFacts}
@@ -262,6 +268,13 @@ export default function QuoteEditorPage({
           saving={editor.saving}
           onCancel={saveFirst.cancel}
           onSave={() => void saveFirst.confirm()}
+        />
+      )}
+      {editor.saveProblems.length > 0 && (
+        <QuoteSaveProblemsDialog
+          problems={editor.saveProblems}
+          onGo={scrollTo}
+          onClose={editor.closeSaveProblems}
         />
       )}
       <QuoteDeleteDialog flow={removal} />
