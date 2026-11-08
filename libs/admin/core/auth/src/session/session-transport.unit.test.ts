@@ -17,6 +17,11 @@ const meResponse = {
   fullName: 'Адміністратор',
   roles: ['Admin'],
 };
+const accessResponse = {
+  allowAll: false,
+  roles: [{ name: 'Admin', title: 'Адміністратор', builtIn: true }],
+  grants: { quotes: ['view', 'create', 'edit'] },
+};
 
 describe('cookie session transport', () => {
   beforeEach(() => {
@@ -28,6 +33,7 @@ describe('cookie session transport', () => {
 
   it('signs in with the cookie endpoint and maps the user', async () => {
     post.mockResolvedValue({ data: meResponse });
+    get.mockResolvedValue({ data: accessResponse });
 
     await expect(
       requestLogin({ email: 'admin@brevi.com.ua', password: 'secret-pass' }),
@@ -37,12 +43,16 @@ describe('cookie session transport', () => {
       fullName: 'Адміністратор',
       roles: ['Admin'],
       avatarUrl: null,
+      access: accessResponse,
     });
     expect(post).toHaveBeenCalledWith(
       'http://localhost/api/auth/cookie/login',
       { email: 'admin@brevi.com.ua', password: 'secret-pass' },
       { withCredentials: true },
     );
+    expect(get).toHaveBeenCalledWith('http://localhost/api/auth/session/access', {
+      withCredentials: true,
+    });
   });
 
   it('signs out with the CSRF cookie value and no bearer token', async () => {

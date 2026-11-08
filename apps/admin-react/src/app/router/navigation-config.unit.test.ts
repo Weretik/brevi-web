@@ -2,11 +2,14 @@ import { describe, expect, it } from 'vitest';
 
 import { adminRouteDefinitions } from './admin-route-definitions';
 import { createNavigation } from './navigation-config';
+import { defaultAccess } from '../../test/default-access';
+
+const as = (...roles: string[]) => ({ roles, access: defaultAccess(roles) });
 
 describe('legacy Admin navigation', () => {
   it('links «КП» and «Налаштування КП»; later КП pages have no link', () => {
     const paths = new Set(adminRouteDefinitions.map((route) => route.path));
-    const manager = createNavigation(paths, ['Admin']).find(
+    const manager = createNavigation(paths, as('Admin')).find(
       (group) => group.id === 'service-manager',
     );
     expect(manager?.items.find((item) => item.id === 'quotes')?.to).toBe('/crm/quotes');
@@ -23,7 +26,9 @@ describe('legacy Admin navigation', () => {
   });
   it('connects the reminders group to its four pages', () => {
     const paths = new Set(adminRouteDefinitions.map((route) => route.path));
-    const reminders = createNavigation(paths).find((group) => group.id === 'reminders');
+    const reminders = createNavigation(paths, as('Admin')).find(
+      (group) => group.id === 'reminders',
+    );
     expect(reminders?.items.map((item) => item.to)).toEqual([
       '/reminders/tasks',
       '/reminders/periods',
@@ -31,8 +36,8 @@ describe('legacy Admin navigation', () => {
       '/reminders/non-working-days',
     ]);
   });
-  it('keeps the shared entries in their sections, with reminders and site content', () => {
-    const groups = createNavigation(new Set(['/']));
+  it('keeps every Admin entry in its section, with reminders and site content', () => {
+    const groups = createNavigation(new Set(['/']), as('Admin'));
 
     expect(groups.map((group) => group.label)).toEqual([
       'Менеджер сервісу',
@@ -42,22 +47,23 @@ describe('legacy Admin navigation', () => {
       'Фото',
       'Контент',
       'Загальні звіти',
+      'Адміністрування',
     ]);
-    expect(groups.map((group) => group.items.length)).toEqual([5, 3, 4, 8, 1, 2, 1]);
-    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(24);
+    expect(groups.map((group) => group.items.length)).toEqual([7, 15, 4, 8, 1, 2, 1, 4]);
+    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(42);
     expect(groups[0].items.map((item) => item.id)).not.toContain('clients');
   });
   it('shows «Налаштування КП» only for the server Admin role', () => {
     const paths = new Set(['/crm/quotes']);
-    const admin = createNavigation(paths, ['Admin']);
-    const manager = createNavigation(paths, ['Manager']);
+    const admin = createNavigation(paths, as('Admin'));
+    const manager = createNavigation(paths, as('Manager'));
     expect(admin[0].items.some((item) => item.id === 'quote-settings')).toBe(true);
     expect(manager[0].items.some((item) => item.id === 'quote-settings')).toBe(false);
     expect(manager[0].items.find((item) => item.id === 'quotes')?.to).toBe('/crm/quotes');
   });
 
   it('shows the photo library as its own group with its registered route', () => {
-    const groups = createNavigation(new Set(['/', '/media']));
+    const groups = createNavigation(new Set(['/', '/media']), as('Manager'));
     const media = groups.find((group) => group.id === 'media');
 
     expect(media).toMatchObject({ label: 'Фото', section: 'Дані' });
@@ -73,8 +79,8 @@ describe('legacy Admin navigation', () => {
 
   it('enables a legacy URL only when the React route is registered', () => {
     const legacyPath = '/references/counterparties';
-    const unavailable = createNavigation(new Set(['/']));
-    const available = createNavigation(new Set(['/', legacyPath]));
+    const unavailable = createNavigation(new Set(['/']), as('Manager'));
+    const available = createNavigation(new Set(['/', legacyPath]), as('Manager'));
 
     const references = (groups: typeof available) =>
       groups.find((group) => group.id === 'references')?.items[4];
@@ -83,17 +89,20 @@ describe('legacy Admin navigation', () => {
     expect(available[0].items[2].to).toBeUndefined();
   });
 
-  it('shows «Користувачі», «Завдання менеджерам» and «Налаштування ШІ» only to Admin', () => {
-    const paths = new Set(['/admin/users', '/admin/tasks', '/admin/ai']);
-    const admin = createNavigation(paths, ['Admin']).find((group) => group.id === 'administration');
+  it('shows «Користувачі», «Завдання менеджерам», «Налаштування ШІ» and «Права доступу» only to Admin', () => {
+    const paths = new Set(['/admin/users', '/admin/tasks', '/admin/ai', '/admin/access']);
+    const admin = createNavigation(paths, as('Admin')).find(
+      (group) => group.id === 'administration',
+    );
 
     expect(admin?.items).toEqual([
       { id: 'users', label: 'Користувачі', to: '/admin/users' },
       { id: 'manager-tasks', label: 'Завдання менеджерам', to: '/admin/tasks' },
       { id: 'ai-settings', label: 'Налаштування ШІ', to: '/admin/ai' },
+      { id: 'access-rights', label: 'Права доступу', to: '/admin/access' },
     ]);
     expect(
-      createNavigation(paths, ['Manager']).some((group) => group.id === 'administration'),
+      createNavigation(paths, as('Manager')).some((group) => group.id === 'administration'),
     ).toBe(false);
   });
 
@@ -112,7 +121,7 @@ describe('legacy Admin navigation', () => {
       '/production/archive',
     ]);
     const shop = (roles: string[]) =>
-      createNavigation(paths, roles).find((group) => group.id === 'sewing-shop');
+      createNavigation(paths, as(...roles)).find((group) => group.id === 'sewing-shop');
 
     expect(
       shop(['WorkshopChief'])
@@ -154,7 +163,7 @@ describe('legacy Admin navigation', () => {
 
   it('shows «Виробничі завдання» and «Склад тканин» to managers as well', () => {
     const paths = new Set(['/production/orders', '/production/fabric-stock']);
-    const shop = createNavigation(paths, ['Manager']).find((group) => group.id === 'sewing-shop');
+    const shop = createNavigation(paths, as('Manager')).find((group) => group.id === 'sewing-shop');
 
     expect(shop?.items[0]).toEqual({
       id: 'production-orders',
@@ -184,7 +193,7 @@ describe('legacy Admin navigation', () => {
       '/accounting/audit',
     ]);
     const accounting = (roles: string[]) =>
-      createNavigation(paths, roles).find((group) => group.id === 'accounting');
+      createNavigation(paths, as(...roles)).find((group) => group.id === 'accounting');
 
     expect(accounting(['Director'])?.items.filter((item) => item.to)).toEqual([
       { id: 'finance-overview', label: 'Огляд', to: '/accounting/overview' },

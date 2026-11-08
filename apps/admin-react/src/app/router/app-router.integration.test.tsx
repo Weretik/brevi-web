@@ -5,23 +5,28 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { App } from '../app';
 import { createAdminRouter } from './create-admin-router';
+import { defaultAccess } from '../../test/default-access';
 
 import type { SessionRole, SessionUser } from '@admin/core/auth';
 import type { ReactNode } from 'react';
 
 const session = vi.hoisted(() => ({ roles: ['Manager'] as SessionRole[] }));
 
+const signedIn = (): SessionUser => ({
+  id: '2',
+  email: 'manager@brevi.com.ua',
+  fullName: 'Олена',
+  roles: session.roles,
+  avatarUrl: null,
+  access: defaultAccess(session.roles),
+});
+
 vi.mock('@admin/core/auth', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@admin/core/auth')>()),
   // A signed-in manager; the session guard itself is tested in the auth library.
   RequireAdminSession: ({ children }: { children: (user: SessionUser) => ReactNode }) =>
-    children({
-      id: '2',
-      email: 'manager@brevi.com.ua',
-      fullName: 'Олена',
-      roles: session.roles,
-      avatarUrl: null,
-    }),
+    children(signedIn()),
+  useAdminSession: () => ({ status: 'authenticated', user: signedIn() }),
   useGetAdminSessionRolesQuery: () => ({
     currentData: session.roles,
     isSuccess: true,

@@ -61,6 +61,87 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/auth/session/access': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * What the signed-in user may do
+     * @description Rights by page of «Права доступу» ([ACC-001](../../specs/identity/002-access-rights/README.md)); the admin hides menu items and buttons by them, the server checks the same rights.
+     */
+    get: operations['getSessionAccess'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/admin/access': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Pages of «Права доступу» and every staff role with its rights
+     * @description Policy `CanManageUsers` (Admin; the director also holds Admin). Built-in roles first in a fixed order, then new roles by title. A role never saved shows its defaults with version 0.
+     */
+    get: operations['getAccessRights'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/admin/access/roles': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Add a role
+     * @description The role starts with no rights and gets a generated name `custom-…`.
+     */
+    post: operations['createRole'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/admin/access/roles/{role}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Save a role's rights
+     * @description Replaces every page of the role; a page left out is hidden from it. Every action needs «view» on the same page.
+     */
+    put: operations['saveRoleAccess'];
+    post?: never;
+    /** Delete a role made on this page */
+    delete: operations['deleteRole'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/accounting/settings': {
     parameters: {
       query?: never;
@@ -1155,7 +1236,7 @@ export interface paths {
     put?: never;
     /**
      * Add a pricing parameter
-     * @description Requires CanManageProducts. The ID is assigned by Brevi; updatedOn becomes today (Kyiv).
+     * @description Requires access:pricing-parameters. The ID is assigned by Brevi; updatedOn becomes today (Kyiv).
      */
     post: operations['createPricingParameter'];
     delete?: never;
@@ -1175,7 +1256,7 @@ export interface paths {
     put?: never;
     /**
      * Import both tables of the Calculator sheet «Налаштування цін»
-     * @description Requires CanManageProducts. Parameters are matched by code, PPE markup rules by name; the row number becomes the display order. dryRun (default) returns the preview only. Otherwise nothing is saved when any row has an error. deleteMissing deletes parameters and rules that are not in the sheet. Repeating the same file changes nothing.
+     * @description Requires access:pricing-parameters. Parameters are matched by code, PPE markup rules by name; the row number becomes the display order. dryRun (default) returns the preview only. Otherwise nothing is saved when any row has an error. deleteMissing deletes parameters and rules that are not in the sheet. Repeating the same file changes nothing.
      */
     post: operations['importPricingSettings'];
     delete?: never;
@@ -1196,7 +1277,7 @@ export interface paths {
     get?: never;
     /**
      * Update a pricing parameter
-     * @description Requires CanManageProducts. The code cannot change. When the value or type changes, updatedOn becomes today (Kyiv). A calculated parameter takes no value.
+     * @description Requires access:pricing-parameters. The code cannot change. When the value or type changes, updatedOn becomes today (Kyiv). A calculated parameter takes no value.
      */
     put: operations['updatePricingParameter'];
     post?: never;
@@ -1222,7 +1303,7 @@ export interface paths {
     put?: never;
     /**
      * Add a product section
-     * @description Requires CanManageProducts. The ID is assigned by Brevi; the name must be unique.
+     * @description Requires access:product-sections. The ID is assigned by Brevi; the name must be unique.
      */
     post: operations['createProductSection'];
     delete?: never;
@@ -1242,7 +1323,7 @@ export interface paths {
     put?: never;
     /**
      * Import the Calculator sheet «Типи і розділи»
-     * @description Requires CanManageProducts. Sections are matched by name (case and punctuation ignored); the row number becomes the display order. dryRun (default) returns the preview only. Otherwise nothing is saved when any row has an error. deleteMissing deletes sections that are not in the sheet. Repeating the same file changes nothing.
+     * @description Requires access:product-sections. Sections are matched by name (case and punctuation ignored); the row number becomes the display order. dryRun (default) returns the preview only. Otherwise nothing is saved when any row has an error. deleteMissing deletes sections that are not in the sheet. Repeating the same file changes nothing.
      */
     post: operations['importProductSections'];
     delete?: never;
@@ -1263,13 +1344,13 @@ export interface paths {
     get?: never;
     /**
      * Edit a product section
-     * @description Requires CanManageProducts. The name stays unique; products keep their link by ID.
+     * @description Requires access:product-sections. The name stays unique; products keep their link by ID.
      */
     put: operations['updateProductSection'];
     post?: never;
     /**
      * Delete a product section
-     * @description Requires CanManageProducts.
+     * @description Requires access:product-sections.
      */
     delete: operations['deleteProductSection'];
     options?: never;
@@ -1289,7 +1370,7 @@ export interface paths {
     put?: never;
     /**
      * Add a PPE markup rule
-     * @description Requires CanManageProducts. The name is unique and cannot change later; PPE offers refer to it.
+     * @description Requires access:pricing-parameters. The name is unique and cannot change later; PPE offers refer to it.
      */
     post: operations['createPpeMarkupRule'];
     delete?: never;
@@ -1330,7 +1411,7 @@ export interface paths {
     put?: never;
     /**
      * Create a garment part operation with a client supplied ID
-     * @description Requires CanManageProducts. The code (OP-…) is unique when given; a duplicate is a 400 on Request.Code. Numeric edits append an approved pricing revision when the reference is versioned.
+     * @description Requires access:operations. The code (OP-…) is unique when given; a duplicate is a 400 on Request.Code. Numeric edits append an approved pricing revision when the reference is versioned.
      */
     post: operations['createGarmentPartOperation'];
     delete?: never;
@@ -1350,7 +1431,7 @@ export interface paths {
     put?: never;
     /**
      * Import the Calculator sheet «Операції»
-     * @description Requires CanManageProducts. The caller sends the sheet rows as JSON (one-time transfer from the Calculator sheet). A row is matched by code (OP-…); the rest are created with the next ID. «Група деталей» is matched by name (case and punctuation ignored); an unknown one becomes a new group. dryRun (default) returns the preview only. Otherwise nothing is saved when any row has an error. deleteMissing deletes operations that are not in the sheet; an operation still used by a product or price history is marked not used instead (keptInUse). Groups left without operations are then deleted. Repeating the same file changes nothing.
+     * @description Requires access:operations. The caller sends the sheet rows as JSON (one-time transfer from the Calculator sheet). A row is matched by code (OP-…); the rest are created with the next ID. «Група деталей» is matched by name (case and punctuation ignored); an unknown one becomes a new group. dryRun (default) returns the preview only. Otherwise nothing is saved when any row has an error. deleteMissing deletes operations that are not in the sheet; an operation still used by a product or price history is marked not used instead (keptInUse). Groups left without operations are then deleted. Repeating the same file changes nothing.
      */
     post: operations['importGarmentPartOperations'];
     delete?: never;
@@ -1371,13 +1452,13 @@ export interface paths {
     get?: never;
     /**
      * Update a garment part operation
-     * @description Requires CanManageProducts. Numeric edits append an approved pricing revision when the reference is versioned.
+     * @description Requires access:operations. Numeric edits append an approved pricing revision when the reference is versioned.
      */
     put: operations['updateGarmentPartOperation'];
     post?: never;
     /**
      * Delete a garment part operation
-     * @description Requires CanManageProducts. Numeric edits append an approved pricing revision when the reference is versioned.
+     * @description Requires access:operations. Numeric edits append an approved pricing revision when the reference is versioned.
      */
     delete: operations['deleteGarmentPartOperation'];
     options?: never;
@@ -1435,7 +1516,7 @@ export interface paths {
     put?: never;
     /**
      * Create a fabric with a client supplied ID
-     * @description Requires CanManageProducts. Numeric edits append an approved pricing revision when the reference is versioned.
+     * @description Requires access:materials. Numeric edits append an approved pricing revision when the reference is versioned.
      */
     post: operations['createFabric'];
     delete?: never;
@@ -1455,7 +1536,7 @@ export interface paths {
     put?: never;
     /**
      * Import the Calculator sheet «Тканини»
-     * @description Requires CanManageProducts. The caller sends the sheet rows as JSON (one-time transfer from the Calculator sheet). A row is matched by code (FAB-…); an older fabric without a code is linked when its name matches (case and punctuation ignored); the rest are created with the next ID. Supplier names are matched like the KeepinCRM sync; an unknown one becomes a new manual supplier, an empty one «Не вказано». dryRun (default) returns the preview only. Otherwise nothing is saved when any row has an error. deactivateMissing marks fabrics that are not in the sheet as not used. Repeating the same file changes nothing.
+     * @description Requires access:materials. The caller sends the sheet rows as JSON (one-time transfer from the Calculator sheet). A row is matched by code (FAB-…); an older fabric without a code is linked when its name matches (case and punctuation ignored); the rest are created with the next ID. Supplier names are matched like the KeepinCRM sync; an unknown one becomes a new manual supplier, an empty one «Не вказано». dryRun (default) returns the preview only. Otherwise nothing is saved when any row has an error. deactivateMissing marks fabrics that are not in the sheet as not used. Repeating the same file changes nothing.
      */
     post: operations['importFabrics'];
     delete?: never;
@@ -1476,13 +1557,13 @@ export interface paths {
     get?: never;
     /**
      * Update a fabric
-     * @description Requires CanManageProducts. Numeric edits append an approved pricing revision when the reference is versioned. A price change sets priceUpdatedAt to today (Kyiv).
+     * @description Requires access:materials. Numeric edits append an approved pricing revision when the reference is versioned. A price change sets priceUpdatedAt to today (Kyiv).
      */
     put: operations['updateFabric'];
     post?: never;
     /**
      * Delete a fabric
-     * @description Requires CanManageProducts. Numeric edits append an approved pricing revision when the reference is versioned.
+     * @description Requires access:materials. Numeric edits append an approved pricing revision when the reference is versioned.
      */
     delete: operations['deleteFabric'];
     options?: never;
@@ -1502,7 +1583,7 @@ export interface paths {
     put?: never;
     /**
      * Create a garment accessory with a client supplied ID
-     * @description Requires CanManageProducts. Numeric edits append an approved pricing revision when the reference is versioned.
+     * @description Requires access:materials. Numeric edits append an approved pricing revision when the reference is versioned.
      */
     post: operations['createGarmentAccessory'];
     delete?: never;
@@ -1522,7 +1603,7 @@ export interface paths {
     put?: never;
     /**
      * Import the Calculator sheet «Фурнітура»
-     * @description Requires CanManageProducts. Same rules as importFabrics with FUR- codes. unit is one of шт., м, послуга («шт», «м.», «Послуга» are accepted); an unknown unit is a row error.
+     * @description Requires access:materials. Same rules as importFabrics with FUR- codes. unit is one of шт., м, послуга («шт», «м.», «Послуга» are accepted); an unknown unit is a row error.
      */
     post: operations['importGarmentAccessories'];
     delete?: never;
@@ -1543,13 +1624,13 @@ export interface paths {
     get?: never;
     /**
      * Update a garment accessory
-     * @description Requires CanManageProducts. Numeric edits append an approved pricing revision when the reference is versioned.
+     * @description Requires access:materials. Numeric edits append an approved pricing revision when the reference is versioned.
      */
     put: operations['updateGarmentAccessory'];
     post?: never;
     /**
      * Delete a garment accessory
-     * @description Requires CanManageProducts. Numeric edits append an approved pricing revision when the reference is versioned.
+     * @description Requires access:materials. Numeric edits append an approved pricing revision when the reference is versioned.
      */
     delete: operations['deleteGarmentAccessory'];
     options?: never;
@@ -1694,7 +1775,7 @@ export interface paths {
     put?: never;
     /**
      * Create a product from the page «Новий ЗІЗ» or «Нова модель»
-     * @description Requires CanManageProducts and an actor (CAT-009). The server picks the ID (largest + 1) and the slug (from the Ukrainian name; the code and then a number are added when it is taken). The name is Ukrainian only. An empty sewing code takes the next free MOD-XXX. The section must belong to the type. A PPE product needs the ppe block; the first price version is appended with source «Створення ЗІЗ». priceSaved is false when the product was saved but its price was not; the card then asks to save the price again.
+     * @description Requires access:products and an actor (CAT-009). The server picks the ID (largest + 1) and the slug (from the Ukrainian name; the code and then a number are added when it is taken). The name is Ukrainian only. An empty sewing code takes the next free MOD-XXX. The section must belong to the type. A PPE product needs the ppe block; the first price version is appended with source «Створення ЗІЗ». priceSaved is false when the product was saved but its price was not; the card then asks to save the price again.
      */
     post: operations['createCatalogProduct'];
     delete?: never;
@@ -1739,7 +1820,7 @@ export interface paths {
     get: operations['getProductOverviewItem'];
     /**
      * Replace the «Товари» page fields of a product
-     * @description Requires CanManageProducts (open while temporary anonymous access is on). Every field is replaced. A PPE product needs a code (site article). The section must exist in Reference «Типи і розділи» and belong to the product type. Season is for sewing only.
+     * @description Requires access:products (open while temporary anonymous access is on). Every field is replaced. A PPE product needs a code (site article). The section must exist in Reference «Типи і розділи» and belong to the product type. Season is for sewing only.
      */
     put: operations['updateProductOverview'];
     post?: never;
@@ -1760,7 +1841,7 @@ export interface paths {
     put?: never;
     /**
      * Import all products from the Calculator sheet (preview or apply)
-     * @description Requires CanManageProducts and an actor (CAT-010). One-time transfer of the tabs «Товари» (with «Прайс на сайт», «Комплектація виробів», «Трудовитрати виробів») and «ЗІЗ». A row matches a stored product by type and code (sewing model ID, PPE site article), else by the exact name of the same type; a matched product keeps its ID and slug, the rest are created (ID largest + 1, slug as in createCatalogProduct). Names are Ukrainian only; the Russian name column gets a copy. A matched sewing model gets its article list and whole composition replaced; the note «Спільна складова для всіх артикулів моделі» that the sheet repeats on shared lines is dropped. A PPE product gets a new offer version (source «Імпорт з таблиці», dated the import day) only when the supplier price, the rule or a given Insight price differs; no supplier price means no version. With deleteMissing, every product of either type that no row matches is deleted. dryRun (default true) never writes. Any problem means nothing is written; warnings (unknown rule imported as none, no supplier price or link) do not stop the import. All writes run in one database transaction.
+     * @description Requires access:products and an actor (CAT-010). One-time transfer of the tabs «Товари» (with «Прайс на сайт», «Комплектація виробів», «Трудовитрати виробів») and «ЗІЗ». A row matches a stored product by type and code (sewing model ID, PPE site article), else by the exact name of the same type; a matched product keeps its ID and slug, the rest are created (ID largest + 1, slug as in createCatalogProduct). Names are Ukrainian only; the Russian name column gets a copy. A matched sewing model gets its article list and whole composition replaced; the note «Спільна складова для всіх артикулів моделі» that the sheet repeats on shared lines is dropped. A PPE product gets a new offer version (source «Імпорт з таблиці», dated the import day) only when the supplier price, the rule or a given Insight price differs; no supplier price means no version. With deleteMissing, every product of either type that no row matches is deleted. dryRun (default true) never writes. Any problem means nothing is written; warnings (unknown rule imported as none, no supplier price or link) do not stop the import. All writes run in one database transaction.
      */
     post: operations['importSheetProducts'];
     delete?: never;
@@ -1832,7 +1913,7 @@ export interface paths {
     put?: never;
     /**
      * Create a fabric variant of a Sewing Product
-     * @description Requires CanManageProducts. Creates the variant (Article) with its fabric and metres per product in one transaction (CAT-015). Sale SKU is globally unique, trimmed and compared using ordinal case-sensitive equality.
+     * @description Requires access:products. Creates the variant (Article) with its fabric and metres per product in one transaction (CAT-015). Sale SKU is globally unique, trimmed and compared using ordinal case-sensitive equality.
      */
     post: operations['createSewingArticle'];
     delete?: never;
@@ -1857,7 +1938,7 @@ export interface paths {
     get: operations['getSewingComposition'];
     /**
      * Replace model-wide Sewing composition
-     * @description Requires CanManageProducts. Replaces all model-wide materials and operations atomically. A stale expectedVersion returns 409; clients must not replay automatically and should retain the user's draft for resolution.
+     * @description Requires access:products. Replaces all model-wide materials and operations atomically. A stale expectedVersion returns 409; clients must not replay automatically and should retain the user's draft for resolution.
      */
     put: operations['replaceSewingComposition'];
     post?: never;
@@ -1880,13 +1961,13 @@ export interface paths {
     get?: never;
     /**
      * Change a fabric variant
-     * @description Requires CanManageProducts. Changes the sale SKU, activity and the variant's fabric with metres per product (CAT-015). A stale expectedVersion returns 409.
+     * @description Requires access:products. Changes the sale SKU, activity and the variant's fabric with metres per product (CAT-015). A stale expectedVersion returns 409.
      */
     put: operations['updateSewingArticle'];
     post?: never;
     /**
      * Remove a fabric variant
-     * @description Requires CanManageProducts. Removes the variant with its fabric line. A variant that already has saved prices returns 409 and can be switched off instead.
+     * @description Requires access:products. Removes the variant with its fabric line. A variant that already has saved prices returns 409 and can be switched off instead.
      */
     delete: operations['deleteSewingArticle'];
     options?: never;
@@ -1923,7 +2004,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** @description Save an immutable calculation using server time. A request UUID is globally unique; retries return the original snapshot, even after inputs change. Blocked results are saved for diagnosis. Requires CanManageProducts. */
+    /** @description Save an immutable calculation using server time. A request UUID is globally unique; retries return the original snapshot, even after inputs change. Blocked results are saved for diagnosis. Requires access:products. */
     post: operations['saveSewingCalculation'];
     delete?: never;
     options?: never;
@@ -1965,7 +2046,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** @description Publish an unblocked current calculation. Replaying an already published calculation returns its original publication without replacing the current price. Requires CanManageProducts. */
+    /** @description Publish an unblocked current calculation. Replaying an already published calculation returns its original publication without replacing the current price. Requires access:products. */
     post: operations['publishSewingCalculation'];
     delete?: never;
     options?: never;
@@ -2002,7 +2083,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** @description Append a complete approved settings revision effective at server time. expectedVersionId must match the latest revision; no partial setting updates. requestId makes retries idempotent. Requires CanManageProducts. */
+    /** @description Append a complete approved settings revision effective at server time. expectedVersionId must match the latest revision; no partial setting updates. requestId makes retries idempotent. Requires access:pricing-parameters. */
     post: operations['createSewingSettingsVersion'];
     delete?: never;
     options?: never;
@@ -2038,7 +2119,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** @description Append an approved revision to an existing non-inventory service cost. Unit and source identity are preserved. requestId makes retries idempotent; expectedVersionId prevents lost updates. Requires CanManageProducts. */
+    /** @description Append an approved revision to an existing non-inventory service cost. Unit and source identity are preserved. requestId makes retries idempotent; expectedVersionId prevents lost updates. Requires access:pricing-parameters. */
     post: operations['reviseOtherCost'];
     delete?: never;
     options?: never;
@@ -2123,7 +2204,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** @description CanManageProducts. Append and approve a version using server actor/time. expectedVersionId null only for first enrollment. Request UUID retries are actor/payload-bound. */
+    /** @description access:pricing-parameters. Append and approve a version using server actor/time. expectedVersionId null only for first enrollment. Request UUID retries are actor/payload-bound. */
     post: operations['createPpeRuleVersion'];
     delete?: never;
     options?: never;
@@ -2142,7 +2223,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** @description CanManageProducts. Append and approve a version using server actor/time. expectedVersionId null only for first enrollment. Request UUID retries are actor/payload-bound. */
+    /** @description access:products. Append and approve a version using server actor/time. expectedVersionId null only for first enrollment. Request UUID retries are actor/payload-bound. */
     post: operations['createPpeOfferVersion'];
     delete?: never;
     options?: never;
@@ -2161,7 +2242,7 @@ export interface paths {
     };
     /** @description CatalogRead. The PPE product card (CAT-008): supplier fields from the sheet tab «ЗІЗ», Insight XML prices of the current offer version and the live three-tier calculation. Nothing is saved. */
     get: operations['getPpeSupplierOffer'];
-    /** @description CanManageProducts. Replaces the supplier fields. When the supplier price or the rule changes, appends an approved offer version (source «Картка ЗІЗ», server actor/time) that keeps the Insight prices; expectedOfferVersionId must name the current version (null when none). */
+    /** @description access:products. Replaces the supplier fields. When the supplier price or the rule changes, appends an approved offer version (source «Картка ЗІЗ», server actor/time) that keeps the Insight prices; expectedOfferVersionId must name the current version (null when none). */
     put: operations['updatePpeSupplierOffer'];
     post?: never;
     delete?: never;
@@ -2213,7 +2294,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** @description CanManageProducts. Reads the supplier's files (Insight: 3 XML; СЕМТО: 1 PDF; each may be gzipped) and returns every product of the supplier with old and new prices. dryRun=false saves changed prices as new approved offer versions; manual-price and inactive products are skipped. Request limit 30 MB. */
+    /** @description access:price-import. Reads the supplier's files (Insight: 3 XML; СЕМТО: 1 PDF; each may be gzipped) and returns every product of the supplier with old and new prices. dryRun=false saves changed prices as new approved offer versions; manual-price and inactive products are skipped. Request limit 30 MB. */
     post: operations['importPpeSupplierPrices'];
     delete?: never;
     options?: never;
@@ -2230,7 +2311,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** @description CanManageProducts. «Оновити зараз» for a connected website, Google Sheets or dealer cabinet source (av-center, 3c-market, perchatka-centr, trele): reads the supplier's pages, the six 3C lists or the cabinet pages now and returns every product of the supplier with old and new prices. A page without a price or a failed page is a row problem; a 3C list that does not load, or a cabinet login that is missing or refused, fails the request with 400 and changes nothing. The cabinet changes only the dealer price. dryRun=false reads again and saves changed prices as new approved offer versions. File and not yet connected sources answer 400. */
+    /** @description access:price-import. «Оновити зараз» for a connected website, Google Sheets or dealer cabinet source (av-center, 3c-market, perchatka-centr, trele): reads the supplier's pages, the six 3C lists or the cabinet pages now and returns every product of the supplier with old and new prices. A page without a price or a failed page is a row problem; a 3C list that does not load, or a cabinet login that is missing or refused, fails the request with 400 and changes nothing. The cabinet changes only the dealer price. dryRun=false reads again and saves changed prices as new approved offer versions. File and not yet connected sources answer 400. */
     post: operations['refreshPpeSupplierPrices'];
     delete?: never;
     options?: never;
@@ -2455,7 +2536,7 @@ export interface paths {
       };
       cookie?: never;
     };
-    /** @description «Надіслати КП» (R-15): the signed-in person's connected Gmail (null until connected), whether Gmail is configured on the server, the PDF file name, and the letters (template from the settings first, then the letter variants) with {quoteNumber}, {managerName}, {managerPhone}, {managerEmail}, {site} filled with the sender's КП contact. */
+    /** @description «Надіслати КП» (R-15): the signed-in person's connected Gmail (null until connected), whether Gmail is configured on the server, the PDF file name, and the letters (template from the settings first, then the letter variants) with {quoteNumber}, {managerName}, {managerPhone}, {managerEmail}, {site} filled with the sender's КП contact, {clientName} and {companyName} with the КП «Отримувач» and «Підприємство» (empty when not filled). */
     get: operations['getCrmQuoteSendDraft'];
     put?: never;
     post?: never;
@@ -3286,7 +3367,7 @@ export interface paths {
     /** Not deleted orders, newest number first; counts by status ignore the status filter */
     get: operations['getProductionOrders'];
     put?: never;
-    /** «Передати в цех»: an order from a sent КП; a repeat with the same requestId returns the same order */
+    /** «Передати в цех»: an order from a КП «під запит» (saved or sent); a repeat with the same requestId returns the same order */
     post: operations['createProductionOrder'];
     delete?: never;
     options?: never;
@@ -3301,7 +3382,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Sent КП «під запит» the person may pass to the workshop (Manager: own; Admin: all) */
+    /** КП «під запит» (saved or sent) the person may pass to the workshop (Manager: own; Admin: all) */
     get: operations['getProductionQuoteSources'];
     put?: never;
     post?: never;
@@ -4709,12 +4790,66 @@ export interface components {
       /** Format: email */
       email: string;
       fullName: string;
-      roles: ('Director' | 'Admin' | 'Accountant' | 'Manager' | 'WorkshopChief' | 'User')[];
+      roles: string[];
       /**
        * Format: uri
        * @description Profile photo on the CDN; null shows the initial and a color
        */
       avatarUrl: string | null;
+    };
+    RoleTitleResponse: {
+      name: string;
+      title: string;
+      builtIn: boolean;
+    };
+    /** @enum {string} */
+    AccessAction: 'view' | 'create' | 'edit' | 'delete';
+    /** @description Page key → allowed actions. */
+    AccessGrants: {
+      [key: string]: components['schemas']['AccessAction'][];
+    };
+    MyAccessResponse: {
+      /** @description The director: every page and action, also pages added later */
+      allowAll: boolean;
+      roles: components['schemas']['RoleTitleResponse'][];
+      grants: components['schemas']['AccessGrants'];
+    };
+    AccessAreaResponse: {
+      key: string;
+      group: string;
+      title: string;
+      actions: components['schemas']['AccessAction'][];
+    };
+    AccessRoleResponse: {
+      name: string;
+      title: string;
+      /** @description The director: every right, not editable */
+      locked: boolean;
+      /** @description Never deleted */
+      builtIn: boolean;
+      /** Format: int32 */
+      userCount: number;
+      /**
+       * Format: int32
+       * @description 0 until the first save; send it back on save
+       */
+      version: number;
+      updatedByName: string | null;
+      /** Format: date-time */
+      updatedAt: string | null;
+      grants: components['schemas']['AccessGrants'];
+    };
+    AccessRightsResponse: {
+      areas: components['schemas']['AccessAreaResponse'][];
+      roles: components['schemas']['AccessRoleResponse'][];
+    };
+    CreateRoleRequest: {
+      title: string;
+    };
+    SaveRoleAccessRequest: {
+      /** Format: int32 */
+      version: number;
+      grants: components['schemas']['AccessGrants'];
     };
     AccountingSettingsResponse: {
       /** Format: date */
@@ -5598,8 +5733,8 @@ export interface components {
       /** Format: int32 */
       pageSize: number;
     };
-    /** @enum {string} */
-    StaffRole: 'Director' | 'Admin' | 'Accountant' | 'Manager' | 'WorkshopChief';
+    /** @description Director, Admin, Accountant, Manager, WorkshopChief or a role made on «Права доступу» (custom-…); an unknown role returns 400 */
+    StaffRole: string;
     StaffAccountResponse: {
       /** Format: int32 */
       id: number;
@@ -8023,7 +8158,7 @@ export interface components {
        */
       logoUrl?: string | null;
     };
-    /** @description Marks: {quoteNumber}, {managerName}, {managerPhone}, {managerEmail}, {site}. */
+    /** @description Marks: {quoteNumber}, {managerName}, {managerPhone}, {managerEmail}, {site}, {clientName}, {companyName}. */
     CrmQuoteEmailTemplate: {
       subject: string;
       body: string;
@@ -10864,6 +10999,7 @@ export interface components {
   parameters: {
     /** @description Value of the `brevi.csrf` cookie. Required on every non-GET request made with the session cookie. */
     CsrfHeader: string;
+    Role: string;
     UserId: number;
     Page: number;
     PageSize: 10 | 20 | 50;
@@ -10984,6 +11120,244 @@ export interface operations {
       };
       /** @description Not signed in */
       401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getSessionAccess: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Rights */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['MyAccessResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getAccessRights: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Pages and roles */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AccessRightsResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not an administrator */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createRole: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Value of the `brevi.csrf` cookie. Required on every non-GET request made with the session cookie. */
+        'X-CSRF-Token': components['parameters']['CsrfHeader'];
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateRoleRequest'];
+      };
+    };
+    responses: {
+      /** @description Created */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AccessRoleResponse'];
+        };
+      };
+      /** @description Empty or longer than 100 characters */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not an administrator */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description A role with this title exists */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  saveRoleAccess: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Value of the `brevi.csrf` cookie. Required on every non-GET request made with the session cookie. */
+        'X-CSRF-Token': components['parameters']['CsrfHeader'];
+      };
+      path: {
+        role: components['parameters']['Role'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SaveRoleAccessRequest'];
+      };
+    };
+    responses: {
+      /** @description Saved */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['AccessRoleResponse'];
+        };
+      };
+      /** @description The director, an unknown page or action, or an action without view */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not an administrator */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such staff role */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Someone saved this role after the page was loaded */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  deleteRole: {
+    parameters: {
+      query?: never;
+      header: {
+        /** @description Value of the `brevi.csrf` cookie. Required on every non-GET request made with the session cookie. */
+        'X-CSRF-Token': components['parameters']['CsrfHeader'];
+      };
+      path: {
+        role: components['parameters']['Role'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Deleted */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description A built-in role */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not an administrator */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such role */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The role has users */
+      409: {
         headers: {
           [name: string]: unknown;
         };
@@ -17056,7 +17430,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Caller does not satisfy CanManageProducts. */
+      /** @description Caller does not satisfy access:products. */
       403: {
         headers: {
           [name: string]: unknown;
@@ -17152,7 +17526,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Caller does not satisfy CanManageProducts. */
+      /** @description Caller does not satisfy access:products. */
       403: {
         headers: {
           [name: string]: unknown;
@@ -17202,7 +17576,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Caller does not satisfy CanManageProducts. */
+      /** @description Caller does not satisfy access:products. */
       403: {
         headers: {
           [name: string]: unknown;
@@ -17248,7 +17622,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Caller does not satisfy CanManageProducts. */
+      /** @description Caller does not satisfy access:products. */
       403: {
         headers: {
           [name: string]: unknown;
@@ -21435,6 +21809,8 @@ export interface operations {
           | 'Complete';
         /** @description The client card tab «Завдання в цех»; only orders made from this client's КП. */
         customerId?: number;
+        /** @description The КП editor; only orders made from this КП. */
+        quoteId?: number;
         page?: number;
         pageSize?: number;
       };
@@ -21467,7 +21843,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders). */
+      /** @description «Права доступу» page access:production-orders required (Manager, WorkshopChief and Admin by default). */
       403: {
         headers: {
           [name: string]: unknown;
@@ -21512,7 +21888,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders). */
+      /** @description «Права доступу» page access:production-orders required (Manager, WorkshopChief and Admin by default). */
       403: {
         headers: {
           [name: string]: unknown;
@@ -21562,7 +21938,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders). */
+      /** @description «Права доступу» page access:production-orders required (Manager, WorkshopChief and Admin by default). */
       403: {
         headers: {
           [name: string]: unknown;
@@ -21598,7 +21974,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders). */
+      /** @description «Права доступу» page access:production-orders required (Manager, WorkshopChief and Admin by default). */
       403: {
         headers: {
           [name: string]: unknown;
@@ -21649,7 +22025,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders). */
+      /** @description «Права доступу» page access:production-orders required (Manager, WorkshopChief and Admin by default). */
       403: {
         headers: {
           [name: string]: unknown;
@@ -21696,7 +22072,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders). */
+      /** @description «Права доступу» page access:production-orders required (Manager, WorkshopChief and Admin by default). */
       403: {
         headers: {
           [name: string]: unknown;
@@ -21732,7 +22108,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders). */
+      /** @description «Права доступу» page access:production-orders required (Manager, WorkshopChief and Admin by default). */
       403: {
         headers: {
           [name: string]: unknown;
@@ -21786,7 +22162,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders). */
+      /** @description «Права доступу» page access:production-orders required (Manager, WorkshopChief and Admin by default). */
       403: {
         headers: {
           [name: string]: unknown;
@@ -21836,7 +22212,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders). */
+      /** @description «Права доступу» page access:production-orders required (Manager, WorkshopChief and Admin by default). */
       403: {
         headers: {
           [name: string]: unknown;
@@ -21886,7 +22262,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders). */
+      /** @description «Права доступу» page access:production-orders required (Manager, WorkshopChief and Admin by default). */
       403: {
         headers: {
           [name: string]: unknown;
@@ -21933,7 +22309,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders). */
+      /** @description «Права доступу» page access:production-orders required (Manager, WorkshopChief and Admin by default). */
       403: {
         headers: {
           [name: string]: unknown;
@@ -21988,7 +22364,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders); the person may not make this change. */
+      /** @description «Права доступу» page access:production-orders required (Manager, WorkshopChief and Admin by default); the person may not make this change. */
       403: {
         headers: {
           [name: string]: unknown;
@@ -22050,7 +22426,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders); the person may not make this change. */
+      /** @description «Права доступу» page access:production-orders required (Manager, WorkshopChief and Admin by default); the person may not make this change. */
       403: {
         headers: {
           [name: string]: unknown;
@@ -22110,7 +22486,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders); the person may not make this change. */
+      /** @description «Права доступу» page access:production-orders required (Manager, WorkshopChief and Admin by default); the person may not make this change. */
       403: {
         headers: {
           [name: string]: unknown;
@@ -22171,7 +22547,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders); the person may not make this change. */
+      /** @description «Права доступу» page access:production-orders required (Manager, WorkshopChief and Admin by default); the person may not make this change. */
       403: {
         headers: {
           [name: string]: unknown;
@@ -22232,7 +22608,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders); the person may not make this change. */
+      /** @description «Права доступу» page access:production-orders required (Manager, WorkshopChief and Admin by default); the person may not make this change. */
       403: {
         headers: {
           [name: string]: unknown;
@@ -22293,7 +22669,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders); the person may not make this change. */
+      /** @description «Права доступу» page access:production-orders required (Manager, WorkshopChief and Admin by default); the person may not make this change. */
       403: {
         headers: {
           [name: string]: unknown;
@@ -22361,7 +22737,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders); the person may not make this change. */
+      /** @description «Права доступу» page access:production-orders required (Manager, WorkshopChief and Admin by default); the person may not make this change. */
       403: {
         headers: {
           [name: string]: unknown;
@@ -22405,7 +22781,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders); the person may not make this change. */
+      /** @description «Права доступу» page access:production-orders required (Manager, WorkshopChief and Admin by default); the person may not make this change. */
       403: {
         headers: {
           [name: string]: unknown;
@@ -22448,7 +22824,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders); the person may not make this change. */
+      /** @description «Права доступу» page access:production-orders required (Manager, WorkshopChief and Admin by default); the person may not make this change. */
       403: {
         headers: {
           [name: string]: unknown;
@@ -22502,7 +22878,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders); the person may not make this change. */
+      /** @description «Права доступу» page access:production-orders required (Manager, WorkshopChief and Admin by default); the person may not make this change. */
       403: {
         headers: {
           [name: string]: unknown;
@@ -22542,7 +22918,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Manager, WorkshopChief or Admin role required (policy CanUseProductionOrders); the person may not make this change. */
+      /** @description «Права доступу» page access:production-orders required (Manager, WorkshopChief and Admin by default); the person may not make this change. */
       403: {
         headers: {
           [name: string]: unknown;

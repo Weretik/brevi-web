@@ -243,6 +243,8 @@ export interface ProductionOrderListQuery {
   pageSize: number;
   /** The client card tab «Завдання в цех»: only orders made from this client's КП. */
   customerId?: number;
+  /** The КП editor: only orders made from this КП. */
+  quoteId?: number;
 }
 
 export interface ProductionItemDetails {

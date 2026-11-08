@@ -1,7 +1,13 @@
+import { builtInStaffRoleOptions } from '@admin/users/model';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { CreateStaffPanel } from './create-staff-panel';
+
+const roleOptions = [
+  ...builtInStaffRoleOptions,
+  { name: 'custom-0123456789ab', title: 'Склад', locked: false },
+];
 
 describe('CreateStaffPanel', () => {
   it('checks the fields before sending', () => {
@@ -13,6 +19,7 @@ describe('CreateStaffPanel', () => {
         onClose={vi.fn()}
         onSubmit={onSubmit}
         open
+        roleOptions={roleOptions}
         submitting={false}
       />,
     );
@@ -33,6 +40,7 @@ describe('CreateStaffPanel', () => {
         onClose={onClose}
         onSubmit={onSubmit}
         open
+        roleOptions={roleOptions}
         submitting={false}
       />,
     );
@@ -65,6 +73,7 @@ describe('CreateStaffPanel', () => {
         onClose={vi.fn()}
         onSubmit={vi.fn()}
         open
+        roleOptions={roleOptions}
         submitting={false}
       />,
     );
@@ -73,6 +82,34 @@ describe('CreateStaffPanel', () => {
 
     expect(screen.getByRole('option', { name: 'Директор' }).getAttribute('aria-disabled')).toBe(
       'true',
+    );
+  });
+
+  it('offers a role made on «Права доступу» by its title', async () => {
+    const onSubmit = vi.fn().mockResolvedValue(true);
+    render(
+      <CreateStaffPanel
+        directorExists
+        error={null}
+        onClose={vi.fn()}
+        onSubmit={onSubmit}
+        open
+        roleOptions={roleOptions}
+        submitting={false}
+      />,
+    );
+
+    fireEvent.change(screen.getByLabelText(/Імʼя/), { target: { value: 'Іван' } });
+    fireEvent.change(screen.getByLabelText(/Email/), { target: { value: 'ivan@brevi.com.ua' } });
+    fireEvent.change(screen.getByLabelText(/Пароль/), { target: { value: 'password-1' } });
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: 'Роль' }));
+    fireEvent.click(screen.getByRole('option', { name: 'Склад' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Створити' }));
+
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({ role: 'custom-0123456789ab' }),
+      ),
     );
   });
 });

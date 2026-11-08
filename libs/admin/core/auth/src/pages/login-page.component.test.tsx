@@ -67,6 +67,7 @@ describe('LoginPage', () => {
       fullName: 'M',
       roles: ['Manager'],
       avatarUrl: null,
+      access: { allowAll: false, roles: [], grants: {} },
     });
     renderLogin();
     fillAndSubmit();

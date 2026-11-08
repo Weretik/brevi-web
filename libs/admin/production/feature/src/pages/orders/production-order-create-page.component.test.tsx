@@ -76,9 +76,9 @@ vi.mock('@admin/production/data-access', () => ({
 
 afterEach(cleanup);
 
-const renderPage = (canCreate = true) =>
+const renderPage = (canCreate = true, entry = '/production/orders/new') =>
   render(
-    <MemoryRouter initialEntries={['/production/orders/new']}>
+    <MemoryRouter initialEntries={[entry]}>
       <Routes>
         <Route
           path="/production/orders/new"
@@ -93,7 +93,7 @@ const renderPage = (canCreate = true) =>
   );
 
 describe('ProductionOrderCreatePage', () => {
-  it('passes a sent КП to the workshop with what the workshop needs', async () => {
+  it('passes a КП під запит to the workshop with what the workshop needs', async () => {
     renderPage();
     fireEvent.click(screen.getByRole('button', { name: /КП-7 · School 5/ }));
     fireEvent.click(await screen.findByRole('button', { name: 'Передати в цех' }));
@@ -112,6 +112,12 @@ describe('ProductionOrderCreatePage', () => {
       requestId: expect.any(String),
       items: [{ quoteItemId: 11, quoteOptionId: 21, details: { quantity: 10 } }],
     });
+  });
+
+  it('opens with the КП picked when it comes from «Передати в цех» in the КП editor', async () => {
+    renderPage(true, '/production/orders/new?quote=7');
+    expect(await screen.findByRole('button', { name: 'Передати в цех' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Інше КП' })).toBeTruthy();
   });
 
   it('sends the head of the workshop back to the list', () => {

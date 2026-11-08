@@ -1,5 +1,5 @@
 import { UserAvatar } from '@admin/shared/ui';
-import { getStaffAccountPermissions, hasDirector, staffRoleLabels } from '@admin/users/model';
+import { getStaffAccountPermissions, getStaffRoleTitle, hasDirector } from '@admin/users/model';
 import {
   Alert,
   Button,
@@ -17,7 +17,7 @@ import { StaffAccountActionsMenu } from './staff-account-actions-menu';
 import { StaffStatusPill } from '../status/staff-status-pill';
 
 import type { StaffAccountAction } from './staff-account-actions-menu';
-import type { StaffAccount, StaffActor } from '@admin/users/model';
+import type { StaffAccount, StaffActor, StaffRoleOption } from '@admin/users/model';
 
 interface StaffAccountsTableProps {
   accounts: readonly StaffAccount[];
@@ -27,6 +27,8 @@ interface StaffAccountsTableProps {
   loading: boolean;
   onAction: (account: StaffAccount, action: StaffAccountAction) => void;
   onRetry: () => void;
+  /** Roles from «Права доступу»: titles for the column and choices for the menu. */
+  roleOptions: readonly StaffRoleOption[];
 }
 
 export function StaffAccountsTable({
@@ -36,6 +38,7 @@ export function StaffAccountsTable({
   loading,
   onAction,
   onRetry,
+  roleOptions,
 }: StaffAccountsTableProps) {
   if (error) {
     return (
@@ -95,7 +98,7 @@ export function StaffAccountsTable({
                 </TableCell>
                 <TableCell>{account.email}</TableCell>
                 <TableCell sx={{ whiteSpace: 'nowrap' }}>{account.phoneNumber ?? '—'}</TableCell>
-                <TableCell>{staffRoleLabels[account.role]}</TableCell>
+                <TableCell>{getStaffRoleTitle(account.role, roleOptions)}</TableCell>
                 <TableCell>
                   <StaffStatusPill blocked={account.isBlocked} />
                 </TableCell>
@@ -103,7 +106,12 @@ export function StaffAccountsTable({
                   <StaffAccountActionsMenu
                     account={account}
                     onAction={onAction}
-                    permissions={getStaffAccountPermissions(account, actor, directorExists)}
+                    permissions={getStaffAccountPermissions(
+                      account,
+                      actor,
+                      directorExists,
+                      roleOptions,
+                    )}
                   />
                 </TableCell>
               </TableRow>

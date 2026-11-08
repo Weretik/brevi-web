@@ -2,9 +2,6 @@ import { accountingRoutes } from '@admin/accounting/feature';
 import { aiRoutes } from '@admin/ai/feature';
 import {
   canManageUsers,
-  canManageWorkshop,
-  canUseAccounting,
-  canUsePurchaseInvoices,
   LoginPage,
   loginPath,
   refreshSession,
@@ -13,7 +10,7 @@ import {
   useAdminSession,
 } from '@admin/core/auth';
 import { purchasingRoutes } from '@admin/purchasing/feature';
-import { createProfileRoutes, createUsersRoutes } from '@admin/users/feature';
+import { createAccessRoutes, createProfileRoutes, createUsersRoutes } from '@admin/users/feature';
 import { createBrowserRouter } from 'react-router-dom';
 
 import {
@@ -25,9 +22,9 @@ import {
   tasksRoutes,
 } from './admin-route-definitions';
 import { AdminRouteLayout } from './admin-route-layout';
+import { RequirePageAccess } from './require-page-access';
 import { NotFoundPage } from '../pages/not-found-page';
 
-import type { SessionUser } from '@admin/core/auth';
 import type { StaffActor } from '@admin/users/model';
 
 function useSignedInStaff(): StaffActor {
@@ -39,19 +36,7 @@ function useSignedInStaff(): StaffActor {
 
 const usersRoutes = createUsersRoutes({ useStaffActor: useSignedInStaff });
 const profileRoutes = createProfileRoutes({ onProfileChanged: refreshSession });
-
-/** Manager tasks belong to managers; Director and Admin manage them (TSK-001 R-01, R-02). */
-const canWorkOnTasks = (user: SessionUser): boolean =>
-  user.roles.includes('Admin') || user.roles.includes('Manager');
-
-/** «Ціна вишивки»: managers price embroidery; Director and Admin also edit its settings (EMB-001 R-02). */
-const canPriceEmbroidery = canWorkOnTasks;
-
-/** «Виробничі завдання»: managers pass КП to the workshop; the head of the workshop runs them. */
-const canUseProductionOrders = (user: SessionUser): boolean =>
-  user.roles.includes('Admin') ||
-  user.roles.includes('Manager') ||
-  user.roles.includes('WorkshopChief');
+const accessRoutes = createAccessRoutes({ onAccessChanged: refreshSession });
 
 export function createAdminRouter() {
   return createBrowserRouter([
@@ -61,20 +46,23 @@ export function createAdminRouter() {
         <RequireAdminSession>{(user) => <AdminRouteLayout user={user} />}</RequireAdminSession>
       ),
       children: [
-        ...adminRouteDefinitions,
         ...profileRoutes,
         { element: <RequireRole allow={canManageUsers} />, children: usersRoutes },
         { element: <RequireRole allow={canManageUsers} />, children: tasksRoutes.admin },
         { element: <RequireRole allow={canManageUsers} />, children: aiRoutes },
-        { element: <RequireRole allow={canWorkOnTasks} />, children: tasksRoutes.board },
-        { element: <RequireRole allow={canPriceEmbroidery} />, children: embroideryRoutes },
-        { element: <RequireRole allow={canManageWorkshop} />, children: productionRoutes },
-        { element: <RequireRole allow={canUseAccounting} />, children: accountingRoutes },
-        { element: <RequireRole allow={canUsePurchaseInvoices} />, children: purchasingRoutes },
-        { element: <RequireRole allow={canManageUsers} />, children: productionReportRoutes },
+        { element: <RequireRole allow={canManageUsers} />, children: accessRoutes },
         {
-          element: <RequireRole allow={canUseProductionOrders} />,
-          children: productionOrderRoutes,
+          element: <RequirePageAccess />,
+          children: [
+            ...adminRouteDefinitions,
+            ...tasksRoutes.board,
+            ...embroideryRoutes,
+            ...productionRoutes,
+            ...productionReportRoutes,
+            ...productionOrderRoutes,
+            ...accountingRoutes,
+            ...purchasingRoutes,
+          ],
         },
         { path: '*', element: <NotFoundPage /> },
       ],

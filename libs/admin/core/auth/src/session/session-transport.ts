@@ -2,7 +2,7 @@ import { csrfHeaderName, readCsrfToken } from '@admin/shared/api-client';
 import { appConfig } from '@admin/shared/config';
 import axios from 'axios';
 
-import type { SessionUser } from './session-user';
+import type { SessionAccess, SessionUser } from './session-user';
 import type { operations } from '@admin/shared/contracts';
 
 export type LoginRequest =
@@ -10,14 +10,33 @@ export type LoginRequest =
 type SessionUserResponse =
   operations['getCurrentSession']['responses'][200]['content']['application/json'];
 
+type SessionAccessResponse =
+  operations['getSessionAccess']['responses'][200]['content']['application/json'];
+
 const getAuthUrl = (path: string): string => new URL(path, appConfig.apiBaseUrl).toString();
 
-const toSessionUser = (response: SessionUserResponse): SessionUser => ({
+const toSessionAccess = (response: SessionAccessResponse): SessionAccess => ({
+  allowAll: response.allowAll,
+  roles: response.roles,
+  grants: response.grants,
+});
+
+/** What the signed-in user may open and do, per page of «Права доступу». */
+const requestAccess = async (): Promise<SessionAccess> => {
+  const response = await axios.get<SessionAccessResponse>(getAuthUrl('/api/auth/session/access'), {
+    withCredentials: true,
+  });
+
+  return toSessionAccess(response.data);
+};
+
+const toSessionUser = (response: SessionUserResponse, access: SessionAccess): SessionUser => ({
   id: response.userId,
   email: response.email,
   fullName: response.fullName,
   roles: response.roles,
   avatarUrl: response.avatarUrl ?? null,
+  access,
 });
 
 /** Signs in with the HttpOnly session cookie. Throws an axios error on 401 or 429. */
@@ -30,7 +49,7 @@ export const requestLogin = async (request: LoginRequest): Promise<SessionUser> 
     },
   );
 
-  return toSessionUser(response.data);
+  return toSessionUser(response.data, await requestAccess());
 };
 
 export const requestLogout = async (): Promise<void> => {
@@ -52,7 +71,7 @@ export const requestCurrentUser = async (): Promise<SessionUser | null> => {
       withCredentials: true,
     });
 
-    return toSessionUser(response.data);
+    return toSessionUser(response.data, await requestAccess());
   } catch (error) {
     if (axios.isAxiosError(error) && error.response?.status === 401) {
       return null;

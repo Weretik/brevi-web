@@ -1,4 +1,3 @@
-import { staffRoleLabels } from '@admin/users/model';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Divider, IconButton, Menu, MenuItem } from '@mui/material';
 import { useState } from 'react';
@@ -7,7 +6,7 @@ import type { StaffAccount, StaffAccountPermissions, StaffRole } from '@admin/us
 import type { MouseEvent } from 'react';
 
 export type StaffAccountAction =
-  | { type: 'changeRole'; role: StaffRole }
+  | { type: 'changeRole'; role: StaffRole; roleTitle: string }
   | { type: 'setBlocked'; blocked: boolean }
   | { type: 'setPassword' }
   | { type: 'editDetails' }
@@ -62,8 +61,11 @@ export function StaffAccountActionsMenu({
           <MenuItem onClick={() => run({ type: 'editDetails' })}>Змінити дані</MenuItem>
         ) : null}
         {permissions.roleChoices.map((role) => (
-          <MenuItem key={role} onClick={() => run({ type: 'changeRole', role })}>
-            Зробити: {staffRoleLabels[role].toLowerCase()}
+          <MenuItem
+            key={role.name}
+            onClick={() => run({ type: 'changeRole', role: role.name, roleTitle: role.title })}
+          >
+            Зробити: {role.title.toLowerCase()}
           </MenuItem>
         ))}
         {permissions.canSetPassword ? (

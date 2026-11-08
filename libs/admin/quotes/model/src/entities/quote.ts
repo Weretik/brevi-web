@@ -159,6 +159,8 @@ export interface QuoteActor {
   readonly canSeeAll: boolean;
   /** «КП: видалення»: only the Director for now (crm R-33). */
   readonly canDelete?: boolean;
+  /** «Передати в цех»: «Створювати» on «Виробничі завдання» (client corrections item 9). */
+  readonly canPassToWorkshop?: boolean;
 }
 
 /** КП left from the removed «Архів» (crm R-23). */

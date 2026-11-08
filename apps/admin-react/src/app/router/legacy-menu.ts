@@ -16,6 +16,8 @@ interface LegacyNavigationItem {
   path?: string;
   /** Shown only to a user with one of these server roles. */
   requiredRoles?: readonly string[];
+  /** Page of «Права доступу»: shown only when the user's rights let them see it. */
+  access?: string;
 }
 
 interface LegacyNavigationGroup {
@@ -27,14 +29,6 @@ interface LegacyNavigationGroup {
 }
 
 const admin = ['Admin'] as const;
-/** «Ціна вишивки»: managers price it; Admin covers the director. */
-const embroideryPrice = ['Admin', 'Manager'] as const;
-/** «Швейний цех»: the head of the workshop; Admin covers the director. */
-const workshop = ['Admin', 'WorkshopChief'] as const;
-/** «Виробничі завдання»: managers too, since they pass КП to the workshop. */
-const productionOrders = ['Admin', 'Manager', 'WorkshopChief'] as const;
-/** «Бухгалтерія»: the director only (ACC-001); Admin and Accountant do not see it. */
-const accounting = ['Director'] as const;
 
 export const legacyGroups: readonly LegacyNavigationGroup[] = [
   {
@@ -44,21 +38,21 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
     label: 'Менеджер сервісу',
     items: [
       { id: 'leads', label: 'Ліди' },
-      { id: 'quotes', label: 'Комерційні пропозиції', path: '/crm/quotes' },
+      { id: 'quotes', label: 'Комерційні пропозиції', path: '/crm/quotes', access: 'quotes' },
       {
         id: 'quote-settings',
         label: 'Налаштування КП',
         path: '/crm/quote-settings',
-        requiredRoles: admin,
+        access: 'quote-settings',
       },
       {
         id: 'embroidery-price',
         label: 'Ціна вишивки',
         path: '/crm/embroidery',
-        requiredRoles: embroideryPrice,
+        access: 'embroidery',
       },
       { id: 'price-list', label: 'Прайс' },
-      { id: 'tasks', label: 'Мої завдання', path: '/crm/tasks' },
+      { id: 'tasks', label: 'Мої завдання', path: '/crm/tasks', access: 'tasks' },
       { id: 'deals', label: 'Угоди' },
     ],
   },
@@ -72,74 +66,74 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         id: 'production-orders',
         label: 'Виробничі завдання',
         path: '/production/orders',
-        requiredRoles: productionOrders,
+        access: 'production-orders',
       },
       {
         id: 'fabric-stock',
         label: 'Склад тканин',
         path: '/production/fabric-stock',
-        requiredRoles: productionOrders,
+        access: 'fabric-stock',
       },
       {
         id: 'work-log',
         label: 'Журнал робіт',
         path: '/production/work',
-        requiredRoles: workshop,
+        access: 'work-log',
       },
       {
         id: 'sewing-forecast',
         label: 'Прогноз пошиття',
         path: '/production/forecast',
-        requiredRoles: productionOrders,
+        access: 'forecast',
       },
       {
         id: 'workshop-staff',
         label: 'Працівники цеху',
         path: '/production/staff',
-        requiredRoles: workshop,
+        access: 'workshop-staff',
       },
       {
         id: 'fabric-norms',
         label: 'Норми витрати тканини',
         path: '/production/fabric-norms',
-        requiredRoles: workshop,
+        access: 'fabric-norms',
       },
       {
         id: 'payroll-rules',
         label: 'Правила зарплати',
         path: '/production/payroll-rules',
-        requiredRoles: workshop,
+        access: 'payroll-rules',
       },
       {
         id: 'workshop-settings',
         label: 'Налаштування цеху',
         path: '/production/settings',
-        requiredRoles: workshop,
+        access: 'workshop-settings',
       },
       {
         id: 'workshop-archive',
         label: 'Архів цеху',
         path: '/production/archive',
-        requiredRoles: productionOrders,
+        access: 'workshop-archive',
       },
       {
         id: 'salary',
         label: 'Зарплата',
         path: '/production/payroll',
-        requiredRoles: workshop,
+        access: 'payroll',
       },
       { id: 'furnitura-stock', label: 'Фурнітура в цеху' },
       {
         id: 'work-time',
         label: 'Робочий час',
         path: '/production/timesheet',
-        requiredRoles: workshop,
+        access: 'timesheet',
       },
       {
         id: 'workshop-reports',
         label: 'Звіти цеху',
         path: '/production/reports',
-        requiredRoles: admin,
+        access: 'workshop-reports',
       },
       { id: 'embroidery', label: 'Вишивка' },
       { id: 'cashbox', label: 'Каса цеху' },
@@ -155,73 +149,73 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         id: 'finance-overview',
         label: 'Огляд',
         path: '/accounting/overview',
-        requiredRoles: accounting,
+        access: 'accounting',
       },
       {
         id: 'finance-operations',
         label: 'Операції',
         path: '/accounting/transactions',
-        requiredRoles: accounting,
+        access: 'accounting',
       },
       {
         id: 'finance-transfers',
         label: 'Перекази',
         path: '/accounting/transfers',
-        requiredRoles: accounting,
+        access: 'accounting',
       },
       {
         id: 'finance-accounts',
         label: 'Рахунки і каси',
         path: '/accounting/accounts',
-        requiredRoles: accounting,
+        access: 'accounting',
       },
       {
         id: 'finance-categories',
         label: 'Категорії',
         path: '/accounting/categories',
-        requiredRoles: accounting,
+        access: 'accounting',
       },
       {
         id: 'finance-counterparties',
         label: 'Контрагенти',
         path: '/accounting/counterparties',
-        requiredRoles: accounting,
+        access: 'accounting',
       },
       {
         id: 'purchase-invoices',
         label: 'Рахунки на закупку',
         path: '/accounting/purchase-invoices',
-        requiredRoles: accounting,
+        access: 'purchase-invoices',
       },
       {
         id: 'finance-review',
         label: 'Потребують перевірки',
         path: '/accounting/review',
-        requiredRoles: accounting,
+        access: 'accounting',
       },
       {
         id: 'finance-import',
         label: 'Виписки банку',
         path: '/accounting/statements',
-        requiredRoles: accounting,
+        access: 'accounting',
       },
       {
         id: 'finance-legacy-import',
         label: 'Перенесення архіву',
         path: '/accounting/legacy-import',
-        requiredRoles: accounting,
+        access: 'accounting',
       },
       {
         id: 'finance-reports',
         label: 'Звіти',
         path: '/accounting/reports',
-        requiredRoles: accounting,
+        access: 'accounting',
       },
       {
         id: 'finance-audit',
         label: 'Журнал змін',
         path: '/accounting/audit',
-        requiredRoles: accounting,
+        access: 'accounting',
       },
     ],
   },
@@ -231,13 +225,19 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
     section: 'Робота',
     label: 'Нагадування',
     items: [
-      { id: 'reminder-tasks', label: 'Задачі', path: '/reminders/tasks' },
-      { id: 'reminder-periods', label: 'Періоди', path: '/reminders/periods' },
-      { id: 'reminder-chats', label: 'Чати Telegram', path: '/reminders/chats' },
+      { id: 'reminder-tasks', label: 'Задачі', path: '/reminders/tasks', access: 'reminders' },
+      { id: 'reminder-periods', label: 'Періоди', path: '/reminders/periods', access: 'reminders' },
+      {
+        id: 'reminder-chats',
+        label: 'Чати Telegram',
+        path: '/reminders/chats',
+        access: 'reminders',
+      },
       {
         id: 'reminder-non-working-days',
         label: 'Неробочі дні',
         path: '/reminders/non-working-days',
+        access: 'reminders',
       },
     ],
   },
@@ -247,22 +247,44 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
     section: 'Дані',
     label: 'Загальні довідники',
     items: [
-      { id: 'products', label: 'Товари', path: '/references/products' },
-      { id: 'product-sections', label: 'Типи і розділи', path: '/references/product-sections' },
-      { id: 'materials', label: 'Тканини та фурнітура', path: '/references/materials' },
+      { id: 'products', label: 'Товари', path: '/references/products', access: 'products' },
+      {
+        id: 'product-sections',
+        label: 'Типи і розділи',
+        path: '/references/product-sections',
+        access: 'product-sections',
+      },
+      {
+        id: 'materials',
+        label: 'Тканини та фурнітура',
+        path: '/references/materials',
+        access: 'materials',
+      },
       {
         id: 'garment-part-operations',
         label: 'Операції',
         path: '/references/garment-part-operation',
+        access: 'operations',
       },
-      { id: 'counterparties', label: 'Контрагенти', path: '/references/counterparties' },
+      {
+        id: 'counterparties',
+        label: 'Контрагенти',
+        path: '/references/counterparties',
+        access: 'counterparties',
+      },
       { id: 'calculations', label: 'Розрахунки' },
       {
         id: 'pricing-parameters',
         label: 'Параметри ціноутворення',
         path: '/references/pricing-parameters',
+        access: 'pricing-parameters',
       },
-      { id: 'price-import', label: 'Імпорт цін', path: '/references/price-import' },
+      {
+        id: 'price-import',
+        label: 'Імпорт цін',
+        path: '/references/price-import',
+        access: 'price-import',
+      },
     ],
   },
   {
@@ -270,7 +292,7 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
     icon: PhotoLibraryOutlinedIcon,
     section: 'Дані',
     label: 'Фото',
-    items: [{ id: 'media-library', label: 'Бібліотека фото', path: '/media' }],
+    items: [{ id: 'media-library', label: 'Бібліотека фото', path: '/media', access: 'media' }],
   },
   {
     id: 'content',
@@ -303,6 +325,7 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         requiredRoles: admin,
       },
       { id: 'ai-settings', label: 'Налаштування ШІ', path: '/admin/ai', requiredRoles: admin },
+      { id: 'access-rights', label: 'Права доступу', path: '/admin/access', requiredRoles: admin },
     ],
   },
 ];

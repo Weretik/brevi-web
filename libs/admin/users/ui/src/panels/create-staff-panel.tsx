@@ -1,4 +1,4 @@
-import { staffRoleLabels, staffRoles, validateStaffAccountInput } from '@admin/users/model';
+import { directorRole, validateStaffAccountInput } from '@admin/users/model';
 import { Alert, MenuItem, Stack, TextField } from '@mui/material';
 import { useState } from 'react';
 
@@ -7,7 +7,7 @@ import { StaffSidePanel } from './staff-side-panel';
 import type {
   CreateStaffAccountInput,
   StaffAccountFieldErrors,
-  StaffRole,
+  StaffRoleOption,
 } from '@admin/users/model';
 import type { FormEvent } from 'react';
 
@@ -23,6 +23,8 @@ interface CreateStaffPanelProps {
   open: boolean;
   /** There can be only one director, so the option is off once one exists. */
   directorExists: boolean;
+  /** Roles from «Права доступу», in the server order. */
+  roleOptions: readonly StaffRoleOption[];
   submitting: boolean;
   /** Server error to show above the form. */
   error: string | null;
@@ -37,6 +39,7 @@ export function CreateStaffPanel({
   onClose,
   onSubmit,
   open,
+  roleOptions,
   submitting,
 }: CreateStaffPanelProps) {
   const [input, setInput] = useState(emptyInput);
@@ -103,13 +106,17 @@ export function CreateStaffPanel({
         />
         <TextField
           label="Роль"
-          onChange={(event) => update({ role: event.target.value as StaffRole })}
+          onChange={(event) => update({ role: event.target.value })}
           select
           value={input.role}
         >
-          {staffRoles.map((role) => (
-            <MenuItem disabled={role === 'Director' && directorExists} key={role} value={role}>
-              {staffRoleLabels[role]}
+          {roleOptions.map((role) => (
+            <MenuItem
+              disabled={role.name === directorRole && directorExists}
+              key={role.name}
+              value={role.name}
+            >
+              {role.title}
             </MenuItem>
           ))}
         </TextField>

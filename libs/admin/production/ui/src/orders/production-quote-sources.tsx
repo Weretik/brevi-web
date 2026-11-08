@@ -9,22 +9,27 @@ interface Props {
   onPick: (source: ProductionQuoteSource) => void;
 }
 
-/** Sent КП to pass to the workshop; an already passed КП says how many orders it has. */
+/** КП «під запит» to pass to the workshop (saved or sent); an already passed КП says how many orders it has. */
 export function ProductionQuoteSources({ sources, loading, onPick }: Props) {
   if (!loading && sources.length === 0)
     return (
       <Alert severity="info">
-        Немає відправлених КП. Завдання створюється з КП «під запит» після відправлення клієнту.
+        Немає КП під запит. Завдання створюється з КП «під запит», збереженого в «Комерційні
+        пропозиції».
       </Alert>
     );
   return (
     <Paper variant="outlined">
-      <List disablePadding aria-label="Відправлені КП">
+      <List disablePadding aria-label="КП під запит">
         {sources.map((source) => (
           <ListItemButton key={source.id} divider onClick={() => onPick(source)}>
             <ListItemText
               primary={`${source.number} · ${source.clientName}`}
-              secondary={`${source.responsibleName} · відправлено ${formatProductionDate(source.lastSentAt)}`}
+              secondary={
+                source.lastSentAt
+                  ? `${source.responsibleName} · відправлено ${formatProductionDate(source.lastSentAt)}`
+                  : source.responsibleName
+              }
             />
             {source.ordersCount > 0 && (
               <Typography

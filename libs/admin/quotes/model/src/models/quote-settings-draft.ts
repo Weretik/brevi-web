@@ -108,9 +108,11 @@ export interface QuoteSettingsDraft {
   staffContacts: QuoteStaffContactDraft[];
 }
 
-/** Marks the email and PDF templates understand. */
+/** Marks the email and PDF templates understand; the client ones come from the КП «Отримувач» and «Підприємство». */
 export const quoteTemplateMarks = [
   '{quoteNumber}',
+  '{clientName}',
+  '{companyName}',
   '{managerName}',
   '{managerPhone}',
   '{managerEmail}',
@@ -138,6 +140,8 @@ export const quotePdfIntroMarks: readonly QuoteMark[] = [...quoteIntroMarks, ...
 /** Button names of the marks: «+ Номер КП» inserts `{quoteNumber}`. */
 export const quoteTemplateMarkLabels: Readonly<Record<QuoteMark, string>> = {
   '{quoteNumber}': 'Номер КП',
+  '{clientName}': 'Отримувач',
+  '{companyName}': 'Підприємство',
   '{managerName}': 'Менеджер',
   '{managerPhone}': 'Телефон менеджера',
   '{managerEmail}': 'Email менеджера',

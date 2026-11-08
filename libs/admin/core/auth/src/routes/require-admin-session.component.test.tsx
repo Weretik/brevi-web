@@ -13,6 +13,7 @@ const staff = (roles: SessionUser['roles']): SessionUser => ({
   fullName: 'Олена',
   roles,
   avatarUrl: null,
+  access: { allowAll: false, roles: [], grants: {} },
 });
 
 function LoginProbe() {

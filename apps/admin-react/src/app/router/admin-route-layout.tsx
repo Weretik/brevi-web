@@ -3,7 +3,7 @@ import { aiSettingsPath } from '@admin/ai/feature';
 import { sessionRoleLabel } from '@admin/core/auth';
 import { AdminLayout } from '@admin/core/shell';
 import { purchasingRoutes } from '@admin/purchasing/feature';
-import { profilePath, usersPath } from '@admin/users/feature';
+import { accessPath, profilePath, usersPath } from '@admin/users/feature';
 
 import {
   adminRouteDefinitions,
@@ -32,12 +32,13 @@ const registeredPaths = new Set([
     ...purchasingRoutes,
   ].map((route) => route.path),
   usersPath,
+  accessPath,
   aiSettingsPath,
 ]);
 
 export function AdminRouteLayout({ user }: { user: SessionUser }) {
   const { colorMode, changeColorMode } = useAdminColorMode();
-  const navigation = createNavigation(registeredPaths, user.roles);
+  const navigation = createNavigation(registeredPaths, user);
   const homeHint = useHomeHint(user);
 
   return (

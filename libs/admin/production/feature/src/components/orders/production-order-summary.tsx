@@ -1,15 +1,24 @@
 import { formatDay, formatProductionDate, reportPriceTierLabels } from '@admin/production/model';
 import { ReferenceDetailsList } from '@admin/references/ui';
 import { Paper } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 import type { ProductionOrder } from '@admin/production/model';
 import type { ReferenceDetailsItem } from '@admin/references/ui';
 
 /** Who the order is for and where it came from. */
 export function ProductionOrderSummary({ order }: { order: ProductionOrder }) {
+  const navigate = useNavigate();
+  const quoteId = order.quoteId;
   const items: ReferenceDetailsItem[] = [
     { label: 'Клієнт', value: order.clientName },
-    { label: 'КП', value: order.quoteNumber, mono: true },
+    {
+      label: 'КП',
+      value: order.quoteNumber,
+      mono: true,
+      // An old order from «Цех» keeps only the old КП number; a new one opens its КП.
+      onOpen: quoteId === null ? undefined : () => navigate(`/crm/quotes/${quoteId}`),
+    },
     { label: 'Менеджер', value: order.managerName },
     { label: 'Дата створення', value: formatDay(order.orderDate), mono: true },
     { label: 'Коментар', value: order.comment },

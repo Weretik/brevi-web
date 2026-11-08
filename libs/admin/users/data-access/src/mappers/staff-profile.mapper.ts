@@ -1,9 +1,7 @@
-import { staffRoles } from '@admin/users/model';
-
-import { isNullableString } from './staff-account.mapper';
+import { isNullableString, isRoleName } from './staff-account.mapper';
 
 import type { components } from '@admin/shared/contracts';
-import type { StaffProfile, StaffRole } from '@admin/users/model';
+import type { StaffProfile } from '@admin/users/model';
 
 type ProfileResponse = components['schemas']['ProfileResponse'];
 
@@ -16,7 +14,7 @@ const isProfileResponse = (value: unknown): value is ProfileResponse => {
     typeof row.fullName === 'string' &&
     isNullableString(row.avatarUrl) &&
     isNullableString(row.phoneNumber) &&
-    staffRoles.includes(row.role as StaffRole)
+    isRoleName(row.role)
   );
 };
 
