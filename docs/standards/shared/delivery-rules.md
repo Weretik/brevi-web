@@ -60,7 +60,7 @@ Implement a feature in stages (one scenario, task slice, or layer at a time). Af
 
 ## Closing checklist
 
-Before reporting a feature complete, check each item that applies: the feature card and [feature catalog](../../features/README.md) row are created or updated; the [specification index](../../specs/README.md) row and traceability are current; the card's "Tests" section is current; the contract snapshot and generated types are synced after a backend change; loading, empty, and error states exist; the existing theme (light and dark), responsive rules, and locale are respected; architecture documentation is updated when a module, route, or boundary is added or changed; the staged structure checks are done.
+Before reporting a feature complete, check each item that applies: the feature card and [feature catalog](../../features/README.md) row are created or updated; the [specification index](../../specs/README.md) row and traceability are current; the card's "Tests" section is current; the contract snapshot and generated types are synced after a backend change; loading, empty, and error states exist; a new Admin page, route or action follows [«Права доступу»](../admin/access-rights.md) (menu `access` key, route inside `RequirePageAccess`, buttons by `canAccess`, `defaultAccess` fixture); the existing theme (light and dark), responsive rules, and locale are respected; architecture documentation is updated when a module, route, or boundary is added or changed; the staged structure checks are done.
 
 When changing an existing feature, open its card and the code and tests it lists before editing.
 
