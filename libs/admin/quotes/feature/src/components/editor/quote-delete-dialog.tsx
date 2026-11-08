@@ -1,4 +1,5 @@
 import {
+  Alert,
   Button,
   Dialog,
   DialogActions,
@@ -7,26 +8,39 @@ import {
   DialogTitle,
 } from '@mui/material';
 
+import type { useQuoteDelete } from '../../hooks/lifecycle/use-quote-delete';
+
 interface Props {
-  number: string;
-  deleting: boolean;
-  onCancel: () => void;
-  onConfirm: () => void;
+  flow: ReturnType<typeof useQuoteDelete>;
 }
 
-/** «Видалити чернетку?» confirmation. */
-export function QuoteDeleteDialog({ number, deleting, onCancel, onConfirm }: Props) {
+/** «Видалити КП …?»: shown while a КП waits for the confirmation; the server's refusal stays here. */
+export function QuoteDeleteDialog({ flow }: Props) {
+  const { target, deleting, error } = flow;
+  if (!target) return null;
   return (
-    <Dialog open onClose={deleting ? undefined : onCancel} aria-labelledby="quote-delete-title">
-      <DialogTitle id="quote-delete-title">Видалити КП {number}?</DialogTitle>
+    <Dialog open onClose={deleting ? undefined : flow.cancel} aria-labelledby="quote-delete-title">
+      <DialogTitle id="quote-delete-title">Видалити КП {target.number}?</DialogTitle>
       <DialogContent>
-        <DialogContentText>Чернетку буде видалено разом з усіма позиціями.</DialogContentText>
+        <DialogContentText>
+          КП буде видалено назавжди разом з усіма позиціями та історією.
+        </DialogContentText>
+        {error && (
+          <Alert severity="error" sx={{ mt: 2 }}>
+            {error}
+          </Alert>
+        )}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onCancel} disabled={deleting}>
+        <Button onClick={flow.cancel} disabled={deleting}>
           Скасувати
         </Button>
-        <Button variant="contained" color="error" onClick={onConfirm} disabled={deleting}>
+        <Button
+          variant="contained"
+          color="error"
+          onClick={() => void flow.confirm()}
+          disabled={deleting}
+        >
           Видалити
         </Button>
       </DialogActions>

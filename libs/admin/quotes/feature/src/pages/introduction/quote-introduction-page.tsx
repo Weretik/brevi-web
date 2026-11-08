@@ -1,7 +1,5 @@
-import { useDeleteQuoteMutation } from '@admin/quotes/data-access';
 import { quoteIntroPageErrors } from '@admin/quotes/model';
 import {
-  QuoteArchivedNotice,
   QuoteIntroLayoutStep,
   QuoteIntroLetterStep,
   QuoteIntroPagesStep,
@@ -16,13 +14,16 @@ import { Navigate, useNavigate, useParams } from 'react-router-dom';
 
 import { QuoteIntroductionActions } from './quote-introduction-actions';
 import { QuoteDeleteDialog } from '../../components/editor/quote-delete-dialog';
+import { QuoteSaveFirstDialog } from '../../components/editor/quote-save-first-dialog';
 import { QuoteIntroModelPickerDrawer } from '../../components/introduction/quote-intro-model-picker-drawer';
 import { QuoteIntroTemplateSaveDrawer } from '../../components/introduction/quote-intro-template-save-drawer';
 import { QuoteIntroTemplatesDrawer } from '../../components/introduction/quote-intro-templates-drawer';
 import { QuoteHistoryDrawer } from '../../components/lifecycle/quote-history-drawer';
 import { QuotePreview } from '../../components/preview/quote-preview';
 import { QuoteSendDrawer } from '../../components/sending/quote-send-drawer';
+import { useQuoteSaveFirst } from '../../hooks/editor/use-quote-save-first';
 import { useQuoteIntroductionEditor } from '../../hooks/introduction/use-quote-introduction-editor';
+import { useQuoteDelete } from '../../hooks/lifecycle/use-quote-delete';
 import { useQuoteLifecycle } from '../../hooks/lifecycle/use-quote-lifecycle';
 import { useRouteNotice } from '../../hooks/lifecycle/use-route-notice';
 import { useQuotePreview } from '../../hooks/preview/use-quote-preview';
@@ -49,15 +50,15 @@ export default function QuoteIntroductionPage({ actor }: { actor: QuoteActor }) 
   const prefill = useQuoteStartPrefill();
   const editor = useQuoteIntroductionEditor(id, prefill);
   const { quote, draft, setup } = editor;
-  const preview = useQuotePreview({ quote, dirty: editor.dirty, save: editor.save });
+  const preview = useQuotePreview();
+  const saveFirst = useQuoteSaveFirst({ quote, dirty: editor.dirty, save: editor.save });
+  const removal = useQuoteDelete(() => navigate('/crm/quotes'));
   const gmail = useGmailReturnNotice();
   const [panel, setPanel] = useState<Panel | null>(null);
   const [notice, setNotice] = useState<{ severity: 'success' | 'warning'; text: string } | null>(
     null,
   );
-  const [confirmDelete, setConfirmDelete] = useState(false);
-  const [deleteQuote, deleting] = useDeleteQuoteMutation();
-  const lifecycle = useQuoteLifecycle(quote, editor.applyServerQuote);
+  const lifecycle = useQuoteLifecycle(quote);
   const routeNotice = useRouteNotice();
 
   if (editor.wrongKind && id !== null) return <Navigate to={`/crm/quotes/${id}`} replace />;
@@ -116,26 +117,16 @@ export default function QuoteIntroductionPage({ actor }: { actor: QuoteActor }) 
             />
             {quote && (
               <QuoteMoreMenu
-                archived={lifecycle.archived}
                 dirty={editor.dirty}
                 busy={lifecycle.busy}
                 onHistory={() => setPanel({ kind: 'history' })}
                 onCopy={() => void lifecycle.copy()}
-                onArchive={(archived) => void lifecycle.setArchived(archived)}
-                onDelete={quote.status === 'Draft' ? () => setConfirmDelete(true) : undefined}
+                onDelete={actor.canDelete ? () => removal.ask(quote) : undefined}
               />
             )}
           </>
         }
       />
-      {quote?.archivedAt && (
-        <QuoteArchivedNotice
-          archivedAt={quote.archivedAt}
-          archivedByName={quote.archivedByName}
-          busy={lifecycle.busy}
-          onRestore={() => void lifecycle.setArchived(false)}
-        />
-      )}
       {lifecycle.error && (
         <Alert severity="error" sx={{ mb: 2 }} onClose={lifecycle.clearError}>
           {lifecycle.error}
@@ -195,19 +186,26 @@ export default function QuoteIntroductionPage({ actor }: { actor: QuoteActor }) 
         dirty={editor.dirty}
         saving={editor.saving}
         generating={preview.preparing}
-        locked={lifecycle.archived}
-        onSave={() => void editor.save()}
-        onPdf={() => void preview.open()}
+        onSave={() =>
+          void editor.save().then((saved) => {
+            if (saved) navigate('/crm/quotes', { state: { notice: 'КП збережено' } });
+          })
+        }
+        onCancel={() => navigate('/crm/quotes')}
+        onPdf={() => saveFirst.run((saved) => void preview.open(saved))}
         onSend={() => {
           setNotice(null);
-          void preview.open();
+          saveFirst.run((saved) => void preview.open(saved));
         }}
       />
-      <QuotePreview
-        preview={preview}
-        locked={lifecycle.archived}
-        onSend={() => setPanel({ kind: 'send' })}
-      />
+      <QuotePreview preview={preview} onSend={() => setPanel({ kind: 'send' })} />
+      {saveFirst.asking && (
+        <QuoteSaveFirstDialog
+          saving={editor.saving}
+          onCancel={saveFirst.cancel}
+          onSave={() => void saveFirst.confirm()}
+        />
+      )}
 
       {panel?.kind === 'pick' && (
         <QuoteIntroModelPickerDrawer
@@ -259,21 +257,7 @@ export default function QuoteIntroductionPage({ actor }: { actor: QuoteActor }) 
           }}
         />
       )}
-      {confirmDelete && quote && (
-        <QuoteDeleteDialog
-          number={quote.number}
-          deleting={deleting.isLoading}
-          onCancel={() => setConfirmDelete(false)}
-          onConfirm={async () => {
-            try {
-              await deleteQuote({ id: quote.id, version: quote.version }).unwrap();
-              navigate('/crm/quotes');
-            } catch {
-              setConfirmDelete(false);
-            }
-          }}
-        />
-      )}
+      <QuoteDeleteDialog flow={removal} />
     </Box>
   );
 }

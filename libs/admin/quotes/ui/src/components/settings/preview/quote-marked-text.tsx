@@ -1,11 +1,11 @@
 import { fillQuoteMarks } from '@admin/quotes/model';
 import { Box } from '@mui/material';
 
-import type { QuoteTemplateMark } from '@admin/quotes/model';
+import type { QuoteMark } from '@admin/quotes/model';
 
 interface Props {
   text: string;
-  marks: Readonly<Record<QuoteTemplateMark, string>>;
+  marks: Readonly<Partial<Record<QuoteMark, string>>>;
 }
 
 /** A template as the client reads it: marks filled with example values, an unknown mark in red. */

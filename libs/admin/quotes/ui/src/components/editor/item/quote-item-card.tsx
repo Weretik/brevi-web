@@ -15,12 +15,16 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 
-import { QuoteCustomComposition } from './quote-custom-composition';
 import { QuoteItemMenu } from './quote-item-menu';
 import { QuoteItemPhoto } from './quote-item-photo';
 import { QuoteItemPrices } from './quote-item-prices';
 
-import type { QuoteItemDraft, QuoteOptionDraft, QuoteTier } from '@admin/quotes/model';
+import type {
+  QuoteFabricFacts,
+  QuoteItemDraft,
+  QuoteOptionDraft,
+  QuoteTier,
+} from '@admin/quotes/model';
 
 interface Props {
   item: QuoteItemDraft;
@@ -48,6 +52,10 @@ interface Props {
   onChangePhoto?: () => void;
   onMove: (offset: -1 | 1) => void;
   onRemove: () => void;
+  /** Current Reference fabrics for the manager line under each fabric (R-31). */
+  fabricFacts: ReadonlyMap<number, QuoteFabricFacts>;
+  /** Opens the card of a fabric's supplier (R-32). */
+  onOpenSupplier?: (facts: QuoteFabricFacts) => void;
 }
 
 /** The anchor the «Перед надсиланням» links scroll to. */
@@ -78,6 +86,8 @@ export function QuoteItemCard({
   onChangePhoto,
   onMove,
   onRemove,
+  fabricFacts,
+  onOpenSupplier,
 }: Props) {
   const oneOff = item.kind === 'OneOffPpe';
   const custom = item.kind === 'CustomSewing';
@@ -88,7 +98,6 @@ export function QuoteItemCard({
     item.kind === 'Embroidery'
       ? (item.subtitle ?? '')
       : [item.season, item.code].filter(Boolean).join(' · ');
-  const changePhoto = item.productId !== null && onChangePhoto ? onChangePhoto : undefined;
   return (
     <Card
       variant="outlined"
@@ -96,8 +105,8 @@ export function QuoteItemCard({
       aria-label={`Позиція ${position}: ${label}`}
       sx={{ scrollMarginTop: 96, borderColor: itemError ? 'warning.main' : undefined }}
     >
-      <Stack direction="row" sx={{ gap: 2, alignItems: 'center', p: 2, pb: 1.5 }}>
-        <QuoteItemPhoto photoUrl={item.photoUrl} label={label} onChange={changePhoto} />
+      <Stack direction="row" sx={{ gap: 2, alignItems: 'flex-start', p: 2, pb: 1.5 }}>
+        <QuoteItemPhoto photoUrl={item.photoUrl} label={label} onChange={onChangePhoto} />
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Stack direction="row" sx={{ gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
             <Typography
@@ -160,7 +169,7 @@ export function QuoteItemCard({
         )}
         <QuoteItemMenu
           label={label}
-          onChangePhoto={changePhoto}
+          onChangePhoto={onChangePhoto}
           isFirst={isFirst}
           isLast={isLast}
           onMove={onMove}
@@ -168,11 +177,6 @@ export function QuoteItemCard({
         />
       </Stack>
 
-      {custom && item.lines.length > 0 && (
-        <Box sx={{ px: 2, pb: 1.5, mt: -2 }}>
-          <QuoteCustomComposition lines={item.lines} />
-        </Box>
-      )}
       <QuoteItemPrices
         item={item}
         itemName={label}
@@ -183,6 +187,9 @@ export function QuoteItemCard({
         }
         onRecommend={onRecommend}
         onRemoveOption={onRemoveOption}
+        onRemoveItem={onRemove}
+        fabricFacts={fabricFacts}
+        onOpenSupplier={onOpenSupplier}
       />
 
       <Box sx={{ px: 2, pt: 1.5 }}>

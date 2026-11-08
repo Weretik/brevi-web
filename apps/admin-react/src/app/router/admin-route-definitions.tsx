@@ -19,13 +19,14 @@ import { useDashboardViewer } from './use-dashboard-viewer';
 import { useEmbroideryViewer } from './use-embroidery-viewer';
 import { useProductionOrderActor } from './use-production-order-actor';
 import { useQuoteActor } from './use-quote-actor';
+import { useQuoteSupplierCard } from './use-quote-supplier-card';
 import { useTaskViewer } from './use-task-viewer';
 
 export const adminRouteDefinitions = [
   ...createDashboardRoutes({ useViewer: useDashboardViewer }),
   ...createReferencesRoutes({ useCanSeePurchaseInvoices }),
   ...clientsRoutes,
-  ...createQuotesRoutes({ useQuoteActor }),
+  ...createQuotesRoutes({ useQuoteActor, useSupplierCard: useQuoteSupplierCard }),
   ...productsRoutes,
   ...remindersRoutes,
   ...mediaRoutes,

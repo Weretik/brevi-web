@@ -4,6 +4,7 @@ import type {
   QuoteCatalogProduct,
   QuoteCustomSewingPrice,
   QuoteEvent,
+  QuoteFabricFacts,
   QuoteItem,
   QuoteModelComposition,
   QuoteOption,
@@ -89,8 +90,6 @@ export const mapQuote = (value: Schemas['CrmQuote']): Quote => ({
   createdAt: value.createdAt,
   updatedAt: value.updatedAt,
   lastSentAt: value.lastSentAt ?? null,
-  archivedAt: value.archivedAt ?? null,
-  archivedByName: value.archivedByName ?? null,
   version: value.version,
   items: value.items.map(item),
   introduction: value.introduction
@@ -122,7 +121,7 @@ export const mapQuotePage = (value: Schemas['CrmQuotePage']): QuotePage => ({
     itemsCount: row.itemsCount,
     updatedAt: row.updatedAt,
     lastSentAt: row.lastSentAt ?? null,
-    archivedAt: row.archivedAt ?? null,
+    version: row.version,
   })),
   page: value.page,
   pageSize: value.pageSize,
@@ -157,6 +156,7 @@ export const mapQuoteCatalogProduct = (
     sku: variant.sku,
     title: variant.title,
     fabricInfo: variant.fabricInfo ?? null,
+    fabricId: variant.fabricId ?? null,
     prices: tierPrices(variant.prices),
     problem: variant.problem ?? null,
   })),
@@ -262,3 +262,14 @@ export const mapQuoteProductPhotos = (value: Schemas['ProductPhotoList']): Quote
         ]
       : [],
   );
+
+export const mapQuoteFabricFacts = (value: Schemas['CrmQuoteFabricFacts'][]): QuoteFabricFacts[] =>
+  value.map((fabric) => ({
+    fabricId: fabric.fabricId,
+    name: fabric.name,
+    composition: fabric.composition ?? null,
+    density: fabric.density ?? null,
+    pricePerMeter: fabric.pricePerMeter,
+    supplierId: fabric.supplierId ?? null,
+    supplierName: fabric.supplierName ?? null,
+  }));

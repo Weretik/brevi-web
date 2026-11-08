@@ -7,7 +7,6 @@ export type {
   QuoteCustomChoice,
   QuoteCustomRow,
 } from './components/custom-sewing/quote-custom-rows';
-export { QuoteArchivedNotice } from './components/editor/quote-archived-notice';
 export { QuoteRecipientCard, quoteRecipientAnchor } from './components/editor/quote-recipient-card';
 export { QuoteStatusPill } from './components/editor/quote-status-pill';
 export { QuoteProblemsCard } from './components/editor/summary/quote-problems-card';

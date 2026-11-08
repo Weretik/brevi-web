@@ -1,8 +1,9 @@
 import { quotesBaseApi } from './quotes-base-api';
-import { quoteLookupErrors, toQuoteApiError } from '../errors/quote-api-error';
+import { quoteLookupErrors, quotePhotoErrors, toQuoteApiError } from '../errors/quote-api-error';
 import {
   mapQuoteCatalogPage,
   mapQuoteCustomSewingPrice,
+  mapQuoteFabricFacts,
   mapQuoteModelComposition,
   mapQuoteProductPhotos,
   mapQuoteStaff,
@@ -12,6 +13,7 @@ import type {
   QuoteCatalogPage,
   QuoteCustomSewingPrice,
   QuoteCustomSewingPriceRequest,
+  QuoteFabricFacts,
   QuoteIntroSeason,
   QuoteModelComposition,
   QuoteProductPhoto,
@@ -62,18 +64,36 @@ export const quoteLookupsApi = quotesBaseApi.injectEndpoints({
       transformResponse: mapQuoteProductPhotos,
       transformErrorResponse: (response) => toQuoteApiError(response, quoteLookupErrors),
     }),
+    /** The manager line under each КП fabric: composition, density, price per metre, supplier (R-31). */
+    getQuoteFabricFacts: build.query<QuoteFabricFacts[], readonly number[]>({
+      query: (ids) => ({ url: '/api/crm/quote-lookups/fabrics', params: { ids: [...ids] } }),
+      transformResponse: mapQuoteFabricFacts,
+      transformErrorResponse: (response) => toQuoteApiError(response, quoteLookupErrors),
+    }),
     getQuoteStaff: build.query<QuoteStaff[], void>({
       query: () => '/api/crm/quote-lookups/staff',
       transformResponse: mapQuoteStaff,
       transformErrorResponse: (response) => toQuoteApiError(response, quoteLookupErrors),
+    }),
+    /** «Змінити фото → Завантажити своє»: the photo goes to the CDN folder «Фото КП» (crm R-34). */
+    uploadQuotePhoto: build.mutation<string, File>({
+      query: (file) => {
+        const body = new FormData();
+        body.set('file', file);
+        return { url: '/api/crm/quote-lookups/photos', method: 'POST', body };
+      },
+      transformResponse: (value: { url: string }) => value.url,
+      transformErrorResponse: (response) => toQuoteApiError(response, quotePhotoErrors),
     }),
   }),
 });
 
 export const {
   useCalculateQuoteCustomSewingMutation,
+  useGetQuoteFabricFactsQuery,
   useGetQuoteModelCompositionQuery,
   useGetQuoteProductPhotosQuery,
   useSearchQuoteCatalogQuery,
   useGetQuoteStaffQuery,
+  useUploadQuotePhotoMutation,
 } = quoteLookupsApi;

@@ -11,7 +11,7 @@ import {
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import SyncOutlinedIcon from '@mui/icons-material/SyncOutlined';
 import { Alert, Box, Button, Paper } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { SupplierDrawer } from '../../components/suppliers/supplier-drawer';
 import { useReferenceListFilters } from '../../hooks/reference-lists/use-reference-list-filters';
@@ -22,11 +22,23 @@ import { useSuppliers } from '../../hooks/suppliers/use-suppliers';
 import type { Supplier, SupplierDialogMode } from '@admin/references/model';
 import type { ReactNode } from 'react';
 
-/** «Контрагенти → Постачальники»; `tabs` are the page tabs shown above the header. */
+interface Props {
+  /** The page tabs shown above the header. */
+  tabs?: ReactNode;
+  canSeePurchaseInvoices?: boolean;
+  /** A supplier to open once the list is loaded («Відкрити в контрагентах»). */
+  openSupplierId?: number | null;
+  /** Called once the requested supplier is handled, so the page can drop it from the URL. */
+  onSupplierOpened?: () => void;
+}
+
+/** «Контрагенти → Постачальники». */
 export function SuppliersPage({
   tabs,
   canSeePurchaseInvoices = false,
-}: { tabs?: ReactNode; canSeePurchaseInvoices?: boolean } = {}) {
+  openSupplierId = null,
+  onSupplierOpened,
+}: Props = {}) {
   const { rows, loading, error, reload } = useSuppliers();
   const [active, setActive] = useState<{
     mode: SupplierDialogMode;
@@ -35,6 +47,14 @@ export function SuppliersPage({
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const filters = useReferenceListFilters(rows, filterSuppliers);
   const deletion = useSupplierDeletion(setActionMessage);
+
+  // «Відкрити в контрагентах» from a supplier card elsewhere: open that supplier once the list is here.
+  useEffect(() => {
+    if (openSupplierId == null || loading) return;
+    const supplier = rows.find((row) => row.id === openSupplierId);
+    if (supplier) setActive({ mode: 'view', supplier });
+    onSupplierOpened?.();
+  }, [openSupplierId, loading, rows, onSupplierOpened]);
 
   const nextId = rows.reduce((largest, row) => Math.max(largest, row.id), 0) + 1;
   const [syncNotice, setSyncNotice] = useState<{ text: string; ok: boolean } | null>(null);

@@ -4,20 +4,23 @@ export {
   useCreateQuoteMutation,
   useDeleteQuoteMutation,
   useGetQuoteHistoryQuery,
+  useGetQuoteLegacyArchiveQuery,
   useGetQuoteQuery,
   useLazyGetQuoteQuery,
   useListQuotesQuery,
+  usePurgeQuoteLegacyArchiveMutation,
   useRepriceQuoteMutation,
   useSaveQuoteMutation,
-  useSetQuoteArchivedMutation,
   useSetQuoteResponsibleMutation,
 } from './api/quotes.api';
 export {
   useCalculateQuoteCustomSewingMutation,
+  useGetQuoteFabricFactsQuery,
   useGetQuoteModelCompositionQuery,
   useGetQuoteProductPhotosQuery,
   useGetQuoteStaffQuery,
   useSearchQuoteCatalogQuery,
+  useUploadQuotePhotoMutation,
 } from './api/quote-lookups.api';
 export type { QuoteCatalogQuery } from './api/quote-lookups.api';
 export { toSaveQuoteInput } from './mappers/quote-input.mapper';

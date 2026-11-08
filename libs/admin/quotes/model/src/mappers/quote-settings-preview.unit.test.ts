@@ -30,6 +30,10 @@ describe('quoteSettingsPreviewSample', () => {
       '{managerPhone}': '+380 44 000 00 00',
       '{managerEmail}': 'olia@brevi.ua',
       '{site}': 'brevi.com.ua',
+      '{recipient}': 'для ТОВ «Приклад»',
+      '{sewingModel}': 'Куртка робоча «Імпульс»',
+      '{fabricName}': '«Грета»',
+      '{ppeItem}': 'рукавиці захисні',
     });
   });
 });

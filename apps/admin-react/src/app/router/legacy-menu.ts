@@ -44,7 +44,7 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
     label: 'Менеджер сервісу',
     items: [
       { id: 'leads', label: 'Ліди' },
-      { id: 'quotes', label: 'КП', path: '/crm/quotes' },
+      { id: 'quotes', label: 'Комерційні пропозиції', path: '/crm/quotes' },
       {
         id: 'quote-settings',
         label: 'Налаштування КП',

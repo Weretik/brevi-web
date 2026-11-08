@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import QuoteIntroductionPage from './quote-introduction-page';
@@ -61,7 +61,6 @@ vi.mock('@admin/quotes/data-access', () => ({
   useCreateQuoteIntroductionMutation: api.mutation(api.create),
   useSaveQuoteIntroductionMutation: api.mutation(vi.fn()),
   useDeleteQuoteMutation: api.mutation(vi.fn()),
-  useSetQuoteArchivedMutation: api.mutation(vi.fn()),
   useCopyQuoteMutation: api.mutation(vi.fn()),
   useGetQuoteHistoryQuery: () => ({ data: [], isLoading: false, isError: false }),
   useSearchQuoteCatalogQuery: () => ({
@@ -104,6 +103,11 @@ vi.mock('@admin/quotes/data-access', () => ({
   useConnectMailboxMutation: api.mutation(vi.fn()),
 }));
 
+function ListPage() {
+  const state = useLocation().state as { notice?: string } | null;
+  return <p>{`Список КП: ${state?.notice ?? ''}`}</p>;
+}
+
 function renderPage() {
   return render(
     <MemoryRouter initialEntries={['/crm/quote-introductions/new']}>
@@ -113,6 +117,7 @@ function renderPage() {
           element={<QuoteIntroductionPage actor={{ userId: 2, canSeeAll: false }} />}
         />
         <Route path="/crm/quote-introductions/:quoteId" element={<p>saved</p>} />
+        <Route path="/crm/quotes" element={<ListPage />} />
       </Routes>
     </MemoryRouter>,
   );
@@ -130,7 +135,7 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe('КП для знайомства', () => {
-  it('builds a summer page from the main model and three picked models, then saves it', async () => {
+  it('builds a summer page from the main model and three picked models, then saves and closes it', async () => {
     api.create.mockResolvedValue({
       id: 9,
       number: '2-11-2026',
@@ -147,8 +152,6 @@ describe('КП для знайомства', () => {
       createdAt: '2026-11-04T10:00:00Z',
       updatedAt: '2026-11-04T10:00:00Z',
       lastSentAt: null,
-      archivedAt: null,
-      archivedByName: null,
       version: 1,
       items: [],
       introduction: { layout: 'Summer', recipientEmail: null, letterName: null },
@@ -185,7 +188,7 @@ describe('КП для знайомства', () => {
       [3, 300],
       [4, 400],
     ]);
-    expect(await screen.findByText('saved')).toBeInTheDocument();
+    expect(await screen.findByText('Список КП: КП збережено')).toBeInTheDocument();
   });
 
   it('fills the selection from a ready template', async () => {

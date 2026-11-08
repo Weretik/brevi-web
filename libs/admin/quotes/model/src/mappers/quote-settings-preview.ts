@@ -1,4 +1,4 @@
-import type { QuoteSettingsDraft, QuoteTemplateMark } from '../models/quote-settings-draft';
+import type { QuoteMark, QuoteSettingsDraft } from '../models/quote-settings-draft';
 
 export interface QuoteSettingsPreviewSample {
   readonly number: string;
@@ -7,7 +7,7 @@ export interface QuoteSettingsPreviewSample {
   readonly managerName: string;
   readonly managerEmail: string;
   /** Values of the marks as they would be filled in this example. */
-  readonly marks: Readonly<Record<QuoteTemplateMark, string>>;
+  readonly marks: Readonly<Record<QuoteMark, string>>;
 }
 
 const siteText = (site: string) =>
@@ -41,6 +41,10 @@ export function quoteSettingsPreviewSample(
       '{managerPhone}': managerPhone,
       '{managerEmail}': managerEmail,
       '{site}': siteText(draft.company.site) || 'brevi.com.ua',
+      '{recipient}': 'для ТОВ «Приклад»',
+      '{sewingModel}': 'Куртка робоча «Імпульс»',
+      '{fabricName}': '«Грета»',
+      '{ppeItem}': 'рукавиці захисні',
     },
   };
 }

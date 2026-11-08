@@ -1,9 +1,10 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import QuoteEditorPage from './quote-editor-page';
 
+import type { QuoteSupplierCard } from './quote-supplier-card';
 import type { Quote, QuoteDraft } from '@admin/quotes/model';
 
 const price = (amount: number) => ({ amount, source: amount, isManual: false, shown: true });
@@ -24,8 +25,6 @@ const quote: Quote = {
   createdAt: '2026-11-04T10:00:00Z',
   updatedAt: '2026-11-04T10:00:00Z',
   lastSentAt: null,
-  archivedAt: null,
-  archivedByName: null,
   version: 3,
   introduction: null,
   items: [
@@ -70,10 +69,11 @@ const api = vi.hoisted(() => ({
   savePdf: vi.fn(),
   send: vi.fn(),
   connect: vi.fn(),
-  archive: vi.fn(),
+  remove: vi.fn(),
   copy: vi.fn(),
   addEmbroidery: vi.fn(),
   draft: { current: null as unknown },
+  quote: { current: null as unknown },
   mutation: (fn: (arg: unknown) => unknown) => () => [
     (arg: unknown) => ({ unwrap: () => fn(arg) }),
     { isLoading: false },
@@ -81,10 +81,28 @@ const api = vi.hoisted(() => ({
 }));
 
 vi.mock('@admin/quotes/data-access', () => ({
-  useGetQuoteQuery: () => ({ data: quote, isLoading: false, isError: false, refetch: api.refetch }),
+  useGetQuoteQuery: () => ({
+    data: api.quote.current ?? quote,
+    isLoading: false,
+    isError: false,
+    refetch: api.refetch,
+  }),
+  useGetQuoteFabricFactsQuery: () => ({
+    data: [
+      {
+        fabricId: 31,
+        name: 'Грета',
+        composition: '53% бавовна, 47% поліестер',
+        density: '220 г/м²',
+        pricePerMeter: 133,
+        supplierId: 5,
+        supplierName: 'Спецтекстиль',
+      },
+    ],
+  }),
   useCreateQuoteMutation: api.mutation(vi.fn()),
   useSaveQuoteMutation: api.mutation(api.save),
-  useDeleteQuoteMutation: api.mutation(vi.fn()),
+  useDeleteQuoteMutation: api.mutation(api.remove),
   fetchQuotePdf: api.fetchPdf,
   saveQuotePdf: api.savePdf,
   useGetQuoteSendDraftQuery: () => ({ data: api.draft.current, isLoading: false, isError: false }),
@@ -92,7 +110,6 @@ vi.mock('@admin/quotes/data-access', () => ({
   useConnectMailboxMutation: api.mutation(api.connect),
   useDisconnectMailboxMutation: api.mutation(vi.fn()),
   useCalculateQuoteCustomSewingMutation: api.mutation(vi.fn()),
-  useSetQuoteArchivedMutation: api.mutation(api.archive),
   useCopyQuoteMutation: api.mutation(api.copy),
   useAddQuoteEmbroideryMutation: () => [
     (arg: unknown) => Promise.resolve({ data: api.addEmbroidery(arg) }),
@@ -169,13 +186,24 @@ vi.mock('@admin/clients/data-access', () => ({
   useListCustomersQuery: () => ({ data: undefined }),
 }));
 
-function renderEditor() {
+function ListPage() {
+  const state = useLocation().state as { notice?: string } | null;
+  return <p>{`Список КП:${state?.notice ? ` ${state.notice}` : ''}`}</p>;
+}
+
+function renderEditor(supplierCard?: QuoteSupplierCard, canDelete = false) {
   return render(
     <MemoryRouter initialEntries={['/crm/quotes/4']}>
       <Routes>
+        <Route path="/crm/quotes" element={<ListPage />} />
         <Route
           path="/crm/quotes/:quoteId"
-          element={<QuoteEditorPage actor={{ userId: 2, canSeeAll: false }} />}
+          element={
+            <QuoteEditorPage
+              actor={{ userId: 2, canSeeAll: false, canDelete }}
+              supplierCard={supplierCard}
+            />
+          }
         />
       </Routes>
     </MemoryRouter>,
@@ -206,9 +234,10 @@ beforeEach(() => {
   URL.revokeObjectURL = vi.fn();
   api.send.mockReset();
   api.connect.mockReset();
-  api.archive.mockReset();
+  api.remove.mockReset();
   api.copy.mockReset();
   api.draft.current = sendDraft;
+  api.quote.current = null;
 });
 afterEach(cleanup);
 
@@ -222,28 +251,45 @@ describe('КП editor', () => {
     expect(panel).toHaveTextContent('Створено');
   });
 
-  it('moves the КП to the archive and locks saving until it is restored', async () => {
-    api.archive.mockImplementation(({ archived }: { archived: boolean }) =>
-      Promise.resolve({
-        ...quote,
-        version: archived ? 4 : 5,
-        archivedAt: archived ? '2026-11-04T12:00:00Z' : null,
-        archivedByName: archived ? 'Олена' : null,
-      }),
-    );
+  it('«Зберегти» saves and closes the КП with «КП збережено»; «Скасувати» closes without saving', async () => {
+    api.save.mockResolvedValue({ ...quote, version: 4 });
+    renderEditor();
+    fireEvent.change(await screen.findByLabelText('Коментар для клієнта'), {
+      target: { value: 'Інше' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
+    expect(await screen.findByText('Список КП: КП збережено')).toBeVisible();
+    expect(api.save).toHaveBeenCalledTimes(1);
+    cleanup();
+
+    renderEditor();
+    fireEvent.change(await screen.findByLabelText('Коментар для клієнта'), {
+      target: { value: 'Інше' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Скасувати' }));
+    expect(await screen.findByText('Список КП:')).toBeVisible();
+    expect(api.save).toHaveBeenCalledTimes(1);
+  });
+
+  it('offers «Видалити КП» in «Ще» only to who may delete, and shows why the server refused', async () => {
     renderEditor();
     fireEvent.click(await screen.findByRole('button', { name: 'Ще' }));
-    fireEvent.click(screen.getByRole('menuitem', { name: /В архів/ }));
+    expect(screen.queryByRole('menuitem', { name: /Видалити КП/ })).not.toBeInTheDocument();
+    cleanup();
 
-    expect(await screen.findByText(/КП в архіві з/)).toBeVisible();
-    expect(api.archive).toHaveBeenCalledWith({ id: 4, version: 3, archived: true });
-    expect(screen.getByRole('button', { name: 'Зберегти' })).toBeDisabled();
-    expect(screen.getByRole('button', { name: 'Надіслати КП' })).toBeDisabled();
-
-    fireEvent.click(screen.getByRole('button', { name: 'Повернути з архіву' }));
-    await waitFor(() => expect(screen.queryByText(/КП в архіві з/)).not.toBeInTheDocument());
-    expect(api.archive).toHaveBeenLastCalledWith({ id: 4, version: 4, archived: false });
-    expect(screen.getByRole('button', { name: 'Зберегти' })).toBeEnabled();
+    api.remove.mockRejectedValue({
+      status: 409,
+      message: 'КП не можна видалити: за ним є виробниче завдання.',
+    });
+    renderEditor(undefined, true);
+    fireEvent.click(await screen.findByRole('button', { name: 'Ще' }));
+    fireEvent.click(screen.getByRole('menuitem', { name: /Видалити КП/ }));
+    const dialog = screen.getByRole('dialog', { name: 'Видалити КП 1-11-2026?' });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Видалити' }));
+    expect(
+      await within(dialog).findByText('КП не можна видалити: за ним є виробниче завдання.'),
+    ).toBeVisible();
+    expect(api.remove).toHaveBeenCalledWith({ id: 4, version: 3 });
   });
 
   it('copies the КП and opens the copy', async () => {
@@ -320,12 +366,60 @@ describe('КП editor', () => {
   it('hides a price from the client', async () => {
     api.save.mockResolvedValue(quote);
     renderEditor();
-    fireEvent.click(await screen.findByRole('button', { name: 'Дії з рядком: Рукавиці, Ціна' }));
-    fireEvent.click(screen.getByRole('menuitemcheckbox', { name: 'Показати в КП: до 9 шт.' }));
+    fireEvent.click(
+      await screen.findByRole('switch', { name: 'Показувати в КП: Рукавиці, Ціна, до 9 шт.' }),
+    );
+    expect(screen.getByText('Сховано')).toBeVisible();
     fireEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
     await waitFor(() => expect(api.save).toHaveBeenCalledTimes(1));
     const sent = api.save.mock.calls[0][0] as { draft: QuoteDraft };
     expect(sent.draft.items[0].options[0].prices.retail.shown).toBe(false);
+  });
+
+  it('shows one fabric line and removes the whole item with its last fabric after a confirmation', async () => {
+    const sewing = {
+      ...quote.items[0],
+      id: 11,
+      kind: 'Sewing' as const,
+      productId: 8,
+      name: 'Костюм «Агат»',
+      options: [
+        {
+          ...quote.items[0].options[0],
+          id: 21,
+          articleId: 40,
+          fabricId: 31,
+          title: 'Тканина «Грета»',
+          details: 'Короткий опис для клієнта',
+        },
+      ],
+    };
+    api.quote.current = { ...quote, items: [sewing] };
+    api.save.mockResolvedValue(quote);
+    const openSupplier = vi.fn();
+    renderEditor({ open: openSupplier, element: null });
+
+    expect(
+      await screen.findByText(
+        /Склад: 53% бавовна, 47% поліестер · Щільність: 220 г\/м² · 133 грн\/м/,
+      ),
+    ).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: 'Постачальник: Спецтекстиль' }));
+    expect(openSupplier).toHaveBeenCalledWith({
+      id: 5,
+      name: 'Спецтекстиль',
+      fabrics: [{ fabricId: 31, name: 'Грета', pricePerMeter: '133 грн/м' }],
+    });
+    expect(screen.queryByText('Короткий опис для клієнта')).not.toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Прибрати тканину: Костюм «Агат», Тканина «Грета»' }),
+    );
+    expect(screen.getByRole('heading', { name: 'Прибрати позицію?' })).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: 'Прибрати позицію' }));
+    await waitFor(() =>
+      expect(screen.queryByRole('heading', { name: /Костюм «Агат»/ })).not.toBeInTheDocument(),
+    );
   });
 
   it('hides one quantity tier in the whole КП with the «Підсумок» switch', async () => {
@@ -379,7 +473,7 @@ describe('КП editor', () => {
     expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:quote-pdf');
   });
 
-  it('«Переглянути PDF» saves unsaved changes first and builds the PDF from the saved version', async () => {
+  it('«Переглянути PDF» with unsaved changes asks to save, then builds the PDF and keeps the КП open', async () => {
     const saved = { ...quote, version: 4 };
     api.save.mockResolvedValue(saved);
     renderEditor();
@@ -389,8 +483,13 @@ describe('КП editor', () => {
     });
 
     fireEvent.click(screen.getByRole('button', { name: 'Переглянути PDF' }));
+    const ask = screen.getByRole('dialog', { name: 'Щоб продовжити, збережіть КП' });
+    expect(api.save).not.toHaveBeenCalled();
+    fireEvent.click(within(ask).getByRole('button', { name: 'Зберегти' }));
     await waitFor(() => expect(api.fetchPdf).toHaveBeenCalledWith(4));
     expect(api.save).toHaveBeenCalledTimes(1);
+    expect(await screen.findByRole('dialog', { name: 'Перегляд КП № 1-11-2026' })).toBeVisible();
+    expect(screen.queryByText(/Список КП/)).not.toBeInTheDocument();
     expect(api.save.mock.invocationCallOrder[0]).toBeLessThan(
       api.fetchPdf.mock.invocationCallOrder[0] ?? 0,
     );
@@ -406,11 +505,17 @@ describe('КП editor', () => {
     fireEvent.change(screen.getByLabelText('Коментар для клієнта'), { target: { value: 'Інше' } });
 
     fireEvent.click(screen.getByRole('button', { name: 'Переглянути PDF' }));
+    fireEvent.click(
+      within(screen.getByRole('dialog', { name: 'Щоб продовжити, збережіть КП' })).getByRole(
+        'button',
+        { name: 'Зберегти' },
+      ),
+    );
     expect(await screen.findByText('КП змінили в іншому вікні. Оновіть сторінку.')).toBeVisible();
     expect(api.fetchPdf).not.toHaveBeenCalled();
   });
 
-  it('«Надіслати КП» saves first, sends the letter and marks the КП sent', async () => {
+  it('«Надіслати КП» asks to save first, sends the letter and marks the КП sent', async () => {
     const saved = { ...quote, version: 4 };
     api.save.mockResolvedValue(saved);
     api.send.mockResolvedValue({
@@ -424,6 +529,12 @@ describe('КП editor', () => {
     fireEvent.change(screen.getByLabelText('Коментар для клієнта'), { target: { value: 'Інше' } });
 
     fireEvent.click(screen.getByRole('button', { name: 'Надіслати КП' }));
+    fireEvent.click(
+      within(screen.getByRole('dialog', { name: 'Щоб продовжити, збережіть КП' })).getByRole(
+        'button',
+        { name: 'Зберегти' },
+      ),
+    );
     await sendFromPreview();
     const to = await screen.findByLabelText(/Кому/);
     expect(api.save).toHaveBeenCalledTimes(1);

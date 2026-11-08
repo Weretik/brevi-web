@@ -1,4 +1,5 @@
-import { Box, Paper } from '@mui/material';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import { Box, IconButton, Paper, Tooltip } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 
 import { QuoteStatusPill } from '../components/editor/quote-status-pill';
@@ -12,15 +13,15 @@ interface Props {
   rowCount: number;
   loading: boolean;
   searching: boolean;
-  /** The «Архів» tab. */
-  archive?: boolean;
-  /** The client card: a «Стан» column (draft, sent or archived), since both lists are mixed. */
+  /** The client card: a «Стан» column (draft or sent). */
   withStatus?: boolean;
   /** Text of an empty list instead of the «КП» page wording. */
   emptyLabel?: string;
   paginationModel: GridPaginationModel;
   onPaginationModelChange: (model: GridPaginationModel) => void;
   onOpen: (row: QuoteSummary) => void;
+  /** «Видалити КП» in each row; only for who may delete (the Director for now). */
+  onDelete?: (row: QuoteSummary) => void;
 }
 
 const dateFormat = new Intl.DateTimeFormat('uk-UA', { dateStyle: 'short', timeStyle: 'short' });
@@ -29,14 +30,30 @@ const statusColumn: GridColDef<QuoteSummary> = {
   field: 'status',
   headerName: 'Стан',
   width: 170,
-  renderCell: ({ row }) => (
-    <QuoteStatusPill
-      status={row.status}
-      lastSentAt={row.lastSentAt}
-      archived={row.archivedAt !== null}
-    />
-  ),
+  renderCell: ({ row }) => <QuoteStatusPill status={row.status} lastSentAt={row.lastSentAt} />,
 };
+
+const deleteColumn = (onDelete: (row: QuoteSummary) => void): GridColDef<QuoteSummary> => ({
+  field: 'actions',
+  headerName: '',
+  width: 64,
+  sortable: false,
+  align: 'center',
+  renderCell: ({ row }) => (
+    <Tooltip title="Видалити КП">
+      <IconButton
+        size="small"
+        aria-label={`Видалити КП ${row.number}`}
+        onClick={(event) => {
+          event.stopPropagation();
+          onDelete(row);
+        }}
+      >
+        <DeleteOutlineOutlinedIcon fontSize="small" />
+      </IconButton>
+    </Tooltip>
+  ),
+});
 
 const columns: GridColDef<QuoteSummary>[] = [
   { field: 'number', headerName: 'Номер', width: 120, cellClassName: 'quote-mono' },
@@ -84,20 +101,25 @@ export function QuotesTable({
   rowCount,
   loading,
   searching,
-  archive = false,
   withStatus = false,
   emptyLabel,
   paginationModel,
   onPaginationModelChange,
   onOpen,
+  onDelete,
 }: Props) {
+  const shown = [
+    ...columns,
+    ...(withStatus ? [statusColumn] : []),
+    ...(onDelete ? [deleteColumn(onDelete)] : []),
+  ];
   return (
     <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
       <Box sx={{ height: 'var(--admin-table-height)' }}>
         <DataGrid
           aria-label="Комерційні пропозиції"
           rows={rows as QuoteSummary[]}
-          columns={withStatus ? [...columns, statusColumn] : columns}
+          columns={shown}
           loading={loading}
           rowCount={rowCount}
           paginationMode="server"
@@ -114,9 +136,7 @@ export function QuotesTable({
               ? emptyLabel
               : searching
                 ? 'Нічого не знайдено'
-                : archive
-                  ? 'В архіві немає КП'
-                  : 'Ще немає жодної КП',
+                : 'Ще немає жодної КП',
             paginationRowsPerPage: 'Рядків на сторінці',
           }}
           sx={{

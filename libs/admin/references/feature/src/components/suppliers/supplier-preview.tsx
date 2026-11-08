@@ -1,16 +1,28 @@
 import { useListSuppliersQuery } from '@admin/references/data-access';
+import { SupplierViewPanel } from '@admin/references/ui';
 import { Alert, Snackbar } from '@mui/material';
 import { useState } from 'react';
-
-import { SupplierDrawer } from './supplier-drawer';
+import { useNavigate } from 'react-router-dom';
 
 import type { Supplier } from '@admin/references/model';
+import type { SupplierViewRelatedRow } from '@admin/references/ui';
 
 /** A supplier named in a table or a card: by its ID when known, else by its name. */
 export interface SupplierRef {
   id?: number | null;
   name?: string | null;
+  /** An extra section of the card, for example the fabrics of this supplier in the current КП. */
+  related?: { title: string; rows: readonly SupplierViewRelatedRow[] };
 }
+
+export interface SupplierPreviewOptions {
+  /** Whether the user may open «Контрагенти»; false hides «Відкрити в контрагентах». */
+  canOpenCounterparties?: boolean;
+}
+
+/** «Відкрити в контрагентах»: the suppliers tab opens this supplier's card. */
+export const counterpartiesSupplierPath = (id: number) =>
+  `/references/counterparties?supplier=${id}`;
 
 const same = (a: string, b: string) =>
   a.trim().toLocaleLowerCase('uk') === b.trim().toLocaleLowerCase('uk');
@@ -23,11 +35,41 @@ function find(suppliers: Supplier[], ref: SupplierRef) {
   return ref.name ? suppliers.find((supplier) => same(supplier.name, ref.name ?? '')) : undefined;
 }
 
+/** The open card; it needs the router only while it is shown. */
+function SupplierPreviewPanel({
+  supplier,
+  related,
+  canOpenCounterparties,
+  onClose,
+}: {
+  supplier: Supplier;
+  related: SupplierRef['related'];
+  canOpenCounterparties: boolean;
+  onClose: () => void;
+}) {
+  const navigate = useNavigate();
+  return (
+    <SupplierViewPanel
+      supplier={supplier}
+      related={related}
+      onOpenInCounterparties={
+        canOpenCounterparties
+          ? () => {
+              onClose();
+              void navigate(counterpartiesSupplierPath(supplier.id));
+            }
+          : undefined
+      }
+      onClose={onClose}
+    />
+  );
+}
+
 /**
- * «Переглянути постачальника» from any table (CAT-019): the click on a supplier name opens the same card
- * as in «Контрагенти → Постачальники». `element` must be rendered once by the page.
+ * «Переглянути постачальника» from any table (CAT-019): the click on a supplier name opens the supplier's
+ * read-only card with «Відкрити в контрагентах». `element` must be rendered once by the page.
  */
-export function useSupplierPreview() {
+export function useSupplierPreview({ canOpenCounterparties = true }: SupplierPreviewOptions = {}) {
   const [ref, setRef] = useState<SupplierRef | null>(null);
   const suppliers = useListSuppliersQuery(undefined, { skip: ref === null });
   const supplier = ref && suppliers.data ? find(suppliers.data, ref) : undefined;
@@ -37,13 +79,12 @@ export function useSupplierPreview() {
   const element = (
     <>
       {supplier && (
-        <SupplierDrawer
+        <SupplierPreviewPanel
           key={supplier.id}
-          mode="view"
           supplier={supplier}
-          nextId={supplier.id}
+          related={ref?.related}
+          canOpenCounterparties={canOpenCounterparties}
           onClose={() => setRef(null)}
-          onSaved={() => setRef(null)}
         />
       )}
       <Snackbar

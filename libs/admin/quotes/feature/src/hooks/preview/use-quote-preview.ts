@@ -3,12 +3,6 @@ import { useEffect, useRef, useState } from 'react';
 
 import type { Quote } from '@admin/quotes/model';
 
-interface Source {
-  quote: Quote | null;
-  dirty: boolean;
-  save: () => Promise<Quote | null>;
-}
-
 interface Shown {
   quote: Quote;
   url: string | null;
@@ -17,10 +11,10 @@ interface Shown {
 }
 
 /**
- * «Перегляд КП» (crm R-30): the PDF is built on the server from the saved КП only, so unsaved changes are saved
- * first; then the manager sees it and chooses to send, download or print it.
+ * «Перегляд КП» (crm R-30): the PDF is built on the server from the saved КП only, so the page asks to save first
+ * (see `useQuoteSaveFirst`); then the manager sees it and chooses to send, download or print it.
  */
-export function useQuotePreview({ quote, dirty, save }: Source) {
+export function useQuotePreview() {
   const [shown, setShown] = useState<Shown | null>(null);
   const [preparing, setPreparing] = useState(false);
   const url = useRef<string | null>(null);
@@ -31,11 +25,9 @@ export function useQuotePreview({ quote, dirty, save }: Source) {
   };
   useEffect(() => release, []);
 
-  const open = async () => {
+  const open = async (saved: Quote) => {
     setPreparing(true);
     try {
-      const saved = quote && !dirty ? quote : await save();
-      if (!saved) return;
       release();
       setShown({ quote: saved, url: null, blob: null, error: null });
       try {

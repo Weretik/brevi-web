@@ -47,6 +47,13 @@ export {
   updateQuoteOption,
 } from './mappers/quote-draft-edits';
 export { formatQuotePrice, parseQuotePrice, priceInputText } from './mappers/quote-price-text';
+export {
+  quoteDraftFabricIds,
+  quoteFabricFactsParts,
+  quoteOptionFabrics,
+  quoteSupplierFabrics,
+} from './mappers/quote-fabric-facts';
+export type { QuoteOptionFabricRef, QuoteSupplierFabric } from './mappers/quote-fabric-facts';
 export { quotePreviewWarnings } from './mappers/quote-preview-warnings';
 export type { QuotePreviewWarning } from './mappers/quote-preview-warnings';
 export {
@@ -62,7 +69,10 @@ export type * from './entities/quote-settings';
 export type * from './models/quote-settings-draft';
 export {
   quoteAdvantageCount,
+  quoteIntroMarks,
   quoteMaxLetterVariants,
+  quotePdfIntroCases,
+  quotePdfIntroMarks,
   quoteTemplateMarkLabels,
   quoteTemplateMarks,
 } from './models/quote-settings-draft';

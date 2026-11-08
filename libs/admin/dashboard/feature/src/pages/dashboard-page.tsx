@@ -9,16 +9,11 @@ import { MetricStrip } from '../components/metrics/metric-strip';
 import { RecentQuotesCard } from '../components/quotes/recent-quotes-card';
 import { WeekHoursCard } from '../components/side-cards/week-hours-card';
 import { WorkshopBoard } from '../components/workshop-board/workshop-board';
-import {
-  recentQuotes,
-  weekHours,
-  workshopMetrics,
-  workshopStages,
-} from '../model/dashboard-view';
+import { recentQuotes, weekHours, workshopMetrics, workshopStages } from '../model/dashboard-view';
 
 import type { DashboardViewer } from '../model/dashboard-view';
 
-const latestQuotes = { archived: false, search: '', responsibleUserId: null, page: 1, pageSize: 6 };
+const latestQuotes = { search: '', responsibleUserId: null, page: 1, pageSize: 6 };
 
 interface DashboardPageProps {
   useViewer: () => DashboardViewer;
@@ -103,9 +98,7 @@ export default function DashboardPage({ useViewer }: DashboardPageProps) {
         </Box>
       )}
       {!viewer.seesWorkshop && !viewer.seesQuotes && (
-        <Typography color="text.secondary">
-          Оберіть розділ у меню ліворуч.
-        </Typography>
+        <Typography color="text.secondary">Оберіть розділ у меню ліворуч.</Typography>
       )}
     </Stack>
   );

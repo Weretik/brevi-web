@@ -12,6 +12,8 @@ import type {
   Quote,
   QuoteDraft,
   QuoteEvent,
+  QuoteLegacyArchive,
+  QuoteLegacyArchivePurge,
   QuoteListQuery,
   QuotePage,
   QuoteRepriceReport,
@@ -29,7 +31,6 @@ export const quotesApi = quotesBaseApi.injectEndpoints({
       query: (query) => ({
         url: '/api/crm/quotes',
         params: {
-          archived: query.archived || undefined,
           search: query.search.trim() || undefined,
           responsibleUserId: query.responsibleUserId ?? undefined,
           page: query.page,
@@ -103,16 +104,17 @@ export const quotesApi = quotesBaseApi.injectEndpoints({
       transformErrorResponse: errors,
       providesTags: (_result, _error, id) => [{ type: 'QuoteHistory', id }],
     }),
-    setQuoteArchived: build.mutation<Quote, { id: number; version: number; archived: boolean }>({
-      query: ({ id, version, archived }) => ({
-        url: `/api/crm/quotes/${id}/${archived ? 'archive' : 'restore'}`,
-        method: 'POST',
-        body: { version },
-      }),
-      transformResponse: mapQuote,
+    /** КП left from the removed «Архів»: their count for the Director (crm R-23). */
+    getQuoteLegacyArchive: build.query<QuoteLegacyArchive, void>({
+      query: () => '/api/crm/quotes/legacy-archive',
       transformErrorResponse: errors,
-      invalidatesTags: (_result, error, { id }) =>
-        error ? [] : [...list, { type: 'QuoteHistory', id }],
+      providesTags: [{ type: 'QuoteLegacyArchive', id: 'COUNT' }],
+    }),
+    purgeQuoteLegacyArchive: build.mutation<QuoteLegacyArchivePurge, void>({
+      query: () => ({ url: '/api/crm/quotes/legacy-archive', method: 'DELETE' }),
+      transformErrorResponse: errors,
+      invalidatesTags: (_result, error) =>
+        error ? [] : [...list, { type: 'QuoteLegacyArchive', id: 'COUNT' }],
     }),
     copyQuote: build.mutation<Quote, number>({
       query: (id) => ({ url: `/api/crm/quotes/${id}/copy`, method: 'POST' }),
@@ -148,6 +150,7 @@ export const {
   useRepriceQuoteMutation,
   useSetQuoteResponsibleMutation,
   useGetQuoteHistoryQuery,
-  useSetQuoteArchivedMutation,
+  useGetQuoteLegacyArchiveQuery,
+  usePurgeQuoteLegacyArchiveMutation,
   useCopyQuoteMutation,
 } = quotesApi;

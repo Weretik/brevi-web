@@ -8,7 +8,6 @@ export function useEmbroideryQuotes() {
   const [search, setSearch] = useState('');
   const deferred = useDeferredValue(search.trim());
   const query = useListQuotesQuery({
-    archived: false,
     search: deferred,
     responsibleUserId: null,
     page: 1,

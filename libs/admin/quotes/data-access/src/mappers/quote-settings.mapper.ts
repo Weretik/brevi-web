@@ -24,7 +24,32 @@ const companyKeys = [
   'site',
   'logoUrl',
 ] as const;
-const pdfKeys = ['vatNotice', 'ctaTitle', 'ctaText', 'ctaContactTemplate', 'introText'] as const;
+const pdfKeys = ['vatNotice', 'ctaTitle', 'ctaText', 'ctaContactTemplate'] as const;
+const introKeys = [
+  'onePpe',
+  'oneSewing',
+  'oneSewingOnePpe',
+  'sewing',
+  'ppe',
+  'sewingAndPpe',
+  'fallback',
+] as const;
+const labelKeys = [
+  'contactLine',
+  'codeLabel',
+  'siteLink',
+  'fabricsTitle',
+  'recommended',
+  'commentTitle',
+] as const;
+
+/** The server answers with the standard text in place of an empty one, so a missing field is only ''. */
+function filled<K extends string>(
+  value: Partial<Record<K, string | null>> | null | undefined,
+  keys: readonly K[],
+): Record<K, string> {
+  return Object.fromEntries(keys.map((key) => [key, value?.[key] ?? ''])) as Record<K, string>;
+}
 const introductionKeys = [
   'logoText',
   'summerTitle',
@@ -58,7 +83,12 @@ export function mapQuoteSettings(value: Schemas['CrmQuoteSettings']): QuoteSetti
     updatedAt: value.updatedAt ?? null,
     company: { ...pick(value.company, companyKeys), name: value.company.name },
     email: value.email,
-    pdf: { ...pick(value.pdf, pdfKeys), title: value.pdf.title },
+    pdf: {
+      ...pick(value.pdf, pdfKeys),
+      title: value.pdf.title,
+      intros: filled(value.pdf.intros, introKeys),
+      labels: filled(value.pdf.labels, labelKeys),
+    },
     introduction: {
       ...pick(value.introduction, introductionKeys),
       advantages: value.introduction.advantages.map((advantage) => ({
@@ -83,11 +113,17 @@ export function toSaveQuoteSettingsInput(
   draft: QuoteSettingsDraft,
 ): Schemas['CrmSaveQuoteSettingsInput'] {
   const { advantages, ...introduction } = draft.introduction;
+  const { intros, labels, ...pdf } = draft.pdf;
   return {
     version: draft.version,
     company: { ...texts(draft.company), name: draft.company.name.trim() },
     email: { subject: draft.email.subject.trim(), body: draft.email.body.trim() },
-    pdf: { ...texts(draft.pdf), title: draft.pdf.title.trim() },
+    pdf: {
+      ...texts(pdf),
+      title: pdf.title.trim(),
+      intros: texts(intros),
+      labels: texts(labels),
+    },
     introduction: {
       ...texts(introduction),
       advantages: advantages.map((advantage) => ({

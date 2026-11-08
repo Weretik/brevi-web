@@ -16,6 +16,7 @@ describe('QuotePriceCell', () => {
         editable={false}
         label="Імпульс, Саржа"
         onManualChange={vi.fn()}
+        onShownChange={vi.fn()}
       />,
     );
     expect(screen.getByText(/19,90/)).toBeVisible();
@@ -31,6 +32,7 @@ describe('QuotePriceCell', () => {
         editable
         label="Рукавиці, Ціна"
         onManualChange={onManualChange}
+        onShownChange={vi.fn()}
       />,
     );
     fireEvent.change(screen.getByLabelText('Ціна: Рукавиці, Ціна, до 9 шт.'), {
@@ -46,9 +48,42 @@ describe('QuotePriceCell', () => {
         editable
         label="Рукавиці, Ціна"
         onManualChange={onManualChange}
+        onShownChange={vi.fn()}
       />,
     );
     expect(screen.getByText('вручну')).toBeVisible();
     expect(screen.getByLabelText(/Ціна каталогу: 19,90/)).toBeVisible();
+  });
+
+  it('switches «Показувати / Сховано» right under the price', () => {
+    const onShownChange = vi.fn();
+    const { rerender } = render(
+      <QuotePriceCell
+        tier="wholesale"
+        price={price}
+        editable={false}
+        label="Імпульс, Саржа"
+        onManualChange={vi.fn()}
+        onShownChange={onShownChange}
+      />,
+    );
+    const toggle = screen.getByRole('switch', {
+      name: 'Показувати в КП: Імпульс, Саржа, 10–40 шт.',
+    });
+    expect(toggle).toHaveAttribute('aria-checked', 'true');
+    fireEvent.click(toggle);
+    expect(onShownChange).toHaveBeenCalledWith(false);
+
+    rerender(
+      <QuotePriceCell
+        tier="wholesale"
+        price={{ ...price, shown: false }}
+        editable={false}
+        label="Імпульс, Саржа"
+        onManualChange={vi.fn()}
+        onShownChange={onShownChange}
+      />,
+    );
+    expect(screen.getByText('Сховано')).toBeVisible();
   });
 });
