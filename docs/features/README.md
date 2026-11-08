@@ -6,7 +6,7 @@ In each feature card, “Structure diagram” shows relationships between parts,
 
 ## Admin React (`apps/admin-react`)
 
-- Service manager: [«КП»: list, «Товари та ціни» editor, «КП для знайомства» with ready templates, PDF, Gmail sending and «Налаштування КП»](admin/quotes.md); [client card from KeepinCRM](admin/clients.md); [manager tasks: «Завдання менеджерам» and the «Мої завдання» board](admin/tasks.md); [«Ціна вишивки»: embroidery and chevron price with «Налаштування»](admin/embroidery.md).
+- Service manager: [«КП»: list, «Товари та ціни» editor, «КП для знайомства» with ready templates, PDF, Gmail sending and «Налаштування КП»](admin/quotes.md); [client card from KeepinCRM](admin/clients.md); [manager tasks: «Завдання менеджерам» and the «Мої завдання» board](admin/tasks.md); [leads from the Google Sheet: «Мій день», «Усі ліди» and «Статистика лідів»](admin/leads.md); [«Ціна вишивки»: embroidery and chevron price with «Налаштування»](admin/embroidery.md).
 - Admin foundation: [shell, navigation, and session](admin/shell.md); [overview page «Огляд виробництва»](admin/dashboard.md).
 - Staff accounts: [sign-in users «Користувачі» (Admin only)](admin/users.md); [«Налаштування ШІ»: OpenAI key, models, limit and recognition rules (Admin only)](admin/ai.md); [«Мій кабінет» and the profile menu](admin/profile.md); [«Права доступу»: rights of every role per page, new and deleted roles (Admin only)](admin/access-rights.md).
 - Site content: [«Контент»: privacy and terms](admin/content.md).

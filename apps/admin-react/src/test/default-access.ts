@@ -8,6 +8,8 @@ const All: readonly AccessAction[] = ['view', 'create', 'edit', 'delete'];
 /** The server's rights of the built-in roles before anyone saves «Права доступу» (AccessCatalog defaults). */
 const defaults: Readonly<Record<string, Readonly<Record<string, readonly AccessAction[]>>>> = {
   Admin: {
+    leads: VE,
+    'lead-stats': VCE,
     quotes: VCE,
     'quote-settings': VE,
     embroidery: VE,
@@ -35,6 +37,7 @@ const defaults: Readonly<Record<string, Readonly<Record<string, readonly AccessA
     media: All,
   },
   Manager: {
+    leads: VE,
     quotes: VCE,
     embroidery: VE,
     tasks: VE,

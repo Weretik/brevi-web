@@ -13,6 +13,7 @@
 - Director and Admin create, edit and delete tasks, and filter both pages by manager. On the board they see everyone's cards with avatars and can mark cards urgent by dragging.
 - A Manager sees own tasks only (the server enforces it), drags cards to «У роботі» or «Виконано», and checks steps in the side panel.
 - Both pages open the same side panel (`ReferenceEditorDrawer`): view with status, steps and history; the form for Director and Admin. In the view Director and Admin pick another manager in «Виконавець» to pass the task on at once (saved as an edit; history shows the transfer).
+- A «Подзвонити» task made from a lead call (LEAD-001 R-08) shows «Лід» in the side panel with a link to the lead in «Мій день»; see [leads](leads.md).
 - The sidebar «Робочий стіл» tile shows «Завдання: прострочено N · терміново M» from the overview, or a neutral line when nothing burns.
 
 ## Structure diagram
