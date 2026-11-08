@@ -98,6 +98,7 @@ export function quoteSettingsErrors(draft: QuoteSettingsDraft): QuoteSettingsErr
     'fabricsTitle',
     'recommended',
     'commentTitle',
+    'clientTitle',
   ] as const)
     check(`pdf.labels.${key}`, pdf.labels[key], optional(quoteSettingsShortMax));
 

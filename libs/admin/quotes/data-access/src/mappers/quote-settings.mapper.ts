@@ -41,6 +41,7 @@ const labelKeys = [
   'fabricsTitle',
   'recommended',
   'commentTitle',
+  'clientTitle',
 ] as const;
 
 /** The server answers with the standard text in place of an empty one, so a missing field is only ''. */
@@ -88,6 +89,7 @@ export function mapQuoteSettings(value: Schemas['CrmQuoteSettings']): QuoteSetti
       title: value.pdf.title,
       intros: filled(value.pdf.intros, introKeys),
       labels: filled(value.pdf.labels, labelKeys),
+      showClient: value.pdf.labels?.showClient !== false,
     },
     introduction: {
       ...pick(value.introduction, introductionKeys),
@@ -113,7 +115,7 @@ export function toSaveQuoteSettingsInput(
   draft: QuoteSettingsDraft,
 ): Schemas['CrmSaveQuoteSettingsInput'] {
   const { advantages, ...introduction } = draft.introduction;
-  const { intros, labels, ...pdf } = draft.pdf;
+  const { intros, labels, showClient, ...pdf } = draft.pdf;
   return {
     version: draft.version,
     company: { ...texts(draft.company), name: draft.company.name.trim() },
@@ -122,7 +124,7 @@ export function toSaveQuoteSettingsInput(
       ...texts(pdf),
       title: pdf.title.trim(),
       intros: texts(intros),
-      labels: texts(labels),
+      labels: { ...texts(labels), showClient },
     },
     introduction: {
       ...texts(introduction),
