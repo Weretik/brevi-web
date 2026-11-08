@@ -1,6 +1,7 @@
 import {
   useBookBankStatementMutation,
   useGetBankStatementQuery,
+  useRollbackBankStatementMutation,
   useUpdateBankStatementLineMutation,
 } from '@admin/accounting/data-access';
 import {
@@ -14,8 +15,8 @@ import { useState } from 'react';
 import type { BankLineState, BankStatementLine } from '@admin/accounting/model';
 
 /**
- * One statement: lines filtered by state, page by page, «Проводити» of a line right in the table and «Провести
- * виписку» with the version the director saw.
+ * One statement: lines filtered by state, page by page, «Проводити» of a line right in the table, «Провести
+ * виписку» and «Відкотити виписку» with the version the director saw.
  */
 export function useBankStatement(id: string) {
   const [state, setStateFilter] = useState<BankLineState | null>(null);
@@ -26,6 +27,7 @@ export function useBankStatement(id: string) {
   const query = useGetBankStatementQuery({ id, state, page });
   const [update] = useUpdateBankStatementLineMutation();
   const [book, bookState] = useBookBankStatementMutation();
+  const [rollback, rollbackState] = useRollbackBankStatementMutation();
   const details = query.data;
 
   async function toggle(line: BankStatementLine, willBook: boolean) {
@@ -60,6 +62,17 @@ export function useBankStatement(id: string) {
     }
   }
 
+  async function rollbackAll() {
+    if (!details || rollbackState.isLoading) return;
+    setMessage(null);
+    try {
+      await rollback({ id, version: details.statement.version }).unwrap();
+      setNotice('Виписку відкочено. Виправте рядки й проведіть її знову, якщо потрібно.');
+    } catch (error) {
+      setMessage(adminApiErrorMessage(error, 'Не вдалося відкотити виписку.'));
+    }
+  }
+
   return {
     details,
     loading: query.isLoading || query.isFetching,
@@ -80,5 +93,7 @@ export function useBankStatement(id: string) {
     toggle: (line: BankStatementLine, willBook: boolean) => void toggle(line, willBook),
     booking: bookState.isLoading,
     book: bookAll,
+    rollingBack: rollbackState.isLoading,
+    rollback: () => void rollbackAll(),
   };
 }

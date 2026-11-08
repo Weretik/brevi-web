@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
 import { bankLineBody, createBankLineFormValues, validateBankLine } from './bank-line-form';
-import { bankStatementFileProblem } from '../../entities/statements/bank-statement';
+import {
+  bankStatementFileProblem,
+  bankStatementRollbackText,
+} from '../../entities/statements/bank-statement';
 
 import type { BankStatementLine } from '../../entities/statements/bank-statement';
 
@@ -60,5 +63,17 @@ describe('bank line form', () => {
     expect(bankStatementFileProblem({ name: 'a.pdf', size: 10 })).toMatch(/XLSX, XLS або CSV/);
     expect(bankStatementFileProblem({ name: 'a.csv', size: 0 })).toBe('Файл порожній.');
     expect(bankStatementFileProblem({ name: 'a.xls', size: 13 * 1024 * 1024 })).toMatch(/12 МБ/);
+  });
+
+  it('names records changed by hand and cancelled before in the rollback confirmation', () => {
+    const text = bankStatementRollbackText({
+      transactions: 3,
+      transfers: 1,
+      changed: 0,
+      cancelled: 2,
+    });
+    expect(text).toMatch(/^Буде анульовано 3 операцій і 1 переказів/);
+    expect(text).not.toMatch(/вручну/);
+    expect(text).toMatch(/2 уже анульовано раніше/);
   });
 });

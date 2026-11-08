@@ -780,6 +780,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/accounting/statements/{id}/rollback': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description «Відкотити виписку» (stage 7): every active operation and transfer the statement booked is cancelled (Void, kept in the journal and the change log) and gives up its bank identity, so the lines are no duplicates when booked again; a record cancelled by hand before stays as it is. Unconfirmed finance counterparties the booking created are archived when no active operation outside the statement uses them. The statement becomes a Preview again with its lines unlinked. One save. */
+    post: operations['rollbackBankStatement'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/admin/users': {
     parameters: {
       query?: never;
@@ -5530,6 +5547,17 @@ export interface components {
       /** Format: uuid */
       transferId: string | null;
     };
+    /** @description Active operations and transfers a rollback would cancel, how many of them were changed by hand after the booking, and how many are cancelled already. */
+    BankStatementRollback: {
+      /** Format: int32 */
+      transactions: number;
+      /** Format: int32 */
+      transfers: number;
+      /** Format: int32 */
+      changed: number;
+      /** Format: int32 */
+      cancelled: number;
+    };
     BankStatementDetailsResponse: {
       statement: components['schemas']['BankStatementResponse'];
       states: components['schemas']['BankLineStateCount'][];
@@ -5541,6 +5569,8 @@ export interface components {
       page: number;
       /** Format: int32 */
       pageSize: number;
+      /** @description Only for a Booked statement — what «Відкотити виписку» would do. */
+      rollback?: components['schemas']['BankStatementRollback'] | null;
     };
     BankStatementLineInput: {
       /** Format: uuid */
@@ -13543,6 +13573,67 @@ export interface operations {
         };
       };
       /** @description Already booked or nothing to book */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not Director */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Statement not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Stale version */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  rollbackBankStatement: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FinanceVersionInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['BankStatementResponse'];
+        };
+      };
+      /** @description Statement not booked */
       400: {
         headers: {
           [name: string]: unknown;

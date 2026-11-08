@@ -87,5 +87,24 @@ export function bankStatementEndpoints(build: AccountingEndpointBuilder) {
               ...financeCounterpartyTags,
             ],
     }),
+    /** «Відкотити виписку»: cancels what the statement booked; it becomes a preview again. */
+    rollbackBankStatement: build.mutation<BankStatement, { id: string; version: number }>({
+      query: ({ id, version }) => ({
+        url: `${one(id)}/rollback`,
+        method: 'POST',
+        body: { version },
+      }),
+      transformResponse: mapBankStatement,
+      transformErrorResponse: accountingApiError,
+      invalidatesTags: (_, error, { id }) =>
+        error
+          ? [bankStatementTag(id)]
+          : [
+              bankStatementsTag,
+              bankStatementTag(id),
+              ...financeMovementTags,
+              ...financeCounterpartyTags,
+            ],
+    }),
   };
 }
