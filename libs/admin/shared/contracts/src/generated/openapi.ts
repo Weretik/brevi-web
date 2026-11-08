@@ -22264,7 +22264,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description No right to the page */
+      /** @description No right to the page, or somebody else's lead for a manager. */
       403: {
         headers: {
           [name: string]: unknown;
@@ -22313,7 +22313,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description No right to the page */
+      /** @description No right to the page, or the lead is somebody else's. */
       403: {
         headers: {
           [name: string]: unknown;
