@@ -29,9 +29,9 @@ export const canManageUsers = (user: SessionUser): boolean => user.roles.include
 export const canManageWorkshop = (user: SessionUser): boolean =>
   user.roles.includes('Admin') || user.roles.includes('WorkshopChief');
 
-/** «Рахунки на закупку»: the accountant and Admin (the director also holds Admin), not the manager. */
+/** «Бухгалтерія → Рахунки на закупку»: only the director (client corrections item 10, 2026-11-08). */
 export const canUsePurchaseInvoices = (user: SessionUser): boolean =>
-  user.roles.includes('Admin') || user.roles.includes('Accountant');
+  user.roles.includes('Director');
 
 /** «Бухгалтерія»: only the director (ACC-001, user decision 2026-11-05). */
 export const canUseAccounting = (user: SessionUser): boolean => user.roles.includes('Director');

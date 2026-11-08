@@ -25,7 +25,7 @@ const pageSizeOf = (value: string | null) =>
 
 /**
  * Server-side list state of «Рахунки на закупку», kept in the URL (`search`, `filter`, `from`, `to`,
- * `vat`, `page`, `pageSize`) next to `tab=purchases`. Search is sent 300 ms after typing stops.
+ * `vat`, `page`, `pageSize`). Search is sent 300 ms after typing stops.
  */
 export function usePurchaseInvoiceList() {
   const [params, setParams] = useSearchParams();

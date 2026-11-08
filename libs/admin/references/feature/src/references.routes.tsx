@@ -28,7 +28,7 @@ function GarmentAccessoriesRedirect() {
 }
 
 export interface ReferencesRouteOptions {
-  /** Whether the signed-in user may see «Рахунки на закупку» (accountant and Admin). */
+  /** Whether the signed-in user may see a supplier's «Рахунки на закупку» (the Director). */
   useCanSeePurchaseInvoices: () => boolean;
 }
 

@@ -2,7 +2,7 @@
 
 **Status:** stage 1 (register), stage 2 (supplier link and note) and stage 3 (invoice recognition) implemented 2026-11-05. Backend decisions and later stages are in the BreviERP specification `docs/sdd/specs/purchasing/001-purchase-invoices`; the consumed contract is [backend/purchasing](../../contracts/openapi/backend/purchasing/purchase-invoices.openapi.yaml).
 
-`/references/counterparties?tab=purchases` («Контрагенти → Рахунки на закупку») shows the purchase invoices that staff post to Telegram and the Google sheet «финансы» collects. The tab is visible only to the accountant and Admin (the director also holds Admin); for others `?tab=purchases` opens «Постачальники». The backend allows the same roles (policy `CanUsePurchaseInvoices`).
+`/accounting/purchase-invoices` («Бухгалтерія → Рахунки на закупку», its own menu item since client corrections item 10, 2026-11-08) shows the purchase invoices that staff post to Telegram and the Google sheet «финансы» collects. Only the Director sees it, and the supplier card tab with the supplier's invoices; the backend allows the same role (policy `CanUsePurchaseInvoices`). The old link `/references/counterparties?tab=purchases` takes the Director to the new page with the same filters.
 
 The page has:
 
@@ -35,8 +35,9 @@ Search, the filter and the page are kept in the URL. The OpenAI key, models and 
 
 ```mermaid
 flowchart LR
-  Host["references/feature: counterparties-page ?tab=purchases"] --> Content["purchasing/feature: PurchaseInvoicesContent"]
-  App["admin-react: useCanSeePurchaseInvoices"] --> Host
+  App["admin-react: RequireRole canUsePurchaseInvoices"] --> Routes["purchasing/feature: purchasingRoutes /accounting/purchase-invoices"]
+  Routes --> Content["purchasing/feature: PurchaseInvoicesContent"]
+  Card["references/feature: supplier drawer"] --> SupplierTab["purchasing/feature: SupplierPurchaseInvoices"]
   Content --> Hooks["feature/hooks: list URL state, sync, recognition"]
   Content --> UI["purchasing/ui: PurchaseInvoicesTable"]
   Hooks --> DataAccess["purchasing/data-access: RTK Query"]
@@ -74,7 +75,9 @@ libs/admin/purchasing/
 ├── ui/src/components/documents/purchase-document-view.tsx           # checked facts of one original
 ├── ui/src/forms/review/purchase-review-form.tsx                     # supplier and note form
 └── feature/src/
-    ├── components/invoices/purchase-invoices-content.tsx           # the tab
+    ├── purchasing.routes.tsx, purchasing-paths.ts                  # /accounting/purchase-invoices
+    ├── pages/purchase-invoices-page.tsx                            # the page
+    ├── components/invoices/purchase-invoices-content.tsx           # the register
     ├── components/suppliers/supplier-purchase-invoices.tsx         # supplier card tab «Рахунки на закупку»
     ├── components/review/purchase-invoice-drawer.tsx               # side panel: view → edit
     ├── components/invoices/purchase-invoice-row-details.tsx       # open row: message, reasons, originals
@@ -86,10 +89,11 @@ libs/admin/purchasing/
     ├── hooks/documents/use-purchase-recognition-batch.ts           # «Розпізнати всі нові» loop and «Зупинити»
     ├── hooks/review/use-purchase-review-editor.ts                  # form state, save with version
     └── hooks/invoices/use-purchase-invoice-{list,sync}.ts          # URL state, counts, sync
-libs/admin/references/feature/src/pages/counterparties/counterparties-page.tsx  # tabs host
+libs/admin/references/feature/src/pages/counterparties/counterparties-page.tsx  # old ?tab=purchases link
 libs/admin/references/feature/src/components/suppliers/supplier-drawer.tsx      # passes the supplier tab to the card
 libs/admin/references/feature/src/references.routes.tsx                          # createReferencesRoutes
-apps/admin-react/src/app/router/use-can-see-purchase-invoices.ts                 # role check
+apps/admin-react/src/app/router/use-can-see-purchase-invoices.ts                 # supplier tab role check
+apps/admin-react/src/app/router/create-admin-router.tsx, legacy-menu.ts          # route guard, menu item
 libs/admin/core/auth/src/session/session-user.ts                                 # canUsePurchaseInvoices
 ```
 
@@ -104,4 +108,5 @@ libs/admin/core/auth/src/session/session-user.ts                                
 - `model/src/validators/review/purchase-review-validation.unit.test.ts` — note limit and request;
 - `ui/src/tables/invoices/purchase-invoices-table.component.test.tsx` — empty and nothing-found texts, state, «Без ПДВ», arrow;
 - `data-access/src/mappers/invoices/purchase-invoice.mapper.unit.test.ts`, `model/src/mappers/invoices/describe-purchase-sync.unit.test.ts`;
-- `references/feature/src/pages/counterparties/counterparties-tab.unit.test.ts` — the tab only for allowed roles.
+- `references/feature/src/pages/counterparties/counterparties-tab.unit.test.ts` — «Контрагенти» tabs without the register;
+- `apps/admin-react/src/app/router/navigation-config.unit.test.ts` — the menu item in «Бухгалтерія», Director only.
