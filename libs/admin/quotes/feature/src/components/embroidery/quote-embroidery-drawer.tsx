@@ -114,6 +114,14 @@ export function QuoteEmbroideryDrawer({ ensureSaved, onClose, onAdded }: Props) 
             />
           )}
         />
+        {calculation?.customerName && (
+          <Box>
+            <Typography variant="caption" color="text.secondary">
+              Зроблено для клієнта
+            </Typography>
+            <Typography variant="body1">{calculation.customerName}</Typography>
+          </Box>
+        )}
         {calculation?.price && (
           <Box>
             <Typography variant="caption" color="text.secondary">
