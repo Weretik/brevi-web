@@ -156,5 +156,7 @@ export const mapLeadSync = (value: Schemas['CrmLeadSync']): LeadSyncResult => ({
   gone: value.gone,
   skipped: value.skipped,
   duplicates: value.duplicates,
+  assigned: value.assigned,
+  calls: value.calls,
   warning: value.warning ?? null,
 });
