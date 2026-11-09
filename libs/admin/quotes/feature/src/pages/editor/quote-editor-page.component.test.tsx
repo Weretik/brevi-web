@@ -339,6 +339,8 @@ describe('КП editor', () => {
     fireEvent.click(screen.getByText('ВШ-0042 · Логотип'));
     expect(within(panel).queryByRole('radio')).not.toBeInTheDocument();
     expect(within(panel).getByText('Категорія 1 — 80,00 грн за 1 шт')).toBeVisible();
+    expect(within(panel).getByText('Зроблено для клієнта')).toBeVisible();
+    expect(within(panel).getByText('ТОВ «Агро»')).toBeVisible();
     fireEvent.click(within(panel).getByRole('button', { name: 'Додати' }));
 
     await waitFor(() =>
