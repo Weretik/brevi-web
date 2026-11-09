@@ -52,7 +52,12 @@ export function ensureEmbroiderySavedPage(value: unknown): Schemas['CrmEmbroider
   check(value, ['items'], ['page', 'pageSize', 'total']);
   const items = (value as { items: unknown[] }).items;
   if (
-    items.some((item) => !isRecord(item) || !isNumber(item['id']) || !Array.isArray(item['prices']))
+    items.some(
+      (item) =>
+        !isRecord(item) ||
+        !isNumber(item['id']) ||
+        (item['price'] != null && !isRecord(item['price'])),
+    )
   )
     throw invalid();
   return value as Schemas['CrmEmbroiderySavedPage'];
