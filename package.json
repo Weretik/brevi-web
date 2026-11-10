@@ -111,6 +111,7 @@
     "@nx/vitest": "24.0.3",
     "@nx/web": "24.0.3",
     "@nx/workspace": "24.0.3",
+    "@opennextjs/cloudflare": "^1.20.16",
     "@playwright/test": "^1.64.1",
     "@rolldown/plugin-babel": "0.2.4",
     "@schematics/angular": "22.2.5",
@@ -166,7 +167,8 @@
     "typescript": "6.0.3",
     "typescript-eslint": "^8.72.1",
     "vite": "8.3.5",
-    "vitest": "5.0.5"
+    "vitest": "5.0.5",
+    "wrangler": "^4.158.0"
   },
   "overrides": {
     "less": "4.9.1",

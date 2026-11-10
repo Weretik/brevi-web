@@ -12,6 +12,25 @@
       },
       "cache": true,
       "inputs": ["default", "^production"]
+    },
+    "build-cloudflare": {
+      "command": "opennextjs-cloudflare build",
+      "options": {
+        "cwd": "apps/site"
+      }
+    },
+    "preview-cloudflare": {
+      "command": "opennextjs-cloudflare preview",
+      "options": {
+        "cwd": "apps/site"
+      },
+      "dependsOn": ["build-cloudflare"]
+    },
+    "deploy-cloudflare": {
+      "command": "opennextjs-cloudflare deploy",
+      "options": {
+        "cwd": "apps/site"
+      }
     }
   }
 }

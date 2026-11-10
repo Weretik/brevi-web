@@ -25,6 +25,8 @@ module.exports = [
       '**/node_modules/**',
       '**/.nx/**',
       '**/.next/**',
+      '**/.open-next/**',
+      '**/.wrangler/**',
       '**/next-env.d.ts',
       '**/tmp/**',
       '**/.vite/**',

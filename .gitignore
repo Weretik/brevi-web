@@ -59,6 +59,8 @@ vite.config.*.timestamp*
 
 # Next.js
 .next
+.open-next
+.wrangler
 out
 .vitest
 apps/site/next-env.d.ts

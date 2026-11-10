@@ -11,4 +11,6 @@ docs/contracts/openapi/backend
 docs/contracts/openapi/SOURCE.json
 libs/admin/shared/contracts/src/generated
 .next
+.open-next
+.wrangler
 apps/site/next-env.d.ts

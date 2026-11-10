@@ -62,6 +62,7 @@ Data comes only from `libs/site/shared/api-client` and the domain `data-access`.
 ## Where to read more
 
 - [SEO architecture](platform/seo-architecture.md): URL and index policy, locales, structured data, sitemaps, and redirects.
+- [Hosting](platform/hosting.md): Cloudflare Worker `brevi-site`, build and deploy targets, cache, and environment variables.
 - [ADR-0001](adr/0001-nextjs-public-site.md): why Next.js replaces the Angular storefront.
 - Standards: [SEO rules](../../standards/site/seo-rules.md) and [design system](../../standards/site/design-system.md).
 - [Migration plan](../../specs/site/migration/README.md) and the [page inventory with SEO analysis](../../specs/site/migration/feature-inventory.md).
