@@ -30,6 +30,11 @@ describe('SiteShell', () => {
     expect(within(footer).queryByRole('heading')).toBeNull();
     expect(
       within(footer)
+        .getByRole('link', { name: /Доставка по всей Украине/ })
+        .getAttribute('href'),
+    ).toBe('/ru/regions');
+    expect(
+      within(footer)
         .getByRole('link', { name: /Показать на карте/ })
         .getAttribute('href'),
     ).toContain('google.com/maps');
