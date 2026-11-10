@@ -118,7 +118,10 @@
       "@site/returns/feature": ["./libs/site/returns/feature/src/index.ts"],
       "@site/works/ui": ["./libs/site/works/ui/src/index.ts"],
       "@site/works/seo": ["./libs/site/works/seo/src/index.ts"],
-      "@site/works/feature": ["./libs/site/works/feature/src/index.ts"]
+      "@site/works/feature": ["./libs/site/works/feature/src/index.ts"],
+      "@site/certificates/ui": ["./libs/site/certificates/ui/src/index.ts"],
+      "@site/certificates/seo": ["./libs/site/certificates/seo/src/index.ts"],
+      "@site/certificates/feature": ["./libs/site/certificates/feature/src/index.ts"]
     }
   }
 }

@@ -2,7 +2,7 @@
 
 **Status:** code exists, checked 2026-11-10. Specification: [«Доставка та оплата» page](../../specs/site/delivery/001-delivery/README.md).
 
-`/uk/delivery-and-payment` and `/ru/delivery-and-payment` show how Brevi ships and how to pay: four delivery ways with their cost, the footnote about what the cost depends on, payment rules, bank details, and both phones. The text and numbers are from the live `brevi.com.ua` page; Russian is its translation. The page is static and reads no API.
+`/uk/delivery-and-payment` and `/ru/delivery-and-payment` show how Brevi ships and how to pay: four delivery ways with their cost, the footnote about what the cost depends on, payment rules, bank details, and the phone. The text and numbers are from the live `brevi.com.ua` page; Russian is its translation. The page is static and reads no API.
 
 Bank details (`recipient`, `edrpou`, `iban`, `bank`) live in `COMPANY.bankDetails`. The sentence of the live page about paying by card on the site is left out: the new site has no online payment.
 

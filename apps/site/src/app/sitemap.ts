@@ -12,5 +12,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: SITE_PATHS.contacts },
     { path: SITE_PATHS.returnsExchanges },
     { path: SITE_PATHS.ourWork },
+    { path: SITE_PATHS.certificates },
   ]);
 }

@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 import type { DeliveryDictionary } from '../i18n/delivery-dictionary';
 
-/** Closing block: whom to call about delivery and payment, with both phones and a link to contacts. */
+/** Closing block: whom to call about delivery and payment, with the phone and a link to contacts. */
 export function DeliveryContact({
   id,
   dictionary,

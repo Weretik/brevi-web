@@ -48,10 +48,10 @@ describe('JSON-LD', () => {
     });
   });
 
-  it('describes the workshop with both phones and opening hours', () => {
+  it('describes the workshop with the phone and opening hours', () => {
     expect(buildLocalBusinessJsonLd('uk', config)).toMatchObject({
       '@type': 'LocalBusiness',
-      telephone: ['+380504698675', '+380532671109'],
+      telephone: ['+380504698675'],
       address: { streetAddress: 'вул. Кагамлика, 3А' },
       openingHoursSpecification: {
         dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],

@@ -42,7 +42,7 @@ describe('DeliveryPayment', () => {
 });
 
 describe('DeliveryContact', () => {
-  it('offers both phones and the contacts page', () => {
+  it('offers the phone and the contacts page', () => {
     const dictionary = getDeliveryDictionary('uk').contact;
     render(
       <DeliveryContact id="delivery-contact" dictionary={dictionary} contactsHref="/uk/contacts" />,
@@ -52,9 +52,7 @@ describe('DeliveryContact', () => {
     expect(screen.getByRole('link', { name: '050 469 86 75' }).getAttribute('href')).toBe(
       'tel:+380504698675',
     );
-    expect(screen.getByRole('link', { name: '0532 67 11 09' }).getAttribute('href')).toBe(
-      'tel:+380532671109',
-    );
+    expect(screen.queryByRole('link', { name: '0532 67 11 09' })).toBeNull();
     expect(screen.getByRole('link', { name: /Контакти/ }).getAttribute('href')).toBe(
       '/uk/contacts',
     );

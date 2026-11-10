@@ -11,7 +11,7 @@ const uk = {
   info: {
     label: 'Контактна інформація',
     title: 'Наша контактна інформація',
-    phones: 'Номери телефонів',
+    phones: 'Телефон',
     email: 'Пошта',
     address: 'Адреса',
     country: 'Україна',
@@ -45,7 +45,7 @@ const ru: ContactsDictionary = {
   info: {
     label: 'Контактная информация',
     title: 'Наша контактная информация',
-    phones: 'Номера телефонов',
+    phones: 'Телефон',
     email: 'Почта',
     address: 'Адрес',
     country: 'Украина',

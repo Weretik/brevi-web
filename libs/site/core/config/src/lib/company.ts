@@ -40,11 +40,11 @@ export const COMPANY = {
   /** Logo for light backgrounds in `apps/site/public`, with its pixel size for `next/image`. */
   logo: { path: '/assets/logo/brevi-logo-dark.png', width: 1401, height: 725 },
   email: 'pp.brevi@gmail.com',
-  /** The sales phone first: it is the header button and the `ContactPoint`. */
-  phones: [
-    { e164: '+380504698675', display: '050 469 86 75' },
-    { e164: '+380532671109', display: '0532 67 11 09' },
-  ] as readonly [CompanyPhone, CompanyPhone],
+  /** The one company phone (owner's decision): the header button and the `ContactPoint`. The list form stays for a second number. */
+  phones: [{ e164: '+380504698675', display: '050 469 86 75' }] as readonly [
+    CompanyPhone,
+    ...CompanyPhone[],
+  ],
   address: {
     countryCode: 'UA',
     city: { uk: 'Полтава', ru: 'Полтава' } as Localized,

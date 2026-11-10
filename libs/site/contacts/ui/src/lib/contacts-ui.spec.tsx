@@ -20,13 +20,13 @@ describe('contacts dictionary', () => {
 });
 
 describe('ContactsInfo', () => {
-  it('shows both phones, the email, the address, and the hours', () => {
+  it('shows the phone, the email, the address, and the hours', () => {
     render(<ContactsInfo locale="uk" dictionary={getContactsDictionary('uk').info} />);
 
     expect(screen.getByRole('link', { name: '050 469 86 75' }).getAttribute('href')).toBe(
       'tel:+380504698675',
     );
-    expect(screen.getByRole('link', { name: '0532 67 11 09' })).toBeTruthy();
+    expect(screen.queryByRole('link', { name: '0532 67 11 09' })).toBeNull();
     expect(screen.getByRole('link', { name: 'pp.brevi@gmail.com' }).getAttribute('href')).toBe(
       'mailto:pp.brevi@gmail.com',
     );
