@@ -89,6 +89,27 @@ export function SiteFooter({
             {COMPANY.address.city[locale]}, {COMPANY.address.street[locale]}
           </span>
           <span>{COMPANY.openingHours.label[locale]}</span>
+          <ul
+            aria-label={dictionary.footerSocials}
+            className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1"
+          >
+            {COMPANY.socials.map((social) => (
+              <li key={social.key}>
+                {social.url ? (
+                  <a
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-foreground hover:text-brand-text"
+                  >
+                    {social.label}
+                  </a>
+                ) : (
+                  <span>{social.label}</span>
+                )}
+              </li>
+            ))}
+          </ul>
         </address>
       </div>
       <p className="mx-auto max-w-[77.5rem] px-4 sm:px-6">

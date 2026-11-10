@@ -16,6 +16,13 @@ export type CompanyOpeningHours = {
   label: Localized;
 };
 
+export type CompanySocial = {
+  key: 'instagram' | 'youtube' | 'facebook';
+  label: string;
+  /** Profile address; `null` until the owner gives it, and the footer then shows the name without a link. */
+  url: string | null;
+};
+
 /**
  * Fixed company facts shown in the header, footer, and structured data.
  * They move to BreviERP when the admin gets a contacts form; until then this is the only place that holds them.
@@ -41,4 +48,10 @@ export const COMPANY = {
     closes: '18:00',
     label: { uk: 'Пн–Пт 9:00–18:00', ru: 'Пн–Пт 9:00–18:00' },
   } as CompanyOpeningHours,
+  /** The networks the live site lists; addresses are not known yet. */
+  socials: [
+    { key: 'instagram', label: 'Instagram', url: null },
+    { key: 'youtube', label: 'YouTube', url: null },
+    { key: 'facebook', label: 'Facebook', url: null },
+  ] as readonly CompanySocial[],
 } as const;

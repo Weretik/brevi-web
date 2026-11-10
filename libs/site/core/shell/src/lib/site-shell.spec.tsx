@@ -30,6 +30,10 @@ describe('SiteShell', () => {
       within(footer).getByRole('link', { name: 'pp.brevi@gmail.com' }).getAttribute('href'),
     ).toBe('mailto:pp.brevi@gmail.com');
     expect(within(footer).getByText('Полтава, ул. Кагамлыка, 3А')).toBeTruthy();
+    // Social profiles have no address yet, so the footer names them without links.
+    const socials = within(footer).getByRole('list', { name: 'Соцсети' });
+    expect(within(socials).getByText('Instagram')).toBeTruthy();
+    expect(within(socials).queryByRole('link')).toBeNull();
   });
 
   it('marks the current page in the header menu', () => {

@@ -17,6 +17,7 @@ const uk = {
   footerCompany: 'Компанія',
   footerBuyers: 'Покупцям',
   footerContacts: 'Контакти',
+  footerSocials: 'Соцмережі',
   copyright: 'Brevi. Всі права захищені.',
   links: {
     catalog: 'Каталог',
@@ -54,6 +55,7 @@ const ru: ShellDictionary = {
   footerCompany: 'Компания',
   footerBuyers: 'Покупателям',
   footerContacts: 'Контакты',
+  footerSocials: 'Соцсети',
   copyright: 'Brevi. Все права защищены.',
   links: {
     catalog: 'Каталог',
