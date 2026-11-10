@@ -12,12 +12,13 @@ export const SHELL_PATHS = SITE_PATHS satisfies Record<NavLinkKey | 'request', s
 const links = (...keys: NavLinkKey[]): readonly NavLink[] =>
   keys.map((key) => ({ key, path: SHELL_PATHS[key] }));
 
-/** Header menu after «Каталог», in the order of the «Строчка» mockup. */
+/** Header menu after the «Каталог» button. */
 export const MAIN_NAV_LINKS = links(
   'logoPrinting',
   'wholesale',
   'industries',
   'production',
+  'ourWork',
   'contacts',
 );
 

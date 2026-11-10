@@ -23,9 +23,16 @@ describe('SiteShell', () => {
         .getByRole('link', { name: /050 469 86 75/ })
         .getAttribute('href'),
     ).toBe('tel:+380504698675');
-    expect(within(footer).getByRole('link', { name: '050 469 86 75' }).getAttribute('href')).toBe(
-      'tel:+380504698675',
-    );
+    for (const link of within(footer).getAllByRole('link', { name: '050 469 86 75' })) {
+      expect(link.getAttribute('href')).toBe('tel:+380504698675');
+    }
+    expect(within(footer).getByText(/Частное предприятие «Бреви» · ЕГРПОУ 35521636/)).toBeTruthy();
+    expect(within(footer).queryByRole('heading')).toBeNull();
+    expect(
+      within(footer)
+        .getByRole('link', { name: /Показать на карте/ })
+        .getAttribute('href'),
+    ).toContain('google.com/maps');
     expect(within(footer).queryByRole('link', { name: '0532 67 11 09' })).toBeNull();
     expect(
       within(footer).getByRole('link', { name: 'pp.brevi@gmail.com' }).getAttribute('href'),
@@ -52,12 +59,14 @@ describe('SiteShell', () => {
   it('keeps the request link out of search results', () => {
     render(<SiteShell locale="uk">content</SiteShell>);
 
-    const request = within(screen.getByRole('banner')).getByRole('link', { name: 'Заявка' });
+    const request = within(screen.getByRole('banner')).getByRole('link', {
+      name: 'Залишити заявку',
+    });
     expect(request.getAttribute('href')).toBe('/uk/request');
     expect(request.getAttribute('rel')).toBe('nofollow');
   });
 
-  it('keeps every catalog section in the HTML and opens the mega menu on click', () => {
+  it('keeps every catalog section in the HTML and shows one section at a time', () => {
     render(<SiteShell locale="uk">content</SiteShell>);
 
     const toggle = within(screen.getByRole('banner')).getByRole('button', { name: 'Каталог' });
@@ -67,31 +76,67 @@ describe('SiteShell', () => {
 
     fireEvent.click(toggle);
     expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    const menu = screen.getByRole('region', { name: 'Розділи каталогу' });
+    expect(within(menu).getByRole('link', { name: 'Костюми робочі літні' })).toBeTruthy();
+    expect(within(menu).queryByRole('link', { name: 'Теніски-поло' })).toBeNull();
+
+    fireEvent.click(within(menu).getByRole('button', { name: 'Трикотаж' }));
+    expect(within(menu).getByRole('link', { name: 'Теніски-поло' })).toBeTruthy();
+    expect(within(menu).queryByRole('link', { name: 'Костюми робочі літні' })).toBeNull();
     expect(
-      within(screen.getByRole('region', { name: 'Розділи каталогу' })).getByRole('link', {
-        name: 'Теніски-поло',
-      }),
-    ).toBeTruthy();
+      within(menu)
+        .getByRole('link', { name: /Дізнатися умови/ })
+        .getAttribute('href'),
+    ).toBe('/uk/logo-printing');
 
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(toggle.getAttribute('aria-expanded')).toBe('false');
   });
 
-  it('opens the side menu with the same pages on a phone', () => {
+  it('shows the phone in the menu row once the page is scrolled', () => {
+    render(<SiteShell locale="uk">content</SiteShell>);
+    const header = screen.getByRole('banner');
+    expect(within(header).getAllByRole('link', { name: /050 469 86 75/ })).toHaveLength(1);
+    expect(within(header).getByText('Від 5 одиниць · Працюємо з ПДВ')).toBeTruthy();
+
+    Object.defineProperty(window, 'scrollY', { value: 400, configurable: true });
+    fireEvent.scroll(window);
+    expect(within(header).getAllByRole('link', { name: /050 469 86 75/ })).toHaveLength(2);
+    Object.defineProperty(window, 'scrollY', { value: 0, configurable: true });
+  });
+
+  it('gives phones a bottom bar with the catalog, the request, the call, and the menu', () => {
     render(<SiteShell locale="uk">content</SiteShell>);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Відкрити меню' }));
-    const dialog = screen.getByRole('dialog');
+    const bar = screen.getByRole('navigation', { name: 'Швидкі дії' });
+    expect(within(bar).getByRole('link', { name: 'Заявка' }).getAttribute('href')).toBe(
+      '/uk/request',
+    );
     expect(
-      within(dialog).getByRole('link', { name: 'Пошиття з логотипом' }).getAttribute('href'),
+      within(bar)
+        .getByRole('link', { name: /050 469 86 75/ })
+        .getAttribute('href'),
+    ).toBe('tel:+380504698675');
+
+    fireEvent.click(within(bar).getByRole('button', { name: 'Каталог' }));
+    const catalog = screen.getByRole('dialog');
+    expect(within(catalog).getByText('Захист рук')).toBeTruthy();
+    expect(within(catalog).getAllByRole('link', { name: 'Усі товари розділу' }).length).toBe(8);
+    fireEvent.click(within(catalog).getByRole('button', { name: 'Закрити меню' }));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Відкрити меню' }));
+    const menu = screen.getByRole('dialog');
+    expect(
+      within(menu).getByRole('link', { name: 'Пошиття з логотипом' }).getAttribute('href'),
     ).toBe('/uk/logo-printing');
-    expect(within(dialog).getByRole('link', { name: 'Захист рук' })).toBeTruthy();
+    expect(within(menu).getByText(/Працюємо з ПДВ/)).toBeTruthy();
   });
 
   it('switches the language on the same page', () => {
     render(<SiteShell locale="ru">content</SiteShell>);
 
-    const languages = screen.getByRole('navigation', { name: 'Язык сайта' });
+    // The toggle is in the contacts row on phones and in the menu row on wide screens.
+    const [languages] = screen.getAllByRole('navigation', { name: 'Язык сайта' });
     const ua = within(languages).getByRole('link', { name: 'UA' });
     expect(ua.getAttribute('href')).toBe('/uk/contacts');
     expect(ua.getAttribute('hreflang')).toBe('uk-UA');
