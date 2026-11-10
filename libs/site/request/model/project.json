@@ -1,0 +1,7 @@
+{
+  "name": "site-request-model",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/site/request/model/src",
+  "projectType": "library",
+  "tags": ["scope:site", "domain:request", "type:model"]
+}

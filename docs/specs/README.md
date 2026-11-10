@@ -16,6 +16,7 @@ The Storefront currently has README files for its Nx feature libraries, but they
 - [Site Next.js: «Ціни для опту» page](site/wholesale/001-wholesale/README.md) — implemented and locally verified 2026-11-10.
 - [Site Next.js: «Галузі» page (industries hub)](site/industries/001-industries-hub/README.md) — implemented and locally verified 2026-11-10.
 - [Site Next.js: «Регіони» page (delivery across Ukraine)](site/regions/001-regions/README.md) — implemented and locally verified 2026-11-10.
+- [Site Next.js: «Заявка» page (request form)](site/request/001-request/README.md) — page and form implemented 2026-11-10; delivery of requests postponed.
 - [Site Next.js: «Договір» page (public offer)](site/agreement/001-agreement/README.md) — implemented and locally verified 2026-11-10.
 - [Site Next.js: header, menu, and footer redesign](site/shell/002-header-footer-redesign/README.md) — implemented 2026-11-10.
 - [Site Next.js: «Статті» pages](site/articles/001-articles/README.md) — implemented and locally verified 2026-11-10.

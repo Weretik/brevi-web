@@ -1,0 +1,7 @@
+{
+  "name": "site-request-seo",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/site/request/seo/src",
+  "projectType": "library",
+  "tags": ["scope:site", "domain:request", "type:util"]
+}
