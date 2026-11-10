@@ -73,15 +73,13 @@ export function SiteFooter({
         ))}
         <address className="grid content-start gap-1.5 not-italic">
           <h2 className="mb-0.5 font-extrabold text-foreground">{dictionary.footerContacts}</h2>
-          {COMPANY.phones.map((phone) => (
-            <a
-              key={phone.e164}
-              href={`tel:${phone.e164}`}
-              className="font-mono font-semibold text-foreground hover:text-brand-text"
-            >
-              {phone.display}
-            </a>
-          ))}
+          {/* One number in the footer (owner decision 2026-11-10): the sales phone. */}
+          <a
+            href={`tel:${COMPANY.phones[0].e164}`}
+            className="font-mono font-semibold text-foreground hover:text-brand-text"
+          >
+            {COMPANY.phones[0].display}
+          </a>
           <a href={`mailto:${COMPANY.email}`} className="hover:text-brand-text">
             {COMPANY.email}
           </a>

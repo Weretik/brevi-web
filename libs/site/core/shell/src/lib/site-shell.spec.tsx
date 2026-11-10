@@ -23,9 +23,10 @@ describe('SiteShell', () => {
         .getByRole('link', { name: /050 469 86 75/ })
         .getAttribute('href'),
     ).toBe('tel:+380504698675');
-    expect(within(footer).getByRole('link', { name: '0532 67 11 09' }).getAttribute('href')).toBe(
-      'tel:+380532671109',
+    expect(within(footer).getByRole('link', { name: '050 469 86 75' }).getAttribute('href')).toBe(
+      'tel:+380504698675',
     );
+    expect(within(footer).queryByRole('link', { name: '0532 67 11 09' })).toBeNull();
     expect(
       within(footer).getByRole('link', { name: 'pp.brevi@gmail.com' }).getAttribute('href'),
     ).toBe('mailto:pp.brevi@gmail.com');

@@ -60,9 +60,20 @@ export function CatalogMenu({
         aria-label={dictionary.catalogMenu}
         className="absolute inset-x-6 top-full z-40 rounded-b-xl border border-t-0 border-border-strong bg-background shadow-lg"
       >
-        <ul className="grid max-h-[70vh] grid-cols-2 gap-x-8 gap-y-6 overflow-y-auto p-6 xl:grid-cols-4">
-          {CATALOG_SECTIONS.map((section) => (
-            <li key={section.key}>
+        <ul className="grid max-h-[70vh] grid-cols-2 gap-3 overflow-y-auto p-5 xl:grid-cols-4">
+          {CATALOG_SECTIONS.map((section, index) => (
+            <li
+              key={section.key}
+              className="rounded-xl border border-border p-4 transition-colors hover:border-border-strong hover:bg-muted"
+            >
+              {/* The «Строчка» seam: section number in mono and a dashed orange line. */}
+              <p
+                aria-hidden
+                className="mb-2.5 flex items-center gap-2.5 font-mono text-xs font-semibold text-brand-text"
+              >
+                <span>{String(index + 1).padStart(2, '0')}</span>
+                <span className="flex-1 border-t-2 border-dashed border-brand-soft" />
+              </p>
               <Link
                 href={catalogHref}
                 onClick={close}
@@ -82,14 +93,18 @@ export function CatalogMenu({
             </li>
           ))}
         </ul>
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-dashed border-border-strong px-6 py-3 text-sm">
-          <Link href={catalogHref} onClick={close} className="font-bold hover:text-brand-text">
-            {dictionary.allCatalog}
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t-2 border-dashed border-brand-soft px-6 py-3.5 text-sm">
+          <Link
+            href={catalogHref}
+            onClick={close}
+            className="font-bold text-brand-text hover:underline"
+          >
+            {dictionary.allCatalog} <span aria-hidden>→</span>
           </Link>
           <Link
             href={localizedPath(locale, SHELL_PATHS.wholesale)}
             onClick={close}
-            className="font-semibold text-brand-text hover:underline"
+            className="font-mono text-[0.8125rem] font-semibold uppercase hover:text-brand-text"
           >
             {dictionary.links.wholesale}
           </Link>
