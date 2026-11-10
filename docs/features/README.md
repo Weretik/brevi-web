@@ -20,6 +20,7 @@ In each feature card, “Structure diagram” shows relationships between parts,
 ## Site Next.js (`apps/site`)
 
 - Frame: [shell: layout, header with the catalog mega menu, footer, languages, 404](site/shell.md).
+- Pages: [home page](site/home.md).
 
 ## Storefront Angular (`apps/storefront`)
 

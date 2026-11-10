@@ -15,4 +15,4 @@
 ## Notes for the next steps
 
 - `ui.shadcn.com` is not reachable from the cloud environment, so `Button` and `Sheet` were taken from the Kedr site's shadcn/ui copies and restyled. `components.json` is in place for `npx shadcn@latest add` on a developer machine.
-- The catalog step should pass the BreviERP tree into the shell through a slot (as the Kedr `catalogNavigation` prop) and delete `navigation/catalog-sections.ts`.
+- The catalog step should pass the BreviERP tree into the shell through a slot (as the Kedr `catalogNavigation` prop) and delete the fixed list (since the home step it is `catalog-sections.ts` in `site-catalog-model`).

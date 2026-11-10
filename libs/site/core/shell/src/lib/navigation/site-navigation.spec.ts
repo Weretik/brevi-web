@@ -1,4 +1,5 @@
-import { CATALOG_SECTIONS } from './catalog-sections';
+import { CATALOG_SECTIONS } from '@site/catalog/model';
+
 import {
   FOOTER_BUYER_LINKS,
   FOOTER_COMPANY_LINKS,

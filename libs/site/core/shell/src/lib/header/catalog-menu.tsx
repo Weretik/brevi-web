@@ -1,5 +1,6 @@
 'use client';
 
+import { CATALOG_SECTIONS } from '@site/catalog/model';
 import { localizedPath } from '@site/core/i18n';
 import { cn } from '@site/shared/ui';
 import { ChevronDownIcon } from 'lucide-react';
@@ -7,7 +8,6 @@ import Link from 'next/link';
 import { useCallback, useId, useRef, useState } from 'react';
 
 import { useDismiss } from './use-dismiss';
-import { CATALOG_SECTIONS } from '../navigation/catalog-sections';
 import { SHELL_PATHS } from '../navigation/site-navigation';
 
 import type { ShellDictionary } from '../i18n/shell-dictionary';

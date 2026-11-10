@@ -1,9 +1,9 @@
+import { CATALOG_SECTIONS } from '@site/catalog/model';
 import { COMPANY } from '@site/core/config';
 import { localizedPath } from '@site/core/i18n';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { CATALOG_SECTIONS } from '../navigation/catalog-sections';
 import {
   FOOTER_BUYER_LINKS,
   FOOTER_COMPANY_LINKS,
