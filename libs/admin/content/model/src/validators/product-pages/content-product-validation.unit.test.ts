@@ -45,12 +45,12 @@ describe('content product validation', () => {
     const errors = validateContentProduct(
       values({
         slug: 'Костюм',
-        uk: { ...empty, seoTitle: 'а'.repeat(121), specs: 'рядок без значення' },
+        uk: { ...empty, seoTitle: 'а'.repeat(201), specs: 'рядок без значення' },
         ru: { ...empty, seoDescription: 'а'.repeat(321) },
       }),
     );
     expect(errors.slug).toBeDefined();
-    expect(errors.uk?.seoTitle).toBe('Не більше 120 символів.');
+    expect(errors.uk?.seoTitle).toBe('Не більше 200 символів.');
     expect(errors.uk?.specs).toContain('рядок без значення');
     expect(errors.ru?.seoDescription).toBe('Не більше 320 символів.');
     expect(errors.ru?.seoTitle).toBeUndefined();

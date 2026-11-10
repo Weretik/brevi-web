@@ -15,7 +15,7 @@ export const contentProductLimits = {
   slugMin: 3,
   slugMax: 120,
   name: 200,
-  seoTitle: 120,
+  seoTitle: 200,
   seoDescription: 320,
   facts: 20,
   factLabel: 80,
