@@ -16,6 +16,14 @@ export type CompanyOpeningHours = {
   label: Localized;
 };
 
+export type CompanyManager = {
+  name: Localized;
+  /** Photo in `apps/site/public`, square. */
+  photo: string;
+  phones: readonly CompanyPhone[];
+  email: string;
+};
+
 export type CompanySocial = {
   key: 'instagram' | 'youtube' | 'facebook';
   label: string;
@@ -48,6 +56,26 @@ export const COMPANY = {
     closes: '18:00',
     label: { uk: 'Пн–Пт 9:00–18:00', ru: 'Пн–Пт 9:00–18:00' },
   } as CompanyOpeningHours,
+  /** Client managers from the live «Контакти» page, in its order. */
+  managers: [
+    {
+      name: { uk: 'Анастасія Берегових', ru: 'Анастасия Береговых' },
+      photo: '/assets/contacts/anastasiia-berehovykh.webp',
+      phones: [
+        { e164: '+380503090660', display: '050 309 06 60' },
+        { e164: '+380674467546', display: '067 446 75 46' },
+      ],
+      email: 'brevianastasia@gmail.com',
+    },
+    {
+      name: { uk: 'Вадим Осауленко', ru: 'Вадим Осауленко' },
+      photo: '/assets/contacts/vadym-osaulenko.webp',
+      phones: [{ e164: '+380503467546', display: '050 346 75 46' }],
+      email: 'brevi.pl05@gmail.com',
+    },
+  ] as readonly CompanyManager[],
+  /** Where the map link and the embedded map point. */
+  mapQuery: 'Полтава, вулиця Кагамлика, 3А',
   /** Payment details from the live «Доставка та оплата» page. */
   bankDetails: {
     recipient: {
