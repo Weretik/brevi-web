@@ -17,6 +17,10 @@ In each feature card, “Structure diagram” shows relationships between parts,
 - Accounting: [«Бухгалтерія»: «Огляд», «Операції», «Перекази», «Рахунки і каси», «Категорії», «Контрагенти», «Потребують перевірки», «Виписки банку», «Перенесення архіву», «Звіти», «Журнал змін», «Фінанси» in the client and supplier cards (director only)](admin/accounting.md); [«Рахунки на закупку»: purchase invoices from the sheet «финансы» with payment links to «Бухгалтерія» (director only)](admin/purchasing.md).
 - Reference data: [«Контрагенти»: suppliers and clients from KeepinCRM](admin/references/counterparties.md); [suppliers: search, contacts, and CRUD](admin/references/suppliers.md); [fabrics and accessories](admin/references/materials.md); [operations and garment part groups](admin/references/operations.md); [pricing parameters](admin/references/pricing-parameters.md); [«Типи і розділи»: product sections](admin/references/product-sections.md); [«Імпорт цін»: PPE supplier prices](admin/references/price-import.md).
 
+## Site Next.js (`apps/site`)
+
+- Frame: [shell: layout, header with the catalog mega menu, footer, languages, 404](site/shell.md).
+
 ## Storefront Angular (`apps/storefront`)
 
 - Main page: [home](storefront/home.md).

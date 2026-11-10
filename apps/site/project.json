@@ -1,0 +1,17 @@
+{
+  "name": "site",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/site/src",
+  "projectType": "application",
+  "tags": ["scope:site", "type:app"],
+  "targets": {
+    "typecheck": {
+      "command": "next typegen && tsc --noEmit -p tsconfig.json",
+      "options": {
+        "cwd": "apps/site"
+      },
+      "cache": true,
+      "inputs": ["default", "^production"]
+    }
+  }
+}

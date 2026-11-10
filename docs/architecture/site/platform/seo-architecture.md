@@ -1,7 +1,7 @@
 # SEO architecture: site
 
-**Checked:** 2026-10-30. `apps/site` does not exist yet. The old OpenCart site `brevi.com.ua` was read only to list its pages and URL patterns.
-**Owners in code (planned):** `libs/site/core/seo`, `libs/site/core/i18n`, `libs/site/core/config`, `apps/site/src/proxy.ts`, `apps/site/src/app/robots.ts`, `apps/site/src/app/sitemap.ts`
+**Checked:** 2026-11-10 against `apps/site` (step 1, shell). The old OpenCart site `brevi.com.ua` was read only to list its pages and URL patterns.
+**Owners in code:** `libs/site/core/seo`, `libs/site/core/i18n`, `libs/site/core/config`, `apps/site/src/proxy.ts`, `apps/site/src/app/robots.ts`, `apps/site/src/app/sitemap.ts`
 
 This page holds the site-wide SEO decisions. Feature specifications apply them in their `design/seo.md` and propose changes here through review. Findings about the old site are in the [page inventory](../../../specs/site/migration/feature-inventory.md).
 
@@ -45,7 +45,8 @@ Owner decision 2026-10-30: this scheme, not a one-to-one copy of the old URLs.
 | Content (storefront `about-us`) | `/uk/about-company`, `/uk/delivery-and-payment` | yes                   | self                        | yes       | menu, footer                         |
 | Article                         | `/uk/articles/{slug}`                           | yes                   | self                        | yes       | articles list, category links        |
 | Contacts                        | `/uk/contacts`                                  | yes                   | self                        | yes       | header, footer                       |
-| Industry landing (new)          | `/uk/industries/{slug}`                         | yes                   | self                        | yes       | home «Галузі», menu                  |
+| Industries hub (new)            | `/uk/industries`                                | yes                   | self                        | yes       | menu «Галузі», footer                |
+| Industry landing (new)          | `/uk/industries/{slug}`                         | yes                   | self                        | yes       | home «Галузі», industries hub        |
 | Logo landing                    | `/uk/logo-printing`                             | yes                   | self                        | yes       | menu «Пошиття з логотипом»           |
 | Wholesale prices                | `/uk/order-in-bulk`                             | yes                   | self                        | yes       | menu «Ціни для опту»                 |
 | Region landing                  | `/uk/regions/{city}`                            | yes, with unique text | self                        | yes       | regions block in the footer          |

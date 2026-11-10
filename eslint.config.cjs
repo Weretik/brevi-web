@@ -3,6 +3,9 @@ const nx = require('@nx/eslint-plugin');
 const angular = require('angular-eslint');
 const prettierConfig = require('eslint-config-prettier');
 const importPlugin = require('eslint-plugin-import');
+const jsxA11y = require('eslint-plugin-jsx-a11y');
+const react = require('eslint-plugin-react');
+const reactHooks = require('eslint-plugin-react-hooks');
 const globals = require('globals');
 const tseslint = require('typescript-eslint');
 
@@ -21,6 +24,8 @@ module.exports = [
       '**/.angular/**',
       '**/node_modules/**',
       '**/.nx/**',
+      '**/.next/**',
+      '**/next-env.d.ts',
       '**/tmp/**',
       '**/.vite/**',
       '**/vite.config.*.timestamp*',
@@ -49,6 +54,33 @@ module.exports = [
     files: ['apps/**/*.html', 'libs/**/*.html'],
     rules: {
       '@angular-eslint/template/alt-text': 'off',
+    },
+  },
+
+  // React, hooks, and accessibility rules for the public Next.js site.
+  {
+    files: ['apps/site/**/*.tsx', 'libs/site/**/*.tsx'],
+    ...react.configs.flat.recommended,
+    languageOptions: {
+      ...react.configs.flat.recommended.languageOptions,
+      globals: globals.browser,
+    },
+    plugins: {
+      ...react.configs.flat.recommended.plugins,
+      ...jsxA11y.flatConfigs.recommended.plugins,
+      'react-hooks': reactHooks,
+    },
+    settings: {
+      react: {
+        version: 'detect',
+      },
+    },
+    rules: {
+      ...react.configs.flat.recommended.rules,
+      ...react.configs.flat['jsx-runtime'].rules,
+      ...reactHooks.configs.recommended.rules,
+      ...jsxA11y.flatConfigs.recommended.rules,
+      'react/prop-types': 'off',
     },
   },
   {
@@ -130,6 +162,11 @@ module.exports = [
             {
               sourceTag: 'scope:storefront',
               onlyDependOnLibsWithTags: ['scope:storefront', 'scope:shared'],
+            },
+            // site (public Next.js site) can only depend on shared and site
+            {
+              sourceTag: 'scope:site',
+              onlyDependOnLibsWithTags: ['scope:site', 'scope:shared'],
             },
             // admin can only depend on shared and admin
             {

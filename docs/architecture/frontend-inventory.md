@@ -7,11 +7,12 @@ applications, package managers, or test targets change.
 
 ## Applications
 
-| Application            | Technology               | Actual state                                                      | Check targets                                           |
-| ---------------------- | ------------------------ | ----------------------------------------------------------------- | ------------------------------------------------------- |
-| `apps/storefront`      | Angular 21, SSR, PrimeNG | Working storefront; feature code is mainly in `libs/storefront/*` | `lint`, `build`; no test target                         |
-| `apps/admin-react`     | React 19, Vite, MUI      | Working Admin with shell, reference data, and product management  | `lint`, `typecheck`, `typecheck-tests`, `test`, `build` |
-| `apps/admin-react-e2e` | Playwright, Chromium     | Browser journeys for critical Admin scenarios                     | `lint`, `typecheck`, `e2e`, atomized `e2e-ci`           |
+| Application            | Technology                                        | Actual state                                                                               | Check targets                                           |
+| ---------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------- |
+| `apps/storefront`      | Angular 21, SSR, PrimeNG                          | Working storefront; feature code is mainly in `libs/storefront/*`                          | `lint`, `build`; no test target                         |
+| `apps/site`            | Next.js 16 App Router, Tailwind CSS v4, shadcn/ui | Public site, step 1: shell (header, footer, `/uk`, `/ru`, SEO base); code in `libs/site/*` | `lint`, `typecheck`, `build`; libraries have `test`     |
+| `apps/admin-react`     | React 19, Vite, MUI                               | Working Admin with shell, reference data, and product management                           | `lint`, `typecheck`, `typecheck-tests`, `test`, `build` |
+| `apps/admin-react-e2e` | Playwright, Chromium                              | Browser journeys for critical Admin scenarios                                              | `lint`, `typecheck`, `e2e`, atomized `e2e-ci`           |
 
 ## Code boundaries
 

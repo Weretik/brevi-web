@@ -10,3 +10,5 @@ yarn.lock
 docs/contracts/openapi/backend
 docs/contracts/openapi/SOURCE.json
 libs/admin/shared/contracts/src/generated
+.next
+apps/site/next-env.d.ts
