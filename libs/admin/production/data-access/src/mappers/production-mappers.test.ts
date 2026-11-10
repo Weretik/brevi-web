@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { mapFabricNormRows } from './fabric-norm.mapper';
+import { mapModelCompositions } from './model-composition.mapper';
 import { mapFabricNormImportResult } from './production-import.mapper';
 import { mapWorkshopStaff } from './workshop-employee.mapper';
 
@@ -11,6 +12,8 @@ describe('production response mappers', () => {
         modelCode: 'MOD-025',
         modelName: 'Куртка',
         modelIsActive: true,
+        productId: 12,
+        season: 'Літо',
         norm: {
           oneColor: 3.6,
           twoColorsMain: 3.35,
@@ -27,7 +30,68 @@ describe('production response mappers', () => {
       { modelCode: 'MOD-030', modelName: 'Жилет', modelIsActive: false, norm: null },
     ]);
     expect(rows[0].norm?.twoColorsAdditional).toBe(0.25);
-    expect(rows[1]).toMatchObject({ norm: null, updatedAt: null, problem: null });
+    expect(rows[0]).toMatchObject({ productId: 12, season: 'Літо' });
+    expect(rows[1]).toMatchObject({ norm: null, updatedAt: null, problem: null, productId: null });
+  });
+
+  it('maps a model composition with its layers', () => {
+    const [model] = mapModelCompositions([
+      {
+        modelCode: 'MOD-052',
+        modelName: 'Куртка «Віол»',
+        productId: 52,
+        season: 'Зима',
+        modelIsActive: true,
+        layers: [
+          {
+            purpose: 'Підкладка',
+            code: 'FUR-021',
+            name: 'Підкладка',
+            quantity: 1.9,
+            unit: 'Metre',
+          },
+        ],
+        lines: [
+          {
+            kind: 'Fabric',
+            article: '386',
+            code: 'FAB-023',
+            name: 'Грета',
+            quantity: 2.5,
+            unit: 'Metre',
+            comment: null,
+          },
+        ],
+      },
+    ]);
+    expect(model.layers[0]).toMatchObject({ purpose: 'Підкладка', quantity: 1.9, unit: 'Metre' });
+    expect(model.lines[0]).toMatchObject({ kind: 'Fabric', article: '386' });
+  });
+
+  it('rejects a composition line of an unknown unit', () => {
+    expect(() =>
+      mapModelCompositions([
+        {
+          modelCode: 'MOD-052',
+          modelName: 'Куртка',
+          productId: null,
+          season: null,
+          modelIsActive: true,
+          layers: [],
+          lines: [
+            {
+              kind: 'Fabric',
+              article: null,
+              code: null,
+              name: null,
+              quantity: 1,
+              unit: 'Yard',
+              comment: null,
+            },
+          ],
+        },
+      ]),
+    ).toThrow();
   });
 
   it('rejects a worker without a name', () => {

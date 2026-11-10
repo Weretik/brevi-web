@@ -19,12 +19,6 @@ export const fabricNormErrors = {
   conflict: 'Норма конфліктує з поточними даними. Оновіть список.',
 } satisfies AdminApiErrorMessages;
 
-export const payrollParameterErrors = {
-  ...common,
-  notFound: 'Параметри не знайдено.',
-  conflict: 'Параметри змінилися. Оновіть сторінку.',
-} satisfies AdminApiErrorMessages;
-
 /** A 400 shows the backend's first field message, because the norm and name rules live on the server. */
 export function toProductionApiError(response: unknown, messages: AdminApiErrorMessages) {
   const error = toAdminApiError(response, messages);

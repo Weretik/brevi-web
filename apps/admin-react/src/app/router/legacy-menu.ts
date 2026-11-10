@@ -97,12 +97,6 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         access: 'fabric-norms',
       },
       {
-        id: 'payroll-rules',
-        label: 'Правила зарплати',
-        path: '/production/payroll-rules',
-        access: 'payroll-rules',
-      },
-      {
         id: 'workshop-settings',
         label: 'Налаштування цеху',
         path: '/production/settings',

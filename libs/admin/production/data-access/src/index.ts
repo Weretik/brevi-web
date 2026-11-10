@@ -8,10 +8,10 @@ export {
 export {
   useDeleteFabricNormMutation,
   useGetFabricNormsQuery,
+  useGetModelCompositionsQuery,
   useImportFabricNormsMutation,
   useSaveFabricNormMutation,
 } from './api/fabric-norms.api';
-export { useGetPayrollParametersQuery } from './api/payroll-parameters.api';
 export {
   useCopyProductionOrderMutation,
   useCreateProductionOrderMutation,

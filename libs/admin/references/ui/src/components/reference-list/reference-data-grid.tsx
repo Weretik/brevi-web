@@ -11,6 +11,7 @@ import { useReferenceRowContextMenu } from '../../hooks/reference-row-actions/us
 
 import type {
   GridColDef,
+  GridColumnGroupingModel,
   GridPaginationModel,
   GridRowSelectionModel,
   GridSortModel,
@@ -64,6 +65,10 @@ interface Props<Row extends ReferenceRow> {
     sortModel: GridSortModel;
     onSortModelChange: (model: GridSortModel) => void;
   };
+  /** Header groups over data columns, for example «2 кольори» over «Основна», «Додаткова», «Разом». */
+  columnGroupingModel?: GridColumnGroupingModel;
+  /** Taller rows for a two-line cell; 52 by default. */
+  rowHeight?: number;
 }
 
 /**
@@ -92,6 +97,8 @@ export function ReferenceDataGrid<Row extends ReferenceRow>({
   deleteLabel,
   selectable = true,
   server,
+  columnGroupingModel,
+  rowHeight = 52,
 }: Props<Row>) {
   const theme = useTheme();
   const menuRows = isDetailRow ? rows.filter((row) => !isDetailRow(row)) : rows;
@@ -156,7 +163,8 @@ export function ReferenceDataGrid<Row extends ReferenceRow>({
             isDetailRow ? ({ row }) => (isDetailRow(row) ? 'reference-detail-row' : '') : undefined
           }
           loading={loading}
-          rowHeight={52}
+          rowHeight={rowHeight}
+          columnGroupingModel={columnGroupingModel}
           columnHeaderHeight={44}
           localeText={{
             ...theme.components?.MuiDataGrid?.defaultProps?.localeText,

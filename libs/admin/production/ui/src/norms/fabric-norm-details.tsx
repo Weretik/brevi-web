@@ -18,6 +18,7 @@ export function FabricNormDetails({ row }: { row: FabricNormRow }) {
           items={[
             { label: 'Код', value: row.modelCode, mono: true },
             { label: 'Модель', value: row.modelName },
+            ...(row.season ? [{ label: 'Сезон', value: row.season }] : []),
             ...(row.modelName && !row.modelIsActive
               ? [{ label: 'Стан у «Товари»', value: 'Вимкнена' }]
               : []),
