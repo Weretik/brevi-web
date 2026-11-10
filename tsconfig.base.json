@@ -131,7 +131,10 @@
       "@site/logo-printing/feature": ["./libs/site/logo-printing/feature/src/index.ts"],
       "@site/wholesale/ui": ["./libs/site/wholesale/ui/src/index.ts"],
       "@site/wholesale/seo": ["./libs/site/wholesale/seo/src/index.ts"],
-      "@site/wholesale/feature": ["./libs/site/wholesale/feature/src/index.ts"]
+      "@site/wholesale/feature": ["./libs/site/wholesale/feature/src/index.ts"],
+      "@site/industries/ui": ["./libs/site/industries/ui/src/index.ts"],
+      "@site/industries/seo": ["./libs/site/industries/seo/src/index.ts"],
+      "@site/industries/feature": ["./libs/site/industries/feature/src/index.ts"]
     }
   }
 }
