@@ -1,0 +1,7 @@
+{
+  "name": "site-articles-model",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/site/articles/model/src",
+  "projectType": "library",
+  "tags": ["scope:site", "domain:articles", "type:model"]
+}

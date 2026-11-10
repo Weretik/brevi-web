@@ -1,0 +1,7 @@
+{
+  "name": "site-articles-feature",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/site/articles/feature/src",
+  "projectType": "library",
+  "tags": ["scope:site", "domain:articles", "type:feature"]
+}
