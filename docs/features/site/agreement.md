@@ -2,7 +2,7 @@
 
 **Status:** code exists, checked 2026-11-10. Specification: [«Договір» page](../../specs/site/agreement/001-agreement/README.md).
 
-`/uk/agreement` and `/ru/agreement` show the public offer of sale: the preamble, a table of contents with anchors, eleven sections clause by clause, and the seller details. The offer is the text of the live `brevi.com.ua` page «Договір» in both languages without edits; the seller details come from `COMPANY` and show only the site phone. The footer links here with «Угода користувача». The page is static and reads no API.
+`/uk/agreement` and `/ru/agreement` show the public offer of sale: the preamble, a table of contents with anchors, eleven sections clause by clause, and the seller details. The offer is the text of the live `brevi.com.ua` page «Договір» in both languages; the clauses about the «Кошик» form and online payment (LiqPay) are removed by the owner's decision of 2026-11-10, because the new site takes no orders or payments; the seller details come from `COMPANY` and show only the site phone. The footer links here with «Угода користувача». The page is static and reads no API.
 
 ## Structure diagram
 

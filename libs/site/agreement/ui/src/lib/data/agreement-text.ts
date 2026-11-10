@@ -1,5 +1,5 @@
 export type AgreementClause = {
-  /** Clause number as in the document, for example `1.9.3`. */
+  /** Clause number as in the document, for example `1.9.1`. */
   number: string;
   text: string;
 };
