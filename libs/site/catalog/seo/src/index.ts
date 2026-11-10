@@ -4,3 +4,9 @@ export {
   buildCatalogMetadata,
 } from './lib/catalog-metadata';
 export type { CatalogCategorySeoInput } from './lib/catalog-metadata';
+export {
+  buildCatalogItemListJsonLd,
+  buildCatalogProductJsonLd,
+  buildCatalogProductMetadata,
+  productDescription,
+} from './lib/catalog-product-seo';

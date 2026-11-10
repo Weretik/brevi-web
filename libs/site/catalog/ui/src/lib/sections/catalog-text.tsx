@@ -1,9 +1,19 @@
+import { cn } from '@site/shared/ui';
+
 import type { CatalogTextBlock } from '@site/catalog/model';
 
 /** The client's text about a category: headings, paragraphs, and lists in the written order. */
-export function CatalogText({ blocks }: { blocks: readonly CatalogTextBlock[] }) {
+export function CatalogText({
+  blocks,
+  className,
+}: {
+  blocks: readonly CatalogTextBlock[];
+  className?: string;
+}) {
   return (
-    <div className="grid max-w-[48rem] gap-4 leading-relaxed text-muted-foreground">
+    <div
+      className={cn('grid max-w-[48rem] gap-4 leading-relaxed text-muted-foreground', className)}
+    >
       {blocks.map((block, index) => {
         const key = `${block.type}-${index}`;
         if (block.type === 'heading') {
@@ -22,7 +32,12 @@ export function CatalogText({ blocks }: { blocks: readonly CatalogTextBlock[] })
             </ul>
           );
         }
-        return <p key={key}>{block.text}</p>;
+        return (
+          <p key={key}>
+            {block.lead ? <strong className="text-foreground">{block.lead} </strong> : null}
+            {block.text}
+          </p>
+        );
       })}
     </div>
   );

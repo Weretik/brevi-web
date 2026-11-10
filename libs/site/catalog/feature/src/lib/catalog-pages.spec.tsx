@@ -1,8 +1,9 @@
-import { getCatalogCategory } from '@site/catalog/data-access';
+import { getCatalogCategory, getCatalogProduct } from '@site/catalog/data-access';
 import { CATALOG_TREE } from '@site/catalog/model';
 import { render, screen } from '@testing-library/react';
 
 import { CatalogCategoryPage } from './catalog-category-page';
+import { CatalogProductPage } from './catalog-product-page';
 import { CatalogRootPage } from './catalog-root-page';
 
 const section = CATALOG_TREE.find((node) => node.children.length > 0) ?? CATALOG_TREE[0];
@@ -48,5 +49,37 @@ describe('CatalogCategoryPage', () => {
     expect(crumbs.textContent).toContain(section.name.ru);
     expect(crumbs.querySelector(`a[href="/ru/catalog/${section.slug}"]`)).toBeTruthy();
     expect(crumbs.querySelector('a[href="/ru/catalog"]')).toBeTruthy();
+  });
+});
+
+describe('CatalogProductPage', () => {
+  const renderProduct = async (locale: 'uk' | 'ru') => {
+    const category = await getCatalogCategory(child.slug);
+    const product = await getCatalogProduct(category?.productSlugs[0] ?? '');
+    if (!product) throw new Error('no product');
+    const { container } = render(await CatalogProductPage({ locale, product }));
+    return { product, container };
+  };
+
+  it('renders the product name as the only h1 with the way to get a price and no price', async () => {
+    const { product } = await renderProduct('uk');
+
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe(product.name.uk);
+    expect(screen.getByRole('link', { name: 'Дізнатися ціну' }).getAttribute('href')).toBe(
+      '/uk/request',
+    );
+    expect(screen.queryByText(/\d\s*грн/)).toBeNull();
+  });
+
+  it('leads the breadcrumbs through the product category and marks up the product', async () => {
+    const { product, container } = await renderProduct('ru');
+
+    const crumbs = screen.getByRole('navigation', { name: 'Хлебные крошки' });
+    expect(crumbs.querySelector(`a[href="/ru/catalog/${product.categorySlug}"]`)).toBeTruthy();
+    expect(crumbs.textContent).toContain(product.name.ru);
+    const types = [...container.querySelectorAll('script[type="application/ld+json"]')].map(
+      (script) => JSON.parse(script.textContent ?? '{}')['@type'],
+    );
+    expect(types).toEqual(['Product', 'BreadcrumbList']);
   });
 });

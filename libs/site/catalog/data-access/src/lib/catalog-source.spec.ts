@@ -4,6 +4,9 @@ import {
   getCatalogCategory,
   getCatalogCategoryProducts,
   getCatalogCategorySlugs,
+  getCatalogProduct,
+  getCatalogProductSlugs,
+  getCatalogRelatedProducts,
 } from './catalog-source';
 
 describe('catalog source', () => {
@@ -42,5 +45,40 @@ describe('catalog source', () => {
 
   it('answers null for an unknown category', async () => {
     expect(await getCatalogCategory('no-such-category')).toBeNull();
+  });
+
+  it('has a product page for every listed product, with a category, a photo, and text in both languages', async () => {
+    const slugs = new Set(await getCatalogProductSlugs());
+    const categories = new Set(await getCatalogCategorySlugs());
+
+    for (const categorySlug of categories) {
+      const category = await getCatalogCategory(categorySlug);
+      for (const slug of category?.productSlugs ?? []) expect(slugs.has(slug)).toBe(true);
+    }
+    for (const slug of slugs) {
+      const product = await getCatalogProduct(slug);
+      if (!product) throw new Error(`no product ${slug}`);
+      expect(categories.has(product.categorySlug)).toBe(true);
+      expect(product.photos.length).toBeGreaterThan(0);
+      expect(product.name.uk.trim()).not.toBe('');
+      expect(product.name.ru.trim()).not.toBe('');
+      expect(product.description.uk.length + product.summary.uk.length).toBeGreaterThan(0);
+      expect(product.description.ru.length + product.summary.ru.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('offers other models of the same category and never the product itself', async () => {
+    for (const slug of await getCatalogProductSlugs()) {
+      const product = await getCatalogProduct(slug);
+      if (!product) throw new Error(`no product ${slug}`);
+      const related = await getCatalogRelatedProducts(product, 4);
+
+      expect(related.length).toBeLessThanOrEqual(4);
+      expect(related.map((card) => card.slug)).not.toContain(slug);
+    }
+  });
+
+  it('answers null for an unknown product', async () => {
+    expect(await getCatalogProduct('no-such-product')).toBeNull();
   });
 });

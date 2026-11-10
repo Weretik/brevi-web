@@ -1,10 +1,12 @@
 import { CATEGORY_SNAPSHOT } from './snapshot/categories';
+import { PRODUCT_DETAILS_SNAPSHOT } from './snapshot/product-details';
 import { PRODUCT_SNAPSHOT } from './snapshot/products';
 
-import type { CatalogCategory, CatalogProductCard } from '@site/catalog/model';
+import type { CatalogCategory, CatalogProduct, CatalogProductCard } from '@site/catalog/model';
 
 const CATEGORIES = new Map(CATEGORY_SNAPSHOT.map((category) => [category.slug, category]));
 const PRODUCTS = new Map(PRODUCT_SNAPSHOT.map((product) => [product.slug, product]));
+const PRODUCT_DETAILS = new Map(PRODUCT_DETAILS_SNAPSHOT.map((product) => [product.slug, product]));
 
 /**
  * Catalog data for server components. Today it reads the snapshot of the live `brevi.com.ua` catalog kept in
@@ -26,4 +28,29 @@ export async function getCatalogCategoryProducts(
 
 export async function getCatalogCategorySlugs(): Promise<readonly string[]> {
   return CATEGORY_SNAPSHOT.map((category) => category.slug);
+}
+
+export async function getCatalogProduct(slug: string): Promise<CatalogProduct | null> {
+  return PRODUCT_DETAILS.get(slug) ?? null;
+}
+
+export async function getCatalogProductSlugs(): Promise<readonly string[]> {
+  return PRODUCT_DETAILS_SNAPSHOT.map((product) => product.slug);
+}
+
+/** Other models of the product's own category, in listing order, for the «more models» block. */
+export async function getCatalogRelatedProducts(
+  product: CatalogProduct,
+  limit: number,
+): Promise<readonly CatalogProductCard[]> {
+  const category = CATEGORIES.get(product.categorySlug);
+  if (!category) return [];
+  const others = category.productSlugs.filter((slug) => slug !== product.slug);
+  const start = Math.max(0, category.productSlugs.indexOf(product.slug));
+  // Start after the product itself and wrap around, so each page links to different neighbours.
+  const rotated = [...others.slice(start), ...others.slice(0, start)];
+  return rotated.slice(0, limit).flatMap((slug) => {
+    const card = PRODUCTS.get(slug);
+    return card ? [card] : [];
+  });
 }

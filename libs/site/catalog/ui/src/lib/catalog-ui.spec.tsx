@@ -1,7 +1,10 @@
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 
 import { formatModelCount, getCatalogDictionary } from './i18n/catalog-dictionary';
+import { CatalogProductBuy } from './sections/catalog-product-buy';
+import { CatalogProductGallery } from './sections/catalog-product-gallery';
 import { CatalogProductGrid } from './sections/catalog-product-grid';
+import { CatalogProductSpecs } from './sections/catalog-product-specs';
 import { CatalogSectionsGrid } from './sections/catalog-sections-grid';
 import { CatalogSubcategories } from './sections/catalog-subcategories';
 import { CatalogText } from './sections/catalog-text';
@@ -80,6 +83,7 @@ describe('catalog blocks', () => {
         locale="uk"
         dictionary={dictionary.products}
         requestHref="/uk/request"
+        productHref={(slug) => `/uk/product/${slug}`}
         products={[
           {
             slug: 'kostyum-verde',
@@ -97,6 +101,66 @@ describe('catalog blocks', () => {
     expect(link.getAttribute('href')).toBe('/uk/request');
     expect(link.getAttribute('rel')).toBe('nofollow');
     expect(screen.queryByText(/грн/)).toBeNull();
+    expect(screen.getByRole('link', { name: 'Костюм ВЕРДЕ' }).getAttribute('href')).toBe(
+      '/uk/product/kostyum-verde',
+    );
+  });
+
+  it('switches the product photo by its thumbnail', () => {
+    render(
+      <CatalogProductGallery
+        name="Костюм ВЕРДЕ"
+        labels={{ gallery: 'Фото моделі', photo: 'Фото', noPhoto: 'Фото готується' }}
+        photos={[
+          { src: '/catalog/products/kostyum-verde/1.webp', width: 600, height: 800 },
+          { src: '/catalog/products/kostyum-verde/2.webp', width: 600, height: 800 },
+        ]}
+      />,
+    );
+
+    expect(screen.getByRole('img', { name: 'Костюм ВЕРДЕ' }).getAttribute('src')).toContain(
+      '/1.webp',
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Фото 2' }));
+    expect(screen.getByRole('img', { name: 'Костюм ВЕРДЕ, Фото 2' }).getAttribute('src')).toContain(
+      '/2.webp',
+    );
+    expect(screen.getByRole('button', { name: 'Фото 2' }).getAttribute('aria-pressed')).toBe(
+      'true',
+    );
+  });
+
+  it('shows the model, short facts with bold openings, and the ways to get a price', () => {
+    render(
+      <CatalogProductBuy
+        model="992"
+        summary={[{ type: 'paragraph', lead: 'Тканина:', text: 'фліс' }]}
+        dictionary={dictionary.product}
+        requestHref="/uk/request"
+      />,
+    );
+
+    expect(screen.getByText('992')).toBeTruthy();
+    expect(screen.getByText('Тканина:').tagName).toBe('STRONG');
+    expect(screen.getByRole('link', { name: 'Дізнатися ціну' }).getAttribute('href')).toBe(
+      '/uk/request',
+    );
+    expect(screen.getByRole('link', { name: '050 469 86 75' }).getAttribute('href')).toBe(
+      'tel:+380504698675',
+    );
+    expect(screen.queryByText(/грн/)).toBeNull();
+  });
+
+  it('renders characteristics as a table per group', () => {
+    render(
+      <CatalogProductSpecs
+        groups={[{ title: 'Трикотаж', rows: [{ name: 'Комір', value: 'високий' }] }]}
+      />,
+    );
+
+    const table = within(screen.getByRole('table', { name: 'Трикотаж' }));
+    expect(table.getByRole('rowheader', { name: 'Комір' })).toBeTruthy();
+    expect(table.getByRole('cell', { name: 'високий' })).toBeTruthy();
   });
 
   it('renders the text about a category as headings, paragraphs, and lists', () => {

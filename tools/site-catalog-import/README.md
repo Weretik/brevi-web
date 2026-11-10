@@ -8,4 +8,6 @@ Run them in this order with a work folder outside the repository (`<work>`):
 2. `python3 fetch_products.py <work>` reads the product pages and writes `product-urls.json` (Ukrainian product address to Russian one).
 3. `python3 build_catalog_data.py <work> <repo> <image-cache>` writes the category tree, the category and product snapshot, and the product photos (`apps/site/public/catalog/products`).
 
+4. `python3 build_product_data.py <work> <repo>` reads the product pages and writes the product details snapshot. It copies no photos: a product page uses the photo of its listing card.
+
 The scripts need Python 3 with Pillow and `curl`. Run `npx prettier --write` on the generated `.ts` files afterwards.

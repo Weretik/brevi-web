@@ -7,4 +7,4 @@ export {
 } from './lib/locales';
 export type { Locale } from './lib/locales';
 export { localizedPath, localizedPaths, stripLocale, switchLocalePath } from './lib/localized-path';
-export { SITE_PATHS, catalogCategoryPath } from './lib/site-paths';
+export { SITE_PATHS, catalogCategoryPath, catalogProductPath } from './lib/site-paths';
