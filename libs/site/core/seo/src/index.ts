@@ -1,6 +1,7 @@
 export { buildRobotsFile, PRIVATE_PATHS } from './lib/crawling/robots-file';
 export { buildSitemapEntries } from './lib/crawling/sitemap-entries';
 export type { SitemapPage } from './lib/crawling/sitemap-entries';
+export { buildBreadcrumbJsonLd } from './lib/json-ld/breadcrumb-json-ld';
 export { JsonLd, serializeJsonLd } from './lib/json-ld/json-ld';
 export type { JsonLdData } from './lib/json-ld/json-ld';
 export {

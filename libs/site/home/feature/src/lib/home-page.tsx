@@ -10,10 +10,10 @@ import {
   HomeLogo,
   HomeProcess,
   HomeProduction,
-  HomeSection,
   HomeSeoText,
   getHomeDictionary,
 } from '@site/home/ui';
+import { PageSection } from '@site/shared/ui';
 
 import type { Locale } from '@site/core/i18n';
 
@@ -35,41 +35,41 @@ export function HomePage({ locale }: { locale: Locale }) {
     <div className="grid gap-14 pb-4 sm:gap-16">
       <HomeHero dictionary={dictionary.hero} requestHref={`#${CONTACTS_ID}`} />
 
-      <HomeSection
+      <PageSection
         id="home-catalog"
         title={dictionary.catalog.title}
         label={{ index: '02', text: dictionary.catalog.label }}
         action={{ href: catalogHref, label: dictionary.catalog.all }}
       >
         <HomeCatalog locale={locale} sections={CATALOG_SECTIONS} catalogHref={catalogHref} />
-      </HomeSection>
+      </PageSection>
 
       <HomeLogo dictionary={dictionary.logo} moreHref={path('logoPrinting')} />
 
-      <HomeSection
+      <PageSection
         id="home-process"
         title={dictionary.process.title}
         label={{ index: '04', text: dictionary.process.label }}
       >
         <HomeProcess steps={dictionary.process.steps} />
-      </HomeSection>
+      </PageSection>
 
-      <HomeSection
+      <PageSection
         id="home-production"
         title={dictionary.production.title}
         label={{ index: '05', text: dictionary.production.label }}
         action={{ href: path('production'), label: dictionary.production.more }}
       >
         <HomeProduction points={dictionary.production.points} />
-      </HomeSection>
+      </PageSection>
 
-      <HomeSection
+      <PageSection
         id="home-industries"
         title={dictionary.industries.title}
         action={{ href: path('industries'), label: dictionary.industries.all }}
       >
         <HomeIndustries items={dictionary.industries.items} href={path('industries')} />
-      </HomeSection>
+      </PageSection>
 
       <HomeContacts
         id={CONTACTS_ID}

@@ -6,7 +6,7 @@ This is the index of versioned frontend documentation.
 - [Technology stack and key libraries](architecture/technology-and-packages.md)
 - [Admin architecture](architecture/admin/README.md)
 - [Storefront architecture](architecture/storefront/README.md)
-- [Public site architecture (Next.js, shell and home page built)](architecture/site/README.md) and its [migration plan](specs/site/migration/README.md)
+- [Public site architecture (Next.js, shell, home, and «Виробництво» pages built)](architecture/site/README.md) and its [migration plan](specs/site/migration/README.md)
 - [Admin and Storefront feature map](features/README.md)
 - [Local startup and diagnostics](operations/README.md)
 - [Admin API integration](architecture/api/README.md)

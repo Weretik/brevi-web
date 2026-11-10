@@ -1,0 +1,7 @@
+{
+  "name": "site-production-feature",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/site/production/feature/src",
+  "projectType": "library",
+  "tags": ["scope:site", "domain:production", "type:feature"]
+}

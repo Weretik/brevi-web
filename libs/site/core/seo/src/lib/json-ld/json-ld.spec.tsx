@@ -1,6 +1,7 @@
 import { createSiteConfig } from '@site/core/config';
 import { renderToStaticMarkup } from 'react-dom/server';
 
+import { buildBreadcrumbJsonLd } from './breadcrumb-json-ld';
 import { JsonLd, serializeJsonLd } from './json-ld';
 import {
   buildLocalBusinessJsonLd,
@@ -58,5 +59,26 @@ describe('JSON-LD', () => {
         closes: '18:00',
       },
     });
+  });
+
+  it('lists breadcrumbs with positions and absolute URLs', () => {
+    const data = buildBreadcrumbJsonLd(
+      [
+        { name: 'Головна', path: '/uk' },
+        { name: 'Виробництво', path: '/uk/about-company' },
+      ],
+      config,
+    );
+
+    expect(data['@type']).toBe('BreadcrumbList');
+    expect(data['itemListElement']).toEqual([
+      { '@type': 'ListItem', position: 1, name: 'Головна', item: 'https://brevi.com.ua/uk' },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Виробництво',
+        item: 'https://brevi.com.ua/uk/about-company',
+      },
+    ]);
   });
 });

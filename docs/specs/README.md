@@ -6,6 +6,7 @@ The Storefront currently has README files for its Nx feature libraries, but they
 
 - [Site Next.js: migration plan](site/migration/README.md) — step 1 done.
 - [Site Next.js: home page (migration step 2)](site/home/001-home/README.md) — implemented and locally verified 2026-11-10.
+- [Site Next.js: «Виробництво» page](site/production/001-production/README.md) — implemented and locally verified 2026-11-10.
 - [Site Next.js: shell — layout, header, footer (migration step 1)](site/shell/001-site-shell/README.md) — implemented and locally verified 2026-11-10.
 - [Admin: product list](admin/products/README.md)
 - [Admin: template migration](admin/migration/README.md)

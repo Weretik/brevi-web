@@ -1,6 +1,9 @@
 export { Button, buttonVariants } from './lib/button';
 export type { ButtonProps } from './lib/button';
+export { Breadcrumbs } from './lib/breadcrumbs';
+export type { BreadcrumbItem } from './lib/breadcrumbs';
 export { cn } from './lib/cn';
+export { PageSection } from './lib/page-section';
 export {
   Sheet,
   SheetClose,

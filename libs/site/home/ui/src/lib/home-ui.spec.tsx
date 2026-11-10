@@ -2,7 +2,6 @@ import { CATALOG_SECTIONS } from '@site/catalog/model';
 import { render, screen, within } from '@testing-library/react';
 
 import { getHomeDictionary } from './i18n/home-dictionary';
-import { HomeSection } from './layout/home-section';
 import { HomeCatalog } from './sections/home-catalog';
 import { HomeContacts } from './sections/home-contacts';
 import { HomeHero } from './sections/home-hero';
@@ -36,29 +35,6 @@ describe('HomeHero', () => {
     );
     expect(screen.getByRole('img', { name: dictionary.imageAlt })).toBeTruthy();
     expect(within(screen.getByRole('figure')).getAllByRole('listitem')).toHaveLength(4);
-  });
-});
-
-describe('HomeSection', () => {
-  it('labels the section by its heading and renders the action link', () => {
-    render(
-      <HomeSection
-        id="home-catalog"
-        title="Каталог спецодягу"
-        label={{ index: '02', text: 'Що ми шиємо' }}
-        action={{ href: '/uk/catalog', label: 'Весь каталог' }}
-      >
-        content
-      </HomeSection>,
-    );
-
-    const section = screen.getByRole('region', { name: 'Каталог спецодягу' });
-    expect(within(section).getByRole('heading', { level: 2 })).toBeTruthy();
-    expect(
-      within(section)
-        .getByRole('link', { name: /Весь каталог/ })
-        .getAttribute('href'),
-    ).toBe('/uk/catalog');
   });
 });
 
