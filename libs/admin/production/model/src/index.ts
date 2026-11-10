@@ -9,7 +9,26 @@ export {
   FABRIC_NORM_MAX_METERS,
   fabricNormFieldLabels,
   fabricNormFields,
+  fabricNormModelCaption,
 } from './entities/fabric-norm';
+export {
+  compositionLineKindLabels,
+  compositionLineKinds,
+  compositionUnitLabels,
+  compositionUnits,
+} from './entities/model-composition';
+export type {
+  CompositionLineKind,
+  CompositionUnit,
+  ModelComposition,
+  ModelCompositionLine,
+  ModelLayer,
+} from './entities/model-composition';
+export {
+  compositionMaterialText,
+  filterModelCompositions,
+  formatCompositionQuantity,
+} from './queries/model-composition-filters';
 export type { FabricNormField, FabricNormRow, FabricNormValues } from './entities/fabric-norm';
 export type {
   FabricNormImportRow,
@@ -18,7 +37,6 @@ export type {
   ProductionImportResult,
   WorkshopStaffImportRow,
 } from './entities/production-import';
-export type { PayrollParameter } from './entities/payroll-parameter';
 export {
   createWorkshopEmployeeDraft,
   validateWorkshopEmployee,
@@ -41,7 +59,6 @@ export {
   formatDay,
   formatMeters,
   formatMoney,
-  formatParameterValue,
   formatProductionDate,
 } from './mappers/format-production';
 export {

@@ -3536,6 +3536,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/production/fabric-norms/compositions': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Every Catalog sewing model by code with its lining, insulation and fleece and its full composition from «Товари» (read-only) */
+    get: operations['getModelCompositions'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/production/fabric-norms/{modelCode}': {
     parameters: {
       query?: never;
@@ -3568,23 +3585,6 @@ export interface paths {
     put?: never;
     /** Load norms from a list (up to 1000); nothing is saved while a row has an error */
     post: operations['importFabricNorms'];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/production/payroll-parameters': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Payroll coefficients read from «Параметри ціноутворення» (edited there, not here) */
-    get: operations['getPayrollParameters'];
-    put?: never;
-    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -9533,6 +9533,44 @@ export interface components {
       updatedAt?: string | null;
       /** @description Set only when something is wrong, for example the model is gone from Catalog. */
       problem?: string | null;
+      /** @description Catalog product of the model, for a link to its card; null when the model is gone. */
+      productId?: number | null;
+      /** @description «Літо» or «Зима» from Catalog; null when not set. */
+      season?: string | null;
+    };
+    ModelLayerResponse: {
+      /** @enum {string} */
+      purpose: 'Підкладка' | 'Утеплювач' | 'Фліс';
+      code?: string | null;
+      name?: string | null;
+      quantity: number;
+      /** @enum {string} */
+      unit: 'Metre' | 'Piece' | 'Service' | 'Kilogram';
+    };
+    ModelCompositionLineResponse: {
+      /** @enum {string} */
+      kind: 'Fabric' | 'Accessory' | 'OtherCost';
+      /** @description Sale SKU of the fabric variant; null for a line of the whole model. */
+      article?: string | null;
+      /** @description FAB-…, FUR-… or the cost code; null when unknown. */
+      code?: string | null;
+      /** @description Reference name; null when the reference is gone. */
+      name?: string | null;
+      quantity: number;
+      /** @enum {string} */
+      unit: 'Metre' | 'Piece' | 'Service' | 'Kilogram';
+      comment?: string | null;
+    };
+    ModelCompositionResponse: {
+      modelCode: string;
+      modelName: string;
+      productId?: number | null;
+      season?: string | null;
+      modelIsActive: boolean;
+      /** @description Composition lines that are an extra layer, recognised by the material name. */
+      layers: components['schemas']['ModelLayerResponse'][];
+      /** @description Full composition; fabric variants first, then the lines of the whole model in card order. */
+      lines: components['schemas']['ModelCompositionLineResponse'][];
     };
     FabricNormImportRow: {
       modelCode: string;
@@ -9551,20 +9589,6 @@ export interface components {
         action: 'created' | 'updated' | 'unchanged' | 'error';
         error?: string | null;
       }[];
-    };
-    PayrollParameterResponse: {
-      /** @description Code in «Параметри ціноутворення», for example SHOP_MANAGER_RATE. */
-      code: string;
-      /** @description What the workshop uses it for. */
-      purpose: string;
-      /** @description Name in «Параметри ціноутворення»; null when the parameter is missing. */
-      name?: string | null;
-      value?: number | null;
-      unit?: string | null;
-      /** Format: date */
-      updatedOn?: string | null;
-      /** @description Set only when the parameter is missing or has no value. */
-      problem?: string | null;
     };
     ProductionOrderSummaryResponse: {
       id: number;
@@ -22886,6 +22910,26 @@ export interface operations {
       };
     };
   };
+  getModelCompositions: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description One block per model; a model without composition has empty lists. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ModelCompositionResponse'][];
+        };
+      };
+    };
+  };
   saveFabricNorm: {
     parameters: {
       query?: never;
@@ -22986,26 +23030,6 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
-      };
-    };
-  };
-  getPayrollParameters: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description One row per coefficient the workshop pays by, in a fixed order. */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['PayrollParameterResponse'][];
-        };
       };
     };
   };

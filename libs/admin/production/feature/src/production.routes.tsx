@@ -1,10 +1,10 @@
 import { lazy } from 'react';
+import { Navigate } from 'react-router-dom';
 
 import type { ProductionOrderActor } from '@admin/production/model';
 
 const WorkshopStaffPage = lazy(() => import('./pages/staff/workshop-staff-page'));
 const FabricNormsPage = lazy(() => import('./pages/norms/fabric-norms-page'));
-const PayrollRulesPage = lazy(() => import('./pages/payroll/payroll-rules-page'));
 const WorkshopSettingsPage = lazy(() => import('./pages/settings/workshop-settings-page'));
 const ProductionOrdersPage = lazy(() => import('./pages/orders/production-orders-page'));
 const ProductionOrderCreatePage = lazy(() => import('./pages/orders/production-order-create-page'));
@@ -27,7 +27,10 @@ export function createProductionRoutes({ useOrderActor }: ProductionRouteOptions
   return [
     { path: '/production/staff', element: <WorkshopStaffPage /> },
     { path: '/production/fabric-norms', element: <FabricNormsPage /> },
-    { path: '/production/payroll-rules', element: <PayrollRulesPage /> },
+    {
+      path: '/production/payroll-rules',
+      element: <Navigate to="/references/pricing-parameters" replace />,
+    },
     { path: '/production/settings', element: <WorkshopSettingsPage /> },
     { path: '/production/work', element: <WorkLogPage useOrderActor={useOrderActor} /> },
     { path: '/production/timesheet', element: <TimesheetPage /> },

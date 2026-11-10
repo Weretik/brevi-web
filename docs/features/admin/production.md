@@ -2,7 +2,7 @@
 
 **Status:** implementation exists, checked 2026-11-05 (stage 8). SDD: [stage 1](../../specs/admin/production/001-workshop-references/README.md) ([consumer contract](../../specs/admin/production/001-workshop-references/contracts/api-contract.md)), [stage 2 «Виробничі завдання»](../../specs/admin/production/002-production-orders/README.md), [stage 3 stages, shipments, files, Telegram](../../specs/admin/production/003-order-tracking/README.md), [stage 4 «Склад тканин»](../../specs/admin/production/004-fabric-stock/README.md), [stage 5 «Журнал робіт» and «Прогноз пошиття»](../../specs/admin/production/005-work-log/README.md), [stage 6 «Робочий час» and «Зарплата»](../../specs/admin/production/006-timesheet-payroll/README.md), [stage 7 «Звіти цеху» and the overview](../../specs/admin/production/007-workshop-reports/README.md), [stage 8 «Архів цеху»](../../specs/admin/production/008-workshop-archive/README.md).
 
-The sidebar group «Швейний цех» gets three reference pages for the head of the workshop (role `WorkshopChief`), Admin and the director; the other items of the group without a page stay placeholders for later stages. «Працівники цеху» (`/production/staff`) is the list of workers: they do not sign in, the head of the workshop records their work. Chips switch «Працюють» / «Архів» and filter by position; a worker who left goes «В архів» instead of being deleted. «Норми витрати тканини» (`/production/fabric-norms`) shows every sewing model of «Товари» with its fabric per item in metres (one, two or three colours); only problems get a mark. Both lists have «Імпорт» of the transfer JSON with a server preview first. «Правила зарплати» (`/production/payroll-rules`) shows the payroll coefficients read from «Параметри ціноутворення», with a link there.
+The sidebar group «Швейний цех» gets three reference pages for the head of the workshop (role `WorkshopChief`), Admin and the director; the other items of the group without a page stay placeholders for later stages. «Працівники цеху» (`/production/staff`) is the list of workers: they do not sign in, the head of the workshop records their work. Chips switch «Працюють» / «Архів» and filter by position; a worker who left goes «В архів» instead of being deleted. «Норми витрати тканини» (`/production/fabric-norms`, [stage 9](../../specs/admin/production/009-fabric-norms-and-compositions/README.md)) follows «Витрата тканини за моделями» of the old «Цех»: tab «Норми тканини» shows every sewing model of «Товари» with «MOD-025 · Літо» under its name and metres per item in grouped columns «1 колір» (Верх), «2 кольори» (Основна, Додаткова, Разом), «3 кольори» (Основна, Додаткова 1, Додаткова 2, Разом); only problems get a mark. Tab «Комплектація моделей» (`?tab=compositions`) shows a block per model with its lining, insulation and fleece and the folded «Повна комплектація», read from «Товари»; «Змінити комплектацію» opens the model card. Both reference lists have «Імпорт» of the transfer JSON with a server preview first. Payroll coefficients are shown only in «Параметри ціноутворення»; the old `/production/payroll-rules` redirects there.
 
 «Виробничі завдання» (`/production/orders`, Admin, Manager and the head of the workshop) is what the workshop sews. A manager makes an order from a КП «під запит» (any saved one, not only one sent from the system; client corrections item 9) at `/production/orders/new`, or with «Передати в цех» in the КП editor's «Цех» block, which saves the КП first and opens the page with it picked (`?quote=`); the block also lists the КП's orders (`QuoteProductionOrders`, given to the quotes routes as `workshopCard`). On the order card the КП number opens the КП; the 28 old orders keep the old number as text. On the page: for each sewing item they pick the fabric and fill in quantity, «Готово до», colours, sizes, technical changes, comment and applications, and see the planned fabric. The list has search, status chips, «Прострочені», a manager filter, «Експорт» to CSV and, for Admin, «Імпорт» of the old orders. The card `/production/orders/:id` has «Опис» and «Історія змін», edit in side panels, «Копіювати», «Друк» and, for Admin, «Видалити». Who sees «Розцінка пошиття» and the КП price comes from the server's `permissions`.
 
@@ -41,19 +41,20 @@ flowchart LR
 ```text
 libs/admin/production/
   model/src/
-    entities/                     # worker, fabric norm, import result, payroll parameter, production order, tracking (stages, files, Telegram, settings), fabric stock, work, sewing forecast, timesheet, payroll, workshop report and overview, workshop archive
+    entities/                     # worker, fabric norm, model composition (layers, lines, units), import result, production order, tracking (stages, files, Telegram, settings), fabric stock, work, sewing forecast, timesheet, payroll, workshop report and overview, workshop archive
     forms/                        # worker, norm, order item and order forms, shipment and cancel reason, workshop settings, receipt, correction, issue, work (and months), timesheet hours, payment and adjustment, report period
-    queries/                      # list filters, chip counts, orders, stock and payroll CSV
+    queries/                      # list filters, chip counts, composition search and quantities, orders, stock and payroll CSV
     validators/                   # reads workshop-staff.json, fabric-norms.json, production-orders.json, production-progress.json, fabric-stock.json, production-work.json, workshop-archive.json
     mappers/format-production.ts  # metres, parameter values, dates
     mappers/format-application.ts # application text, linked embroidery details and link
   data-access/src/
-    api/{workshop-staff,fabric-norms,payroll-parameters,production-orders,production-tracking,workshop-settings,fabric-stock,production-work,payroll,workshop-reports,workshop-archive}.api.ts # endpoints; production-base-api.ts adds tags
+    api/{workshop-staff,fabric-norms,production-orders,production-tracking,workshop-settings,fabric-stock,production-work,payroll,workshop-reports,workshop-archive}.api.ts # endpoints (fabric-norms also reads model compositions); production-base-api.ts adds tags
     mappers/                      # runtime-checked response → model
     validators/production-response.ts
     errors/production-api-error.ts
   ui/src/
-    staff/  norms/  payroll/  import/  dialogs/
+    staff/  import/  dialogs/
+    norms/                        # norms grid with «1 колір» / «2 кольори» / «3 кольори» column groups, chips, form, details, model composition block
     orders/                       # grid, chips, status, item form and card, applications with «Розрахунок вишивки», embroidery block, history, КП list, print sheet
     tracking/                     # stage pill and toggles, shipments, files, Telegram block, shipment form
     settings/                     # workshop settings form
@@ -61,19 +62,20 @@ libs/admin/production/
     work/                         # work records table, «Додати роботу» form, item «Робота»
     forecast/                     # forecast queue table with problem marks and up/down
     timesheet/                    # day table, month summary, change history
-    payroll/                      # parameters table; month table with «Видано», payments and adjustments, worker detail, year, roles/embroidery and entry forms
+    payroll/                      # month table with «Видано», payments and adjustments, worker detail, year, roles/embroidery and entry forms
     reports/                      # report totals with comparison and gaps; output, staff, materials and stock tables
     archive/                      # archive grid, read-only line details
   feature/src/
     production.routes.tsx         # createProductionRoutes (workshop), createProductionOrderRoutes, createProductionReportRoutes (Admin); the app wraps them in RequireRole
-    pages/{staff,norms,payroll}/
+    pages/staff/
+    pages/norms/                  # «Норми витрати тканини» with tabs «Норми тканини» and «Комплектація моделей»
     pages/orders/                 # list, create from КП, card
     pages/settings/               # «Налаштування цеху»
     pages/stock/                  # «Склад тканин»
     pages/work/                   # «Журнал робіт»
     pages/forecast/               # «Прогноз пошиття»
     pages/timesheet/              # «Робочий час»
-    pages/payroll/                # «Правила зарплати», «Зарплата»
+    pages/payroll/                # «Зарплата»
     pages/reports/                # «Звіти цеху»
     pages/archive/                # «Архів цеху»
     hooks/{staff,norms,import,payroll}/
@@ -86,7 +88,7 @@ libs/admin/production/
     hooks/timesheet/              # a day: typed hours, changes, save
     hooks/archive/                # tab, search, dates, pages of the archive or closed orders
     hooks/payroll/                # payment and adjustment editors, month actions («Видано», cancel, close, reopen)
-    components/{staff,norms,import}/ # side panels
+    components/{staff,norms,import}/ # side panels; norms/model-compositions-tab.tsx (search and pages of composition blocks)
     components/orders/            # header and item side panels, header actions, КП item line, order summary
     components/tracking/          # item work (stages, shipments, work, fabric, files), order work (files, Telegram), shipment side panel
     components/stock/             # line card, receipt, correction, consumption and issue side panels, item «Тканина»
@@ -101,7 +103,7 @@ libs/admin/core/auth/src/session/session-user.ts # WorkshopChief, canManageWorks
 
 - `libs/admin/production/model/src/forms/production-forms.test.ts`, `libs/admin/production/model/src/forms/production-order-forms.test.ts`, `libs/admin/production/model/src/validators/production-import-file.test.ts`, `libs/admin/production/model/src/forms/fabric-stock-forms.test.ts`, `libs/admin/production/model/src/forms/production-work-form.test.ts`, `libs/admin/production/model/src/forms/timesheet-form.test.ts`, `libs/admin/production/model/src/forms/payroll-forms.test.ts`, `libs/admin/production/model/src/forms/workshop-report-period.test.ts`, `libs/admin/production/model/src/validators/workshop-archive-import-file.test.ts`
 - `libs/admin/production/data-access/src/mappers/production-mappers.test.ts`, `libs/admin/production/data-access/src/mappers/production-order.mapper.test.ts`, `libs/admin/production/data-access/src/mappers/production-tracking.mapper.test.ts`, `libs/admin/production/data-access/src/mappers/fabric-stock.mapper.test.ts`, `libs/admin/production/data-access/src/mappers/production-work.mapper.test.ts`, `libs/admin/production/data-access/src/mappers/payroll.mapper.test.ts`, `libs/admin/production/data-access/src/mappers/workshop-report.mapper.test.ts`, `libs/admin/production/data-access/src/mappers/workshop-archive.mapper.test.ts`
-- `libs/admin/production/ui/src/payroll/payroll-parameters-table.component.test.tsx`, `libs/admin/production/ui/src/forecast/sewing-forecast-table.component.test.tsx`, `libs/admin/production/ui/src/timesheet/timesheet-day-table.component.test.tsx`, `libs/admin/production/ui/src/payroll/payroll-month-table.component.test.tsx`, `libs/admin/production/ui/src/reports/report-totals.component.test.tsx`
+- `libs/admin/production/ui/src/forecast/sewing-forecast-table.component.test.tsx`, `libs/admin/production/ui/src/timesheet/timesheet-day-table.component.test.tsx`, `libs/admin/production/ui/src/payroll/payroll-month-table.component.test.tsx`, `libs/admin/production/ui/src/reports/report-totals.component.test.tsx`
 - `libs/admin/production/feature/src/pages/staff/workshop-staff-page.component.test.tsx`, `libs/admin/production/feature/src/pages/norms/fabric-norms-page.component.test.tsx`, `libs/admin/production/feature/src/pages/archive/workshop-archive-page.component.test.tsx`
 - `libs/admin/production/feature/src/pages/orders/production-order-create-page.component.test.tsx`, `libs/admin/production/feature/src/pages/orders/production-order-page.component.test.tsx`
 - `apps/admin-react/src/app/router/navigation-config.unit.test.ts` (who sees the items)

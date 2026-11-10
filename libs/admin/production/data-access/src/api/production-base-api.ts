@@ -4,7 +4,6 @@ export const productionBaseApi = adminApi.enhanceEndpoints({
   addTagTypes: [
     'WorkshopEmployee',
     'FabricNorm',
-    'PayrollParameter',
     'ProductionOrder',
     'WorkshopSettings',
     'FabricStock',

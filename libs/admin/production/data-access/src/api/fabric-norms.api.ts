@@ -1,12 +1,14 @@
 import { productionBaseApi } from './production-base-api';
 import { fabricNormErrors, toProductionApiError } from '../errors/production-api-error';
 import { mapFabricNormRow, mapFabricNormRows } from '../mappers/fabric-norm.mapper';
+import { mapModelCompositions } from '../mappers/model-composition.mapper';
 import { mapFabricNormImportResult } from '../mappers/production-import.mapper';
 
 import type {
   FabricNormImportRow,
   FabricNormRow,
   FabricNormValues,
+  ModelComposition,
   ProductionImportResult,
 } from '@admin/production/model';
 import type { components } from '@admin/shared/contracts';
@@ -25,6 +27,12 @@ export const fabricNormsApi = productionBaseApi.injectEndpoints({
       transformResponse: mapFabricNormRows,
       transformErrorResponse: errors,
       providesTags: normList,
+    }),
+    /** Read from «Товари»; changes there show after a reload of the tab. */
+    getModelCompositions: build.query<ModelComposition[], void>({
+      query: () => '/api/production/fabric-norms/compositions',
+      transformResponse: mapModelCompositions,
+      transformErrorResponse: errors,
     }),
     saveFabricNorm: build.mutation<FabricNormRow, { modelCode: string; norm: FabricNormValues }>({
       query: ({ modelCode, norm }) => ({
@@ -65,6 +73,7 @@ export const fabricNormsApi = productionBaseApi.injectEndpoints({
 export const {
   useDeleteFabricNormMutation,
   useGetFabricNormsQuery,
+  useGetModelCompositionsQuery,
   useImportFabricNormsMutation,
   useSaveFabricNormMutation,
 } = fabricNormsApi;

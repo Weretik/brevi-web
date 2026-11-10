@@ -6,7 +6,7 @@ export { FabricNormsGrid } from './norms/fabric-norms-grid';
 export { FabricNormFilterChips } from './norms/fabric-norm-filter-chips';
 export { FabricNormForm } from './norms/fabric-norm-form';
 export { FabricNormDetails } from './norms/fabric-norm-details';
-export { PayrollParametersTable } from './payroll/payroll-parameters-table';
+export { ModelCompositionBlock } from './norms/model-composition-block';
 export { ProductionImportPreview } from './import/production-import-preview';
 export { ProductionConfirmDialog } from './dialogs/production-confirm-dialog';
 export { ProductionItemCard } from './orders/production-item-card';

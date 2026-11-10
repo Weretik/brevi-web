@@ -14,6 +14,10 @@ export interface FabricNormRow {
   /** null when the model is no longer in «Товари». */
   modelName: string | null;
   modelIsActive: boolean;
+  /** «Товари» product of the model, for a link to its card; null when the model is gone. */
+  productId: number | null;
+  /** «Літо» or «Зима»; null when not set. */
+  season: string | null;
   norm: FabricNormValues | null;
   twoColorsTotal: number | null;
   threeColorsTotal: number | null;
@@ -32,6 +36,10 @@ export const fabricNormFields = [
 ] as const satisfies readonly (keyof FabricNormValues)[];
 
 export type FabricNormField = (typeof fabricNormFields)[number];
+
+/** «MOD-025 · Літо»: the line under the model name. */
+export const fabricNormModelCaption = (row: Pick<FabricNormRow, 'modelCode' | 'season'>) =>
+  row.season ? `${row.modelCode} · ${row.season}` : row.modelCode;
 
 export const fabricNormFieldLabels: Record<FabricNormField, string> = {
   oneColor: 'Один колір',
