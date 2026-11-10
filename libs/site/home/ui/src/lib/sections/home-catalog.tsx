@@ -3,25 +3,22 @@ import Link from 'next/link';
 import type { CatalogSection } from '@site/catalog/model';
 import type { Locale } from '@site/core/i18n';
 
-/**
- * Catalog sections as cards. Product cards with the three prices of the mockup come with the catalog step;
- * until then every card opens the catalog root.
- */
+/** Catalog sections as cards; each card opens its category page. */
 export function HomeCatalog({
   locale,
   sections,
-  catalogHref,
+  categoryHref,
 }: {
   locale: Locale;
   sections: readonly CatalogSection[];
-  catalogHref: string;
+  categoryHref: (slug: string) => string;
 }) {
   return (
     <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {sections.map((section, index) => (
         <li key={section.key}>
           <Link
-            href={catalogHref}
+            href={categoryHref(section.slug)}
             className="group flex h-full flex-col gap-2.5 rounded-xl border border-border bg-background p-4 transition-colors hover:border-border-strong hover:bg-muted"
           >
             <span

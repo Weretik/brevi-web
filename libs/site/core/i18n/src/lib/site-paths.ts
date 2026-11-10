@@ -19,3 +19,8 @@ export const SITE_PATHS = {
   /** Private request list: never indexed, links to it carry `rel="nofollow"`. */
   request: '/request',
 } as const;
+
+/** Locale-free path of a catalog category: `/catalog/<slug>`. Every level of the tree has a flat URL. */
+export function catalogCategoryPath(slug: string): string {
+  return `${SITE_PATHS.catalog}/${slug}`;
+}

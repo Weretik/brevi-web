@@ -1,6 +1,7 @@
 import { ARTICLES } from '@site/articles/model';
 import { articlePath } from '@site/articles/seo';
-import { SITE_PATHS } from '@site/core/i18n';
+import { flattenCatalogTree } from '@site/catalog/model';
+import { SITE_PATHS, catalogCategoryPath } from '@site/core/i18n';
 import { buildSitemapEntries } from '@site/core/seo';
 
 import type { MetadataRoute } from 'next';
@@ -21,6 +22,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: SITE_PATHS.industries },
     { path: SITE_PATHS.regions },
     { path: SITE_PATHS.agreement },
+    { path: SITE_PATHS.catalog },
+    ...flattenCatalogTree().map((category) => ({ path: catalogCategoryPath(category.slug) })),
     ...ARTICLES.map((article) => ({ path: articlePath(article.slug) })),
   ]);
 }
