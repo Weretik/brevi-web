@@ -20,7 +20,7 @@ import { MAIN_NAV_LINKS, SHELL_PATHS } from '../navigation/site-navigation';
 import type { ShellDictionary } from '../i18n/shell-dictionary';
 import type { Locale } from '@site/core/i18n';
 
-/** Phone and tablet menu in a side sheet: the header menu, catalog sections, and both phones. */
+/** Phone and tablet menu in a side sheet: the header menu, catalog sections, and the phone. */
 export function MobileMenu({
   locale,
   dictionary,

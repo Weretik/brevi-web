@@ -2,7 +2,7 @@
 
 **Status:** code exists, checked 2026-11-10. Specification: [«Контакти» page](../../specs/site/contacts/001-contacts/README.md).
 
-`/uk/contacts` and `/ru/contacts` show the company contacts (both phones, email, address with the service area, working hours), a lazy Google map of the workshop with a link to Maps, and the two client managers with photo, phones, and email. The facts are from the live `brevi.com.ua` page and live in `COMPANY` (`phones`, `email`, `address`, `openingHours`, `managers`, `mapQuery`); the dictionary holds only captions. The page is static and reads no API.
+`/uk/contacts` and `/ru/contacts` show the company contacts (phone, email, address with the service area, working hours), a lazy Google map of the workshop with a link to Maps, and the two client managers with photo, phones, and email. The facts are from the live `brevi.com.ua` page and live in `COMPANY` (`phones`, `email`, `address`, `openingHours`, `managers`, `mapQuery`); the dictionary holds only captions. The page is static and reads no API.
 
 The QR codes of the social networks of the live page are not shown: the profile addresses are not known yet (`COMPANY.socials` has `url: null`).
 

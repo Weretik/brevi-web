@@ -2,7 +2,7 @@
 
 **Status:** code exists, checked 2026-11-10. Specification: [site shell](../../specs/site/shell/001-site-shell/README.md).
 
-Every page under `/uk` and `/ru` is rendered inside `SiteShell`: a skip link, the top line (tagline, working hours, office phone, UA/RU), the sticky header (logo, menu with the catalog mega menu, «Заявка», sales phone), `<main id="content">`, and the footer (catalog sections, company and buyer pages, contacts with one sales phone, social network names without links until the owner gives the addresses). Below 1024 px the menu is a side sheet. The shell reads no API: company facts come from `COMPANY`, catalog sections from a fixed list taken from the Angular storefront.
+Every page under `/uk` and `/ru` is rendered inside `SiteShell`: a skip link, the top line (tagline, working hours, UA/RU), the sticky header (logo, menu with the catalog mega menu, «Заявка», the one company phone), `<main id="content">`, and the footer (catalog sections, company and buyer pages, contacts with the phone, social network names without links until the owner gives the addresses). Below 1024 px the menu is a side sheet. The shell reads no API: company facts come from `COMPANY`, catalog sections from a fixed list taken from the Angular storefront.
 
 `/` redirects to `/uk`. Unknown paths under a locale get a 404 inside the frame; paths without a locale get a bare two-language 404. Indexing is off unless `SITE_ENV=production` and `SITE_INDEXING=true`.
 

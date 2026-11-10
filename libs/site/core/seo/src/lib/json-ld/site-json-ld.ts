@@ -53,7 +53,7 @@ export function buildWebSiteJsonLd(locale: Locale, config: SiteConfig = siteConf
   };
 }
 
-/** The Poltava workshop as a LocalBusiness: address, both phones, and opening hours. Home and contacts use it. */
+/** The Poltava workshop as a LocalBusiness: address, the phone, and opening hours. Home and contacts use it. */
 export function buildLocalBusinessJsonLd(
   locale: Locale,
   config: SiteConfig = siteConfig,
