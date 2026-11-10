@@ -16,6 +16,8 @@ const nextConfig: NextConfig = {
   experimental: {
     // The root layout sits under [locale], so unmatched URLs get a global 404 document rendered on the server.
     globalNotFound: true,
+    // The «Заявка» form takes a brief or a layout up to 10 MB; the default limit of a Server Action body is 1 MB.
+    serverActions: { bodySizeLimit: '11mb' },
   },
   async redirects() {
     return [{ source: '/', destination: '/uk', permanent: true }];

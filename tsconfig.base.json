@@ -140,7 +140,11 @@
       "@site/regions/feature": ["./libs/site/regions/feature/src/index.ts"],
       "@site/agreement/ui": ["./libs/site/agreement/ui/src/index.ts"],
       "@site/agreement/seo": ["./libs/site/agreement/seo/src/index.ts"],
-      "@site/agreement/feature": ["./libs/site/agreement/feature/src/index.ts"]
+      "@site/agreement/feature": ["./libs/site/agreement/feature/src/index.ts"],
+      "@site/request/model": ["./libs/site/request/model/src/index.ts"],
+      "@site/request/ui": ["./libs/site/request/ui/src/index.ts"],
+      "@site/request/seo": ["./libs/site/request/seo/src/index.ts"],
+      "@site/request/feature": ["./libs/site/request/feature/src/index.ts"]
     }
   }
 }
