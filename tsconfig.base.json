@@ -103,7 +103,10 @@
       "@site/home/ui": ["./libs/site/home/ui/src/index.ts"],
       "@site/home/seo": ["./libs/site/home/seo/src/index.ts"],
       "@site/home/feature": ["./libs/site/home/feature/src/index.ts"],
-      "@site/catalog/model": ["./libs/site/catalog/model/src/index.ts"]
+      "@site/catalog/model": ["./libs/site/catalog/model/src/index.ts"],
+      "@site/production/ui": ["./libs/site/production/ui/src/index.ts"],
+      "@site/production/seo": ["./libs/site/production/seo/src/index.ts"],
+      "@site/production/feature": ["./libs/site/production/feature/src/index.ts"]
     }
   }
 }

@@ -38,17 +38,17 @@ Replace the temporary first screen at `/uk` and `/ru` with the home page of the 
 
 ## File-role map
 
-| Path                                           | Role                                                                    |
-| ---------------------------------------------- | ----------------------------------------------------------------------- |
-| `apps/site/src/app/[locale]/page.tsx`          | route: locale check, `buildHomeMetadata`, `HomePage`                    |
-| `apps/site/public/assets/home/*.webp`          | photos of the «Імпульс» suit from the Angular storefront                |
-| `libs/site/home/feature/src/lib/home-page.tsx` | block order, links, JSON-LD                                             |
-| `libs/site/home/ui/src/lib/i18n`               | home text in `uk` and `ru`                                              |
-| `libs/site/home/ui/src/lib/layout`             | `HomeSection`: stitch label, `h2`, action link                          |
-| `libs/site/home/ui/src/lib/sections`           | one file per block                                                      |
-| `libs/site/home/seo/src/lib`                   | home title and description, `FAQPage` builder                           |
-| `libs/site/catalog/model/src/lib`              | fixed catalog sections for the mega menu, the footer, and the home page |
-| `libs/site/core/i18n/src/lib/site-paths.ts`    | locale-free page paths                                                  |
+| Path                                           | Role                                                                     |
+| ---------------------------------------------- | ------------------------------------------------------------------------ |
+| `apps/site/src/app/[locale]/page.tsx`          | route: locale check, `buildHomeMetadata`, `HomePage`                     |
+| `apps/site/public/assets/home/*.webp`          | photos of the «Імпульс» suit from the Angular storefront                 |
+| `libs/site/home/feature/src/lib/home-page.tsx` | block order, links, JSON-LD                                              |
+| `libs/site/home/ui/src/lib/i18n`               | home text in `uk` and `ru`                                               |
+| `libs/site/shared/ui/src/lib/page-section.tsx` | `PageSection` (was `HomeSection` until step 3): stitch label, `h2`, link |
+| `libs/site/home/ui/src/lib/sections`           | one file per block                                                       |
+| `libs/site/home/seo/src/lib`                   | home title and description, `FAQPage` builder                            |
+| `libs/site/catalog/model/src/lib`              | fixed catalog sections for the mega menu, the footer, and the home page  |
+| `libs/site/core/i18n/src/lib/site-paths.ts`    | locale-free page paths                                                   |
 
 ## Open questions
 

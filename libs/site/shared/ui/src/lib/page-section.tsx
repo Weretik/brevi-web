@@ -1,9 +1,11 @@
-import { StitchLabel, cn } from '@site/shared/ui';
 import Link from 'next/link';
+
+import { cn } from './cn';
+import { StitchLabel } from './stitch-label';
 
 import type { ReactNode } from 'react';
 
-type HomeSectionProps = {
+type PageSectionProps = {
   /** Anchor and the id the heading gets (`<id>-title`). */
   id: string;
   title: string;
@@ -15,8 +17,8 @@ type HomeSectionProps = {
   children: ReactNode;
 };
 
-/** A home page block: stitch label, `h2`, optional link, content. */
-export function HomeSection({ id, title, label, action, className, children }: HomeSectionProps) {
+/** A page block of the «Строчка» design: stitch label, `h2`, optional link, content. */
+export function PageSection({ id, title, label, action, className, children }: PageSectionProps) {
   const titleId = `${id}-title`;
 
   return (

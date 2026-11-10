@@ -30,11 +30,11 @@ libs/site/
 ├── home/feature/src/lib/home-page.tsx   # block order, links, JSON-LD
 ├── home/ui/src/lib/
 │   ├── i18n/home-dictionary.ts  # uk and ru text
-│   ├── layout/home-section.tsx  # stitch label, h2, action link
 │   └── sections/                # home-hero, home-catalog, home-logo, home-process,
 │                                # home-production, home-industries, home-contacts, home-seo-text
 ├── home/seo/src/lib/            # home-metadata, faq-json-ld
 ├── catalog/model/src/lib/catalog-sections.ts
+├── shared/ui/src/lib/page-section.tsx   # block frame: stitch label, h2, action link
 └── core/i18n/src/lib/site-paths.ts
 ```
 
