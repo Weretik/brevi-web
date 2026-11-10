@@ -137,7 +137,10 @@
       "@site/industries/feature": ["./libs/site/industries/feature/src/index.ts"],
       "@site/regions/ui": ["./libs/site/regions/ui/src/index.ts"],
       "@site/regions/seo": ["./libs/site/regions/seo/src/index.ts"],
-      "@site/regions/feature": ["./libs/site/regions/feature/src/index.ts"]
+      "@site/regions/feature": ["./libs/site/regions/feature/src/index.ts"],
+      "@site/agreement/ui": ["./libs/site/agreement/ui/src/index.ts"],
+      "@site/agreement/seo": ["./libs/site/agreement/seo/src/index.ts"],
+      "@site/agreement/feature": ["./libs/site/agreement/feature/src/index.ts"]
     }
   }
 }
