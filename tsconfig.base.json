@@ -115,7 +115,10 @@
       "@site/contacts/feature": ["./libs/site/contacts/feature/src/index.ts"],
       "@site/returns/ui": ["./libs/site/returns/ui/src/index.ts"],
       "@site/returns/seo": ["./libs/site/returns/seo/src/index.ts"],
-      "@site/returns/feature": ["./libs/site/returns/feature/src/index.ts"]
+      "@site/returns/feature": ["./libs/site/returns/feature/src/index.ts"],
+      "@site/works/ui": ["./libs/site/works/ui/src/index.ts"],
+      "@site/works/seo": ["./libs/site/works/seo/src/index.ts"],
+      "@site/works/feature": ["./libs/site/works/feature/src/index.ts"]
     }
   }
 }
