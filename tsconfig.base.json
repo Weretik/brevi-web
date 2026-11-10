@@ -125,7 +125,10 @@
       "@site/articles/model": ["./libs/site/articles/model/src/index.ts"],
       "@site/articles/ui": ["./libs/site/articles/ui/src/index.ts"],
       "@site/articles/seo": ["./libs/site/articles/seo/src/index.ts"],
-      "@site/articles/feature": ["./libs/site/articles/feature/src/index.ts"]
+      "@site/articles/feature": ["./libs/site/articles/feature/src/index.ts"],
+      "@site/logo-printing/ui": ["./libs/site/logo-printing/ui/src/index.ts"],
+      "@site/logo-printing/seo": ["./libs/site/logo-printing/seo/src/index.ts"],
+      "@site/logo-printing/feature": ["./libs/site/logo-printing/feature/src/index.ts"]
     }
   }
 }

@@ -16,6 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: SITE_PATHS.ourWork },
     { path: SITE_PATHS.certificates },
     { path: SITE_PATHS.articles },
+    { path: SITE_PATHS.logoPrinting },
     ...ARTICLES.map((article) => ({ path: articlePath(article.slug) })),
   ]);
 }
