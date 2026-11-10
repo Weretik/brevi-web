@@ -20,6 +20,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: SITE_PATHS.wholesale },
     { path: SITE_PATHS.industries },
     { path: SITE_PATHS.regions },
+    { path: SITE_PATHS.agreement },
     ...ARTICLES.map((article) => ({ path: articlePath(article.slug) })),
   ]);
 }
