@@ -128,7 +128,10 @@
       "@site/articles/feature": ["./libs/site/articles/feature/src/index.ts"],
       "@site/logo-printing/ui": ["./libs/site/logo-printing/ui/src/index.ts"],
       "@site/logo-printing/seo": ["./libs/site/logo-printing/seo/src/index.ts"],
-      "@site/logo-printing/feature": ["./libs/site/logo-printing/feature/src/index.ts"]
+      "@site/logo-printing/feature": ["./libs/site/logo-printing/feature/src/index.ts"],
+      "@site/wholesale/ui": ["./libs/site/wholesale/ui/src/index.ts"],
+      "@site/wholesale/seo": ["./libs/site/wholesale/seo/src/index.ts"],
+      "@site/wholesale/feature": ["./libs/site/wholesale/feature/src/index.ts"]
     }
   }
 }
