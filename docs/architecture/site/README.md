@@ -29,7 +29,7 @@ Arrows point from the consumer to the dependency.
 
 ## Projects
 
-Built: `site`, `site-core-config`, `site-core-i18n`, `site-core-seo`, `site-core-shell`, `site-shared-ui` ([shell](../../features/site/shell.md)); `site-home-{ui,seo,feature}` and `site-catalog-model` ([home page](../../features/site/home.md)); `site-production-{ui,seo,feature}` ([«Виробництво»](../../features/site/production.md)); `site-delivery-{ui,seo,feature}` ([«Доставка та оплата»](../../features/site/delivery.md)); `site-contacts-{ui,seo,feature}` ([«Контакти»](../../features/site/contacts.md)); `site-returns-{ui,seo,feature}` ([«Повернення та обмін»](../../features/site/returns.md)). The rest are planned.
+Built: `site`, `site-core-config`, `site-core-i18n`, `site-core-seo`, `site-core-shell`, `site-shared-ui` ([shell](../../features/site/shell.md)); `site-home-{ui,seo,feature}` and `site-catalog-model` ([home page](../../features/site/home.md)); `site-production-{ui,seo,feature}` ([«Виробництво»](../../features/site/production.md)); `site-delivery-{ui,seo,feature}` ([«Доставка та оплата»](../../features/site/delivery.md)); `site-contacts-{ui,seo,feature}` ([«Контакти»](../../features/site/contacts.md)); `site-returns-{ui,seo,feature}` ([«Повернення та обмін»](../../features/site/returns.md)); `site-works-{ui,seo,feature}` ([«Наші роботи»](../../features/site/works.md)). The rest are planned.
 
 | Project                                           | Role                                                                                                                 | Step |
 | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ---- |
