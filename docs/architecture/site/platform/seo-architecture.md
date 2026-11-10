@@ -32,26 +32,27 @@ Owner decision 2026-10-30: this scheme, not a one-to-one copy of the old URLs.
 
 ## URL and index policy
 
-| URL type                        | Example                                         | Index                 | Canonical                   | Sitemap   | Links                                |
-| ------------------------------- | ----------------------------------------------- | --------------------- | --------------------------- | --------- | ------------------------------------ |
-| Home                            | `/uk`                                           | yes                   | self                        | yes       | logo, footer                         |
-| Catalog root                    | `/uk/catalog`                                   | yes                   | self                        | yes       | menu «Каталог»                       |
-| Category or subcategory         | `/uk/catalog/{categorySlug}`                    | yes                   | self (page 1 without query) | yes       | mega menu, home, breadcrumbs, footer |
-| Category page 2+                | `?page=2`                                       | yes                   | self with `page`            | no        | pagination links                     |
-| Sort, filter combinations       | `?sort=price-asc`                               | no, `noindex, follow` | category                    | no        | `rel="nofollow"` on sort             |
-| Single-value filter landing     | whitelist only, decided per category            | whitelist             | self                        | whitelist | filter links                         |
-| Search                          | `/uk/search?q=…`                                | no, `noindex, follow` | —                           | no        | form only                            |
-| Product                         | `/uk/product/{productSlug}`                     | yes                   | self                        | yes       | listings, related products           |
-| Content (storefront `about-us`) | `/uk/about-company`, `/uk/delivery-and-payment` | yes                   | self                        | yes       | menu, footer                         |
-| Article                         | `/uk/articles/{slug}`                           | yes                   | self                        | yes       | articles list, category links        |
-| Contacts                        | `/uk/contacts`                                  | yes                   | self                        | yes       | header, footer                       |
-| Industries hub (new)            | `/uk/industries`                                | yes                   | self                        | yes       | menu «Галузі», footer                |
-| Industry landing (new)          | `/uk/industries/{slug}`                         | yes                   | self                        | yes       | home «Галузі», industries hub        |
-| Logo landing                    | `/uk/logo-printing`                             | yes                   | self                        | yes       | menu «Пошиття з логотипом»           |
-| Wholesale prices                | `/uk/order-in-bulk`                             | yes                   | self                        | yes       | menu «Ціни для опту»                 |
-| Region landing                  | `/uk/regions/{city}`                            | yes, with unique text | self                        | yes       | regions block in the footer          |
-| Request list, form, thanks      | `/uk/request`                                   | no                    | —                           | no        | `rel="nofollow"`                     |
-| 404                             | any unknown URL                                 | no                    | —                           | no        | —                                    |
+| URL type                        | Example                                         | Index                 | Canonical                   | Sitemap   | Links                                 |
+| ------------------------------- | ----------------------------------------------- | --------------------- | --------------------------- | --------- | ------------------------------------- |
+| Home                            | `/uk`                                           | yes                   | self                        | yes       | logo, footer                          |
+| Catalog root                    | `/uk/catalog`                                   | yes                   | self                        | yes       | menu «Каталог»                        |
+| Category or subcategory         | `/uk/catalog/{categorySlug}`                    | yes                   | self (page 1 without query) | yes       | mega menu, home, breadcrumbs, footer  |
+| Category page 2+                | `?page=2`                                       | yes                   | self with `page`            | no        | pagination links                      |
+| Sort, filter combinations       | `?sort=price-asc`                               | no, `noindex, follow` | category                    | no        | `rel="nofollow"` on sort              |
+| Single-value filter landing     | whitelist only, decided per category            | whitelist             | self                        | whitelist | filter links                          |
+| Search                          | `/uk/search?q=…`                                | no, `noindex, follow` | —                           | no        | form only                             |
+| Product                         | `/uk/product/{productSlug}`                     | yes                   | self                        | yes       | listings, related products            |
+| Content (storefront `about-us`) | `/uk/about-company`, `/uk/delivery-and-payment` | yes                   | self                        | yes       | menu, footer                          |
+| Article                         | `/uk/articles/{slug}`                           | yes                   | self                        | yes       | articles list, category links         |
+| Contacts                        | `/uk/contacts`                                  | yes                   | self                        | yes       | header, footer                        |
+| Industries hub (new)            | `/uk/industries`                                | yes                   | self                        | yes       | menu «Галузі», footer                 |
+| Industry landing (new)          | `/uk/industries/{slug}`                         | yes                   | self                        | yes       | home «Галузі», industries hub         |
+| Logo landing                    | `/uk/logo-printing`                             | yes                   | self                        | yes       | menu «Пошиття з логотипом»            |
+| Wholesale prices                | `/uk/order-in-bulk`                             | yes                   | self                        | yes       | menu «Ціни для опту»                  |
+| Regions page                    | `/uk/regions`                                   | yes                   | self                        | yes       | footer «Доставка по всій Україні»     |
+| City landing (not built)        | `/uk/regions/{city}`                            | only with unique text | self                        | yes       | added per city on Search Console data |
+| Request list, form, thanks      | `/uk/request`                                   | no                    | —                           | no        | `rel="nofollow"`                      |
+| 404                             | any unknown URL                                 | no                    | —                           | no        | —                                     |
 
 Content slugs follow the storefront route names (`libs/storefront/feature/*/lib.routes.ts`); the exact list is fixed in each step's SDD.
 

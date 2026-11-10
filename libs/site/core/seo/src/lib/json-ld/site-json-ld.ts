@@ -31,6 +31,7 @@ export function buildOrganizationJsonLd(
     email: COMPANY.email,
     telephone: salesPhone.e164,
     address: postalAddress(locale),
+    areaServed: { '@type': 'Country', name: COMPANY.address.countryCode },
     contactPoint: {
       '@type': 'ContactPoint',
       telephone: salesPhone.e164,

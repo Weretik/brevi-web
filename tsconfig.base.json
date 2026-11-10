@@ -134,7 +134,10 @@
       "@site/wholesale/feature": ["./libs/site/wholesale/feature/src/index.ts"],
       "@site/industries/ui": ["./libs/site/industries/ui/src/index.ts"],
       "@site/industries/seo": ["./libs/site/industries/seo/src/index.ts"],
-      "@site/industries/feature": ["./libs/site/industries/feature/src/index.ts"]
+      "@site/industries/feature": ["./libs/site/industries/feature/src/index.ts"],
+      "@site/regions/ui": ["./libs/site/regions/ui/src/index.ts"],
+      "@site/regions/seo": ["./libs/site/regions/seo/src/index.ts"],
+      "@site/regions/feature": ["./libs/site/regions/feature/src/index.ts"]
     }
   }
 }

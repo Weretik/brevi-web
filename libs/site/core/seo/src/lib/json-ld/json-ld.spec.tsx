@@ -36,6 +36,7 @@ describe('JSON-LD', () => {
         addressLocality: 'Полтава',
         addressCountry: 'UA',
       },
+      areaServed: { '@type': 'Country', name: 'UA' },
       contactPoint: { contactType: 'sales', availableLanguage: ['uk', 'ru'] },
     });
   });

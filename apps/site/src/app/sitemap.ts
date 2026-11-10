@@ -19,6 +19,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: SITE_PATHS.logoPrinting },
     { path: SITE_PATHS.wholesale },
     { path: SITE_PATHS.industries },
+    { path: SITE_PATHS.regions },
     ...ARTICLES.map((article) => ({ path: articlePath(article.slug) })),
   ]);
 }

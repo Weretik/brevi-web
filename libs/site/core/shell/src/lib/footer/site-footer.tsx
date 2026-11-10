@@ -96,6 +96,12 @@ export function SiteFooter({
           <p className="font-mono text-xs font-semibold tracking-wider text-brand-soft uppercase">
             {dictionary.vat}
           </p>
+          <Link
+            href={localizedPath(locale, SHELL_PATHS.regions)}
+            className="justify-self-start font-bold text-primary-foreground hover:text-brand-soft"
+          >
+            {dictionary.deliveryAll} <span aria-hidden>→</span>
+          </Link>
         </div>
         {columns.map((column) => (
           <nav key={column.title} aria-label={column.title}>
