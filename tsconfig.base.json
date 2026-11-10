@@ -121,7 +121,11 @@
       "@site/works/feature": ["./libs/site/works/feature/src/index.ts"],
       "@site/certificates/ui": ["./libs/site/certificates/ui/src/index.ts"],
       "@site/certificates/seo": ["./libs/site/certificates/seo/src/index.ts"],
-      "@site/certificates/feature": ["./libs/site/certificates/feature/src/index.ts"]
+      "@site/certificates/feature": ["./libs/site/certificates/feature/src/index.ts"],
+      "@site/articles/model": ["./libs/site/articles/model/src/index.ts"],
+      "@site/articles/ui": ["./libs/site/articles/ui/src/index.ts"],
+      "@site/articles/seo": ["./libs/site/articles/seo/src/index.ts"],
+      "@site/articles/feature": ["./libs/site/articles/feature/src/index.ts"]
     }
   }
 }

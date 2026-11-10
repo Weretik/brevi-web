@@ -1,3 +1,5 @@
+import { ARTICLES } from '@site/articles/model';
+import { articlePath } from '@site/articles/seo';
 import { SITE_PATHS } from '@site/core/i18n';
 import { buildSitemapEntries } from '@site/core/seo';
 
@@ -13,5 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: SITE_PATHS.returnsExchanges },
     { path: SITE_PATHS.ourWork },
     { path: SITE_PATHS.certificates },
+    { path: SITE_PATHS.articles },
+    ...ARTICLES.map((article) => ({ path: articlePath(article.slug) })),
   ]);
 }
