@@ -29,7 +29,7 @@ describe('JSON-LD', () => {
       '@id': 'https://brevi.com.ua/#organization',
       url: 'https://brevi.com.ua/ru',
       logo: 'https://brevi.com.ua/assets/logo/brevi-logo-dark.png',
-      telephone: '+380503075554',
+      telephone: '+380504698675',
       address: {
         streetAddress: 'ул. Кагамлыка, 3А',
         addressLocality: 'Полтава',
@@ -50,7 +50,7 @@ describe('JSON-LD', () => {
   it('describes the workshop with both phones and opening hours', () => {
     expect(buildLocalBusinessJsonLd('uk', config)).toMatchObject({
       '@type': 'LocalBusiness',
-      telephone: ['+380503075554', '+380532671109'],
+      telephone: ['+380504698675', '+380532671109'],
       address: { streetAddress: 'вул. Кагамлика, 3А' },
       openingHoursSpecification: {
         dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],

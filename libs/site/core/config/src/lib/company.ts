@@ -34,7 +34,7 @@ export const COMPANY = {
   email: 'pp.brevi@gmail.com',
   /** The sales phone first: it is the header button and the `ContactPoint`. */
   phones: [
-    { e164: '+380503075554', display: '050 307 55 54' },
+    { e164: '+380504698675', display: '050 469 86 75' },
     { e164: '+380532671109', display: '0532 67 11 09' },
   ] as readonly [CompanyPhone, CompanyPhone],
   address: {

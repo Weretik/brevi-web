@@ -20,9 +20,9 @@ describe('SiteShell', () => {
     );
     expect(
       within(header)
-        .getByRole('link', { name: /050 307 55 54/ })
+        .getByRole('link', { name: /050 469 86 75/ })
         .getAttribute('href'),
-    ).toBe('tel:+380503075554');
+    ).toBe('tel:+380504698675');
     expect(within(footer).getByRole('link', { name: '0532 67 11 09' }).getAttribute('href')).toBe(
       'tel:+380532671109',
     );
