@@ -48,6 +48,16 @@ export const COMPANY = {
     closes: '18:00',
     label: { uk: 'Пн–Пт 9:00–18:00', ru: 'Пн–Пт 9:00–18:00' },
   } as CompanyOpeningHours,
+  /** Payment details from the live «Доставка та оплата» page. */
+  bankDetails: {
+    recipient: {
+      uk: 'Приватне підприємство «Бреві»',
+      ru: 'Частное предприятие «Бреви»',
+    } as Localized,
+    edrpou: '35521636',
+    iban: 'UA63 305299 00000 26004041206862',
+    bank: { uk: 'АТ КБ «ПриватБанк»', ru: 'АО КБ «ПриватБанк»' } as Localized,
+  },
   /** The networks the live site lists; addresses are not known yet. */
   socials: [
     { key: 'instagram', label: 'Instagram', url: null },

@@ -1,0 +1,7 @@
+{
+  "name": "site-delivery-ui",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/site/delivery/ui/src",
+  "projectType": "library",
+  "tags": ["scope:site", "domain:delivery", "type:ui"]
+}
