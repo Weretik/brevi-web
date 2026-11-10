@@ -106,7 +106,10 @@
       "@site/catalog/model": ["./libs/site/catalog/model/src/index.ts"],
       "@site/production/ui": ["./libs/site/production/ui/src/index.ts"],
       "@site/production/seo": ["./libs/site/production/seo/src/index.ts"],
-      "@site/production/feature": ["./libs/site/production/feature/src/index.ts"]
+      "@site/production/feature": ["./libs/site/production/feature/src/index.ts"],
+      "@site/delivery/ui": ["./libs/site/delivery/ui/src/index.ts"],
+      "@site/delivery/seo": ["./libs/site/delivery/seo/src/index.ts"],
+      "@site/delivery/feature": ["./libs/site/delivery/feature/src/index.ts"]
     }
   }
 }
