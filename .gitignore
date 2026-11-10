@@ -56,3 +56,12 @@ Thumbs.db
 vitest.config.*.timestamp*
 
 vite.config.*.timestamp*
+
+# Next.js
+.next
+.open-next
+.wrangler
+out
+.vitest
+apps/site/next-env.d.ts
+apps/site/tsconfig.tsbuildinfo

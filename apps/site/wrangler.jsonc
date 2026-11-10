@@ -1,0 +1,30 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  // Worker of the public Next.js site; brevi.com.ua stays on the old site until the domain cutover.
+  "name": "brevi-site",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS",
+  },
+  "services": [
+    {
+      // Lets the Worker call itself (OpenNext); must match "name".
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "brevi-site",
+    },
+  ],
+  // next/image optimization through Cloudflare Images (free tier: 5000 unique transformations a month).
+  "images": {
+    "binding": "IMAGES",
+  },
+  "observability": {
+    "enabled": true,
+  },
+  // Environment variables and secrets live in the Cloudflare dashboard; deploys must not wipe them.
+  "keep_vars": true,
+  // esbuild keepNames adds __name() calls that break functions serialized into inline scripts.
+  "keep_names": false,
+}

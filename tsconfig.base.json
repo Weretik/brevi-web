@@ -93,7 +93,13 @@
       "@admin/leads/model": ["libs/admin/leads/model/src/index.ts"],
       "@admin/leads/data-access": ["libs/admin/leads/data-access/src/index.ts"],
       "@admin/leads/ui": ["libs/admin/leads/ui/src/index.ts"],
-      "@admin/leads/feature": ["libs/admin/leads/feature/src/index.ts"]
+      "@admin/leads/feature": ["libs/admin/leads/feature/src/index.ts"],
+      "@site/core/config": ["./libs/site/core/config/src/index.ts"],
+      "@site/core/i18n": ["./libs/site/core/i18n/src/index.ts"],
+      "@site/core/seo": ["./libs/site/core/seo/src/index.ts"],
+      "@site/core/shell": ["./libs/site/core/shell/src/index.ts"],
+      "@site/core/shell/error": ["./libs/site/core/shell/src/error.ts"],
+      "@site/shared/ui": ["./libs/site/shared/ui/src/index.ts"]
     }
   }
 }

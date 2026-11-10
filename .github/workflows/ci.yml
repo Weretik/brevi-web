@@ -25,3 +25,7 @@ jobs:
       - run: npm run test:web
       - run: npx nx build admin-react --configuration=production
       - run: npx nx build storefront --configuration=production
+      - run: npm run lint:site
+      - run: npx nx run site:typecheck
+      - run: npm run test:site
+      - run: npx nx build site

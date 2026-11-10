@@ -9,7 +9,7 @@ Brevi Web holds the Brevi Admin (React, staff manage the catalogue, reference da
 ## Project context
 
 - [Frontend inventory](docs/architecture/frontend-inventory.md) — applications, tools, and available Nx targets.
-- Application architecture: [Admin React](docs/architecture/admin/README.md), [Storefront Angular](docs/architecture/storefront/README.md) (unfinished, not deployed), and [Site Next.js](docs/architecture/site/README.md) (planned public site replacing `brevi.com.ua` by the [migration plan](docs/specs/site/migration/README.md); new public-site work goes here).
+- Application architecture: [Admin React](docs/architecture/admin/README.md), [Storefront Angular](docs/architecture/storefront/README.md) (unfinished, not deployed), and [Site Next.js](docs/architecture/site/README.md) (new public site in `apps/site`, built page by page, replacing `brevi.com.ua` by the [migration plan](docs/specs/site/migration/README.md); new public-site work goes here).
 - [Implemented feature map](docs/features/README.md) — separate Admin and Storefront descriptions with routes, boundaries, and code.
 - Admin look and page patterns: [design system «Цех»](docs/standards/admin/design-system.md); every new Admin feature follows it.
 - [Standards index](docs/standards/README.md) — stable rules for code, UI, API, testing, security, and delivery.
@@ -28,13 +28,14 @@ For a new or substantially changed feature, update the [feature map](docs/featur
 
 ## Commands
 
-| Purpose                         | Command                                                        | Cost |
-| ------------------------------- | -------------------------------------------------------------- | ---- |
-| Focused tests of one Nx project | `npx nx test <project> -- <file-path-filter>`                  | fast |
-| Lint or typecheck one project   | `npx nx lint <project>`, `npx nx typecheck <project>`          | fast |
-| Documentation links             | `npm run docs:check`                                           | fast |
-| Backend contract snapshot       | `npm run contracts:check`                                      | fast |
-| List projects and targets       | `npx nx show projects`, `npx nx show project <project> --json` | fast |
+| Purpose                         | Command                                                               | Cost |
+| ------------------------------- | --------------------------------------------------------------------- | ---- |
+| Focused tests of one Nx project | `npx nx test <project> -- <file-path-filter>`                         | fast |
+| Lint or typecheck one project   | `npx nx lint <project>`, `npx nx typecheck <project>`                 | fast |
+| Site tests, lint, typecheck     | `npm run test:site`, `npm run lint:site`, `npx nx run site:typecheck` | fast |
+| Documentation links             | `npm run docs:check`                                                  | fast |
+| Backend contract snapshot       | `npm run contracts:check`                                             | fast |
+| List projects and targets       | `npx nx show projects`, `npx nx show project <project> --json`        | fast |
 
 Do not run `run-many`, full `npm run test:web`, coverage, production builds, or E2E (`admin-react-e2e`) unless the user asks; CI runs them. A small fix that restores documented behavior needs no SDD, file-role map, or audit: fix it, run the focused test, and describe the change briefly.
 

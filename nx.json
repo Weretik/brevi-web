@@ -76,7 +76,14 @@
       },
       "library": {
         "style": "css",
-        "linter": "none"
+        "linter": "none",
+        "unitTestRunner": "vitest"
+      }
+    },
+    "@nx/next": {
+      "application": {
+        "style": "css",
+        "linter": "eslint"
       }
     }
   },
@@ -127,6 +134,8 @@
         "apps/admin-react/**/*",
         "apps/admin-react-e2e/**/*",
         "apps/storefront/**/*",
+        "apps/site/**/*",
+        "libs/site/**/*",
         "libs/shared/config/**/*",
         "libs/shared/data-access/**/*",
         "libs/shared/http/**/*",
@@ -146,6 +155,17 @@
         "libs/storefront/ui/**/*",
         "libs/storefront/util/**/*"
       ]
+    },
+    {
+      "plugin": "@nx/next/plugin",
+      "options": {
+        "startTargetName": "start",
+        "buildTargetName": "build",
+        "devTargetName": "dev",
+        "serveStaticTargetName": "serve-static",
+        "buildDepsTargetName": "build-deps",
+        "watchDepsTargetName": "watch-deps"
+      }
     }
   ],
   "affected": {

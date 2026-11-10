@@ -1,8 +1,8 @@
 # Site architecture (Next.js public site)
 
-**Code:** `apps/site` and `libs/site/*` (planned; not created yet)
-**Status:** target architecture only. The new site is rebuilt from the Angular [Storefront](../storefront/README.md) (unfinished, not deployed) with data from BreviERP. The domain `brevi.com.ua` still serves the old OpenCart site.
-**Checked:** 2026-10-30 against the storefront code and the [migration plan](../../specs/site/migration/README.md).
+**Code:** `apps/site` and `libs/site/*`
+**Status:** step 1 (shell) is built; the remaining rows below are the target. The new site is rebuilt from the Angular [Storefront](../storefront/README.md) (unfinished, not deployed) with data from BreviERP. The domain `brevi.com.ua` still serves the old OpenCart site.
+**Checked:** 2026-11-10 against `apps/site`, `libs/site`, the storefront code and the [migration plan](../../specs/site/migration/README.md).
 
 ## Purpose and boundary
 
@@ -27,7 +27,9 @@ apps/site/src/proxy.ts  (/ -> 308 to /uk, old brevi.com.ua URLs -> 301 by the re
 
 Arrows point from the consumer to the dependency.
 
-## Planned projects
+## Projects
+
+Built in step 1: `site`, `site-core-config`, `site-core-i18n`, `site-core-seo`, `site-core-shell`, `site-shared-ui` ([feature card](../../features/site/shell.md)). The rest are planned.
 
 | Project                                           | Role                                                                                                                 | Step |
 | ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ---- |
@@ -37,7 +39,7 @@ Arrows point from the consumer to the dependency.
 | `site-core-seo`                                   | Metadata, alternates, robots, sitemap, and JSON-LD builders, plus a `JsonLd` component                               | 1    |
 | `site-core-shell`                                 | Header with the catalog mega menu, footer, language switch, request counter                                          | 1    |
 | `site-shared-ui`                                  | shadcn/ui primitives in the «Строчка» theme, stitch divider, numbered callouts                                       | 1    |
-| `site-shared-api-client`                          | Server-only typed `fetch` over the BreviERP public API                                                               | 1    |
+| `site-shared-api-client`                          | Server-only typed `fetch` over the BreviERP public API; created with its first consumer                              | 3    |
 | `site-catalog-{model,data-access,ui,seo,feature}` | Category tree, listings, URL model, price tiers, product cards, Breadcrumb and ItemList JSON-LD                      | 3–4  |
 | `site-home-{ui,seo,feature}`                      | Home blocks, price calculator island, home metadata                                                                  | 3    |
 | `site-product-{model,data-access,ui,seo,feature}` | Product page, gallery with callouts, size and quantity input, Product JSON-LD                                        | 5    |
@@ -60,6 +62,7 @@ Data comes only from `libs/site/shared/api-client` and the domain `data-access`.
 ## Where to read more
 
 - [SEO architecture](platform/seo-architecture.md): URL and index policy, locales, structured data, sitemaps, and redirects.
+- [Hosting](platform/hosting.md): Cloudflare Worker `brevi-site`, build and deploy targets, cache, and environment variables.
 - [ADR-0001](adr/0001-nextjs-public-site.md): why Next.js replaces the Angular storefront.
 - Standards: [SEO rules](../../standards/site/seo-rules.md) and [design system](../../standards/site/design-system.md).
 - [Migration plan](../../specs/site/migration/README.md) and the [page inventory with SEO analysis](../../specs/site/migration/feature-inventory.md).

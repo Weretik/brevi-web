@@ -1,0 +1,36 @@
+{
+  "name": "site",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/site/src",
+  "projectType": "application",
+  "tags": ["scope:site", "type:app"],
+  "targets": {
+    "typecheck": {
+      "command": "next typegen && tsc --noEmit -p tsconfig.json",
+      "options": {
+        "cwd": "apps/site"
+      },
+      "cache": true,
+      "inputs": ["default", "^production"]
+    },
+    "build-cloudflare": {
+      "command": "opennextjs-cloudflare build",
+      "options": {
+        "cwd": "apps/site"
+      }
+    },
+    "preview-cloudflare": {
+      "command": "opennextjs-cloudflare preview",
+      "options": {
+        "cwd": "apps/site"
+      },
+      "dependsOn": ["build-cloudflare"]
+    },
+    "deploy-cloudflare": {
+      "command": "opennextjs-cloudflare deploy",
+      "options": {
+        "cwd": "apps/site"
+      }
+    }
+  }
+}

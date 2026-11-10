@@ -4,6 +4,8 @@ This index contains SDD requirements and tasks. The [implemented feature map](..
 
 The Storefront currently has README files for its Nx feature libraries, but they are not SDDs: [home](../../libs/storefront/feature/home/README.md), [catalog](../../libs/storefront/feature/catalog/README.md), [contacts](../../libs/storefront/feature/contacts/README.md), [about-us](../../libs/storefront/feature/about-us/README.md), [order-in-bulk](../../libs/storefront/feature/order-in-bulk/order-in-bulk/README.md), and [regions](../../libs/storefront/feature/regions/regions/README.md). See their verified architecture map in [Storefront](../features/README.md#storefront-angular-appsstorefront).
 
+- [Site Next.js: migration plan](site/migration/README.md) — step 1 done.
+- [Site Next.js: shell — layout, header, footer (migration step 1)](site/shell/001-site-shell/README.md) — implemented and locally verified 2026-11-10.
 - [Admin: product list](admin/products/README.md)
 - [Admin: template migration](admin/migration/README.md)
 - [Admin React: shell and corporate theme](admin/shell/001-react-admin-shell-theme/README.md)
