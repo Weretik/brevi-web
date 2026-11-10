@@ -20,6 +20,11 @@ export const SITE_PATHS = {
   request: '/request',
 } as const;
 
+/** Locale-free path of a product page: `/product/<slug>`. */
+export function catalogProductPath(slug: string): string {
+  return `/product/${slug}`;
+}
+
 /** Locale-free path of a catalog category: `/catalog/<slug>`. Every level of the tree has a flat URL. */
 export function catalogCategoryPath(slug: string): string {
   return `${SITE_PATHS.catalog}/${slug}`;

@@ -1,13 +1,16 @@
 import { ARTICLES } from '@site/articles/model';
 import { articlePath } from '@site/articles/seo';
+import { getCatalogProductSlugs } from '@site/catalog/data-access';
 import { flattenCatalogTree } from '@site/catalog/model';
-import { SITE_PATHS, catalogCategoryPath } from '@site/core/i18n';
+import { SITE_PATHS, catalogCategoryPath, catalogProductPath } from '@site/core/i18n';
 import { buildSitemapEntries } from '@site/core/seo';
 
 import type { MetadataRoute } from 'next';
 
 /** Pages in both languages with `hreflang` alternates. Each migrated page adds its own entry. */
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const products = await getCatalogProductSlugs();
+
   return buildSitemapEntries([
     { path: '/' },
     { path: SITE_PATHS.production },
@@ -24,6 +27,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: SITE_PATHS.agreement },
     { path: SITE_PATHS.catalog },
     ...flattenCatalogTree().map((category) => ({ path: catalogCategoryPath(category.slug) })),
+    ...products.map((slug) => ({ path: catalogProductPath(slug) })),
     ...ARTICLES.map((article) => ({ path: articlePath(article.slug) })),
   ]);
 }

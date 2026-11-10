@@ -1,5 +1,6 @@
 import { getCatalogCategoryProducts } from '@site/catalog/data-access';
 import { findCatalogPath } from '@site/catalog/model';
+import { buildCatalogItemListJsonLd } from '@site/catalog/seo';
 import {
   CatalogOrder,
   CatalogProductGrid,
@@ -8,7 +9,12 @@ import {
   formatModelCount,
   getCatalogDictionary,
 } from '@site/catalog/ui';
-import { SITE_PATHS, catalogCategoryPath, localizedPath } from '@site/core/i18n';
+import {
+  SITE_PATHS,
+  catalogCategoryPath,
+  catalogProductPath,
+  localizedPath,
+} from '@site/core/i18n';
 import { JsonLd, buildBreadcrumbJsonLd } from '@site/core/seo';
 import { PageHeader, PageSection } from '@site/shared/ui';
 
@@ -30,6 +36,7 @@ export async function CatalogCategoryPage({
   const products = await getCatalogCategoryProducts(category);
   const path = (key: keyof typeof SITE_PATHS) => localizedPath(locale, SITE_PATHS[key]);
   const categoryHref = (slug: string) => localizedPath(locale, catalogCategoryPath(slug));
+  const productHref = (slug: string) => localizedPath(locale, catalogProductPath(slug));
   const trail = findCatalogPath(category.slug) ?? [];
   const children = trail.at(-1)?.children ?? [];
   const breadcrumbs = [
@@ -65,6 +72,7 @@ export async function CatalogCategoryPage({
           products={products}
           dictionary={dictionary.products}
           requestHref={path('request')}
+          productHref={productHref}
         />
       </section>
 
@@ -87,6 +95,14 @@ export async function CatalogCategoryPage({
         wholesaleHref={path('wholesale')}
       />
 
+      <JsonLd
+        data={buildCatalogItemListJsonLd(
+          products.map((product) => ({
+            name: product.name[locale],
+            path: productHref(product.slug),
+          })),
+        )}
+      />
       <JsonLd
         data={buildBreadcrumbJsonLd(
           breadcrumbs.map((item) => ({ name: item.name, path: item.href })),

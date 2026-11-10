@@ -9,26 +9,29 @@ import type { Locale } from '@site/core/i18n';
 const EAGER_CARDS = 4;
 
 /**
- * Listing of a category: a photo on white and the model name. There is no price and no product page yet,
- * so the only action of a card is «Дізнатися ціну», which opens the request page.
+ * Listing of products: a photo on white and the model name, and the whole card opens the product page
+ * (the name is the link). There is no price, so the second action is «Дізнатися ціну» to the request page.
  */
 export function CatalogProductGrid({
   locale,
   products,
   dictionary,
   requestHref,
+  productHref,
 }: {
   locale: Locale;
   products: readonly CatalogProductCard[];
   dictionary: CatalogDictionary['products'];
   requestHref: string;
+  /** Localized link of a product page by its slug. */
+  productHref: (slug: string) => string;
 }) {
   return (
     <ul className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
       {products.map((product, index) => (
         <li
           key={product.slug}
-          className="flex flex-col overflow-hidden rounded-xl border border-border bg-background"
+          className="relative flex flex-col overflow-hidden rounded-xl border border-border bg-background hover:border-border-strong"
         >
           <div className="flex aspect-[4/5] items-center justify-center bg-white p-3">
             {product.image ? (
@@ -46,12 +49,19 @@ export function CatalogProductGrid({
             )}
           </div>
           <div className="flex flex-1 flex-col gap-2 border-t p-3 sm:p-4">
-            <h3 className="text-[0.9375rem] leading-snug font-bold">{product.name[locale]}</h3>
+            <h3 className="text-[0.9375rem] leading-snug font-bold">
+              <Link
+                href={productHref(product.slug)}
+                className="after:absolute after:inset-0 hover:text-brand-text hover:underline"
+              >
+                {product.name[locale]}
+              </Link>
+            </h3>
             <Link
               href={requestHref}
               rel="nofollow"
               aria-label={`${dictionary.askPrice}: ${product.name[locale]}`}
-              className="mt-auto inline-flex min-h-11 items-center text-sm font-bold text-brand-text hover:underline"
+              className="relative z-10 mt-auto inline-flex min-h-11 items-center text-sm font-bold text-brand-text hover:underline"
             >
               {dictionary.askPrice} <span aria-hidden>&nbsp;→</span>
             </Link>
