@@ -1,4 +1,4 @@
-import type { JsonLdData } from '@site/core/seo';
+import type { JsonLdData } from './json-ld';
 
 /** `FAQPage` for the questions that are visible on the page, in the same order and wording. */
 export function buildFaqPageJsonLd(

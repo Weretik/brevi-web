@@ -11,11 +11,10 @@ It shows no prices and has no form (owner decision 2026-11-10): the price calcul
 ```mermaid
 flowchart LR
   Route["apps/site: [locale]/page.tsx"] --> Feature["site-home-feature: HomePage"]
-  Route --> HomeSeo["site-home-seo: metadata, FAQPage"]
+  Route --> HomeSeo["site-home-seo: metadata"]
   Feature --> Ui["site-home-ui: blocks, dictionary"]
-  Feature --> HomeSeo
   Feature --> Model["site-catalog-model: sections"]
-  Feature --> Seo["site-core-seo: JsonLd, WebSite, LocalBusiness"]
+  Feature --> Seo["site-core-seo: JsonLd, WebSite, LocalBusiness, FAQPage"]
   Ui --> Shared["site-shared-ui"]
   Ui --> Config["site-core-config: COMPANY"]
 ```
@@ -32,7 +31,7 @@ libs/site/
 │   ├── i18n/home-dictionary.ts  # uk and ru text
 │   └── sections/                # home-hero, home-catalog, home-logo, home-process,
 │                                # home-production, home-industries, home-contacts, home-seo-text
-├── home/seo/src/lib/            # home-metadata, faq-json-ld
+├── home/seo/src/lib/            # home-metadata
 ├── catalog/model/src/lib/catalog-sections.ts
 ├── shared/ui/src/lib/page-section.tsx   # block frame: stitch label, h2, action link
 └── core/i18n/src/lib/site-paths.ts

@@ -56,7 +56,7 @@ libs/site/
 ├── core/seo/src/lib/
 │   ├── metadata/             # root and page metadata, alternates, robots meta
 │   ├── crawling/             # robots.txt and sitemap builders
-│   └── json-ld/              # JsonLd, Organization, WebSite, LocalBusiness
+│   └── json-ld/              # JsonLd, Organization, WebSite, LocalBusiness, BreadcrumbList, FAQPage
 ├── core/shell/src/lib/
 │   ├── site-shell.tsx        # page frame
 │   ├── header/               # site-header, catalog-menu, catalog-section-icon, show-when-stuck

@@ -1,6 +1,5 @@
 import { LOCALES } from '@site/core/i18n';
 
-import { buildFaqPageJsonLd } from './faq-json-ld';
 import { HOME_SEO_TEXT, buildHomeMetadata } from './home-metadata';
 
 describe('home metadata', () => {
@@ -23,28 +22,5 @@ describe('home metadata', () => {
       expect(description.length).toBeGreaterThanOrEqual(110);
       expect(description.length).toBeLessThanOrEqual(165);
     }
-  });
-});
-
-describe('FAQ structured data', () => {
-  it('maps the visible questions into FAQPage in order', () => {
-    const data = buildFaqPageJsonLd([
-      { question: 'Яка мінімальна партія?', answer: 'Від 5 штук.' },
-      { question: 'Які терміни?', answer: 'Від 20 днів.' },
-    ]);
-
-    expect(data['@type']).toBe('FAQPage');
-    expect(data['mainEntity']).toEqual([
-      {
-        '@type': 'Question',
-        name: 'Яка мінімальна партія?',
-        acceptedAnswer: { '@type': 'Answer', text: 'Від 5 штук.' },
-      },
-      {
-        '@type': 'Question',
-        name: 'Які терміни?',
-        acceptedAnswer: { '@type': 'Answer', text: 'Від 20 днів.' },
-      },
-    ]);
   });
 });

@@ -4,7 +4,7 @@ SEO builders of `apps/site`. Decisions are in the [SEO architecture](../../../..
 
 - `metadata/` — `buildRootMetadata`, `buildPageMetadata`, `buildLanguageAlternates`, `buildCanonicalPath`, `buildRobotsMeta`.
 - `crawling/` — `buildRobotsFile`, `buildSitemapEntries`.
-- `json-ld/` — `JsonLd`, `buildOrganizationJsonLd`, `buildWebSiteJsonLd`, `buildLocalBusinessJsonLd`, `buildBreadcrumbJsonLd`.
+- `json-ld/` — `JsonLd`, `buildOrganizationJsonLd`, `buildWebSiteJsonLd`, `buildLocalBusinessJsonLd`, `buildBreadcrumbJsonLd`, `buildFaqPageJsonLd`.
 
 Depends only on `@site/core/config` and `@site/core/i18n`.
 

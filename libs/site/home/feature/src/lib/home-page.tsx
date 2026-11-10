@@ -1,7 +1,11 @@
 import { CATALOG_SECTIONS } from '@site/catalog/model';
 import { SITE_PATHS, localizedPath } from '@site/core/i18n';
-import { JsonLd, buildLocalBusinessJsonLd, buildWebSiteJsonLd } from '@site/core/seo';
-import { buildFaqPageJsonLd } from '@site/home/seo';
+import {
+  JsonLd,
+  buildFaqPageJsonLd,
+  buildLocalBusinessJsonLd,
+  buildWebSiteJsonLd,
+} from '@site/core/seo';
 import {
   HomeCatalog,
   HomeContacts,
