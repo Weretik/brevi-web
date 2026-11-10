@@ -112,7 +112,10 @@
       "@site/delivery/feature": ["./libs/site/delivery/feature/src/index.ts"],
       "@site/contacts/ui": ["./libs/site/contacts/ui/src/index.ts"],
       "@site/contacts/seo": ["./libs/site/contacts/seo/src/index.ts"],
-      "@site/contacts/feature": ["./libs/site/contacts/feature/src/index.ts"]
+      "@site/contacts/feature": ["./libs/site/contacts/feature/src/index.ts"],
+      "@site/returns/ui": ["./libs/site/returns/ui/src/index.ts"],
+      "@site/returns/seo": ["./libs/site/returns/seo/src/index.ts"],
+      "@site/returns/feature": ["./libs/site/returns/feature/src/index.ts"]
     }
   }
 }
