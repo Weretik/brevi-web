@@ -113,6 +113,8 @@ export interface FabricStockFabricChoice {
 export interface FabricStockChoices {
   fabrics: FabricStockFabricChoice[];
   suppliers: { id: number; name: string }[];
+  /** Active colours of «Кольори»; a new stock line takes one of them. */
+  colors: string[];
 }
 
 export interface CreateFabricMovementBody {

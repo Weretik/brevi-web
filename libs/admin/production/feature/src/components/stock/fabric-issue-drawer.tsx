@@ -10,11 +10,12 @@ interface Props {
   modelName: string;
   fabric: ProductionItemFabric;
   fabrics: readonly FabricStockFabricChoice[];
+  colors: readonly string[];
   onClose: () => void;
   onSaved: (message: string) => void;
 }
 
-export function FabricIssueDrawer({ modelName, fabric, fabrics, onClose, onSaved }: Props) {
+export function FabricIssueDrawer({ modelName, fabric, fabrics, colors, onClose, onSaved }: Props) {
   const issue = useFabricIssue(fabric, fabrics, onSaved);
   return (
     <ReferenceEditorDrawer
@@ -38,6 +39,7 @@ export function FabricIssueDrawer({ modelName, fabric, fabrics, onClose, onSaved
           errors={issue.errors}
           fabric={fabric}
           fabrics={fabrics}
+          colors={colors}
           itemFabricId={issue.itemFabricId}
           disabled={issue.saving}
           onChange={issue.change}

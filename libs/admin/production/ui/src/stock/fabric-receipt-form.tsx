@@ -1,6 +1,7 @@
-import { FABRIC_STOCK_COLOR_MAX_LENGTH } from '@admin/production/model';
 import { ReferenceFormSection } from '@admin/references/ui';
 import { Autocomplete, MenuItem, Stack, TextField } from '@mui/material';
+
+import { ProductionColorField } from '../colors/production-color-field';
 
 import type {
   FabricReceiptErrors,
@@ -72,15 +73,15 @@ export function FabricReceiptForm({
             />
           )}
         />
-        <TextField
+        <ProductionColorField
           label="Колір"
           required
+          colors={choices.colors}
           value={values.color}
           disabled={disabled || fixedLine}
-          error={Boolean(errors.color)}
-          helperText={errors.color}
-          slotProps={{ htmlInput: { maxLength: FABRIC_STOCK_COLOR_MAX_LENGTH } }}
-          onChange={(event) => set({ color: event.target.value })}
+          error={errors.color}
+          helperText={fixedLine ? undefined : 'З довідника «Кольори».'}
+          onChange={(color) => set({ color })}
         />
       </ReferenceFormSection>
       <ReferenceFormSection title="Рух">

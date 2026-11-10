@@ -41,6 +41,7 @@ The Storefront currently has README files for its Nx feature libraries, but they
 - [Admin React: additional reference tables and pages](admin/references/011-additional-references-pages/README.md), replaced by [pricing parameters](admin/references/015-pricing-parameters-sheet/README.md)
 - [Admin React: fabrics and accessories — Calculator sheet fields and «Цех» pages](admin/references/013-fabrics-accessories-sheet/README.md) — implemented 2026-11-02.
 - [Admin React: operations — Calculator sheet fields and a «Цех» page](admin/references/014-operations-sheet/README.md) — implemented 2026-11-02.
+- [Admin React: «Кольори» tab and colours picked from the list in the workshop](admin/references/019-fabric-colors/README.md) — implemented 2026-11-11.
 - [Admin React: Telegram reminders](admin/reminders/001-telegram-reminders/README.md) — implemented and locally verified 2026-11-01.
 - [Admin React: «Швейний цех» stage 1](admin/production/001-workshop-references/README.md) — implemented 2026-11-04.
 - [Admin React: «Швейний цех» stage 2, «Виробничі завдання»](admin/production/002-production-orders/README.md) — implemented 2026-11-04.

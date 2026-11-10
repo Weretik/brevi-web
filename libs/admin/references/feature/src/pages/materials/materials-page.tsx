@@ -1,16 +1,17 @@
 import { Tab, Tabs } from '@mui/material';
 import { useSearchParams } from 'react-router-dom';
 
+import { FabricColorsContent } from './fabric-colors-content';
 import { FabricsContent } from './fabrics-content';
 import { GarmentAccessoriesContent } from './garment-accessories-content';
 
-export type MaterialsTab = 'fabrics' | 'accessories';
+export type MaterialsTab = 'fabrics' | 'accessories' | 'colors';
 
 export function materialsTabOf(value: string | null): MaterialsTab {
-  return value === 'accessories' ? 'accessories' : 'fabrics';
+  return value === 'accessories' || value === 'colors' ? value : 'fabrics';
 }
 
-/** One page for the Calculator's two material sheets, switched by `?tab=`. */
+/** One page for the material sheets and their colours list, switched by `?tab=`. */
 export function MaterialsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const tab = materialsTabOf(searchParams.get('tab'));
@@ -25,8 +26,10 @@ export function MaterialsPage() {
     >
       <Tab value="fabrics" label="Тканини" />
       <Tab value="accessories" label="Фурнітура" />
+      <Tab value="colors" label="Кольори" />
     </Tabs>
   );
+  if (tab === 'colors') return <FabricColorsContent tabs={tabs} />;
   return tab === 'fabrics' ? (
     <FabricsContent tabs={tabs} />
   ) : (

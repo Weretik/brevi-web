@@ -54,6 +54,7 @@ export function ProductionItemFabricSection({ orderId, item, onMessage }: Props)
           modelName={item.modelName}
           fabric={data}
           fabrics={choices.data.fabrics}
+          colors={choices.data.colors}
           onClose={() => setIssuing(false)}
           onSaved={(message) => {
             setIssuing(false);

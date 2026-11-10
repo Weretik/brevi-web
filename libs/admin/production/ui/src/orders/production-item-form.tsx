@@ -8,6 +8,7 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import { Box, Button, IconButton, Stack, TextField, Tooltip, Typography } from '@mui/material';
 
 import { ProductionItemApplications } from './production-item-applications';
+import { ProductionColorField } from '../colors/production-color-field';
 
 import type { EmbroideryPicker } from './production-item-applications';
 import type {
@@ -21,6 +22,8 @@ interface Props {
   idPrefix: string;
   values: ProductionItemFormValues;
   errors: ProductionItemErrors;
+  /** Active colours of «Кольори»: the main and additional colours are picked only from them. */
+  colors: readonly string[];
   /**
    * The workshop norm of the model; shows the planned fabric. Undefined when the page does not
    * know it (the server recounts the plan on save).
@@ -39,6 +42,7 @@ export function ProductionItemForm({
   idPrefix,
   values,
   errors,
+  colors,
   norm,
   withRate,
   disabled = false,
@@ -83,25 +87,26 @@ export function ProductionItemForm({
           onChange={(event) => set('dueDate', event.target.value)}
         />
       </Box>
-      <TextField
+      <ProductionColorField
         id={`${idPrefix}-color`}
         label="Основний колір"
         required
         disabled={disabled}
+        colors={colors}
         value={values.mainColor}
-        error={Boolean(errors.mainColor)}
-        helperText={errors.mainColor}
-        onChange={(event) => set('mainColor', event.target.value)}
+        error={errors.mainColor}
+        helperText="З довідника «Кольори»."
+        onChange={(color) => set('mainColor', color)}
       />
       {values.additionalColors.map((color, index) => (
         <Stack key={index} direction="row" sx={{ gap: 1, alignItems: 'center' }}>
-          <TextField
+          <ProductionColorField
             id={`${idPrefix}-color-${index + 1}`}
             label={`Додатковий колір ${index + 1}`}
-            fullWidth
             disabled={disabled}
+            colors={colors}
             value={color}
-            onChange={(event) => setColor(index, event.target.value)}
+            onChange={(next) => setColor(index, next)}
           />
           <Tooltip title="Прибрати колір">
             <span>

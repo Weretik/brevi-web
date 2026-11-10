@@ -136,8 +136,13 @@ export function mapFabricStockChoices(value: unknown): FabricStockChoices {
         name: nonEmptyText(x['name'], 'постачальник'),
       };
     }),
+    colors: productionColors(row['colors']),
   };
 }
+
+/** Colour names of «Кольори» as the workshop endpoints give them. */
+export const productionColors = (value: unknown): string[] =>
+  list(value, 'кольори').map((item) => nonEmptyText(item, 'колір'));
 
 const planPart = (value: unknown): FabricPlanPart => {
   const row = record(value, 'план позиції');
