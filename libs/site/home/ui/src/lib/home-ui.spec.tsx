@@ -40,12 +40,20 @@ describe('HomeHero', () => {
 
 describe('HomeCatalog', () => {
   it('renders every catalog section as a link in the page language', () => {
-    render(<HomeCatalog locale="ru" sections={CATALOG_SECTIONS} catalogHref="/ru/catalog" />);
+    render(
+      <HomeCatalog
+        locale="ru"
+        sections={CATALOG_SECTIONS}
+        categoryHref={(slug) => `/ru/catalog/${slug}`}
+      />,
+    );
 
     const links = screen.getAllByRole('link');
     expect(links).toHaveLength(CATALOG_SECTIONS.length);
-    expect(links.every((link) => link.getAttribute('href') === '/ru/catalog')).toBe(true);
-    expect(screen.getByText('Летняя спецодежда')).toBeTruthy();
+    expect(links.map((link) => link.getAttribute('href'))).toEqual(
+      CATALOG_SECTIONS.map((section) => `/ru/catalog/${section.slug}`),
+    );
+    expect(screen.getByText(CATALOG_SECTIONS[0].label.ru)).toBeTruthy();
   });
 });
 

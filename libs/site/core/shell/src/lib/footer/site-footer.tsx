@@ -1,6 +1,6 @@
 import { CATALOG_SECTIONS } from '@site/catalog/model';
 import { COMPANY } from '@site/core/config';
-import { localizedPath } from '@site/core/i18n';
+import { catalogCategoryPath, localizedPath } from '@site/core/i18n';
 import { Button } from '@site/shared/ui';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -41,10 +41,9 @@ export function SiteFooter({
   const columns: FooterColumn[] = [
     {
       title: dictionary.links.catalog,
-      // Category slugs arrive with the BreviERP category tree; until then every section opens the catalog root.
       links: CATALOG_SECTIONS.map((section) => ({
         key: section.key,
-        href: localizedPath(locale, SHELL_PATHS.catalog),
+        href: localizedPath(locale, catalogCategoryPath(section.slug)),
         label: section.label[locale],
       })),
     },

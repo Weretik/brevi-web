@@ -1,7 +1,7 @@
 'use client';
 
 import { CATALOG_SECTIONS } from '@site/catalog/model';
-import { localizedPath } from '@site/core/i18n';
+import { catalogCategoryPath, localizedPath } from '@site/core/i18n';
 import { cn } from '@site/shared/ui';
 import { ChevronDownIcon, ChevronRightIcon, LayoutGridIcon } from 'lucide-react';
 import Link from 'next/link';
@@ -34,8 +34,8 @@ export function CatalogMenu({
   const close = useCallback(() => setOpen(false), []);
   useDismiss(rootRef, open, close);
 
-  // Category slugs arrive with the BreviERP category tree; until then every entry opens the catalog root.
   const catalogHref = localizedPath(locale, SHELL_PATHS.catalog);
+  const categoryHref = (slug: string) => localizedPath(locale, catalogCategoryPath(slug));
 
   return (
     <div ref={rootRef}>
@@ -123,7 +123,7 @@ export function CatalogMenu({
                   {section.label[locale]}
                 </p>
                 <Link
-                  href={catalogHref}
+                  href={categoryHref(section.slug)}
                   onClick={close}
                   aria-label={`${dictionary.sectionAll}: ${section.label[locale]}`}
                   className="font-bold text-brand-text hover:underline"
@@ -135,7 +135,7 @@ export function CatalogMenu({
                 {section.items.map((item) => (
                   <li key={item.key} className="border-b border-border">
                     <Link
-                      href={catalogHref}
+                      href={categoryHref(item.slug)}
                       onClick={close}
                       className="flex items-center justify-between gap-3 py-3 font-semibold hover:text-brand-text"
                     >

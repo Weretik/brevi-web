@@ -9,7 +9,7 @@ Every page under `/uk` and `/ru` is rendered inside `SiteShell`: a skip link, th
 - **Phones and tablets (below 1024 px).** The header keeps the logo and the language toggle. The bar fixed to the bottom has «Каталог» and «Меню» (side sheets, rendered only while open), «Заявка», and «Дзвінок».
 - **Footer.** Call band with the phone and «Залишити заявку»; brand; catalog, buyer, and company links; contacts with the map link; social network names without links until the owner gives the addresses; legal name and ЄДРПОУ. Column titles are plain text, not headings.
 
-The shell reads no API: company facts come from `COMPANY`, catalog sections from a fixed list taken from the Angular storefront. Until BreviERP gives category slugs, every catalog entry opens `/catalog`. There is no search field until the catalog page exists.
+The shell reads no API: company facts come from `COMPANY`, catalog sections from the category tree in `site-catalog-model`, and every catalog entry opens its [category page](catalog.md). There is no search field until the catalog page exists.
 
 `/` redirects to `/uk`. Unknown paths under a locale get a 404 inside the frame; paths without a locale get a bare two-language 404. Indexing is off unless `SITE_ENV=production` and `SITE_INDEXING=true`.
 

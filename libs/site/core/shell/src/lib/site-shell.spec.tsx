@@ -1,3 +1,4 @@
+import { CATALOG_SECTIONS } from '@site/catalog/model';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 
 import { SiteShell } from './site-shell';
@@ -77,17 +78,22 @@ describe('SiteShell', () => {
     const toggle = within(screen.getByRole('banner')).getByRole('button', { name: 'Каталог' });
     const panel = document.getElementById(toggle.getAttribute('aria-controls') ?? '');
     expect(panel?.hidden).toBe(true);
-    expect(panel?.querySelectorAll('a[href="/uk/catalog"]').length).toBeGreaterThan(30);
+    expect(panel?.querySelectorAll('a[href^="/uk/catalog/"]').length).toBeGreaterThan(30);
 
     fireEvent.click(toggle);
     expect(toggle.getAttribute('aria-expanded')).toBe('true');
     const menu = screen.getByRole('region', { name: 'Розділи каталогу' });
-    expect(within(menu).getByRole('link', { name: 'Костюми робочі літні' })).toBeTruthy();
-    expect(within(menu).queryByRole('link', { name: 'Теніски-поло' })).toBeNull();
+    const [first, second] = CATALOG_SECTIONS.filter((section) => section.items.length > 0);
+    const firstItem = first.items[0];
+    const secondItem = second.items[0];
+    expect(within(menu).getByRole('link', { name: firstItem.label.uk }).getAttribute('href')).toBe(
+      `/uk/catalog/${firstItem.slug}`,
+    );
+    expect(within(menu).queryByRole('link', { name: secondItem.label.uk })).toBeNull();
 
-    fireEvent.click(within(menu).getByRole('button', { name: 'Трикотаж' }));
-    expect(within(menu).getByRole('link', { name: 'Теніски-поло' })).toBeTruthy();
-    expect(within(menu).queryByRole('link', { name: 'Костюми робочі літні' })).toBeNull();
+    fireEvent.click(within(menu).getByRole('button', { name: second.label.uk }));
+    expect(within(menu).getByRole('link', { name: secondItem.label.uk })).toBeTruthy();
+    expect(within(menu).queryByRole('link', { name: firstItem.label.uk })).toBeNull();
     expect(
       within(menu)
         .getByRole('link', { name: /Дізнатися умови/ })
@@ -126,7 +132,9 @@ describe('SiteShell', () => {
     fireEvent.click(within(bar).getByRole('button', { name: 'Каталог' }));
     const catalog = screen.getByRole('dialog');
     expect(within(catalog).getByText('Захист рук')).toBeTruthy();
-    expect(within(catalog).getAllByRole('link', { name: 'Усі товари розділу' }).length).toBe(8);
+    expect(within(catalog).getAllByRole('link', { name: 'Усі товари розділу' }).length).toBe(
+      CATALOG_SECTIONS.length,
+    );
     fireEvent.click(within(catalog).getByRole('button', { name: 'Закрити меню' }));
 
     fireEvent.click(screen.getByRole('button', { name: 'Відкрити меню' }));

@@ -2,7 +2,7 @@
 
 import { CATALOG_SECTIONS } from '@site/catalog/model';
 import { COMPANY } from '@site/core/config';
-import { localizedPath } from '@site/core/i18n';
+import { catalogCategoryPath, localizedPath } from '@site/core/i18n';
 import {
   Sheet,
   SheetClose,
@@ -72,7 +72,10 @@ export function MobileBar({ locale, dictionary }: { locale: Locale; dictionary: 
                   <ul className="grid pt-1 pr-5 pb-3 pl-14 text-[0.9375rem]">
                     <li>
                       <SheetClose asChild>
-                        <Link href={catalogHref} className="block py-2 font-bold text-brand-text">
+                        <Link
+                          href={localizedPath(locale, catalogCategoryPath(section.slug))}
+                          className="block py-2 font-bold text-brand-text"
+                        >
                           {dictionary.sectionAll}
                         </Link>
                       </SheetClose>
@@ -80,7 +83,10 @@ export function MobileBar({ locale, dictionary }: { locale: Locale; dictionary: 
                     {section.items.map((item) => (
                       <li key={item.key}>
                         <SheetClose asChild>
-                          <Link href={catalogHref} className="block py-2">
+                          <Link
+                            href={localizedPath(locale, catalogCategoryPath(item.slug))}
+                            className="block py-2"
+                          >
                             {item.label[locale]}
                           </Link>
                         </SheetClose>

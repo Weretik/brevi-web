@@ -144,7 +144,11 @@
       "@site/request/model": ["./libs/site/request/model/src/index.ts"],
       "@site/request/ui": ["./libs/site/request/ui/src/index.ts"],
       "@site/request/seo": ["./libs/site/request/seo/src/index.ts"],
-      "@site/request/feature": ["./libs/site/request/feature/src/index.ts"]
+      "@site/request/feature": ["./libs/site/request/feature/src/index.ts"],
+      "@site/catalog/data-access": ["./libs/site/catalog/data-access/src/index.ts"],
+      "@site/catalog/ui": ["./libs/site/catalog/ui/src/index.ts"],
+      "@site/catalog/seo": ["./libs/site/catalog/seo/src/index.ts"],
+      "@site/catalog/feature": ["./libs/site/catalog/feature/src/index.ts"]
     }
   }
 }

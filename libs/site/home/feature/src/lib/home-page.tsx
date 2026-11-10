@@ -1,5 +1,5 @@
 import { CATALOG_SECTIONS } from '@site/catalog/model';
-import { SITE_PATHS, localizedPath } from '@site/core/i18n';
+import { SITE_PATHS, catalogCategoryPath, localizedPath } from '@site/core/i18n';
 import {
   JsonLd,
   buildFaqPageJsonLd,
@@ -45,7 +45,11 @@ export function HomePage({ locale }: { locale: Locale }) {
         label={{ index: '02', text: dictionary.catalog.label }}
         action={{ href: catalogHref, label: dictionary.catalog.all }}
       >
-        <HomeCatalog locale={locale} sections={CATALOG_SECTIONS} catalogHref={catalogHref} />
+        <HomeCatalog
+          locale={locale}
+          sections={CATALOG_SECTIONS}
+          categoryHref={(slug) => localizedPath(locale, catalogCategoryPath(slug))}
+        />
       </PageSection>
 
       <HomeLogo dictionary={dictionary.logo} moreHref={path('logoPrinting')} />
