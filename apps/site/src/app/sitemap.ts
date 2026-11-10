@@ -9,5 +9,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/' },
     { path: SITE_PATHS.production },
     { path: SITE_PATHS.deliveryAndPayment },
+    { path: SITE_PATHS.contacts },
   ]);
 }

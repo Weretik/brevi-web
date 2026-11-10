@@ -59,4 +59,4 @@ Short check under the staged structure check in the [delivery rules](../../../..
 | Facts in one place          | Phones and bank details only in `COMPANY`; delivery cost only in the dictionary.                     |
 | Generator leftovers         | Removed sample components, CSS modules, and `.babelrc`.                                              |
 
-Note for later: the page heads of «Виробництво» and «Доставка та оплата» share the same breadcrumbs, label, and `h1` markup. When the third content page needs it, move it to `site-shared-ui` as `PageHeader`.
+Update (contacts step): the page head moved to `site-shared-ui` as `PageHeader`; «Доставка та оплата» and «Контакти» use it.

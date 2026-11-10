@@ -5,6 +5,7 @@ Presentation primitives of `apps/site` in the «Строчка» theme: shadcn/u
 - `Button`, `buttonVariants` — graphite main action, outlined and ghost variants, 44 px tall.
 - `Sheet*` — side panel on Radix Dialog, used by the mobile menu.
 - `StitchLabel` — the signature number, dashed seam, and mono caption («01 — ШИЄМО САМІ»).
+- `PageHeader` — head of a content page: breadcrumbs, stitch label, `h1`, lead.
 - `PageSection` — page block frame: stitch label, `h2`, action link.
 - `Breadcrumbs` — breadcrumb trail; the last item is the current page.
 - `cn` — class name merge.

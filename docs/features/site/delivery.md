@@ -27,7 +27,7 @@ libs/site/
 ├── delivery/feature/src/lib/delivery-page.tsx   # block order, links, JSON-LD
 ├── delivery/ui/src/lib/
 │   ├── i18n/delivery-dictionary.ts              # uk and ru text
-│   └── sections/                                # delivery-hero, -options, -payment, -contact
+│   └── sections/                                # delivery-options, -payment, -contact
 ├── delivery/seo/src/lib/delivery-metadata.ts
 └── core/config/src/lib/company.ts               # bankDetails
 ```

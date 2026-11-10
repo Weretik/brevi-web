@@ -2,12 +2,11 @@ import { SITE_PATHS, localizedPath } from '@site/core/i18n';
 import { JsonLd, buildBreadcrumbJsonLd } from '@site/core/seo';
 import {
   DeliveryContact,
-  DeliveryHero,
   DeliveryOptions,
   DeliveryPayment,
   getDeliveryDictionary,
 } from '@site/delivery/ui';
-import { PageSection } from '@site/shared/ui';
+import { PageHeader, PageSection } from '@site/shared/ui';
 
 import type { Locale } from '@site/core/i18n';
 
@@ -24,7 +23,13 @@ export function DeliveryPage({ locale }: { locale: Locale }) {
 
   return (
     <div className="grid gap-14 pb-4 sm:gap-16">
-      <DeliveryHero dictionary={dictionary} breadcrumbs={breadcrumbs} />
+      <PageHeader
+        breadcrumbs={breadcrumbs}
+        breadcrumbsLabel={dictionary.breadcrumbsLabel}
+        label={dictionary.label}
+        title={dictionary.title}
+        lead={dictionary.lead}
+      />
 
       <PageSection
         id="delivery"
