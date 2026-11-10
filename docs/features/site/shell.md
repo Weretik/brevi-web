@@ -33,7 +33,7 @@ apps/site/
         ├── robots.ts, sitemap.ts, manifest.ts
         └── [locale]/
             ├── layout.tsx    # html, SiteShell, Organization JSON-LD
-            ├── page.tsx      # temporary first screen until the home step
+            ├── page.tsx      # home page, see the home card
             ├── not-found.tsx, error.tsx
             └── [...rest]/page.tsx # unknown path -> framed 404
 ```
@@ -55,7 +55,7 @@ libs/site/
 │   ├── header/               # top-line, site-header, catalog-menu, header-actions, mobile-menu
 │   ├── footer/site-footer.tsx
 │   ├── controls/             # locale-switch, nav-link
-│   ├── navigation/           # SHELL_PATHS, menu and footer links, catalog sections
+│   ├── navigation/           # SHELL_PATHS (= SITE_PATHS of core/i18n), menu and footer links
 │   ├── i18n/shell-dictionary.ts
 │   └── not-found/, error/    # 404 and 500 views
 └── shared/ui/src/lib/        # button, sheet, stitch-label, cn

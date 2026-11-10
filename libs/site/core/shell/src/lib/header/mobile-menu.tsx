@@ -1,5 +1,6 @@
 'use client';
 
+import { CATALOG_SECTIONS } from '@site/catalog/model';
 import { COMPANY } from '@site/core/config';
 import { localizedPath } from '@site/core/i18n';
 import {
@@ -14,7 +15,6 @@ import {
 import { MenuIcon } from 'lucide-react';
 import Link from 'next/link';
 
-import { CATALOG_SECTIONS } from '../navigation/catalog-sections';
 import { MAIN_NAV_LINKS, SHELL_PATHS } from '../navigation/site-navigation';
 
 import type { ShellDictionary } from '../i18n/shell-dictionary';

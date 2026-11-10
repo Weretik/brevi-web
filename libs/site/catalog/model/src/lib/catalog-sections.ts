@@ -9,7 +9,7 @@ export type CatalogSection = {
 };
 
 /**
- * Catalog sections of the header mega menu and the footer, taken from the Angular storefront menu.
+ * Catalog sections of the header mega menu, the footer, and the home page, taken from the Angular storefront menu.
  * Fixed until the catalog step reads the category tree from BreviERP; category slugs come with that tree.
  */
 export const CATALOG_SECTIONS: readonly CatalogSection[] = [

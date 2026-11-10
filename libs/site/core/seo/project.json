@@ -3,5 +3,5 @@
   "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/site/core/seo/src",
   "projectType": "library",
-  "tags": ["scope:site", "type:core"]
+  "tags": ["scope:site", "type:util"]
 }
