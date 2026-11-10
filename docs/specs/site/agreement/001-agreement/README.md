@@ -11,7 +11,7 @@ Build the page at `/uk/agreement` and `/ru/agreement`; the footer already links 
 
 ## Decision on the edition
 
-The offer is carried over clause by clause without edits. It already covers an order through the order form, by phone, e-mail, or messengers (clauses 1.8.2, 1.8.3, 1.9.3), so it is valid for the new site. Clauses that mention the «Кошик» form and payment through LiqPay (1.4, 1.8.1, 1.9.1, 1.9.2, 5.10.5, 6.6, 6.7) describe functions the new site does not have; they stay until the client's lawyer gives a new edition. A legal text is not rewritten in code review.
+The offer is carried over clause by clause. Owner's decision of 2026-11-10: the new site takes no orders through a cart and no online payment, so the clauses about the «Кошик» form and LiqPay are removed. Old clauses 1.8.1, 1.9.1, 1.9.2 and 6.7 are deleted and the following clauses renumbered (1.8.2–1.8.3 became 1.8.1–1.8.2, 1.9.3 became 1.9.1 and now also names the order form, 6.8–6.11 became 6.7–6.10); clauses 1.4, 5.10.5 and 6.6 lost only the cart and payment-system wording. Payment stays by bank transfer on an invoice. The client's lawyer may still give a new edition.
 
 Two technical corrections only: clause number `4..1.1` reads `4.1.1`; in the Russian version clause 4.3.3, glued to 4.3.2 on the live page, is a separate clause as in the Ukrainian one.
 

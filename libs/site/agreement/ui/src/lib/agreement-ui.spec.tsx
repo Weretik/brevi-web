@@ -41,7 +41,7 @@ describe('agreement blocks', () => {
 
     expect(screen.getByRole('heading', { level: 2 }).textContent).toBe(`01${section.title}`);
     expect(screen.getAllByRole('listitem')).toHaveLength(section.clauses.length);
-    expect(screen.getByText('1.9.3.')).toBeTruthy();
+    expect(screen.getByText('1.9.1.')).toBeTruthy();
   });
 
   it('shows the seller details with the site phone only', () => {
