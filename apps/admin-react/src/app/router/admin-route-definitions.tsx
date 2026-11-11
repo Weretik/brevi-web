@@ -23,7 +23,7 @@ import { useCanSeePurchaseInvoices } from './use-can-see-purchase-invoices';
 import { useContentProductsViewer } from './use-content-products-viewer';
 import { useDashboardViewer } from './use-dashboard-viewer';
 import { useEmbroideryViewer } from './use-embroidery-viewer';
-import { useLeadStatsViewer, useLeadViewer } from './use-lead-viewer';
+import { useLeadStatsViewer, useLeadViewer, useSiteRequestViewer } from './use-lead-viewer';
 import { useProductionOrderActor } from './use-production-order-actor';
 import { useQuoteActor } from './use-quote-actor';
 import { useQuoteSupplierCard } from './use-quote-supplier-card';
@@ -45,7 +45,7 @@ export const adminRouteDefinitions = [
     useSupplierCard: useQuoteSupplierCard,
     workshopCard: QuoteProductionOrders,
   }),
-  ...createLeadsRoutes({ useLeadViewer, useLeadStatsViewer }),
+  ...createLeadsRoutes({ useLeadViewer, useLeadStatsViewer, useSiteRequestViewer }),
   ...productsRoutes,
   ...remindersRoutes,
   ...mediaRoutes,

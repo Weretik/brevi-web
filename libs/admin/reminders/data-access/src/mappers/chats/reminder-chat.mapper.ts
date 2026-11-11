@@ -22,6 +22,8 @@ export function mapReminderChat(value: unknown): ReminderChat {
     displayName: nullableText(row['displayName'], 'назва в адмінці'),
     isApproved: flag(row['isApproved'], 'підтверджено'),
     isBotMember: flag(row['isBotMember'], 'бот у чаті'),
+    // Missing before LEAD-002 is deployed: the chat does not get site requests yet.
+    receivesSiteRequests: row['receivesSiteRequests'] === true,
     discoveredAt: dateTime(row['discoveredAt'], 'знайдено'),
   };
 }

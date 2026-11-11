@@ -3,6 +3,7 @@ export {
   REQUEST_ATTACHMENT_MAX_BYTES,
   REQUEST_FIELD_LIMITS,
   REQUEST_FORM_IDLE,
+  REQUEST_TRAP_FIELD,
 } from './lib/request-form';
 export type {
   RequestField,

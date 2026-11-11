@@ -48,5 +48,6 @@ export const chatResponse = {
   displayName: null,
   isApproved: false,
   isBotMember: true,
+  receivesSiteRequests: true,
   discoveredAt: '2026-11-01T10:00:00+00:00',
 };

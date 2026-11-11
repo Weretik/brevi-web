@@ -14,6 +14,7 @@ const defaults: Readonly<Record<string, Readonly<Record<string, readonly AccessA
     'desk-workshop': V,
     'desk-seo': V,
     leads: VE,
+    'site-requests': VE,
     'lead-stats': VCE,
     quotes: VCE,
     'quote-settings': VE,
@@ -57,6 +58,7 @@ const defaults: Readonly<Record<string, Readonly<Record<string, readonly AccessA
   Manager: {
     'desk-sales': V,
     leads: VE,
+    'site-requests': VE,
     quotes: VCE,
     embroidery: VE,
     tasks: VE,
