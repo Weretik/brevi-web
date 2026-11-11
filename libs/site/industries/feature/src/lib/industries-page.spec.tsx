@@ -6,6 +6,7 @@ import { IndustriesPage } from './industries-page';
 vi.mock('@site/settings/data-access', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   loadSiteCompany: async () => (await import('@site/core/config')).COMPANY,
+  loadSitePageText: async () => undefined,
 }));
 
 describe('IndustriesPage', () => {
@@ -52,7 +53,7 @@ describe('IndustriesPage', () => {
     expect(breadcrumbs.itemListElement[1].item).toBe('https://brevi.com.ua/uk/industries');
     expect(faq['@type']).toBe('FAQPage');
     expect(faq.mainEntity.map((item: { name: string }) => item.name)).toEqual(
-      dictionary.faq.items.map((item) => item.title),
+      dictionary.faq.items.map((item) => item.question),
     );
   });
 });

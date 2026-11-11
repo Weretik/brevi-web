@@ -2,6 +2,7 @@ import { isLocale } from '@site/core/i18n';
 import { ReturnsPage } from '@site/returns/feature';
 import { buildReturnsMetadata } from '@site/returns/seo';
 import { sitePageMetadata } from '@site/settings/data-access';
+import { SitePageTextSection } from '@site/settings/feature';
 import { notFound } from 'next/navigation';
 
 import type { Metadata } from 'next';
@@ -19,5 +20,10 @@ export default async function Page({ params }: PageProps<'/[locale]/returns-exch
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
-  return <ReturnsPage locale={locale} />;
+  return (
+    <>
+      <ReturnsPage locale={locale} />
+      <SitePageTextSection pageKey="returnsExchanges" locale={locale} />
+    </>
+  );
 }

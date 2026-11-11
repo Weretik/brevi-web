@@ -2,6 +2,7 @@ import { isLocale } from '@site/core/i18n';
 import { LogoPrintingPage } from '@site/logo-printing/feature';
 import { buildLogoPrintingMetadata } from '@site/logo-printing/seo';
 import { sitePageMetadata } from '@site/settings/data-access';
+import { SitePageTextSection } from '@site/settings/feature';
 import { notFound } from 'next/navigation';
 
 import type { Metadata } from 'next';
@@ -19,5 +20,10 @@ export default async function Page({ params }: PageProps<'/[locale]/logo-printin
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
-  return <LogoPrintingPage locale={locale} />;
+  return (
+    <>
+      <LogoPrintingPage locale={locale} />
+      <SitePageTextSection pageKey="logoPrinting" locale={locale} />
+    </>
+  );
 }

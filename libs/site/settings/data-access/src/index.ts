@@ -1,7 +1,12 @@
 export { withPageText } from './lib/page-text-metadata';
 export { sitePageMetadata, withSiteSharePicture } from './lib/site-metadata';
-export { SITE_PAGES_CACHE_TAG, loadSitePageTexts, mapSitePageTexts } from './lib/site-pages-loader';
-export type { SitePageText, SitePageTexts } from './lib/site-pages-loader';
+export {
+  SITE_PAGES_CACHE_TAG,
+  loadSitePageText,
+  loadSitePageTexts,
+  mapSitePageTexts,
+} from './lib/site-pages-loader';
+export type { SiteFaqItem, SitePageText, SitePageTexts } from './lib/site-pages-loader';
 export {
   EMPTY_SITE_SETTINGS,
   SITE_SETTINGS_CACHE_TAG,

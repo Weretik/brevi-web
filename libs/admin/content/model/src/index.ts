@@ -192,6 +192,7 @@ export type {
   SeoSettingsFormValues,
 } from './validators/seo-settings/seo-settings-validation';
 export type {
+  SiteFaqItem,
   SitePage,
   SitePageInput,
   SitePageText,
@@ -207,6 +208,7 @@ export {
 export type {
   SitePageErrors,
   SitePageFormValues,
+  SitePageTextValues,
 } from './validators/site-pages/site-page-validation';
 export {
   seoAreaLabels,

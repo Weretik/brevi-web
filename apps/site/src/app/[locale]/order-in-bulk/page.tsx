@@ -1,5 +1,6 @@
 import { isLocale } from '@site/core/i18n';
 import { sitePageMetadata } from '@site/settings/data-access';
+import { SitePageTextSection } from '@site/settings/feature';
 import { WholesalePage } from '@site/wholesale/feature';
 import { buildWholesaleMetadata } from '@site/wholesale/seo';
 import { notFound } from 'next/navigation';
@@ -19,5 +20,10 @@ export default async function Page({ params }: PageProps<'/[locale]/order-in-bul
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
-  return <WholesalePage locale={locale} />;
+  return (
+    <>
+      <WholesalePage locale={locale} />
+      <SitePageTextSection pageKey="wholesale" locale={locale} />
+    </>
+  );
 }

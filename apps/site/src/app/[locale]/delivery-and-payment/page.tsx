@@ -2,6 +2,7 @@ import { isLocale } from '@site/core/i18n';
 import { DeliveryPage } from '@site/delivery/feature';
 import { buildDeliveryMetadata } from '@site/delivery/seo';
 import { sitePageMetadata } from '@site/settings/data-access';
+import { SitePageTextSection } from '@site/settings/feature';
 import { notFound } from 'next/navigation';
 
 import type { Metadata } from 'next';
@@ -19,5 +20,10 @@ export default async function Page({ params }: PageProps<'/[locale]/delivery-and
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
-  return <DeliveryPage locale={locale} />;
+  return (
+    <>
+      <DeliveryPage locale={locale} />
+      <SitePageTextSection pageKey="deliveryAndPayment" locale={locale} />
+    </>
+  );
 }

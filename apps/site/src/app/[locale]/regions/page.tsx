@@ -2,6 +2,7 @@ import { isLocale } from '@site/core/i18n';
 import { RegionsPage } from '@site/regions/feature';
 import { buildRegionsMetadata } from '@site/regions/seo';
 import { sitePageMetadata } from '@site/settings/data-access';
+import { SitePageTextSection } from '@site/settings/feature';
 import { notFound } from 'next/navigation';
 
 import type { Metadata } from 'next';
@@ -17,5 +18,10 @@ export default async function Page({ params }: PageProps<'/[locale]/regions'>) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
-  return <RegionsPage locale={locale} />;
+  return (
+    <>
+      <RegionsPage locale={locale} />
+      <SitePageTextSection pageKey="regions" locale={locale} />
+    </>
+  );
 }
