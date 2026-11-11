@@ -6,5 +6,5 @@ test('serves the Ukrainian Admin application shell', async ({ page }) => {
   await expect(page).toHaveTitle('Brevi Admin');
   await expect(page.locator('html')).toHaveAttribute('lang', 'uk');
   await expect(page.locator('#root')).toBeAttached();
-  await expect(page.getByRole('main')).toContainText('Огляд виробництва');
+  await expect(page.getByRole('main')).toContainText('Робочий стіл');
 });

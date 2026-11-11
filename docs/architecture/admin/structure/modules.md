@@ -13,7 +13,7 @@ in [domains.md](domains.md).
 | Products     | `libs/admin/products/{model,data-access,ui,feature}`   | Product model, API, presentation, and scenarios   |
 | References   | `libs/admin/references/{model,data-access,ui,feature}` | Admin reference data                              |
 | Clients      | `libs/admin/clients/{model,data-access,ui,feature}`    | Customers, quotes, documents, and custom sewing   |
-| Dashboard    | `libs/admin/dashboard/feature`                         | Overview page on `/` (demo data for now)          |
+| Dashboard    | `libs/admin/dashboard/feature`                         | «Робочий стіл» on `/`: desks by role              |
 | Admin shared | `libs/admin/shared/{api-client,config,contracts}`      | API transport, configuration, and Admin contracts |
 
 The route list in `apps/admin-react/src/app/router/admin-route-definitions.tsx`

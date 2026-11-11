@@ -1,12 +1,10 @@
 import type { WorkshopDashboard } from '@admin/production/model';
 import type { QuoteSummary } from '@admin/quotes/model';
 
-/** What the signed-in person may see on the overview; the app decides it from the session roles. */
+/** What the signed-in person may see on «Робочий стіл»; the app answers from «Права доступу». */
 export interface DashboardViewer {
-  /** «Виробничі завдання»: Admin, Manager, the head of the workshop. */
-  seesWorkshop: boolean;
-  /** КП: Admin and Manager. */
-  seesQuotes: boolean;
+  /** View right on a page of «Права доступу», e.g. `desk-workshop` or `fabric-booking`. */
+  canSee: (page: string) => boolean;
 }
 
 export type StatusTone = 'success' | 'warning' | 'error' | 'info';

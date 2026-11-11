@@ -22,7 +22,7 @@ test('garment parts opens directly and from the legacy menu', async ({ page }) =
   await page.goBack();
   await expect(page.getByRole('tab', { name: 'Групи деталей' })).toBeVisible();
   await page.goForward();
-  await expect(page.getByRole('heading', { name: 'Огляд виробництва' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: /^Робочий стіл/ })).toBeVisible();
   await page.goBack();
   await page.setViewportSize({ width: 320, height: 720 });
   await page.getByRole('button', { name: 'Відкрити меню навігації' }).click();
