@@ -7,6 +7,19 @@ const meters = new Intl.NumberFormat('uk-UA', {
 export const formatMeters = (value: number | null) =>
   value === null ? '—' : `${meters.format(value)} м`;
 
+const perProduct = new Intl.NumberFormat('uk-UA', {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 3,
+});
+
+/** Metres per product to thousandths: «2,167 м». */
+export const formatPerProduct = (value: number | null) =>
+  value === null ? '—' : `${perProduct.format(value)} м`;
+
+/** A quantity to 6 decimals without a unit: «12,5». */
+export const formatQuantity = (value: number) =>
+  value.toLocaleString('uk-UA', { maximumFractionDigits: 6 });
+
 const money = new Intl.NumberFormat('uk-UA', {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,

@@ -127,7 +127,7 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
     ],
   },
   {
-    // Own module Warehouse (WH-001, WH-002); pages without a path come in the next stages of the warehouse plan.
+    // Own module Warehouse (WH-001…WH-005).
     id: 'fabric-warehouse',
     icon: Inventory2OutlinedIcon,
     section: 'Робота',
@@ -151,15 +151,31 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         path: '/warehouse/opening',
         access: 'fabric-stock',
       },
-      { id: 'fabric-plan-fact', label: 'План і факт', access: 'fabric-stock' },
-      { id: 'fabric-booking', label: 'Бронь і що замовити', access: 'fabric-stock' },
+      // The reports (WH-005): each is its own page of «Права доступу»; «Вартість складу» is the owner's.
+      {
+        id: 'fabric-plan-fact',
+        label: 'План і факт',
+        path: '/warehouse/plan-fact',
+        access: 'fabric-plan-fact',
+      },
+      {
+        id: 'fabric-booking',
+        label: 'Бронь і що замовити',
+        path: '/warehouse/booking',
+        access: 'fabric-booking',
+      },
       {
         id: 'fabric-valuation',
         label: 'Вартість складу',
-        access: 'fabric-stock',
-        requiredRoles: admin,
+        path: '/warehouse/valuation',
+        access: 'fabric-valuation',
       },
-      { id: 'hardware-to-order', label: 'Фурнітура до замовлення', access: 'fabric-stock' },
+      {
+        id: 'hardware-to-order',
+        label: 'Фурнітура до замовлення',
+        path: '/warehouse/hardware',
+        access: 'hardware-order',
+      },
     ],
   },
   {

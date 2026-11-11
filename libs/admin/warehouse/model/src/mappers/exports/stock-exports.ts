@@ -60,6 +60,7 @@ export function movementsWorkbook(rows: readonly FabricMovementRow[], now = new 
         'Замовлення / куди',
         'Прихід, м',
         'Витрата, м',
+        'На 1 виріб, м',
         'Залишок рядка, м',
         'Хто записав',
         'Примітка',
@@ -77,12 +78,13 @@ export function movementsWorkbook(rows: readonly FabricMovementRow[], now = new 
         movementTarget(row),
         row.delta > 0 ? row.delta : null,
         row.delta < 0 ? -row.delta : null,
+        row.perProduct,
         row.metersAfter,
         row.createdByName,
         row.note,
         row.isReversed ? 'так' : null,
       ]),
-      widths: [13, 17, 18, 11, 30, 18, 22, 16, 28, 11, 11, 14, 22, 30, 11],
+      widths: [13, 17, 18, 11, 30, 18, 22, 16, 28, 11, 11, 12, 14, 22, 30, 11],
     },
   ]);
 }

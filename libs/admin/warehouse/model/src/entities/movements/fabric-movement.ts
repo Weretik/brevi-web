@@ -49,6 +49,8 @@ export interface FabricMovementRow {
   delta: number;
   /** Balance of that line after the movement. */
   metersAfter: number;
+  /** «На 1 виріб»: metres per product cut for an issue by cutting; null otherwise. */
+  perProduct: number | null;
   note: string | null;
   createdByName: string;
   isReversed: boolean;
