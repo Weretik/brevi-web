@@ -360,6 +360,12 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         path: '/content/site-pages',
         access: 'content-site-pages',
       },
+      {
+        id: 'site-seo-overview',
+        label: 'SEO-огляд',
+        path: '/content/seo-overview',
+        access: 'content-seo-overview',
+      },
       { id: 'legal', label: 'Конфіденційність та умови', path: '/content/legal' },
     ],
   },

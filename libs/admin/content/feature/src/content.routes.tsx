@@ -1,5 +1,15 @@
 import { lazy } from 'react';
 
+import {
+  articlesPath,
+  contentProductsPath,
+  redirectsPath,
+  seoOverviewPath,
+  seoSettingsPath,
+  siteCategoriesPath,
+  sitePagesPath,
+} from './model/content-paths';
+
 import type {
   ArticlesViewer,
   ContentProductsViewer,
@@ -14,16 +24,20 @@ const ArticlesPage = lazy(() => import('./pages/articles/articles-page'));
 const LegalDocumentsPage = lazy(() => import('./pages/legal/legal-documents-page'));
 const ContentProductsPage = lazy(() => import('./pages/product-pages/content-products-page'));
 const RedirectsPage = lazy(() => import('./pages/redirects/redirects-page'));
+const SeoOverviewPage = lazy(() => import('./pages/seo-overview/seo-overview-page'));
 const SeoSettingsPage = lazy(() => import('./pages/seo-settings/seo-settings-page'));
 const SitePagesPage = lazy(() => import('./pages/site-pages/site-pages-page'));
 const SiteCategoriesPage = lazy(() => import('./pages/site-categories/site-categories-page'));
 
-export const contentProductsPath = '/content/products';
-export const siteCategoriesPath = '/content/categories';
-export const articlesPath = '/content/articles';
-export const redirectsPath = '/content/redirects';
-export const seoSettingsPath = '/content/seo-settings';
-export const sitePagesPath = '/content/site-pages';
+export {
+  articlesPath,
+  contentProductsPath,
+  redirectsPath,
+  seoOverviewPath,
+  seoSettingsPath,
+  siteCategoriesPath,
+  sitePagesPath,
+};
 
 export interface ContentRouteOptions {
   /** Rights of the signed-in staff member on «Товари сайту»; the app reads them from the session. */
@@ -43,8 +57,8 @@ export interface ContentRouteOptions {
 /**
  * «Контент»: public content of Brevi sites. «Товари сайту», «Розділи сайту», «Статті», «Переадресації»,
  * «Налаштування SEO сайту» and «Сторінки сайту» sit behind «Права доступу» (`content-products`, `content-categories`,
- * `content-articles`, `content-redirects`, `content-seo-settings`, `content-site-pages`); the public BreviERP
- * documents are open to every staff member.
+ * `content-articles`, `content-redirects`, `content-seo-settings`, `content-site-pages`); the read-only «SEO-огляд»
+ * behind `content-seo-overview` too. The public BreviERP documents are open to every staff member.
  */
 export function createContentRoutes({
   useContentProductsViewer,
@@ -79,6 +93,7 @@ export function createContentRoutes({
     { path: redirectsPath, element: <Redirects /> },
     { path: seoSettingsPath, element: <SeoSettings /> },
     { path: sitePagesPath, element: <SitePages /> },
+    { path: seoOverviewPath, element: <SeoOverviewPage /> },
     { path: '/content/legal', element: <LegalDocumentsPage /> },
   ];
 }
