@@ -30,6 +30,7 @@ import { useQuoteSupplierCard } from './use-quote-supplier-card';
 import { useRedirectsViewer } from './use-redirects-viewer';
 import { useSeoSettingsViewer } from './use-seo-settings-viewer';
 import { useSiteCategoriesViewer } from './use-site-categories-viewer';
+import { useSitePagesViewer } from './use-site-pages-viewer';
 import { useTaskViewer } from './use-task-viewer';
 import { useWorkshopPeopleAccess } from './use-workshop-people-access';
 
@@ -52,6 +53,7 @@ export const adminRouteDefinitions = [
     useArticlesViewer,
     useRedirectsViewer,
     useSeoSettingsViewer,
+    useSitePagesViewer,
   }),
   ...createWarehouseRoutes(),
 ];

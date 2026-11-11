@@ -43,6 +43,7 @@ const defaults: Readonly<Record<string, Readonly<Record<string, readonly AccessA
     'content-articles': All,
     'content-redirects': All,
     'content-seo-settings': VE,
+    'content-site-pages': VE,
   },
   Manager: {
     leads: VE,
@@ -68,6 +69,7 @@ const defaults: Readonly<Record<string, Readonly<Record<string, readonly AccessA
     'content-articles': V,
     'content-redirects': V,
     'content-seo-settings': V,
+    'content-site-pages': V,
   },
   Accountant: {
     products: V,

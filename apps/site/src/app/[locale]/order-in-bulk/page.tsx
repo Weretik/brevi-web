@@ -1,5 +1,5 @@
 import { isLocale } from '@site/core/i18n';
-import { withSiteSharePicture } from '@site/settings/data-access';
+import { sitePageMetadata } from '@site/settings/data-access';
 import { WholesalePage } from '@site/wholesale/feature';
 import { buildWholesaleMetadata } from '@site/wholesale/seo';
 import { notFound } from 'next/navigation';
@@ -10,7 +10,9 @@ export async function generateMetadata({
   params,
 }: PageProps<'/[locale]/order-in-bulk'>): Promise<Metadata> {
   const { locale } = await params;
-  return isLocale(locale) ? withSiteSharePicture(buildWholesaleMetadata(locale)) : {};
+  return isLocale(locale)
+    ? sitePageMetadata('wholesale', locale, buildWholesaleMetadata(locale))
+    : {};
 }
 
 export default async function Page({ params }: PageProps<'/[locale]/order-in-bulk'>) {
