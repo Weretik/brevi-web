@@ -10,5 +10,6 @@ export type { ClothingRow, Gender, HeightRow, ShoeRow } from './lib/data/size-ch
 export { getSizesDictionary } from './lib/i18n/sizes-dictionary';
 export type { SizesDictionary } from './lib/i18n/sizes-dictionary';
 export { MeasureSteps } from './lib/sections/measure-steps';
+export { SizeChartSheet } from './lib/sections/size-chart-sheet';
 export { SizeFinder } from './lib/sections/size-finder';
 export { SizeTables } from './lib/sections/size-tables';

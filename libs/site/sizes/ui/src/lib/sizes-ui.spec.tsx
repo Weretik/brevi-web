@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 
 import { findClothingSize, findHeightGroup, findShoeSize } from './data/size-chart';
 import { getSizesDictionary } from './i18n/sizes-dictionary';
+import { SizeChartSheet } from './sections/size-chart-sheet';
 import { SizeFinder } from './sections/size-finder';
 import { SizeTables } from './sections/size-tables';
 
@@ -63,5 +64,20 @@ describe('SizeTables', () => {
 
     rerender(<SizeTables dictionary={getSizesDictionary('uk').tables} showShoes={false} />);
     expect(screen.getAllByRole('table')).toHaveLength(4);
+  });
+});
+
+describe('SizeChartSheet', () => {
+  it('opens the panel with the finder and the tables from the button', () => {
+    render(<SizeChartSheet dictionary={getSizesDictionary('uk')} fullPageHref="/uk/size-chart" />);
+    expect(screen.queryByRole('dialog')).toBeNull();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Таблиця розмірів' }));
+
+    expect(screen.getByRole('dialog')).toBeTruthy();
+    expect(screen.getAllByRole('table')).toHaveLength(5);
+    expect(screen.getByRole('link', { name: /Повна сторінка/ }).getAttribute('href')).toBe(
+      '/uk/size-chart',
+    );
   });
 });

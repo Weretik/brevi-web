@@ -17,6 +17,7 @@ import {
 } from '@site/core/i18n';
 import { JsonLd, buildBreadcrumbJsonLd } from '@site/core/seo';
 import { Breadcrumbs, PageSection, StitchLabel } from '@site/shared/ui';
+import { SizeChartSheet, getSizesDictionary } from '@site/sizes/ui';
 
 import type { CatalogProduct } from '@site/catalog/model';
 import type { Locale } from '@site/core/i18n';
@@ -89,6 +90,10 @@ export async function CatalogProductPage({
               prices={product.prices}
               dictionary={dictionary.product}
               requestHref={path('request')}
+            />
+            <SizeChartSheet
+              dictionary={getSizesDictionary(locale)}
+              fullPageHref={path('sizeChart')}
             />
           </div>
         </div>

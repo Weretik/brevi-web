@@ -1,6 +1,6 @@
 # «Таблиця розмірів» page
 
-**Status:** stage 1 implemented and verified locally 2026-11-11 (page); stage 2 (size panel on the product page) follows.
+**Status:** stage 1 (page, #138) merged; stage 2 (size panel on the product page) implemented and verified locally 2026-11-11.
 **Variant:** `nextjs`.
 **Source:** [migration plan](../../migration/README.md); design «Строчка»; data and rules from the live page `brevi.com.ua/ru/tablica-razmerov`, where the charts are two images.
 **Feature card:** [site sizes](../../../../features/site/sizes.md).
@@ -21,14 +21,15 @@ A size page at `/uk/size-chart` and `/ru/size-chart` that is more modern and con
 
 ## Rules
 
-| ID    | Rule                                                                                                                     |
-| ----- | ------------------------------------------------------------------------------------------------------------------------ |
-| R-001 | One `h1`; blocks: finder, tables, measuring rules, call help.                                                            |
-| R-002 | Charts are `<table>` text, never images; data in one place (`size-chart.ts`) feeds both the finder and the tables.       |
-| R-003 | Finder: chest girth gives the size, height gives the height group, foot length gives the shoe size; decimal comma works. |
-| R-004 | A value outside a chart shows a call-us message; a gap between ranges (94.5) rounds up; foot length rounds up.           |
-| R-005 | Women's height group 5–6 is «168–179»: the live page prints «168–169», a probable typo (owner to confirm).               |
-| R-006 | Title and description per language, canonical, `hreflang`, breadcrumbs with `BreadcrumbList`; UA and RU keys match.      |
+| ID    | Rule                                                                                                                                                                                          |
+| ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R-001 | One `h1`; blocks: finder, tables, measuring rules, call help.                                                                                                                                 |
+| R-002 | Charts are `<table>` text, never images; data in one place (`size-chart.ts`) feeds both the finder and the tables.                                                                            |
+| R-003 | Finder: chest girth gives the size, height gives the height group, foot length gives the shoe size; decimal comma works.                                                                      |
+| R-004 | A value outside a chart shows a call-us message; a gap between ranges (94.5) rounds up; foot length rounds up.                                                                                |
+| R-005 | Women's height group 5–6 is «168–179»: the live page prints «168–169», a probable typo (owner to confirm).                                                                                    |
+| R-007 | Every product page has a «Таблиця розмірів» button under the buy block; it opens a side panel with the finder and all tables and links to the full page. No navigation away from the product. |
+| R-006 | Title and description per language, canonical, `hreflang`, breadcrumbs with `BreadcrumbList`; UA and RU keys match.                                                                           |
 
 ## Traceability
 
@@ -51,3 +52,12 @@ Focused tests and lint of the three libraries pass; `site:typecheck` passes. `ne
 | One responsibility per file | Data and lookup in `size-chart.ts`; finder, tables and steps are separate components.       |
 | Client code                 | Only `SizeFinder` (`'use client'`); the rest is Server Components.                          |
 | Generator leftovers         | Removed sample components, CSS modules and `.babelrc`; configs match the returns libraries. |
+
+## Stage 2 structure check (2026-11-11)
+
+| Check                       | Result                                                                                                |
+| --------------------------- | ----------------------------------------------------------------------------------------------------- |
+| One responsibility per file | `SizeChartSheet` only composes the shared `Sheet`, `SizeFinder` and `SizeTables`; no duplicated data. |
+| Client code                 | `SizeChartSheet` and `SizeFinder`; the product page stays a Server Component.                         |
+| Catalog change              | Three lines in `catalog-product-page.tsx`; no data-access change.                                     |
+| Visual                      | Panel checked on 1280 px and 390 px in headless Chromium.                                             |
