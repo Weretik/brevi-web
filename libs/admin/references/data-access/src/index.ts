@@ -5,6 +5,12 @@ export {
   useUpdateFabricMutation,
 } from './api/fabrics/fabrics.api';
 export {
+  useCreateFabricColorMutation,
+  useDeleteFabricColorMutation,
+  useListFabricColorsQuery,
+  useUpdateFabricColorMutation,
+} from './api/fabric-colors/fabric-colors.api';
+export {
   useCreateGarmentAccessoryMutation,
   useDeleteGarmentAccessoryMutation,
   useListGarmentAccessoriesQuery,

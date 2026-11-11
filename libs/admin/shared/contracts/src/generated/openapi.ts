@@ -5206,6 +5206,74 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/public/catalog/tree': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description The two product types and, under each, the active sections of «Типи і розділи» that have at least one product on the site, in the display order of the reference. A type without products is left out. */
+    get: operations['getPublicCatalogTree'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/public/catalog/products': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description One page of product cards, sewing first, by code. */
+    get: operations['getPublicCatalogProducts'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/public/catalog/products/{slug}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description A product page by its address. A Russian request for a product without Russian texts gets the Ukrainian texts, and language says which came back. */
+    get: operations['getPublicCatalogProduct'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/public/catalog/product-slugs': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Addresses of every product on the site, for the sitemap and for building pages ahead of time. */
+    get: operations['getPublicCatalogProductSlugs'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -11880,6 +11948,108 @@ export interface components {
       notMatched: components['schemas']['OldSiteImportNote'][];
       problems: components['schemas']['OldSiteImportNote'][];
     };
+    PublicCatalogSection: {
+      /** Format: int32 */
+      id: number;
+      /** @description Built from the Ukrainian name; the same for both languages and unique in the tree. */
+      slug: string;
+      /** @description Ukrainian name of the section (sections have no Russian name yet). */
+      name: string;
+      /** Format: int32 */
+      productCount: number;
+    };
+    PublicCatalogType: {
+      /** @enum {string} */
+      type: 'Sewing' | 'Ppe';
+      /**
+       * Format: int32
+       * @description Products of the type on the site, with and without a section.
+       */
+      productCount: number;
+      sections: components['schemas']['PublicCatalogSection'][];
+    };
+    PublicCatalogTree: {
+      types: components['schemas']['PublicCatalogType'][];
+    };
+    PublicCatalogCard: {
+      slug: string;
+      /** @enum {string} */
+      type: 'Sewing' | 'Ppe';
+      /** @description Model code or PPE code. */
+      code?: string | null;
+      name: string;
+      /** Format: int32 */
+      sectionId?: number | null;
+      /** @description Small copy of the main photo, or the full photo when there is no small copy. */
+      photoUrl?: string | null;
+      /**
+       * Format: double
+       * @description The lowest large-wholesale price among active fabrics, or the PPE price; null means «ціну уточнюйте».
+       */
+      priceFrom?: number | null;
+    };
+    PublicCatalogCardPage: {
+      items: components['schemas']['PublicCatalogCard'][];
+      /** Format: int32 */
+      page: number;
+      /** Format: int32 */
+      pageSize: number;
+      /** Format: int32 */
+      total: number;
+    };
+    PublicCatalogSectionLink: {
+      /** Format: int32 */
+      id: number;
+      slug: string;
+      name: string;
+    };
+    PublicCatalogPhoto: {
+      url: string;
+      thumbnailUrl?: string | null;
+      isMain: boolean;
+    };
+    /** @description An active fabric of a sewing model. */
+    PublicCatalogVariant: {
+      sku: string;
+      fabricName?: string | null;
+      /** @description Composition and density of the fabric in words. */
+      fabricDetails?: string | null;
+      prices?: components['schemas']['ContentPriceTiersResponse'] | null;
+    };
+    PublicCatalogProduct: {
+      slug: string;
+      /** @enum {string} */
+      type: 'Sewing' | 'Ppe';
+      code?: string | null;
+      name: string;
+      /**
+       * @description Language of the texts that came back.
+       * @enum {string}
+       */
+      language: 'uk' | 'ru';
+      section?: components['schemas']['PublicCatalogSectionLink'] | null;
+      seoTitle?: string | null;
+      seoDescription?: string | null;
+      summary: components['schemas']['ProductFact'][];
+      description: components['schemas']['ProductTextBlock'][];
+      specs: components['schemas']['ProductSpecGroup'][];
+      /** @description Photos of the card tab «Фото», the main one first. */
+      photos: components['schemas']['PublicCatalogPhoto'][];
+      /** Format: double */
+      priceFrom?: number | null;
+      /** @description Prices of a PPE product, or the lowest tier prices of a sewing model. */
+      prices?: components['schemas']['ContentPriceTiersResponse'] | null;
+      variants: components['schemas']['PublicCatalogVariant'][];
+      /** Format: date-time */
+      updatedAtUtc: string;
+    };
+    PublicCatalogSlug: {
+      slug: string;
+      /** Format: date-time */
+      updatedAtUtc: string;
+      /** @description false when the Russian page shows the Ukrainian texts. */
+      hasRussian: boolean;
+    };
   };
   responses: {
     /** @description Validation failures including field identifiers. */
@@ -12010,6 +12180,7 @@ export interface components {
     FileId: string;
     /** @description Catalog product id. */
     'components-parameters-ProductId': number;
+    Language: 'uk' | 'ru';
   };
   requestBodies: never;
   headers: never;
@@ -28467,6 +28638,118 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+    };
+  };
+  getPublicCatalogTree: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Tree */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PublicCatalogTree'];
+        };
+      };
+    };
+  };
+  getPublicCatalogProducts: {
+    parameters: {
+      query?: {
+        language?: components['parameters']['Language'];
+        type?: 'Sewing' | 'Ppe';
+        /** @description A section id from the tree. */
+        sectionId?: number;
+        page?: number;
+        pageSize?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Cards */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PublicCatalogCardPage'];
+        };
+      };
+      /** @description Wrong language, type, section or paging */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getPublicCatalogProduct: {
+    parameters: {
+      query?: {
+        language?: components['parameters']['Language'];
+      };
+      header?: never;
+      path: {
+        slug: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Product */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PublicCatalogProduct'];
+        };
+      };
+      /** @description Wrong language */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such address, or the product is hidden or switched off */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getPublicCatalogProductSlugs: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Addresses */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PublicCatalogSlug'][];
+        };
       };
     };
   };

@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 
 import { useEmbroideryPicker } from '../../hooks/orders/use-embroidery-picker';
+import { useProductionColors } from '../../hooks/orders/use-production-colors';
 
 import type {
   CreateOrderLine,
@@ -33,6 +34,7 @@ const optionLabel = (option: ProductionQuoteDraftOption) =>
 /** A КП item: whether it goes to the workshop, in which fabric, and what the workshop needs. */
 export function ProductionOrderCreateLine({ item, line, errors, disabled, onChange }: Props) {
   const embroidery = useEmbroideryPicker();
+  const colors = useProductionColors();
   const id = `quote-item-${item.quoteItemId}`;
   return (
     <Paper variant="outlined" sx={{ p: 2 }}>
@@ -90,6 +92,7 @@ export function ProductionOrderCreateLine({ item, line, errors, disabled, onChan
               norm={item.norm}
               withRate={false}
               disabled={disabled}
+              colors={colors}
               embroidery={embroidery}
               onChange={(values) => onChange({ ...line, values })}
             />

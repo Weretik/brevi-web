@@ -18,6 +18,7 @@ export const adminApi = createApi({
     'Product',
     'ProductCategory',
     'ProductSection',
+    'FabricColor',
     'StaffAccount',
     'StaffProfile',
     'Supplier',

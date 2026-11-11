@@ -36,3 +36,7 @@ export * from './validators/product-sections/product-section-validation';
 export * from './entities/price-import/price-source';
 export * from './mappers/price-import/price-import-format';
 export * from './validators/price-import/price-source-discount-validation';
+export * from './entities/fabric-colors/fabric-color';
+export * from './forms/fabric-colors/fabric-color-form';
+export * from './queries/fabric-colors/fabric-color-filters';
+export * from './validators/fabric-colors/fabric-color-validation';

@@ -4,6 +4,7 @@ import { ReferenceEditorDrawer } from '@admin/references/ui';
 import { Alert, Stack, Typography } from '@mui/material';
 
 import { useEmbroideryPicker } from '../../hooks/orders/use-embroidery-picker';
+import { useProductionColors } from '../../hooks/orders/use-production-colors';
 
 import type {
   ProductionItem,
@@ -36,6 +37,7 @@ export function ProductionItemDrawer({
   onSubmit,
 }: Props) {
   const embroidery = useEmbroideryPicker();
+  const colors = useProductionColors();
   const fabric = [item.fabricCode, item.fabricName].filter(Boolean).join(' · ');
   return (
     <ReferenceEditorDrawer
@@ -64,6 +66,7 @@ export function ProductionItemDrawer({
           errors={errors}
           withRate={withRate}
           disabled={saving}
+          colors={colors}
           embroidery={embroidery}
           onChange={onChange}
         />
