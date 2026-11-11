@@ -5456,6 +5456,66 @@ export interface paths {
     patch: operations['setSiteCategoryVisibility'];
     trace?: never;
   };
+  '/api/content/articles': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Every article, the newest first. */
+    get: operations['getContentArticles'];
+    put?: never;
+    /** @description Adds an article, hidden unless showOnSite is true. revision is 0. An empty slug is built from the Ukrainian title. A language without any text is not kept. */
+    post: operations['createContentArticle'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/content/articles/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Article id. */
+        id: components['parameters']['parameters-ArticleId'];
+      };
+      cookie?: never;
+    };
+    /** @description The editor of one article with the photos it uses. */
+    get: operations['getContentArticle'];
+    /** @description Replaces the article as a whole. revision is the number the editor showed. An empty slug keeps the current address. */
+    put: operations['saveContentArticle'];
+    post?: never;
+    /** @description Removes the article with its texts. Its photos stay in the «Фото» library. */
+    delete: operations['deleteContentArticle'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/content/articles/{id}/visibility': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Article id. */
+        id: components['parameters']['parameters-ArticleId'];
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** @description «Показувати на сайті» from the list. */
+    patch: operations['setContentArticleVisibility'];
+    trace?: never;
+  };
   '/api/public/catalog/tree': {
     parameters: {
       query?: never;
@@ -12584,6 +12644,112 @@ export interface components {
       /** Format: int32 */
       revision: number;
     };
+    ArticleRow: {
+      /** Format: int32 */
+      id: number;
+      slug: string;
+      /** Format: date */
+      publishedOn: string;
+      showOnSite: boolean;
+      titleUk?: string | null;
+      titleRu?: string | null;
+      hasUkrainianText: boolean;
+      hasRussianText: boolean;
+      /** @description SEO title and description are written in both languages. */
+      hasSeo: boolean;
+      /** @description The small copy of the cover, or the photo itself without one; null without a cover. */
+      coverUrl?: string | null;
+      /** Format: date-time */
+      updatedAtUtc: string;
+    };
+    ArticleList: {
+      items: components['schemas']['ArticleRow'][];
+    };
+    /** @enum {string} */
+    ArticleBlockKind: 'Paragraph' | 'Heading' | 'List' | 'Image';
+    /** @description One block of the article body. A paragraph may open with a bold lead; a list keeps its lines in items; an image names a photo of the «Фото» library by photoId with its alt text. */
+    ArticleBlock: {
+      kind: components['schemas']['ArticleBlockKind'];
+      text?: string | null;
+      lead?: string | null;
+      items?: string[] | null;
+      /**
+       * Format: int32
+       * @description Required for an Image block.
+       */
+      photoId?: number | null;
+      alt?: string | null;
+    };
+    /** @description What staff type for one language. The body is edited in the visual editor and sent as blocks. */
+    ArticleTextInput: {
+      title?: string | null;
+      /** @description The short text of the article in lists. */
+      excerpt?: string | null;
+      seoTitle?: string | null;
+      seoDescription?: string | null;
+      /** @description At most 60000 characters in all blocks together. */
+      body?: components['schemas']['ArticleBlock'][] | null;
+    };
+    SaveContentArticleRequest: {
+      /** Format: int32 */
+      revision: number;
+      /** @description Lower-case Latin letters, digits and single hyphens, 3 to 120 characters. */
+      slug?: string | null;
+      /**
+       * Format: date
+       * @description The date readers see; newer articles come first.
+       */
+      publishedOn: string;
+      showOnSite: boolean;
+      /**
+       * Format: int32
+       * @description A photo of the «Фото» library, or null for an article without a cover.
+       */
+      coverPhotoId?: number | null;
+      /** @description The Ukrainian title is required. */
+      uk: components['schemas']['ArticleTextInput'];
+      ru?: components['schemas']['ArticleTextInput'] | null;
+    };
+    ArticleTextResponse: {
+      title?: string | null;
+      excerpt?: string | null;
+      seoTitle?: string | null;
+      seoDescription?: string | null;
+      body: components['schemas']['ArticleBlock'][];
+    };
+    /** @description A photo of the «Фото» library that the article uses. */
+    ArticlePhoto: {
+      /** Format: int32 */
+      id: number;
+      url: string;
+      thumbnailUrl?: string | null;
+      /** Format: int32 */
+      width?: number | null;
+      /** Format: int32 */
+      height?: number | null;
+    };
+    ArticleResponse: {
+      article: components['schemas']['ArticleRow'];
+      /** Format: int32 */
+      revision: number;
+      updatedBy: string;
+      /** Format: int32 */
+      coverPhotoId?: number | null;
+      uk: components['schemas']['ArticleTextResponse'];
+      ru: components['schemas']['ArticleTextResponse'];
+      /** @description The cover and the photos of the bodies that the library still has. */
+      photos: components['schemas']['ArticlePhoto'][];
+    };
+    ContentArticleVisibilityRequest: {
+      showOnSite: boolean;
+    };
+    ArticleVisibilityResponse: {
+      /** Format: int32 */
+      id: number;
+      showOnSite: boolean;
+      /** Format: int32 */
+      revision: number;
+    };
     PublicCatalogSection: {
       /** Format: int32 */
       id: number;
@@ -12872,6 +13038,8 @@ export interface components {
     'components-parameters-ProductId': number;
     /** @description Site category id. */
     'parameters-CategoryId': number;
+    /** @description Article id. */
+    'parameters-ArticleId': number;
     Language: 'uk' | 'ru';
   };
   requestBodies: never;
@@ -30209,6 +30377,292 @@ export interface operations {
         content?: never;
       };
       /** @description No such category */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getContentArticles: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ArticleList'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to view «Статті» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createContentArticle: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SaveContentArticleRequest'];
+      };
+    };
+    responses: {
+      /** @description Created */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ArticleResponse'];
+        };
+      };
+      /** @description No Ukrainian title, an invalid address or date, a picture block without a photo or a text over its limit */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to create in «Статті» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The address belongs to another article or a photo is not in the «Фото» library */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Messages'];
+        };
+      };
+    };
+  };
+  getContentArticle: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Article id. */
+        id: components['parameters']['parameters-ArticleId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ArticleResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to view «Статті» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such article */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  saveContentArticle: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Article id. */
+        id: components['parameters']['parameters-ArticleId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SaveContentArticleRequest'];
+      };
+    };
+    responses: {
+      /** @description Saved */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ArticleResponse'];
+        };
+      };
+      /** @description No Ukrainian title, an invalid address or date, a picture block without a photo or a text over its limit */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to edit in «Статті» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such article */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The revision is stale, the address belongs to another article or a photo is not in the «Фото» library */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Messages'];
+        };
+      };
+    };
+  };
+  deleteContentArticle: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Article id. */
+        id: components['parameters']['parameters-ArticleId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Deleted */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to delete in «Статті» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such article */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  setContentArticleVisibility: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Article id. */
+        id: components['parameters']['parameters-ArticleId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ContentArticleVisibilityRequest'];
+      };
+    };
+    responses: {
+      /** @description Saved */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ArticleVisibilityResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to edit in «Статті» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such article */
       404: {
         headers: {
           [name: string]: unknown;

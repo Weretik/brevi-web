@@ -12,7 +12,7 @@
 
 Owner rule of 2026-11-11: staff are ordinary users and do not know Markdown or any other markup.
 
-- A long text that the site shows (description, text about a section, article) is edited in the shared visual editor `RichTextEditor` from `@admin/shared/ui`: a toolbar with heading, bold, italic, list, undo and redo, and the usual keys (Ctrl+B, Ctrl+I). Do not use a plain multiline field with marks such as `## `, `- `, or `**…**`, and do not explain markup in helper text.
+- A long text that the site shows (description, text about a section, article) is edited in the shared visual editor `RichTextEditor` from `@admin/shared/ui`: a toolbar with heading, bold, italic, list, undo and redo, and the usual keys (Ctrl+B, Ctrl+I). Do not use a plain multiline field with marks such as `## `, `- `, or `**…**`, and do not explain markup in helper text. A text that may have pictures (an article) passes `onPickImages`: the toolbar gets «Фото», and a picture is a block with a photo of the «Фото» library and its «Опис фото»; links to pictures are never typed.
 - Structured data (short facts, characteristics, any «name: value» list) is edited as rows of fields with «Додати рядок» and a delete button per row, never as lines typed in one field.
 - The view mode and previews show the formatting itself, never the stored marks.
 - How the text is stored is hidden from staff. Product texts stay blocks of the BreviERP Content contract; bold and italic are kept inside the strings as `**…**` and `*…*` (a typed asterisk as `\*`), written and read only by code: `content-rich-text.ts` in `admin-content-model` and `catalog-inline.ts` in `site-catalog-model`.

@@ -13,7 +13,6 @@ import { useMemo, useState } from 'react';
 import { SiteCategoryDrawer } from './site-category-drawer';
 import { useOldSiteCategoryImport } from '../../hooks/site-categories/use-old-site-category-import';
 
-
 import type { SiteCategoryTarget } from '../../hooks/site-categories/use-site-category-editor';
 import type { SiteCategoriesViewer, SiteCategoryRow } from '@admin/content/model';
 import type { OldSiteImportCopy } from '@admin/content/ui';
