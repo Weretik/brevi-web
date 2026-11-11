@@ -1,5 +1,5 @@
 import {
-  useGetFabricStockChoicesQuery,
+  useGetIssueFabricChoicesQuery,
   useGetProductionItemFabricQuery,
   useReverseFabricIssueMutation,
 } from '@admin/production/data-access';
@@ -23,7 +23,7 @@ interface Props {
 export function ProductionItemFabricSection({ orderId, item, onMessage }: Props) {
   const { data, isLoading, error } = useGetProductionItemFabricQuery({ orderId, itemId: item.id });
   const [issuing, setIssuing] = useState(false);
-  const choices = useGetFabricStockChoicesQuery(undefined, { skip: !issuing });
+  const choices = useGetIssueFabricChoicesQuery(undefined, { skip: !issuing });
   const [reverse] = useReverseFabricIssueMutation();
   const reversal = useStockReason<FabricIssue>(
     (issue, reason) =>

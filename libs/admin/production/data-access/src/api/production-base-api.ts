@@ -7,6 +7,7 @@ export const productionBaseApi = adminApi.enhanceEndpoints({
     'ProductionOrder',
     'WorkshopSettings',
     'FabricStock',
+    'FabricMovement',
     'ItemFabric',
     'ProductionWork',
     'SewingForecast',

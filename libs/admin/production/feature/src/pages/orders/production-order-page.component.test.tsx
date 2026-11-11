@@ -151,7 +151,7 @@ vi.mock('@admin/production/data-access', () => {
       },
       isLoading: false,
     }),
-    useGetFabricStockChoicesQuery: () => ({ data: undefined, isFetching: false }),
+    useGetIssueFabricChoicesQuery: () => ({ data: undefined, isFetching: false }),
     useCreateFabricIssueMutation: mutation(() => undefined),
     useReverseFabricIssueMutation: mutation(() => undefined),
     useGetProductionItemWorkQuery: () => ({

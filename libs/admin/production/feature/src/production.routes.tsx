@@ -9,7 +9,6 @@ const WorkshopSettingsPage = lazy(() => import('./pages/settings/workshop-settin
 const ProductionOrdersPage = lazy(() => import('./pages/orders/production-orders-page'));
 const ProductionOrderCreatePage = lazy(() => import('./pages/orders/production-order-create-page'));
 const ProductionOrderPage = lazy(() => import('./pages/orders/production-order-page'));
-const FabricStockPage = lazy(() => import('./pages/stock/fabric-stock-page'));
 const WorkLogPage = lazy(() => import('./pages/work/work-log-page'));
 const SewingForecastPage = lazy(() => import('./pages/forecast/sewing-forecast-page'));
 const TimesheetPage = lazy(() => import('./pages/timesheet/timesheet-page'));
@@ -44,7 +43,7 @@ interface ProductionOrderRouteOptions {
 }
 
 /**
- * «Виробничі завдання», «Склад тканин», «Прогноз пошиття» and «Архів цеху»; the app puts them behind Admin, Manager or
+ * «Виробничі завдання», «Прогноз пошиття» and «Архів цеху»; the app puts them behind Admin, Manager or
  * WorkshopChief. The server still decides what each person may change and which prices they see.
  */
 export function createProductionOrderRoutes({ useOrderActor }: ProductionOrderRouteOptions) {
@@ -55,12 +54,6 @@ export function createProductionOrderRoutes({ useOrderActor }: ProductionOrderRo
       element: <ProductionOrderCreatePage useOrderActor={useOrderActor} />,
     },
     { path: '/production/orders/:id', element: <ProductionOrderPage /> },
-    // «Склад тканин» is its own menu block now (WH-001); the old address still opens it.
-    {
-      path: '/warehouse/stock',
-      element: <FabricStockPage useOrderActor={useOrderActor} />,
-    },
-    { path: '/production/fabric-stock', element: <Navigate to="/warehouse/stock" replace /> },
     { path: '/production/forecast', element: <SewingForecastPage /> },
     {
       path: '/production/archive',

@@ -219,69 +219,35 @@ export type {
 export {
   FABRIC_ISSUE_MAX_LINES,
   FABRIC_STOCK_COLOR_MAX_LENGTH,
-  FABRIC_STOCK_DOCUMENT_MAX_LENGTH,
   FABRIC_STOCK_NOTE_MAX_LENGTH,
   fabricIssuePurposeLabels,
   fabricIssuePurposes,
-  fabricMovementKindLabels,
-  fabricMovementKinds,
 } from './entities/fabric-stock';
 export type {
-  CorrectFabricStockBody,
   CreateFabricIssueBody,
-  CreateFabricMovementBody,
-  FabricConsumption,
-  FabricConsumptionRow,
   FabricIssue,
   FabricIssueLine,
   FabricIssuePurpose,
-  FabricMovement,
-  FabricMovementKind,
   FabricPlanPart,
-  FabricReservation,
   FabricStockChoices,
   FabricStockFabricChoice,
-  FabricStockImportFile,
-  FabricStockLine,
-  FabricStockList,
-  FabricStockPermissions,
-  FabricStockRow,
-  FabricStockTotals,
   ProductionItemFabric,
 } from './entities/fabric-stock';
 export {
-  createFabricCorrectionValues,
   createFabricIssueValues,
-  createFabricReceiptValues,
   emptyIssueLine,
-  fabricCorrectionBody,
   fabricIssueBody,
-  fabricReceiptBody,
   hasFabricIssueErrors,
   parseStockMeters,
   stockColorKey,
-  validateFabricCorrection,
   validateFabricIssue,
-  validateFabricReceipt,
   validateStockReason,
 } from './forms/fabric-stock-forms';
 export type {
-  FabricCorrectionErrors,
-  FabricCorrectionFormValues,
   FabricIssueErrors,
   FabricIssueFormValues,
   FabricIssueLineValues,
-  FabricReceiptErrors,
-  FabricReceiptFormValues,
 } from './forms/fabric-stock-forms';
-export {
-  countFabricStock,
-  fabricStockProblem,
-  filterFabricStock,
-} from './queries/fabric-stock-filters';
-export type { FabricStockFilter } from './queries/fabric-stock-filters';
-export { fabricStockCsv } from './queries/fabric-stock-csv';
-export { parseFabricStockImportFile } from './validators/fabric-stock-import-file';
 export {
   PRODUCTION_WORK_COMMENT_MAX_LENGTH,
   PRODUCTION_WORK_MAX_QUANTITY,

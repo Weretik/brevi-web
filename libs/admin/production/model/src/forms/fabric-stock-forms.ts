@@ -1,17 +1,13 @@
 import {
   FABRIC_ISSUE_MAX_LINES,
   FABRIC_STOCK_COLOR_MAX_LENGTH,
-  FABRIC_STOCK_DOCUMENT_MAX_LENGTH,
   FABRIC_STOCK_MAX_METERS,
   FABRIC_STOCK_NOTE_MAX_LENGTH,
 } from '../entities/fabric-stock';
 
 import type {
-  CorrectFabricStockBody,
   CreateFabricIssueBody,
-  CreateFabricMovementBody,
   FabricIssuePurpose,
-  FabricStockRow,
   ProductionItemFabric,
 } from '../entities/fabric-stock';
 
@@ -35,106 +31,6 @@ const noteError = (note: string, required: boolean) => {
     ? `Не довше ${FABRIC_STOCK_NOTE_MAX_LENGTH} символів.`
     : undefined;
 };
-
-export interface FabricReceiptFormValues {
-  kind: 'Opening' | 'Receipt';
-  fabricId: number | null;
-  color: string;
-  meters: string;
-  operationDate: string;
-  supplierId: number | null;
-  document: string;
-  note: string;
-}
-
-export type FabricReceiptErrors = Partial<Record<keyof FabricReceiptFormValues, string>>;
-
-/** A receipt of today; from a line card the fabric and colour are already chosen. */
-export const createFabricReceiptValues = (
-  today: string,
-  line: Pick<FabricStockRow, 'fabricId' | 'color'> | null,
-): FabricReceiptFormValues => ({
-  kind: 'Receipt',
-  fabricId: line?.fabricId ?? null,
-  color: line?.color ?? '',
-  meters: '',
-  operationDate: today,
-  supplierId: null,
-  document: '',
-  note: '',
-});
-
-export function validateFabricReceipt(values: FabricReceiptFormValues): FabricReceiptErrors {
-  const errors: FabricReceiptErrors = {};
-  if (values.fabricId === null) errors.fabricId = 'Оберіть тканину.';
-  if (!values.color.trim()) errors.color = 'Вкажіть колір.';
-  else if (values.color.trim().length > FABRIC_STOCK_COLOR_MAX_LENGTH)
-    errors.color = `Не довше ${FABRIC_STOCK_COLOR_MAX_LENGTH} символів.`;
-  const meters = parseStockMeters(values.meters);
-  if (meters === null || meters <= 0) errors.meters = 'Метри — число більше нуля, до двох знаків.';
-  if (!isDay(values.operationDate)) errors.operationDate = 'Вкажіть дату.';
-  if (values.document.trim().length > FABRIC_STOCK_DOCUMENT_MAX_LENGTH)
-    errors.document = `Не довше ${FABRIC_STOCK_DOCUMENT_MAX_LENGTH} символів.`;
-  const note = noteError(values.note, false);
-  if (note) errors.note = note;
-  return errors;
-}
-
-export const fabricReceiptBody = (
-  values: FabricReceiptFormValues,
-  version: number | null,
-): CreateFabricMovementBody => ({
-  kind: values.kind,
-  fabricId: values.fabricId ?? 0,
-  color: values.color.trim(),
-  meters: parseStockMeters(values.meters) ?? 0,
-  operationDate: values.operationDate,
-  supplierId: values.kind === 'Receipt' ? values.supplierId : null,
-  document: values.document.trim() || null,
-  note: values.note.trim() || null,
-  version,
-});
-
-export interface FabricCorrectionFormValues {
-  countedMeters: string;
-  operationDate: string;
-  note: string;
-}
-
-export type FabricCorrectionErrors = Partial<Record<keyof FabricCorrectionFormValues, string>>;
-
-export const createFabricCorrectionValues = (
-  meters: number,
-  today: string,
-): FabricCorrectionFormValues => ({
-  countedMeters: String(meters).replace('.', ','),
-  operationDate: today,
-  note: '',
-});
-
-export function validateFabricCorrection(
-  values: FabricCorrectionFormValues,
-  meters: number,
-): FabricCorrectionErrors {
-  const errors: FabricCorrectionErrors = {};
-  const counted = parseStockMeters(values.countedMeters);
-  if (counted === null || counted < 0) errors.countedMeters = 'Число від 0, до двох знаків.';
-  else if (counted === meters) errors.countedMeters = 'Пораховано стільки ж, скільки на складі.';
-  if (!isDay(values.operationDate)) errors.operationDate = 'Вкажіть дату.';
-  const note = noteError(values.note, true);
-  if (note) errors.note = note;
-  return errors;
-}
-
-export const fabricCorrectionBody = (
-  values: FabricCorrectionFormValues,
-  version: number,
-): CorrectFabricStockBody => ({
-  version,
-  countedMeters: parseStockMeters(values.countedMeters) ?? 0,
-  operationDate: values.operationDate,
-  note: values.note.trim(),
-});
 
 /** «Сторно» of a movement or of an issue needs a reason. */
 export const validateStockReason = (reason: string) => noteError(reason, true) ?? null;
