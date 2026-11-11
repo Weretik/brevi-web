@@ -1,9 +1,20 @@
-import type { ContentLanguage } from '../product-pages/content-product';
+import type { ContentLanguage, ContentTextBlock } from '../product-pages/content-product';
 
-/** Search texts of a page in one language; null keeps the site's own text. */
+/** A frequent question of a page with its answer, both plain text (CNT-010). */
+export interface SiteFaqItem {
+  question: string;
+  answer: string;
+}
+
+/**
+ * Texts of a page in one language: search title and description, the main text at the bottom of the page and its
+ * frequent questions. Null or empty keeps the site's own text.
+ */
 export interface SitePageText {
   title: string | null;
   description: string | null;
+  text: ContentTextBlock[];
+  faq: SiteFaqItem[];
 }
 
 /** A fixed page of the public site in «Контент → Сторінки сайту». */

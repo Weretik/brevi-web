@@ -3,6 +3,7 @@ import { ArticlesPage } from '@site/articles/feature';
 import { buildArticlesMetadata } from '@site/articles/seo';
 import { isLocale } from '@site/core/i18n';
 import { sitePageMetadata } from '@site/settings/data-access';
+import { SitePageTextSection } from '@site/settings/feature';
 import { notFound } from 'next/navigation';
 
 import type { Metadata } from 'next';
@@ -20,5 +21,10 @@ export default async function Page({ params }: PageProps<'/[locale]/articles'>) 
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
-  return <ArticlesPage locale={locale} articles={await getArticles(locale)} />;
+  return (
+    <>
+      <ArticlesPage locale={locale} articles={await getArticles(locale)} />
+      <SitePageTextSection pageKey="articles" locale={locale} />
+    </>
+  );
 }

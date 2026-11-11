@@ -1,3 +1,7 @@
+import { contentTextBlockKinds } from '@admin/content/model';
+
+import type { ContentTextBlock } from '@admin/content/model';
+
 const invalid = (what: string) => new Error(`Некоректна відповідь API контенту сайту: ${what}.`);
 
 export function record(value: unknown, what = 'обʼєкт'): Record<string, unknown> {
@@ -53,4 +57,16 @@ export function oneOf<T extends string>(value: unknown, allowed: readonly T[], w
 export function amount(value: unknown, what = 'сума'): number {
   if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) throw invalid(what);
   return value;
+}
+
+/** One block of a text from the visual editor: paragraph, heading or list. */
+export function mapTextBlock(value: unknown): ContentTextBlock {
+  const block = record(value, 'блок тексту');
+  return {
+    kind: oneOf(block['kind'], contentTextBlockKinds, 'тип блоку'),
+    text: nullableText(block['text'], 'текст блоку'),
+    lead: nullableText(block['lead'], 'початок абзацу'),
+    items:
+      block['items'] == null ? [] : list(block['items'], 'рядки списку').map((line) => text(line)),
+  };
 }

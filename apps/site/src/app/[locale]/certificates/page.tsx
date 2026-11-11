@@ -2,6 +2,7 @@ import { CertificatesPage } from '@site/certificates/feature';
 import { buildCertificatesMetadata } from '@site/certificates/seo';
 import { isLocale } from '@site/core/i18n';
 import { sitePageMetadata } from '@site/settings/data-access';
+import { SitePageTextSection } from '@site/settings/feature';
 import { notFound } from 'next/navigation';
 
 import type { Metadata } from 'next';
@@ -19,5 +20,10 @@ export default async function Page({ params }: PageProps<'/[locale]/certificates
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
-  return <CertificatesPage locale={locale} />;
+  return (
+    <>
+      <CertificatesPage locale={locale} />
+      <SitePageTextSection pageKey="certificates" locale={locale} />
+    </>
+  );
 }

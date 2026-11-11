@@ -23,9 +23,9 @@ export function SitePageDrawer({ page, viewer, onClose, onDone }: Props) {
     <ReferenceEditorDrawer
       titleId="site-page-drawer-title"
       title={page.name}
-      description="Заголовок і опис, які Google і Bing показують у результатах пошуку. Порожнє поле повертає текст сайту."
+      description="Заголовок і опис для пошуку, основний текст і часті запитання сторінки. Порожнє поле повертає текст сайту."
       formId="site-page-form"
-      paperWidth={640}
+      paperWidth={760}
       readOnly={readOnly}
       saving={editor.saving}
       submitLabel="Зберегти"
