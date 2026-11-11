@@ -5,6 +5,9 @@ import {
   formatMeters,
   movementTarget,
 } from '@admin/warehouse/model';
+import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined';
 import UndoOutlinedIcon from '@mui/icons-material/UndoOutlined';
 import {
   IconButton,
@@ -27,6 +30,11 @@ interface Props {
   filtered: boolean;
   /** «Сторно» for people who may move stock. */
   onReverse: ((row: FabricMovementRow) => void) | null;
+  /** Edit and «Скасувати» of rows with `canEdit`, for people who may move stock. */
+  onEdit?: ((row: FabricMovementRow) => void) | null;
+  onVoid?: ((row: FabricMovementRow) => void) | null;
+  /** «Історія правок» of a changed row; everyone with access reads it. */
+  onHistory?: ((row: FabricMovementRow) => void) | null;
 }
 
 const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' };
@@ -40,7 +48,15 @@ const kindLabel = (row: FabricMovementRow) =>
  * «Рух тканини»: newest operation date first. The balance is the moved line's own; the merged
  * metres of a fabric and colour are on «Залишки».
  */
-export function FabricMovementsTable({ rows, filtered, onReverse }: Props) {
+export function FabricMovementsTable({
+  rows,
+  filtered,
+  onReverse,
+  onEdit = null,
+  onVoid = null,
+  onHistory = null,
+}: Props) {
+  const actions = Boolean(onReverse || onEdit || onVoid || onHistory);
   if (rows.length === 0)
     return (
       <Paper variant="outlined" sx={{ p: 3 }}>
@@ -62,12 +78,13 @@ export function FabricMovementsTable({ rows, filtered, onReverse }: Props) {
             <TableCell align="right">Прихід</TableCell>
             <TableCell align="right">Витрата</TableCell>
             <TableCell align="right">Залишок рядка</TableCell>
-            {onReverse && <TableCell aria-label="Дії" />}
+            {actions && <TableCell aria-label="Дії" />}
           </TableRow>
         </TableHead>
         <TableBody>
           {rows.map((row) => {
             const struck = row.isReversed ? { textDecoration: 'line-through' } : undefined;
+            const label = `${kindLabel(row)} ${row.fabricName} ${row.color}`;
             return (
               <TableRow key={row.id} sx={{ verticalAlign: 'top' }}>
                 <TableCell>
@@ -88,6 +105,11 @@ export function FabricMovementsTable({ rows, filtered, onReverse }: Props) {
                   {row.isReversed && (
                     <Typography variant="caption" color="error" component="div">
                       Сторновано
+                    </Typography>
+                  )}
+                  {row.isVoided && (
+                    <Typography variant="caption" color="warning.main" component="div">
+                      Скасовано
                     </Typography>
                   )}
                   {row.note && (
@@ -134,16 +156,49 @@ export function FabricMovementsTable({ rows, filtered, onReverse }: Props) {
                 >
                   {formatMeters(row.metersAfter)}
                 </TableCell>
-                {onReverse && (
-                  <TableCell align="right" padding="checkbox">
-                    {row.canReverse && (
+                {actions && (
+                  <TableCell align="right" sx={{ whiteSpace: 'nowrap', px: 0.5 }}>
+                    {onEdit && row.canEdit && !row.isVoided && (
+                      <Tooltip title="Редагувати">
+                        <IconButton
+                          size="small"
+                          aria-label={`Редагувати: ${label}`}
+                          onClick={() => onEdit(row)}
+                        >
+                          <EditOutlinedIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                    {onVoid && row.canEdit && !row.isVoided && (
+                      <Tooltip title="Скасувати">
+                        <IconButton
+                          size="small"
+                          aria-label={`Скасувати: ${label}`}
+                          onClick={() => onVoid(row)}
+                        >
+                          <BlockOutlinedIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                    {onReverse && row.canReverse && (
                       <Tooltip title="Сторно">
                         <IconButton
                           size="small"
-                          aria-label={`Сторно: ${kindLabel(row)} ${row.fabricName} ${row.color}`}
+                          aria-label={`Сторно: ${label}`}
                           onClick={() => onReverse(row)}
                         >
                           <UndoOutlinedIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                    {onHistory && row.revision > 0 && (
+                      <Tooltip title="Історія правок">
+                        <IconButton
+                          size="small"
+                          aria-label={`Історія правок: ${label}`}
+                          onClick={() => onHistory(row)}
+                        >
+                          <HistoryOutlinedIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
                     )}

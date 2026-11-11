@@ -15,12 +15,18 @@ export {
   fabricMovementFilters,
   fabricMovementKindLabels,
   fabricMovementKinds,
+  fabricMovementRevisionActionLabels,
+  fabricMovementRevisionActions,
 } from './entities/movements/fabric-movement';
 export type {
   FabricMovementFilter,
+  FabricMovementHistory,
   FabricMovementKind,
   FabricMovementPage,
+  FabricMovementRevision,
+  FabricMovementRevisionAction,
   FabricMovementRow,
+  FabricMovementState,
 } from './entities/movements/fabric-movement';
 export {
   FABRIC_STOCK_FORM_TEXT_MAX_LENGTH,
@@ -31,10 +37,13 @@ export {
 } from './entities/operations/stock-operation';
 export type {
   AdjustFabricStockBody,
+  EditFabricMovementBody,
   FabricStockOperationResult,
   IssueFabricBody,
   OpenFabricStockBody,
   ReceiveFabricBody,
+  RestoreFabricMovementBody,
+  VoidFabricMovementBody,
 } from './entities/operations/stock-operation';
 export type {
   FabricConsumption,
@@ -68,6 +77,18 @@ export type {
   FabricReceiptErrors,
   FabricReceiptFormValues,
 } from './forms/stock-operations/stock-operation-forms';
+export {
+  createMovementEditValues,
+  movementEditBody,
+  movementEditChanged,
+  movementEditDelta,
+  movementEditEffect,
+  validateMovementEdit,
+} from './forms/movement-edit/movement-edit-form';
+export type {
+  FabricMovementEditErrors,
+  FabricMovementEditValues,
+} from './forms/movement-edit/movement-edit-form';
 export {
   parseStockMeters,
   stockReasonError,

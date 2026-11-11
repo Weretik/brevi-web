@@ -47,6 +47,37 @@ export interface AdjustFabricStockBody {
   reason: string;
 }
 
+/**
+ * Edit of one movement. Metres without sign (receipt and issue > 0, opening ≥ 0), a correction keeps its sign.
+ * A receipt may move to another offer and colour (fabricId + color), an issue to another held pair (fabricCode + color).
+ */
+export interface EditFabricMovementBody {
+  operationId: string;
+  expectedRevision: number;
+  operationDate: string;
+  meters: number;
+  fabricId: number | null;
+  fabricCode: string | null;
+  color: string | null;
+  supplierName: string | null;
+  document: string | null;
+  destination: string | null;
+  reason: string | null;
+}
+
+/** «Скасувати»: the movement stays in the history with no effect on the balance. */
+export interface VoidFabricMovementBody {
+  operationId: string;
+  expectedRevision: number;
+  reason: string;
+}
+
+/** «Скасувати останню правку». */
+export interface RestoreFabricMovementBody {
+  operationId: string;
+  expectedRevision: number;
+}
+
 /** The pair after a stock operation. */
 export interface FabricStockOperationResult {
   operationId: string | null;

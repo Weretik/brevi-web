@@ -19,14 +19,19 @@ import { Box, Button, Stack } from '@mui/material';
 import { useState } from 'react';
 
 import { FabricConsumptionDrawer } from '../../components/consumption/fabric-consumption-drawer';
+import { FabricMovementEditDrawer } from '../../components/movements/fabric-movement-edit-drawer';
+import { FabricMovementHistoryDrawer } from '../../components/movements/fabric-movement-history-drawer';
 import { FabricIssueDrawer } from '../../components/operations/fabric-issue-drawer';
 import { FabricReceiptDrawer } from '../../components/operations/fabric-receipt-drawer';
 import { useMovementReversal } from '../../hooks/movements/use-movement-reversal';
+import { useMovementVoid } from '../../hooks/movements/use-movement-void';
 import { useMovementsExport } from '../../hooks/movements/use-movements-export';
 
-import type { FabricMovementQuery } from '@admin/warehouse/model';
+import type { FabricMovementQuery, FabricMovementRow } from '@admin/warehouse/model';
 
-type Panel = 'receipt' | 'issue' | 'consumption';
+type Panel =
+  | { kind: 'receipt' | 'issue' | 'consumption' }
+  | { kind: 'edit' | 'history'; row: FabricMovementRow };
 
 /** «Склад тканин › Рух тканини»: receipts, one-off issues and every movement, 50 per page. */
 export function FabricMovementsPage() {
@@ -36,6 +41,7 @@ export function FabricMovementsPage() {
   const movements = useGetFabricMovementsQuery(query);
   const stock = useGetFabricStockQuery();
   const reversal = useMovementReversal(setMessage);
+  const voiding = useMovementVoid(setMessage);
   const exporter = useMovementsExport(setMessage);
   const canMove = Boolean(movements.data?.permissions.canMove ?? stock.data?.permissions.canMove);
   const filtered = Boolean(query.fabricCode || query.color || query.kind !== 'All');
@@ -57,7 +63,7 @@ export function FabricMovementsPage() {
                 <Button
                   variant="contained"
                   startIcon={<AddOutlinedIcon />}
-                  onClick={() => setPanel('receipt')}
+                  onClick={() => setPanel({ kind: 'receipt' })}
                 >
                   Новий прихід
                 </Button>
@@ -65,7 +71,7 @@ export function FabricMovementsPage() {
                   variant="outlined"
                   startIcon={<RemoveOutlinedIcon />}
                   disabled={!stock.data}
-                  onClick={() => setPanel('issue')}
+                  onClick={() => setPanel({ kind: 'issue' })}
                 >
                   Разова витрата
                 </Button>
@@ -74,7 +80,7 @@ export function FabricMovementsPage() {
             <Button
               variant="outlined"
               startIcon={<QueryStatsOutlinedIcon />}
-              onClick={() => setPanel('consumption')}
+              onClick={() => setPanel({ kind: 'consumption' })}
             >
               Зведення витрати
             </Button>
@@ -107,6 +113,9 @@ export function FabricMovementsPage() {
             rows={movements.data.rows}
             filtered={filtered}
             onReverse={canMove ? reversal.request : null}
+            onEdit={canMove ? (row) => setPanel({ kind: 'edit', row }) : null}
+            onVoid={canMove ? voiding.request : null}
+            onHistory={(row) => setPanel({ kind: 'history', row })}
           />
           <FabricMovementPager
             page={query.page}
@@ -116,17 +125,49 @@ export function FabricMovementsPage() {
           />
         </>
       )}
-      {panel === 'receipt' && (
+      {panel?.kind === 'receipt' && (
         <FabricReceiptDrawer onClose={() => setPanel(null)} onSaved={setMessage} />
       )}
-      {panel === 'issue' && stock.data && (
+      {panel?.kind === 'issue' && stock.data && (
         <FabricIssueDrawer
           fabrics={stock.data.fabrics}
           onClose={() => setPanel(null)}
           onSaved={saved}
         />
       )}
-      {panel === 'consumption' && <FabricConsumptionDrawer onClose={() => setPanel(null)} />}
+      {panel?.kind === 'consumption' && <FabricConsumptionDrawer onClose={() => setPanel(null)} />}
+      {panel?.kind === 'edit' && (
+        <FabricMovementEditDrawer
+          row={panel.row}
+          fabrics={stock.data?.fabrics ?? []}
+          onClose={() => setPanel(null)}
+          onSaved={saved}
+        />
+      )}
+      {panel?.kind === 'history' && (
+        <FabricMovementHistoryDrawer
+          row={panel.row}
+          canMove={canMove}
+          onClose={() => setPanel(null)}
+          onRestored={saved}
+        />
+      )}
+      <StockReasonDialog
+        open={voiding.pending !== null}
+        title="Скасувати рух?"
+        text={
+          voiding.pending
+            ? `${voiding.pending.fabricName}, ${voiding.pending.color}: залишок зміниться на ${voiding.pending.delta < 0 ? '+' : ''}${formatMeters(-voiding.pending.delta)}. Запис лишиться в історії як «Скасовано», його можна повернути через «Історія правок».`
+            : ''
+        }
+        confirmLabel="Скасувати рух"
+        reason={voiding.reason}
+        error={voiding.error}
+        busy={voiding.busy}
+        onChange={voiding.change}
+        onClose={voiding.cancel}
+        onConfirm={() => void voiding.confirm()}
+      />
       <StockReasonDialog
         open={reversal.pending !== null}
         title="Сторнувати рух?"

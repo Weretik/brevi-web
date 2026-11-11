@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  mapFabricMovementHistory,
   mapFabricMovementPage,
   mapFabricStockChoices,
   mapFabricStockList,
@@ -69,6 +70,9 @@ describe('warehouse mappers', () => {
       isReversed: false,
       reversesMovementId: null,
       canReverse: true,
+      isVoided: false,
+      revision: 1,
+      canEdit: true,
     };
     const page = mapFabricMovementPage({ rows: [row], page: 1, hasMore: false, permissions });
     expect(page.rows[0]).toMatchObject({ groupCode: 'FAB-023', destination: 'Зразки' });
@@ -78,6 +82,45 @@ describe('warehouse mappers', () => {
         page: 1,
         hasMore: false,
         permissions,
+      }),
+    ).toThrow();
+  });
+
+  it('maps the history of a movement and refuses an unknown action', () => {
+    const state = {
+      fabricCode: 'FAB-023',
+      color: 'Синій',
+      operationDate: '2026-11-10',
+      delta: 10,
+      supplierName: 'Тексика',
+      document: null,
+      destination: null,
+      isVoided: false,
+    };
+    const revision = {
+      id: 3,
+      number: 1,
+      action: 'Void',
+      before: state,
+      after: { ...state, delta: 0, isVoided: true },
+      reason: 'Дубль',
+      createdByName: 'Олена',
+      createdAt: '2026-11-11T09:00:00Z',
+      isUndone: false,
+    };
+    const history = mapFabricMovementHistory({
+      movementId: 7,
+      revision: 1,
+      canRestore: true,
+      revisions: [revision],
+    });
+    expect(history.revisions[0]).toMatchObject({ action: 'Void', after: { isVoided: true } });
+    expect(() =>
+      mapFabricMovementHistory({
+        movementId: 7,
+        revision: 1,
+        canRestore: true,
+        revisions: [{ ...revision, action: 'Delete' }],
       }),
     ).toThrow();
   });

@@ -28,6 +28,9 @@ const api = vi.hoisted(() => {
     isReversed: false,
     reversesMovementId: null,
     canReverse: true,
+    isVoided: false,
+    revision: 0,
+    canEdit: true,
     ...patch,
   });
   return {
@@ -36,6 +39,9 @@ const api = vi.hoisted(() => {
     queries: [] as unknown[],
     receive: vi.fn(),
     reverse: vi.fn(),
+    edit: vi.fn(),
+    voidMovement: vi.fn(),
+    restore: vi.fn(),
   };
 });
 
@@ -45,7 +51,7 @@ vi.mock('@admin/warehouse/data-access', () => ({
     return {
       data: {
         rows: [
-          api.row(1),
+          api.row(1, { revision: 1 }),
           api.row(2, {
             kind: 'Issue',
             delta: -3.5,
@@ -99,6 +105,53 @@ vi.mock('@admin/warehouse/data-access', () => ({
     (body: unknown) => ({ unwrap: () => api.reverse(body) }),
   ],
   useGetFabricConsumptionQuery: () => ({ data: undefined, isFetching: false }),
+  useEditFabricMovementMutation: () => [(body: unknown) => ({ unwrap: () => api.edit(body) })],
+  useVoidFabricMovementMutation: () => [
+    (body: unknown) => ({ unwrap: () => api.voidMovement(body) }),
+  ],
+  useRestoreFabricMovementMutation: () => [
+    (body: unknown) => ({ unwrap: () => api.restore(body) }),
+  ],
+  useGetFabricMovementHistoryQuery: (movementId: number) => ({
+    data: {
+      movementId,
+      revision: 1,
+      canRestore: true,
+      revisions: [
+        {
+          id: 9,
+          number: 1,
+          action: 'Edit',
+          before: {
+            fabricCode: 'FAB-067',
+            color: 'Синій',
+            operationDate: '2026-11-10',
+            delta: 25,
+            supplierName: 'Тексика',
+            document: 'Н-15',
+            destination: null,
+            isVoided: false,
+          },
+          after: {
+            fabricCode: 'FAB-067',
+            color: 'Синій',
+            operationDate: '2026-11-10',
+            delta: 20,
+            supplierName: 'Тексика',
+            document: 'Н-15',
+            destination: null,
+            isVoided: false,
+          },
+          reason: 'Перерахували рулон',
+          createdByName: 'Олена',
+          createdAt: '2026-11-11T09:00:00Z',
+          isUndone: false,
+        },
+      ],
+    },
+    isFetching: false,
+    error: undefined,
+  }),
 }));
 
 beforeEach(() => {
@@ -106,7 +159,18 @@ beforeEach(() => {
   api.queries = [];
   api.receive.mockReset();
   api.reverse.mockReset();
+  api.edit.mockReset();
+  api.voidMovement.mockReset();
+  api.restore.mockReset();
 });
+
+const saved = {
+  operationId: 'a',
+  fabricCode: 'FAB-023',
+  color: 'Синій',
+  meters: 18,
+  replayed: false,
+};
 
 describe('FabricMovementsPage', () => {
   it('shows receipts and one-off issues with the line balance and pages by «Далі»', () => {
@@ -126,6 +190,9 @@ describe('FabricMovementsPage', () => {
     render(<FabricMovementsPage />);
     expect(screen.queryByRole('button', { name: 'Новий прихід' })).toBeNull();
     expect(screen.queryByRole('button', { name: /^Сторно/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: /^Редагувати/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: /^Скасувати:/ })).toBeNull();
+    expect(screen.getByRole('button', { name: /^Історія правок/ })).toBeTruthy();
   });
 
   it('retries a failed receipt with the same operation id and keeps the form for the next roll', async () => {
@@ -174,6 +241,55 @@ describe('FabricMovementsPage', () => {
     fireEvent.click(within(dialog).getByRole('button', { name: 'Сторнувати' }));
     await waitFor(() =>
       expect(api.reverse).toHaveBeenCalledWith({ movementId: 1, reason: 'Помилка' }),
+    );
+  });
+
+  it('edits a receipt with the revision it shows and the effect on the balance', async () => {
+    api.edit.mockResolvedValue(saved);
+    render(<FabricMovementsPage />);
+    fireEvent.click(screen.getAllByRole('button', { name: /^Редагувати/ })[0] as HTMLElement);
+    const drawer = screen.getByRole('dialog');
+    fireEvent.change(within(drawer).getByLabelText(/Метри/), { target: { value: '18' } });
+    expect(within(drawer).getByText(/зміниться на -2 м/)).toBeTruthy();
+    fireEvent.click(within(drawer).getByRole('button', { name: 'Зберегти правку' }));
+    await waitFor(() => expect(api.edit).toHaveBeenCalledTimes(1));
+    expect(api.edit.mock.calls[0]?.[0]).toMatchObject({
+      movementId: 1,
+      body: { expectedRevision: 1, meters: 18, fabricId: null, color: null },
+    });
+    expect(await screen.findByText('Правку збережено. Залишки перераховано.')).toBeTruthy();
+  });
+
+  it('voids a movement with a reason', async () => {
+    api.voidMovement.mockResolvedValue(saved);
+    render(<FabricMovementsPage />);
+    fireEvent.click(screen.getAllByRole('button', { name: /^Скасувати:/ })[1] as HTMLElement);
+    const dialog = screen.getByRole('dialog');
+    expect(within(dialog).getByText(/залишок зміниться на \+3,5 м/)).toBeTruthy();
+    fireEvent.change(within(dialog).getByLabelText(/Причина/), { target: { value: 'Дубль' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Скасувати рух' }));
+    await waitFor(() =>
+      expect(api.voidMovement).toHaveBeenCalledWith({
+        movementId: 2,
+        body: expect.objectContaining({ expectedRevision: 0, reason: 'Дубль' }),
+      }),
+    );
+  });
+
+  it('shows the history before and after and takes the last edit back', async () => {
+    api.restore.mockResolvedValue(saved);
+    render(<FabricMovementsPage />);
+    fireEvent.click(screen.getByRole('button', { name: /^Історія правок/ }));
+    const drawer = screen.getByRole('dialog');
+    const table = within(drawer).getByRole('table', { name: 'Історія правок' });
+    expect(within(table).getByText('Перерахували рулон')).toBeTruthy();
+    expect(within(table).getByText(/\+25 м/)).toBeTruthy();
+    fireEvent.click(within(drawer).getByRole('button', { name: 'Скасувати останню правку' }));
+    await waitFor(() =>
+      expect(api.restore).toHaveBeenCalledWith({
+        movementId: 1,
+        body: expect.objectContaining({ expectedRevision: 1 }),
+      }),
     );
   });
 });

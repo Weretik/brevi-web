@@ -4241,6 +4241,74 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/warehouse/fabric-stock/movements/{movementId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** Edits an opening, receipt, correction or issue without an order; the chains of both lines are restated */
+    put: operations['editFabricMovement'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/warehouse/fabric-stock/movements/{movementId}/void': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** «Скасувати»: the movement stays in the history with no effect on the balance */
+    post: operations['voidFabricMovement'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/warehouse/fabric-stock/movements/{movementId}/restore': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** «Скасувати останню правку»: the state before the newest edit or void not yet taken back comes back, only while the movement still is what it left */
+    post: operations['restoreFabricMovement'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/warehouse/fabric-stock/movements/{movementId}/revisions': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** «Історія правок» of a movement, newest first */
+    get: operations['getFabricMovementHistory'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/warehouse/fabric-stock/consumption': {
     parameters: {
       query?: never;
@@ -10739,6 +10807,12 @@ export interface components {
       isReversed: boolean;
       reversesMovementId: number | null;
       canReverse: boolean;
+      /** @description «Скасовано»: kept in the history with no effect on the balance. */
+      isVoided: boolean;
+      /** @description Number of edits, voids and restores; send it back as expectedRevision. */
+      revision: number;
+      /** @description Edit, «Скасувати» and «Історія правок» actions are offered. */
+      canEdit: boolean;
     };
     FabricMovementPageResponse: {
       rows: components['schemas']['FabricMovementRowResponse'][];
@@ -10842,6 +10916,91 @@ export interface components {
     };
     ReverseFabricMovementInput: {
       reason: string;
+    };
+    EditFabricMovementInput: {
+      /**
+       * Format: uuid
+       * @description A new id per form; the same id with the same data returns the saved result, with other data 409.
+       */
+      operationId: string;
+      /** @description The movement revision shown on the form; another one is 409. */
+      expectedRevision: number;
+      /**
+       * Format: date
+       * @description The day the fabric really came or went, 1900-01-01…2100-12-31.
+       */
+      operationDate: string;
+      /**
+       * Format: double
+       * @description Amount without sign: >0 for a receipt or issue, ≥0 for an opening; a correction is signed and ≠0.
+       */
+      meters: number;
+      /** @description A receipt only: another offer of «Тканини». */
+      fabricId?: number | null;
+      /** @description An issue only: another pair the stock holds. */
+      fabricCode?: string | null;
+      /** @description A receipt: another colour (alone: the same offer). An issue, with fabricCode: the colour of the target pair. */
+      color?: string | null;
+      /** @description A receipt only. */
+      supplierName?: string | null;
+      /** @description A receipt only. */
+      document?: string | null;
+      /** @description An issue only. */
+      destination?: string | null;
+      reason?: string | null;
+    };
+    VoidFabricMovementInput: {
+      /**
+       * Format: uuid
+       * @description A new id per form; the same id with the same data returns the saved result, with other data 409.
+       */
+      operationId: string;
+      /** @description The movement revision shown on the form; another one is 409. */
+      expectedRevision: number;
+      reason: string;
+    };
+    RestoreFabricMovementInput: {
+      /**
+       * Format: uuid
+       * @description A new id per form; the same id with the same data returns the saved result, with other data 409.
+       */
+      operationId: string;
+      /** @description The movement revision shown on the form; another one is 409. */
+      expectedRevision: number;
+    };
+    /** @description A movement before or after a revision. */
+    FabricMovementStateResponse: {
+      fabricCode: string;
+      color: string;
+      /** Format: date */
+      operationDate: string;
+      /** Format: double */
+      delta: number;
+      supplierName: string | null;
+      document: string | null;
+      destination: string | null;
+      isVoided: boolean;
+    };
+    FabricMovementRevisionResponse: {
+      id: number;
+      number: number;
+      /** @enum {string} */
+      action: 'Edit' | 'Void' | 'Restore';
+      before: components['schemas']['FabricMovementStateResponse'];
+      after: components['schemas']['FabricMovementStateResponse'];
+      reason: string | null;
+      createdByName: string;
+      /** Format: date-time */
+      createdAt: string;
+      /** @description Taken back by a later restore. */
+      isUndone: boolean;
+    };
+    FabricMovementHistoryResponse: {
+      movementId: number;
+      revision: number;
+      /** @description «Скасувати останню правку» is offered. */
+      canRestore: boolean;
+      revisions: components['schemas']['FabricMovementRevisionResponse'][];
     };
     FabricConsumptionRowResponse: {
       stockId: number;
@@ -26058,6 +26217,232 @@ export interface operations {
       };
       /** @description Stale, already reversed, or an issue to an order */
       409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  editFabricMovement: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        movementId: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['EditFabricMovementInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FabricStockOperationResponse'];
+        };
+      };
+      /** @description Invalid, wrong sign for the kind, nothing changed, or a target change of an opening or correction */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such movement, or the stock never held the target pair */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Changed by someone else, voided, reversed, an issue to an order, or the operation id was used for other data */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  voidFabricMovement: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        movementId: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['VoidFabricMovementInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FabricStockOperationResponse'];
+        };
+      };
+      /** @description Invalid */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such movement */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Changed by someone else, voided, reversed, an issue to an order, or the operation id was used for other data */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  restoreFabricMovement: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        movementId: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RestoreFabricMovementInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FabricStockOperationResponse'];
+        };
+      };
+      /** @description Invalid or out of range */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such movement */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Nothing to restore, changed since, or the operation id was used for other data */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getFabricMovementHistory: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        movementId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FabricMovementHistoryResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such movement */
+      404: {
         headers: {
           [name: string]: unknown;
         };

@@ -54,6 +54,12 @@ export interface FabricMovementRow {
   isReversed: boolean;
   reversesMovementId: number | null;
   canReverse: boolean;
+  /** «Скасовано»: kept in the history with no effect on the balance. */
+  isVoided: boolean;
+  /** Edits, voids and restores so far; sent back as the expected revision. */
+  revision: number;
+  /** Edit, «Скасувати» and «Історія правок» are offered. */
+  canEdit: boolean;
 }
 
 export interface FabricMovementPage {
@@ -61,4 +67,46 @@ export interface FabricMovementPage {
   page: number;
   hasMore: boolean;
   permissions: FabricStockPermissions;
+}
+
+export const fabricMovementRevisionActions = ['Edit', 'Void', 'Restore'] as const;
+export type FabricMovementRevisionAction = (typeof fabricMovementRevisionActions)[number];
+
+export const fabricMovementRevisionActionLabels: Record<FabricMovementRevisionAction, string> = {
+  Edit: 'Правка',
+  Void: 'Скасування',
+  Restore: 'Скасування правки',
+};
+
+/** A movement before or after a revision. */
+export interface FabricMovementState {
+  fabricCode: string;
+  color: string;
+  operationDate: string;
+  delta: number;
+  supplierName: string | null;
+  document: string | null;
+  destination: string | null;
+  isVoided: boolean;
+}
+
+export interface FabricMovementRevision {
+  id: number;
+  number: number;
+  action: FabricMovementRevisionAction;
+  before: FabricMovementState;
+  after: FabricMovementState;
+  reason: string | null;
+  createdByName: string;
+  createdAt: string;
+  /** Taken back by a later «Скасувати останню правку». */
+  isUndone: boolean;
+}
+
+/** «Історія правок» of a movement, newest first. */
+export interface FabricMovementHistory {
+  movementId: number;
+  revision: number;
+  canRestore: boolean;
+  revisions: FabricMovementRevision[];
 }
