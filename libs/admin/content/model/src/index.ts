@@ -112,6 +112,14 @@ export type { SiteCategoryImportReport } from './entities/site-categories/site-c
 export { readSiteCategoryImportFile } from './mappers/site-categories/site-category-import-file';
 export type { SiteCategoryImportFile } from './mappers/site-categories/site-category-import-file';
 export { articleBlockKinds } from './entities/articles/article';
+export { articleImportBatchSize, articleImportMaxItems } from './entities/articles/article-import';
+export type { ArticleImportReport } from './entities/articles/article-import';
+export {
+  articleImportBatches,
+  readArticleImportFile,
+  sumArticleImportReports,
+} from './mappers/articles/article-import-file';
+export type { ArticleImportFile } from './mappers/articles/article-import-file';
 export type {
   Article,
   ArticleBlock,

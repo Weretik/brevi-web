@@ -10,6 +10,7 @@ const fixture = vi.hoisted(() => ({
   visibility: vi.fn(),
   save: vi.fn(),
   remove: vi.fn(),
+  transfer: vi.fn(),
 }));
 
 const fabric = {
@@ -71,6 +72,7 @@ vi.mock('@admin/content/data-access', () => ({
   useSetContentArticleVisibilityMutation: () => [fixture.visibility, { isLoading: false }],
   useSaveContentArticleMutation: () => [fixture.save, { isLoading: false }],
   useDeleteContentArticleMutation: () => [fixture.remove, { isLoading: false }],
+  useImportOldSiteArticlesMutation: () => [fixture.transfer, { isLoading: false }],
 }));
 
 // The «Фото» library is its own feature: here it hands back one chosen photo.
@@ -219,5 +221,56 @@ describe('ArticlesContent', () => {
 
     expect(fixture.remove).toHaveBeenCalledWith(1);
     expect(await screen.findByText('Статтю «Як обрати тканину» видалено.')).toBeInTheDocument();
+  });
+  it('checks the old-site file in one request and transfers the articles in parts of three', async () => {
+    const items = ['a', 'b', 'c', 'd'].map((slug) => ({ slug, publishedOn: '2021-07-28' }));
+    const problem = { url: 'https://brevi.com.ua/image/x.jpg', name: 'd', reason: 'Фото немає.' };
+    fixture.transfer.mockImplementation((request: { items: unknown[]; dryRun: boolean }) =>
+      unwrapped({
+        dryRun: request.dryRun,
+        total: request.items.length,
+        created: request.items.length,
+        updated: 0,
+        kept: 0,
+        photos: request.dryRun ? 6 : request.items.length,
+        notMatched: [],
+        problems: !request.dryRun && request.items.length === 1 ? [problem] : [],
+      }),
+    );
+    renderPage();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Перенести зі старого сайту' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Перенести статті зі старого сайту' });
+    await userEvent.upload(
+      within(dialog).getByLabelText('Файл перенесення'),
+      new File([JSON.stringify({ items })], 'articles.json', { type: 'application/json' }),
+    );
+
+    expect(
+      await within(dialog).findByText(/Статей у файлі: 4 .* Буде перенесено фото: 6/),
+    ).toBeInTheDocument();
+    expect(fixture.transfer).toHaveBeenCalledTimes(1);
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Перенести' }));
+
+    expect(await within(dialog).findByText('Статті перенесено.')).toBeInTheDocument();
+    expect(within(dialog).getByText(/Створено: 4 .* Перенесено фото: 4/)).toBeInTheDocument();
+    expect(within(dialog).getByText(/Фото немає\./)).toBeInTheDocument();
+    expect(fixture.transfer).toHaveBeenCalledTimes(3);
+    expect(fixture.transfer).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ items: items.slice(0, 3), dryRun: false }),
+    );
+    expect(fixture.transfer).toHaveBeenNthCalledWith(
+      3,
+      expect.objectContaining({ items: items.slice(3), dryRun: false }),
+    );
+  });
+
+  it('hides the transfer without the create right', () => {
+    renderPage({ canCreate: false, canEdit: true, canDelete: false });
+
+    expect(
+      screen.queryByRole('button', { name: 'Перенести зі старого сайту' }),
+    ).not.toBeInTheDocument();
   });
 });

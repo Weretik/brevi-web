@@ -5474,6 +5474,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/content/articles/old-site-import': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description One-time transfer of the old-site articles with SEO, texts and pictures. An article is matched by its address. With dryRun (the default) nothing is written and the answer says what would happen. Articles that already exist are kept unless overwrite is true. Pictures (the cover and pictures of the text) are downloaded from the old site into the folder «Старий сайт / Статті» of the «Фото» library, each once; a picture that fails is left out and named in problems, the article is still saved. showOnSite switches transferred articles on and never switches one off. Every article is saved on its own, so a repeated run continues where the previous one stopped. Needs the create right. */
+    post: operations['importOldSiteArticles'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/content/articles/{id}': {
     parameters: {
       query?: never;
@@ -12739,6 +12756,65 @@ export interface components {
       ru: components['schemas']['ArticleTextResponse'];
       /** @description The cover and the photos of the bodies that the library still has. */
       photos: components['schemas']['ArticlePhoto'][];
+    };
+    /** @description A block of an old-site article; a picture is named by its address on the old site. */
+    OldSiteArticleBlock: {
+      kind: components['schemas']['ArticleBlockKind'];
+      text?: string | null;
+      lead?: string | null;
+      items?: string[] | null;
+      /** @description Required for an Image block. https on brevi.com.ua, a JPG, PNG or WebP file. */
+      imageUrl?: string | null;
+      alt?: string | null;
+    };
+    OldSiteArticleText: {
+      title?: string | null;
+      excerpt?: string | null;
+      seoTitle?: string | null;
+      seoDescription?: string | null;
+      body?: components['schemas']['OldSiteArticleBlock'][] | null;
+    };
+    OldSiteArticle: {
+      /** @description Lower-case Latin letters, digits and single hyphens, 3 to 120 characters. */
+      slug: string;
+      /** Format: date */
+      publishedOn: string;
+      /** @description The cover on the old site (https on brevi.com.ua, a JPG, PNG or WebP file). */
+      coverUrl?: string | null;
+      uk?: components['schemas']['OldSiteArticleText'] | null;
+      ru?: components['schemas']['OldSiteArticleText'] | null;
+    };
+    ImportOldSiteArticlesRequest: {
+      items: components['schemas']['OldSiteArticle'][];
+      /** @default true */
+      dryRun: boolean;
+      /** @default false */
+      showOnSite: boolean;
+      /** @default false */
+      overwrite: boolean;
+    };
+    OldSiteArticleImportResponse: {
+      dryRun: boolean;
+      /** Format: int32 */
+      total: number;
+      /** Format: int32 */
+      created: number;
+      /** Format: int32 */
+      updated: number;
+      /**
+       * Format: int32
+       * @description Articles that already exist and were not replaced.
+       */
+      kept: number;
+      /**
+       * Format: int32
+       * @description Pictures of the articles to write that the «Фото» library does not have yet.
+       */
+      photosToDownload: number;
+      /** Format: int32 */
+      photosDownloaded: number;
+      /** @description Articles left out and pictures that could not be brought, each with the reason. */
+      problems: components['schemas']['OldSiteImportNote'][];
     };
     ContentArticleVisibilityRequest: {
       showOnSite: boolean;
@@ -30470,6 +30546,51 @@ export interface operations {
         content: {
           'application/json': components['schemas']['Messages'];
         };
+      };
+    };
+  };
+  importOldSiteArticles: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ImportOldSiteArticlesRequest'];
+      };
+    };
+    responses: {
+      /** @description Counted (dryRun) or transferred */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['OldSiteArticleImportResponse'];
+        };
+      };
+      /** @description No articles, more than 200 articles, an invalid address or date, a picture that is not on the old site or a text over its limit */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to create in «Статті» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };
