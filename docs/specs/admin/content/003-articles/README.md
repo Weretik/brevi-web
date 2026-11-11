@@ -1,6 +1,6 @@
 # Admin: «Контент → Статті» (articles of the site)
 
-**Status:** implemented and locally verified 2026-11-11. **Backend:** BreviERP CNT-004 (`docs/sdd/specs/content/004-articles`), stage 2 of its plan. **Contract:** [content-articles.openapi.yaml](../../../../contracts/openapi/backend/content/content-articles.openapi.yaml), operations `getContentArticles`, `getContentArticle`, `createContentArticle`, `saveContentArticle`, `setContentArticleVisibility`, `deleteContentArticle`.
+**Status:** implemented and locally verified 2026-11-11. **Backend:** BreviERP [CNT-004](https://github.com/Weretik/BreviERP/blob/4e37a94ec9ddc1f64dc46df4b4e1caeeb9b8763d/docs/sdd/specs/content/004-articles/README.md), stage 2 of its plan. **Contract:** [content-articles.openapi.yaml](../../../../contracts/openapi/backend/content/content-articles.openapi.yaml), operations `getContentArticles`, `getContentArticle`, `createContentArticle`, `saveContentArticle`, `setContentArticleVisibility`, `deleteContentArticle`.
 
 ## Goal
 
