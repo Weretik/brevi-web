@@ -46,12 +46,6 @@ export {
   useUpdateWorkshopSettingsMutation,
 } from './api/workshop-settings.api';
 export {
-  useCreateFabricIssueMutation,
-  useGetIssueFabricChoicesQuery,
-  useGetProductionItemFabricQuery,
-  useReverseFabricIssueMutation,
-} from './api/fabric-stock.api';
-export {
   useCreateProductionWorkMutation,
   useGetProductionItemWorkQuery,
   useGetSewingForecastQuery,

@@ -75,6 +75,56 @@ const api = vi.hoisted(() => {
   };
 });
 
+vi.mock('@admin/warehouse/data-access', () => {
+  const mutation = () => () => [
+    () => ({ unwrap: () => Promise.resolve(undefined) }),
+    { isLoading: false },
+  ];
+  return {
+    useGetItemFabricQuery: () => ({
+      data: {
+        orderId: 5,
+        itemId: 3,
+        orderNumber: 12,
+        clientName: 'School 5',
+        modelName: 'Куртка',
+        orderVersion: 2,
+        isOpen: true,
+        fabricCode: 'FAB-1',
+        fabricName: 'Оксфорд',
+        quantity: 10,
+        hasNorm: true,
+        planVersion: 0,
+        planMissing: null,
+        plan: [
+          {
+            fabricCode: 'FAB-1',
+            color: 'чорний',
+            colorKey: 'чорний',
+            layer: 'Upper',
+            planned: 15,
+            covered: 0,
+            issued: 0,
+            reserved: 15,
+            stockId: 1,
+            stockMeters: 10,
+            stockAvailable: -5,
+            missing: 15,
+          },
+        ],
+        issued: 0,
+        issues: [],
+        canIssue: api.current.permissions.canTrack,
+      },
+      isLoading: false,
+    }),
+    useGetFabricStockQuery: () => ({ data: undefined, isFetching: false }),
+    useIssueFabricToItemMutation: mutation(),
+    useRefreshItemFabricPlanMutation: mutation(),
+    useReverseFabricIssueMutation: mutation(),
+  };
+});
+
 vi.mock('@admin/production/data-access', () => {
   const mutation = (fn: (arg: unknown) => unknown) => () => [
     (arg: unknown) => ({ unwrap: () => Promise.resolve(fn(arg)) }),
@@ -122,38 +172,6 @@ vi.mock('@admin/production/data-access', () => {
     useUploadProductionOrderFileMutation: mutation(() => api.current),
     useDeleteProductionOrderFileMutation: mutation(() => api.current),
     useSendProductionOrderTelegramMutation: mutation(() => api.current),
-    useGetProductionItemFabricQuery: () => ({
-      data: {
-        orderId: 5,
-        itemId: 3,
-        orderVersion: 2,
-        fabricCode: 'FAB-1',
-        fabricName: 'Оксфорд',
-        quantity: 10,
-        hasNorm: true,
-        plan: [
-          {
-            fabricCode: 'FAB-1',
-            color: 'чорний',
-            colorKey: 'чорний',
-            planned: 15,
-            covered: 0,
-            issued: 0,
-            reserved: 15,
-            stockId: 1,
-            stockMeters: 10,
-            stockAvailable: -5,
-          },
-        ],
-        issued: 0,
-        issues: [],
-        canIssue: api.current.permissions.canTrack,
-      },
-      isLoading: false,
-    }),
-    useGetIssueFabricChoicesQuery: () => ({ data: undefined, isFetching: false }),
-    useCreateFabricIssueMutation: mutation(() => undefined),
-    useReverseFabricIssueMutation: mutation(() => undefined),
     useGetProductionItemWorkQuery: () => ({
       data: {
         orderId: 5,
