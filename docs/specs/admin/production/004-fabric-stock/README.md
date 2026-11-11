@@ -1,6 +1,6 @@
 # Admin «Швейний цех», stage 4: «Склад тканин»
 
-**Status:** implemented 2026-11-04. Backend: BreviERP PRD-004 (`docs/sdd/specs/production/004-fabric-stock`). Follows [stage 3](../003-order-tracking/README.md).
+**Status:** implemented 2026-11-04. Backend: BreviERP PRD-004 (`docs/sdd/specs/production/004-fabric-stock`). Follows [stage 3](../003-order-tracking/README.md). The stock pages were replaced on 2026-11-11 by [«Склад тканин» stage 2](../../warehouse/001-ledger-pages/README.md); the item «Тканина» tab described here stays.
 
 ## Scenarios
 

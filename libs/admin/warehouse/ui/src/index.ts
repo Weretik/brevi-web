@@ -1,0 +1,12 @@
+export { FabricStockTable } from './tables/stock/fabric-stock-table';
+export { FabricMovementsTable } from './tables/movements/fabric-movements-table';
+export { FabricMovementHistoryTable } from './tables/movements/fabric-movement-history-table';
+export { FabricConsumptionTable } from './tables/consumption/fabric-consumption-table';
+export { FabricMovementFilters } from './components/movements/fabric-movement-filters';
+export { FabricMovementPager } from './components/movements/fabric-movement-pager';
+export { FabricReceiptForm } from './forms/stock-operations/fabric-receipt-form';
+export { FabricOpeningForm } from './forms/stock-operations/fabric-opening-form';
+export { FabricIssueForm } from './forms/stock-operations/fabric-issue-form';
+export { FabricAdjustmentForm } from './forms/stock-operations/fabric-adjustment-form';
+export { StockReasonDialog } from './dialogs/stock-reason-dialog';
+export { FabricMovementEditForm } from './forms/movement-edit/fabric-movement-edit-form';

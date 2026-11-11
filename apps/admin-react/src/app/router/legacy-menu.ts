@@ -127,20 +127,30 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
     ],
   },
   {
-    // Own module Warehouse (WH-001); pages without a path come in the next stages of the warehouse plan.
+    // Own module Warehouse (WH-001, WH-002); pages without a path come in the next stages of the warehouse plan.
     id: 'fabric-warehouse',
     icon: Inventory2OutlinedIcon,
     section: 'Робота',
     label: 'Склад тканин',
     items: [
-      { id: 'fabric-movements', label: 'Рух тканини', access: 'fabric-stock' },
+      {
+        id: 'fabric-movements',
+        label: 'Рух тканини',
+        path: '/warehouse/movements',
+        access: 'fabric-stock',
+      },
       {
         id: 'fabric-stock',
         label: 'Залишки',
         path: '/warehouse/stock',
         access: 'fabric-stock',
       },
-      { id: 'fabric-opening', label: 'Початкові залишки', access: 'fabric-stock' },
+      {
+        id: 'fabric-opening',
+        label: 'Початкові залишки',
+        path: '/warehouse/opening',
+        access: 'fabric-stock',
+      },
       { id: 'fabric-plan-fact', label: 'План і факт', access: 'fabric-stock' },
       { id: 'fabric-booking', label: 'Бронь і що замовити', access: 'fabric-stock' },
       {

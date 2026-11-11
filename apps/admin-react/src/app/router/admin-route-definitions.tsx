@@ -15,6 +15,7 @@ import { createQuotesRoutes } from '@admin/quotes/feature';
 import { createReferencesRoutes } from '@admin/references/feature';
 import { remindersRoutes } from '@admin/reminders/feature';
 import { createTasksRoutes } from '@admin/tasks/feature';
+import { createWarehouseRoutes } from '@admin/warehouse/feature';
 
 import { useArticlesViewer } from './use-articles-viewer';
 import { useCanSeeFinance } from './use-can-see-finance';
@@ -47,6 +48,7 @@ export const adminRouteDefinitions = [
     useSiteCategoriesViewer,
     useArticlesViewer,
   }),
+  ...createWarehouseRoutes(),
 ];
 
 /** Task pages need a role check, so the router wraps them instead of listing them above. */
