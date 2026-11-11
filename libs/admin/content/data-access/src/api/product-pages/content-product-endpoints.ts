@@ -58,10 +58,11 @@ export function contentProductEndpoints(build: ContentEndpointBuilder) {
       }),
       transformResponse: mapContentProduct,
       transformErrorResponse: contentApiError,
-      // A stale revision means someone else saved: reload either way.
+      // A stale revision means someone else saved: reload either way. Categories count their products.
       invalidatesTags: (_result, _error, { productId }) => [
         contentProductsTag,
         contentProductTag(productId),
+        'SiteCategory',
       ],
     }),
     setContentProductVisibility: build.mutation<

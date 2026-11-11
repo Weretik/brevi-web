@@ -1,6 +1,10 @@
 import { flag, integer, list, nullableText, record, text } from '../../validators/content-response';
 
-import type { OldSiteImportNote, OldSiteImportReport } from '@admin/content/model';
+import type {
+  OldSiteImportNote,
+  OldSiteImportReport,
+  SiteCategoryImportReport,
+} from '@admin/content/model';
 
 function mapNote(value: unknown): OldSiteImportNote {
   const note = record(value, 'сторінка старого сайту');
@@ -21,5 +25,13 @@ export function mapOldSiteImportReport(value: unknown): OldSiteImportReport {
     kept: integer(report['kept'], 'залишено'),
     notMatched: list(report['notMatched'], 'без товару').map(mapNote),
     problems: list(report['problems'], 'проблеми').map(mapNote),
+  };
+}
+
+export function mapSiteCategoryImportReport(value: unknown): SiteCategoryImportReport {
+  const report = record(value, 'звіт перенесення розділів');
+  return {
+    ...mapOldSiteImportReport(value),
+    productLinks: integer(report['productLinks'], 'додано товарів'),
   };
 }

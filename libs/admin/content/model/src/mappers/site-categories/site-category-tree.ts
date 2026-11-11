@@ -2,6 +2,12 @@ import type { SiteCategoryRow } from '../../entities/site-categories/site-catego
 
 export const siteCategoryName = (row: SiteCategoryRow) => row.nameUk ?? row.nameRu ?? row.slug;
 
+/** «Розділ → Підрозділ»: the name of a category with its top-level category in front. */
+export function siteCategoryPath(row: SiteCategoryRow, rows: readonly SiteCategoryRow[]): string {
+  const parent = row.parentId === null ? null : rows.find((other) => other.id === row.parentId);
+  return parent ? `${siteCategoryName(parent)} → ${siteCategoryName(row)}` : siteCategoryName(row);
+}
+
 /**
  * What the site would miss for this category. Only problems are shown: a complete category has no
  * mark, and a hidden one has nothing to miss yet.

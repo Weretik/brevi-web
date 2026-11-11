@@ -12,4 +12,5 @@ export {
   useSetSiteCategoryVisibilityMutation,
   useReorderSiteCategoriesMutation,
   useDeleteSiteCategoryMutation,
+  useImportOldSiteCategoriesMutation,
 } from './api/content.api';

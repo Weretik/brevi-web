@@ -22,4 +22,5 @@ export const {
   useSetSiteCategoryVisibilityMutation,
   useReorderSiteCategoriesMutation,
   useDeleteSiteCategoryMutation,
+  useImportOldSiteCategoriesMutation,
 } = contentApi;

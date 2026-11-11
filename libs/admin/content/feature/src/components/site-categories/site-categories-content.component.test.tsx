@@ -11,6 +11,7 @@ const fixture = vi.hoisted(() => ({
   reorder: vi.fn(),
   save: vi.fn(),
   remove: vi.fn(),
+  transfer: vi.fn(),
 }));
 
 const clothes = {
@@ -81,6 +82,7 @@ vi.mock('@admin/content/data-access', () => ({
   useReorderSiteCategoriesMutation: () => [fixture.reorder, { isLoading: false }],
   useSaveSiteCategoryMutation: () => [fixture.save, { isLoading: false }],
   useDeleteSiteCategoryMutation: () => [fixture.remove, { isLoading: false }],
+  useImportOldSiteCategoriesMutation: () => [fixture.transfer, { isLoading: false }],
 }));
 
 const unwrapped = <T,>(value: T) => ({ unwrap: () => Promise.resolve(value) });
@@ -229,5 +231,53 @@ describe('SiteCategoriesContent', () => {
 
     expect(fixture.remove).toHaveBeenCalledWith(2);
     expect(await screen.findByText('Розділ «Костюми» видалено.')).toBeInTheDocument();
+  });
+
+  it('transfers old-site categories only after a check and «Перенести»', async () => {
+    const items = [{ slug: 'specodyag', parentSlug: null, productUrls: ['/kostyum-lider/'] }];
+    const counted = {
+      dryRun: true,
+      total: 1,
+      created: 0,
+      updated: 0,
+      kept: 1,
+      productLinks: 5,
+      notMatched: [{ url: '/halat-gera/', name: null, reason: 'Немає товару.' }],
+      problems: [],
+    };
+    fixture.transfer.mockImplementation(({ dryRun }: { dryRun: boolean }) =>
+      unwrapped({ ...counted, dryRun }),
+    );
+    renderPage();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Перенести зі старого сайту' }));
+    const dialog = await screen.findByRole('dialog', {
+      name: 'Перенести розділи зі старого сайту',
+    });
+    await userEvent.upload(
+      within(dialog).getByLabelText('Файл перенесення'),
+      new File([JSON.stringify({ items })], 'categories.json', { type: 'application/json' }),
+    );
+
+    expect(
+      await within(dialog).findByText(/Розділів у файлі: 1 .* Буде додано товарів у розділи: 5/),
+    ).toBeInTheDocument();
+    expect(fixture.transfer).toHaveBeenCalledTimes(1);
+    expect(fixture.transfer).toHaveBeenLastCalledWith(
+      expect.objectContaining({ items, dryRun: true, showOnSite: false, overwrite: false }),
+    );
+    // Only new products in existing categories are enough to transfer.
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Перенести' }));
+
+    expect(await within(dialog).findByText('Розділи перенесено.')).toBeInTheDocument();
+    expect(fixture.transfer).toHaveBeenLastCalledWith(expect.objectContaining({ dryRun: false }));
+  });
+
+  it('hides the transfer without the create right', () => {
+    renderPage({ canCreate: false, canEdit: true, canDelete: false });
+
+    expect(
+      screen.queryByRole('button', { name: 'Перенести зі старого сайту' }),
+    ).not.toBeInTheDocument();
   });
 });

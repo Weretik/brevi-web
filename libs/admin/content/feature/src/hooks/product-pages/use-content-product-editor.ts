@@ -18,7 +18,12 @@ import type { ContentProductErrors, ContentProductFormValues } from '@admin/cont
  * Side panel of one product: view first, «Редагувати» opens the form. The save sends the revision
  * the user opened; a newer change by someone else comes back as an error to reopen.
  */
-export function useContentProductEditor(productId: number, onDone: (text: string) => void) {
+export function useContentProductEditor(
+  productId: number,
+  /** False when the tree of «Розділи сайту» is not available: the save then keeps the categories. */
+  categoriesKnown: boolean,
+  onDone: (text: string) => void,
+) {
   const query = useGetContentProductQuery(productId);
   const product = query.currentData ?? null;
   const [values, setValues] = useState<ContentProductFormValues | null>(null);
@@ -66,7 +71,9 @@ export function useContentProductEditor(productId: number, onDone: (text: string
       : null,
     mode: values ? ('edit' as const) : ('view' as const),
     enableEditing: () => {
-      if (product) setValues(contentProductFormOf(product));
+      if (!product) return;
+      const form = contentProductFormOf(product);
+      setValues(categoriesKnown ? form : { ...form, categoryIds: null });
     },
     values,
     errors,

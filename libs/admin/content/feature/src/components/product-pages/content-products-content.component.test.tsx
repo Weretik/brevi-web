@@ -13,6 +13,7 @@ const fixture = vi.hoisted(() => ({
   save: vi.fn(),
   remove: vi.fn(),
   transfer: vi.fn(),
+  categories: true,
 }));
 
 const complete = {
@@ -33,6 +34,7 @@ const complete = {
   hasRussianText: true,
   hasSeo: true,
   updatedAtUtc: '2026-11-11T08:00:00Z',
+  categoryCount: 1,
 };
 const hidden = {
   ...complete,
@@ -90,7 +92,28 @@ const detail = {
       prices: { retail: 1500, wholesale: 1400, largeWholesale: 1300 },
     },
   ],
+  categoryIds: [2],
 };
+const category = {
+  id: 1,
+  parentId: null,
+  slug: 'spetsodyah',
+  sortOrder: 1,
+  showOnSite: true,
+  onSite: true,
+  nameUk: 'Спецодяг',
+  nameRu: 'Спецодежда',
+  hasUkrainianText: true,
+  hasRussianText: true,
+  hasSeo: true,
+  productCount: 1,
+  updatedAtUtc: null,
+};
+const categories = [
+  category,
+  { ...category, id: 2, parentId: 1, slug: 'kostyumy', nameUk: 'Костюми' },
+  { ...category, id: 3, parentId: 1, slug: 'kurtky', nameUk: 'Куртки' },
+];
 
 vi.mock('@admin/content/data-access', () => ({
   useGetContentProductsQuery: (query: Record<string, unknown>) => {
@@ -108,6 +131,9 @@ vi.mock('@admin/content/data-access', () => ({
       refetch: vi.fn(),
     };
   },
+  useGetSiteCategoriesQuery: () => ({
+    currentData: fixture.categories ? categories : undefined,
+  }),
   useGetContentProductQuery: () => ({ currentData: detail, isLoading: false, error: undefined }),
   useSetContentProductVisibilityMutation: () => [fixture.visibility, { isLoading: false }],
   useSaveContentProductMutation: () => [fixture.save, { isLoading: false }],
@@ -132,6 +158,7 @@ function renderPage(
 afterEach(() => {
   cleanup();
   fixture.queries.length = 0;
+  fixture.categories = true;
   vi.clearAllMocks();
 });
 
@@ -238,6 +265,37 @@ describe('ContentProductsContent', () => {
     expect(
       await screen.findByText('Збережено: «Костюм Лідер» показується на сайті.'),
     ).toBeInTheDocument();
+  });
+
+  it('shows the categories of a product and saves the chosen ones', async () => {
+    fixture.save.mockReturnValue(unwrapped(detail));
+    renderPage();
+
+    await userEvent.click(screen.getByText('Костюм Лідер'));
+    const panel = await screen.findByRole('dialog');
+    expect(within(panel).getByText('Спецодяг → Костюми')).toBeInTheDocument();
+    await userEvent.click(within(panel).getByRole('button', { name: 'Редагувати' }));
+    await userEvent.click(within(panel).getByRole('combobox', { name: 'Розділи сайту' }));
+    await userEvent.click(await screen.findByRole('option', { name: 'Спецодяг → Куртки' }));
+    await userEvent.click(within(panel).getByRole('button', { name: 'Зберегти' }));
+
+    await waitFor(() => expect(fixture.save).toHaveBeenCalledTimes(1));
+    expect(fixture.save.mock.calls[0]![0]).toMatchObject({ categoryIds: [2, 3] });
+  });
+
+  it('keeps the categories when the category tree is not available', async () => {
+    fixture.categories = false;
+    fixture.save.mockReturnValue(unwrapped(detail));
+    renderPage();
+
+    await userEvent.click(screen.getByText('Костюм Лідер'));
+    const panel = await screen.findByRole('dialog');
+    await userEvent.click(within(panel).getByRole('button', { name: 'Редагувати' }));
+    expect(within(panel).getByRole('combobox', { name: 'Розділи сайту' })).toBeDisabled();
+    await userEvent.click(within(panel).getByRole('button', { name: 'Зберегти' }));
+
+    await waitFor(() => expect(fixture.save).toHaveBeenCalledTimes(1));
+    expect(fixture.save.mock.calls[0]![0]).toMatchObject({ categoryIds: null });
   });
 
   it('does not save an invalid address', async () => {
