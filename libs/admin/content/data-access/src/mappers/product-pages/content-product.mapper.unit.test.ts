@@ -25,6 +25,7 @@ const row = {
   hasSeo: false,
   updatedAtUtc: '2026-11-11T08:00:00+00:00',
   categoryCount: 2,
+  categoryIds: [1, 2],
 };
 const emptyText = {
   name: null,
@@ -80,6 +81,7 @@ describe('content product mapper', () => {
     expect(product.prices?.largeWholesale).toBe(1300);
     expect(product.variants[0]?.fabricName).toBe('Грета');
     expect(product.product.categoryCount).toBe(2);
+    expect(product.product.categoryIds).toEqual([1, 2]);
     expect(product.categoryIds).toEqual([7, 9]);
   });
 

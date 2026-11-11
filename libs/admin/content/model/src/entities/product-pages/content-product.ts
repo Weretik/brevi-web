@@ -58,6 +58,8 @@ export interface ContentProductRow {
   updatedAtUtc: string | null;
   /** Number of site categories («Розділи сайту») the product is in. */
   categoryCount: number;
+  /** The site categories the product is in. */
+  categoryIds: readonly number[];
 }
 
 export interface ContentProductPage {

@@ -23,6 +23,7 @@ const row = (changes: Partial<ContentProductRow> = {}): ContentProductRow => ({
   hasSeo: true,
   updatedAtUtc: null,
   categoryCount: 2,
+  categoryIds: [1, 2],
   ...changes,
 });
 

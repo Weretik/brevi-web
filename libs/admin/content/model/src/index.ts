@@ -31,6 +31,7 @@ export type { OldSiteImportFile } from './mappers/product-pages/old-site-import-
 export {
   contentProductPageSizes,
   contentProductSiteFilters,
+  withoutSiteCategory,
   defaultContentProductPageSize,
 } from './queries/product-pages/content-product-query';
 export type {

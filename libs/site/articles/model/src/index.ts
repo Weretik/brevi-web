@@ -1,2 +1,2 @@
-export type { Article, ArticleBlock } from './lib/article';
-export { ARTICLES, findArticle, formatArticleDate } from './lib/articles';
+export type { Article, ArticleBlock, ArticleCard, ArticlePhoto } from './lib/article';
+export { MORE_ARTICLES, formatArticleDate, pickMoreArticles } from './lib/articles';

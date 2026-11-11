@@ -12839,6 +12839,8 @@ export interface components {
        * @description Number of site categories («Контент → Розділи») the product is in.
        */
       categoryCount: number;
+      /** @description The site categories the product is in, by id. */
+      categoryIds: number[];
     };
     ContentProductPage: {
       items: components['schemas']['ContentProductRow'][];
@@ -30645,6 +30647,8 @@ export interface operations {
         sectionId?: number;
         /** @description true keeps products the site shows (mark set and product active); false keeps the rest. */
         onSite?: boolean;
+        /** @description A site category («Контент → Розділи сайту»); keeps products of it or of its subcategories. 0 keeps products in no site category. */
+        categoryId?: number;
       };
       header?: never;
       path?: never;
@@ -30661,7 +30665,7 @@ export interface operations {
           'application/json': components['schemas']['ContentProductPage'];
         };
       };
-      /** @description Invalid page, page size, search, type or section */
+      /** @description Invalid page, page size, search, type, section or site category */
       400: {
         headers: {
           [name: string]: unknown;

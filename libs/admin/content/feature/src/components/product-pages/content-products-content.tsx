@@ -1,5 +1,13 @@
-import { useSetContentProductVisibilityMutation } from '@admin/content/data-access';
-import { contentProductTypeLabel, contentProductTypes } from '@admin/content/model';
+import {
+  useGetSiteCategoriesQuery,
+  useSetContentProductVisibilityMutation,
+} from '@admin/content/data-access';
+import {
+  contentProductTypeLabel,
+  contentProductTypes,
+  siteCategoryPath,
+  withoutSiteCategory,
+} from '@admin/content/model';
 import { ContentProductsTable, OldSiteImportDialog } from '@admin/content/ui';
 import {
   ReferenceFilterChip,
@@ -9,7 +17,7 @@ import {
   ReferenceSearchBar,
 } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
-import { Alert, Box, Button, Divider, Paper } from '@mui/material';
+import { Alert, Box, Button, Divider, MenuItem, Paper, TextField } from '@mui/material';
 import { useState } from 'react';
 
 import { ContentProductDrawer } from './content-product-drawer';
@@ -35,6 +43,8 @@ export function ContentProductsContent({ viewer }: { viewer: ContentProductsView
   const [opened, setOpened] = useState<ContentProductRow | null>(null);
   const [savingId, setSavingId] = useState<number | null>(null);
   const [setVisibility] = useSetContentProductVisibilityMutation();
+  // Without the right to see «Розділи сайту» the list does not load and the filter is not offered.
+  const categories = useGetSiteCategoriesQuery().currentData ?? null;
   const { list } = state;
   const page = list.currentData;
 
@@ -121,6 +131,30 @@ export function ContentProductsContent({ viewer }: { viewer: ContentProductsView
                 onClick={() => state.setType(type)}
               />
             ))}
+            {categories && (
+              <>
+                <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+                <TextField
+                  select
+                  size="small"
+                  label="Розділ сайту"
+                  value={state.category === null ? '' : String(state.category)}
+                  onChange={(event) =>
+                    state.setCategory(event.target.value === '' ? null : Number(event.target.value))
+                  }
+                  slotProps={{ select: { displayEmpty: true }, inputLabel: { shrink: true } }}
+                  sx={{ minWidth: 240 }}
+                >
+                  <MenuItem value="">Усі розділи сайту</MenuItem>
+                  <MenuItem value={String(withoutSiteCategory)}>Без розділу сайту</MenuItem>
+                  {categories.map((row) => (
+                    <MenuItem key={row.id} value={String(row.id)}>
+                      {siteCategoryPath(row, categories)}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </>
+            )}
           </>
         }
         count={page?.total ?? 0}
@@ -132,6 +166,7 @@ export function ContentProductsContent({ viewer }: { viewer: ContentProductsView
       <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
         <ContentProductsTable
           page={page}
+          categories={categories}
           loading={list.isFetching}
           narrowed={state.narrowed}
           unavailable={Boolean(list.error)}

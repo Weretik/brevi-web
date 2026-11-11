@@ -1,10 +1,11 @@
-import { ARTICLES } from '@site/articles/model';
 import { render, screen, within } from '@testing-library/react';
 
 import { getArticlesDictionary } from './i18n/articles-dictionary';
 import { ArticleBody } from './sections/article-body';
 import { ArticleCards } from './sections/article-cards';
 import { ArticlesOrder } from './sections/articles-order';
+
+import type { ArticleCard } from '@site/articles/model';
 
 const shape = (value: unknown): unknown => {
   if (value && typeof value === 'object') {
@@ -19,13 +20,35 @@ describe('articles dictionary', () => {
   });
 });
 
+const card = (slug: string, over: Partial<ArticleCard> = {}): ArticleCard => ({
+  slug,
+  date: '2022-01-25',
+  textLocale: 'ru',
+  title: `Статья ${slug}`,
+  excerpt: `Коротко о ${slug}`,
+  cover: null,
+  hasRussian: true,
+  updatedAt: '2026-11-11T08:00:00Z',
+  ...over,
+});
+
 describe('ArticleCards', () => {
-  it('shows the date, the title as a link, and the excerpt in the page language', () => {
-    const articles = ARTICLES.slice(0, 3);
-    render(
+  it('shows the cover, the date, the title as a link, and the excerpt', () => {
+    const articles = [
+      card('a', {
+        cover: {
+          src: 'https://cdn.example/5.jpg',
+          thumbnail: 'https://cdn.example/5-small.webp',
+          width: 1200,
+          height: 800,
+        },
+      }),
+      card('b', { excerpt: '' }),
+      card('c'),
+    ];
+    const { container } = render(
       <ArticleCards
         articles={articles}
-        locale="ru"
         readLabel="Читать"
         hrefFor={(article) => `/ru/articles/${article.slug}`}
       />,
@@ -34,17 +57,22 @@ describe('ArticleCards', () => {
     const cards = screen.getAllByRole('article');
     expect(cards).toHaveLength(3);
     const first = within(cards[0]);
-    expect(first.getByRole('heading', { level: 3 }).textContent).toBe(articles[0].title.ru);
-    expect(first.getByRole('link').getAttribute('href')).toBe(`/ru/articles/${articles[0].slug}`);
+    expect(first.getByRole('heading', { level: 3 }).textContent).toBe('Статья a');
+    expect(first.getByRole('link').getAttribute('href')).toBe('/ru/articles/a');
     expect(first.getByText('25.01.2022').getAttribute('datetime')).toBe('2022-01-25');
-    expect(first.getByText(articles[0].excerpt.ru)).toBeTruthy();
+    expect(first.getByText('Коротко о a')).toBeTruthy();
+    // The cover is decoration: the title already names the article.
+    expect(container.querySelectorAll('img')).toHaveLength(1);
+    expect(container.querySelector('img')?.getAttribute('src')).toBe(
+      'https://cdn.example/5-small.webp',
+    );
+    expect(within(cards[1]).queryByText(/Коротко/)).toBeNull();
   });
 
   it('uses the heading level of the block it stands in', () => {
     render(
       <ArticleCards
-        articles={ARTICLES.slice(0, 1)}
-        locale="uk"
+        articles={[card('a')]}
         readLabel="Читати"
         hrefFor={() => '/uk/articles/x'}
         headingLevel={4}
@@ -56,29 +84,40 @@ describe('ArticleCards', () => {
 });
 
 describe('ArticleBody', () => {
-  it('renders paragraphs, lists, and pictures in order', () => {
+  it('renders headings, paragraphs with a lead and formatting, lists, and pictures in order', () => {
     render(
       <ArticleBody
         blocks={[
-          { type: 'paragraph', text: 'Перший абзац' },
+          { type: 'heading', text: 'Захист голови' },
+          { type: 'paragraph', text: 'Шиємо **самі** і *швидко*.', lead: 'Важливо:' },
           { type: 'list', items: ['один', 'два'] },
           {
             type: 'image',
-            src: '/assets/articles/helmets.webp',
+            photo: { src: 'https://cdn.example/7.jpg', thumbnail: null, width: 1200, height: 1200 },
             alt: 'Каски',
-            width: 1200,
-            height: 1200,
+          },
+          {
+            type: 'image',
+            photo: { src: 'https://cdn.example/8.jpg', thumbnail: null, width: null, height: null },
+            alt: 'Без розміру',
           },
         ]}
       />,
     );
 
-    expect(screen.getByText('Перший абзац').tagName).toBe('P');
+    expect(screen.getByRole('heading', { level: 2 }).textContent).toBe('Захист голови');
+    const paragraph = screen.getByText('Важливо:').closest('p');
+    expect(paragraph?.textContent).toBe('Важливо: Шиємо самі і швидко.');
+    expect(within(paragraph as HTMLElement).getByText('самі').tagName).toBe('STRONG');
+    expect(within(paragraph as HTMLElement).getByText('швидко').tagName).toBe('EM');
     expect(screen.getAllByRole('listitem').map((item) => item.textContent)).toEqual([
       'один',
       'два',
     ]);
     expect(screen.getByRole('img', { name: 'Каски' }).getAttribute('width')).toBe('1200');
+    expect(screen.getByRole('img', { name: 'Без розміру' }).getAttribute('src')).toBe(
+      'https://cdn.example/8.jpg',
+    );
   });
 });
 

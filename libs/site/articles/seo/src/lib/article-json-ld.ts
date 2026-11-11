@@ -8,7 +8,7 @@ import type { SiteConfig } from '@site/core/config';
 import type { Locale } from '@site/core/i18n';
 import type { JsonLdData } from '@site/core/seo';
 
-/** `Article` for one article page: headline, date, language, and Brevi as author and publisher. */
+/** `Article` for one article page: headline, date, the language of its texts, cover, and Brevi as author and publisher. */
 export function buildArticleJsonLd(
   locale: Locale,
   article: ArticleSeoInput,
@@ -27,10 +27,10 @@ export function buildArticleJsonLd(
     headline: article.title,
     description: article.description,
     datePublished: article.date,
-    inLanguage: LOCALE_LANGUAGE_TAGS[locale],
+    inLanguage: LOCALE_LANGUAGE_TAGS[article.textLocale],
     mainEntityOfPage: url,
     author: organization,
     publisher: organization,
-    ...(article.image ? { image: `${config.siteUrl}${article.image}` } : {}),
+    ...(article.image ? { image: article.image } : {}),
   };
 }

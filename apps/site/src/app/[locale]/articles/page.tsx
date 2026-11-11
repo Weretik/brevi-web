@@ -1,3 +1,4 @@
+import { getArticles } from '@site/articles/data-access';
 import { ArticlesPage } from '@site/articles/feature';
 import { buildArticlesMetadata } from '@site/articles/seo';
 import { isLocale } from '@site/core/i18n';
@@ -16,5 +17,5 @@ export default async function Page({ params }: PageProps<'/[locale]/articles'>) 
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
-  return <ArticlesPage locale={locale} />;
+  return <ArticlesPage locale={locale} articles={await getArticles(locale)} />;
 }

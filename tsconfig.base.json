@@ -157,6 +157,7 @@
       "@site/catalog/seo": ["./libs/site/catalog/seo/src/index.ts"],
       "@site/catalog/feature": ["./libs/site/catalog/feature/src/index.ts"],
       "@site/shared/api-client": ["./libs/site/shared/api-client/src/index.ts"],
+      "@site/articles/data-access": ["./libs/site/articles/data-access/src/index.ts"],
       "@site/sizes/ui": ["./libs/site/sizes/ui/src/index.ts"],
       "@site/sizes/seo": ["./libs/site/sizes/seo/src/index.ts"],
       "@site/sizes/feature": ["./libs/site/sizes/feature/src/index.ts"]

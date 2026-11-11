@@ -1,4 +1,4 @@
-import { SITE_PATHS } from '@site/core/i18n';
+import { SITE_PATHS, localizedPath } from '@site/core/i18n';
 import { buildPageMetadata } from '@site/core/seo';
 
 import type { Locale } from '@site/core/i18n';
@@ -7,12 +7,14 @@ import type { Metadata } from 'next';
 /** What the SEO values of one article are built from; the caller picks the language. */
 export type ArticleSeoInput = {
   slug: string;
+  /** The language of the texts: Ukrainian on the Russian page of an article without Russian texts. */
+  textLocale: Locale;
   title: string;
-  /** The article excerpt: it is the meta description. */
+  /** The meta description: what staff wrote for search, or the excerpt. */
   description: string;
   /** ISO date of publication. */
   date: string;
-  /** Root-relative path of the article picture, when it has one. */
+  /** Absolute address of the article cover on the CDN, when it has one. */
   image?: string;
 };
 
@@ -39,14 +41,28 @@ export function buildArticlesMetadata(locale: Locale): Metadata {
   return buildPageMetadata({ locale, path: SITE_PATHS.articles, ...ARTICLES_SEO_TEXT[locale] });
 }
 
-/** Metadata of one article: its own title and description, Open Graph type `article` with the date. */
+/**
+ * Metadata of one article: its own title and description, Open Graph type `article` with the date. An
+ * article without Russian texts shows the Ukrainian ones on the Russian page, so that page names the
+ * Ukrainian one as canonical and has no language alternates.
+ */
 export function buildArticleMetadata(locale: Locale, article: ArticleSeoInput): Metadata {
-  const metadata = buildPageMetadata({
+  const path = articlePath(article.slug);
+  const page = buildPageMetadata({
     locale,
-    path: articlePath(article.slug),
+    path,
     title: article.title,
     description: article.description,
   });
+  const original = localizedPath(article.textLocale, path);
+  const metadata: Metadata =
+    article.textLocale === locale
+      ? page
+      : {
+          ...page,
+          alternates: { canonical: original },
+          openGraph: { ...page.openGraph, url: original },
+        };
 
   return {
     ...metadata,
