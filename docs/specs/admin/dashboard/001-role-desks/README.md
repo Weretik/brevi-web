@@ -1,6 +1,6 @@
 # Admin «Робочий стіл» by role (DESK-001)
 
-**Status:** stages 1–4 implemented 2026-11-11. **Backend:** BreviERP [DESK-001](https://github.com/Weretik/BreviERP/blob/master/docs/sdd/specs/identity/003-role-desks/README.md) (role `Seo`, «Права доступу» group «Робочі столи»). **Source:** owner request 2026-11-11, [concept](https://claude.ai/artifact/BABr1LD9V1954wsa6w4Uip).
+**Status:** all 5 stages implemented 2026-11-11. **Backend:** BreviERP [DESK-001](https://github.com/Weretik/BreviERP/blob/master/docs/sdd/specs/identity/003-role-desks/README.md) (role `Seo`, «Права доступу» group «Робочі столи»). **Source:** owner request 2026-11-11, [concept](https://claude.ai/artifact/BABr1LD9V1954wsa6w4Uip).
 
 ## Goal
 
@@ -29,4 +29,4 @@ The admin home `/` («Робочий стіл», the tile at the top of the side
 
 ## Tests
 
-`npx nx test admin-dashboard-feature` (`dashboard-page.test.tsx`: workshop desk blocks, hidden blocks without rights, manager desk metrics and blocks with own orders, SEO desk, accountant desk and its note without rights, tabs and remembered choice, no desk), `npx nx test admin-react` (`app-router.integration.test.tsx`: manager desk on `/`).
+`npx nx test admin-dashboard-feature` (`dashboard-page.test.tsx`: workshop desk blocks, hidden blocks without rights, manager desk metrics and blocks with own orders, SEO desk, accountant desk and its note without rights, main desk with «Потребує уваги», managers and folded desks, tabs and remembered choice, no desk), `npx nx test admin-react` (`app-router.integration.test.tsx`: manager desk on `/`).

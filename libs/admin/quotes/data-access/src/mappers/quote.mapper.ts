@@ -9,6 +9,7 @@ import type {
   QuoteModelComposition,
   QuoteOption,
   QuotePage,
+  QuotePeriod,
   QuotePrice,
   QuoteProductPhoto,
   QuoteRepriceReport,
@@ -109,6 +110,14 @@ export const mapQuoteEvent = (value: Schemas['CrmQuoteEvent']): QuoteEvent => ({
   at: value.at,
   actor: value.actor,
   details: value.details ?? null,
+});
+
+export const mapQuotePeriod = (value: Schemas['CrmQuotePeriod']): QuotePeriod => ({
+  from: value.from,
+  to: value.to,
+  created: value.created,
+  sent: value.sent,
+  managers: value.managers.map((x) => ({ manager: x.manager, created: x.created, sent: x.sent })),
 });
 
 export const mapQuotePage = (value: Schemas['CrmQuotePage']): QuotePage => ({

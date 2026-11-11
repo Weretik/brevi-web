@@ -10,7 +10,8 @@ interface DeskListCardProps {
   id: string;
   title: string;
   list: DeskList;
-  link: { label: string; to: string };
+  /** The full section; left out when every line links to its own place. */
+  link?: { label: string; to: string };
   /** Shown when the list is empty; without it an empty card is not drawn by the caller. */
   empty?: string;
   /** «І ще N — …» under the rows. */
@@ -29,14 +30,16 @@ export function DeskListCard({ id, title, list, link, empty, moreText }: DeskLis
         <Typography component="h2" id={titleId} variant="h6">
           {title}
         </Typography>
-        <Link
-          component={RouterLink}
-          sx={{ flex: 'none', fontSize: 13, fontWeight: 700 }}
-          to={link.to}
-          underline="hover"
-        >
-          {link.label}
-        </Link>
+        {link && (
+          <Link
+            component={RouterLink}
+            sx={{ flex: 'none', fontSize: 13, fontWeight: 700 }}
+            to={link.to}
+            underline="hover"
+          >
+            {link.label}
+          </Link>
+        )}
       </Stack>
       {list.rows.length === 0 && empty ? (
         <Typography color="text.secondary" variant="body2">

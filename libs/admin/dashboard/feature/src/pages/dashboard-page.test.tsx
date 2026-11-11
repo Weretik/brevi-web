@@ -119,6 +119,25 @@ vi.mock('@admin/production/data-access', () => ({
   },
 }));
 vi.mock('@admin/leads/data-access', () => ({
+  useGetLeadStatsQuery: (_: unknown, options: { skip: boolean }) =>
+    options.skip
+      ? {}
+      : {
+          data: {
+            callsInPeriod: 41,
+            managers: [
+              {
+                manager: { userId: 2, name: 'Марина' },
+                inWork: 9,
+                calls: 14,
+                reachedPercent: 70,
+                offers: 1,
+                clients: 0,
+                overdue: 2,
+              },
+            ],
+          },
+        },
   useGetLeadMyDayQuery: (_: unknown, options: { skip: boolean }) =>
     options.skip
       ? {}
@@ -275,6 +294,18 @@ vi.mock('@admin/purchasing/data-access', () => ({
         },
 }));
 vi.mock('@admin/quotes/data-access', () => ({
+  useGetQuotePeriodQuery: (_: unknown, options: { skip: boolean }) =>
+    options.skip
+      ? {}
+      : {
+          data: {
+            from: '2026-11-01',
+            to: '2026-11-11',
+            created: 38,
+            sent: 20,
+            managers: [{ manager: { userId: 2, name: 'Марина' }, created: 3, sent: 2 }],
+          },
+        },
   useListQuotesQuery: (_: unknown, options: { skip: boolean }) =>
     options.skip
       ? {}
@@ -456,6 +487,48 @@ describe('DashboardPage', () => {
 
     expect(screen.getByText(/Їх відкриває директор/)).toBeVisible();
     expect(screen.queryByRole('region', { name: 'Показники' })).toBeNull();
+  });
+
+  it('gives the director the main desk with what needs attention and every other desk folded', () => {
+    renderFor(
+      'desk-main',
+      'desk-workshop',
+      'desk-sales',
+      'quotes',
+      'lead-stats',
+      'production-orders',
+      'fabric-booking',
+      'accounting',
+      'content-seo-overview',
+    );
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Робочий стіл' })).toBeVisible();
+    expect(screen.queryByRole('tablist')).toBeNull();
+    const metrics = screen.getByRole('region', { name: 'Показники' });
+    expect(within(metrics).getByText('надіслано 20')).toBeVisible();
+    expect(within(metrics).getByText('41')).toBeVisible();
+    expect(within(metrics).getByText('1 прострочено')).toBeVisible();
+
+    const attention = screen.getByRole('region', { name: 'Потребує уваги' });
+    expect(
+      within(attention).getByRole('link', { name: 'Цех: замовлення прострочено' }),
+    ).toHaveAttribute('href', '/production/orders');
+    expect(within(attention).getByText('Продажі: Марина, прострочені дзвінки')).toBeVisible();
+    expect(within(attention).getByText('Бухгалтерія: операції на перевірку')).toBeVisible();
+    expect(within(attention).getByText('Сайт: сторінки з проблемами для пошуку')).toBeVisible();
+    expect(within(attention).queryByText('Склад: фурнітура до замовлення')).toBeNull();
+
+    const managers = screen.getByRole('region', { name: 'Менеджери сьогодні' });
+    expect(within(managers).getByText('дзвінків 14 · КП 3 · у роботі 9')).toBeVisible();
+
+    expect(screen.queryByRole('region', { name: 'Дошка цеху' })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Цех' }));
+    expect(screen.getByRole('region', { name: 'Дошка цеху' })).toBeVisible();
+    expect(window.localStorage.getItem('brevi-admin:desks-open')).toBe('["workshop"]');
+    expect(screen.getByRole('button', { name: 'Продажі' })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    );
   });
 
   it('lets a person with several desks switch them and remembers the choice', () => {
