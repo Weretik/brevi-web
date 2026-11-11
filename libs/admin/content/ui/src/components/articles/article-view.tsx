@@ -16,23 +16,33 @@ import type {
 const isText = (block: ArticleBlock): block is ArticleBlock & ContentTextBlock =>
   block.kind !== 'Image';
 
+/**
+ * A picture at its own proportions: the panel's column would otherwise stretch it to the full width
+ * while the height stays capped.
+ */
+const picture = (maxHeight: number) =>
+  ({
+    borderRadius: 1,
+    display: 'block',
+    alignSelf: 'flex-start',
+    width: 'auto',
+    height: 'auto',
+    maxWidth: '100%',
+    maxHeight,
+    objectFit: 'contain',
+  }) as const;
+
 /** The body as the site lays it out: text blocks with the photos between them. */
 function ArticleBodyPreview({ article, blocks }: { article: Article; blocks: ArticleBlock[] }) {
   if (blocks.length === 0) return <ContentBlocksPreview blocks={[]} />;
-  const urls = new Map(article.photos.map((photo) => [photo.id, photo.thumbnailUrl ?? photo.url]));
+  const urls = new Map(article.photos.map((photo) => [photo.id, photo.url]));
   return (
     <Stack sx={{ gap: 1 }}>
       {blocks.map((block, index) => {
         if (isText(block)) return <ContentBlocksPreview key={index} blocks={[block]} />;
         const url = block.photoId === null ? undefined : urls.get(block.photoId);
         return url ? (
-          <Box
-            key={index}
-            component="img"
-            src={url}
-            alt={block.alt ?? ''}
-            sx={{ borderRadius: 1, display: 'block', maxHeight: 220, maxWidth: '100%' }}
-          />
+          <Box key={index} component="img" src={url} alt={block.alt ?? ''} sx={picture(220)} />
         ) : (
           <Typography key={index} variant="body2" sx={{ color: 'warning.dark' }}>
             Фото видалено з бібліотеки «Фото»: сайт його не покаже.
@@ -65,14 +75,7 @@ export function ArticleView({ article }: { article: Article }) {
         </Alert>
       )}
       <ReferenceFormSection title="Стаття">
-        {cover && (
-          <Box
-            component="img"
-            src={cover.thumbnailUrl ?? cover.url}
-            alt="Обкладинка статті"
-            sx={{ borderRadius: 1, display: 'block', maxHeight: 200, maxWidth: '100%' }}
-          />
-        )}
+        {cover && <Box component="img" src={cover.url} alt="Обкладинка статті" sx={picture(240)} />}
         <ReferenceDetailsList
           items={[
             { label: 'Показувати на сайті', value: row.showOnSite ? 'Так' : 'Ні' },
