@@ -73,3 +73,36 @@ export type {
   ContentProductErrors,
   ContentProductTextErrors,
 } from './validators/product-pages/content-product-validation';
+export type {
+  SiteCategoriesViewer,
+  SiteCategory,
+  SiteCategoryRow,
+  SiteCategoryText,
+  SiteCategoryVisibility,
+} from './entities/site-categories/site-category';
+export {
+  newSiteCategoryForm,
+  siteCategoryFormOf,
+  siteCategoryInputOf,
+} from './forms/site-categories/site-category-form';
+export type {
+  SiteCategoryFormValues,
+  SiteCategoryInput,
+  SiteCategoryTextInput,
+  SiteCategoryTextValues,
+} from './forms/site-categories/site-category-form';
+export {
+  filterSiteCategories,
+  moveSiteCategory,
+  siteCategoryName,
+  siteCategoryProblems,
+} from './mappers/site-categories/site-category-tree';
+export {
+  hasSiteCategoryErrors,
+  siteCategoryLimits,
+  validateSiteCategory,
+} from './validators/site-categories/site-category-validation';
+export type {
+  SiteCategoryErrors,
+  SiteCategoryTextErrors,
+} from './validators/site-categories/site-category-validation';

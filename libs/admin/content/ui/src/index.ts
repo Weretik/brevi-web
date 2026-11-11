@@ -4,3 +4,7 @@ export * from './components/product-pages/content-text-preview';
 export * from './forms/product-pages/content-product-form';
 export * from './dialogs/content-product-delete-dialog';
 export * from './dialogs/old-site-import-dialog';
+export * from './tables/site-categories/site-categories-table';
+export * from './components/site-categories/site-category-view';
+export * from './forms/site-categories/site-category-form';
+export * from './dialogs/site-category-delete-dialog';

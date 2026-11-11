@@ -1,8 +1,7 @@
 import { inlineRuns } from '@admin/content/model';
 import { Box, Stack, Typography } from '@mui/material';
 
-
-import type { ContentProductText } from '@admin/content/model';
+import type { ContentProductText, ContentTextBlock } from '@admin/content/model';
 
 const empty = (
   <Typography variant="body2" color="text.secondary">
@@ -23,14 +22,58 @@ function Inline({ text }: { text: string | null }) {
   ));
 }
 
-function Part({ title, children }: { title: string; children: React.ReactNode }) {
+/** A titled part of a preview; `text` shows a plain value or «Не заповнено». */
+export function ContentPreviewPart({
+  title,
+  text,
+  children,
+}: {
+  title: string;
+  text?: string | null;
+  children?: React.ReactNode;
+}) {
   return (
     <Box>
       <Typography component="h4" variant="overline" color="text.secondary">
         {title}
       </Typography>
-      {children}
+      {children ?? (text ? <Typography variant="body2">{text}</Typography> : empty)}
     </Box>
+  );
+}
+
+const Part = ContentPreviewPart;
+
+/** Stored text blocks with their headings, lists, bold and italic shown as formatting. */
+export function ContentBlocksPreview({ blocks }: { blocks: readonly ContentTextBlock[] }) {
+  if (blocks.length === 0) return empty;
+  return (
+    <Stack sx={{ gap: 1 }}>
+      {blocks.map((block, index) =>
+        block.kind === 'Heading' ? (
+          <Typography key={index} component="p" variant="subtitle2">
+            {block.text}
+          </Typography>
+        ) : block.kind === 'List' ? (
+          <Box key={index} component="ul" sx={{ m: 0, pl: 2.5 }}>
+            {block.items.map((item, line) => (
+              <Typography key={line} component="li" variant="body2">
+                <Inline text={item} />
+              </Typography>
+            ))}
+          </Box>
+        ) : (
+          <Typography key={index} variant="body2">
+            {block.lead && (
+              <Box component="span" sx={{ fontWeight: 600 }}>
+                {block.lead}{' '}
+              </Box>
+            )}
+            <Inline text={block.text} />
+          </Typography>
+        ),
+      )}
+    </Stack>
   );
 }
 
@@ -66,36 +109,7 @@ export function ContentTextPreview({ text }: { text: ContentProductText }) {
             ))}
       </Part>
       <Part title="Опис">
-        {text.description.length === 0 ? (
-          empty
-        ) : (
-          <Stack sx={{ gap: 1 }}>
-            {text.description.map((block, index) =>
-              block.kind === 'Heading' ? (
-                <Typography key={index} component="p" variant="subtitle2">
-                  {block.text}
-                </Typography>
-              ) : block.kind === 'List' ? (
-                <Box key={index} component="ul" sx={{ m: 0, pl: 2.5 }}>
-                  {block.items.map((item, line) => (
-                    <Typography key={line} component="li" variant="body2">
-                      <Inline text={item} />
-                    </Typography>
-                  ))}
-                </Box>
-              ) : (
-                <Typography key={index} variant="body2">
-                  {block.lead && (
-                    <Box component="span" sx={{ fontWeight: 600 }}>
-                      {block.lead}{' '}
-                    </Box>
-                  )}
-                  <Inline text={block.text} />
-                </Typography>
-              ),
-            )}
-          </Stack>
-        )}
+        <ContentBlocksPreview blocks={text.description} />
       </Part>
       <Part title="Характеристики">
         {text.specs.length === 0 ? (

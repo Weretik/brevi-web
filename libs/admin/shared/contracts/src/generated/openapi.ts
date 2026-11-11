@@ -5243,6 +5243,83 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/content/categories': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description The whole tree in site order, every category followed by its subcategories. */
+    get: operations['getSiteCategories'];
+    put?: never;
+    /** @description Adds a category (parentId null) or a subcategory at the end of its parent, hidden unless showOnSite is true. revision is 0. An empty slug is built from the Ukrainian name. A language without any text is not kept. */
+    post: operations['createSiteCategory'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/content/categories/order': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** @description The new order of the categories of one parent (parentId null for the top level). ids must list exactly the categories of that parent. */
+    put: operations['reorderSiteCategories'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/content/categories/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Site category id. */
+        id: components['parameters']['parameters-CategoryId'];
+      };
+      cookie?: never;
+    };
+    /** @description The editor of one category or subcategory. */
+    get: operations['getSiteCategory'];
+    /** @description Replaces the category as a whole. revision is the number the editor showed. An empty slug keeps the current address. Another parentId moves the category to the end of the new parent; a category with subcategories cannot become a subcategory. */
+    put: operations['saveSiteCategory'];
+    post?: never;
+    /** @description Removes the category with its texts and its product links. Products and their pages stay. */
+    delete: operations['deleteSiteCategory'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/content/categories/{id}/visibility': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Site category id. */
+        id: components['parameters']['parameters-CategoryId'];
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** @description «Показувати на сайті» from the tree. A subcategory is on the site only together with its parent. */
+    patch: operations['setSiteCategoryVisibility'];
+    trace?: never;
+  };
   '/api/public/catalog/tree': {
     parameters: {
       query?: never;
@@ -12012,6 +12089,89 @@ export interface components {
       notMatched: components['schemas']['OldSiteImportNote'][];
       problems: components['schemas']['OldSiteImportNote'][];
     };
+    SiteCategoryRow: {
+      /** Format: int32 */
+      id: number;
+      /** Format: int32 */
+      parentId?: number | null;
+      slug: string;
+      /** Format: int32 */
+      sortOrder: number;
+      showOnSite: boolean;
+      /** @description True only when the category and its parent are both marked. */
+      onSite: boolean;
+      nameUk?: string | null;
+      nameRu?: string | null;
+      hasUkrainianText: boolean;
+      hasRussianText: boolean;
+      /** @description SEO title and description are written in both languages. */
+      hasSeo: boolean;
+      /**
+       * Format: int32
+       * @description Products of the category together with its subcategories.
+       */
+      productCount: number;
+      /** Format: date-time */
+      updatedAtUtc: string;
+    };
+    SiteCategoryList: {
+      items: components['schemas']['SiteCategoryRow'][];
+    };
+    /** @description What staff type for one language. The text is edited in the visual editor and sent as blocks. */
+    SiteCategoryTextInput: {
+      name?: string | null;
+      seoTitle?: string | null;
+      seoDescription?: string | null;
+      /** @description At most 20000 characters in all blocks together. */
+      text?: components['schemas']['ProductTextBlock'][] | null;
+    };
+    SaveSiteCategoryRequest: {
+      /** Format: int32 */
+      revision: number;
+      /**
+       * Format: int32
+       * @description Null for a category of the top level; a top-level category id for a subcategory.
+       */
+      parentId?: number | null;
+      /** @description Lower-case Latin letters, digits and single hyphens, 3 to 120 characters. */
+      slug?: string | null;
+      showOnSite: boolean;
+      /** @description The Ukrainian name is required. */
+      uk: components['schemas']['SiteCategoryTextInput'];
+      ru?: components['schemas']['SiteCategoryTextInput'] | null;
+    };
+    SiteCategoryTextResponse: {
+      name?: string | null;
+      seoTitle?: string | null;
+      seoDescription?: string | null;
+      text: components['schemas']['ProductTextBlock'][];
+    };
+    SiteCategoryResponse: {
+      category: components['schemas']['SiteCategoryRow'];
+      /** Format: int32 */
+      revision: number;
+      updatedBy?: string | null;
+      uk: components['schemas']['SiteCategoryTextResponse'];
+      ru: components['schemas']['SiteCategoryTextResponse'];
+    };
+    /** @description Ukrainian texts for staff that say why the action was refused. */
+    Messages: string[];
+    ReorderSiteCategoriesRequest: {
+      /** Format: int32 */
+      parentId?: number | null;
+      ids: number[];
+    };
+    SiteCategoryVisibilityRequest: {
+      showOnSite: boolean;
+    };
+    SiteCategoryVisibilityResponse: {
+      /** Format: int32 */
+      id: number;
+      showOnSite: boolean;
+      onSite: boolean;
+      /** Format: int32 */
+      revision: number;
+    };
     PublicCatalogSection: {
       /** Format: int32 */
       id: number;
@@ -12244,6 +12404,8 @@ export interface components {
     FileId: string;
     /** @description Catalog product id. */
     'components-parameters-ProductId': number;
+    /** @description Site category id. */
+    'parameters-CategoryId': number;
     Language: 'uk' | 'ru';
   };
   requestBodies: never;
@@ -28816,6 +28978,353 @@ export interface operations {
       };
       /** @description No right to create in «Товари сайту» */
       403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getSiteCategories: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SiteCategoryList'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to view «Розділи сайту» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createSiteCategory: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SaveSiteCategoryRequest'];
+      };
+    };
+    responses: {
+      /** @description Created */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SiteCategoryResponse'];
+        };
+      };
+      /** @description No Ukrainian name, an invalid address or a text over its limit */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to create in «Розділи сайту» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The address belongs to another category, the parent is missing or is a subcategory itself */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Messages'];
+        };
+      };
+    };
+  };
+  reorderSiteCategories: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ReorderSiteCategoriesRequest'];
+      };
+    };
+    responses: {
+      /** @description Saved */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Repeated ids */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to edit in «Розділи сайту» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The list of categories was changed meanwhile; nothing is saved */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Messages'];
+        };
+      };
+    };
+  };
+  getSiteCategory: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Site category id. */
+        id: components['parameters']['parameters-CategoryId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SiteCategoryResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to view «Розділи сайту» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such category */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  saveSiteCategory: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Site category id. */
+        id: components['parameters']['parameters-CategoryId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SaveSiteCategoryRequest'];
+      };
+    };
+    responses: {
+      /** @description Saved */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SiteCategoryResponse'];
+        };
+      };
+      /** @description No Ukrainian name, an invalid address or a text over its limit */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to edit in «Розділи сайту» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such category */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The revision is stale, the address belongs to another category or the move is not allowed */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Messages'];
+        };
+      };
+    };
+  };
+  deleteSiteCategory: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Site category id. */
+        id: components['parameters']['parameters-CategoryId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Deleted */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to delete in «Розділи сайту» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such category */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The category has subcategories; move or delete them first */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Messages'];
+        };
+      };
+    };
+  };
+  setSiteCategoryVisibility: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Site category id. */
+        id: components['parameters']['parameters-CategoryId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SiteCategoryVisibilityRequest'];
+      };
+    };
+    responses: {
+      /** @description Saved */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SiteCategoryVisibilityResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to edit in «Розділи сайту» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such category */
+      404: {
         headers: {
           [name: string]: unknown;
         };
