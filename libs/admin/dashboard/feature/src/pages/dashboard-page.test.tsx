@@ -101,6 +101,7 @@ const order = (id: number, number: number, clientName: string, nearestDueDate: s
 });
 
 const ordersQuery = vi.fn();
+const overviewQuery = vi.fn();
 
 vi.mock('@admin/production/data-access', () => ({
   useGetWorkshopDashboardQuery: (_: unknown, options: { skip: boolean }) =>
@@ -215,6 +216,61 @@ vi.mock('@admin/content/data-access', () => ({
                 ],
               },
             ],
+          },
+        },
+}));
+vi.mock('@admin/accounting/data-access', () => ({
+  useGetFinanceOverviewQuery: (args: unknown, options: { skip: boolean }) => {
+    overviewQuery(args);
+    return options.skip
+      ? {}
+      : {
+          data: {
+            scope: 'Current',
+            from: '2026-11-01',
+            to: '2026-11-11',
+            needsReviewCount: 4,
+            needsCategoryCount: 3,
+            needsCounterpartyCount: 0,
+            currencies: [
+              {
+                currency: 'UAH',
+                balanceMinor: 12_500_000,
+                unconfirmedCutoverCount: 1,
+                incomeMinor: 4_000_000,
+                expenseMinor: 5_000_000,
+                differenceMinor: -1_000_000,
+                accountCount: 3,
+                incomeCount: 5,
+                expenseCount: 9,
+                topExpenses: [{ categoryId: 'c1', name: 'Тканини', amountMinor: 3_000_000 }],
+                otherExpenseMinor: 0,
+                otherExpenseCategoryCount: 0,
+              },
+            ],
+          },
+        };
+  },
+}));
+vi.mock('@admin/purchasing/data-access', () => ({
+  useGetPurchaseInvoicesQuery: (_: unknown, options: { skip: boolean }) =>
+    options.skip
+      ? {}
+      : {
+          data: {
+            items: [
+              {
+                messageId: 'm1',
+                supplierId: null,
+                supplierName: null,
+                fromUser: 'Ірина',
+                issues: ['Немає посилання на рахунок'],
+                links: [],
+              },
+            ],
+            total: 1,
+            page: 1,
+            pageSize: 25,
           },
         },
 }));
@@ -365,6 +421,41 @@ describe('DashboardPage', () => {
       '/content/products',
     );
     expect(screen.queryByRole('link', { name: 'Статті' })).toBeNull();
+  });
+
+  it('gives the accountant the balance, the month, what waits for review and invoices with problems', () => {
+    renderFor('desk-accounting', 'accounting', 'purchase-invoices');
+
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Робочий стіл бухгалтера' }),
+    ).toBeVisible();
+    expect(overviewQuery).toHaveBeenCalledWith(
+      expect.objectContaining({ from: expect.stringMatching(/-01$/), scope: 'Current' }),
+    );
+    const metrics = screen.getByRole('region', { name: 'Показники' });
+    expect(within(metrics).getByText('не підтверджено рахунків: 1')).toBeVisible();
+    expect(within(metrics).getByText('витрат більше')).toBeVisible();
+
+    const review = screen.getByRole('region', { name: 'Потребують перевірки' });
+    expect(within(review).getByText('Без категорії')).toBeVisible();
+    expect(within(review).getByText('операцій: 3')).toBeVisible();
+    expect(within(review).queryByText('Контрагент не підтверджений')).toBeNull();
+
+    const invoices = screen.getByRole('region', { name: 'Рахунки на закупку з проблемами' });
+    expect(within(invoices).getByText('Ірина')).toBeVisible();
+    expect(within(invoices).getByText('Немає посилання на рахунок')).toBeVisible();
+    expect(screen.getByText('Тканини')).toBeVisible();
+    expect(screen.getByRole('link', { name: 'Операції' })).toHaveAttribute(
+      'href',
+      '/accounting/transactions',
+    );
+  });
+
+  it('tells the accountant who opens the books when the role has no right to them yet', () => {
+    renderFor('desk-accounting');
+
+    expect(screen.getByText(/Їх відкриває директор/)).toBeVisible();
+    expect(screen.queryByRole('region', { name: 'Показники' })).toBeNull();
   });
 
   it('lets a person with several desks switch them and remembers the choice', () => {

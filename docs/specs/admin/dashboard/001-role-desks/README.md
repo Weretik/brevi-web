@@ -1,6 +1,6 @@
 # Admin «Робочий стіл» by role (DESK-001)
 
-**Status:** stages 1–3 implemented 2026-11-11. **Backend:** BreviERP [DESK-001](https://github.com/Weretik/BreviERP/blob/master/docs/sdd/specs/identity/003-role-desks/README.md) (role `Seo`, «Права доступу» group «Робочі столи»). **Source:** owner request 2026-11-11, [concept](https://claude.ai/artifact/BABr1LD9V1954wsa6w4Uip).
+**Status:** stages 1–4 implemented 2026-11-11. **Backend:** BreviERP [DESK-001](https://github.com/Weretik/BreviERP/blob/master/docs/sdd/specs/identity/003-role-desks/README.md) (role `Seo`, «Права доступу» group «Робочі столи»). **Source:** owner request 2026-11-11, [concept](https://claude.ai/artifact/BABr1LD9V1954wsa6w4Uip).
 
 ## Goal
 
@@ -24,9 +24,9 @@ The admin home `/` («Робочий стіл», the tile at the top of the side
 | 1     | Desk frame, tabs, workshop desk, interim «Продажі», role `Seo`                               | implemented 2026-11-11 |
 | 2     | Manager desk: «Мій день» of leads, tasks that burn, own КП, own orders in the workshop       | implemented 2026-11-11 |
 | 3     | SEO desk: «SEO-огляд» on the desk                                                            | implemented 2026-11-11 |
-| 4     | Accountant desk: balances, the month, what waits for review, purchase invoices with problems | planned                |
+| 4     | Accountant desk: balances, the month, what waits for review, purchase invoices with problems | implemented 2026-11-11 |
 | 5     | Director and admin main desk with «Потребує уваги»; every desk as a foldable block           | planned                |
 
 ## Tests
 
-`npx nx test admin-dashboard-feature` (`dashboard-page.test.tsx`: workshop desk blocks, hidden blocks without rights, manager desk metrics and blocks with own orders, SEO desk, tabs and remembered choice, no desk), `npx nx test admin-react` (`app-router.integration.test.tsx`: manager desk on `/`).
+`npx nx test admin-dashboard-feature` (`dashboard-page.test.tsx`: workshop desk blocks, hidden blocks without rights, manager desk metrics and blocks with own orders, SEO desk, accountant desk and its note without rights, tabs and remembered choice, no desk), `npx nx test admin-react` (`app-router.integration.test.tsx`: manager desk on `/`).
