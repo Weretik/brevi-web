@@ -1,103 +1,61 @@
-import { useGetWorkshopDashboardQuery } from '@admin/production/data-access';
-import { useListQuotesQuery } from '@admin/quotes/data-access';
-import { adminApiErrorMessage } from '@admin/shared/api-client';
-import AddIcon from '@mui/icons-material/Add';
-import { Alert, Box, Button, Stack, Typography } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
+import { Box, Stack, Tab, Tabs, Typography } from '@mui/material';
 
-import { MetricStrip } from '../components/metrics/metric-strip';
-import { RecentQuotesCard } from '../components/quotes/recent-quotes-card';
-import { WeekHoursCard } from '../components/side-cards/week-hours-card';
-import { WorkshopBoard } from '../components/workshop-board/workshop-board';
-import { recentQuotes, weekHours, workshopMetrics, workshopStages } from '../model/dashboard-view';
+import { SalesDesk } from '../components/desks/sales-desk';
+import { WorkshopDesk } from '../components/desks/workshop-desk';
+import { useChosenDesk } from '../hooks/use-chosen-desk';
+import { visibleDesks } from '../model/desks';
 
 import type { DashboardViewer } from '../model/dashboard-view';
-
-const latestQuotes = { search: '', responsibleUserId: null, page: 1, pageSize: 6 };
+import type { DeskKey } from '../model/desks';
 
 interface DashboardPageProps {
   useViewer: () => DashboardViewer;
 }
 
-/** «Огляд виробництва»: the workshop board, late and ready orders, the latest КП (PRD-D50). */
+/**
+ * «Робочий стіл» (DESK-001): the desks of «Права доступу» → «Робочі столи» this person may see. One desk opens as it
+ * is; several get tabs, and the last chosen tab is remembered.
+ */
 export default function DashboardPage({ useViewer }: DashboardPageProps) {
   const viewer = useViewer();
-  const workshop = useGetWorkshopDashboardQuery(undefined, { skip: !viewer.seesWorkshop });
-  const quotes = useListQuotesQuery(latestQuotes, { skip: !viewer.seesQuotes });
-  const dashboard = workshop.data;
-  const hours = dashboard?.hours ?? null;
+  const visible = visibleDesks(viewer.canSee);
+  const { current, choose } = useChosenDesk(visible);
 
   return (
     <Stack spacing={2}>
-      <Stack
-        direction="row"
-        sx={{ alignItems: 'flex-end', flexWrap: 'wrap', gap: 2, justifyContent: 'space-between' }}
-      >
-        <Box>
-          <Typography component="h1" variant="h4">
-            Огляд виробництва
-          </Typography>
-          {dashboard && (
-            <Typography color="text.secondary" sx={{ mt: 0.5 }} variant="body2">
-              Завдання в роботі за етапом найповільнішої позиції.
-            </Typography>
-          )}
-        </Box>
-        {viewer.seesQuotes && (
-          <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 1.25 }}>
-            <Button
-              component={RouterLink}
-              to="/references/counterparties?tab=clients"
-              variant="outlined"
-            >
-              Клієнти
-            </Button>
-            <Button
-              component={RouterLink}
-              startIcon={<AddIcon />}
-              to="/crm/quotes/new"
-              variant="contained"
-            >
-              Новий розрахунок
-            </Button>
-          </Stack>
-        )}
-      </Stack>
-      {workshop.error && (
-        <Alert severity="error">
-          {adminApiErrorMessage(workshop.error, 'Не вдалося завантажити дані цеху.')}
-        </Alert>
-      )}
-      {dashboard && (
-        <>
-          <MetricStrip metrics={workshopMetrics(dashboard)} />
-          <WorkshopBoard stages={workshopStages(dashboard)} />
-        </>
-      )}
-      {(viewer.seesQuotes || hours) && (
-        <Box
-          sx={{
-            alignItems: 'start',
-            display: 'grid',
-            gap: 2,
-            gridTemplateColumns: {
-              xs: '1fr',
-              lg: viewer.seesQuotes && hours ? 'minmax(0, 1fr) 340px' : '1fr',
-            },
-          }}
-        >
-          {viewer.seesQuotes &&
-            (quotes.error ? (
-              <Alert severity="error">
-                {adminApiErrorMessage(quotes.error, 'Не вдалося завантажити КП.')}
-              </Alert>
-            ) : (
-              quotes.data && <RecentQuotesCard quotes={recentQuotes(quotes.data.items)} />
+      <Typography component="h1" variant="h4">
+        {visible.length === 1 && current ? current.heading : 'Робочий стіл'}
+      </Typography>
+      {visible.length > 1 && current && (
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs
+            aria-label="Робочі столи"
+            onChange={(_, key: DeskKey) => choose(key)}
+            value={current.key}
+            variant="scrollable"
+          >
+            {visible.map((desk) => (
+              <Tab
+                aria-controls={`desk-panel-${desk.key}`}
+                id={`desk-tab-${desk.key}`}
+                key={desk.key}
+                label={desk.title}
+                value={desk.key}
+              />
             ))}
-          {hours && <WeekHoursCard rows={weekHours(hours)} />}
+          </Tabs>
         </Box>
       )}
-      {!viewer.seesWorkshop && !viewer.seesQuotes && (
+      {current ? (
+        <Box
+          aria-labelledby={visible.length > 1 ? `desk-tab-${current.key}` : undefined}
+          id={`desk-panel-${current.key}`}
+          role={visible.length > 1 ? 'tabpanel' : undefined}
+        >
+          {current.key === 'workshop' && <WorkshopDesk viewer={viewer} />}
+          {current.key === 'sales' && <SalesDesk viewer={viewer} />}
+        </Box>
+      ) : (
         <Typography color="text.secondary">Оберіть розділ у меню ліворуч.</Typography>
       )}
     </Stack>

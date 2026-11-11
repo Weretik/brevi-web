@@ -4,10 +4,15 @@ const V: readonly AccessAction[] = ['view'];
 const VE: readonly AccessAction[] = ['view', 'edit'];
 const VCE: readonly AccessAction[] = ['view', 'create', 'edit'];
 const All: readonly AccessAction[] = ['view', 'create', 'edit', 'delete'];
+const VC: readonly AccessAction[] = ['view', 'create'];
 
 /** The server's rights of the built-in roles before anyone saves «Права доступу» (AccessCatalog defaults). */
 const defaults: Readonly<Record<string, Readonly<Record<string, readonly AccessAction[]>>>> = {
   Admin: {
+    'desk-main': V,
+    'desk-sales': V,
+    'desk-workshop': V,
+    'desk-seo': V,
     leads: VE,
     'lead-stats': VCE,
     quotes: VCE,
@@ -48,6 +53,7 @@ const defaults: Readonly<Record<string, Readonly<Record<string, readonly AccessA
     'content-company': VE,
   },
   Manager: {
+    'desk-sales': V,
     leads: VE,
     quotes: VCE,
     embroidery: VE,
@@ -76,6 +82,7 @@ const defaults: Readonly<Record<string, Readonly<Record<string, readonly AccessA
     'content-company': V,
   },
   Accountant: {
+    'desk-accounting': V,
     products: V,
     'product-sections': V,
     materials: V,
@@ -84,6 +91,7 @@ const defaults: Readonly<Record<string, Readonly<Record<string, readonly AccessA
     'price-import': V,
   },
   WorkshopChief: {
+    'desk-workshop': V,
     'production-orders': All,
     'fabric-stock': VE,
     'fabric-plan-fact': V,
@@ -98,6 +106,18 @@ const defaults: Readonly<Record<string, Readonly<Record<string, readonly AccessA
     payroll: VE,
     timesheet: VE,
   },
+  Seo: {
+    'desk-seo': V,
+    media: VC,
+    'content-products': VCE,
+    'content-categories': VCE,
+    'content-articles': VCE,
+    'content-redirects': VCE,
+    'content-seo-settings': VE,
+    'content-site-pages': VE,
+    'content-seo-overview': V,
+    'content-company': VE,
+  },
 };
 
 const titles: Readonly<Record<string, string>> = {
@@ -106,6 +126,7 @@ const titles: Readonly<Record<string, string>> = {
   Manager: 'Менеджер',
   Accountant: 'Бухгалтер',
   WorkshopChief: 'Начальник цеху',
+  Seo: 'SEO-фахівець',
 };
 
 /** Rights of these roles together, as GET /api/auth/session/access returns them. */

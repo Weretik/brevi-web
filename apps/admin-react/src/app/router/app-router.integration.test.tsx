@@ -143,13 +143,13 @@ describe('React Admin routing', () => {
     }
   });
 
-  it('shows the overview and the signed-in person in the profile menu', async () => {
+  it('shows the manager desk and the signed-in person in the profile menu', async () => {
     const user = userEvent.setup();
     window.history.replaceState({}, '', '/');
     renderApp();
 
     expect(
-      await screen.findByRole('heading', { name: 'Огляд виробництва' }, { timeout: 5000 }),
+      await screen.findByRole('heading', { name: 'Робочий стіл менеджера' }, { timeout: 5000 }),
     ).toBeVisible();
     expect(screen.queryByText('Демо-дані')).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Профіль' }));
@@ -173,7 +173,7 @@ describe('React Admin routing', () => {
     expect(screen.getByRole('main')).toHaveTextContent('Сторінку не знайдено');
     await user.click(screen.getByRole('link', { name: 'На початок' }));
     expect(
-      await screen.findByRole('heading', { name: 'Огляд виробництва' }, { timeout: 5000 }),
+      await screen.findByRole('heading', { name: 'Робочий стіл менеджера' }, { timeout: 5000 }),
     ).toBeVisible();
   });
 

@@ -1,5 +1,5 @@
 /**
- * A built-in role (Director, Admin, Accountant, Manager, WorkshopChief) or a role made on
+ * A built-in role (Director, Admin, Accountant, Manager, WorkshopChief, Seo) or a role made on
  * «Права доступу» (`custom-…`). Director is the single owner account; the server also gives it Admin.
  */
 export type StaffRole = string;
@@ -44,6 +44,7 @@ export interface CreateStaffAccountInput {
 export const staffRoles: readonly StaffRole[] = [
   'Manager',
   'WorkshopChief',
+  'Seo',
   'Accountant',
   'Admin',
   'Director',
@@ -56,6 +57,7 @@ export const staffRoleLabels: Readonly<Partial<Record<StaffRole, string>>> = {
   Accountant: 'Бухгалтер',
   Manager: 'Менеджер',
   WorkshopChief: 'Начальник цеху',
+  Seo: 'SEO-фахівець',
 };
 
 /** The built-in roles as options, for when the server list is unavailable. */

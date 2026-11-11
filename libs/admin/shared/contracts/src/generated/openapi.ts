@@ -998,7 +998,7 @@ export interface paths {
     };
     /**
      * The signed-in staff member's profile («Мій кабінет»)
-     * @description Policy `OwnProfile` (Accountant, Manager, WorkshopChief, Admin; the director also holds Admin).
+     * @description Policy `OwnProfile` (Accountant, Manager, WorkshopChief, Seo, Admin; the director also holds Admin).
      */
     get: operations['getMyProfile'];
     put?: never;
@@ -6996,7 +6996,7 @@ export interface components {
       /** Format: int32 */
       pageSize: number;
     };
-    /** @description Director, Admin, Accountant, Manager, WorkshopChief or a role made on «Права доступу» (custom-…); an unknown role returns 400 */
+    /** @description Director, Admin, Accountant, Manager, WorkshopChief, Seo or a role made on «Права доступу» (custom-…); an unknown role returns 400 */
     StaffRole: string;
     StaffAccountResponse: {
       /** Format: int32 */
