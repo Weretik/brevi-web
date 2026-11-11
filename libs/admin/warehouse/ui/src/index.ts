@@ -20,3 +20,4 @@ export { ValuationShortageTable, ValuationTable } from './tables/reports/valuati
 export { HardwareIncompleteTable, HardwareNeedTable } from './tables/reports/hardware-table';
 export { ReportStats } from './components/reports/report-stats';
 export type { ReportStat } from './components/reports/report-stats';
+export { StockTransferSummary } from './panels/stock-transfer/stock-transfer-summary';

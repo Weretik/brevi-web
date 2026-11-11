@@ -35,6 +35,7 @@ const permissions = (value: unknown): FabricStockPermissions => {
   return {
     canMove: boolean(row['canMove'], 'рух складу'),
     seesValue: boolean(row['seesValue'], 'ціни'),
+    canTransfer: boolean(row['canTransfer'], 'перенесення'),
   };
 };
 

@@ -2,6 +2,8 @@
 export interface FabricStockPermissions {
   canMove: boolean;
   seesValue: boolean;
+  /** «Перенесення з v133»: Admin. */
+  canTransfer: boolean;
 }
 
 /** A stock line inside a pair: its own fabric code and balance. */

@@ -9,10 +9,12 @@ import {
 } from '@admin/warehouse/model';
 import { FabricStockTable } from '@admin/warehouse/ui';
 import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined';
-import { Alert, Box, Button } from '@mui/material';
+import MoveDownOutlinedIcon from '@mui/icons-material/MoveDownOutlined';
+import { Alert, Box, Button, Stack } from '@mui/material';
 import { useMemo, useState } from 'react';
 
 import { FabricAdjustmentDrawer } from '../../components/operations/fabric-adjustment-drawer';
+import { StockTransferDrawer } from '../../components/transfer/stock-transfer-drawer';
 import { downloadFile } from '../../hooks/files/download-file';
 
 import type { FabricStockPair } from '@admin/warehouse/model';
@@ -26,6 +28,7 @@ export function FabricStockPage() {
   const [search, setSearch] = useState('');
   const [adjusting, setAdjusting] = useState<FabricStockPair | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [transferring, setTransferring] = useState(false);
   const fabrics = useMemo(
     () => searchFabricStock(stock.data?.fabrics ?? [], search),
     [stock.data, search],
@@ -42,21 +45,32 @@ export function FabricStockPage() {
             : 'Скільки тканини лежить на полицях'
         }
         actions={
-          <Button
-            variant="outlined"
-            startIcon={<DownloadOutlinedIcon />}
-            disabled={!data?.fabrics.length}
-            onClick={() =>
-              data &&
-              downloadFile(
-                stockBalancesWorkbook(data),
-                `zalyshky-tkanyn-${kyivToday()}.xlsx`,
-                XLSX_MIME_TYPE,
-              )
-            }
-          >
-            Завантажити всі залишки Excel
-          </Button>
+          <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap' }}>
+            {data?.permissions.canTransfer && (
+              <Button
+                variant="outlined"
+                startIcon={<MoveDownOutlinedIcon />}
+                onClick={() => setTransferring(true)}
+              >
+                Перенесення з v133
+              </Button>
+            )}
+            <Button
+              variant="outlined"
+              startIcon={<DownloadOutlinedIcon />}
+              disabled={!data?.fabrics.length}
+              onClick={() =>
+                data &&
+                downloadFile(
+                  stockBalancesWorkbook(data),
+                  `zalyshky-tkanyn-${kyivToday()}.xlsx`,
+                  XLSX_MIME_TYPE,
+                )
+              }
+            >
+              Завантажити всі залишки Excel
+            </Button>
+          </Stack>
         }
       />
       <ReferenceListAlerts
@@ -95,6 +109,7 @@ export function FabricStockPage() {
           }}
         />
       )}
+      {transferring && <StockTransferDrawer onClose={() => setTransferring(false)} />}
     </Box>
   );
 }

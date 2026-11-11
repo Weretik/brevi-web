@@ -4326,7 +4326,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/warehouse/fabric-stock/import': {
+  '/api/warehouse/fabric-stock/transfer': {
     parameters: {
       query?: never;
       header?: never;
@@ -4335,8 +4335,11 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Moves the stock of the old «Цех» (Admin); nothing is saved unless every row is fine */
-    post: operations['importFabricStock'];
+    /**
+     * «Перенесення з v133» (Admin) replaces the stock with the D1 export of the old «Цех»
+     * @description WH-006. The body holds the rows of nine D1 tables (camelCase columns, values as exported). Every link, before + change = after, the chain of every line and the issued metres are checked; truncated values are refused. The stock is emptied and written in one transaction, revisions are replayed, and every movement and line is compared with the export; any difference rolls back. A dry run rolls back too. Records entered in Brevi itself are removed only with confirmReplace. The same export again changes nothing.
+     */
+    post: operations['transferFabricStock'];
     delete?: never;
     options?: never;
     head?: never;
@@ -10984,6 +10987,8 @@ export interface components {
       canMove: boolean;
       /** @description Prices of «Тканини» on the forms: WorkshopChief and Admin. */
       seesValue: boolean;
+      /** @description «Перенесення з v133»: Admin only. */
+      canTransfer: boolean;
     };
     /** @description «Залишки»: only fabrics and colours that have stock lines, zero and negative included. */
     FabricStockListResponse: {
@@ -11271,81 +11276,163 @@ export interface components {
       issued: number;
       issuedValue: number | null;
     };
-    FabricMovementImportRow: {
-      legacyId: string;
-      /** @enum {string} */
-      kind: 'Opening' | 'Receipt' | 'Issue' | 'Adjustment' | 'Reversal';
-      metersBefore: number;
-      delta: number;
-      metersAfter: number;
-      /** Format: date */
-      operationDate: string;
-      /** Format: date-time */
-      at: string;
+    V133StockRow: {
+      id: string;
+      fabricId: string;
+      fabricName: string | null;
+      color: string;
+      normalizedColor: string | null;
+      hundredthsOfMeter: number;
+      lastMovementId: string | null;
+      updatedAt: string | null;
+    };
+    V133MovementRow: {
+      id: string;
+      stockId: string;
+      fabricId: string | null;
+      fabricName: string | null;
+      color: string | null;
+      kind: string;
+      beforeHundredths: number;
+      deltaHundredths: number;
+      afterHundredths: number;
+      orderId: string | null;
+      itemId: string | null;
+      orderNumber: string | null;
+      modelName: string | null;
+      clientName: string | null;
+      itemQuantity: number | null;
       supplier: string | null;
-      document: string | null;
+      reference: string | null;
       note: string | null;
       actorEmail: string | null;
-      orderLegacyId: string | null;
-      position: number | null;
-    };
-    FabricStockImportRow: {
-      legacyId: string;
-      fabricCode: string;
-      color: string;
-      meters: number;
-      movements: components['schemas']['FabricMovementImportRow'][];
-    };
-    FabricIssueLineImportRow: {
-      /** @enum {string} */
-      purpose: 'Planned' | 'Replacement' | 'Additional';
-      planFabricCode: string | null;
-      planColor: string | null;
-      plannedMeters: number | null;
-      movementLegacyId: string;
-      coveredMeters: number;
-    };
-    FabricIssueImportRow: {
-      legacyId: string;
-      orderLegacyId: string;
-      position: number;
-      /** Format: date */
-      issuedOn: string;
-      /** Format: date-time */
       at: string;
-      actorEmail: string | null;
-      note: string | null;
-      lines: components['schemas']['FabricIssueLineImportRow'][];
+      operationDate: string | null;
     };
-    FabricReservationImportRow: {
-      fabricCode: string;
+    V133RevisionRow: {
+      id: string;
+      operationId: string | null;
+      movementId: string;
+      beforeJson: string;
+      afterJson: string;
+      actorEmail: string | null;
+      at: string;
+    };
+    V133BatchRow: {
+      id: string;
+      itemId: string;
+      actorEmail: string | null;
+      resultJson: string | null;
+      createdAt: string;
+    };
+    V133IssueLineRow: {
+      id: string;
+      batchId: string;
+      itemId: string;
+      stockId: string;
+      purpose: string;
+      planKey: string | null;
+      plannedFabricId: string | null;
+      plannedColor: string | null;
+      plannedHundredths: number | null;
+      actualFabricId: string | null;
+      actualColor: string | null;
+      actualHundredths: number;
+      coveredPlanHundredths: number;
+      note: string | null;
+      createdAt: string;
+      plannedComponentJson: string | null;
+      voidedAt: string | null;
+    };
+    V133IssueComponentRow: {
+      movementId: string;
+      lineId: string;
+    };
+    V133ReservationRow: {
+      id: string;
+      orderId: string | null;
+      itemId: string;
+      fabricId: string;
       color: string;
+      hundredthsOfMeter: number;
+    };
+    V133OrderRow: {
+      id: string;
+      seq: number;
+      status: string | null;
+      deletedAt: string | null;
+    };
+    V133ItemRow: {
+      id: string;
+      orderId: string;
+      modelArticle: string | null;
+      modelName: string | null;
+      quantity: number;
+    };
+    StockTransferInput: {
+      snapshot: string | null;
+      fabricStock: components['schemas']['V133StockRow'][];
+      fabricStockMovements: components['schemas']['V133MovementRow'][];
+      fabricMovementRevisions: components['schemas']['V133RevisionRow'][];
+      fabricIssueBatches: components['schemas']['V133BatchRow'][];
+      fabricIssueLines: components['schemas']['V133IssueLineRow'][];
+      fabricIssueComponents: components['schemas']['V133IssueComponentRow'][];
+      fabricReservations: components['schemas']['V133ReservationRow'][];
+      productionOrders: components['schemas']['V133OrderRow'][];
+      productionItems: components['schemas']['V133ItemRow'][];
+    };
+    StockTransferSource: {
+      lines: number;
+      pairs: number;
+      movements: number;
+      openings: number;
+      receipts: number;
+      issues: number;
+      adjustments: number;
+      voided: number;
+      revisions: number;
+      packages: number;
+      issueLines: number;
+      reservations: number;
+      meters: number;
+      negativePairs: number;
+      zeroPairs: number;
+    };
+    StockTransferTarget: {
+      lines: number;
+      movements: number;
+      revisions: number;
+      issues: number;
+      issueLines: number;
+      plans: number;
       meters: number;
     };
-    FabricStockImportInput: {
-      stocks: components['schemas']['FabricStockImportRow'][];
-      issues: components['schemas']['FabricIssueImportRow'][];
-      oldReservations: components['schemas']['FabricReservationImportRow'][];
-    };
-    FabricStockImportLine: {
-      fabricCode: string;
-      color: string;
-      movements: number;
-      /** @enum {string} */
-      action: 'created' | 'unchanged' | 'error';
-      error: string | null;
-    };
-    FabricStockImportResult: {
-      dryRun: boolean;
-      created: number;
-      unchanged: number;
-      errors: number;
+    StockTransferCurrent: {
+      lines: number;
       movements: number;
       issues: number;
-      /** @description Fabric and colour pairs whose recomputed reservation differs from the old app. */
-      reservationDifferences: number;
-      lines: components['schemas']['FabricStockImportLine'][];
-      issueErrors: string[];
+      plans: number;
+      ownLines: number;
+      ownMovements: number;
+      ownIssues: number;
+    };
+    StockTransferProblem: {
+      table: string;
+      rowId: string | null;
+      message: string;
+    };
+    StockTransferResult: {
+      applied: boolean;
+      unchanged: boolean;
+      hash: string;
+      source: components['schemas']['StockTransferSource'];
+      target: components['schemas']['StockTransferTarget'] | null;
+      current: components['schemas']['StockTransferCurrent'];
+      needsConfirmation: boolean;
+      errors: components['schemas']['StockTransferProblem'][];
+      notes: components['schemas']['StockTransferProblem'][];
+      /** Format: date-time */
+      lastTransferAt: string | null;
     };
     FabricIssueItemResponse: {
       orderId: number;
@@ -27251,11 +27338,13 @@ export interface operations {
       };
     };
   };
-  importFabricStock: {
+  transferFabricStock: {
     parameters: {
       query?: {
-        /** @description Only check and show. */
+        /** @description Do everything, show the result, and roll back. */
         dryRun?: boolean;
+        /** @description Allow removing stock lines, movements and issues entered in Brevi. */
+        confirmReplace?: boolean;
       };
       header?: never;
       path?: never;
@@ -27263,20 +27352,20 @@ export interface operations {
     };
     requestBody: {
       content: {
-        'application/json': components['schemas']['FabricStockImportInput'];
+        'application/json': components['schemas']['StockTransferInput'];
       };
     };
     responses: {
-      /** @description OK */
+      /** @description OK; applied is false on a dry run, with errors, or while a confirmation is needed */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['FabricStockImportResult'];
+          'application/json': components['schemas']['StockTransferResult'];
         };
       };
-      /** @description Invalid file */
+      /** @description A table is missing or too large */
       400: {
         headers: {
           [name: string]: unknown;
@@ -27290,7 +27379,7 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description Not allowed */
+      /** @description Only Admin */
       403: {
         headers: {
           [name: string]: unknown;

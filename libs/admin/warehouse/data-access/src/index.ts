@@ -28,3 +28,5 @@ export {
   useGetFabricValuationQuery,
   useGetHardwareOrderQuery,
 } from './api/stock-reports.api';
+export { useTransferFabricStockMutation } from './api/stock-transfer.api';
+export type { StockTransferArgs } from './api/stock-transfer.api';

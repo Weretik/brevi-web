@@ -189,3 +189,15 @@ export type {
 } from './entities/reports/stock-reports';
 export { searchBooking } from './queries/reports/booking-search';
 export { hardwareWorkbook } from './mappers/exports/hardware-exports';
+export type {
+  StockTransferCurrent,
+  StockTransferInput,
+  StockTransferProblem,
+  StockTransferResult,
+  StockTransferSource,
+  StockTransferTable,
+  StockTransferTarget,
+  V133Row,
+} from './entities/transfer/stock-transfer';
+export { readV133Export, v133Tables } from './mappers/transfer/v133-export';
+export type { V133ExportFile, V133ExportResult } from './mappers/transfer/v133-export';
