@@ -19,4 +19,8 @@ export {
   useSetContentArticleVisibilityMutation,
   useDeleteContentArticleMutation,
   useImportOldSiteArticlesMutation,
+  useGetSiteRedirectsQuery,
+  useSaveSiteRedirectMutation,
+  useDeleteSiteRedirectMutation,
+  useImportOldSiteRedirectsMutation,
 } from './api/content.api';

@@ -1,15 +1,19 @@
 import { DEFAULT_LOCALE } from '@site/core/i18n';
 import { NextResponse } from 'next/server';
 
+import { MOVED_PREFIX } from './proxy-paths';
+
 import type { NextRequest } from 'next/server';
 
 /**
- * Paths whose first segment is not a locale still match `[locale]`, and the root layout cannot render a framed
- * 404 for them. Rewriting them to an unmatched path under the default locale serves `global-not-found.tsx`
- * with status 404 while the address bar keeps the requested URL.
+ * Paths whose first segment is not a locale (old-site addresses such as `/specodyag-litnij`) still match
+ * `[locale]`, and the root layout cannot render them. Rewriting them under the default locale to
+ * `/uk/_moved/<path>` lets `[locale]/[...rest]` answer a permanent redirect from «Переадресації» or the
+ * framed 404, while the address bar keeps the requested URL.
  */
 export function proxy(request: NextRequest) {
-  return NextResponse.rewrite(new URL(`/${DEFAULT_LOCALE}/_not-found`, request.url));
+  const url = new URL(`/${DEFAULT_LOCALE}/${MOVED_PREFIX}${request.nextUrl.pathname}`, request.url);
+  return NextResponse.rewrite(url);
 }
 
 export const config = {

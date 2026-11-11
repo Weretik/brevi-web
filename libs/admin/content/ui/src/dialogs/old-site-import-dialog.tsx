@@ -24,6 +24,7 @@ import type {
 export interface OldSiteImportCopy {
   title: string;
   intro: string;
+  /** Label of «show on the site»; empty hides the switch (the redirect transfer has none). */
   showOnSite: string;
   overwrite: string;
   done: string;
@@ -143,16 +144,18 @@ export function OldSiteImportDialog({
           </Box>
           {!done && (
             <Stack>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={options.showOnSite}
-                    disabled={busy}
-                    onChange={(_event, showOnSite) => onOptions({ ...options, showOnSite })}
-                  />
-                }
-                label={copy.showOnSite}
-              />
+              {copy.showOnSite && (
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={options.showOnSite}
+                      disabled={busy}
+                      onChange={(_event, showOnSite) => onOptions({ ...options, showOnSite })}
+                    />
+                  }
+                  label={copy.showOnSite}
+                />
+              )}
               <FormControlLabel
                 control={
                   <Switch

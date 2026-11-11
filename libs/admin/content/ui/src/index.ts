@@ -12,3 +12,6 @@ export * from './tables/articles/articles-table';
 export * from './components/articles/article-view';
 export * from './forms/articles/article-form';
 export * from './dialogs/article-delete-dialog';
+export * from './tables/redirects/redirects-table';
+export * from './forms/redirects/redirect-form';
+export * from './dialogs/redirect-delete-dialog';
