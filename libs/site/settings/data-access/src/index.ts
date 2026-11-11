@@ -9,3 +9,9 @@ export {
   mapSiteSettings,
 } from './lib/site-settings-loader';
 export type { SiteSettings } from './lib/site-settings-loader';
+export {
+  SITE_COMPANY_CACHE_TAG,
+  hoursLabel,
+  loadSiteCompany,
+  mapSiteCompany,
+} from './lib/site-company-loader';

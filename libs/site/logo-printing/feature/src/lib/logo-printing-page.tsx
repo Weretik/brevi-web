@@ -9,6 +9,7 @@ import {
   LogoPrintingSewing,
   getLogoPrintingDictionary,
 } from '@site/logo-printing/ui';
+import { loadSiteCompany } from '@site/settings/data-access';
 import { PageSection } from '@site/shared/ui';
 
 import type { Locale } from '@site/core/i18n';
@@ -17,7 +18,8 @@ import type { Locale } from '@site/core/i18n';
  * «Пошиття з логотипом» page in the order of the live `brevi.com.ua` page: lead with the order terms,
  * branding methods, kinds of workwear, custom sewing, and how to order. Static: the text is in the dictionary.
  */
-export function LogoPrintingPage({ locale }: { locale: Locale }) {
+export async function LogoPrintingPage({ locale }: { locale: Locale }) {
+  const company = await loadSiteCompany();
   const dictionary = getLogoPrintingDictionary(locale);
   const path = (key: keyof typeof SITE_PATHS) => localizedPath(locale, SITE_PATHS[key]);
   const breadcrumbs = [
@@ -63,6 +65,7 @@ export function LogoPrintingPage({ locale }: { locale: Locale }) {
       </PageSection>
 
       <LogoPrintingOrder
+        company={company}
         id="logo-order"
         index="05"
         dictionary={dictionary.order}

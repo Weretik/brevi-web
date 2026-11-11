@@ -1,17 +1,19 @@
-import { COMPANY } from '@site/core/config';
-
 import type { DeliveryDictionary } from '../i18n/delivery-dictionary';
+import type { Company } from '@site/core/config';
 import type { Locale } from '@site/core/i18n';
 
-/** Payment rules on the left and the bank details from `COMPANY` on the right. */
+/** Payment rules on the left and the bank details from «Контакти та компанія» on the right. */
 export function DeliveryPayment({
+  company,
   locale,
   dictionary,
 }: {
+  /** Company facts from «Контакти та компанія». */
+  company: Company;
   locale: Locale;
   dictionary: DeliveryDictionary['payment'];
 }) {
-  const { bankDetails } = COMPANY;
+  const { bankDetails } = company;
   const rows = [
     { name: dictionary.recipient, value: bankDetails.recipient[locale], mono: false },
     { name: dictionary.edrpou, value: bankDetails.edrpou, mono: true },

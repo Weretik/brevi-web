@@ -1,3 +1,4 @@
+import { COMPANY } from '@site/core/config';
 import { render, screen } from '@testing-library/react';
 
 import { getContactsDictionary } from './i18n/contacts-dictionary';
@@ -21,7 +22,9 @@ describe('contacts dictionary', () => {
 
 describe('ContactsInfo', () => {
   it('shows the phone, the email, the address, and the hours', () => {
-    render(<ContactsInfo locale="uk" dictionary={getContactsDictionary('uk').info} />);
+    render(
+      <ContactsInfo company={COMPANY} locale="uk" dictionary={getContactsDictionary('uk').info} />,
+    );
 
     expect(screen.getByRole('link', { name: '050 469 86 75' }).getAttribute('href')).toBe(
       'tel:+380504698675',
@@ -39,7 +42,7 @@ describe('ContactsInfo', () => {
 describe('ContactsMap', () => {
   it('embeds a lazy map with a title and links to the place in Maps', () => {
     const dictionary = getContactsDictionary('uk').info;
-    render(<ContactsMap locale="uk" dictionary={dictionary} />);
+    render(<ContactsMap company={COMPANY} locale="uk" dictionary={dictionary} />);
 
     const frame = screen.getByTitle(dictionary.mapTitle);
     expect(frame.getAttribute('loading')).toBe('lazy');
@@ -52,7 +55,13 @@ describe('ContactsMap', () => {
 
 describe('ContactsManagers', () => {
   it('lists the managers with their phones and email', () => {
-    render(<ContactsManagers locale="uk" dictionary={getContactsDictionary('uk').managers} />);
+    render(
+      <ContactsManagers
+        company={COMPANY}
+        locale="uk"
+        dictionary={getContactsDictionary('uk').managers}
+      />,
+    );
 
     expect(screen.getAllByRole('listitem')).toHaveLength(2);
     expect(screen.getByRole('heading', { name: 'Анастасія Берегових' })).toBeTruthy();

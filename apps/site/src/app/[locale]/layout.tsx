@@ -10,7 +10,7 @@ import {
   withSharePicture,
 } from '@site/core/seo';
 import { SiteShell } from '@site/core/shell';
-import { loadSiteSettings } from '@site/settings/data-access';
+import { loadSiteCompany, loadSiteSettings } from '@site/settings/data-access';
 import { notFound } from 'next/navigation';
 
 import '../global.css';
@@ -38,7 +38,11 @@ export const viewport: Viewport = { themeColor: '#ffffff' };
 export default async function LocaleLayout({ children, params }: LayoutProps<'/[locale]'>) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
-  const [tree, settings] = await Promise.all([getCatalogTree(), loadSiteSettings()]);
+  const [tree, settings, company] = await Promise.all([
+    getCatalogTree(),
+    loadSiteSettings(),
+    loadSiteCompany(),
+  ]);
   const catalogSections = toCatalogSections(tree);
 
   return (
@@ -48,10 +52,10 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
     >
       {/* Browser extensions (Grammarly and similar) add attributes to <body> before React hydrates. */}
       <body className="flex min-h-dvh flex-col" suppressHydrationWarning>
-        <SiteShell locale={locale} catalogSections={catalogSections}>
+        <SiteShell company={company} locale={locale} catalogSections={catalogSections}>
           {children}
         </SiteShell>
-        <JsonLd data={buildOrganizationJsonLd(locale)} />
+        <JsonLd data={buildOrganizationJsonLd(locale, company)} />
         <SiteAnalytics
           googleAnalyticsId={settings.googleAnalyticsId}
           googleTagManagerId={settings.googleTagManagerId}

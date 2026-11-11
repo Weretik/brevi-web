@@ -226,3 +226,28 @@ export type {
   SeoProblemKind,
   SeoSiteProblem,
 } from './entities/seo-overview/seo-overview';
+export { scheduleText, weekDayLabels } from './entities/company/site-company';
+export type {
+  CompanyBankDetails,
+  CompanyManager,
+  CompanySchedule,
+  CompanySocials,
+  CompanyText,
+  SiteCompany,
+  SiteCompanyInput,
+  SiteCompanyViewer,
+} from './entities/company/site-company';
+export {
+  companyLimits,
+  emptyManager,
+  formatPhone,
+  siteCompanyFormOf,
+  siteCompanyInputOf,
+  splitPhones,
+  validateSiteCompany,
+} from './validators/company/site-company-validation';
+export type {
+  CompanyManagerFormValues,
+  SiteCompanyErrors,
+  SiteCompanyFormValues,
+} from './validators/company/site-company-validation';

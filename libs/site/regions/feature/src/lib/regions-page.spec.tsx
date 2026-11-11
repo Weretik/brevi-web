@@ -3,10 +3,15 @@ import { render, screen } from '@testing-library/react';
 
 import { RegionsPage } from './regions-page';
 
+vi.mock('@site/settings/data-access', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  loadSiteCompany: async () => (await import('@site/core/config')).COMPANY,
+}));
+
 describe('RegionsPage', () => {
-  it('renders one h1 and the blocks in order', () => {
+  it('renders one h1 and the blocks in order', async () => {
     const dictionary = getRegionsDictionary('uk');
-    render(<RegionsPage locale="uk" />);
+    render(await RegionsPage({ locale: 'uk' }));
 
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     expect(screen.getAllByRole('heading', { level: 2 }).map((node) => node.textContent)).toEqual([
@@ -17,8 +22,8 @@ describe('RegionsPage', () => {
     ]);
   });
 
-  it('links to the localized pages around the order', () => {
-    render(<RegionsPage locale="ru" />);
+  it('links to the localized pages around the order', async () => {
+    render(await RegionsPage({ locale: 'ru' }));
 
     expect(screen.getByRole('link', { name: 'Главная' }).getAttribute('href')).toBe('/ru');
     expect(
@@ -36,8 +41,8 @@ describe('RegionsPage', () => {
     }
   });
 
-  it('is one page for all cities: the cities are text, not links', () => {
-    const { container } = render(<RegionsPage locale="uk" />);
+  it('is one page for all cities: the cities are text, not links', async () => {
+    const { container } = render(await RegionsPage({ locale: 'uk' }));
     const [breadcrumbs] = [...container.querySelectorAll('script[type="application/ld+json"]')].map(
       (node) => JSON.parse(node.textContent ?? '{}'),
     );

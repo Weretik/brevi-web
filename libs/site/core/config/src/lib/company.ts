@@ -1,4 +1,4 @@
-type Localized = { uk: string; ru: string };
+export type Localized = { uk: string; ru: string };
 
 export type CompanyPhone = {
   /** `tel:` value in E.164. */
@@ -18,10 +18,10 @@ export type CompanyOpeningHours = {
 
 export type CompanyManager = {
   name: Localized;
-  /** Photo in `apps/site/public`, square. */
-  photo: string;
+  /** Square photo: in `apps/site/public` (`/assets/…`) or on the CDN of the «Фото» library; null without one. */
+  photo: string | null;
   phones: readonly CompanyPhone[];
-  email: string;
+  email: string | null;
 };
 
 export type CompanySocial = {
@@ -31,31 +31,53 @@ export type CompanySocial = {
   url: string | null;
 };
 
+export type CompanyBankDetails = {
+  recipient: Localized;
+  edrpou: string;
+  iban: string;
+  bank: Localized;
+};
+
+/** Company facts shown in the header, footer, pages, and structured data. */
+export type Company = {
+  name: string;
+  /** Logo for light backgrounds in `apps/site/public`, with its pixel size for `next/image`. */
+  logo: { path: string; width: number; height: number };
+  email: string;
+  /** The company phone first: the header button and the `ContactPoint`. */
+  phones: readonly [CompanyPhone, ...CompanyPhone[]];
+  address: { countryCode: string; city: Localized; street: Localized };
+  openingHours: CompanyOpeningHours;
+  managers: readonly CompanyManager[];
+  /** Where the map link and the embedded map point. */
+  mapQuery: string;
+  bankDetails: CompanyBankDetails;
+  socials: readonly CompanySocial[];
+};
+
 /**
- * Fixed company facts shown in the header, footer, and structured data.
- * They move to BreviERP when the admin gets a contacts form; until then this is the only place that holds them.
+ * The company facts the site was built with. «Контент → Контакти та компанія» in the Admin replaces them
+ * (`loadSiteCompany` in `@site/settings/data-access`); these stay as the fallback when the API is unavailable,
+ * and the name and the logo always come from here.
  */
-export const COMPANY = {
+export const COMPANY: Company = {
   name: 'Brevi',
   /** Logo for light backgrounds in `apps/site/public`, with its pixel size for `next/image`. */
   logo: { path: '/assets/logo/brevi-logo-dark.png', width: 1401, height: 725 },
   email: 'pp.brevi@gmail.com',
-  /** The one company phone (owner's decision): the header button and the `ContactPoint`. The list form stays for a second number. */
-  phones: [{ e164: '+380504698675', display: '050 469 86 75' }] as readonly [
-    CompanyPhone,
-    ...CompanyPhone[],
-  ],
+  /** The one company phone (owner's decision). */
+  phones: [{ e164: '+380504698675', display: '050 469 86 75' }],
   address: {
     countryCode: 'UA',
-    city: { uk: 'Полтава', ru: 'Полтава' } as Localized,
-    street: { uk: 'вул. Кагамлика, 3А', ru: 'ул. Кагамлыка, 3А' } as Localized,
+    city: { uk: 'Полтава', ru: 'Полтава' },
+    street: { uk: 'вул. Кагамлика, 3А', ru: 'ул. Кагамлыка, 3А' },
   },
   openingHours: {
     days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
     opens: '09:00',
     closes: '18:00',
     label: { uk: 'Пн–Пт 9:00–18:00', ru: 'Пн–Пт 9:00–18:00' },
-  } as CompanyOpeningHours,
+  },
   /** Client managers from the live «Контакти» page, in its order. */
   managers: [
     {
@@ -73,7 +95,7 @@ export const COMPANY = {
       phones: [{ e164: '+380503467546', display: '050 346 75 46' }],
       email: 'brevi.pl05@gmail.com',
     },
-  ] as readonly CompanyManager[],
+  ],
   /** Where the map link and the embedded map point. */
   mapQuery: 'Полтава, вулиця Кагамлика, 3А',
   /** Payment details from the live «Доставка та оплата» page. */
@@ -81,15 +103,15 @@ export const COMPANY = {
     recipient: {
       uk: 'Приватне підприємство «Бреві»',
       ru: 'Частное предприятие «Бреви»',
-    } as Localized,
+    },
     edrpou: '35521636',
     iban: 'UA63 305299 00000 26004041206862',
-    bank: { uk: 'АТ КБ «ПриватБанк»', ru: 'АО КБ «ПриватБанк»' } as Localized,
+    bank: { uk: 'АТ КБ «ПриватБанк»', ru: 'АО КБ «ПриватБанк»' },
   },
   /** The networks the live site lists; addresses are not known yet. */
   socials: [
     { key: 'instagram', label: 'Instagram', url: null },
     { key: 'youtube', label: 'YouTube', url: null },
     { key: 'facebook', label: 'Facebook', url: null },
-  ] as readonly CompanySocial[],
-} as const;
+  ],
+};

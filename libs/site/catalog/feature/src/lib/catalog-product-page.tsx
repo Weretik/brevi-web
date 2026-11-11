@@ -16,6 +16,7 @@ import {
   localizedPath,
 } from '@site/core/i18n';
 import { JsonLd, buildBreadcrumbJsonLd } from '@site/core/seo';
+import { loadSiteCompany } from '@site/settings/data-access';
 import { Breadcrumbs, PageSection, StitchLabel } from '@site/shared/ui';
 import { SizeChartSheet, getSizesDictionary } from '@site/sizes/ui';
 
@@ -37,6 +38,7 @@ export async function CatalogProductPage({
   locale: Locale;
   product: CatalogProduct;
 }) {
+  const company = await loadSiteCompany();
   const dictionary = getCatalogDictionary(locale);
   const [related, category] = await Promise.all([
     getCatalogRelatedProducts(product, locale, RELATED_LIMIT),
@@ -84,6 +86,7 @@ export async function CatalogProductPage({
               {name}
             </h1>
             <CatalogProductBuy
+              company={company}
               model={product.model}
               summary={product.summary}
               fabrics={product.fabrics}
@@ -140,6 +143,7 @@ export async function CatalogProductPage({
       ) : null}
 
       <CatalogOrder
+        company={company}
         id="catalog-order"
         index={index('order')}
         dictionary={dictionary.order}

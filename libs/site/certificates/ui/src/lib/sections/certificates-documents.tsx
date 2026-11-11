@@ -34,7 +34,7 @@ export function CertificatesDocuments({
             <a
               href={certificateScanPath(document)}
               target="_blank"
-              rel="noopener"
+              rel="noopener noreferrer"
               aria-label={`${dictionary.open}: ${title}. ${scope}`}
               className="block overflow-hidden rounded-md border border-border hover:border-brand"
             >

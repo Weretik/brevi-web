@@ -1,3 +1,4 @@
+import { COMPANY } from '@site/core/config';
 import { render, screen } from '@testing-library/react';
 
 import { getIndustriesDictionary } from './i18n/industries-dictionary';
@@ -66,6 +67,7 @@ describe('industries blocks', () => {
     const dictionary = getIndustriesDictionary('uk');
     const { container } = render(
       <IndustriesOrder
+        company={COMPANY}
         id="order"
         index="05"
         dictionary={dictionary.order}

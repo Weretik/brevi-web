@@ -3,10 +3,15 @@ import { render, screen } from '@testing-library/react';
 
 import { ProductionPage } from './production-page';
 
+vi.mock('@site/settings/data-access', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  loadSiteCompany: async () => (await import('@site/core/config')).COMPANY,
+}));
+
 describe('ProductionPage', () => {
-  it('renders one h1 and the blocks in the order of the live page', () => {
+  it('renders one h1 and the blocks in the order of the live page', async () => {
     const dictionary = getProductionDictionary('uk');
-    render(<ProductionPage locale="uk" />);
+    render(await ProductionPage({ locale: 'uk' }));
 
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     expect(screen.getAllByRole('heading', { level: 2 }).map((node) => node.textContent)).toEqual([
@@ -18,8 +23,8 @@ describe('ProductionPage', () => {
     ]);
   });
 
-  it('links to the localized pages', () => {
-    render(<ProductionPage locale="ru" />);
+  it('links to the localized pages', async () => {
+    render(await ProductionPage({ locale: 'ru' }));
 
     expect(screen.getByRole('link', { name: 'Главная' }).getAttribute('href')).toBe('/ru');
     expect(
@@ -33,8 +38,8 @@ describe('ProductionPage', () => {
     ).toBe('/ru#zayavka');
   });
 
-  it('describes the breadcrumb trail in JSON-LD', () => {
-    const { container } = render(<ProductionPage locale="uk" />);
+  it('describes the breadcrumb trail in JSON-LD', async () => {
+    const { container } = render(await ProductionPage({ locale: 'uk' }));
     const data = JSON.parse(
       container.querySelector('script[type="application/ld+json"]')?.textContent ?? '{}',
     );

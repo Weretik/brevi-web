@@ -1,8 +1,8 @@
-import { COMPANY } from '@site/core/config';
 import { buttonVariants } from '@site/shared/ui';
 import Link from 'next/link';
 
 import type { HomeDictionary } from '../i18n/home-dictionary';
+import type { Company } from '@site/core/config';
 import type { Locale } from '@site/core/i18n';
 
 /**
@@ -10,17 +10,20 @@ import type { Locale } from '@site/core/i18n';
  * The request form of the mockup replaces the right side when the site can send requests.
  */
 export function HomeContacts({
+  company,
   id,
   locale,
   dictionary,
   contactsHref,
 }: {
+  /** Company facts from «Контакти та компанія». */
+  company: Company;
   id: string;
   locale: Locale;
   dictionary: HomeDictionary['contacts'];
   contactsHref: string;
 }) {
-  const [salesPhone] = COMPANY.phones;
+  const [salesPhone] = company.phones;
   const titleId = `${id}-title`;
 
   return (
@@ -36,7 +39,7 @@ export function HomeContacts({
         <h2 id={titleId} className="text-2xl leading-tight font-extrabold tracking-[-0.015em]">
           {dictionary.title}
         </h2>
-        {COMPANY.phones.map((phone) => (
+        {company.phones.map((phone) => (
           <a
             key={phone.e164}
             href={`tel:${phone.e164}`}
@@ -45,13 +48,13 @@ export function HomeContacts({
             {phone.display}
           </a>
         ))}
-        <a href={`mailto:${COMPANY.email}`} className="justify-self-start hover:text-brand-text">
-          {COMPANY.email}
+        <a href={`mailto:${company.email}`} className="justify-self-start hover:text-brand-text">
+          {company.email}
         </a>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          {COMPANY.openingHours.label[locale]}
+          {company.openingHours.label[locale]}
           <br />
-          {COMPANY.address.city[locale]}, {COMPANY.address.street[locale]}
+          {company.address.city[locale]}, {company.address.street[locale]}
         </p>
         <Link
           href={contactsHref}
@@ -80,7 +83,7 @@ export function HomeContacts({
             {dictionary.call}
           </a>
           <a
-            href={`mailto:${COMPANY.email}`}
+            href={`mailto:${company.email}`}
             className={buttonVariants({ variant: 'outline', size: 'lg' })}
           >
             {dictionary.write}

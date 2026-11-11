@@ -66,7 +66,7 @@ const ru: AgreementDictionary = {
 const DICTIONARIES: Record<Locale, AgreementDictionary> = { uk, ru };
 const TEXTS: Record<Locale, AgreementText> = { uk: AGREEMENT_UK, ru: AGREEMENT_RU };
 
-/** Seller tax number from the offer; the other details come from `COMPANY`. */
+/** Seller tax number from the offer; the other details come from «Контакти та компанія». */
 export const AGREEMENT_TAX_ID = '355216316015';
 
 /** Labels of the «Договір» page for a language. */

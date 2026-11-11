@@ -6,15 +6,17 @@ import {
 } from '@site/contacts/ui';
 import { SITE_PATHS, localizedPath } from '@site/core/i18n';
 import { JsonLd, buildBreadcrumbJsonLd, buildLocalBusinessJsonLd } from '@site/core/seo';
+import { loadSiteCompany } from '@site/settings/data-access';
 import { PageHeader, PageSection } from '@site/shared/ui';
 
 import type { Locale } from '@site/core/i18n';
 
 /**
  * «Контакти» page in the order of the live `brevi.com.ua` page: company contacts with the map and hours, then
- * the client managers. Static: the facts are in `COMPANY`, the captions in the contacts dictionary.
+ * the client managers. The facts come from «Контакти та компанія», the captions in the contacts dictionary.
  */
-export function ContactsPage({ locale }: { locale: Locale }) {
+export async function ContactsPage({ locale }: { locale: Locale }) {
+  const company = await loadSiteCompany();
   const dictionary = getContactsDictionary(locale);
   const breadcrumbs = [
     { name: dictionary.home, href: localizedPath(locale) },
@@ -37,8 +39,8 @@ export function ContactsPage({ locale }: { locale: Locale }) {
         label={{ index: '02', text: dictionary.info.label }}
       >
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
-          <ContactsInfo locale={locale} dictionary={dictionary.info} />
-          <ContactsMap locale={locale} dictionary={dictionary.info} />
+          <ContactsInfo company={company} locale={locale} dictionary={dictionary.info} />
+          <ContactsMap company={company} locale={locale} dictionary={dictionary.info} />
         </div>
       </PageSection>
 
@@ -47,13 +49,13 @@ export function ContactsPage({ locale }: { locale: Locale }) {
         title={dictionary.managers.title}
         label={{ index: '03', text: dictionary.managers.label }}
       >
-        <ContactsManagers locale={locale} dictionary={dictionary.managers} />
+        <ContactsManagers company={company} locale={locale} dictionary={dictionary.managers} />
       </PageSection>
 
       <JsonLd
         data={[
           buildBreadcrumbJsonLd(breadcrumbs.map((item) => ({ name: item.name, path: item.href }))),
-          buildLocalBusinessJsonLd(locale),
+          buildLocalBusinessJsonLd(locale, company),
         ]}
       />
     </div>

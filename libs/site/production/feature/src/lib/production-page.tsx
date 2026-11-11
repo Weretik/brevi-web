@@ -8,6 +8,7 @@ import {
   ProductionStages,
   getProductionDictionary,
 } from '@site/production/ui';
+import { loadSiteCompany } from '@site/settings/data-access';
 import { PageSection } from '@site/shared/ui';
 
 import type { Locale } from '@site/core/i18n';
@@ -19,7 +20,8 @@ const REQUEST_ANCHOR = '#zayavka';
  * «Виробництво» page in the order of the live `brevi.com.ua` page: lead, production stages, fabric, threads
  * and hardware, branding, and how to start an order. Static: the text is in the production dictionary.
  */
-export function ProductionPage({ locale }: { locale: Locale }) {
+export async function ProductionPage({ locale }: { locale: Locale }) {
+  const company = await loadSiteCompany();
   const dictionary = getProductionDictionary(locale);
   const path = (key: keyof typeof SITE_PATHS) => localizedPath(locale, SITE_PATHS[key]);
   const discussHref = `${localizedPath(locale)}${REQUEST_ANCHOR}`;
@@ -71,6 +73,7 @@ export function ProductionPage({ locale }: { locale: Locale }) {
       </PageSection>
 
       <ProductionOrder
+        company={company}
         id="production-order"
         dictionary={dictionary.order}
         discussHref={discussHref}

@@ -18,6 +18,11 @@ import type {
   CatalogTreeNode,
 } from '@site/catalog/model';
 
+vi.mock('@site/settings/data-access', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  loadSiteCompany: async () => (await import('@site/core/config')).COMPANY,
+}));
+
 vi.mock('@site/catalog/data-access', () => ({
   getCatalogTree: vi.fn(),
   getCatalogProductAddresses: vi.fn(),

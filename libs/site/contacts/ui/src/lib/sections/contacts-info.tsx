@@ -1,23 +1,25 @@
-import { COMPANY } from '@site/core/config';
-
 import type { ContactsDictionary } from '../i18n/contacts-dictionary';
+import type { Company } from '@site/core/config';
 import type { Locale } from '@site/core/i18n';
 
-/** Company contacts from `COMPANY`: phones, email, address with the service area, and working hours. */
+/** Company contacts from «Контакти та компанія»: phones, email, address with the service area, and working hours. */
 export function ContactsInfo({
+  company,
   locale,
   dictionary,
 }: {
+  /** Company facts from «Контакти та компанія». */
+  company: Company;
   locale: Locale;
   dictionary: ContactsDictionary['info'];
 }) {
-  const { address, openingHours } = COMPANY;
+  const { address, openingHours } = company;
 
   return (
     <address className="grid content-start gap-5 rounded-xl border border-border p-5 not-italic sm:p-6">
       <div className="grid gap-1.5">
         <span className="text-sm text-muted-foreground">{dictionary.phones}</span>
-        {COMPANY.phones.map((phone) => (
+        {company.phones.map((phone) => (
           <a
             key={phone.e164}
             href={`tel:${phone.e164}`}
@@ -30,10 +32,10 @@ export function ContactsInfo({
       <div className="grid gap-1.5">
         <span className="text-sm text-muted-foreground">{dictionary.email}</span>
         <a
-          href={`mailto:${COMPANY.email}`}
+          href={`mailto:${company.email}`}
           className="justify-self-start font-semibold hover:text-brand-text"
         >
-          {COMPANY.email}
+          {company.email}
         </a>
       </div>
       <div className="grid gap-1.5">

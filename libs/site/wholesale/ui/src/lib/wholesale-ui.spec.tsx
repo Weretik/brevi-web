@@ -1,3 +1,4 @@
+import { COMPANY } from '@site/core/config';
 import { render, screen, within } from '@testing-library/react';
 
 import { getWholesaleDictionary } from './i18n/wholesale-dictionary';
@@ -76,6 +77,7 @@ describe('wholesale blocks', () => {
     const dictionary = getWholesaleDictionary('uk');
     render(
       <WholesaleOrder
+        company={COMPANY}
         id="order"
         index="05"
         dictionary={dictionary.order}

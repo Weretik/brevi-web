@@ -3,10 +3,15 @@ import { render, screen } from '@testing-library/react';
 
 import { RequestPage } from './request-page';
 
+vi.mock('@site/settings/data-access', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  loadSiteCompany: async () => (await import('@site/core/config')).COMPANY,
+}));
+
 describe('RequestPage', () => {
-  it('renders one h1 and the form where only the phone is required', () => {
+  it('renders one h1 and the form where only the phone is required', async () => {
     const dictionary = getRequestDictionary('uk');
-    render(<RequestPage locale="uk" />);
+    render(await RequestPage({ locale: 'uk' }));
 
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     expect(screen.getByRole('form', { name: dictionary.form.title })).toBeTruthy();
@@ -19,8 +24,8 @@ describe('RequestPage', () => {
     expect(screen.getByRole('button', { name: dictionary.form.submit })).toBeTruthy();
   });
 
-  it('links to the localized offer and home page', () => {
-    render(<RequestPage locale="ru" />);
+  it('links to the localized offer and home page', async () => {
+    render(await RequestPage({ locale: 'ru' }));
 
     expect(screen.getByRole('link', { name: 'Главная' }).getAttribute('href')).toBe('/ru');
     expect(

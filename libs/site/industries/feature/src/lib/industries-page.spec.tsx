@@ -3,10 +3,15 @@ import { render, screen } from '@testing-library/react';
 
 import { IndustriesPage } from './industries-page';
 
+vi.mock('@site/settings/data-access', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  loadSiteCompany: async () => (await import('@site/core/config')).COMPANY,
+}));
+
 describe('IndustriesPage', () => {
-  it('renders one h1 and the blocks in the order of the live page', () => {
+  it('renders one h1 and the blocks in the order of the live page', async () => {
     const dictionary = getIndustriesDictionary('uk');
-    render(<IndustriesPage locale="uk" />);
+    render(await IndustriesPage({ locale: 'uk' }));
 
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     expect(screen.getAllByRole('heading', { level: 2 }).map((node) => node.textContent)).toEqual([
@@ -17,8 +22,8 @@ describe('IndustriesPage', () => {
     ]);
   });
 
-  it('links to the localized pages around the order', () => {
-    render(<IndustriesPage locale="ru" />);
+  it('links to the localized pages around the order', async () => {
+    render(await IndustriesPage({ locale: 'ru' }));
 
     expect(screen.getByRole('link', { name: 'Главная' }).getAttribute('href')).toBe('/ru');
     expect(screen.getByRole('link', { name: /Примеры наших работ/ }).getAttribute('href')).toBe(
@@ -36,9 +41,9 @@ describe('IndustriesPage', () => {
     }
   });
 
-  it('repeats the breadcrumb trail and the visible questions in JSON-LD', () => {
+  it('repeats the breadcrumb trail and the visible questions in JSON-LD', async () => {
     const dictionary = getIndustriesDictionary('uk');
-    const { container } = render(<IndustriesPage locale="uk" />);
+    const { container } = render(await IndustriesPage({ locale: 'uk' }));
     const [breadcrumbs, faq] = [
       ...container.querySelectorAll('script[type="application/ld+json"]'),
     ].map((node) => JSON.parse(node.textContent ?? '{}'));

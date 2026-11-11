@@ -1,3 +1,4 @@
+import { COMPANY } from '@site/core/config';
 import { render, screen } from '@testing-library/react';
 
 import { getDeliveryDictionary } from './i18n/delivery-dictionary';
@@ -33,7 +34,13 @@ describe('DeliveryOptions', () => {
 
 describe('DeliveryPayment', () => {
   it('shows the bank details of the company in the page language', () => {
-    render(<DeliveryPayment locale="ru" dictionary={getDeliveryDictionary('ru').payment} />);
+    render(
+      <DeliveryPayment
+        company={COMPANY}
+        locale="ru"
+        dictionary={getDeliveryDictionary('ru').payment}
+      />,
+    );
 
     expect(screen.getByText('Частное предприятие «Бреви»')).toBeTruthy();
     expect(screen.getByText('35521636')).toBeTruthy();
@@ -45,7 +52,12 @@ describe('DeliveryContact', () => {
   it('offers the phone and the contacts page', () => {
     const dictionary = getDeliveryDictionary('uk').contact;
     render(
-      <DeliveryContact id="delivery-contact" dictionary={dictionary} contactsHref="/uk/contacts" />,
+      <DeliveryContact
+        company={COMPANY}
+        id="delivery-contact"
+        dictionary={dictionary}
+        contactsHref="/uk/contacts"
+      />,
     );
 
     expect(screen.getByRole('region', { name: dictionary.title })).toBeTruthy();

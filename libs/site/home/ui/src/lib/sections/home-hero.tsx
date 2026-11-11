@@ -1,8 +1,8 @@
-import { COMPANY } from '@site/core/config';
 import { StitchLabel, buttonVariants, cn } from '@site/shared/ui';
 import Image from 'next/image';
 
 import type { HomeDictionary } from '../i18n/home-dictionary';
+import type { Company } from '@site/core/config';
 
 /** Callout dots on the product photo, in percent of the photo box; the order matches `hero.callouts`. */
 const CALLOUT_POSITIONS = [
@@ -14,14 +14,17 @@ const CALLOUT_POSITIONS = [
 
 /** First screen of the «Строчка» mockup: offer, three facts, two actions, and a product photo with numbered callouts. */
 export function HomeHero({
+  company,
   dictionary,
   requestHref,
 }: {
+  /** Company facts from «Контакти та компанія». */
+  company: Company;
   dictionary: HomeDictionary['hero'];
   /** Where «Залишити заявку» leads; the contacts block until the request page exists. */
   requestHref: string;
 }) {
-  const [salesPhone] = COMPANY.phones;
+  const [salesPhone] = company.phones;
 
   return (
     <section className="grid items-center gap-10 py-8 sm:py-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">

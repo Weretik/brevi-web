@@ -1,3 +1,4 @@
+import { COMPANY } from '@site/core/config';
 import { render, screen, within } from '@testing-library/react';
 
 import { getLogoPrintingDictionary } from './i18n/logo-printing-dictionary';
@@ -66,6 +67,7 @@ describe('logo printing blocks', () => {
     const dictionary = getLogoPrintingDictionary('uk');
     render(
       <LogoPrintingOrder
+        company={COMPANY}
         id="order"
         index="05"
         dictionary={dictionary.order}

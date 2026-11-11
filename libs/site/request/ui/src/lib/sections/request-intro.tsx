@@ -1,11 +1,18 @@
-import { COMPANY } from '@site/core/config';
 import { StitchLabel } from '@site/shared/ui';
 
 import type { RequestDictionary } from '../i18n/request-dictionary';
+import type { Company } from '@site/core/config';
 
 /** Left column: `h1`, one lead sentence, what happens after the request, and the phone for those in a hurry. */
-export function RequestIntro({ dictionary }: { dictionary: RequestDictionary }) {
-  const [phone] = COMPANY.phones;
+export function RequestIntro({
+  company,
+  dictionary,
+}: {
+  /** Company facts from «Контакти та компанія». */
+  company: Company;
+  dictionary: RequestDictionary;
+}) {
+  const [phone] = company.phones;
 
   return (
     <div className="grid content-start gap-6">

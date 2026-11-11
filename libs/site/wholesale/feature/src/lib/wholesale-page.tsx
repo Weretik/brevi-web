@@ -1,5 +1,6 @@
 import { SITE_PATHS, localizedPath } from '@site/core/i18n';
 import { JsonLd, buildBreadcrumbJsonLd } from '@site/core/seo';
+import { loadSiteCompany } from '@site/settings/data-access';
 import { PageSection } from '@site/shared/ui';
 import {
   WholesaleHero,
@@ -16,7 +17,8 @@ import type { Locale } from '@site/core/i18n';
  * «Ціни для опту» page: lead with the wholesale terms, the three price levels, what can be ordered,
  * why Brevi, and how to order. Static: the text is in the dictionary and the page shows no prices.
  */
-export function WholesalePage({ locale }: { locale: Locale }) {
+export async function WholesalePage({ locale }: { locale: Locale }) {
+  const company = await loadSiteCompany();
   const dictionary = getWholesaleDictionary(locale);
   const path = (key: keyof typeof SITE_PATHS) => localizedPath(locale, SITE_PATHS[key]);
   const breadcrumbs = [
@@ -66,6 +68,7 @@ export function WholesalePage({ locale }: { locale: Locale }) {
       </PageSection>
 
       <WholesaleOrder
+        company={company}
         id="wholesale-order"
         index="05"
         dictionary={dictionary.order}

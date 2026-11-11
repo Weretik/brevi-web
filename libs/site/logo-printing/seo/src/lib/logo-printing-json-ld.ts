@@ -1,4 +1,4 @@
-import { siteConfig } from '@site/core/config';
+import { COMPANY, siteConfig } from '@site/core/config';
 import { SITE_PATHS, localizedPath } from '@site/core/i18n';
 import { buildOrganizationJsonLd } from '@site/core/seo';
 
@@ -18,7 +18,7 @@ export function buildLogoPrintingServiceJsonLd(locale: Locale): JsonLdData {
     description,
     serviceType: locale === 'uk' ? 'Брендування спецодягу' : 'Брендирование спецодежды',
     url: `${siteConfig.siteUrl}${localizedPath(locale, SITE_PATHS.logoPrinting)}`,
-    provider: { '@id': buildOrganizationJsonLd(locale)['@id'] },
+    provider: { '@id': buildOrganizationJsonLd(locale, COMPANY)['@id'] },
     areaServed: { '@type': 'Country', name: 'UA' },
   };
 }

@@ -1,5 +1,6 @@
 export {
   articlesPath,
+  companyPath,
   contentProductsPath,
   createContentRoutes,
   redirectsPath,
