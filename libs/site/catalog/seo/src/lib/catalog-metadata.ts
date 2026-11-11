@@ -9,12 +9,12 @@ export const CATALOG_SEO_TEXT: Record<Locale, { title: string; description: stri
   uk: {
     title: 'Каталог спецодягу та засобів захисту',
     description:
-      'Каталог Brevi: літній і зимовий спецодяг власного пошиття, робоче взуття, захист рук, очей і дихання. Замовлення від 5 виробів, доставка по Україні.',
+      'Каталог Brevi: спецодяг власного пошиття і засоби індивідуального захисту з цінами. Замовлення від 5 виробів, доставка по Україні.',
   },
   ru: {
     title: 'Каталог спецодежды и средств защиты',
     description:
-      'Каталог Brevi: летняя и зимняя спецодежда собственного пошива, рабочая обувь, защита рук, глаз и дыхания. Заказ от 5 изделий, доставка по Украине.',
+      'Каталог Brevi: спецодежда собственного пошива и средства индивидуальной защиты с ценами. Заказ от 5 изделий, доставка по Украине.',
   },
 };
 
@@ -24,13 +24,21 @@ export function buildCatalogMetadata(locale: Locale): Metadata {
 
 export type CatalogCategorySeoInput = {
   slug: string;
-  /** Category name: the fallback when the catalog data has no title. */
+  /** Category name in the page language. */
   name: string;
-  title: string;
-  description: string;
 };
 
-/** Metadata of a category page: the title and description come from the catalog data. */
+const CATEGORY_DESCRIPTION: Record<Locale, (name: string) => string> = {
+  uk: (name) =>
+    `${name} від виробника Brevi: моделі з фото, характеристиками та цінами. Замовлення від 5 виробів, ціна залежить від кількості, доставка по Україні.`,
+  ru: (name) =>
+    `${name} от производителя Brevi: модели с фото, характеристиками и ценами. Заказ от 5 изделий, цена зависит от количества, доставка по Украине.`,
+};
+
+/**
+ * Metadata of a category page. The Admin keeps only the name of a section, so the title is the name and the
+ * description is built from it; texts written by staff come with «Контент → Розділи».
+ */
 export function buildCatalogCategoryMetadata(
   locale: Locale,
   category: CatalogCategorySeoInput,
@@ -38,7 +46,7 @@ export function buildCatalogCategoryMetadata(
   return buildPageMetadata({
     locale,
     path: catalogCategoryPath(category.slug),
-    title: category.title || category.name,
-    description: category.description,
+    title: category.name,
+    description: CATEGORY_DESCRIPTION[locale](category.name),
   });
 }

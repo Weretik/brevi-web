@@ -3,11 +3,23 @@ import { SiteHeader } from './header/site-header';
 import { getShellDictionary } from './i18n/shell-dictionary';
 import { MobileBar } from './mobile/mobile-bar';
 
+import type { CatalogSection } from '@site/catalog/model';
 import type { Locale } from '@site/core/i18n';
 import type { ReactNode } from 'react';
 
-/** Page frame for every localized route: skip link, two-row header, main content, footer, and the bottom bar on phones. */
-export function SiteShell({ locale, children }: { locale: Locale; children: ReactNode }) {
+/**
+ * Page frame for every localized route: skip link, two-row header, main content, footer, and the bottom bar
+ * on phones. The catalog sections come from the layout, which reads them on the server.
+ */
+export function SiteShell({
+  locale,
+  catalogSections,
+  children,
+}: {
+  locale: Locale;
+  catalogSections: readonly CatalogSection[];
+  children: ReactNode;
+}) {
   const dictionary = getShellDictionary(locale);
 
   return (
@@ -18,12 +30,12 @@ export function SiteShell({ locale, children }: { locale: Locale; children: Reac
       >
         {dictionary.skipToContent}
       </a>
-      <SiteHeader locale={locale} dictionary={dictionary} />
+      <SiteHeader locale={locale} dictionary={dictionary} catalogSections={catalogSections} />
       <main id="content" className="mx-auto w-full max-w-[77.5rem] flex-1 px-4 sm:px-6">
         {children}
       </main>
-      <SiteFooter locale={locale} dictionary={dictionary} />
-      <MobileBar locale={locale} dictionary={dictionary} />
+      <SiteFooter locale={locale} dictionary={dictionary} catalogSections={catalogSections} />
+      <MobileBar locale={locale} dictionary={dictionary} catalogSections={catalogSections} />
     </>
   );
 }

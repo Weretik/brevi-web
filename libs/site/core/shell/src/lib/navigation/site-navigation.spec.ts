@@ -1,5 +1,3 @@
-import { CATALOG_SECTIONS } from '@site/catalog/model';
-
 import {
   FOOTER_BUYER_LINKS,
   FOOTER_COMPANY_LINKS,
@@ -36,16 +34,6 @@ describe('site navigation', () => {
   it('uses paths without a locale or a trailing slash', () => {
     for (const path of Object.values(SHELL_PATHS)) {
       expect(path).toMatch(/^\/[a-z-]+$/);
-    }
-  });
-
-  it('names every catalog section and item in both languages', () => {
-    expect(CATALOG_SECTIONS.length).toBeGreaterThan(0);
-    for (const section of CATALOG_SECTIONS) {
-      for (const entry of [section, ...section.items]) {
-        expect(entry.label.uk).toBeTruthy();
-        expect(entry.label.ru).toBeTruthy();
-      }
     }
   });
 });

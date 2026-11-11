@@ -1,85 +1,163 @@
-import { getCatalogCategory, getCatalogProduct } from '@site/catalog/data-access';
-import { CATALOG_TREE } from '@site/catalog/model';
-import { render, screen } from '@testing-library/react';
+import {
+  getCatalogCategoryProducts,
+  getCatalogProductCategory,
+  getCatalogRelatedProducts,
+  getCatalogTree,
+} from '@site/catalog/data-access';
+import { CATALOG_TYPES } from '@site/catalog/model';
+import { render, screen, within } from '@testing-library/react';
 
 import { CatalogCategoryPage } from './catalog-category-page';
 import { CatalogProductPage } from './catalog-product-page';
 import { CatalogRootPage } from './catalog-root-page';
 
-const section = CATALOG_TREE.find((node) => node.children.length > 0) ?? CATALOG_TREE[0];
-const child = section.children[0];
+import type { CatalogProduct, CatalogProductCard, CatalogTreeNode } from '@site/catalog/model';
 
-const renderCategory = async (locale: 'uk' | 'ru', slug: string) => {
-  const category = await getCatalogCategory(slug);
-  if (!category) throw new Error(`no category ${slug}`);
-  render(await CatalogCategoryPage({ locale, category }));
-  return category;
+vi.mock('@site/catalog/data-access', () => ({
+  getCatalogTree: vi.fn(),
+  getCatalogCategoryProducts: vi.fn(),
+  getCatalogProductCategory: vi.fn(),
+  getCatalogRelatedProducts: vi.fn(),
+}));
+
+const child: CatalogTreeNode = {
+  slug: 'kostyumy',
+  name: { uk: 'Костюми', ru: 'Костюми' },
+  productCount: 2,
+  productType: 'Sewing',
+  sectionId: 7,
+  children: [],
+};
+const section: CatalogTreeNode = {
+  ...CATALOG_TYPES.Sewing,
+  productCount: 2,
+  productType: 'Sewing',
+  sectionId: null,
+  children: [child],
+};
+const cards: CatalogProductCard[] = [
+  { slug: 'kostyum-verde', name: 'Костюм ВЕРДЕ', image: null, priceFrom: 900 },
+  { slug: 'kostyum-fort', name: 'Костюм ФОРТ', image: null, priceFrom: null },
+];
+const product: CatalogProduct = {
+  slug: 'kostyum-verde',
+  type: 'Sewing',
+  sectionId: 7,
+  model: 'MOD-014',
+  name: 'Костюм ВЕРДЕ',
+  textLocale: 'uk',
+  seo: { title: '', description: '' },
+  photos: [],
+  summary: [{ type: 'paragraph', lead: 'Сезон:', text: 'літо' }],
+  description: [{ type: 'paragraph', text: 'Костюм для роботи влітку.' }],
+  specs: [{ title: 'Куртка', rows: [{ name: 'Застібка', value: 'блискавка' }] }],
+  priceFrom: 900,
+  prices: null,
+  fabrics: [
+    {
+      sku: 'MOD-014-1',
+      name: 'Грета',
+      details: null,
+      prices: { retail: 1100, wholesale: 1000, largeWholesale: 900 },
+    },
+  ],
 };
 
+beforeEach(() => {
+  vi.mocked(getCatalogTree).mockResolvedValue([section]);
+  vi.mocked(getCatalogCategoryProducts).mockResolvedValue(cards);
+  vi.mocked(getCatalogProductCategory).mockResolvedValue({ node: child, trail: [section, child] });
+  vi.mocked(getCatalogRelatedProducts).mockResolvedValue([cards[1]]);
+});
+
 describe('CatalogRootPage', () => {
-  it('renders one h1 and a link to every section', () => {
-    render(<CatalogRootPage locale="uk" />);
+  it('renders one h1 and a link to every product type and section', async () => {
+    render(await CatalogRootPage({ locale: 'uk' }));
 
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
-    for (const node of CATALOG_TREE) {
-      expect(screen.getAllByRole('link', { name: node.name.uk })[0].getAttribute('href')).toBe(
+    for (const node of [section, child]) {
+      expect(screen.getByRole('link', { name: node.name.uk }).getAttribute('href')).toBe(
         `/uk/catalog/${node.slug}`,
       );
     }
   });
+
+  it('keeps the heading and the call to order while the catalog is empty', async () => {
+    vi.mocked(getCatalogTree).mockResolvedValue([]);
+    render(await CatalogRootPage({ locale: 'uk' }));
+
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    expect(screen.queryByRole('list', { name: 'Розділи каталогу' })).toBeNull();
+    expect(screen.getByRole('link', { name: 'Залишити заявку' })).toBeTruthy();
+  });
 });
 
 describe('CatalogCategoryPage', () => {
-  it('renders the category name as the only h1, its subsections, and every model', async () => {
-    const category = await renderCategory('uk', section.slug);
+  it('renders the category name as the only h1, its sections, and every product with its price', async () => {
+    render(
+      await CatalogCategoryPage({ locale: 'uk', category: { node: section, trail: [section] } }),
+    );
 
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe(section.name.uk);
-    expect(
-      screen.getByRole('link', { name: new RegExp(`^${child.name.uk}`) }).getAttribute('href'),
-    ).toBe(`/uk/catalog/${child.slug}`);
-    expect(screen.getAllByRole('heading', { level: 3 }).length).toBeGreaterThanOrEqual(
-      category.productSlugs.length,
+    expect(screen.getByRole('link', { name: /^Костюми/ }).getAttribute('href')).toBe(
+      '/uk/catalog/kostyumy',
     );
+    expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(cards.length);
+    expect(screen.getByText('900')).toBeTruthy();
+    expect(getCatalogCategoryProducts).toHaveBeenCalledWith(section, 'uk');
   });
 
-  it('leads the breadcrumbs through the parent category in the page language', async () => {
-    await renderCategory('ru', child.slug);
+  it('leads the breadcrumbs through the product type in the page language', async () => {
+    render(
+      await CatalogCategoryPage({
+        locale: 'ru',
+        category: { node: child, trail: [section, child] },
+      }),
+    );
 
     const crumbs = screen.getByRole('navigation', { name: 'Хлебные крошки' });
     expect(crumbs.textContent).toContain(section.name.ru);
-    expect(crumbs.querySelector(`a[href="/ru/catalog/${section.slug}"]`)).toBeTruthy();
+    expect(crumbs.querySelector('a[href="/ru/catalog/spetsodyah"]')).toBeTruthy();
     expect(crumbs.querySelector('a[href="/ru/catalog"]')).toBeTruthy();
+  });
+
+  it('says the models are coming when the category has none', async () => {
+    vi.mocked(getCatalogCategoryProducts).mockResolvedValue([]);
+    render(
+      await CatalogCategoryPage({
+        locale: 'uk',
+        category: { node: child, trail: [section, child] },
+      }),
+    );
+
+    expect(screen.getByText(/скоро з’являться/)).toBeTruthy();
   });
 });
 
 describe('CatalogProductPage', () => {
-  const renderProduct = async (locale: 'uk' | 'ru') => {
-    const category = await getCatalogCategory(child.slug);
-    const product = await getCatalogProduct(category?.productSlugs[0] ?? '');
-    if (!product) throw new Error('no product');
-    const { container } = render(await CatalogProductPage({ locale, product }));
-    return { product, container };
-  };
+  it('renders the product name as the only h1 with the prices and the way to order', async () => {
+    render(await CatalogProductPage({ locale: 'uk', product }));
 
-  it('renders the product name as the only h1 with the way to get a price and no price', async () => {
-    const { product } = await renderProduct('uk');
-
-    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe(product.name.uk);
-    expect(screen.getByRole('link', { name: 'Дізнатися ціну' }).getAttribute('href')).toBe(
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Костюм ВЕРДЕ');
+    const prices = within(screen.getByRole('table', { name: 'Ціна за одиницю, грн' }));
+    expect(prices.getAllByRole('row')).toHaveLength(3);
+    expect(screen.getAllByRole('link', { name: 'Залишити заявку' })[0].getAttribute('href')).toBe(
       '/uk/request',
     );
-    expect(screen.queryByText(/\d\s*грн/)).toBeNull();
+    expect(screen.getByRole('table', { name: 'Куртка' })).toBeTruthy();
   });
 
   it('leads the breadcrumbs through the product category and marks up the product', async () => {
-    const { product, container } = await renderProduct('ru');
+    const { container } = render(await CatalogProductPage({ locale: 'ru', product }));
 
     const crumbs = screen.getByRole('navigation', { name: 'Хлебные крошки' });
-    expect(crumbs.querySelector(`a[href="/ru/catalog/${product.categorySlug}"]`)).toBeTruthy();
-    expect(crumbs.textContent).toContain(product.name.ru);
-    const types = [...container.querySelectorAll('script[type="application/ld+json"]')].map(
-      (script) => JSON.parse(script.textContent ?? '{}')['@type'],
+    expect(crumbs.querySelector('a[href="/ru/catalog/kostyumy"]')).toBeTruthy();
+    expect(crumbs.textContent).toContain('Костюм ВЕРДЕ');
+    const data = [...container.querySelectorAll('script[type="application/ld+json"]')].map(
+      (script) => JSON.parse(script.textContent ?? '{}'),
     );
-    expect(types).toEqual(['Product', 'BreadcrumbList']);
+    expect(data.map((item) => item['@type'])).toEqual(['Product', 'BreadcrumbList']);
+    expect(data[0].offers).toMatchObject({ lowPrice: 900, priceCurrency: 'UAH' });
+    expect(getCatalogRelatedProducts).toHaveBeenCalledWith(product, 'ru', 4);
   });
 });

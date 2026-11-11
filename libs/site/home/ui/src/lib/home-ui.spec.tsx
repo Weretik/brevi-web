@@ -1,4 +1,3 @@
-import { CATALOG_SECTIONS } from '@site/catalog/model';
 import { render, screen, within } from '@testing-library/react';
 
 import { getHomeDictionary } from './i18n/home-dictionary';
@@ -6,6 +5,23 @@ import { HomeCatalog } from './sections/home-catalog';
 import { HomeContacts } from './sections/home-contacts';
 import { HomeHero } from './sections/home-hero';
 import { HomeSeoText } from './sections/home-seo-text';
+
+import type { CatalogSection } from '@site/catalog/model';
+
+const CATALOG_SECTIONS: CatalogSection[] = [
+  {
+    key: 'spetsodyah',
+    slug: 'spetsodyah',
+    label: { uk: 'Спецодяг власного пошиття', ru: 'Спецодежда собственного пошива' },
+    items: [{ key: 'kostyumy', slug: 'kostyumy', label: { uk: 'Костюми', ru: 'Костюми' } }],
+  },
+  {
+    key: 'zasoby-zakhystu',
+    slug: 'zasoby-zakhystu',
+    label: { uk: 'Засоби індивідуального захисту', ru: 'Средства индивидуальной защиты' },
+    items: [],
+  },
+];
 
 const shape = (value: unknown): unknown => {
   if (Array.isArray(value)) return value.map(shape);

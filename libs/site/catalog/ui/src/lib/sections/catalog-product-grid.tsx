@@ -1,25 +1,25 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { formatPrice } from '../i18n/catalog-dictionary';
+
 import type { CatalogDictionary } from '../i18n/catalog-dictionary';
 import type { CatalogProductCard } from '@site/catalog/model';
-import type { Locale } from '@site/core/i18n';
 
 /** Photos above the fold load at once; the rest wait until the visitor scrolls to them. */
 const EAGER_CARDS = 4;
 
 /**
- * Listing of products: a photo on white and the model name, and the whole card opens the product page
- * (the name is the link). There is no price, so the second action is «Дізнатися ціну» to the request page.
+ * Listing of products: a photo on white, the model name, and the lowest price «від 1 250 грн». The whole
+ * card opens the product page (the name is the link). A product without a price links «Дізнатися ціну» to
+ * the request page. Photos are on the media server and have no known size, so they fill a fixed frame.
  */
 export function CatalogProductGrid({
-  locale,
   products,
   dictionary,
   requestHref,
   productHref,
 }: {
-  locale: Locale;
   products: readonly CatalogProductCard[];
   dictionary: CatalogDictionary['products'];
   requestHref: string;
@@ -33,16 +33,16 @@ export function CatalogProductGrid({
           key={product.slug}
           className="relative flex flex-col overflow-hidden rounded-xl border border-border bg-background hover:border-border-strong"
         >
-          <div className="flex aspect-[4/5] items-center justify-center bg-white p-3">
+          <div className="relative flex aspect-[4/5] items-center justify-center bg-white">
             {product.image ? (
               <Image
-                src={product.image.src}
-                alt={product.name[locale]}
-                width={product.image.width}
-                height={product.image.height}
+                src={product.image}
+                alt={product.name}
+                fill
+                sizes="(min-width: 1024px) 18rem, (min-width: 768px) 33vw, 50vw"
                 unoptimized
                 loading={index < EAGER_CARDS ? 'eager' : 'lazy'}
-                className="size-full object-contain"
+                className="object-contain p-3"
               />
             ) : (
               <span className="text-sm text-muted-foreground">{dictionary.noPhoto}</span>
@@ -54,17 +54,27 @@ export function CatalogProductGrid({
                 href={productHref(product.slug)}
                 className="after:absolute after:inset-0 hover:text-brand-text hover:underline"
               >
-                {product.name[locale]}
+                {product.name}
               </Link>
             </h3>
-            <Link
-              href={requestHref}
-              rel="nofollow"
-              aria-label={`${dictionary.askPrice}: ${product.name[locale]}`}
-              className="relative z-10 mt-auto inline-flex min-h-11 items-center text-sm font-bold text-brand-text hover:underline"
-            >
-              {dictionary.askPrice} <span aria-hidden>&nbsp;→</span>
-            </Link>
+            {product.priceFrom === null ? (
+              <Link
+                href={requestHref}
+                rel="nofollow"
+                aria-label={`${dictionary.askPrice}: ${product.name}`}
+                className="relative z-10 mt-auto inline-flex min-h-11 items-center text-sm font-bold text-brand-text hover:underline"
+              >
+                {dictionary.askPrice} <span aria-hidden>&nbsp;→</span>
+              </Link>
+            ) : (
+              <p className="mt-auto flex min-h-11 items-baseline gap-1.5 pt-2 text-sm text-muted-foreground">
+                {dictionary.priceFrom}
+                <span className="text-lg font-extrabold text-foreground">
+                  {formatPrice(product.priceFrom)}
+                </span>
+                грн
+              </p>
+            )}
           </div>
         </li>
       ))}

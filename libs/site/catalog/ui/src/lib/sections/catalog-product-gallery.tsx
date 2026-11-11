@@ -8,7 +8,8 @@ import type { CatalogPhoto } from '@site/catalog/model';
 
 /**
  * Product photos on white: the chosen photo and a row of thumbnails. Without JavaScript the first photo
- * stays; the thumbnails are buttons, so the keyboard and a screen reader can switch photos.
+ * stays; the thumbnails are buttons, so the keyboard and a screen reader can switch photos. The photos are
+ * on the media server and have no known size, so each fills its frame.
  */
 export function CatalogProductGallery({
   photos,
@@ -32,15 +33,15 @@ export function CatalogProductGallery({
 
   return (
     <div className="grid gap-3">
-      <div className="flex aspect-square items-center justify-center overflow-hidden rounded-xl border bg-white p-4">
+      <div className="relative aspect-square overflow-hidden rounded-xl border bg-white">
         <Image
           src={photo.src}
           alt={current === 0 ? name : `${name}, ${labels.photo} ${current + 1}`}
-          width={photo.width}
-          height={photo.height}
+          fill
+          sizes="(min-width: 768px) 38rem, 100vw"
           unoptimized
           priority
-          className="size-full object-contain"
+          className="object-contain p-4"
         />
       </div>
       {photos.length > 1 ? (
@@ -53,18 +54,18 @@ export function CatalogProductGallery({
                 aria-pressed={index === current}
                 onClick={() => setCurrent(index)}
                 className={cn(
-                  'flex size-16 items-center justify-center overflow-hidden rounded-md border bg-white p-1 outline-none focus-visible:ring-2 focus-visible:ring-ring sm:size-[4.5rem]',
+                  'relative block size-16 overflow-hidden rounded-md border bg-white outline-none focus-visible:ring-2 focus-visible:ring-ring sm:size-[4.5rem]',
                   index === current ? 'border-2 border-brand' : 'hover:border-border-strong',
                 )}
               >
                 <Image
                   src={item.src}
                   alt=""
-                  width={item.width}
-                  height={item.height}
+                  fill
+                  sizes="4.5rem"
                   unoptimized
                   loading="lazy"
-                  className="size-full object-contain"
+                  className="object-contain p-1"
                 />
               </button>
             </li>

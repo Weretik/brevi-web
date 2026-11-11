@@ -12,6 +12,7 @@ import { NavLink } from '../controls/nav-link';
 import { MAIN_NAV_LINKS, SHELL_PATHS } from '../navigation/site-navigation';
 
 import type { ShellDictionary } from '../i18n/shell-dictionary';
+import type { CatalogSection } from '@site/catalog/model';
 import type { Locale } from '@site/core/i18n';
 
 /** Height of the contacts row on wide screens, in px; the header slides up by it so only the menu row sticks. */
@@ -26,9 +27,11 @@ const CONTACTS_ROW_HEIGHT = 80;
 export function SiteHeader({
   locale,
   dictionary,
+  catalogSections,
 }: {
   locale: Locale;
   dictionary: ShellDictionary;
+  catalogSections: readonly CatalogSection[];
 }) {
   const [phone] = COMPANY.phones;
 
@@ -91,7 +94,7 @@ export function SiteHeader({
 
       <div className="border-t border-border bg-muted max-lg:hidden">
         <div className="relative mx-auto flex h-14 max-w-[77.5rem] items-center gap-5 px-6 xl:gap-7">
-          <CatalogMenu locale={locale} dictionary={dictionary} />
+          <CatalogMenu locale={locale} dictionary={dictionary} sections={catalogSections} />
           <nav
             aria-label={dictionary.mainNav}
             className="flex min-w-0 flex-1 items-center gap-x-4 text-sm font-semibold xl:gap-x-7 xl:text-[0.9375rem]"

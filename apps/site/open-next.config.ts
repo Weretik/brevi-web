@@ -1,12 +1,16 @@
 import { defineCloudflareConfig } from '@opennextjs/cloudflare';
-import staticAssetsIncrementalCache from '@opennextjs/cloudflare/overrides/incremental-cache/static-assets-incremental-cache';
+import kvIncrementalCache from '@opennextjs/cloudflare/overrides/incremental-cache/kv-incremental-cache';
+import memoryQueue from '@opennextjs/cloudflare/overrides/queue/memory-queue';
+import kvNextTagCache from '@opennextjs/cloudflare/overrides/tag-cache/kv-next-tag-cache';
 
 // Cloudflare Workers adapter (owner decision 2026-10-30).
-// Every page is prerendered at build time and nothing is revalidated yet, so the prerendered pages are read from
-// the Worker's static assets. Pages with BreviERP data need a writable cache (Workers KV) before they ship.
+// The catalog comes from the BreviERP Admin and is refreshed without a rebuild (owner decision 2026-11-11):
+// 'use cache' data and prerendered pages live in Workers KV, and the tag cache lets a later revalidation
+// request reach every isolate.
 const config = defineCloudflareConfig({
-  incrementalCache: staticAssetsIncrementalCache,
-  enableCacheInterception: true,
+  incrementalCache: kvIncrementalCache,
+  tagCache: kvNextTagCache,
+  queue: memoryQueue,
 });
 
 // apps/site has no package.json: OpenNext starts in the workspace root, and next.config.ts must be loaded from its own folder.

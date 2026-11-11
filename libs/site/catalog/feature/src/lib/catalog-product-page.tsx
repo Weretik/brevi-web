@@ -1,5 +1,4 @@
-import { getCatalogRelatedProducts } from '@site/catalog/data-access';
-import { findCatalogPath } from '@site/catalog/model';
+import { getCatalogProductCategory, getCatalogRelatedProducts } from '@site/catalog/data-access';
 import { buildCatalogProductJsonLd } from '@site/catalog/seo';
 import {
   CatalogOrder,
@@ -26,8 +25,9 @@ import type { Locale } from '@site/core/i18n';
 const RELATED_LIMIT = 4;
 
 /**
- * Product page: photos, the name and short facts with the way to get a price, the description, the
- * characteristics, other models of the same category, and the call to order. No price and no cart.
+ * Product page: photos, the name and short facts with the prices by order size and the way to order, the
+ * description, the characteristics, other models of the same category, and the call to order. No cart.
+ * `product` is already in the language of the page.
  */
 export async function CatalogProductPage({
   locale,
@@ -37,21 +37,22 @@ export async function CatalogProductPage({
   product: CatalogProduct;
 }) {
   const dictionary = getCatalogDictionary(locale);
-  const related = await getCatalogRelatedProducts(product, RELATED_LIMIT);
+  const [related, category] = await Promise.all([
+    getCatalogRelatedProducts(product, locale, RELATED_LIMIT),
+    getCatalogProductCategory(product),
+  ]);
   const path = (key: keyof typeof SITE_PATHS) => localizedPath(locale, SITE_PATHS[key]);
   const categoryHref = (slug: string) => localizedPath(locale, catalogCategoryPath(slug));
   const productHref = (slug: string) => localizedPath(locale, catalogProductPath(slug));
-  const trail = findCatalogPath(product.categorySlug) ?? [];
-  const category = trail.at(-1);
-  const name = product.name[locale];
+  const trail = category?.trail ?? [];
+  const name = product.name;
   const breadcrumbs = [
     { name: dictionary.home, href: localizedPath(locale) },
     { name: dictionary.catalog, href: path('catalog') },
     ...trail.map((node) => ({ name: node.name[locale], href: categoryHref(node.slug) })),
     { name, href: productHref(product.slug) },
   ];
-  const description = product.description[locale];
-  const specs = product.specs[locale];
+  const { description, specs } = product;
   const sections = [
     description.length > 0 ? 'description' : null,
     specs.length > 0 ? 'specs' : null,
@@ -76,14 +77,16 @@ export async function CatalogProductPage({
           />
           <div className="grid gap-5">
             <StitchLabel index="01">
-              {category?.name[locale] ?? dictionary.product.label}
+              {category?.node.name[locale] ?? dictionary.product.label}
             </StitchLabel>
             <h1 className="text-[1.75rem] leading-[1.1] font-extrabold tracking-[-0.025em] sm:text-[2.25rem]">
               {name}
             </h1>
             <CatalogProductBuy
               model={product.model}
-              summary={product.summary[locale]}
+              summary={product.summary}
+              fabrics={product.fabrics}
+              prices={product.prices}
               dictionary={dictionary.product}
               requestHref={path('request')}
             />
@@ -118,12 +121,11 @@ export async function CatalogProductPage({
           label={{ index: index('related'), text: dictionary.product.related.label }}
           action={
             category
-              ? { href: categoryHref(category.slug), label: dictionary.product.related.all }
+              ? { href: categoryHref(category.node.slug), label: dictionary.product.related.all }
               : undefined
           }
         >
           <CatalogProductGrid
-            locale={locale}
             products={related}
             dictionary={dictionary.products}
             requestHref={path('request')}
@@ -141,7 +143,9 @@ export async function CatalogProductPage({
         wholesaleHref={path('wholesale')}
       />
 
-      <JsonLd data={buildCatalogProductJsonLd(locale, product, category?.name[locale] ?? null)} />
+      <JsonLd
+        data={buildCatalogProductJsonLd(locale, product, category?.node.name[locale] ?? null)}
+      />
       <JsonLd
         data={buildBreadcrumbJsonLd(
           breadcrumbs.map((item) => ({ name: item.name, path: item.href })),

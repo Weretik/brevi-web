@@ -1,4 +1,3 @@
-import { CATALOG_SECTIONS } from '@site/catalog/model';
 import { COMPANY } from '@site/core/config';
 import { catalogCategoryPath, localizedPath } from '@site/core/i18n';
 import { Button } from '@site/shared/ui';
@@ -12,6 +11,7 @@ import {
 } from '../navigation/site-navigation';
 
 import type { ShellDictionary } from '../i18n/shell-dictionary';
+import type { CatalogSection } from '@site/catalog/model';
 import type { Locale } from '@site/core/i18n';
 
 type FooterColumn = { title: string; links: { key: string; href: string; label: string }[] };
@@ -27,9 +27,11 @@ const COLUMN_TITLE =
 export function SiteFooter({
   locale,
   dictionary,
+  catalogSections,
 }: {
   locale: Locale;
   dictionary: ShellDictionary;
+  catalogSections: readonly CatalogSection[];
 }) {
   const [phone] = COMPANY.phones;
   const page = (links: typeof FOOTER_COMPANY_LINKS) =>
@@ -41,11 +43,18 @@ export function SiteFooter({
   const columns: FooterColumn[] = [
     {
       title: dictionary.links.catalog,
-      links: CATALOG_SECTIONS.map((section) => ({
-        key: section.key,
-        href: localizedPath(locale, catalogCategoryPath(section.slug)),
-        label: section.label[locale],
-      })),
+      links: [
+        ...catalogSections.map((section) => ({
+          key: section.key,
+          href: localizedPath(locale, catalogCategoryPath(section.slug)),
+          label: section.label[locale],
+        })),
+        {
+          key: 'all',
+          href: localizedPath(locale, SHELL_PATHS.catalog),
+          label: dictionary.allCatalog,
+        },
+      ],
     },
     { title: dictionary.footerBuyers, links: page(FOOTER_BUYER_LINKS) },
     { title: dictionary.footerCompany, links: page(FOOTER_COMPANY_LINKS) },

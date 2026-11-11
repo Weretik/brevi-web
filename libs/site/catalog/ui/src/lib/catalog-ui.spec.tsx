@@ -24,12 +24,16 @@ const child: CatalogTreeNode = {
   slug: 'zhylety',
   name: { uk: 'Жилети', ru: 'Жилеты' },
   productCount: 5,
+  productType: 'Sewing',
+  sectionId: 7,
   children: [],
 };
 const section: CatalogTreeNode = {
   slug: 'specodyag-zymovyj',
   name: { uk: 'Спецодяг зимовий', ru: 'Зимняя спецодежда' },
   productCount: 33,
+  productType: 'Sewing',
+  sectionId: null,
   children: [child],
 };
 
@@ -77,30 +81,34 @@ describe('catalog blocks', () => {
     );
   });
 
-  it('shows a product with its photo, name, and the price request link, and no price', () => {
+  it('shows a product with its photo, name, and the lowest price', () => {
     render(
       <CatalogProductGrid
-        locale="uk"
         dictionary={dictionary.products}
         requestHref="/uk/request"
         productHref={(slug) => `/uk/product/${slug}`}
         products={[
           {
             slug: 'kostyum-verde',
-            name: { uk: 'Костюм ВЕРДЕ', ru: 'Костюм ВЕРДЕ' },
-            image: { src: '/catalog/products/kostyum-verde.webp', width: 400, height: 560 },
+            name: 'Костюм ВЕРДЕ',
+            image: 'https://media.example/kostyum-verde.webp',
+            priceFrom: 1250,
           },
-          { slug: 'bez-foto', name: { uk: 'Модель без фото', ru: 'Модель без фото' }, image: null },
+          { slug: 'bez-foto', name: 'Модель без фото', image: null, priceFrom: null },
         ]}
       />,
     );
 
-    expect(screen.getByRole('img', { name: 'Костюм ВЕРДЕ' })).toBeTruthy();
+    expect(screen.getByRole('img', { name: 'Костюм ВЕРДЕ' }).getAttribute('src')).toBe(
+      'https://media.example/kostyum-verde.webp',
+    );
     expect(screen.getByText(dictionary.products.noPhoto)).toBeTruthy();
-    const link = screen.getByRole('link', { name: 'Дізнатися ціну: Костюм ВЕРДЕ' });
+    expect(screen.getByText('1 250')).toBeTruthy();
+    expect(screen.queryByRole('link', { name: 'Дізнатися ціну: Костюм ВЕРДЕ' })).toBeNull();
+    // A product without a price asks to learn it from a manager.
+    const link = screen.getByRole('link', { name: 'Дізнатися ціну: Модель без фото' });
     expect(link.getAttribute('href')).toBe('/uk/request');
     expect(link.getAttribute('rel')).toBe('nofollow');
-    expect(screen.queryByText(/грн/)).toBeNull();
     expect(screen.getByRole('link', { name: 'Костюм ВЕРДЕ' }).getAttribute('href')).toBe(
       '/uk/product/kostyum-verde',
     );
@@ -112,8 +120,8 @@ describe('catalog blocks', () => {
         name="Костюм ВЕРДЕ"
         labels={{ gallery: 'Фото моделі', photo: 'Фото', noPhoto: 'Фото готується' }}
         photos={[
-          { src: '/catalog/products/kostyum-verde/1.webp', width: 600, height: 800 },
-          { src: '/catalog/products/kostyum-verde/2.webp', width: 600, height: 800 },
+          { src: 'https://media.example/kostyum-verde/1.webp' },
+          { src: 'https://media.example/kostyum-verde/2.webp' },
         ]}
       />,
     );
@@ -130,23 +138,59 @@ describe('catalog blocks', () => {
     );
   });
 
-  it('shows the model, short facts with bold openings, and the ways to get a price', () => {
+  it('shows the model, short facts, and the prices of the chosen fabric with the ways to order', () => {
     render(
       <CatalogProductBuy
         model="992"
-        summary={[{ type: 'paragraph', lead: 'Тканина:', text: 'фліс' }]}
+        summary={[{ type: 'paragraph', lead: 'Сезон:', text: 'літо' }]}
+        fabrics={[
+          {
+            sku: 'MOD-992-1',
+            name: 'Грета',
+            details: 'бавовна 35 %, 210 г/м²',
+            prices: { retail: 1500, wholesale: 1400, largeWholesale: 1250.5 },
+          },
+          { sku: 'MOD-992-2', name: 'Саржа', details: null, prices: null },
+        ]}
+        prices={null}
         dictionary={dictionary.product}
         requestHref="/uk/request"
       />,
     );
 
     expect(screen.getByText('992')).toBeTruthy();
-    expect(screen.getByText('Тканина:').tagName).toBe('STRONG');
-    expect(screen.getByRole('link', { name: 'Дізнатися ціну' }).getAttribute('href')).toBe(
+    expect(screen.getByText('Сезон:').tagName).toBe('STRONG');
+    const prices = within(screen.getByRole('table', { name: 'Ціна за одиницю, грн' }));
+    expect(prices.getByRole('row', { name: '1–9 шт 1\u00a0500' })).toBeTruthy();
+    expect(prices.getByRole('row', { name: 'від 40 шт 1\u00a0250,5' })).toBeTruthy();
+    expect(screen.getByText('бавовна 35 %, 210 г/м²')).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Залишити заявку' }).getAttribute('href')).toBe(
       '/uk/request',
     );
     expect(screen.getByRole('link', { name: '050 469 86 75' }).getAttribute('href')).toBe(
       'tel:+380504698675',
+    );
+
+    // The second fabric has no price yet: a manager quotes it.
+    fireEvent.click(screen.getByRole('button', { name: 'Саржа' }));
+    expect(screen.queryByRole('table')).toBeNull();
+    expect(screen.getByText(dictionary.product.priceNote)).toBeTruthy();
+  });
+
+  it('asks to learn the price when the product has none', () => {
+    render(
+      <CatalogProductBuy
+        model={null}
+        summary={[]}
+        fabrics={[]}
+        prices={null}
+        dictionary={dictionary.product}
+        requestHref="/uk/request"
+      />,
+    );
+
+    expect(screen.getByRole('link', { name: 'Дізнатися ціну' }).getAttribute('href')).toBe(
+      '/uk/request',
     );
     expect(screen.queryByText(/грн/)).toBeNull();
   });
