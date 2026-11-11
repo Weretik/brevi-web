@@ -55,10 +55,12 @@ export function createProductionOrderRoutes({ useOrderActor }: ProductionOrderRo
       element: <ProductionOrderCreatePage useOrderActor={useOrderActor} />,
     },
     { path: '/production/orders/:id', element: <ProductionOrderPage /> },
+    // «Склад тканин» is its own menu block now (WH-001); the old address still opens it.
     {
-      path: '/production/fabric-stock',
+      path: '/warehouse/stock',
       element: <FabricStockPage useOrderActor={useOrderActor} />,
     },
+    { path: '/production/fabric-stock', element: <Navigate to="/warehouse/stock" replace /> },
     { path: '/production/forecast', element: <SewingForecastPage /> },
     {
       path: '/production/archive',

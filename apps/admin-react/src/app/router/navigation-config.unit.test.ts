@@ -42,6 +42,7 @@ describe('legacy Admin navigation', () => {
     expect(groups.map((group) => group.label)).toEqual([
       'Менеджер сервісу',
       'Швейний цех',
+      'Склад тканин',
       'Нагадування',
       'Загальні довідники',
       'Фото',
@@ -49,8 +50,8 @@ describe('legacy Admin navigation', () => {
       'Загальні звіти',
       'Адміністрування',
     ]);
-    expect(groups.map((group) => group.items.length)).toEqual([5, 14, 4, 8, 1, 4, 1, 5]);
-    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(42);
+    expect(groups.map((group) => group.items.length)).toEqual([5, 13, 7, 4, 8, 1, 4, 1, 5]);
+    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(48);
     expect(groups[0].items.map((item) => item.id)).not.toContain('clients');
   });
   it('shows «Налаштування КП» only for the server Admin role', () => {
@@ -144,7 +145,6 @@ describe('legacy Admin navigation', () => {
   it('shows the «Швейний цех» pages to the head of the workshop and Admin only', () => {
     const paths = new Set([
       '/production/orders',
-      '/production/fabric-stock',
       '/production/work',
       '/production/forecast',
       '/production/staff',
@@ -159,17 +159,16 @@ describe('legacy Admin navigation', () => {
 
     expect(
       shop(['WorkshopChief'])
-        ?.items.slice(0, 6)
+        ?.items.slice(0, 5)
         .map((item) => item.to),
     ).toEqual([
       '/production/orders',
-      '/production/fabric-stock',
       '/production/work',
       '/production/forecast',
       '/production/staff',
       '/production/fabric-norms',
     ]);
-    expect(shop(['Admin'])?.items[4].label).toBe('Працівники цеху');
+    expect(shop(['Admin'])?.items[3].label).toBe('Працівники цеху');
     expect(
       shop(['WorkshopChief'])
         ?.items.filter((item) => item.id === 'salary' || item.id === 'work-time')
@@ -187,15 +186,15 @@ describe('legacy Admin navigation', () => {
     expect(shop(['Manager'])?.items.find((item) => item.id === 'workshop-archive')?.to).toBe(
       '/production/archive',
     );
-    expect(shop(['Manager'])?.items[2]).toEqual({
+    expect(shop(['Manager'])?.items[1]).toEqual({
       id: 'sewing-forecast',
       label: 'Прогноз пошиття',
       to: '/production/forecast',
     });
   });
 
-  it('shows «Виробничі завдання» and «Склад тканин» to managers as well', () => {
-    const paths = new Set(['/production/orders', '/production/fabric-stock']);
+  it('shows «Виробничі завдання» to managers as well', () => {
+    const paths = new Set(['/production/orders']);
     const shop = createNavigation(paths, as('Manager')).find((group) => group.id === 'sewing-shop');
 
     expect(shop?.items[0]).toEqual({
@@ -203,11 +202,35 @@ describe('legacy Admin navigation', () => {
       label: 'Виробничі завдання',
       to: '/production/orders',
     });
-    expect(shop?.items[1]).toEqual({
+  });
+
+  it('shows «Склад тканин» as its own block right under «Швейний цех»', () => {
+    const paths = new Set(['/production/orders', '/warehouse/stock']);
+    const groups = (roles: string[]) => createNavigation(paths, as(...roles));
+    const warehouse = (roles: string[]) =>
+      groups(roles).find((group) => group.id === 'fabric-warehouse');
+    const ids = groups(['Admin']).map((group) => group.id);
+
+    expect(ids.indexOf('fabric-warehouse')).toBe(ids.indexOf('sewing-shop') + 1);
+    expect(warehouse(['Manager'])?.label).toBe('Склад тканин');
+    expect(warehouse(['Manager'])?.items.find((item) => item.id === 'fabric-stock')).toEqual({
       id: 'fabric-stock',
-      label: 'Склад тканин',
-      to: '/production/fabric-stock',
+      label: 'Залишки',
+      to: '/warehouse/stock',
     });
+    expect(warehouse(['Admin'])?.items.map((item) => item.label)).toEqual([
+      'Рух тканини',
+      'Залишки',
+      'Початкові залишки',
+      'План і факт',
+      'Бронь і що замовити',
+      'Вартість складу',
+      'Фурнітура до замовлення',
+    ]);
+    expect(warehouse(['WorkshopChief'])?.items.some((item) => item.id === 'fabric-valuation')).toBe(
+      false,
+    );
+    expect(warehouse(['Accountant'])).toBeUndefined();
   });
 
   it('shows «Бухгалтерія» to the director only and links its pages', () => {
