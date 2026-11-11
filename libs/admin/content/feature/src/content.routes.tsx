@@ -3,6 +3,7 @@ import { lazy } from 'react';
 import type {
   ArticlesViewer,
   ContentProductsViewer,
+  RedirectsViewer,
   SiteCategoriesViewer,
 } from '@admin/content/model';
 import type { RouteObject } from 'react-router-dom';
@@ -10,11 +11,13 @@ import type { RouteObject } from 'react-router-dom';
 const ArticlesPage = lazy(() => import('./pages/articles/articles-page'));
 const LegalDocumentsPage = lazy(() => import('./pages/legal/legal-documents-page'));
 const ContentProductsPage = lazy(() => import('./pages/product-pages/content-products-page'));
+const RedirectsPage = lazy(() => import('./pages/redirects/redirects-page'));
 const SiteCategoriesPage = lazy(() => import('./pages/site-categories/site-categories-page'));
 
 export const contentProductsPath = '/content/products';
 export const siteCategoriesPath = '/content/categories';
 export const articlesPath = '/content/articles';
+export const redirectsPath = '/content/redirects';
 
 export interface ContentRouteOptions {
   /** Rights of the signed-in staff member on «Товари сайту»; the app reads them from the session. */
@@ -23,17 +26,21 @@ export interface ContentRouteOptions {
   useSiteCategoriesViewer: () => SiteCategoriesViewer;
   /** Rights on «Статті», read the same way. */
   useArticlesViewer: () => ArticlesViewer;
+  /** Rights on «Переадресації», read the same way. */
+  useRedirectsViewer: () => RedirectsViewer;
 }
 
 /**
- * «Контент»: public content of Brevi sites. «Товари сайту», «Розділи сайту» and «Статті» sit behind
- * «Права доступу» (`content-products`, `content-categories`, `content-articles`); the public BreviERP
+ * «Контент»: public content of Brevi sites. «Товари сайту», «Розділи сайту», «Статті» and «Переадресації»
+ * sit behind «Права доступу» (`content-products`, `content-categories`, `content-articles`,
+ * `content-redirects`); the public BreviERP
  * documents are open to every staff member.
  */
 export function createContentRoutes({
   useContentProductsViewer,
   useSiteCategoriesViewer,
   useArticlesViewer,
+  useRedirectsViewer,
 }: ContentRouteOptions): (RouteObject & { path: string })[] {
   function Products() {
     return <ContentProductsPage viewer={useContentProductsViewer()} />;
@@ -44,10 +51,14 @@ export function createContentRoutes({
   function Articles() {
     return <ArticlesPage viewer={useArticlesViewer()} />;
   }
+  function Redirects() {
+    return <RedirectsPage viewer={useRedirectsViewer()} />;
+  }
   return [
     { path: contentProductsPath, element: <Products /> },
     { path: siteCategoriesPath, element: <Categories /> },
     { path: articlesPath, element: <Articles /> },
+    { path: redirectsPath, element: <Redirects /> },
     { path: '/content/legal', element: <LegalDocumentsPage /> },
   ];
 }

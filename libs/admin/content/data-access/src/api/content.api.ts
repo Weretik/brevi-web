@@ -1,6 +1,7 @@
 import { articleEndpoints } from './articles/article-endpoints';
 import { contentBaseApi } from './content-base-api';
 import { contentProductEndpoints } from './product-pages/content-product-endpoints';
+import { redirectEndpoints } from './redirects/redirect-endpoints';
 import { siteCategoryEndpoints } from './site-categories/site-category-endpoints';
 
 export const contentApi = contentBaseApi.injectEndpoints({
@@ -8,6 +9,7 @@ export const contentApi = contentBaseApi.injectEndpoints({
     ...contentProductEndpoints(build),
     ...siteCategoryEndpoints(build),
     ...articleEndpoints(build),
+    ...redirectEndpoints(build),
   }),
 });
 
@@ -31,4 +33,8 @@ export const {
   useSetContentArticleVisibilityMutation,
   useDeleteContentArticleMutation,
   useImportOldSiteArticlesMutation,
+  useGetSiteRedirectsQuery,
+  useSaveSiteRedirectMutation,
+  useDeleteSiteRedirectMutation,
+  useImportOldSiteRedirectsMutation,
 } = contentApi;

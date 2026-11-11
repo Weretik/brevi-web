@@ -5672,6 +5672,62 @@ export interface paths {
     patch: operations['setContentArticleVisibility'];
     trace?: never;
   };
+  '/api/content/redirects': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Every redirect, by the old address. */
+    get: operations['getSiteRedirects'];
+    put?: never;
+    /** @description Adds a redirect made by hand (source Manual). */
+    post: operations['createSiteRedirect'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/content/redirects/old-site-import': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Transfer of the old-site addresses. Each address goes to the page given in the file (to) or, without it, to the page the server finds - an address under /ru/ is resolved without that prefix and goes to the Russian page; the last part of the address is tried as an article, a site category and the old-site link of a product (its page, or its first site category when it has no page); then the deepest part that is a site category. With dryRun nothing is written and the answer says what would happen. An existing redirect is kept unless overwrite is true; a redirect made or changed by hand is always kept. Needs the create right. */
+    post: operations['importOldSiteRedirects'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/content/redirects/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Redirect id. */
+        id: components['parameters']['RedirectId'];
+      };
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Changes a redirect; it becomes a redirect made by hand (source Manual). */
+    put: operations['saveSiteRedirect'];
+    post?: never;
+    /** @description Removes a redirect; the old address then answers 404. */
+    delete: operations['deleteSiteRedirect'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/public/catalog/tree': {
     parameters: {
       query?: never;
@@ -5817,6 +5873,23 @@ export interface paths {
     };
     /** @description An article page by its address with SEO and the text. */
     get: operations['getPublicArticle'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/public/redirects': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Every redirect of the site, by the old address. */
+    get: operations['getPublicRedirects'];
     put?: never;
     post?: never;
     delete?: never;
@@ -13427,6 +13500,68 @@ export interface components {
       /** Format: int32 */
       revision: number;
     };
+    /**
+     * @description Manual - added or changed by staff; OldSite - made by the old-site transfer; SlugChange - made when staff changed the address of a page.
+     * @enum {string}
+     */
+    SiteRedirectSource: 'Manual' | 'OldSite' | 'SlugChange';
+    SiteRedirectResponse: {
+      /** Format: int32 */
+      id: number;
+      /** @description The old address, for example /specodyag-litnij or /ru/specodyag-litnij. */
+      fromPath: string;
+      /** @description The page of the new site, for example /uk/catalog/litnij-specodyag. */
+      toPath: string;
+      source: components['schemas']['SiteRedirectSource'];
+      note?: string | null;
+      /** Format: date-time */
+      updatedAtUtc: string;
+      updatedBy: string;
+    };
+    SiteRedirectList: {
+      items: components['schemas']['SiteRedirectResponse'][];
+    };
+    /** @description Both addresses may be typed as full links; they are normalized. */
+    SaveSiteRedirectRequest: {
+      fromPath?: string | null;
+      toPath?: string | null;
+      note?: string | null;
+    };
+    OldSiteRedirectItem: {
+      /** @description An address of the old site, a full link or a path. */
+      from: string;
+      /** @description The page of the new site; empty to let the server find it. */
+      to?: string | null;
+    };
+    ImportOldSiteRedirectsRequest: {
+      dryRun?: boolean;
+      overwrite?: boolean;
+      items: components['schemas']['OldSiteRedirectItem'][];
+    };
+    OldSiteRedirectRow: {
+      fromPath: string;
+      /** @description Where the address goes; null when no page was found. */
+      toPath?: string | null;
+      /** @description How the page was found, or why not. */
+      note?: string | null;
+      /** @enum {string} */
+      result: 'Created' | 'Updated' | 'Kept' | 'Same' | 'Unresolved';
+    };
+    OldSiteRedirectImportResponse: {
+      dryRun: boolean;
+      /** Format: int32 */
+      total: number;
+      /** Format: int32 */
+      created: number;
+      /** Format: int32 */
+      updated: number;
+      /** Format: int32 */
+      kept: number;
+      /** Format: int32 */
+      unresolved: number;
+      /** @description One row per address of the file; a repeated address is listed once. */
+      rows: components['schemas']['OldSiteRedirectRow'][];
+    };
     PublicCatalogSection: {
       /** Format: int32 */
       id: number;
@@ -13643,6 +13778,15 @@ export interface components {
       /** Format: date-time */
       updatedAtUtc: string;
     };
+    PublicRedirect: {
+      /** @description The old address as a normalized path (lower case, no closing slash, no query). */
+      from: string;
+      /** @description The page of the new site, starting with /uk or /ru. */
+      to: string;
+    };
+    PublicRedirectList: {
+      items: components['schemas']['PublicRedirect'][];
+    };
   };
   responses: {
     /** @description Validation failures including field identifiers. */
@@ -13777,6 +13921,8 @@ export interface components {
     'parameters-CategoryId': number;
     /** @description Article id. */
     'parameters-ArticleId': number;
+    /** @description Redirect id. */
+    RedirectId: number;
     Language: 'uk' | 'ru';
   };
   requestBodies: never;
@@ -31811,6 +31957,260 @@ export interface operations {
       };
     };
   };
+  getSiteRedirects: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SiteRedirectList'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to view «Переадресації» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createSiteRedirect: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SaveSiteRedirectRequest'];
+      };
+    };
+    responses: {
+      /** @description Added */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SiteRedirectResponse'];
+        };
+      };
+      /** @description An invalid old address, a target outside /uk and /ru, the same address twice or a long note */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': Record<string, never>;
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to create in «Переадресації» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The old address already has a redirect, the pair would make a loop, or there are 10 000 redirects */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Messages'];
+        };
+      };
+    };
+  };
+  importOldSiteRedirects: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ImportOldSiteRedirectsRequest'];
+      };
+    };
+    responses: {
+      /** @description Reported (dryRun) or transferred */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['OldSiteRedirectImportResponse'];
+        };
+      };
+      /** @description No addresses, more than 3000 addresses, or an address over 2000 characters */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': Record<string, never>;
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to create in «Переадресації» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The transfer would make more than 10 000 redirects */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Messages'];
+        };
+      };
+    };
+  };
+  saveSiteRedirect: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Redirect id. */
+        id: components['parameters']['RedirectId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SaveSiteRedirectRequest'];
+      };
+    };
+    responses: {
+      /** @description Saved */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SiteRedirectResponse'];
+        };
+      };
+      /** @description An invalid old address, a target outside /uk and /ru, the same address twice or a long note */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': Record<string, never>;
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to edit in «Переадресації» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such redirect */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Another redirect has this old address, or the pair would make a loop */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Messages'];
+        };
+      };
+    };
+  };
+  deleteSiteRedirect: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Redirect id. */
+        id: components['parameters']['RedirectId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Removed */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to delete in «Переадресації» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such redirect */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   getPublicCatalogTree: {
     parameters: {
       query?: never;
@@ -32074,6 +32474,26 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+    };
+  };
+  getPublicRedirects: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Redirects */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PublicRedirectList'];
+        };
       };
     };
   };

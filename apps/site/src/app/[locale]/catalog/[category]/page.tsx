@@ -2,6 +2,7 @@ import { getCatalogCategory, getCatalogCategorySlugs } from '@site/catalog/data-
 import { CatalogCategoryPage } from '@site/catalog/feature';
 import { buildCatalogCategoryMetadata } from '@site/catalog/seo';
 import { isLocale } from '@site/core/i18n';
+import { redirectOrNotFound } from '@site/redirects/data-access';
 import { notFound } from 'next/navigation';
 
 import type { Metadata } from 'next';
@@ -36,7 +37,7 @@ export default async function Page({ params }: PageProps<'/[locale]/catalog/[cat
   const { locale, category: slug } = await params;
   if (!isLocale(locale)) notFound();
   const category = await getCatalogCategory(slug, locale);
-  if (!category) notFound();
+  if (!category) return redirectOrNotFound(`/${locale}/catalog/${slug}`);
 
   return <CatalogCategoryPage locale={locale} category={category} />;
 }

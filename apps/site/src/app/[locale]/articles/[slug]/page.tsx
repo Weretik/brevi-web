@@ -3,6 +3,7 @@ import { ArticlePage, toArticleSeoInput } from '@site/articles/feature';
 import { pickMoreArticles } from '@site/articles/model';
 import { buildArticleMetadata } from '@site/articles/seo';
 import { isLocale } from '@site/core/i18n';
+import { redirectOrNotFound } from '@site/redirects/data-access';
 import { notFound } from 'next/navigation';
 
 import type { Metadata } from 'next';
@@ -32,7 +33,7 @@ export default async function Page({ params }: PageProps<'/[locale]/articles/[sl
   const { locale, slug } = await params;
   if (!isLocale(locale)) notFound();
   const [article, articles] = await Promise.all([getArticle(slug, locale), getArticles(locale)]);
-  if (!article) notFound();
+  if (!article) return redirectOrNotFound(`/${locale}/articles/${slug}`);
 
   return <ArticlePage locale={locale} article={article} more={pickMoreArticles(articles, slug)} />;
 }

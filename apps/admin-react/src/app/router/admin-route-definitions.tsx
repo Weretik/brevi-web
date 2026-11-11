@@ -27,6 +27,7 @@ import { useLeadStatsViewer, useLeadViewer } from './use-lead-viewer';
 import { useProductionOrderActor } from './use-production-order-actor';
 import { useQuoteActor } from './use-quote-actor';
 import { useQuoteSupplierCard } from './use-quote-supplier-card';
+import { useRedirectsViewer } from './use-redirects-viewer';
 import { useSiteCategoriesViewer } from './use-site-categories-viewer';
 import { useTaskViewer } from './use-task-viewer';
 import { useWorkshopPeopleAccess } from './use-workshop-people-access';
@@ -48,6 +49,7 @@ export const adminRouteDefinitions = [
     useContentProductsViewer,
     useSiteCategoriesViewer,
     useArticlesViewer,
+    useRedirectsViewer,
   }),
   ...createWarehouseRoutes(),
 ];
