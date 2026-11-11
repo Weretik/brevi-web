@@ -1,7 +1,7 @@
 import { isLocale } from '@site/core/i18n';
 import { LogoPrintingPage } from '@site/logo-printing/feature';
 import { buildLogoPrintingMetadata } from '@site/logo-printing/seo';
-import { withSiteSharePicture } from '@site/settings/data-access';
+import { sitePageMetadata } from '@site/settings/data-access';
 import { notFound } from 'next/navigation';
 
 import type { Metadata } from 'next';
@@ -10,7 +10,9 @@ export async function generateMetadata({
   params,
 }: PageProps<'/[locale]/logo-printing'>): Promise<Metadata> {
   const { locale } = await params;
-  return isLocale(locale) ? withSiteSharePicture(buildLogoPrintingMetadata(locale)) : {};
+  return isLocale(locale)
+    ? sitePageMetadata('logoPrinting', locale, buildLogoPrintingMetadata(locale))
+    : {};
 }
 
 export default async function Page({ params }: PageProps<'/[locale]/logo-printing'>) {

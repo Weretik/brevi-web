@@ -1,7 +1,7 @@
 import { isLocale } from '@site/core/i18n';
 import { IndustriesPage } from '@site/industries/feature';
 import { buildIndustriesMetadata } from '@site/industries/seo';
-import { withSiteSharePicture } from '@site/settings/data-access';
+import { sitePageMetadata } from '@site/settings/data-access';
 import { notFound } from 'next/navigation';
 
 import type { Metadata } from 'next';
@@ -10,7 +10,9 @@ export async function generateMetadata({
   params,
 }: PageProps<'/[locale]/industries'>): Promise<Metadata> {
   const { locale } = await params;
-  return isLocale(locale) ? withSiteSharePicture(buildIndustriesMetadata(locale)) : {};
+  return isLocale(locale)
+    ? sitePageMetadata('industries', locale, buildIndustriesMetadata(locale))
+    : {};
 }
 
 export default async function Page({ params }: PageProps<'/[locale]/industries'>) {

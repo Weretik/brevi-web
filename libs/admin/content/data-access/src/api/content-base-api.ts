@@ -7,5 +7,6 @@ export const contentBaseApi = adminApi.enhanceEndpoints({
     'ContentArticle',
     'SiteRedirect',
     'SiteSeoSettings',
+    'SitePages',
   ],
 });

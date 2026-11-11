@@ -17,3 +17,6 @@ export * from './forms/redirects/redirect-form';
 export * from './dialogs/redirect-delete-dialog';
 export * from './components/seo-settings/seo-settings-view';
 export * from './forms/seo-settings/seo-settings-form';
+export * from './tables/site-pages/site-pages-table';
+export * from './components/site-pages/site-page-view';
+export * from './forms/site-pages/site-page-form';

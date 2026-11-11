@@ -191,3 +191,20 @@ export type {
   SeoSettingsErrors,
   SeoSettingsFormValues,
 } from './validators/seo-settings/seo-settings-validation';
+export type {
+  SitePage,
+  SitePageInput,
+  SitePageText,
+  SitePagesViewer,
+} from './entities/site-pages/site-page';
+export {
+  sitePageFormOf,
+  sitePageInputOf,
+  sitePageLimits,
+  sitePageProblems,
+  validateSitePage,
+} from './validators/site-pages/site-page-validation';
+export type {
+  SitePageErrors,
+  SitePageFormValues,
+} from './validators/site-pages/site-page-validation';

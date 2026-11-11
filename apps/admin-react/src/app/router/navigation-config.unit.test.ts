@@ -100,6 +100,9 @@ describe('legacy Admin navigation', () => {
     expect(item('Admin', 'site-seo-settings')?.to).toBe('/content/seo-settings');
     expect(item('Manager', 'site-seo-settings')?.to).toBe('/content/seo-settings');
     expect(item('Accountant', 'site-seo-settings')).toBeUndefined();
+    expect(item('Admin', 'site-pages')?.to).toBe('/content/site-pages');
+    expect(item('Manager', 'site-pages')?.to).toBe('/content/site-pages');
+    expect(item('Accountant', 'site-pages')).toBeUndefined();
   });
 
   it('enables a legacy URL only when the React route is registered', () => {

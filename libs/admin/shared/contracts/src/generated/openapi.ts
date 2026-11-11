@@ -5746,6 +5746,42 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/content/site-pages': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Every fixed page in menu order with its texts; revision 0 for a page never saved. */
+    get: operations['getSitePages'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/content/site-pages/{key}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        key: string;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Replaces the texts of one page; spaces and line breaks inside a text are joined to one line. */
+    put: operations['saveSitePage'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/public/catalog/tree': {
     parameters: {
       query?: never;
@@ -5925,6 +5961,23 @@ export interface paths {
     };
     /** @description The settings; empty fields are null. */
     get: operations['getPublicSiteSettings'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/public/site-pages': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description The saved texts by page key; a page that is not listed, or an empty text, keeps the site's own text. */
+    get: operations['getPublicSitePages'];
     put?: never;
     post?: never;
     delete?: never;
@@ -13636,6 +13689,39 @@ export interface components {
       /** Format: int32 */
       defaultOgPhotoId?: number | null;
     };
+    /** @description Texts of one language; null leaves the site its own text. */
+    SitePageText: {
+      title?: string | null;
+      description?: string | null;
+    };
+    SitePageResponse: {
+      key: string;
+      /** @description The name staff see. */
+      name: string;
+      /** @description The address without the language, for example /order-in-bulk. */
+      path: string;
+      /** @description True for the home page, whose title is shown as written; the site adds « — Brevi» to the others. */
+      titleHasBrand: boolean;
+      uk: components['schemas']['SitePageText'];
+      ru: components['schemas']['SitePageText'];
+      /** Format: int32 */
+      revision: number;
+      /** Format: date-time */
+      updatedAtUtc?: string | null;
+      updatedBy?: string | null;
+    };
+    SitePageListResponse: {
+      items: components['schemas']['SitePageResponse'][];
+    };
+    SaveSitePageRequest: {
+      /**
+       * Format: int32
+       * @description The revision that was read; 0 for a page never saved.
+       */
+      revision: number;
+      uk: components['schemas']['SitePageText'];
+      ru: components['schemas']['SitePageText'];
+    };
     PublicCatalogSection: {
       /** Format: int32 */
       id: number;
@@ -13874,6 +13960,18 @@ export interface components {
       googleSiteVerification?: string | null;
       bingSiteVerification?: string | null;
       defaultOgImage?: components['schemas']['PublicSitePicture'] | null;
+    };
+    'schemas-SitePageText': {
+      title?: string | null;
+      description?: string | null;
+    };
+    PublicSitePage: {
+      key: string;
+      uk: components['schemas']['schemas-SitePageText'];
+      ru: components['schemas']['schemas-SitePageText'];
+    };
+    PublicSitePagesResponse: {
+      items: components['schemas']['PublicSitePage'][];
     };
   };
   responses: {
@@ -32389,6 +32487,107 @@ export interface operations {
       };
     };
   };
+  getSitePages: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SitePageListResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to view «Сторінки сайту» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  saveSitePage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        key: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SaveSitePageRequest'];
+      };
+    };
+    responses: {
+      /** @description Saved */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SitePageResponse'];
+        };
+      };
+      /** @description A text is too long */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': Record<string, never>;
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to edit «Сторінки сайту» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such page */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Messages'];
+        };
+      };
+      /** @description The revision is stale */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Messages'];
+        };
+      };
+    };
+  };
   getPublicCatalogTree: {
     parameters: {
       query?: never;
@@ -32691,6 +32890,26 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['PublicSiteSettingsResponse'];
+        };
+      };
+    };
+  };
+  getPublicSitePages: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Texts */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PublicSitePagesResponse'];
         };
       };
     };
