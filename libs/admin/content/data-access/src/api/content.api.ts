@@ -13,4 +13,5 @@ export const {
   useSaveContentProductMutation,
   useSetContentProductVisibilityMutation,
   useDeleteContentProductMutation,
+  useImportOldSiteProductPagesMutation,
 } = contentApi;

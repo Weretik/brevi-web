@@ -1,6 +1,6 @@
 # API contract: «Контент → Товари»
 
-Source of truth: BreviERP `docs/sdd/contracts/content/content-products.openapi.yaml` at commit `f4d8435ab91d5f165b8e30ced5397c77d0a00582`, synced into [the snapshot](../../../../../contracts/openapi/backend/content/content-products.openapi.yaml). Policy `access:content-products`.
+Source of truth: BreviERP `docs/sdd/contracts/content/content-products.openapi.yaml` at commit `1f72d70cea29129f8a8a51e8394fd3e6b6f74b47`, synced into [the snapshot](../../../../../contracts/openapi/backend/content/content-products.openapi.yaml). Policy `access:content-products`.
 
 | operationId                   | Use                              | Client decisions                                                                                                                                                        |
 | ----------------------------- | -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -9,5 +9,6 @@ Source of truth: BreviERP `docs/sdd/contracts/content/content-products.openapi.y
 | `saveContentProduct`          | «Зберегти» in the panel          | Sends the opened `revision`; texts are built from the plain-text fields; invalidates the list and the product, also after an error, because 409 means newer data exists |
 | `setContentProductVisibility` | «На сайті» switch in the list    | Invalidates the list and the product; `showOnSite && !onSite` shows the inactive-product warning                                                                        |
 | `deleteContentProduct`        | «Видалити сторінку»              | Invalidates the list and the product                                                                                                                                    |
+| `importOldSiteProductPages`   | «Перенести зі старого сайту»     | The file's pages are sent as they are; first with `dryRun: true`, then with `false` on «Перенести»; a real transfer invalidates every `ContentProduct` tag              |
 
-Responses are validated at runtime in `content-product.mapper.ts`; a response of another shape is an error, not partial data. Errors go through `contentApiError`, which keeps the server's Ukrainian reason for 409 and 404. No retries; RTK Query cancels a replaced list request.
+Responses are validated at runtime in `content-product.mapper.ts` and `old-site-import.mapper.ts`; a response of another shape is an error, not partial data. Errors go through `contentApiError`, which keeps the server's Ukrainian reason for 409 and 404. No retries; RTK Query cancels a replaced list request.

@@ -5,4 +5,5 @@ export {
   useSaveContentProductMutation,
   useSetContentProductVisibilityMutation,
   useDeleteContentProductMutation,
+  useImportOldSiteProductPagesMutation,
 } from './api/content.api';

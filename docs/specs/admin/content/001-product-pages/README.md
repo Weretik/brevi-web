@@ -11,8 +11,9 @@ The public site takes its products from the Admin. Staff decide which products o
 - Page «Контент → Товари сайту» at `/content/products`, menu group «Контент».
 - List of every product of «Товари» (sewing and PPE) with the «На сайті» switch and what the page still misses.
 - Side panel: view first, then «Редагувати»; delete of the page with a confirmation.
+- «Перенести зі старого сайту»: one-time transfer of old-site texts and SEO from a file (CNT-002 stage 3).
 
-Not here: the transfer of old-site texts (CNT-002 stage 3), the public API and the site itself (stages 4–5), section names and SEO («Контент → Розділи», later).
+Not here: building the transfer file (a script in the project files), the public API and the site itself (stages 4–5), section names and SEO («Контент → Розділи», later).
 
 ## Rules
 
@@ -25,6 +26,7 @@ Not here: the transfer of old-site texts (CNT-002 stage 3), the public API and t
 - R-07: Save sends the whole page with the revision that was opened. A stale revision or a taken address comes back as the server's message in the panel.
 - R-08: «Видалити сторінку» asks for a confirmation that explains the difference from switching the product off the site.
 - R-09: «Права доступу», page `content-products`: without «Редагувати» the switch is disabled and the panel has no «Редагувати»; without «Видаляти» there is no «Видалити сторінку». Defaults: Admin everything, Manager view. A role made on «Права доступу» has exactly the rights it was given.
+- R-10: «Перенести зі старого сайту» is shown with the «Створювати» right. The dialog takes a JSON file (`{ items: [...] }` or the list, up to 500 pages, each with its old-site link) and refuses any other file before a request. After the file is picked the server counts what would happen (`dryRun`): pages to create, to replace, kept, old pages without a product and pages with a problem, each with its reason. Two switches, both off: «Одразу показувати перенесені товари на сайті» and «Замінити тексти сторінок, які вже заповнені»; changing one counts again. «Перенести» is enabled only after a count with something to create or replace; nothing is written before it.
 
 ## Scenarios
 
@@ -33,6 +35,7 @@ Not here: the transfer of old-site texts (CNT-002 stage 3), the public API and t
 - SC-03: An admin opens the panel, presses «Редагувати», fills the Ukrainian and Russian texts and saves; the list shows the result.
 - SC-04: An admin types an address with Cyrillic letters; the form refuses it before any request.
 - SC-05: An admin deletes a page after the confirmation; the product stays in the list without a page.
+- SC-06: An admin picks the transfer file, reads the count and the old pages without a product, presses «Перенести» and sees the result; the list reloads.
 
 ## Design
 
@@ -40,4 +43,4 @@ Follows the design system «Цех»: reference list pattern (header, search, fi
 
 ## Verification
 
-Unit tests of the markup, validation, problems and mappers; component tests of the list, filters, switch, read-only rights, save with revision, invalid address and delete; the navigation test for the menu item by role. Evidence: `npx nx test admin-content-model`, `admin-content-data-access`, `admin-content-ui`, `admin-content-feature`, the admin-react navigation and router tests, lint and typecheck of the same projects, `npm run contracts:check`.
+Unit tests of the markup, validation, problems and mappers; component tests of the list, filters, switch, read-only rights, save with revision, invalid address, delete and the old-site transfer (check first, wrong file, no create right); the navigation test for the menu item by role. Evidence: `npx nx test admin-content-model`, `admin-content-data-access`, `admin-content-ui`, `admin-content-feature`, the admin-react navigation and router tests, lint and typecheck of the same projects, `npm run contracts:check`.
