@@ -33,7 +33,7 @@ export function createProductionRoutes({ useOrderActor, usePeopleAccess }: Produ
     },
     {
       path: '/production/payroll',
-      element: <Navigate to="/production/people?tab=payroll" replace />,
+      element: <Navigate to="/production/people?tab=month" replace />,
     },
     { path: '/production/fabric-norms', element: <FabricNormsPage /> },
     {

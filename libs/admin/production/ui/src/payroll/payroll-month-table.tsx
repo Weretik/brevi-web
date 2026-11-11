@@ -71,6 +71,19 @@ function IssuedCell({
   );
 }
 
+type Part = 'sewing' | 'cutting' | 'bonus' | 'master' | 'chief' | 'embroidery' | 'other';
+
+/** Columns of the money kinds; a kind nobody earned in the month is left out. */
+const parts: readonly { key: Part; label: string; count?: 'sewn' | 'cut' }[] = [
+  { key: 'sewing', label: 'Пошив', count: 'sewn' },
+  { key: 'cutting', label: 'Крій', count: 'cut' },
+  { key: 'bonus', label: 'Премія' },
+  { key: 'master', label: 'Майстер' },
+  { key: 'chief', label: 'Начальник' },
+  { key: 'embroidery', label: 'Вишивка' },
+  { key: 'other', label: 'Інше' },
+];
+
 /** «Нарахування працівникам»: what each worker earned, was paid and is due in the month. */
 export function PayrollMonthTable({
   lines,
@@ -86,6 +99,7 @@ export function PayrollMonthTable({
         За цей місяць нарахувань немає.
       </Typography>
     );
+  const shown = parts.filter((part) => lines.some((line) => line[part.key] !== 0));
   return (
     <TableContainer component={Paper} variant="outlined">
       <Table size="small" aria-label="Нарахування працівникам">
@@ -93,13 +107,11 @@ export function PayrollMonthTable({
           <TableRow>
             <TableCell>Працівник</TableCell>
             <TableCell align="right">Години</TableCell>
-            <TableCell align="right">Пошив</TableCell>
-            <TableCell align="right">Крій</TableCell>
-            <TableCell align="right">Премія</TableCell>
-            <TableCell align="right">Майстер</TableCell>
-            <TableCell align="right">Начальник</TableCell>
-            <TableCell align="right">Вишивка</TableCell>
-            <TableCell align="right">Інше</TableCell>
+            {shown.map((part) => (
+              <TableCell key={part.key} align="right">
+                {part.label}
+              </TableCell>
+            ))}
             <TableCell align="right">Нараховано</TableCell>
             <TableCell align="right">Виплачено</TableCell>
             <TableCell align="right">До видачі</TableCell>
@@ -126,40 +138,26 @@ export function PayrollMonthTable({
               <TableCell align="right" sx={mono}>
                 {line.minutes === 0 ? '—' : formatHours(line.minutes)}
               </TableCell>
-              <TableCell align="right" sx={mono}>
-                {money(line.sewing)}
-                {line.sewn > 0 && (
-                  <Typography variant="caption" color="text.secondary" component="div">
-                    {line.sewn} шт.
-                  </Typography>
-                )}
-              </TableCell>
-              <TableCell align="right" sx={mono}>
-                {money(line.cutting)}
-                {line.cut > 0 && (
-                  <Typography variant="caption" color="text.secondary" component="div">
-                    {line.cut} шт.
-                  </Typography>
-                )}
-              </TableCell>
-              <TableCell align="right" sx={mono}>
-                {money(line.bonus)}
-              </TableCell>
-              <TableCell align="right" sx={mono}>
-                {money(line.master)}
-              </TableCell>
-              <TableCell align="right" sx={mono}>
-                {money(line.chief)}
-              </TableCell>
-              <TableCell align="right" sx={mono}>
-                {money(line.embroidery)}
-              </TableCell>
-              <TableCell
-                align="right"
-                sx={{ ...mono, color: line.other < 0 ? 'error.main' : undefined }}
-              >
-                {money(line.other)}
-              </TableCell>
+              {shown.map((part) => {
+                const count = part.count ? line[part.count] : 0;
+                return (
+                  <TableCell
+                    key={part.key}
+                    align="right"
+                    sx={{
+                      ...mono,
+                      color: part.key === 'other' && line.other < 0 ? 'error.main' : undefined,
+                    }}
+                  >
+                    {money(line[part.key])}
+                    {count > 0 && (
+                      <Typography variant="caption" color="text.secondary" component="div">
+                        {count} шт.
+                      </Typography>
+                    )}
+                  </TableCell>
+                );
+              })}
               <TableCell align="right" sx={{ ...mono, fontWeight: 700 }}>
                 {formatMoney(line.accrued)}
               </TableCell>
@@ -190,27 +188,11 @@ export function PayrollMonthTable({
             <TableCell align="right" sx={mono}>
               {formatHours(totals.minutes)}
             </TableCell>
-            <TableCell align="right" sx={mono}>
-              {formatMoney(totals.sewing)}
-            </TableCell>
-            <TableCell align="right" sx={mono}>
-              {formatMoney(totals.cutting)}
-            </TableCell>
-            <TableCell align="right" sx={mono}>
-              {formatMoney(totals.bonus)}
-            </TableCell>
-            <TableCell align="right" sx={mono}>
-              {formatMoney(totals.master)}
-            </TableCell>
-            <TableCell align="right" sx={mono}>
-              {formatMoney(totals.chief)}
-            </TableCell>
-            <TableCell align="right" sx={mono}>
-              {formatMoney(totals.embroidery)}
-            </TableCell>
-            <TableCell align="right" sx={mono}>
-              {formatMoney(totals.other)}
-            </TableCell>
+            {shown.map((part) => (
+              <TableCell key={part.key} align="right" sx={mono}>
+                {formatMoney(totals[part.key])}
+              </TableCell>
+            ))}
             <TableCell align="right" sx={mono}>
               {formatMoney(totals.accrued)}
             </TableCell>
