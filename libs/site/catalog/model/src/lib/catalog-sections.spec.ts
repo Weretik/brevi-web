@@ -1,41 +1,27 @@
 import { toCatalogSections } from './catalog-sections';
 import { findCatalogPath, flattenCatalogTree } from './catalog-tree';
-import { CATALOG_TYPES } from './catalog-types';
 
 import type { CatalogTreeNode } from './catalog-tree';
 
-const section = (slug: string, sectionId: number): CatalogTreeNode => ({
+const section = (slug: string): CatalogTreeNode => ({
   slug,
   name: { uk: slug, ru: slug },
   productCount: 2,
-  productType: 'Sewing',
-  sectionId,
   children: [],
 });
+const clothes = { uk: 'Спецодяг', ru: 'Спецодежда' };
 
 const tree: CatalogTreeNode[] = [
   {
-    ...CATALOG_TYPES.Sewing,
+    slug: 'spetsodyah',
+    name: clothes,
     productCount: 4,
-    productType: 'Sewing',
-    sectionId: null,
-    children: [section('kostyumy', 10), section('kurtky', 11)],
+    children: [section('kostyumy'), section('kurtky')],
   },
 ];
 
 describe('catalog tree', () => {
-  it('names the two product types in both languages with different addresses', () => {
-    const types = Object.values(CATALOG_TYPES);
-
-    expect(new Set(types.map((type) => type.slug)).size).toBe(2);
-    for (const type of types) {
-      expect(type.slug).toMatch(/^[a-z0-9-]+$/);
-      expect(type.name.uk.trim()).not.toBe('');
-      expect(type.name.ru.trim()).not.toBe('');
-    }
-  });
-
-  it('finds the path from a product type to a section', () => {
+  it('finds the path from a category to a subcategory', () => {
     expect(findCatalogPath('kurtky', tree)?.map((node) => node.slug)).toEqual([
       'spetsodyah',
       'kurtky',
@@ -53,7 +39,7 @@ describe('catalog tree', () => {
       {
         key: 'spetsodyah',
         slug: 'spetsodyah',
-        label: CATALOG_TYPES.Sewing.name,
+        label: clothes,
         items: [
           { key: 'kostyumy', slug: 'kostyumy', label: { uk: 'kostyumy', ru: 'kostyumy' } },
           { key: 'kurtky', slug: 'kurtky', label: { uk: 'kurtky', ru: 'kurtky' } },

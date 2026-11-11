@@ -1,4 +1,4 @@
-import { SITE_PATHS, catalogCategoryPath } from '@site/core/i18n';
+import { SITE_PATHS, catalogCategoryPath, localizedPath } from '@site/core/i18n';
 import { buildPageMetadata } from '@site/core/seo';
 
 import type { Locale } from '@site/core/i18n';
@@ -26,6 +26,10 @@ export type CatalogCategorySeoInput = {
   slug: string;
   /** Category name in the page language. */
   name: string;
+  /** Title and description staff wrote for search; empty strings when they did not. */
+  seo: { title: string; description: string };
+  /** Language of the texts that came back. */
+  textLocale: Locale;
 };
 
 const CATEGORY_DESCRIPTION: Record<Locale, (name: string) => string> = {
@@ -36,17 +40,26 @@ const CATEGORY_DESCRIPTION: Record<Locale, (name: string) => string> = {
 };
 
 /**
- * Metadata of a category page. The Admin keeps only the name of a section, so the title is the name and the
- * description is built from it; texts written by staff come with «Контент → Розділи».
+ * Metadata of a category page: the title and description staff wrote in «Контент → Розділи сайту», or the
+ * name and a description built from it. A category without Russian texts shows the Ukrainian ones on the
+ * Russian page, so that page names the Ukrainian one as canonical and has no language alternates.
  */
 export function buildCatalogCategoryMetadata(
   locale: Locale,
   category: CatalogCategorySeoInput,
 ): Metadata {
-  return buildPageMetadata({
+  const path = catalogCategoryPath(category.slug);
+  const page = buildPageMetadata({
     locale,
-    path: catalogCategoryPath(category.slug),
-    title: category.name,
-    description: CATEGORY_DESCRIPTION[locale](category.name),
+    path,
+    title: category.seo.title || category.name,
+    description: category.seo.description || CATEGORY_DESCRIPTION[locale](category.name),
   });
+  if (category.textLocale === locale) return page;
+  const original = localizedPath(category.textLocale, path);
+  return {
+    ...page,
+    alternates: { canonical: original },
+    openGraph: { ...page.openGraph, url: original },
+  };
 }

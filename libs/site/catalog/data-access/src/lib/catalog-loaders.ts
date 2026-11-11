@@ -5,15 +5,16 @@ import { CATALOG_CACHE_TAG, CATALOG_LIFE, FAILURE_LIFE } from './catalog-cache';
 import {
   mapCatalogAddresses,
   mapCatalogCardPage,
+  mapCatalogCategoryText,
   mapCatalogProduct,
   mapCatalogTree,
 } from './mappers/public-catalog.mapper';
 
 import type {
+  CatalogCategoryPage,
   CatalogProduct,
   CatalogProductAddress,
   CatalogProductCard,
-  CatalogProductType,
   CatalogTreeNode,
 } from '@site/catalog/model';
 import type { Locale } from '@site/core/i18n';
@@ -44,7 +45,7 @@ export async function loadCatalogTree(): Promise<CatalogTreeNode[] | null> {
   'use cache';
   cacheTag(CATALOG_CACHE_TAG);
 
-  const result = await read('/api/public/catalog/tree', {}, mapCatalogTree);
+  const result = await read('/api/public/catalog/categories', {}, mapCatalogTree);
   if (result?.kind !== 'ok') {
     cacheLife(FAILURE_LIFE);
     return null;
@@ -53,11 +54,13 @@ export async function loadCatalogTree(): Promise<CatalogTreeNode[] | null> {
   return result.data;
 }
 
-/** Every product card of a type or of one section, in the order of the Admin; `null` when unavailable. */
+/**
+ * Every product card of a category with its subcategories, in the order of the category; `null` when
+ * unavailable or when the site does not show such a category.
+ */
 export async function loadCatalogCards(
   locale: Locale,
-  type: CatalogProductType,
-  sectionId: number | null,
+  category: string,
 ): Promise<CatalogProductCard[] | null> {
   'use cache';
   cacheTag(CATALOG_CACHE_TAG);
@@ -66,7 +69,7 @@ export async function loadCatalogCards(
   for (let page = 1; page <= MAX_CARD_PAGES; page += 1) {
     const result = await read(
       '/api/public/catalog/products',
-      { language: locale, type, sectionId, page, pageSize: CARDS_PAGE_SIZE },
+      { language: locale, category, page, pageSize: CARDS_PAGE_SIZE },
       mapCatalogCardPage,
     );
     if (result?.kind !== 'ok') {
@@ -78,6 +81,27 @@ export async function loadCatalogCards(
   }
   cacheLife(CATALOG_LIFE);
   return cards;
+}
+
+/** What staff wrote about a category in the language of the page; `null` when unavailable or not shown. */
+export async function loadCatalogCategoryText(
+  slug: string,
+  locale: Locale,
+): Promise<Pick<CatalogCategoryPage, 'name' | 'textLocale' | 'seo' | 'text'> | null> {
+  'use cache';
+  cacheTag(CATALOG_CACHE_TAG);
+
+  const result = await read(
+    `/api/public/catalog/categories/${encodeURIComponent(slug)}`,
+    { language: locale },
+    mapCatalogCategoryText,
+  );
+  if (result?.kind !== 'ok') {
+    cacheLife(FAILURE_LIFE);
+    return null;
+  }
+  cacheLife(CATALOG_LIFE);
+  return result.data;
 }
 
 /** A product page; `'not-found'` when the site does not show such a product, `null` when unavailable. */
@@ -101,12 +125,14 @@ export async function loadCatalogProduct(
   return result.kind === 'ok' ? result.data : 'not-found';
 }
 
-/** Addresses of every product on the site; `null` when unavailable. */
-export async function loadCatalogAddresses(): Promise<CatalogProductAddress[] | null> {
+/** Addresses of every product or of every category on the site; `null` when unavailable. */
+export async function loadCatalogAddresses(
+  of: 'product' | 'category',
+): Promise<CatalogProductAddress[] | null> {
   'use cache';
   cacheTag(CATALOG_CACHE_TAG);
 
-  const result = await read('/api/public/catalog/product-slugs', {}, mapCatalogAddresses);
+  const result = await read(`/api/public/catalog/${of}-slugs`, {}, mapCatalogAddresses);
   if (result?.kind !== 'ok') {
     cacheLife(FAILURE_LIFE);
     return null;

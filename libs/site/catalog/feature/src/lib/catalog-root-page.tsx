@@ -1,4 +1,4 @@
-import { getCatalogTree } from '@site/catalog/data-access';
+import { getCatalogProductAddresses, getCatalogTree } from '@site/catalog/data-access';
 import {
   CatalogOrder,
   CatalogSectionsGrid,
@@ -12,18 +12,19 @@ import { PageHeader } from '@site/shared/ui';
 import type { Locale } from '@site/core/i18n';
 
 /**
- * Catalog root: the two product types with their sections from the Admin, and the call to order. While the
+ * Catalog root: the categories with their subcategories from the Admin, and the call to order. While the
  * catalog is empty or unavailable the page keeps its heading and the call to order.
  */
 export async function CatalogRootPage({ locale }: { locale: Locale }) {
-  const tree = await getCatalogTree();
+  const [tree, products] = await Promise.all([getCatalogTree(), getCatalogProductAddresses()]);
   const dictionary = getCatalogDictionary(locale);
   const path = (key: keyof typeof SITE_PATHS) => localizedPath(locale, SITE_PATHS[key]);
   const breadcrumbs = [
     { name: dictionary.home, href: localizedPath(locale) },
     { name: dictionary.catalog, href: path('catalog') },
   ];
-  const total = tree.reduce((sum, section) => sum + section.productCount, 0);
+  // A product may be in several categories, so the models are counted once, by their own addresses.
+  const total = tree.length > 0 ? products.length : 0;
 
   return (
     <div className="grid gap-10 pb-4 sm:gap-14">

@@ -4,6 +4,7 @@ import {
   CatalogOrder,
   CatalogProductGrid,
   CatalogSubcategories,
+  CatalogText,
   formatModelCount,
   getCatalogDictionary,
 } from '@site/catalog/ui';
@@ -14,35 +15,35 @@ import {
   localizedPath,
 } from '@site/core/i18n';
 import { JsonLd, buildBreadcrumbJsonLd } from '@site/core/seo';
-import { PageHeader } from '@site/shared/ui';
+import { PageHeader, PageSection } from '@site/shared/ui';
 
-import type { CatalogCategory } from '@site/catalog/model';
+import type { CatalogCategoryPage as CatalogCategoryPageData } from '@site/catalog/model';
 import type { Locale } from '@site/core/i18n';
 
 /**
- * Category page: breadcrumbs through the product type, the sections of a type, every product of the category
- * on one page with its lowest price, and the call to order. Texts about a category come with «Контент → Розділи».
+ * Category page: breadcrumbs through the top-level category, the subcategories, every product of the
+ * category on one page with its lowest price, the text staff wrote about the category, and the call to order.
  */
 export async function CatalogCategoryPage({
   locale,
   category,
 }: {
   locale: Locale;
-  category: CatalogCategory;
+  category: CatalogCategoryPageData;
 }) {
   const dictionary = getCatalogDictionary(locale);
-  const products = await getCatalogCategoryProducts(category.node, locale);
+  const products = await getCatalogCategoryProducts(category.node.slug, locale);
   const path = (key: keyof typeof SITE_PATHS) => localizedPath(locale, SITE_PATHS[key]);
   const categoryHref = (slug: string) => localizedPath(locale, catalogCategoryPath(slug));
   const productHref = (slug: string) => localizedPath(locale, catalogProductPath(slug));
-  const { node, trail } = category;
+  const { node, trail, text } = category;
   const children = node.children;
   const breadcrumbs = [
     { name: dictionary.home, href: localizedPath(locale) },
     { name: dictionary.catalog, href: path('catalog') },
     ...trail.map((node) => ({ name: node.name[locale], href: categoryHref(node.slug) })),
   ];
-  const name = node.name[locale];
+  const name = category.name;
 
   return (
     <div className="grid gap-10 pb-4 sm:gap-14">
@@ -78,9 +79,19 @@ export async function CatalogCategoryPage({
         )}
       </section>
 
+      {text.length > 0 ? (
+        <PageSection
+          id="catalog-about"
+          title={dictionary.about.label}
+          label={{ index: '02', text: dictionary.label }}
+        >
+          <CatalogText blocks={text} />
+        </PageSection>
+      ) : null}
+
       <CatalogOrder
         id="catalog-order"
-        index="02"
+        index={text.length > 0 ? '03' : '02'}
         dictionary={dictionary.order}
         requestHref={path('request')}
         logoHref={path('logoPrinting')}

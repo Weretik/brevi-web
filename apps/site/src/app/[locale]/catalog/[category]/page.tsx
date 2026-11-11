@@ -21,19 +21,22 @@ export async function generateMetadata({
   params,
 }: PageProps<'/[locale]/catalog/[category]'>): Promise<Metadata> {
   const { locale, category: slug } = await params;
-  const category = await getCatalogCategory(slug);
+  const category = isLocale(locale) ? await getCatalogCategory(slug, locale) : null;
   return isLocale(locale) && category
     ? buildCatalogCategoryMetadata(locale, {
         slug: category.node.slug,
-        name: category.node.name[locale],
+        name: category.name,
+        seo: category.seo,
+        textLocale: category.textLocale,
       })
     : {};
 }
 
 export default async function Page({ params }: PageProps<'/[locale]/catalog/[category]'>) {
   const { locale, category: slug } = await params;
-  const category = await getCatalogCategory(slug);
-  if (!isLocale(locale) || !category) notFound();
+  if (!isLocale(locale)) notFound();
+  const category = await getCatalogCategory(slug, locale);
+  if (!category) notFound();
 
   return <CatalogCategoryPage locale={locale} category={category} />;
 }

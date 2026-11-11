@@ -22,12 +22,19 @@ export type CatalogFabric = {
   prices: CatalogPriceTiers | null;
 };
 
+/** A category of a product with its top-level category, in the language of the page. */
+export type CatalogProductCategory = {
+  slug: string;
+  name: string;
+  parent: { slug: string; name: string } | null;
+};
+
 /** A product page in the language of the page. */
 export type CatalogProduct = {
   slug: string;
   type: CatalogProductType;
-  /** Section of the Admin the product is in; `null` when it has none. */
-  sectionId: number | null;
+  /** Site categories the product is in, in menu order; empty when staff put it in none. */
+  categories: readonly CatalogProductCategory[];
   /** Model or article number the manager knows the product by. */
   model: string | null;
   name: string;
@@ -48,7 +55,7 @@ export type CatalogProduct = {
   fabrics: readonly CatalogFabric[];
 };
 
-/** An address for the sitemap. */
+/** An address of a product or of a category for the sitemap. */
 export type CatalogProductAddress = {
   slug: string;
   updatedAt: string;
