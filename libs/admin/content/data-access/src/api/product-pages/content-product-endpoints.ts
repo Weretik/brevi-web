@@ -30,7 +30,7 @@ type ImportBody =
 export function contentProductEndpoints(build: ContentEndpointBuilder) {
   return {
     getContentProducts: build.query<ContentProductPage, ContentProductQuery>({
-      query: ({ page, pageSize, search, type, site }) => ({
+      query: ({ page, pageSize, search, type, site, category }) => ({
         url: '/api/content/products',
         params: {
           page,
@@ -38,6 +38,7 @@ export function contentProductEndpoints(build: ContentEndpointBuilder) {
           search: search || undefined,
           type: type ?? undefined,
           onSite: site === 'all' ? undefined : site === 'onSite',
+          categoryId: category ?? undefined,
         },
       }),
       transformResponse: mapContentProductPage,

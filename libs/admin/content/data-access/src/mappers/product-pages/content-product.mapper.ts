@@ -43,6 +43,11 @@ export function mapContentProductRow(value: unknown): ContentProductRow {
     hasSeo: flag(row['hasSeo'], 'SEO'),
     updatedAtUtc: nullableDateTime(row['updatedAtUtc'], 'час зміни'),
     categoryCount: integer(row['categoryCount'], 'кількість розділів'),
+    // A server without the list yet sends no categoryIds; the row then names no category.
+    categoryIds:
+      row['categoryIds'] === undefined
+        ? []
+        : list(row['categoryIds'], 'розділи сайту').map((id) => integer(id, 'id розділу', 1)),
   };
 }
 

@@ -35,6 +35,7 @@ const complete = {
   hasSeo: true,
   updatedAtUtc: '2026-11-11T08:00:00Z',
   categoryCount: 1,
+  categoryIds: [2],
 };
 const hidden = {
   ...complete,
@@ -187,6 +188,33 @@ describe('ContentProductsContent', () => {
     expect(fixture.queries).toContainEqual(
       expect.objectContaining({ site: 'onSite', type: 'Ppe', pageSize: 50 }),
     );
+  });
+
+  it('filters by site category and names the categories of each row', async () => {
+    const router = renderPage();
+
+    const table = screen.getByRole('table', { name: 'Товари сайту' });
+    const row = within(table).getByText('Костюм Лідер').closest('tr')!;
+    expect(within(row).getByText('Сайт: Спецодяг → Костюми')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('combobox', { name: 'Розділ сайту' }));
+    await userEvent.click(screen.getByRole('option', { name: 'Спецодяг → Куртки' }));
+    expect(router.state.location.search).toBe('?category=3');
+    expect(fixture.queries).toContainEqual(
+      expect.objectContaining({ category: 3, site: 'all', pageSize: 50 }),
+    );
+
+    await userEvent.click(screen.getByRole('combobox', { name: 'Розділ сайту' }));
+    await userEvent.click(screen.getByRole('option', { name: 'Без розділу сайту' }));
+    expect(router.state.location.search).toBe('?category=0');
+    expect(fixture.queries.at(-1)).toMatchObject({ category: 0 });
+  });
+
+  it('hides the site-category filter without the right to see categories', () => {
+    fixture.categories = false;
+    renderPage();
+
+    expect(screen.queryByRole('combobox', { name: 'Розділ сайту' })).not.toBeInTheDocument();
   });
 
   it('switches «На сайті» from the list and warns about an inactive product', async () => {

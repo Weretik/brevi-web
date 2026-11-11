@@ -2,6 +2,7 @@ import {
   contentProductPageSizes,
   contentProductProblems,
   contentProductTypeLabel,
+  siteCategoryPath,
 } from '@admin/content/model';
 import ImageNotSupportedOutlinedIcon from '@mui/icons-material/ImageNotSupportedOutlined';
 import {
@@ -19,10 +20,12 @@ import {
   Typography,
 } from '@mui/material';
 
-import type { ContentProductPage, ContentProductRow } from '@admin/content/model';
+import type { ContentProductPage, ContentProductRow, SiteCategoryRow } from '@admin/content/model';
 
 interface Props {
   page: ContentProductPage | undefined;
+  /** «Розділи сайту», to name the categories of each row; null without the right to see them. */
+  categories?: readonly SiteCategoryRow[] | null;
   loading: boolean;
   /** Search or a filter is on: an empty page means «nothing found». */
   narrowed: boolean;
@@ -59,12 +62,22 @@ function Photo({ url }: { url: string | null }) {
   );
 }
 
+/** The site categories of a row, or null when it is in none or they cannot be named. */
+function siteCategories(row: ContentProductRow, categories: readonly SiteCategoryRow[] | null) {
+  if (!categories || row.categoryIds.length === 0) return null;
+  const names = categories
+    .filter((category) => row.categoryIds.includes(category.id))
+    .map((category) => siteCategoryPath(category, categories));
+  return names.length > 0 ? names.join(', ') : null;
+}
+
 /**
  * «Контент → Товари»: every product of «Товари» with the «На сайті» switch and what its page still
  * misses. Only problems are marked; a row opens the side panel.
  */
 export function ContentProductsTable({
   page,
+  categories = null,
   loading,
   narrowed,
   unavailable,
@@ -122,6 +135,7 @@ export function ContentProductsTable({
             ) : (
               items.map((row) => {
                 const problems = contentProductProblems(row);
+                const inSite = siteCategories(row, categories);
                 return (
                   <TableRow
                     key={row.productId}
@@ -153,6 +167,15 @@ export function ContentProductsTable({
                       <Typography variant="caption" color="text.secondary">
                         {contentProductTypeLabel(row.type)}
                       </Typography>
+                      {inSite && (
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ display: 'block' }}
+                        >
+                          Сайт: {inSite}
+                        </Typography>
+                      )}
                     </TableCell>
                     <TableCell sx={{ maxWidth: 320 }}>
                       {problems.length > 0 && (
