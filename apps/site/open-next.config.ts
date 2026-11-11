@@ -13,7 +13,7 @@ const config = defineCloudflareConfig({
   queue: memoryQueue,
 });
 
-// apps/site has no package.json: OpenNext starts in the workspace root, and next.config.ts must be loaded from its own folder.
+// apps/site has no package.json: OpenNext starts in the workspace root, and next.config.mjs must be loaded from its own folder.
 config.buildCommand = 'cd apps/site && npx next build';
 
 export default config;

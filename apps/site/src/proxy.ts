@@ -14,7 +14,7 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   // Static literal required by Next.js: keep the locale list in sync with LOCALES in @site/core/i18n.
-  // Skips locale paths, the root (redirected in next.config.ts), route handlers under /api/, Next.js internals,
+  // Skips locale paths, the root (redirected in next.config.mjs), route handlers under /api/, Next.js internals,
   // and files with an extension.
   matcher: ['/((?!uk(?:/|$)|ru(?:/|$)|api/|_next/|.*\\..*).+)'],
 };

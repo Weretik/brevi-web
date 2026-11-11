@@ -30,7 +30,7 @@ flowchart LR
 
 ```text
 apps/site/
-├── next.config.ts            # / -> /uk, global 404, workspace root
+├── next.config.mjs            # / -> /uk, global 404, workspace root
 └── src/
     ├── proxy.ts              # 404 for paths without a locale
     └── app/
