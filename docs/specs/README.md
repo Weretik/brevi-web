@@ -56,6 +56,7 @@ The Storefront currently has README files for its Nx feature libraries, but they
 - [Admin React: «Склад тканин» stage 2, ledger rules, «Рух тканини», «Залишки» and «Початкові залишки»](admin/warehouse/001-ledger-pages/README.md) — implemented 2026-11-11.
 - [Admin React: «Склад тканин» stage 3, edit, void and restore of movements](admin/warehouse/002-movement-revisions/README.md) — implemented 2026-11-11.
 - [Admin React: «Склад тканин» stage 4, issuing fabric by actual cutting](admin/warehouse/003-issue-by-cutting/README.md) — implemented 2026-11-11.
+- [Admin React: «Склад тканин» stage 5, the four reports](admin/warehouse/004-reports/README.md) — implemented 2026-11-11.
 - [Admin React: «Контент → Товари», site pages of products](admin/content/001-product-pages/README.md) — implemented and locally verified 2026-11-11.
 - [Admin React: «Контент → Розділи», categories of the site catalog](admin/content/002-site-categories/README.md) — implemented and locally verified 2026-11-11.
 - [Admin React: «Контент → Статті», articles of the site](admin/content/003-articles/README.md) — implemented and locally verified 2026-11-11.

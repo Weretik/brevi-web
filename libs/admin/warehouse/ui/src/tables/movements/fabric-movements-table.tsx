@@ -3,6 +3,7 @@ import {
   formatDay,
   formatKyivTime,
   formatMeters,
+  formatPerProduct,
   movementTarget,
 } from '@admin/warehouse/model';
 import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
@@ -77,6 +78,7 @@ export function FabricMovementsTable({
             <TableCell>Замовлення / куди</TableCell>
             <TableCell align="right">Прихід</TableCell>
             <TableCell align="right">Витрата</TableCell>
+            <TableCell align="right">На 1 виріб</TableCell>
             <TableCell align="right">Залишок рядка</TableCell>
             {actions && <TableCell aria-label="Дії" />}
           </TableRow>
@@ -149,6 +151,9 @@ export function FabricMovementsTable({
                 </TableCell>
                 <TableCell align="right" sx={{ ...mono, ...struck }}>
                   {row.delta < 0 ? formatMeters(-row.delta) : ''}
+                </TableCell>
+                <TableCell align="right" sx={mono}>
+                  {row.perProduct === null ? '—' : formatPerProduct(row.perProduct)}
                 </TableCell>
                 <TableCell
                   align="right"

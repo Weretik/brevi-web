@@ -101,6 +101,7 @@ export function mapFabricMovementRow(value: unknown): FabricMovementRow {
     destination: nullableText(row['destination'], 'куди використано'),
     delta: decimal(row['delta'], 'зміна'),
     metersAfter: decimal(row['metersAfter'], 'залишок рядка'),
+    perProduct: nullableNumber(row['perProduct'], 'на 1 виріб'),
     note: nullableText(row['note'], 'примітка'),
     createdByName: nonEmptyText(row['createdByName'], 'хто записав'),
     isReversed: boolean(row['isReversed'], 'сторновано'),
