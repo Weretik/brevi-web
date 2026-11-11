@@ -1,5 +1,6 @@
 import { Box, Stack, Tab, Tabs, Typography } from '@mui/material';
 
+import { AccountingDesk } from '../components/desks/accounting-desk';
 import { SalesDesk } from '../components/desks/sales-desk';
 import { SeoDesk } from '../components/desks/seo-desk';
 import { WorkshopDesk } from '../components/desks/workshop-desk';
@@ -62,6 +63,7 @@ export default function DashboardPage({ useViewer }: DashboardPageProps) {
           {current.key === 'workshop' && <WorkshopDesk viewer={viewer} />}
           {current.key === 'sales' && <SalesDesk today={today()} viewer={viewer} />}
           {current.key === 'seo' && <SeoDesk viewer={viewer} />}
+          {current.key === 'accounting' && <AccountingDesk today={today()} viewer={viewer} />}
         </Box>
       ) : (
         <Typography color="text.secondary">Оберіть розділ у меню ліворуч.</Typography>
