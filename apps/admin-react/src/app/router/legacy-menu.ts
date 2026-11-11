@@ -3,6 +3,7 @@ import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import ContentCutOutlinedIcon from '@mui/icons-material/ContentCutOutlined';
 import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
 import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
+import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined';
 import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
 import NotificationsActiveOutlinedIcon from '@mui/icons-material/NotificationsActiveOutlined';
@@ -67,12 +68,6 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         access: 'production-orders',
       },
       {
-        id: 'fabric-stock',
-        label: 'Склад тканин',
-        path: '/production/fabric-stock',
-        access: 'fabric-stock',
-      },
-      {
         id: 'work-log',
         label: 'Журнал робіт',
         path: '/production/work',
@@ -129,6 +124,32 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
       },
       { id: 'embroidery', label: 'Вишивка' },
       { id: 'cashbox', label: 'Каса цеху' },
+    ],
+  },
+  {
+    // Own module Warehouse (WH-001); pages without a path come in the next stages of the warehouse plan.
+    id: 'fabric-warehouse',
+    icon: Inventory2OutlinedIcon,
+    section: 'Робота',
+    label: 'Склад тканин',
+    items: [
+      { id: 'fabric-movements', label: 'Рух тканини', access: 'fabric-stock' },
+      {
+        id: 'fabric-stock',
+        label: 'Залишки',
+        path: '/warehouse/stock',
+        access: 'fabric-stock',
+      },
+      { id: 'fabric-opening', label: 'Початкові залишки', access: 'fabric-stock' },
+      { id: 'fabric-plan-fact', label: 'План і факт', access: 'fabric-stock' },
+      { id: 'fabric-booking', label: 'Бронь і що замовити', access: 'fabric-stock' },
+      {
+        id: 'fabric-valuation',
+        label: 'Вартість складу',
+        access: 'fabric-stock',
+        requiredRoles: admin,
+      },
+      { id: 'hardware-to-order', label: 'Фурнітура до замовлення', access: 'fabric-stock' },
     ],
   },
   {

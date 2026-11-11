@@ -4088,7 +4088,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/production/fabric-stock': {
+  '/api/warehouse/fabric-stock': {
     parameters: {
       query?: never;
       header?: never;
@@ -4105,7 +4105,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/production/fabric-stock/choices': {
+  '/api/warehouse/fabric-stock/choices': {
     parameters: {
       query?: never;
       header?: never;
@@ -4122,7 +4122,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/production/fabric-stock/{id}': {
+  '/api/warehouse/fabric-stock/{id}': {
     parameters: {
       query?: never;
       header?: never;
@@ -4139,7 +4139,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/production/fabric-stock/movements': {
+  '/api/warehouse/fabric-stock/movements': {
     parameters: {
       query?: never;
       header?: never;
@@ -4156,7 +4156,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/production/fabric-stock/{id}/correction': {
+  '/api/warehouse/fabric-stock/{id}/correction': {
     parameters: {
       query?: never;
       header?: never;
@@ -4173,7 +4173,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/production/fabric-stock/{id}/movements/{movementId}/reverse': {
+  '/api/warehouse/fabric-stock/{id}/movements/{movementId}/reverse': {
     parameters: {
       query?: never;
       header?: never;
@@ -4190,7 +4190,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/production/fabric-stock/consumption': {
+  '/api/warehouse/fabric-stock/consumption': {
     parameters: {
       query?: never;
       header?: never;
@@ -4207,7 +4207,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/production/fabric-stock/import': {
+  '/api/warehouse/fabric-stock/import': {
     parameters: {
       query?: never;
       header?: never;
@@ -4224,7 +4224,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/production/orders/{id}/items/{itemId}/fabric': {
+  '/api/warehouse/orders/{id}/items/{itemId}/fabric': {
     parameters: {
       query?: never;
       header?: never;
@@ -4241,7 +4241,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/production/orders/{id}/items/{itemId}/fabric-issues': {
+  '/api/warehouse/orders/{id}/items/{itemId}/fabric-issues': {
     parameters: {
       query?: never;
       header?: never;
@@ -4258,7 +4258,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/production/orders/{id}/fabric-issues/{issueId}/reverse': {
+  '/api/warehouse/orders/{id}/fabric-issues/{issueId}/reverse': {
     parameters: {
       query?: never;
       header?: never;
