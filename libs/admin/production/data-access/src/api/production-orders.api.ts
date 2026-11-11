@@ -73,6 +73,7 @@ function listParams(query: ProductionOrderListQuery) {
     ...filterParams(query),
     ...(query.customerId ? { customerId: query.customerId } : {}),
     ...(query.quoteId ? { quoteId: query.quoteId } : {}),
+    ...(query.managerUserId ? { managerUserId: query.managerUserId } : {}),
   };
 }
 

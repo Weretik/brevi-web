@@ -25868,6 +25868,8 @@ export interface operations {
         season?: string;
         /** @description «№», «Готово до» (the nearest item due date; orders without one last) or «Створено»; a leading «-» sorts from the largest. */
         sort?: 'number' | '-number' | 'due' | '-due' | 'created' | '-created';
+        /** @description Only orders of this manager (the КП responsible); «Робочий стіл менеджера» (DESK-001). */
+        managerUserId?: number;
         page?: number;
         pageSize?: number;
       };

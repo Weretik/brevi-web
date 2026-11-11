@@ -5,10 +5,9 @@ import { Alert, Box, Stack, Typography } from '@mui/material';
 
 import { workshopMetrics, workshopStages, weekHours } from '../../model/dashboard-view';
 import { fabricShortages, hardwareToOrder } from '../../model/stock-shortages';
+import { DeskListCard } from '../desk-list/desk-list-card';
 import { MetricStrip } from '../metrics/metric-strip';
 import { WeekHoursCard } from '../side-cards/week-hours-card';
-import { FabricShortageCard } from '../stock/fabric-shortage-card';
-import { HardwareOrderCard } from '../stock/hardware-order-card';
 import { WorkshopBoard } from '../workshop-board/workshop-board';
 
 import type { DashboardViewer } from '../../model/dashboard-view';
@@ -35,8 +34,26 @@ export function WorkshopDesk({ viewer }: WorkshopDeskProps) {
   const toOrder = hardware.data ? hardwareToOrder(hardware.data) : null;
   const sideCards = [
     hours && <WeekHoursCard key="hours" rows={weekHours(hours)} />,
-    shortages && shortages.rows.length > 0 && <FabricShortageCard key="fabric" list={shortages} />,
-    toOrder && toOrder.rows.length > 0 && <HardwareOrderCard key="hardware" list={toOrder} />,
+    shortages && shortages.rows.length > 0 && (
+      <DeskListCard
+        id="fabric-shortage"
+        key="fabric"
+        link={{ label: 'Бронь і що замовити', to: '/warehouse/booking' }}
+        list={shortages}
+        moreText={(more) => `І ще ${more} — у звіті «Бронь і що замовити».`}
+        title="Не вистачає тканини"
+      />
+    ),
+    toOrder && toOrder.rows.length > 0 && (
+      <DeskListCard
+        id="hardware-order"
+        key="hardware"
+        link={{ label: 'Увесь список', to: '/warehouse/hardware' }}
+        list={toOrder}
+        moreText={(more) => `І ще ${more} — у звіті «Фурнітура до замовлення».`}
+        title="Фурнітура до замовлення"
+      />
+    ),
   ].filter(Boolean);
 
   if (!seesOrders && !seesBooking && !seesHardware) {

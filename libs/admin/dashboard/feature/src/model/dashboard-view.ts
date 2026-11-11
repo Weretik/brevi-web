@@ -5,6 +5,8 @@ import type { QuoteSummary } from '@admin/quotes/model';
 export interface DashboardViewer {
   /** View right on a page of «Права доступу», e.g. `desk-workshop` or `fabric-booking`. */
   canSee: (page: string) => boolean;
+  /** The signed-in person: «мої» КП, tasks and orders on the manager desk. */
+  userId: number | null;
 }
 
 export type StatusTone = 'success' | 'warning' | 'error' | 'info';
