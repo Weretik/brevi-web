@@ -18,6 +18,9 @@ const nextConfig: NextConfig = {
     globalNotFound: true,
     // The «Заявка» form takes a brief or a layout up to 10 MB; the default limit of a Server Action body is 1 MB.
     serverActions: { bodySizeLimit: '11mb' },
+    // The catalog loaders cache answers of the BreviERP API with 'use cache'. Cache Components stay off:
+    // their runtime prerender does not finish on Cloudflare Workers.
+    useCache: true,
   },
   async redirects() {
     return [{ source: '/', destination: '/uk', permanent: true }];

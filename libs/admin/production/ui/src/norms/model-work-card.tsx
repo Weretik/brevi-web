@@ -131,8 +131,8 @@ export function ModelWorkCard({
         sx={{
           display: 'grid',
           gap: 1.5,
-          gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, minmax(0, 1fr))' },
-          alignItems: 'start',
+          gridTemplateColumns: { xs: '1fr', md: 'repeat(3, minmax(0, 1fr))' },
+          alignItems: 'stretch',
         }}
       >
         {variants.map((variant) => (
@@ -162,51 +162,6 @@ export function ModelWorkCard({
             alignItems: 'start',
           }}
         >
-          <CompositionCard title="Підкладка, утеплювач, фліс" action={null}>
-            {composition.layers.length === 0 ? (
-              <Typography variant="body2" color="text.secondary" sx={{ px: 2, pb: 2 }}>
-                Немає: модель без підкладки та утеплення.
-              </Typography>
-            ) : (
-              <Table size="small" aria-label={`Підкладка і утеплювач: ${name}`}>
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={head}>Матеріал</TableCell>
-                    <TableCell sx={{ ...head, width: 110 }} align="right">
-                      На виріб
-                    </TableCell>
-                    {batchLabel && (
-                      <TableCell sx={{ ...head, width: 120 }} align="right">
-                        {batchLabel}
-                      </TableCell>
-                    )}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {composition.layers.map((layer, index) => (
-                    <TableRow key={`${layer.code ?? ''}-${index}`}>
-                      <TableCell>
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                          {layer.purpose}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {compositionMaterialText(layer)}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="right" sx={mono}>
-                        {quantity(layer.quantity, layer.unit)}
-                      </TableCell>
-                      {batchSize !== null && (
-                        <TableCell align="right" sx={{ ...mono, fontWeight: 600 }}>
-                          {quantity(forBatch(layer.quantity, batchSize), layer.unit)}
-                        </TableCell>
-                      )}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
-          </CompositionCard>
           <CompositionCard
             title={`Решта складу · ${rest.length}`}
             action={
@@ -255,6 +210,51 @@ export function ModelWorkCard({
                       {batchSize !== null && (
                         <TableCell align="right" sx={{ ...mono, fontWeight: 600 }}>
                           {quantity(forBatch(line.quantity, batchSize), line.unit)}
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CompositionCard>
+          <CompositionCard title="Підкладка, утеплювач, фліс" action={null}>
+            {composition.layers.length === 0 ? (
+              <Typography variant="body2" color="text.secondary" sx={{ px: 2, pb: 2 }}>
+                Немає: модель без підкладки та утеплення.
+              </Typography>
+            ) : (
+              <Table size="small" aria-label={`Підкладка і утеплювач: ${name}`}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={head}>Матеріал</TableCell>
+                    <TableCell sx={{ ...head, width: 110 }} align="right">
+                      На виріб
+                    </TableCell>
+                    {batchLabel && (
+                      <TableCell sx={{ ...head, width: 120 }} align="right">
+                        {batchLabel}
+                      </TableCell>
+                    )}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {composition.layers.map((layer, index) => (
+                    <TableRow key={`${layer.code ?? ''}-${index}`}>
+                      <TableCell>
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                          {layer.purpose}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {compositionMaterialText(layer)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="right" sx={mono}>
+                        {quantity(layer.quantity, layer.unit)}
+                      </TableCell>
+                      {batchSize !== null && (
+                        <TableCell align="right" sx={{ ...mono, fontWeight: 600 }}>
+                          {quantity(forBatch(layer.quantity, batchSize), layer.unit)}
                         </TableCell>
                       )}
                     </TableRow>

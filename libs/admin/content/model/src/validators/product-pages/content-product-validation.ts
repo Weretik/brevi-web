@@ -1,9 +1,5 @@
-import {
-  blocksFromText,
-  factsFromText,
-  specLinesWithoutValue,
-  specsFromText,
-} from '../../mappers/product-pages/content-text-markup';
+import { factsOf, specGroupsOf } from '../../forms/product-pages/content-product-form';
+import { blocksFromRichText } from '../../mappers/product-pages/content-rich-text';
 
 import type {
   ContentProductFormValues,
@@ -53,8 +49,10 @@ function validateText(values: ContentProductTextValues): ContentProductTextError
   if (values.seoDescription.trim().length > limits.seoDescription)
     errors.seoDescription = tooLong(limits.seoDescription);
 
-  const facts = factsFromText(values.summary);
-  if (facts.length > limits.facts) errors.summary = `Не більше ${limits.facts} рядків.`;
+  const facts = factsOf(values.summary);
+  if (values.summary.some((row) => row.label.trim() && !row.text.trim()))
+    errors.summary = 'Заповніть текст у рядку з назвою або видаліть рядок.';
+  else if (facts.length > limits.facts) errors.summary = `Не більше ${limits.facts} рядків.`;
   else if (
     facts.some(
       (fact) => (fact.label?.length ?? 0) > limits.factLabel || fact.text.length > limits.factText,
@@ -62,7 +60,7 @@ function validateText(values: ContentProductTextValues): ContentProductTextError
   )
     errors.summary = `Назва до ${limits.factLabel} символів, текст до ${limits.factText}.`;
 
-  const blocks = blocksFromText(values.description);
+  const blocks = blocksFromRichText(values.description);
   const length = blocks.reduce(
     (sum, block) =>
       sum +
@@ -74,9 +72,12 @@ function validateText(values: ContentProductTextValues): ContentProductTextError
   if (blocks.length > limits.blocks) errors.description = `Не більше ${limits.blocks} абзаців.`;
   else if (length > limits.description) errors.description = tooLong(limits.description);
 
-  const groups = specsFromText(values.specs);
-  const lost = specLinesWithoutValue(values.specs);
-  if (lost.length > 0) errors.specs = `Рядок «${lost[0]}» без двокрапки. Пишіть «Назва: значення».`;
+  const groups = specGroupsOf(values.specs);
+  const half = values.specs
+    .flatMap((group) => group.rows)
+    .find((row) => Boolean(row.name.trim()) !== Boolean(row.value.trim()));
+  if (half)
+    errors.specs = `У рядку «${(half.name || half.value).trim()}» заповніть і назву, і значення.`;
   else if (groups.length > limits.specGroups) errors.specs = `Не більше ${limits.specGroups} груп.`;
   else if (groups.some((group) => group.rows.length > limits.specRows))
     errors.specs = `Не більше ${limits.specRows} рядків у групі.`;

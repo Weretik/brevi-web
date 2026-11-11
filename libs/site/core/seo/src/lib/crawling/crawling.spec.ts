@@ -35,4 +35,13 @@ describe('sitemap entries', () => {
       'ru-UA': 'https://brevi.com.ua/ru',
     });
   });
+
+  it('lists only the language versions a page has', () => {
+    const entries = buildSitemapEntries([{ path: '/product/a', locales: ['uk'] }], production);
+
+    expect(entries.map((entry) => entry.url)).toEqual(['https://brevi.com.ua/uk/product/a']);
+    expect(entries[0]?.alternates?.languages).toEqual({
+      'uk-UA': 'https://brevi.com.ua/uk/product/a',
+    });
+  });
 });

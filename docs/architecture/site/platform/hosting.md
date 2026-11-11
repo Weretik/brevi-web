@@ -19,9 +19,19 @@ The public site runs on Cloudflare Workers through the OpenNext adapter (`@openn
 
 ## Cache
 
-Every page is prerendered at build time and nothing is revalidated, so the incremental cache is the read-only static-assets cache: prerendered pages are files under `.open-next/assets/cdn-cgi/_next_cache`, written by `preview` and `deploy`. It needs no KV namespace.
+The catalog comes from the BreviERP Admin and must refresh without a rebuild (owner decision 2026-11-11), so the cache is writable, as on the Kedr site:
 
-Before the first page that reads BreviERP data or revalidates ships, switch to a writable cache (Workers KV incremental and tag cache, as the Kedr site does) and keep Cache Components off: on the Kedr site its runtime prerender hung on Workers.
+| Part              | Override               | Binding             | KV namespace (created 2026-11-11)                     |
+| ----------------- | ---------------------- | ------------------- | ----------------------------------------------------- |
+| Incremental cache | `kv-incremental-cache` | `NEXT_INC_CACHE_KV` | `brevi-site-cache` `1ee61412f2994778b64f0105fe6a813b` |
+| Tag cache         | `kv-next-tag-cache`    | `NEXT_TAG_CACHE_KV` | `brevi-site-tags` `5740cb20ed0f4919bae73d034d937214`  |
+| Revalidation      | `memory-queue`         | —                   | —                                                     |
+
+- `deploy` writes the prerendered pages into `brevi-site-cache`, so the deploy token needs write access to Workers KV.
+- `next.config.ts` has `experimental.useCache: true`; loaders in `site-catalog-data-access` cache API answers with `'use cache'`, `cacheTag('catalog')`, and `cacheLife` (five minutes; one minute after a failed read). Every page includes the catalog menu, so every page is revalidated on that schedule.
+- Cache Components stay off: on the Kedr site their runtime prerender hung on Workers.
+- The build reads the API too. When it is unreachable during a build, the pages are built with an empty catalog and fill in on the first revalidation.
+- Rendering a page on demand may exceed the 10 ms CPU limit of the free Workers plan (error 1102); the fix is the Workers Paid plan.
 
 ## Images
 

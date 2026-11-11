@@ -41,16 +41,17 @@ Do not run `run-many`, full `npm run test:web`, coverage, production builds, or 
 
 ## Task routing
 
-| Task                                                          | Skill                                                    | Project documentation                                                     |
-| ------------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Specify new or changed behavior                               | `$frontend-feature-spec`                                 | [Readiness rules](docs/standards/shared/delivery-rules.md)                |
-| Implement an accepted specification                           | `$frontend-feature-delivery`                             | [Delivery rules](docs/standards/shared/delivery-rules.md)                 |
-| Implement with multiple agents at the user's explicit request | `$frontend-feature-orchestrator`                         | [Delivery rules](docs/standards/shared/delivery-rules.md)                 |
-| Architecture audit / systemic violations                      | `$frontend-code-audit` / `$frontend-remediation-plan`    | [Standards index](docs/standards/README.md)                               |
-| New Admin page, route or action (who may see or do it)        | —                                                        | [«Права доступу» in every feature](docs/standards/admin/access-rights.md) |
-| HTTP and API contracts                                        | `$frontend-api-contract-sync`                            | [Contract workflow](docs/architecture/api/contract-workflow.md)           |
-| Verify changes / hand off for review                          | `$frontend-change-verification` / `$frontend-pr-handoff` | [Testing rules](docs/standards/shared/testing-rules.md)                   |
-| Differences between code and documentation                    | `$frontend-docs-sync`                                    | [Documentation index](docs/README.md)                                     |
+| Task                                                          | Skill                                                    | Project documentation                                                                                               |
+| ------------------------------------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Specify new or changed behavior                               | `$frontend-feature-spec`                                 | [Readiness rules](docs/standards/shared/delivery-rules.md)                                                          |
+| Implement an accepted specification                           | `$frontend-feature-delivery`                             | [Delivery rules](docs/standards/shared/delivery-rules.md)                                                           |
+| Implement with multiple agents at the user's explicit request | `$frontend-feature-orchestrator`                         | [Delivery rules](docs/standards/shared/delivery-rules.md)                                                           |
+| Architecture audit / systemic violations                      | `$frontend-code-audit` / `$frontend-remediation-plan`    | [Standards index](docs/standards/README.md)                                                                         |
+| New Admin page, route or action (who may see or do it)        | —                                                        | [«Права доступу» in every feature](docs/standards/admin/access-rights.md)                                           |
+| Admin field with a text for the site                          | —                                                        | [Visual editor, no typed markup](docs/standards/admin/admin-ui.md#texts-for-the-site-visual-editor-no-typed-markup) |
+| HTTP and API contracts                                        | `$frontend-api-contract-sync`                            | [Contract workflow](docs/architecture/api/contract-workflow.md)                                                     |
+| Verify changes / hand off for review                          | `$frontend-change-verification` / `$frontend-pr-handoff` | [Testing rules](docs/standards/shared/testing-rules.md)                                                             |
+| Differences between code and documentation                    | `$frontend-docs-sync`                                    | [Documentation index](docs/README.md)                                                                               |
 
 ## Process priority
 

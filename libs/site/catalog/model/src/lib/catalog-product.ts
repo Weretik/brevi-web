@@ -1,28 +1,57 @@
 import type { CatalogTextBlock } from './catalog-category';
-import type { CatalogLocalized } from './catalog-tree';
+import type { CatalogProductType } from './catalog-tree';
 import type { Locale } from '@site/core/i18n';
 
-export type CatalogPhoto = { src: string; width: number; height: number };
+export type CatalogPhoto = { src: string };
 
-/** A titled group of characteristics, for example «Тканина» with its rows. */
+/** A titled group of characteristics, for example «Куртка» with its rows. */
 export type CatalogSpecGroup = {
-  title: string;
+  title: string | null;
   rows: readonly { name: string; value: string }[];
 };
 
-/** A product page. Prices are not part of the snapshot: a manager quotes them on request. */
+/** Prices in hryvnias by order size: 1–9, 10–40, and from 41 pieces. */
+export type CatalogPriceTiers = { retail: number; wholesale: number; largeWholesale: number };
+
+/** A fabric a sewing model is made of, with its own prices; `null` prices mean a manager quotes them. */
+export type CatalogFabric = {
+  sku: string;
+  name: string;
+  /** Composition and density in words. */
+  details: string | null;
+  prices: CatalogPriceTiers | null;
+};
+
+/** A product page in the language of the page. */
 export type CatalogProduct = {
   slug: string;
-  /** The deepest category that lists the product: the parent in the breadcrumbs. */
-  categorySlug: string;
+  type: CatalogProductType;
+  /** Section of the Admin the product is in; `null` when it has none. */
+  sectionId: number | null;
   /** Model or article number the manager knows the product by. */
   model: string | null;
-  name: CatalogLocalized;
-  seo: Record<Locale, { title: string; description: string }>;
-  /** Photos in `apps/site/public`, the main one first. */
+  name: string;
+  /** Language of the texts: a product without Russian texts shows the Ukrainian ones on the Russian page. */
+  textLocale: Locale;
+  seo: { title: string; description: string };
+  /** Photos on the media server, the main one first. */
   photos: readonly CatalogPhoto[];
-  /** Short facts next to the photo: who it is for, fabric, features, colors. */
-  summary: Record<Locale, readonly CatalogTextBlock[]>;
-  description: Record<Locale, readonly CatalogTextBlock[]>;
-  specs: Record<Locale, readonly CatalogSpecGroup[]>;
+  /** Short facts next to the photo: who it is for, season, features. */
+  summary: readonly CatalogTextBlock[];
+  description: readonly CatalogTextBlock[];
+  specs: readonly CatalogSpecGroup[];
+  /** The lowest price among the fabrics, or the price of a product without fabrics. */
+  priceFrom: number | null;
+  /** Prices of a product without fabrics (protective equipment). */
+  prices: CatalogPriceTiers | null;
+  /** Fabrics of a sewing model; empty for protective equipment. */
+  fabrics: readonly CatalogFabric[];
+};
+
+/** An address for the sitemap. */
+export type CatalogProductAddress = {
+  slug: string;
+  updatedAt: string;
+  /** False when the Russian page shows the Ukrainian texts. */
+  hasRussian: boolean;
 };

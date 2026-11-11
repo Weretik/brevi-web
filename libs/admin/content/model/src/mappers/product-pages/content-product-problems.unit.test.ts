@@ -22,6 +22,7 @@ const row = (changes: Partial<ContentProductRow> = {}): ContentProductRow => ({
   hasRussianText: true,
   hasSeo: true,
   updatedAtUtc: null,
+  categoryCount: 2,
   ...changes,
 });
 
@@ -44,6 +45,7 @@ describe('contentProductProblems', () => {
           hasPrice: false,
           mainPhotoUrl: null,
           hasRussianText: false,
+          categoryCount: 0,
           hasSeo: false,
         }),
       ),
@@ -52,6 +54,7 @@ describe('contentProductProblems', () => {
       'Немає ціни',
       'Немає фото',
       'Немає опису російською',
+      'Немає розділу сайту',
       'Немає SEO',
     ]);
   });

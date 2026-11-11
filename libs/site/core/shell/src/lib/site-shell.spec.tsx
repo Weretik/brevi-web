@@ -1,14 +1,35 @@
-import { CATALOG_SECTIONS } from '@site/catalog/model';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 
 import { SiteShell } from './site-shell';
 
+import type { CatalogSection } from '@site/catalog/model';
+
 vi.mock('next/navigation', () => ({ usePathname: () => '/ru/contacts' }));
+
+const CATALOG_SECTIONS: CatalogSection[] = [
+  {
+    key: 'spetsodyah',
+    slug: 'spetsodyah',
+    label: { uk: 'Спецодяг власного пошиття', ru: 'Спецодежда собственного пошива' },
+    items: [
+      { key: 'kostyumy', slug: 'kostyumy', label: { uk: 'Костюми', ru: 'Костюми' } },
+      { key: 'kurtky', slug: 'kurtky', label: { uk: 'Куртки', ru: 'Куртки' } },
+    ],
+  },
+  {
+    key: 'zasoby-zakhystu',
+    slug: 'zasoby-zakhystu',
+    label: { uk: 'Засоби індивідуального захисту', ru: 'Средства индивидуальной защиты' },
+    items: [
+      { key: 'zakhyst-ruk', slug: 'zakhyst-ruk', label: { uk: 'Захист рук', ru: 'Захист рук' } },
+    ],
+  },
+];
 
 describe('SiteShell', () => {
   it('frames the page with the header menu, phones, and footer contacts', () => {
     render(
-      <SiteShell locale="ru">
+      <SiteShell locale="ru" catalogSections={CATALOG_SECTIONS}>
         <h1>Страница</h1>
       </SiteShell>,
     );
@@ -51,7 +72,11 @@ describe('SiteShell', () => {
   });
 
   it('marks the current page in the header menu', () => {
-    render(<SiteShell locale="ru">content</SiteShell>);
+    render(
+      <SiteShell locale="ru" catalogSections={CATALOG_SECTIONS}>
+        content
+      </SiteShell>,
+    );
 
     const nav = screen.getByRole('navigation', { name: 'Главное меню' });
     expect(within(nav).getByRole('link', { name: 'Контакты' }).getAttribute('aria-current')).toBe(
@@ -63,7 +88,11 @@ describe('SiteShell', () => {
   });
 
   it('keeps the request link out of search results', () => {
-    render(<SiteShell locale="uk">content</SiteShell>);
+    render(
+      <SiteShell locale="uk" catalogSections={CATALOG_SECTIONS}>
+        content
+      </SiteShell>,
+    );
 
     const request = within(screen.getByRole('banner')).getByRole('link', {
       name: 'Залишити заявку',
@@ -73,17 +102,21 @@ describe('SiteShell', () => {
   });
 
   it('keeps every catalog section in the HTML and shows one section at a time', () => {
-    render(<SiteShell locale="uk">content</SiteShell>);
+    render(
+      <SiteShell locale="uk" catalogSections={CATALOG_SECTIONS}>
+        content
+      </SiteShell>,
+    );
 
     const toggle = within(screen.getByRole('banner')).getByRole('button', { name: 'Каталог' });
     const panel = document.getElementById(toggle.getAttribute('aria-controls') ?? '');
     expect(panel?.hidden).toBe(true);
-    expect(panel?.querySelectorAll('a[href^="/uk/catalog/"]').length).toBeGreaterThan(30);
+    expect(panel?.querySelectorAll('a[href^="/uk/catalog/"]').length).toBe(5);
 
     fireEvent.click(toggle);
     expect(toggle.getAttribute('aria-expanded')).toBe('true');
     const menu = screen.getByRole('region', { name: 'Розділи каталогу' });
-    const [first, second] = CATALOG_SECTIONS.filter((section) => section.items.length > 0);
+    const [first, second] = CATALOG_SECTIONS;
     const firstItem = first.items[0];
     const secondItem = second.items[0];
     expect(within(menu).getByRole('link', { name: firstItem.label.uk }).getAttribute('href')).toBe(
@@ -104,8 +137,31 @@ describe('SiteShell', () => {
     expect(toggle.getAttribute('aria-expanded')).toBe('false');
   });
 
+  it('keeps the catalog entry when the catalog is empty', () => {
+    render(
+      <SiteShell locale="uk" catalogSections={[]}>
+        content
+      </SiteShell>,
+    );
+
+    fireEvent.click(within(screen.getByRole('banner')).getByRole('button', { name: 'Каталог' }));
+    const menu = screen.getByRole('region', { name: 'Розділи каталогу' });
+    expect(within(menu).getByRole('link', { name: 'Весь каталог' }).getAttribute('href')).toBe(
+      '/uk/catalog',
+    );
+    expect(
+      within(screen.getByRole('contentinfo'))
+        .getByRole('link', { name: 'Весь каталог' })
+        .getAttribute('href'),
+    ).toBe('/uk/catalog');
+  });
+
   it('shows the phone in the menu row once the page is scrolled', () => {
-    render(<SiteShell locale="uk">content</SiteShell>);
+    render(
+      <SiteShell locale="uk" catalogSections={CATALOG_SECTIONS}>
+        content
+      </SiteShell>,
+    );
     const header = screen.getByRole('banner');
     expect(within(header).getAllByRole('link', { name: /050 469 86 75/ })).toHaveLength(1);
     expect(within(header).getByText('Від 5 одиниць · Працюємо з ПДВ')).toBeTruthy();
@@ -117,7 +173,11 @@ describe('SiteShell', () => {
   });
 
   it('gives phones a bottom bar with the catalog, the request, the call, and the menu', () => {
-    render(<SiteShell locale="uk">content</SiteShell>);
+    render(
+      <SiteShell locale="uk" catalogSections={CATALOG_SECTIONS}>
+        content
+      </SiteShell>,
+    );
 
     const bar = screen.getByRole('navigation', { name: 'Швидкі дії' });
     expect(within(bar).getByRole('link', { name: 'Заявка' }).getAttribute('href')).toBe(
@@ -146,7 +206,11 @@ describe('SiteShell', () => {
   });
 
   it('switches the language on the same page', () => {
-    render(<SiteShell locale="ru">content</SiteShell>);
+    render(
+      <SiteShell locale="ru" catalogSections={CATALOG_SECTIONS}>
+        content
+      </SiteShell>,
+    );
 
     // The toggle is in the contacts row on phones and in the menu row on wide screens.
     const [languages] = screen.getAllByRole('navigation', { name: 'Язык сайта' });

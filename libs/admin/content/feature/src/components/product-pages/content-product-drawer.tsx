@@ -1,3 +1,4 @@
+import { useGetSiteCategoriesQuery } from '@admin/content/data-access';
 import {
   ContentProductDeleteDialog,
   ContentProductForm,
@@ -20,7 +21,9 @@ interface Props {
 
 /** A product of «Контент → Товари» in the «Цех» side panel: view, then «Редагувати». */
 export function ContentProductDrawer({ row, viewer, onClose, onDone }: Props) {
-  const editor = useContentProductEditor(row.productId, onDone);
+  // Without the right to see «Розділи сайту» the list does not load: categories stay as they are.
+  const categories = useGetSiteCategoriesQuery().currentData ?? null;
+  const editor = useContentProductEditor(row.productId, categories !== null, onDone);
   const readOnly = editor.mode === 'view';
   const product = editor.product;
 
@@ -61,10 +64,11 @@ export function ContentProductDrawer({ row, viewer, onClose, onDone }: Props) {
                 values={editor.values}
                 errors={editor.errors}
                 disabled={editor.saving}
+                categories={categories}
                 onChange={editor.change}
               />
             ) : (
-              <ContentProductView product={product} />
+              <ContentProductView product={product} categories={categories} />
             ))}
         </Stack>
       </ReferenceEditorDrawer>

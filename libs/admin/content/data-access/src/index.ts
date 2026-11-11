@@ -6,4 +6,11 @@ export {
   useSetContentProductVisibilityMutation,
   useDeleteContentProductMutation,
   useImportOldSiteProductPagesMutation,
+  useGetSiteCategoriesQuery,
+  useGetSiteCategoryQuery,
+  useSaveSiteCategoryMutation,
+  useSetSiteCategoryVisibilityMutation,
+  useReorderSiteCategoriesMutation,
+  useDeleteSiteCategoryMutation,
+  useImportOldSiteCategoriesMutation,
 } from './api/content.api';

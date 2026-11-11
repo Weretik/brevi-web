@@ -5,6 +5,7 @@ import {
   isValidContentSlug,
   validateContentProduct,
 } from './content-product-validation';
+import { emptyRichText } from '../../mappers/product-pages/content-rich-text';
 
 import type { ContentProductFormValues } from '../../forms/product-pages/content-product-form';
 
@@ -12,9 +13,9 @@ const empty = {
   name: '',
   seoTitle: '',
   seoDescription: '',
-  summary: '',
-  description: '',
-  specs: '',
+  summary: [],
+  description: emptyRichText,
+  specs: [],
 };
 const values = (changes: Partial<ContentProductFormValues> = {}): ContentProductFormValues => ({
   slug: 'kostyum-lider',
@@ -45,13 +46,19 @@ describe('content product validation', () => {
     const errors = validateContentProduct(
       values({
         slug: 'Костюм',
-        uk: { ...empty, seoTitle: 'а'.repeat(201), specs: 'рядок без значення' },
+        uk: {
+          ...empty,
+          seoTitle: 'а'.repeat(201),
+          summary: [{ label: 'Сезон', text: '' }],
+          specs: [{ title: 'Куртка', rows: [{ name: 'Застібка', value: '' }] }],
+        },
         ru: { ...empty, seoDescription: 'а'.repeat(321) },
       }),
     );
     expect(errors.slug).toBeDefined();
     expect(errors.uk?.seoTitle).toBe('Не більше 200 символів.');
-    expect(errors.uk?.specs).toContain('рядок без значення');
+    expect(errors.uk?.specs).toContain('Застібка');
+    expect(errors.uk?.summary).toBeDefined();
     expect(errors.ru?.seoDescription).toBe('Не більше 320 символів.');
     expect(errors.ru?.seoTitle).toBeUndefined();
   });

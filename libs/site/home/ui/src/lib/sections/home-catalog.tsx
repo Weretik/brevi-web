@@ -1,3 +1,4 @@
+import { cn } from '@site/shared/ui';
 import Link from 'next/link';
 
 import type { CatalogSection } from '@site/catalog/model';
@@ -14,7 +15,7 @@ export function HomeCatalog({
   categoryHref: (slug: string) => string;
 }) {
   return (
-    <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <ul className={cn('grid gap-4 sm:grid-cols-2', { 'lg:grid-cols-4': sections.length > 2 })}>
       {sections.map((section, index) => (
         <li key={section.key}>
           <Link

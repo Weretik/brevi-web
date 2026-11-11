@@ -1,6 +1,5 @@
 'use client';
 
-import { CATALOG_SECTIONS } from '@site/catalog/model';
 import { COMPANY } from '@site/core/config';
 import { catalogCategoryPath, localizedPath } from '@site/core/i18n';
 import {
@@ -24,6 +23,7 @@ import { CatalogSectionIcon } from '../header/catalog-section-icon';
 import { MAIN_NAV_LINKS, SHELL_PATHS } from '../navigation/site-navigation';
 
 import type { ShellDictionary } from '../i18n/shell-dictionary';
+import type { CatalogSection } from '@site/catalog/model';
 import type { Locale } from '@site/core/i18n';
 
 const ITEM =
@@ -33,9 +33,16 @@ const ITEM =
  * Phone and tablet bar fixed to the bottom of the screen: «Каталог», «Заявка», «Дзвінок», «Меню».
  * The catalog and the menu open in side sheets, which are rendered only while open.
  */
-export function MobileBar({ locale, dictionary }: { locale: Locale; dictionary: ShellDictionary }) {
+export function MobileBar({
+  locale,
+  dictionary,
+  catalogSections,
+}: {
+  locale: Locale;
+  dictionary: ShellDictionary;
+  catalogSections: readonly CatalogSection[];
+}) {
   const [phone] = COMPANY.phones;
-  // Category slugs arrive with the BreviERP category tree; until then every entry opens the catalog root.
   const catalogHref = localizedPath(locale, SHELL_PATHS.catalog);
 
   return (
@@ -54,7 +61,7 @@ export function MobileBar({ locale, dictionary }: { locale: Locale; dictionary: 
           </SheetTitle>
           <SheetDescription>{dictionary.catalogMenu}</SheetDescription>
           <ul>
-            {CATALOG_SECTIONS.map((section) => (
+            {catalogSections.map((section) => (
               <li key={section.key} className="border-b border-border">
                 <details className="group">
                   <summary className="flex cursor-pointer list-none items-center gap-3.5 px-5 py-3.5 font-bold group-open:bg-brand-surface [&::-webkit-details-marker]:hidden">

@@ -16,6 +16,11 @@
       "service": "brevi-site",
     },
   ],
+  // 'use cache' data and prerendered pages (open-next.config.ts); namespaces created in the dashboard 2026-11-11.
+  "kv_namespaces": [
+    { "binding": "NEXT_INC_CACHE_KV", "id": "1ee61412f2994778b64f0105fe6a813b" }, // brevi-site-cache
+    { "binding": "NEXT_TAG_CACHE_KV", "id": "5740cb20ed0f4919bae73d034d937214" }, // brevi-site-tags
+  ],
   // next/image optimization through Cloudflare Images (free tier: 5000 unique transformations a month).
   "images": {
     "binding": "IMAGES",

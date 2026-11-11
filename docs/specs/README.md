@@ -19,6 +19,7 @@ The Storefront currently has README files for its Nx feature libraries, but they
 - [Site Next.js: «Заявка» page (request form)](site/request/001-request/README.md) — page and form implemented 2026-11-10; delivery of requests postponed.
 - [Site Next.js: catalog, stage 1 (catalog root and category pages)](site/catalog/001-catalog/README.md) — implemented 2026-11-10 on a snapshot of the old site; product page is next.
 - [Site Next.js: catalog, stage 2 (product page)](site/catalog/002-product-page/README.md) — implemented 2026-11-11 on the snapshot of the old site, without prices.
+- [Site Next.js: catalog, stage 3 (products from the Admin)](site/catalog/003-catalog-from-admin/README.md) — implemented 2026-11-11: the catalog reads the BreviERP public API, shows prices, and refreshes without a rebuild.
 - [Site Next.js: «Договір» page (public offer)](site/agreement/001-agreement/README.md) — implemented and locally verified 2026-11-10.
 - [Site Next.js: header, menu, and footer redesign](site/shell/002-header-footer-redesign/README.md) — implemented 2026-11-10.
 - [Site Next.js: «Статті» pages](site/articles/001-articles/README.md) — implemented and locally verified 2026-11-10.
@@ -52,6 +53,7 @@ The Storefront currently has README files for its Nx feature libraries, but they
 - [Admin React: «Швейний цех» stage 7, «Звіти цеху» and the overview](admin/production/007-workshop-reports/README.md) — implemented 2026-11-05.
 - [Admin React: «Швейний цех» stage 8, «Архів цеху»](admin/production/008-workshop-archive/README.md) — implemented 2026-11-05.
 - [Admin React: «Контент → Товари», site pages of products](admin/content/001-product-pages/README.md) — implemented and locally verified 2026-11-11.
+- [Admin React: «Контент → Розділи», categories of the site catalog](admin/content/002-site-categories/README.md) — implemented and locally verified 2026-11-11.
 - [Admin React: photo library with folders](admin/media/001-photo-library/README.md) — implemented and locally verified 2026-11-03; replaces 007-media.
 - [Admin React: «КП» commercial proposals](admin/quotes/001-quotes/README.md) — stages 1–3 (list, «Товари та ціни» editor, «Налаштування КП», PDF, Gmail sending) implemented 2026-11-04; stages 4–6 planned.
 - [Admin React: manager tasks and the «Мої завдання» board](admin/tasks/001-manager-tasks/README.md) — implemented 2026-11-04.

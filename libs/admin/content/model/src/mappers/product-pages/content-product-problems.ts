@@ -12,6 +12,7 @@ export function contentProductProblems(row: ContentProductRow): string[] {
   if (!row.mainPhotoUrl) problems.push('Немає фото');
   if (!row.hasUkrainianText) problems.push('Немає опису українською');
   if (!row.hasRussianText) problems.push('Немає опису російською');
+  if (row.categoryCount === 0) problems.push('Немає розділу сайту');
   if (!row.hasSeo) problems.push('Немає SEO');
   return problems;
 }

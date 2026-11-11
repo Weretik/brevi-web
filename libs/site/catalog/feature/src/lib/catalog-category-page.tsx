@@ -1,11 +1,9 @@
 import { getCatalogCategoryProducts } from '@site/catalog/data-access';
-import { findCatalogPath } from '@site/catalog/model';
 import { buildCatalogItemListJsonLd } from '@site/catalog/seo';
 import {
   CatalogOrder,
   CatalogProductGrid,
   CatalogSubcategories,
-  CatalogText,
   formatModelCount,
   getCatalogDictionary,
 } from '@site/catalog/ui';
@@ -16,14 +14,14 @@ import {
   localizedPath,
 } from '@site/core/i18n';
 import { JsonLd, buildBreadcrumbJsonLd } from '@site/core/seo';
-import { PageHeader, PageSection } from '@site/shared/ui';
+import { PageHeader } from '@site/shared/ui';
 
 import type { CatalogCategory } from '@site/catalog/model';
 import type { Locale } from '@site/core/i18n';
 
 /**
- * Category page: breadcrumbs through the parent categories, subsections, every model of the category on one
- * page (the largest category has under a hundred), the client's text about the category, and the call to order.
+ * Category page: breadcrumbs through the product type, the sections of a type, every product of the category
+ * on one page with its lowest price, and the call to order. Texts about a category come with «Контент → Розділи».
  */
 export async function CatalogCategoryPage({
   locale,
@@ -33,19 +31,18 @@ export async function CatalogCategoryPage({
   category: CatalogCategory;
 }) {
   const dictionary = getCatalogDictionary(locale);
-  const products = await getCatalogCategoryProducts(category);
+  const products = await getCatalogCategoryProducts(category.node, locale);
   const path = (key: keyof typeof SITE_PATHS) => localizedPath(locale, SITE_PATHS[key]);
   const categoryHref = (slug: string) => localizedPath(locale, catalogCategoryPath(slug));
   const productHref = (slug: string) => localizedPath(locale, catalogProductPath(slug));
-  const trail = findCatalogPath(category.slug) ?? [];
-  const children = trail.at(-1)?.children ?? [];
+  const { node, trail } = category;
+  const children = node.children;
   const breadcrumbs = [
     { name: dictionary.home, href: localizedPath(locale) },
     { name: dictionary.catalog, href: path('catalog') },
     ...trail.map((node) => ({ name: node.name[locale], href: categoryHref(node.slug) })),
   ];
-  const text = category.text[locale];
-  const name = category.name[locale];
+  const name = node.name[locale];
 
   return (
     <div className="grid gap-10 pb-4 sm:gap-14">
@@ -67,28 +64,23 @@ export async function CatalogCategoryPage({
       </div>
 
       <section aria-label={dictionary.products.title}>
-        <CatalogProductGrid
-          locale={locale}
-          products={products}
-          dictionary={dictionary.products}
-          requestHref={path('request')}
-          productHref={productHref}
-        />
+        {products.length > 0 ? (
+          <CatalogProductGrid
+            products={products}
+            dictionary={dictionary.products}
+            requestHref={path('request')}
+            productHref={productHref}
+          />
+        ) : (
+          <p className="max-w-[48rem] leading-relaxed text-muted-foreground">
+            {dictionary.products.empty}
+          </p>
+        )}
       </section>
-
-      {text.length > 0 ? (
-        <PageSection
-          id="catalog-about"
-          title={name}
-          label={{ index: '02', text: dictionary.about.label }}
-        >
-          <CatalogText blocks={text} />
-        </PageSection>
-      ) : null}
 
       <CatalogOrder
         id="catalog-order"
-        index={text.length > 0 ? '03' : '02'}
+        index="02"
         dictionary={dictionary.order}
         requestHref={path('request')}
         logoHref={path('logoPrinting')}
@@ -98,7 +90,7 @@ export async function CatalogCategoryPage({
       <JsonLd
         data={buildCatalogItemListJsonLd(
           products.map((product) => ({
-            name: product.name[locale],
+            name: product.name,
             path: productHref(product.slug),
           })),
         )}

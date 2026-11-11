@@ -42,13 +42,13 @@ export {
   contentProductTypeLabel,
 } from './mappers/product-pages/content-product-problems';
 export {
-  blocksFromText,
-  blocksToText,
-  factsFromText,
-  factsToText,
-  specsFromText,
-  specsToText,
-} from './mappers/product-pages/content-text-markup';
+  blocksFromRichText,
+  blocksToRichText,
+  emptyRichText,
+  inlineRuns,
+  plainInline,
+} from './mappers/product-pages/content-rich-text';
+export type { ContentRichNode } from './mappers/product-pages/content-rich-text';
 export {
   contentLanguageLabel,
   contentProductFormOf,
@@ -56,6 +56,8 @@ export {
   contentProductTextInputOf,
 } from './forms/product-pages/content-product-form';
 export type {
+  ContentFactValues,
+  ContentSpecGroupValues,
   ContentProductFormValues,
   ContentProductInput,
   ContentProductTextInput,
@@ -71,3 +73,41 @@ export type {
   ContentProductErrors,
   ContentProductTextErrors,
 } from './validators/product-pages/content-product-validation';
+export type {
+  SiteCategoriesViewer,
+  SiteCategory,
+  SiteCategoryRow,
+  SiteCategoryText,
+  SiteCategoryVisibility,
+} from './entities/site-categories/site-category';
+export {
+  newSiteCategoryForm,
+  siteCategoryFormOf,
+  siteCategoryInputOf,
+} from './forms/site-categories/site-category-form';
+export type {
+  SiteCategoryFormValues,
+  SiteCategoryInput,
+  SiteCategoryTextInput,
+  SiteCategoryTextValues,
+} from './forms/site-categories/site-category-form';
+export {
+  filterSiteCategories,
+  moveSiteCategory,
+  siteCategoryName,
+  siteCategoryPath,
+  siteCategoryProblems,
+} from './mappers/site-categories/site-category-tree';
+export {
+  hasSiteCategoryErrors,
+  siteCategoryLimits,
+  validateSiteCategory,
+} from './validators/site-categories/site-category-validation';
+export type {
+  SiteCategoryErrors,
+  SiteCategoryTextErrors,
+} from './validators/site-categories/site-category-validation';
+export { siteCategoryImportMaxItems } from './entities/site-categories/site-category-import';
+export type { SiteCategoryImportReport } from './entities/site-categories/site-category-import';
+export { readSiteCategoryImportFile } from './mappers/site-categories/site-category-import-file';
+export type { SiteCategoryImportFile } from './mappers/site-categories/site-category-import-file';

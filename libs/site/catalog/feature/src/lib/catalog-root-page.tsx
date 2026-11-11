@@ -1,4 +1,4 @@
-import { CATALOG_TREE } from '@site/catalog/model';
+import { getCatalogTree } from '@site/catalog/data-access';
 import {
   CatalogOrder,
   CatalogSectionsGrid,
@@ -11,31 +11,43 @@ import { PageHeader } from '@site/shared/ui';
 
 import type { Locale } from '@site/core/i18n';
 
-/** Catalog root: every section with its subsections and the call to order. Static. */
-export function CatalogRootPage({ locale }: { locale: Locale }) {
+/**
+ * Catalog root: the two product types with their sections from the Admin, and the call to order. While the
+ * catalog is empty or unavailable the page keeps its heading and the call to order.
+ */
+export async function CatalogRootPage({ locale }: { locale: Locale }) {
+  const tree = await getCatalogTree();
   const dictionary = getCatalogDictionary(locale);
   const path = (key: keyof typeof SITE_PATHS) => localizedPath(locale, SITE_PATHS[key]);
   const breadcrumbs = [
     { name: dictionary.home, href: localizedPath(locale) },
     { name: dictionary.catalog, href: path('catalog') },
   ];
-  const total = CATALOG_TREE.reduce((sum, section) => sum + section.productCount, 0);
+  const total = tree.reduce((sum, section) => sum + section.productCount, 0);
 
   return (
     <div className="grid gap-10 pb-4 sm:gap-14">
       <PageHeader
         breadcrumbs={breadcrumbs}
         breadcrumbsLabel={dictionary.breadcrumbsLabel}
-        label={`${dictionary.label} · ${formatModelCount(locale, total)}`}
+        label={
+          total > 0 ? `${dictionary.label} · ${formatModelCount(locale, total)}` : dictionary.label
+        }
         title={dictionary.rootTitle}
         lead={dictionary.rootLead}
       />
-      <CatalogSectionsGrid
-        locale={locale}
-        sections={CATALOG_TREE}
-        label={dictionary.sectionsLabel}
-        categoryHref={(slug) => localizedPath(locale, catalogCategoryPath(slug))}
-      />
+      {tree.length > 0 ? (
+        <CatalogSectionsGrid
+          locale={locale}
+          sections={tree}
+          label={dictionary.sectionsLabel}
+          categoryHref={(slug) => localizedPath(locale, catalogCategoryPath(slug))}
+        />
+      ) : (
+        <p className="max-w-[48rem] leading-relaxed text-muted-foreground">
+          {dictionary.products.empty}
+        </p>
+      )}
       <CatalogOrder
         id="catalog-order"
         index="02"

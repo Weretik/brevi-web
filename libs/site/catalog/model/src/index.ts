@@ -1,6 +1,16 @@
 export type { CatalogCategory, CatalogProductCard, CatalogTextBlock } from './lib/catalog-category';
-export type { CatalogPhoto, CatalogProduct, CatalogSpecGroup } from './lib/catalog-product';
-export { CATALOG_SECTIONS } from './lib/catalog-sections';
+export type {
+  CatalogFabric,
+  CatalogPhoto,
+  CatalogPriceTiers,
+  CatalogProduct,
+  CatalogProductAddress,
+  CatalogSpecGroup,
+} from './lib/catalog-product';
+export { parseCatalogInline, plainCatalogText } from './lib/catalog-inline';
+export type { CatalogInlineRun } from './lib/catalog-inline';
+export { toCatalogSections } from './lib/catalog-sections';
 export type { CatalogSection } from './lib/catalog-sections';
-export { CATALOG_TREE, findCatalogPath, flattenCatalogTree } from './lib/catalog-tree';
-export type { CatalogLocalized, CatalogTreeNode } from './lib/catalog-tree';
+export { findCatalogPath, flattenCatalogTree } from './lib/catalog-tree';
+export type { CatalogLocalized, CatalogProductType, CatalogTreeNode } from './lib/catalog-tree';
+export { CATALOG_TYPES } from './lib/catalog-types';

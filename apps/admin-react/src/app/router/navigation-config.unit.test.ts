@@ -50,8 +50,8 @@ describe('legacy Admin navigation', () => {
       'Загальні звіти',
       'Адміністрування',
     ]);
-    expect(groups.map((group) => group.items.length)).toEqual([5, 13, 7, 4, 8, 1, 3, 1, 5]);
-    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(47);
+    expect(groups.map((group) => group.items.length)).toEqual([5, 13, 7, 4, 8, 1, 4, 1, 5]);
+    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(48);
     expect(groups[0].items.map((item) => item.id)).not.toContain('clients');
   });
   it('shows «Налаштування КП» only for the server Admin role', () => {
@@ -78,16 +78,19 @@ describe('legacy Admin navigation', () => {
     ).toBe(false);
   });
 
-  it('shows «Товари сайту» to roles that may see it', () => {
+  it('shows «Товари сайту» and «Розділи сайту» to roles that may see them', () => {
     const paths = new Set(adminRouteDefinitions.map((route) => route.path));
-    const item = (role: string) =>
+    const item = (role: string, id: string) =>
       createNavigation(paths, as(role))
         .find((group) => group.id === 'content')
-        ?.items.find((entry) => entry.id === 'site-products');
+        ?.items.find((entry) => entry.id === id);
 
-    expect(item('Admin')?.to).toBe('/content/products');
-    expect(item('Manager')?.to).toBe('/content/products');
-    expect(item('Accountant')).toBeUndefined();
+    expect(item('Admin', 'site-products')?.to).toBe('/content/products');
+    expect(item('Manager', 'site-products')?.to).toBe('/content/products');
+    expect(item('Accountant', 'site-products')).toBeUndefined();
+    expect(item('Admin', 'site-categories')?.to).toBe('/content/categories');
+    expect(item('Manager', 'site-categories')?.to).toBe('/content/categories');
+    expect(item('Accountant', 'site-categories')).toBeUndefined();
   });
 
   it('enables a legacy URL only when the React route is registered', () => {
