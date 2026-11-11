@@ -2500,6 +2500,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/crm/quotes/period': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description «КП за місяць» of «Робочий стіл» (DESK-001). КП created and sent in a Kyiv period, both days included, in total and per responsible person; a КП sent more than once counts once. By default the current Kyiv month up to today. A Manager counts only their own. */
+    get: operations['getCrmQuotePeriod'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/crm/quotes/{id}': {
     parameters: {
       query?: never;
@@ -9360,6 +9377,21 @@ export interface components {
       items: components['schemas']['CrmQuoteItem'][];
       /** @description Only a «КП для знайомства» has it; its items go page by page, 4 per page. */
       introduction?: components['schemas']['CrmQuoteIntroduction'] | null;
+    };
+    CrmQuotePeriodManager: {
+      manager: components['schemas']['CrmQuotePerson'];
+      created: number;
+      sent: number;
+    };
+    CrmQuotePeriod: {
+      /** Format: date */
+      from: string;
+      /** Format: date */
+      to: string;
+      created: number;
+      sent: number;
+      /** @description One line per responsible person, most КП first. */
+      managers: components['schemas']['CrmQuotePeriodManager'][];
     };
     CrmQuoteTierPrices: {
       /** @description 1–9 pcs. */
@@ -22966,6 +22998,44 @@ export interface operations {
         content?: never;
       };
       409: components['responses']['Conflict'];
+    };
+  };
+  getCrmQuotePeriod: {
+    parameters: {
+      query?: {
+        from?: string;
+        to?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The period. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmQuotePeriod'];
+        };
+      };
+      400: components['responses']['Invalid'];
+      /** @description Authentication required. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Admin or Manager role and a numeric actor claim required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
     };
   };
   getCrmQuote: {

@@ -5,6 +5,7 @@ export {
   useDeleteQuoteMutation,
   useGetQuoteHistoryQuery,
   useGetQuoteLegacyArchiveQuery,
+  useGetQuotePeriodQuery,
   useGetQuoteQuery,
   useLazyGetQuoteQuery,
   useListQuotesQuery,

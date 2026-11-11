@@ -5,6 +5,7 @@ import {
   mapQuote,
   mapQuoteEvent,
   mapQuotePage,
+  mapQuotePeriod,
   mapQuoteRepriceReport,
 } from '../mappers/quote.mapper';
 
@@ -16,6 +17,7 @@ import type {
   QuoteLegacyArchivePurge,
   QuoteListQuery,
   QuotePage,
+  QuotePeriod,
   QuoteRepriceReport,
 } from '@admin/quotes/model';
 import type { components } from '@admin/shared/contracts';
@@ -39,6 +41,13 @@ export const quotesApi = quotesBaseApi.injectEndpoints({
         },
       }),
       transformResponse: mapQuotePage,
+      transformErrorResponse: errors,
+      providesTags: list,
+    }),
+    /** «КП за місяць»: `from`/`to` are Kyiv days; without them the current month. */
+    getQuotePeriod: build.query<QuotePeriod, { from?: string; to?: string }>({
+      query: ({ from, to }) => ({ url: '/api/crm/quotes/period', params: { from, to } }),
+      transformResponse: mapQuotePeriod,
       transformErrorResponse: errors,
       providesTags: list,
     }),
@@ -140,6 +149,7 @@ export const quotesApi = quotesBaseApi.injectEndpoints({
 export const {
   useAddQuoteEmbroideryMutation,
   useListQuotesQuery,
+  useGetQuotePeriodQuery,
   useGetQuoteQuery,
   useLazyGetQuoteQuery,
   useCreateQuoteMutation,

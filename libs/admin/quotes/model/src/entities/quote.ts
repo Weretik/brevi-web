@@ -116,6 +116,15 @@ export interface QuoteSummary {
   readonly version: number;
 }
 
+/** «КП за місяць» of «Робочий стіл»: КП created and sent in a Kyiv period, per responsible person too. */
+export interface QuotePeriod {
+  readonly from: string;
+  readonly to: string;
+  readonly created: number;
+  readonly sent: number;
+  readonly managers: readonly { manager: QuotePerson; created: number; sent: number }[];
+}
+
 export interface QuotePage {
   readonly items: readonly QuoteSummary[];
   readonly page: number;
