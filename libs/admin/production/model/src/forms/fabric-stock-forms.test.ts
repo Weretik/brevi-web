@@ -2,36 +2,14 @@ import { describe, expect, it } from 'vitest';
 
 import {
   createFabricIssueValues,
-  createFabricReceiptValues,
   fabricIssueBody,
   hasFabricIssueErrors,
   parseStockMeters,
   stockColorKey,
-  validateFabricCorrection,
   validateFabricIssue,
-  validateFabricReceipt,
 } from './fabric-stock-forms';
-import { fabricStockCsv } from '../queries/fabric-stock-csv';
-import { countFabricStock, fabricStockProblem } from '../queries/fabric-stock-filters';
-import { parseFabricStockImportFile } from '../validators/fabric-stock-import-file';
 
-import type { FabricStockRow, ProductionItemFabric } from '../entities/fabric-stock';
-
-const row = (patch: Partial<FabricStockRow>): FabricStockRow => ({
-  id: 1,
-  fabricId: 4,
-  fabricCode: 'FAB-1',
-  fabricName: 'Оксфорд',
-  color: 'Чорний',
-  meters: 10,
-  reserved: 0,
-  available: 10,
-  price: 100,
-  value: 1000,
-  version: 1,
-  updatedAt: null,
-  ...patch,
-});
+import type { ProductionItemFabric } from '../entities/fabric-stock';
 
 const fabric: ProductionItemFabric = {
   orderId: 5,
@@ -80,27 +58,6 @@ describe('fabric stock forms', () => {
     expect(stockColorKey('  Темно   Синій ')).toBe('темно синій');
   });
 
-  it('needs a fabric, a colour and positive metres for a receipt', () => {
-    const values = createFabricReceiptValues('2026-11-04', null);
-    expect(Object.keys(validateFabricReceipt(values)).sort()).toEqual([
-      'color',
-      'fabricId',
-      'meters',
-    ]);
-    expect(
-      validateFabricReceipt({ ...values, fabricId: 4, color: 'чорний', meters: '3,5' }),
-    ).toEqual({});
-  });
-
-  it('needs a reason and a different count for a correction', () => {
-    const errors = validateFabricCorrection(
-      { countedMeters: '10', operationDate: '2026-11-04', note: '' },
-      10,
-    );
-    expect(errors.countedMeters).toBeDefined();
-    expect(errors.note).toBe('Вкажіть причину.');
-  });
-
   it('starts an issue with what is still reserved and keeps planned lines on the plan', () => {
     const values = createFabricIssueValues(fabric, 4, '2026-11-04');
     expect(values.lines).toHaveLength(1);
@@ -113,33 +70,5 @@ describe('fabric stock forms', () => {
     );
     const extra = { ...values, lines: [{ ...values.lines[0], purpose: 'Additional' as const }] };
     expect(fabricIssueBody(extra, 2).lines[0]).toMatchObject({ planColorKey: null, meters: 10.5 });
-  });
-});
-
-describe('fabric stock list', () => {
-  it('marks only lines with a problem', () => {
-    expect(fabricStockProblem(row({}))).toBeNull();
-    expect(fabricStockProblem(row({ meters: -2, available: -2 }))).toMatch(/Мінус/);
-    expect(fabricStockProblem(row({ reserved: 15, available: -5 }))).toBe('Не вистачає 5 м');
-    expect(countFabricStock([row({}), row({ meters: -1, available: -1 })])).toEqual({
-      short: 1,
-      negative: 1,
-      reserved: 0,
-    });
-  });
-
-  it('exports the value only for people who see it', () => {
-    expect(fabricStockCsv([row({ meters: 2.5 })], false)).toContain(
-      'FAB-1;Оксфорд;Чорний;2,5;0;10',
-    );
-    expect(fabricStockCsv([row({})], false)).not.toContain('Вартість');
-    expect(fabricStockCsv([row({})], true)).toContain('Вартість, грн');
-  });
-
-  it('accepts the transfer file only with all its parts', () => {
-    expect(parseFabricStockImportFile('{"stocks":[]}').error).toMatch(/oldReservations/);
-    const file = parseFabricStockImportFile('{"stocks":[{}],"issues":[],"oldReservations":[]}');
-    expect(file.error).toBeNull();
-    expect(file.rows).toHaveLength(1);
   });
 });

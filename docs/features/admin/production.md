@@ -10,7 +10,7 @@ An embroidery can point to a saved «Ціна вишивки» calculation («Р
 
 After «Передати в цех» every item shows its «Етапи» (the head of the workshop and Admin tick them; the furthest colours the item) and «Відвантаження» («Відвантажити» side panel, cancel with ×). The header gets «Закрити» when everything is shipped, «Скасувати» with a reason and, for Admin, «Повернути в роботу». Files of the order and of each item are uploaded to the CDN with their kind; old ones are Google Drive links. The Telegram block sends the one message to the workshop group and shows a failure with its reason. The list has an «Етап» column and filter and, for Admin, «Імпорт етапів» and «Ціни КП» (КП prices of orders moved from the old «Цех», which kept none, so «Звіти цеху» can value their output; only an item without a price takes one). «Налаштування цеху» (`/production/settings`) picks the Brevi bot's group and topic.
 
-«Склад тканин» is its own menu block right under «Швейний цех» (backend module Warehouse, `api/warehouse/...`, spec [WH-001 in BreviERP](https://github.com/Weretik/BreviERP/tree/main/docs/sdd/specs/warehouse/001-warehouse-module)). Its sub-items follow the old «Цех» v133 tabs: «Рух тканини», «Залишки», «Початкові залишки», «План і факт», «Бронь і що замовити», «Вартість складу» (Admin) and «Фурнітура до замовлення»; only «Залишки» works now, the rest are disabled until their stages. «Залишки» (`/warehouse/stock`, the old `/production/fabric-stock` redirects; access «Склад тканин») shows each fabric and colour with its balance, the reservation of «Нове» orders and what is available; the value in UAH only for Admin and the head of the workshop. A row opens its card with the reservation and every movement. The head of the workshop and Admin record «Прихід» (supplier from the server's `choices`), «Початковий залишок» (the colour of a new line from «Кольори»), «Коригування» with a reason and «Сторно». Every item of an order card has «Тканина»: the plan by colour, what issues covered and «Видати тканину» (planned, replacement and extra lines) or «Сторно видачі». The page also has «Зведення витрати» for a period, «Excel» and, for Admin, «Імпорт» of the old stock.
+«Склад тканин» is its own menu block right under «Швейний цех», with its own libraries: see [«Склад тканин»](warehouse.md). Every item of an order card has «Тканина»: the plan by colour, what issues covered and «Видати тканину» (planned, replacement and extra lines) or «Сторно видачі»; the offers and colours come from the warehouse `choices` endpoint.
 
 «Журнал робіт» (`/production/work`, the head of the workshop and Admin) lists the work of a month by worker and order: who sewed or cut how many pieces of which item, at which rate. «Додати роботу» records it; within the plan the item's quantity is the limit, more goes as «понад план» with a reason. A wrong record is cancelled by «Сторно» with a reason and stays crossed out. The same «Робота» section is on every item of an order card for those who see the sewing rate. Admin also has «Імпорт» of the old log. «Прогноз пошиття» (`/production/forecast`, the same people as «Виробничі завдання») shows the «Нове» orders in the order they are sewn with the approximate end of sewing from «Параметри ціноутворення»; the head of the workshop and Admin move orders up or down; only problems are marked.
 
@@ -27,7 +27,7 @@ flowchart LR
   Menu["legacy-menu.ts: Швейний цех"] --> Router["create-admin-router: RequireRole canManageWorkshop / canUseProductionOrders"]
   Router --> Routes["feature: production.routes.tsx (createProductionRoutes, createProductionOrderRoutes)"]
   Actor["app: use-production-order-actor.ts"] --> Routes
-  Routes --> Pages["feature/pages: staff, norms, payroll, orders, stock, work, forecast, timesheet, archive"]
+  Routes --> Pages["feature/pages: staff, norms, payroll, orders, work, forecast, timesheet, archive"]
   Pages --> Hooks["feature/hooks: lists, editors, archive, delete, import, orders, requests, stock"]
   Pages --> UI["ui: grids, forms, details, chips, import preview, payroll table, orders"]
   Pages --> RefUI["@admin/references/ui: page header, search, filter row, side panel"]
@@ -41,10 +41,10 @@ flowchart LR
 ```text
 libs/admin/production/
   model/src/
-    entities/                     # worker, fabric norm, model composition (layers, lines, units), import result, production order, tracking (stages, files, Telegram, settings), fabric stock, work, sewing forecast, timesheet, payroll, workshop report and overview, workshop archive
+    entities/                     # worker, fabric norm, model composition (layers, lines, units), import result, production order, tracking (stages, files, Telegram, settings), item fabric and issues, work, sewing forecast, timesheet, payroll, workshop report and overview, workshop archive
     forms/                        # worker, norm, order item and order forms, shipment and cancel reason, workshop settings, receipt, correction, issue, work (and months), timesheet hours, payment and adjustment, report period
-    queries/                      # list filters, chip counts, composition search and quantities, orders, stock and payroll CSV
-    validators/                   # reads workshop-staff.json, fabric-norms.json, production-orders.json, production-progress.json, fabric-stock.json, production-work.json, workshop-archive.json
+    queries/                      # list filters, chip counts, composition search and quantities, orders and payroll CSV
+    validators/                   # reads workshop-staff.json, fabric-norms.json, production-orders.json, production-progress.json, production-work.json, workshop-archive.json
     mappers/format-production.ts  # metres, parameter values, dates
     mappers/format-application.ts # application text, linked embroidery details and link
   data-access/src/
@@ -58,7 +58,7 @@ libs/admin/production/
     orders/                       # grid, chips, status, item form and card, applications with «Розрахунок вишивки», embroidery block, history, КП list, print sheet
     tracking/                     # stage pill and toggles, shipments, files, Telegram block, shipment form
     settings/                     # workshop settings form
-    stock/                        # stock grid and chips, line details, movements, receipt and correction forms, consumption, item «Тканина», issue form
+    stock/                        # item «Тканина», issue form
     work/                         # work records table, «Додати роботу» form, item «Робота»
     forecast/                     # forecast queue table with problem marks and up/down
     timesheet/                    # day table, month summary, change history
@@ -71,7 +71,6 @@ libs/admin/production/
     pages/norms/                  # «Норми витрати тканини»: model list + work card
     pages/orders/                 # list, create from КП, card
     pages/settings/               # «Налаштування цеху»
-    pages/stock/                  # «Склад тканин» → «Залишки» (code moves to libs/admin/warehouse/* in warehouse stage 2)
     pages/work/                   # «Журнал робіт»
     pages/forecast/               # «Прогноз пошиття»
     pages/timesheet/              # «Робочий час»
@@ -83,7 +82,7 @@ libs/admin/production/
     hooks/requests/               # debounce, request id against duplicates
     hooks/tracking/               # stages and shipments, close/cancel/reopen
     hooks/files/  hooks/telegram/  hooks/settings/
-    hooks/stock/                  # stock list, receipt, correction, issue, «Сторно» reason (also used for work)
+    hooks/stock/                  # item «Видача», «Сторно» reason (also used for work)
     hooks/work/                   # «Додати роботу» editor
     hooks/timesheet/              # a day: typed hours, changes, save
     hooks/archive/                # tab, search, dates, pages of the archive or closed orders
@@ -91,7 +90,7 @@ libs/admin/production/
     components/{staff,norms,import}/ # side panels
     components/orders/            # header and item side panels, header actions, КП item line, order summary
     components/tracking/          # item work (stages, shipments, work, fabric, files), order work (files, Telegram), shipment side panel
-    components/stock/             # line card, receipt, correction, consumption and issue side panels, item «Тканина»
+    components/stock/             # item «Тканина» and its issue side panel
     components/work/              # «Додати роботу» side panel, «Сторно» dialog, item «Робота»
     components/payroll/           # month view, roles and embroidery, payment / adjustment / worker side panels
     components/customers/         # client card tab «Завдання в цех» (`CustomerProductionOrders`, `customerId`)

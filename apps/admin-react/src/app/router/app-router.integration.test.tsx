@@ -152,7 +152,7 @@ describe('React Admin routing', () => {
             : section === 'Швейний цех'
               ? 3
               : section === 'Склад тканин'
-                ? 1
+                ? 3
                 : section === 'Фото'
                   ? 1
                   : 0,

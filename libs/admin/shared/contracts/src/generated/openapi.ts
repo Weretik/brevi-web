@@ -4095,25 +4095,8 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Stock lines with reservation and available; planned pairs the stock never held come with a null id */
+    /** «Залишки»: fabrics by canonical code with every colour the stock holds; alias groups and colours summed */
     get: operations['getFabricStock'];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  '/api/warehouse/fabric-stock/choices': {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Fabrics with a FAB- code and active suppliers for the stock forms */
-    get: operations['getFabricStockChoices'];
     put?: never;
     post?: never;
     delete?: never;
@@ -4129,8 +4112,25 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Card of a line: movements newest first and the items holding it */
-    get: operations['getFabricStockLine'];
+    get?: never;
+    put?: never;
+    post?: never;
+    /** Always 410: stock lines keep their history; «Уточнити» brings a balance to zero */
+    delete: operations['deleteFabricStock'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/warehouse/fabric-stock/choices': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Active offers of «Тканини» with a FAB- code, supplier names and colours for the stock forms */
+    get: operations['getFabricStockChoices'];
     put?: never;
     post?: never;
     delete?: never;
@@ -4146,17 +4146,17 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    get?: never;
+    /** «Рух тканини»: 50 per page, newest operation date first (then record time and id) */
+    get: operations['getFabricMovements'];
     put?: never;
-    /** «Початковий залишок» or «Прихід»; a new fabric and colour opens its line */
-    post: operations['createFabricMovement'];
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  '/api/warehouse/fabric-stock/{id}/correction': {
+  '/api/warehouse/fabric-stock/openings': {
     parameters: {
       query?: never;
       header?: never;
@@ -4165,15 +4165,15 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** «Коригування» to the counted metres, with a reason */
-    post: operations['correctFabricStock'];
+    /** «Початковий залишок»: once per fabric and colour (any code of its group), zero allowed */
+    post: operations['openFabricStock'];
     delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  '/api/warehouse/fabric-stock/{id}/movements/{movementId}/reverse': {
+  '/api/warehouse/fabric-stock/receipts': {
     parameters: {
       query?: never;
       header?: never;
@@ -4182,7 +4182,58 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** «Сторно» of an opening, receipt or correction */
+    /** «Прихід» of the offer picked; the supplier is a name, not a required counterparty */
+    post: operations['receiveFabric'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/warehouse/fabric-stock/issues': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** «Разова витрата / без замовлення»: lines spent in order, the balance may go below zero */
+    post: operations['issueFabric'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/warehouse/fabric-stock/adjustments': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** «Уточнити»: the counted total of a pair with a reason; it may not end below min(0, current total) */
+    post: operations['adjustFabricStock'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/warehouse/fabric-stock/movements/{movementId}/reverse': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** «Сторно» of an opening, receipt, correction or issue without an order */
     post: operations['reverseFabricMovement'];
     delete?: never;
     options?: never;
@@ -10583,129 +10634,214 @@ export interface components {
       errors: number;
       errorLines: components['schemas']['WorkshopArchiveImportError'][];
     };
-    FabricStockRowResponse: {
-      /** @description Null for a fabric and colour open orders plan but the stock never held. */
-      id: number | null;
-      fabricId: number | null;
+    /** @description A stock line inside a pair: its own code and balance. */
+    FabricStockSourceResponse: {
+      id: number;
       fabricCode: string;
-      fabricName: string;
-      color: string;
-      /** @description Balance; may be negative. */
+      /** Format: double */
       meters: number;
-      /** @description Plan of «Нове» orders not yet covered by issues. */
-      reserved: number;
-      /** @description Balance − reserved. */
-      available: number;
-      /** @description UAH per metre of «Тканини»; null without the right to see the value. */
-      price: number | null;
-      value: number | null;
-      /** @description 0 for a line that does not exist yet. */
-      version: number;
-      /** Format: date-time */
-      updatedAt: string | null;
     };
-    FabricStockTotals: {
+    /** @description A fabric and colour on the shelf: every line of the alias group with that colour summed. */
+    FabricStockColorResponse: {
+      color: string;
+      /** @description NFC, trimmed, spaces collapsed, lower case (uk-UA). */
+      colorKey: string;
+      /** Format: double */
       meters: number;
-      reserved: number;
-      lines: number;
-      /** @description Lines whose available is below zero. */
-      short: number;
-      value: number | null;
+      /** @description Changes whenever any line of the pair changes; goes back with «Уточнити» and a «Разова витрата». */
+      version: string;
+      sources: components['schemas']['FabricStockSourceResponse'][];
+    };
+    FabricStockFabricResponse: {
+      /** @description The canonical code (FAB-067 → FAB-023, FAB-077 → FAB-078). */
+      fabricCode: string;
+      /** @description Codes of «Тканини» that are this fabric, the canonical first. */
+      codes: string[];
+      fabricName: string;
+      composition: string | null;
+      density: string | null;
+      /** Format: double */
+      meters: number;
+      colors: components['schemas']['FabricStockColorResponse'][];
     };
     FabricStockPermissions: {
-      /** @description Receipts, corrections, reversals and issues: WorkshopChief and Admin. */
+      /** @description Openings, receipts, issues and «Уточнити»: WorkshopChief and Admin. */
       canMove: boolean;
-      /** @description The value in UAH: WorkshopChief and Admin. */
+      /** @description Prices of «Тканини» on the forms: WorkshopChief and Admin. */
       seesValue: boolean;
     };
+    /** @description «Залишки»: only fabrics and colours that have stock lines, zero and negative included. */
     FabricStockListResponse: {
-      rows: components['schemas']['FabricStockRowResponse'][];
-      totals: components['schemas']['FabricStockTotals'];
+      fabrics: components['schemas']['FabricStockFabricResponse'][];
+      /** Format: double */
+      meters: number;
+      pairs: number;
+      /** @description Pairs below zero. */
+      negative: number;
       permissions: components['schemas']['FabricStockPermissions'];
     };
+    /** @description An active offer of «Тканини» with a FAB- code. */
     FabricStockFabricChoice: {
       id: number;
       code: string;
+      /** @description Offers with the same group code are the same fabric on the shelf. */
+      groupCode: string;
       name: string;
-    };
-    FabricStockSupplierChoice: {
-      id: number;
-      name: string;
+      composition: string | null;
+      density: string | null;
+      supplier: string | null;
+      /**
+       * Format: double
+       * @description UAH per metre; null for people who do not see prices.
+       */
+      price: number | null;
     };
     FabricStockChoicesResponse: {
       fabrics: components['schemas']['FabricStockFabricChoice'][];
-      /** @description Active suppliers; empty for people who cannot move stock. */
-      suppliers: components['schemas']['FabricStockSupplierChoice'][];
-      /** @description Active colours of «Кольори» in list order; a new stock line takes one of them. */
+      /** @description Names of active «Постачальники» and of the suppliers of «Тканини»; empty for people who cannot move stock. */
+      suppliers: string[];
+      /** @description Active colours of «Кольори» in list order. */
       colors: string[];
     };
-    FabricMovementResponse: {
+    /** @description A row of «Рух тканини». */
+    FabricMovementRowResponse: {
       id: number;
+      stockId: number;
       /** @enum {string} */
       kind: 'Opening' | 'Receipt' | 'Issue' | 'Adjustment' | 'Reversal';
-      metersBefore: number;
-      delta: number;
-      metersAfter: number;
       /** Format: date */
       operationDate: string;
-      note: string | null;
-      supplierId: number | null;
+      /** Format: date-time */
+      createdAt: string;
+      /** @description Code of the line moved. */
+      fabricCode: string;
+      /** @description The fabric the stock shows. */
+      groupCode: string;
+      fabricName: string;
+      color: string;
       supplierName: string | null;
       document: string | null;
       orderId: number | null;
+      itemId: number | null;
       orderNumber: number | null;
       modelName: string | null;
-      /** @description The movement a «Сторно» takes back. */
-      reversesMovementId: number | null;
-      isReversed: boolean;
-      /** @description An opening, receipt or correction not yet taken back, for those who may move stock. */
-      canReverse: boolean;
+      /** @description «Куди використано» of an issue without an order. */
+      destination: string | null;
+      /** Format: double */
+      delta: number;
+      /**
+       * Format: double
+       * @description Balance of that line after the movement.
+       */
+      metersAfter: number;
+      note: string | null;
       createdByName: string;
-      /** Format: date-time */
-      createdAt: string;
+      isReversed: boolean;
+      reversesMovementId: number | null;
+      canReverse: boolean;
     };
-    FabricReservationResponse: {
-      orderId: number;
-      orderNumber: number;
-      itemId: number;
-      modelName: string;
-      planned: number;
-      covered: number;
-      reserved: number;
-    };
-    FabricStockLineResponse: {
-      line: components['schemas']['FabricStockRowResponse'];
-      movements: components['schemas']['FabricMovementResponse'][];
-      reservations: components['schemas']['FabricReservationResponse'][];
+    FabricMovementPageResponse: {
+      rows: components['schemas']['FabricMovementRowResponse'][];
+      page: number;
+      hasMore: boolean;
       permissions: components['schemas']['FabricStockPermissions'];
     };
-    CreateFabricMovementInput: {
+    OpenFabricStockInput: {
       /**
-       * @description Opening only as the first movement of a line.
-       * @enum {string}
+       * Format: uuid
+       * @description A new id per form; the same id with the same data returns the saved result, with other data 409.
        */
-      kind: 'Opening' | 'Receipt';
+      operationId: string;
       fabricId: number;
       color: string;
+      /**
+       * Format: double
+       * @description 0…1 000 000, at most two decimals.
+       */
       meters: number;
-      /** Format: date */
+      /**
+       * Format: date
+       * @description The day the fabric really came or went, 1900-01-01…2100-12-31.
+       */
       operationDate: string;
-      supplierId: number | null;
-      document: string | null;
-      note: string | null;
-      /** @description The line version; null when the fabric and colour are new. */
-      version: number | null;
     };
-    CorrectFabricStockInput: {
-      version: number;
-      countedMeters: number;
-      /** Format: date */
+    /** @description The pair after a stock operation. */
+    FabricStockOperationResponse: {
+      /** Format: uuid */
+      operationId: string | null;
+      fabricCode: string;
+      color: string;
+      /**
+       * Format: double
+       * @description The pair total after the operation.
+       */
+      meters: number;
+      /** @description The same operation id was saved before; nothing moved now. */
+      replayed: boolean;
+    };
+    ReceiveFabricInput: {
+      /**
+       * Format: uuid
+       * @description A new id per form; the same id with the same data returns the saved result, with other data 409.
+       */
+      operationId: string;
+      fabricId: number;
+      color: string;
+      /** Format: double */
+      meters: number;
+      /**
+       * Format: date
+       * @description The day the fabric really came or went, 1900-01-01…2100-12-31.
+       */
       operationDate: string;
-      note: string;
+      supplierName?: string | null;
+      document?: string | null;
+      note?: string | null;
+    };
+    IssueFabricInput: {
+      /**
+       * Format: uuid
+       * @description A new id per form; the same id with the same data returns the saved result, with other data 409.
+       */
+      operationId: string;
+      fabricCode: string;
+      color: string;
+      /** @description The pair version shown on the form; null skips the check. */
+      expectedVersion?: string | null;
+      /** Format: double */
+      meters: number;
+      /**
+       * Format: date
+       * @description The day the fabric really came or went, 1900-01-01…2100-12-31.
+       */
+      operationDate: string;
+      /** @description «Куди використано / контрагент». */
+      destination?: string | null;
+      note?: string | null;
+    };
+    AdjustFabricStockInput: {
+      /**
+       * Format: uuid
+       * @description A new id per form; the same id with the same data returns the saved result, with other data 409.
+       */
+      operationId: string;
+      fabricCode: string;
+      color: string;
+      expectedVersion: string;
+      /**
+       * Format: double
+       * @description The counted total of the pair; not below min(0, current total).
+       */
+      targetMeters: number;
+      /**
+       * Format: date
+       * @description The day the fabric really came or went, 1900-01-01…2100-12-31.
+       */
+      operationDate: string;
+      reason: string;
     };
     ReverseFabricMovementInput: {
-      version: number;
-      note: string;
+      reason: string;
     };
     FabricConsumptionRowResponse: {
       stockId: number;
@@ -25480,10 +25616,7 @@ export interface operations {
   };
   getFabricStock: {
     parameters: {
-      query?: {
-        /** @description Code, fabric or colour. */
-        search?: string;
-      };
+      query?: never;
       header?: never;
       path?: never;
       cookie?: never;
@@ -25499,13 +25632,6 @@ export interface operations {
           'application/json': components['schemas']['FabricStockListResponse'];
         };
       };
-      /** @description Invalid */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
       /** @description Not signed in */
       401: {
         headers: {
@@ -25519,6 +25645,42 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+    };
+  };
+  deleteFabricStock: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Stock lines are never deleted */
+      410: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': Record<string, never>;
+        };
       };
     };
   };
@@ -25556,13 +25718,20 @@ export interface operations {
       };
     };
   };
-  getFabricStockLine: {
+  getFabricMovements: {
     parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
+      query?: {
+        page?: number;
+        /** @description Opening lists openings not taken back («Внесені початкові залишки»). */
+        kind?: 'All' | 'Receipt' | 'Issue' | 'Opening';
+        /** @description Any code of an alias group selects the whole group. */
+        fabricCode?: string;
+        /** @description Matched by the normalised colour key. */
+        color?: string;
+        itemId?: number;
       };
+      header?: never;
+      path?: never;
       cookie?: never;
     };
     requestBody?: never;
@@ -25573,175 +25742,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          'application/json': components['schemas']['FabricStockLineResponse'];
-        };
-      };
-      /** @description Not signed in */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Not allowed */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description No such line */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  createFabricMovement: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateFabricMovementInput'];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['FabricStockLineResponse'];
-        };
-      };
-      /** @description Invalid, or the fabric has no FAB- code */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Not signed in */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Not allowed */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description No such fabric or supplier */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Stale version or opening not first */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  correctFabricStock: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CorrectFabricStockInput'];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['FabricStockLineResponse'];
-        };
-      };
-      /** @description Invalid or nothing to correct */
-      400: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Not signed in */
-      401: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Not allowed */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description No such line */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Stale version */
-      409: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  reverseFabricMovement: {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: number;
-        movementId: number;
-      };
-      cookie?: never;
-    };
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['ReverseFabricMovementInput'];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          'application/json': components['schemas']['FabricStockLineResponse'];
+          'application/json': components['schemas']['FabricMovementPageResponse'];
         };
       };
       /** @description Invalid */
@@ -25765,14 +25766,297 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description No such line or movement */
+    };
+  };
+  openFabricStock: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['OpenFabricStockInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FabricStockOperationResponse'];
+        };
+      };
+      /** @description Invalid, inactive fabric, colour not in «Кольори» or changed alias offer */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such fabric */
       404: {
         headers: {
           [name: string]: unknown;
         };
         content?: never;
       };
-      /** @description Stale, already reversed, or an issue */
+      /** @description The pair is already on the stock, or the operation id was used for other data */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  receiveFabric: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ReceiveFabricInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FabricStockOperationResponse'];
+        };
+      };
+      /** @description Invalid, inactive fabric, colour not in «Кольори» or changed alias offer */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such fabric */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Stale, or the operation id was used for other data */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  issueFabric: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['IssueFabricInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FabricStockOperationResponse'];
+        };
+      };
+      /** @description Invalid */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The stock never held this fabric and colour */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Stale version, or the operation id was used for other data */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  adjustFabricStock: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AdjustFabricStockInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FabricStockOperationResponse'];
+        };
+      };
+      /** @description Invalid, nothing to adjust, or it would create or deepen a negative balance */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The stock never held this fabric and colour */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Stale version, or the operation id was used for other data */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  reverseFabricMovement: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        movementId: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ReverseFabricMovementInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FabricStockOperationResponse'];
+        };
+      };
+      /** @description Invalid */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such movement */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Stale, already reversed, or an issue to an order */
       409: {
         headers: {
           [name: string]: unknown;
