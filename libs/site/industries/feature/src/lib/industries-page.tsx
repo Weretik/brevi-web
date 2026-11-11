@@ -1,3 +1,4 @@
+import { CatalogText } from '@site/catalog/ui';
 import { SITE_PATHS, localizedPath } from '@site/core/i18n';
 import { JsonLd, buildBreadcrumbJsonLd, buildFaqPageJsonLd } from '@site/core/seo';
 import {
@@ -8,18 +9,25 @@ import {
   IndustriesSteps,
   getIndustriesDictionary,
 } from '@site/industries/ui';
-import { loadSiteCompany } from '@site/settings/data-access';
+import { loadSiteCompany, loadSitePageText } from '@site/settings/data-access';
 import { PageSection } from '@site/shared/ui';
 
 import type { Locale } from '@site/core/i18n';
 
 /**
  * «Галузі» page in the order of the live `brevi.com.ua` page «Спецодяг для підприємств»: lead with the terms,
- * industries, how to get a quote, frequent questions, and the call to order. Static: the text is in the dictionary.
+ * industries, how to get a quote, frequent questions, the text saved in the Admin, and the call to order. The text is in the dictionary; questions and text
+ * saved in «Сторінки сайту» replace or add to it.
  */
 export async function IndustriesPage({ locale }: { locale: Locale }) {
-  const company = await loadSiteCompany();
+  const [company, saved] = await Promise.all([
+    loadSiteCompany(),
+    loadSitePageText('industries', locale),
+  ]);
   const dictionary = getIndustriesDictionary(locale);
+  // Questions of «Контент → Сторінки сайту» replace the dictionary ones; its main text goes under them (CNT-010).
+  const faq = saved?.faq.length ? saved.faq : dictionary.faq.items;
+  const text = saved?.text ?? [];
   const path = (key: keyof typeof SITE_PATHS) => localizedPath(locale, SITE_PATHS[key]);
   const breadcrumbs = [
     { name: dictionary.home, href: localizedPath(locale) },
@@ -60,8 +68,14 @@ export async function IndustriesPage({ locale }: { locale: Locale }) {
         title={dictionary.faq.title}
         label={{ index: '04', text: dictionary.faq.label }}
       >
-        <IndustriesFaq items={dictionary.faq.items} />
+        <IndustriesFaq items={faq} />
       </PageSection>
+
+      {text.length > 0 && (
+        <section aria-label={dictionary.breadcrumb}>
+          <CatalogText blocks={text} />
+        </section>
+      )}
 
       <IndustriesOrder
         company={company}
@@ -79,11 +93,7 @@ export async function IndustriesPage({ locale }: { locale: Locale }) {
           breadcrumbs.map((item) => ({ name: item.name, path: item.href })),
         )}
       />
-      <JsonLd
-        data={buildFaqPageJsonLd(
-          dictionary.faq.items.map((item) => ({ question: item.title, answer: item.text })),
-        )}
-      />
+      <JsonLd data={buildFaqPageJsonLd(faq)} />
     </div>
   );
 }

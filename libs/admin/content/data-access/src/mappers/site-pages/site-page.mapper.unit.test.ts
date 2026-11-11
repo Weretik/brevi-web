@@ -11,8 +11,13 @@ describe('mapSitePages', () => {
           name: 'Головна',
           path: '/',
           titleHasBrand: true,
-          uk: { title: 'Пошиття спецодягу — Brevi', description: 'Опис' },
-          ru: { title: null, description: null },
+          uk: {
+            title: 'Пошиття спецодягу — Brevi',
+            description: 'Опис',
+            text: [{ kind: 'List', items: ['Костюми', 'Куртки'] }],
+            faq: [{ question: 'Що шиєте?', answer: 'Спецодяг.' }],
+          },
+          ru: { title: null, description: null, text: [], faq: [] },
           revision: 1,
           updatedAtUtc: '2026-11-11T00:00:00Z',
           updatedBy: 'Тексти сайту',
@@ -22,7 +27,14 @@ describe('mapSitePages', () => {
     expect(page).toMatchObject({
       key: 'home',
       titleHasBrand: true,
-      texts: { uk: { title: 'Пошиття спецодягу — Brevi' }, ru: { title: null } },
+      texts: {
+        uk: {
+          title: 'Пошиття спецодягу — Brevi',
+          text: [{ kind: 'List', text: null, lead: null, items: ['Костюми', 'Куртки'] }],
+          faq: [{ question: 'Що шиєте?', answer: 'Спецодяг.' }],
+        },
+        ru: { title: null, text: [], faq: [] },
+      },
     });
   });
 

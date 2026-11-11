@@ -1,5 +1,6 @@
 import { isLocale } from '@site/core/i18n';
 import { sitePageMetadata } from '@site/settings/data-access';
+import { SitePageTextSection } from '@site/settings/feature';
 import { WorksPage } from '@site/works/feature';
 import { buildWorksMetadata } from '@site/works/seo';
 import { notFound } from 'next/navigation';
@@ -17,5 +18,10 @@ export default async function Page({ params }: PageProps<'/[locale]/our-work'>) 
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
-  return <WorksPage locale={locale} />;
+  return (
+    <>
+      <WorksPage locale={locale} />
+      <SitePageTextSection pageKey="ourWork" locale={locale} />
+    </>
+  );
 }

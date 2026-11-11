@@ -13858,10 +13858,19 @@ export interface components {
       areas: components['schemas']['SeoAreaSummary'][];
       issues: components['schemas']['SeoIssue'][];
     };
-    /** @description Texts of one language; null leaves the site its own text. */
+    SiteFaqItem: {
+      question: string;
+      /** @description One paragraph of plain text. */
+      answer: string;
+    };
+    /** @description Texts of one language; null or an empty list leaves the site its own text. Responses always list text and faq; a save without them clears them (CNT-010). */
     SitePageText: {
       title?: string | null;
       description?: string | null;
+      /** @description Main text at the bottom of the page from the visual editor; at most 200 blocks and 20000 characters. */
+      text?: components['schemas']['ProductTextBlock'][] | null;
+      /** @description Frequent questions of the page in the order shown; a question without its answer is dropped. */
+      faq?: components['schemas']['SiteFaqItem'][] | null;
     };
     SitePageResponse: {
       key: string;
@@ -14156,6 +14165,10 @@ export interface components {
     'schemas-SitePageText': {
       title?: string | null;
       description?: string | null;
+      /** @description Main text at the bottom of the page; empty keeps the site's own (CNT-010). */
+      text: components['schemas']['ProductTextBlock'][];
+      /** @description Frequent questions in the order shown, also given to search engines as FAQPage; empty keeps the site's own. */
+      faq: components['schemas']['SiteFaqItem'][];
     };
     PublicSitePage: {
       key: string;

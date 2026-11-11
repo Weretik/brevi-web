@@ -16,7 +16,7 @@ import {
   HomeSeoText,
   getHomeDictionary,
 } from '@site/home/ui';
-import { loadSiteCompany } from '@site/settings/data-access';
+import { loadSiteCompany, loadSitePageText } from '@site/settings/data-access';
 import { PageSection } from '@site/shared/ui';
 
 import type { CatalogSection } from '@site/catalog/model';
@@ -27,7 +27,7 @@ const CONTACTS_ID = 'zayavka';
 
 /**
  * Home page body in the order of the «Строчка» mockup: first screen, catalog sections, logo, process, own
- * production, industries, contacts, SEO text with FAQ. The text is in the home dictionary; the catalog sections
+ * production, industries, contacts, SEO text with FAQ. The text is in the home dictionary; the SEO text and FAQ saved in «Сторінки сайту» replace it; the catalog sections
  * come from the route, which reads them from the catalog API, and the block is left out while there are none. The price calculator, product cards with prices, and the request
  * form of the mockup come with the catalog and request steps (owner decision 2026-11-10).
  */
@@ -38,8 +38,10 @@ export async function HomePage({
   locale: Locale;
   catalogSections: readonly CatalogSection[];
 }) {
-  const company = await loadSiteCompany();
+  const [company, saved] = await Promise.all([loadSiteCompany(), loadSitePageText('home', locale)]);
   const dictionary = getHomeDictionary(locale);
+  // Text and questions of «Контент → Сторінки сайту» replace the dictionary ones (CNT-010).
+  const faq = saved?.faq.length ? saved.faq : dictionary.seo.faq;
   const path = (key: keyof typeof SITE_PATHS) => localizedPath(locale, SITE_PATHS[key]);
   const catalogHref = path('catalog');
 
@@ -97,15 +99,13 @@ export async function HomePage({
         contactsHref={path('contacts')}
       />
 
-      <HomeSeoText dictionary={dictionary.seo} />
+      <HomeSeoText dictionary={dictionary.seo} text={saved?.text ?? []} faq={faq} />
 
       <JsonLd
         data={[
           buildWebSiteJsonLd(locale),
           buildLocalBusinessJsonLd(locale, company),
-          buildFaqPageJsonLd(
-            dictionary.seo.faq.map((item) => ({ question: item.title, answer: item.text })),
-          ),
+          buildFaqPageJsonLd(faq),
         ]}
       />
     </div>

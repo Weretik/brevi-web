@@ -2,6 +2,7 @@ import {
   flag,
   integer,
   list,
+  mapTextBlock,
   nullableDateTime,
   nullableText,
   record,
@@ -15,6 +16,14 @@ function mapText(value: unknown, name: string): SitePageText {
   return {
     title: nullableText(texts['title'], 'заголовок'),
     description: nullableText(texts['description'], 'опис'),
+    text: list(texts['text'] ?? [], 'основний текст').map(mapTextBlock),
+    faq: list(texts['faq'] ?? [], 'запитання').map((item) => {
+      const faq = record(item, 'запитання');
+      return {
+        question: text(faq['question'], 'запитання'),
+        answer: text(faq['answer'], 'відповідь'),
+      };
+    }),
   };
 }
 

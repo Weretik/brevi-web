@@ -4,11 +4,19 @@ import { render, screen } from '@testing-library/react';
 import { HomePage } from './home-page';
 
 import type { CatalogSection } from '@site/catalog/model';
+import type { SitePageText } from '@site/settings/data-access';
+
+const page = vi.hoisted(() => ({ saved: undefined as SitePageText | undefined }));
 
 vi.mock('@site/settings/data-access', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   loadSiteCompany: async () => (await import('@site/core/config')).COMPANY,
+  loadSitePageText: async () => page.saved,
 }));
+
+afterEach(() => {
+  page.saved = undefined;
+});
 
 const CATALOG_SECTIONS: CatalogSection[] = [
   {
@@ -77,9 +85,28 @@ describe('HomePage', () => {
 
     expect(data.map((item) => item['@type'])).toEqual(['WebSite', 'LocalBusiness', 'FAQPage']);
     const faq = data[2]['mainEntity'] as { name: string; acceptedAnswer: { text: string } }[];
-    expect(faq.map((item) => item.name)).toEqual(dictionary.seo.faq.map((item) => item.title));
+    expect(faq.map((item) => item.name)).toEqual(dictionary.seo.faq.map((item) => item.question));
     expect(faq.map((item) => item.acceptedAnswer.text)).toEqual(
-      dictionary.seo.faq.map((item) => item.text),
+      dictionary.seo.faq.map((item) => item.answer),
     );
+  });
+
+  it('shows the text and questions saved in «Сторінки сайту» instead of the dictionary', async () => {
+    page.saved = {
+      title: null,
+      description: null,
+      text: [{ type: 'paragraph', text: 'Шиємо **оптом** у Полтаві.' }],
+      faq: [{ question: 'Чи є доставка?', answer: 'Так, по всій Україні.' }],
+    };
+    const dictionary = getHomeDictionary('uk');
+    const { container } = render(
+      await HomePage({ locale: 'uk', catalogSections: CATALOG_SECTIONS }),
+    );
+
+    expect(screen.getByText('оптом').tagName).toBe('STRONG');
+    expect(container.textContent).not.toContain(dictionary.seo.intro);
+    expect(container.querySelectorAll('details')).toHaveLength(1);
+    const faq = readJsonLd(container)[2]['mainEntity'] as { name: string }[];
+    expect(faq.map((item) => item.name)).toEqual(['Чи є доставка?']);
   });
 });

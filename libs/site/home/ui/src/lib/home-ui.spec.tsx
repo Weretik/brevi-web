@@ -107,11 +107,32 @@ describe('HomeContacts', () => {
 describe('HomeSeoText', () => {
   it('keeps every FAQ answer in the HTML', () => {
     const dictionary = getHomeDictionary('uk').seo;
-    const { container } = render(<HomeSeoText dictionary={dictionary} />);
+    const { container } = render(
+      <HomeSeoText dictionary={dictionary} text={[]} faq={dictionary.faq} />,
+    );
 
     expect(container.querySelectorAll('details')).toHaveLength(dictionary.faq.length);
+    expect(container.textContent).toContain(dictionary.intro);
     for (const item of dictionary.faq) {
-      expect(container.textContent).toContain(item.text);
+      expect(container.textContent).toContain(item.answer);
     }
+  });
+
+  it('shows the text from the Admin instead of the dictionary text', () => {
+    const dictionary = getHomeDictionary('uk').seo;
+    const { container } = render(
+      <HomeSeoText
+        dictionary={dictionary}
+        text={[
+          { type: 'heading', text: 'Пошиття' },
+          { type: 'list', items: ['Костюми'] },
+        ]}
+        faq={dictionary.faq}
+      />,
+    );
+
+    expect(container.querySelector('h3')?.textContent).toBe('Пошиття');
+    expect(container.querySelector('li')?.textContent).toBe('Костюми');
+    expect(container.textContent).not.toContain(dictionary.intro);
   });
 });

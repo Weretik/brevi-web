@@ -2,7 +2,7 @@
 
 **Status:** code exists, checked 2026-11-10. Specification: [«Галузі» page](../../specs/site/industries/001-industries-hub/README.md).
 
-`/uk/industries` and `/ru/industries` are the industries hub: the lead with the terms for enterprises (from 5 pieces, models and fabric for the task, logo and VAT), eight industries with typical garments, three steps to a quote, four frequent questions, and the call to order with «Залишити заявку» and the phone. The text is the live `brevi.com.ua` page «Спецодяг для підприємств» in both languages; the industries list repeats the home page. Industry landing pages (`/industries/{slug}`) do not exist yet, so the industries are not links. The page is static and reads no API.
+`/uk/industries` and `/ru/industries` are the industries hub: the lead with the terms for enterprises (from 5 pieces, models and fabric for the task, logo and VAT), eight industries with typical garments, three steps to a quote, four frequent questions, and the call to order with «Залишити заявку» and the phone. The text is the live `brevi.com.ua` page «Спецодяг для підприємств» in both languages; the industries list repeats the home page. Industry landing pages (`/industries/{slug}`) do not exist yet, so the industries are not links. Company facts come from «Контакти та компанія»; the questions saved in «Сторінки сайту» replace the dictionary ones and its main text goes under them (BreviERP CNT-010).
 
 ## Structure diagram
 

@@ -15,8 +15,13 @@ const page: SitePage = {
   path: '/order-in-bulk',
   titleHasBrand: false,
   texts: {
-    uk: { title: 'Спецодяг оптом', description: 'Опис' },
-    ru: { title: null, description: null },
+    uk: {
+      title: 'Спецодяг оптом',
+      description: 'Опис',
+      text: [{ kind: 'Paragraph', text: 'Шиємо **оптом**', lead: null, items: [] }],
+      faq: [{ question: 'Яка партія?', answer: 'Від 5 штук.' }],
+    },
+    ru: { title: null, description: null, text: [], faq: [] },
   },
   revision: 1,
   updatedAtUtc: '2026-11-11T00:00:00Z',
@@ -31,10 +36,36 @@ describe('site page form', () => {
       key: 'wholesale',
       revision: 1,
       texts: {
-        uk: { title: 'Спецодяг оптом', description: 'Опис' },
-        ru: { title: null, description: null },
+        uk: {
+          title: 'Спецодяг оптом',
+          description: 'Опис',
+          text: [{ kind: 'Paragraph', text: 'Шиємо **оптом**', lead: null, items: [] }],
+          faq: [{ question: 'Яка партія?', answer: 'Від 5 штук.' }],
+        },
+        ru: { title: null, description: null, text: [], faq: [] },
       },
     });
+  });
+
+  it('drops empty question rows and trims the others', () => {
+    const values = sitePageFormOf(page);
+    values.ru.faq = [
+      { question: ' Що\n шиєте? ', answer: 'Костюми.' },
+      { question: ' ', answer: '' },
+    ];
+    expect(sitePageInputOf(page, values).texts.ru.faq).toEqual([
+      { question: 'Що шиєте?', answer: 'Костюми.' },
+    ]);
+  });
+
+  it('names a question without its answer and too many questions', () => {
+    const values = sitePageFormOf(page);
+    values.uk.faq = [...values.uk.faq, { question: 'Ціна?', answer: '' }];
+    expect(validateSitePage(values)).toEqual({
+      'uk.faq': 'Запитання 2: заповніть і запитання, і відповідь.',
+    });
+    values.uk.faq = Array.from({ length: 13 }, (_, at) => ({ question: `${at}?`, answer: 'Так.' }));
+    expect(validateSitePage(values)).toEqual({ 'uk.faq': 'Не більше 12 запитань.' });
   });
 
   it('refuses texts longer than the server keeps', () => {
@@ -48,7 +79,10 @@ describe('site page form', () => {
     expect(
       sitePageProblems({
         ...page,
-        texts: { uk: page.texts.uk, ru: { title: 'а'.repeat(61), description: 'Опис' } },
+        texts: {
+          uk: page.texts.uk,
+          ru: { title: 'а'.repeat(61), description: 'Опис', text: [], faq: [] },
+        },
       }),
     ).toEqual(['Задовгий текст російською: у пошуку обріжеться']);
   });

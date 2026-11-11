@@ -1,13 +1,11 @@
-import { contentTextBlockKinds } from '@admin/content/model';
-
 import {
   dateTime,
   flag,
   integer,
   list,
+  mapTextBlock,
   nullableInteger,
   nullableText,
-  oneOf,
   record,
   text,
 } from '../../validators/content-response';
@@ -48,18 +46,7 @@ function mapText(value: unknown): SiteCategoryText {
     name: nullableText(texts['name'], 'назва'),
     seoTitle: nullableText(texts['seoTitle'], 'SEO-заголовок'),
     seoDescription: nullableText(texts['seoDescription'], 'SEO-опис'),
-    text: list(texts['text'], 'текст').map((item) => {
-      const block = record(item, 'блок тексту');
-      return {
-        kind: oneOf(block['kind'], contentTextBlockKinds, 'тип блоку'),
-        text: nullableText(block['text'], 'текст блоку'),
-        lead: nullableText(block['lead'], 'початок абзацу'),
-        items:
-          block['items'] == null
-            ? []
-            : list(block['items'], 'рядки списку').map((line) => text(line)),
-      };
-    }),
+    text: list(texts['text'], 'текст').map(mapTextBlock),
   };
 }
 
