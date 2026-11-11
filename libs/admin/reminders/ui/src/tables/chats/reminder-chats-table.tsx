@@ -37,6 +37,7 @@ export function ReminderChatsTable({ rows, loading, busyId, onEdit, onTest, onAs
           <Typography variant="caption" component="p" sx={{ color: 'text.secondary' }} noWrap>
             {reminderChatKindLabels[row.kind]}
             {row.displayName ? ` · ${row.telegramTitle}` : ''}
+            {row.receivesSiteRequests ? ' · заявки з сайту' : ''}
           </Typography>
         </Box>
       ),

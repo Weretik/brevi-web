@@ -4,6 +4,7 @@ import {
   REQUEST_ATTACHMENT_EXTENSIONS,
   REQUEST_FIELD_LIMITS,
   REQUEST_FORM_IDLE,
+  REQUEST_TRAP_FIELD,
   formatUkrainianPhone,
 } from '@site/request/model';
 import { Button, cn } from '@site/shared/ui';
@@ -117,7 +118,7 @@ function RequestFormAttempt({
       action={formAction}
       noValidate
       aria-labelledby="request-form-title"
-      className="grid gap-5 rounded-xl border-2 border-dashed border-brand-soft bg-muted p-6 sm:p-8"
+      className="relative grid gap-5 rounded-xl border-2 border-dashed border-brand-soft bg-muted p-6 sm:p-8"
     >
       <h2
         id="request-form-title"
@@ -177,6 +178,17 @@ function RequestFormAttempt({
         />,
         text.attachmentHint,
       )}
+
+      {/* Bots fill every field; people never reach this one (not in the tab order, hidden from screen readers). */}
+      <div aria-hidden className="absolute -left-[9999px] h-px w-px overflow-hidden">
+        <input
+          type="text"
+          name={REQUEST_TRAP_FIELD}
+          tabIndex={-1}
+          autoComplete="off"
+          defaultValue=""
+        />
+      </div>
 
       <Button
         type="submit"

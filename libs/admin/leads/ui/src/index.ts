@@ -13,3 +13,5 @@ export { LeadIndustriesTable, LeadManagersTable, LeadResultsBars } from './stats
 export { LeadSyncCard } from './stats/lead-sync-card';
 export { LeadCallResultsList } from './references/lead-call-results-list';
 export { LeadCategoriesList } from './references/lead-categories-list';
+export { SiteRequestStatusPill } from './components/status/site-request-status-pill';
+export { SiteRequestsTable } from './tables/site-requests-table';

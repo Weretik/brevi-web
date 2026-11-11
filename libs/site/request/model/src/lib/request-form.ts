@@ -31,6 +31,9 @@ export type RequestFormState =
 
 export const REQUEST_FORM_IDLE: RequestFormState = { status: 'idle' };
 
+/** Hidden field of the form: people never see or fill it, bots fill every field (LEAD-002). */
+export const REQUEST_TRAP_FIELD = 'website';
+
 export const REQUEST_FIELD_LIMITS: Record<RequestTextField, number> = {
   phone: 32,
   workwear: 200,

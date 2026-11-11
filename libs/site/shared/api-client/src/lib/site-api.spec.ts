@@ -1,4 +1,4 @@
-import { siteApiGet } from './site-api';
+import { siteApiGet, siteApiPostForm } from './site-api';
 
 const json = (status: number, body: unknown = {}) =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
@@ -28,6 +28,45 @@ describe('siteApiGet', () => {
     expect(await call(vi.fn().mockResolvedValue(json(401)))).toEqual({
       kind: 'unavailable',
       status: 401,
+    });
+    expect(await call(vi.fn().mockRejectedValue(new TypeError('fetch failed')))).toEqual({
+      kind: 'unavailable',
+    });
+  });
+});
+
+describe('siteApiPostForm', () => {
+  it('posts the form to the public address and reads the answer', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(json(200, { id: 5 }));
+    const body = new FormData();
+    body.set('phone', '0504698675');
+
+    const result = await siteApiPostForm(
+      '/api/public/site-requests',
+      body,
+      fetchMock,
+      'https://api.example.com',
+    );
+
+    expect(result).toEqual({ kind: 'ok', data: { id: 5 } });
+    expect(String(fetchMock.mock.calls[0][0])).toBe(
+      'https://api.example.com/api/public/site-requests',
+    );
+    expect(fetchMock.mock.calls[0][1]).toMatchObject({ method: 'POST', body });
+  });
+
+  it('treats a refused or failed post as unavailable', async () => {
+    const call = (fetchMock: typeof fetch) =>
+      siteApiPostForm(
+        '/api/public/site-requests',
+        new FormData(),
+        fetchMock,
+        'https://api.example.com',
+      );
+
+    expect(await call(vi.fn().mockResolvedValue(json(429)))).toEqual({
+      kind: 'unavailable',
+      status: 429,
     });
     expect(await call(vi.fn().mockRejectedValue(new TypeError('fetch failed')))).toEqual({
       kind: 'unavailable',

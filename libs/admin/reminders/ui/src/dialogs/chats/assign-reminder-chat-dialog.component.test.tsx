@@ -14,6 +14,7 @@ const chat: ReminderChat = {
   displayName: null,
   isApproved: true,
   isBotMember: true,
+  receivesSiteRequests: false,
   discoveredAt: '2026-11-01T10:00:00Z',
 };
 

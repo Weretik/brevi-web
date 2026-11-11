@@ -3262,6 +3262,57 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/crm/site-requests': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Newest first, with the counts for the tabs. */
+    get: operations['getCrmSiteRequests'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/crm/site-requests/{id}/change': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Take (anyone with edit), Done or Spam with a note, Reopen (the owner or an Admin). */
+    post: operations['changeCrmSiteRequest'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/public/site-requests': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Saves the request. A Telegram failure does not refuse it; the reason is kept for staff. */
+    post: operations['submitPublicSiteRequest'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/crm/leads': {
     parameters: {
       query?: never;
@@ -10334,6 +10385,72 @@ export interface components {
       version: number;
       isDone: boolean;
     };
+    CrmSiteRequest: {
+      /** Format: int64 */
+      id: number;
+      phone: string;
+      workwear?: string | null;
+      quantity?: string | null;
+      comment?: string | null;
+      /** @enum {string} */
+      locale: 'uk' | 'ru';
+      fileName?: string | null;
+      fileUrl?: string | null;
+      /** @enum {string} */
+      status: 'New' | 'InWork' | 'Done' | 'Spam';
+      ownerUserId?: number | null;
+      ownerName?: string | null;
+      /** Format: date-time */
+      takenAt?: string | null;
+      /** Format: date-time */
+      closedAt?: string | null;
+      note?: string | null;
+      /** Format: date-time */
+      createdAt: string;
+      /** Format: date-time */
+      notifiedAt?: string | null;
+      /** @description Why the bot could not post the request; null when it did or it is not known yet. */
+      notifyError?: string | null;
+      version: number;
+    };
+    CrmSiteRequestCounts: {
+      new: number;
+      inWork: number;
+      /** @description In work and taken by the signed-in staff member. */
+      mine: number;
+      closed: number;
+    };
+    CrmSiteRequestPage: {
+      items: components['schemas']['CrmSiteRequest'][];
+      total: number;
+      page: number;
+      pageSize: number;
+      counts: components['schemas']['CrmSiteRequestCounts'];
+    };
+    CrmChangeSiteRequestInput: {
+      /** @enum {string} */
+      action: 'Take' | 'Done' | 'Spam' | 'Reopen';
+      version: number;
+      note?: string | null;
+    };
+    CrmPublicSiteRequestForm: {
+      /** @description A Ukrainian number, 10 digits from 0 or 12 from 380; other characters are ignored. */
+      phone: string;
+      workwear?: string;
+      quantity?: string;
+      comment?: string;
+      /** @enum {string} */
+      locale?: 'uk' | 'ru';
+      /**
+       * Format: binary
+       * @description Up to 10 MB; pdf, doc, docx, xls, xlsx, zip, rar, 7z, jpg, jpeg, png, cdr, ai, eps, psd.
+       */
+      attachment?: string;
+    };
+    CrmSiteRequestReceived: {
+      /** Format: int64 */
+      id: number;
+    };
     /** @enum {string} */
     CrmLeadScope: 'All' | 'Mine' | 'Free';
     /** @enum {string} */
@@ -13158,10 +13275,14 @@ export interface components {
       isBotMember?: boolean;
       /** Format: date-time */
       discoveredAt?: string;
+      /** @description The bot also posts the requests of the public site here (LEAD-002) while the chat is approved. */
+      receivesSiteRequests?: boolean;
     };
     ReminderChatInput: {
       displayName?: string | null;
       isApproved?: boolean;
+      /** @description «Заявки з сайту» (LEAD-002); null or missing keeps the current choice. */
+      receivesSiteRequests?: boolean | null;
     };
     ReminderActorResponse: {
       name?: string | null;
@@ -25048,6 +25169,153 @@ export interface operations {
         content?: never;
       };
       409: components['responses']['components-responses-Conflict'];
+    };
+  };
+  getCrmSiteRequests: {
+    parameters: {
+      query?: {
+        /** @description Open (default, new and in work), Mine, Closed or All. */
+        scope?: 'Open' | 'Mine' | 'Closed' | 'All';
+        page?: number;
+        pageSize?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmSiteRequestPage'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to view «Заявки з сайту» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  changeCrmSiteRequest: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CrmChangeSiteRequestInput'];
+      };
+    };
+    responses: {
+      /** @description Changed */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmSiteRequest'];
+        };
+      };
+      /** @description Unknown action, a long note, or the request is already closed */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to edit, or the request is another manager's */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such request */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The version is stale or another manager took it */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  submitPublicSiteRequest: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'multipart/form-data': components['schemas']['CrmPublicSiteRequestForm'];
+      };
+    };
+    responses: {
+      /** @description Saved; a manager will call */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['CrmSiteRequestReceived'];
+        };
+      };
+      /** @description The phone, a text or the file is wrong; the answer names it in Ukrainian */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': Record<string, never>;
+        };
+      };
+      /** @description The body is larger than 11 MB */
+      413: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Too many requests from this address */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
     };
   };
   getCrmLeads: {

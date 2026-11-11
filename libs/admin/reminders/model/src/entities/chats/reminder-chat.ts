@@ -15,6 +15,8 @@ export interface ReminderChat {
   displayName: string | null;
   isApproved: boolean;
   isBotMember: boolean;
+  /** «Заявки з сайту» (LEAD-002): the bot also posts site requests here while the chat is approved. */
+  receivesSiteRequests: boolean;
   /** ISO date-time when the bot first saw the chat. */
   discoveredAt: string;
 }
@@ -22,6 +24,7 @@ export interface ReminderChat {
 export interface ReminderChatInput {
   displayName: string | null;
   isApproved: boolean;
+  receivesSiteRequests: boolean;
 }
 
 export function reminderChatName(

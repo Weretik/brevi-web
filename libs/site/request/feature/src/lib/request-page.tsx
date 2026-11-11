@@ -29,7 +29,7 @@ export async function RequestPage({ locale }: { locale: Locale }) {
         <RequestForm
           company={company}
           dictionary={{ form: dictionary.form, sent: dictionary.sent }}
-          action={submitRequest}
+          action={submitRequest.bind(null, locale)}
           agreementHref={path('agreement')}
           catalogHref={path('catalog')}
         />

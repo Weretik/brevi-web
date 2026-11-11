@@ -26,10 +26,12 @@ interface Props {
 export function ReminderChatDialog({ chat, saving, error, onClose, onSave }: Props) {
   const [name, setName] = useState('');
   const [approved, setApproved] = useState(true);
+  const [siteRequests, setSiteRequests] = useState(false);
   useEffect(() => {
     setName(chat?.displayName ?? '');
     // Opening the dialog is how a new chat gets approved, so the switch starts on.
     setApproved(true);
+    setSiteRequests(chat?.receivesSiteRequests ?? false);
   }, [chat]);
   return (
     <Dialog
@@ -62,6 +64,16 @@ export function ReminderChatDialog({ chat, saving, error, onClose, onSave }: Pro
             }
             label="Надсилати нагадування в цей чат"
           />
+          <FormControlLabel
+            control={
+              <Switch
+                checked={siteRequests}
+                disabled={saving || !approved}
+                onChange={(event) => setSiteRequests(event.target.checked)}
+              />
+            }
+            label="Надсилати сюди заявки з сайту"
+          />
         </Stack>
       </DialogContent>
       <DialogActions>
@@ -71,7 +83,13 @@ export function ReminderChatDialog({ chat, saving, error, onClose, onSave }: Pro
         <Button
           variant="contained"
           disabled={saving}
-          onClick={() => onSave({ displayName: name.trim() || null, isApproved: approved })}
+          onClick={() =>
+            onSave({
+              displayName: name.trim() || null,
+              isApproved: approved,
+              receivesSiteRequests: approved && siteRequests,
+            })
+          }
         >
           Зберегти
         </Button>

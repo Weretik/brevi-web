@@ -22,6 +22,7 @@ export function reminderChatEndpoints(build: RemindersEndpointBuilder) {
         body: {
           displayName: input.displayName,
           isApproved: input.isApproved,
+          receivesSiteRequests: input.receivesSiteRequests,
         } satisfies components['schemas']['ReminderChatInput'],
       }),
       transformResponse: mapReminderChat,
