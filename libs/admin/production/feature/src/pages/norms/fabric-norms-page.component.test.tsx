@@ -29,6 +29,12 @@ const api = vi.hoisted(() => {
     save: vi.fn(),
     rows: [
       row('MOD-025', 'Куртка', { ...empty, oneColor: 3.6 }),
+      row('MOD-052', 'Куртка «Віол»', {
+        ...empty,
+        oneColor: 2.5,
+        twoColorsMain: 2.2,
+        twoColorsAdditional: 0.3,
+      }),
       row('MOD-030', 'Жилет', null),
       row('MOD-099', null, { ...empty, oneColor: 1 }),
     ],
@@ -99,61 +105,73 @@ vi.mock('@admin/production/data-access', () => ({
 
 afterEach(cleanup);
 
+const renderPage = (url = '/production/fabric-norms') =>
+  render(
+    <MemoryRouter initialEntries={[url]}>
+      <FabricNormsPage />
+    </MemoryRouter>,
+  );
+
 describe('FabricNormsPage', () => {
   it('counts models and shows the problems chip only when there are problems', () => {
-    render(
-      <MemoryRouter>
-        <FabricNormsPage />
-      </MemoryRouter>,
-    );
+    renderPage();
     expect(screen.getByRole('button', { name: 'Без норми 1' })).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Проблеми 1' }));
-    const grid = screen.getByRole('grid', { name: 'Норми витрати тканини' });
-    expect(within(grid).getAllByText('MOD-099').length).toBeGreaterThan(0);
-    expect(within(grid).queryByText('Куртка')).toBeNull();
+    const list = screen.getByRole('list', { name: 'Моделі' });
+    expect(within(list).getByText('MOD-099')).toBeTruthy();
+    expect(within(list).queryByText('Куртка')).toBeNull();
   });
 
-  it('groups the colour columns and shows the season under the model', () => {
-    render(
-      <MemoryRouter>
-        <FabricNormsPage />
-      </MemoryRouter>,
-    );
-    const grid = screen.getByRole('grid', { name: 'Норми витрати тканини' });
-    expect(within(grid).getByText('2 кольори')).toBeTruthy();
-    expect(within(grid).getByText('3 кольори')).toBeTruthy();
-    expect(within(grid).getByText('MOD-025 · Літо')).toBeTruthy();
-    expect(within(grid).getByText('3,6 м')).toBeTruthy();
+  it('shows the first model with the season under its name', () => {
+    renderPage();
+    const card = screen.getByRole('region', { name: 'MOD-025 Куртка' });
+    expect(within(card).getByText('MOD-025 · Літо')).toBeTruthy();
+    expect(within(card).getByText('3,6 м')).toBeTruthy();
+    expect(within(card).getByText('Не шиється у 2 кольори.')).toBeTruthy();
   });
 
-  it('shows the composition of a model on its own tab', () => {
-    render(
-      <MemoryRouter initialEntries={['/production/fabric-norms?tab=compositions']}>
-        <FabricNormsPage />
-      </MemoryRouter>,
-    );
-    expect(screen.queryByRole('button', { name: 'Імпорт' })).toBeNull();
-    const block = screen.getByRole('region', { name: 'MOD-052 Куртка «Віол»' });
-    const layers = within(block).getByRole('table', {
-      name: 'Додаткові шари: MOD-052 Куртка «Віол»',
+  it('shows main and additional fabric, lining and the rest of the composition in one card', () => {
+    renderPage('/production/fabric-norms?model=MOD-052');
+    const card = screen.getByRole('region', { name: 'MOD-052 Куртка «Віол»' });
+    const two = within(card).getByRole('region', { name: '2 кольори' });
+    expect(within(two).getByText('Основна')).toBeTruthy();
+    expect(within(two).getByText('2,2 м')).toBeTruthy();
+    expect(within(two).getByText('Додаткова')).toBeTruthy();
+    expect(within(two).getByText('0,3 м')).toBeTruthy();
+    expect(within(two).getByText('2,5 м')).toBeTruthy();
+
+    const layers = within(card).getByRole('table', {
+      name: 'Підкладка і утеплювач: Куртка «Віол»',
     });
     expect(within(layers).getByText('Підкладка')).toBeTruthy();
-    expect(within(layers).getByText('1,9 м')).toBeTruthy();
-    expect(within(block).getByText('Повна комплектація · 2 рядки')).toBeTruthy();
-    expect(
-      within(block).getByRole('link', { name: 'Змінити комплектацію: MOD-052 Куртка «Віол»' }),
-    ).toHaveAttribute('href', '/references/products/52?tab=materials');
+    const rest = within(card).getByRole('table', { name: 'Решта складу: Куртка «Віол»' });
+    expect(within(rest).getByText('FAB-023 Грета')).toBeTruthy();
+    expect(within(rest).queryByText('FUR-021 Підкладка поліестерова')).toBeNull();
+    expect(within(card).getByRole('link', { name: 'Склад у «Товари»' })).toHaveAttribute(
+      'href',
+      '/references/products/12?tab=materials',
+    );
+  });
+
+  it('counts the materials for a batch', () => {
+    renderPage('/production/fabric-norms?model=MOD-052');
+    fireEvent.change(screen.getByLabelText('Рахувати на кількість виробів'), {
+      target: { value: '40' },
+    });
+    const two = screen.getByRole('region', { name: '2 кольори' });
+    expect(within(two).getByText('× 40 = 88 м')).toBeTruthy();
+    expect(within(two).getByText('× 40 = 12 м')).toBeTruthy();
+    const layers = screen.getByRole('table', { name: 'Підкладка і утеплювач: Куртка «Віол»' });
+    expect(within(layers).getByText('На 40 шт.')).toBeTruthy();
+    expect(within(layers).getByText('76 м')).toBeTruthy();
   });
 
   it('sets a norm for a model without one', async () => {
-    render(
-      <MemoryRouter>
-        <FabricNormsPage />
-      </MemoryRouter>,
-    );
-    fireEvent.click(screen.getByRole('button', { name: 'Дії: MOD-030 Жилет' }));
-    fireEvent.click(await screen.findByRole('menuitem', { name: 'Редагувати' }));
-    fireEvent.change(await screen.findByLabelText('Один колір'), { target: { value: '2,5' } });
+    renderPage('/production/fabric-norms?model=MOD-030');
+    fireEvent.click(screen.getByRole('button', { name: 'Задати норму' }));
+    fireEvent.change(await screen.findByLabelText('Один колір: основна'), {
+      target: { value: '2,5' },
+    });
     fireEvent.click(screen.getByRole('button', { name: 'Зберегти' }));
 
     expect(await screen.findByText('Норму MOD-030 збережено.')).toBeTruthy();

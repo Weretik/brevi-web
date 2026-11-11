@@ -41,8 +41,18 @@ export type FabricNormField = (typeof fabricNormFields)[number];
 export const fabricNormModelCaption = (row: Pick<FabricNormRow, 'modelCode' | 'season'>) =>
   row.season ? `${row.modelCode} · ${row.season}` : row.modelCode;
 
+/** The short label inside a colour group of the form: «Основна», «Додаткова 1». */
+export const fabricNormFieldShortLabels: Record<FabricNormField, string> = {
+  oneColor: 'Основна',
+  twoColorsMain: 'Основна',
+  twoColorsAdditional: 'Додаткова',
+  threeColorsMain: 'Основна',
+  threeColorsAdditional1: 'Додаткова 1',
+  threeColorsAdditional2: 'Додаткова 2',
+};
+
 export const fabricNormFieldLabels: Record<FabricNormField, string> = {
-  oneColor: 'Один колір',
+  oneColor: 'Один колір: основна',
   twoColorsMain: 'Два кольори: основна',
   twoColorsAdditional: 'Два кольори: додаткова',
   threeColorsMain: 'Три кольори: основна',

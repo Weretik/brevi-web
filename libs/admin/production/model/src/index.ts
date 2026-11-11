@@ -8,6 +8,7 @@ export {
   FABRIC_NORM_DECIMALS,
   FABRIC_NORM_MAX_METERS,
   fabricNormFieldLabels,
+  fabricNormFieldShortLabels,
   fabricNormFields,
   fabricNormModelCaption,
 } from './entities/fabric-norm';
@@ -26,9 +27,16 @@ export type {
 } from './entities/model-composition';
 export {
   compositionMaterialText,
-  filterModelCompositions,
   formatCompositionQuantity,
 } from './queries/model-composition-filters';
+export {
+  BATCH_SIZE_MAX,
+  compositionRest,
+  fabricNormVariants,
+  forBatch,
+  parseBatchSize,
+} from './queries/model-work-card';
+export type { FabricNormPart, FabricNormVariant } from './queries/model-work-card';
 export type { FabricNormField, FabricNormRow, FabricNormValues } from './entities/fabric-norm';
 export type {
   FabricNormImportRow,
