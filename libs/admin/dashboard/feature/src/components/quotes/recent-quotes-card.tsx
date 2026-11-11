@@ -19,6 +19,7 @@ import type { RecentQuote } from '../../model/dashboard-view';
 
 interface RecentQuotesCardProps {
   quotes: readonly RecentQuote[];
+  title?: string;
 }
 
 const headerCellSx = {
@@ -31,7 +32,7 @@ const headerCellSx = {
 } as const;
 
 /** The latest КП in work, newest first. */
-export function RecentQuotesCard({ quotes }: RecentQuotesCardProps) {
+export function RecentQuotesCard({ quotes, title = 'Останні КП' }: RecentQuotesCardProps) {
   return (
     <Card aria-labelledby="recent-quotes-title" component="section" sx={{ minWidth: 0, p: 2 }}>
       <Stack
@@ -45,7 +46,7 @@ export function RecentQuotesCard({ quotes }: RecentQuotesCardProps) {
         }}
       >
         <Typography component="h2" id="recent-quotes-title" variant="h6">
-          Останні КП
+          {title}
         </Typography>
         <Link
           component={RouterLink}

@@ -11,8 +11,8 @@ export interface DeskDefinition {
 export type DeskKey = 'workshop' | 'sales';
 
 /**
- * Desks built so far, in tab order. Stage 1: the workshop desk and, until the manager desk (stage 2), the latest КП
- * as «Продажі». SEO, accountant and the director's main desk come in later stages.
+ * Desks built so far, in tab order: the workshop desk (stage 1) and the manager desk «Продажі» (stage 2). SEO,
+ * accountant and the director's main desk come in later stages.
  */
 export const desks: readonly DeskDefinition[] = [
   { key: 'workshop', title: 'Цех', heading: 'Робочий стіл цеху', access: 'desk-workshop' },

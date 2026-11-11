@@ -81,9 +81,110 @@ const hardware: HardwareReport = {
   calculatedAt: '2026-11-11T10:00:00Z',
 };
 
+const order = (id: number, number: number, clientName: string, nearestDueDate: string) => ({
+  id,
+  number,
+  status: 'New',
+  clientName,
+  quoteId: null,
+  quoteNumber: null,
+  managerName: 'Олена',
+  orderDate: '2026-11-01',
+  itemsCount: 1,
+  totalQuantity: 10,
+  nearestDueDate,
+  isTransferred: false,
+  updatedAt: '2026-11-01T10:00:00Z',
+  stage: 'Cutting',
+  shippedQuantity: 0,
+  items: [],
+});
+
+const ordersQuery = vi.fn();
+
 vi.mock('@admin/production/data-access', () => ({
   useGetWorkshopDashboardQuery: (_: unknown, options: { skip: boolean }) =>
     options.skip ? {} : { data: dashboard },
+  useGetProductionOrdersQuery: (query: unknown, options: { skip: boolean }) => {
+    ordersQuery(query);
+    return options.skip
+      ? {}
+      : {
+          data: {
+            items: [order(9, 44, 'Метінвест', '2026-01-02'), order(10, 45, 'АТБ', '2099-11-18')],
+            total: 2,
+          },
+        };
+  },
+}));
+vi.mock('@admin/leads/data-access', () => ({
+  useGetLeadMyDayQuery: (_: unknown, options: { skip: boolean }) =>
+    options.skip
+      ? {}
+      : {
+          data: {
+            queue: [
+              { id: 1, company: 'ТОВ «Агросвіт»', isOverdue: true, nextContactAt: null },
+              { id: 2, company: 'ПП «Колос»', isOverdue: false, nextContactAt: null },
+            ],
+            later: [],
+            callsToday: 5,
+            plannedToday: 17,
+            free: 3,
+          },
+        },
+}));
+vi.mock('@admin/tasks/data-access', () => ({
+  useGetTaskOverviewQuery: (_: unknown, options: { skip: boolean }) =>
+    options.skip
+      ? {}
+      : {
+          data: {
+            open: 9,
+            overdue: 2,
+            urgent: 1,
+            new: 0,
+            inProgress: 0,
+            done: 0,
+            doneLastWeek: 0,
+            onTimePercent: null,
+            load: [],
+          },
+        },
+  useListTasksQuery: (_: unknown, options: { skip: boolean }) =>
+    options.skip
+      ? {}
+      : {
+          data: {
+            items: [
+              {
+                id: 1,
+                title: 'Надіслати КП',
+                isOverdue: true,
+                isUrgent: false,
+                dueAt: '2026-11-10T10:00:00Z',
+                customerName: 'Кернел',
+              },
+              {
+                id: 2,
+                title: 'Узгодити макет',
+                isOverdue: false,
+                isUrgent: true,
+                dueAt: '2026-11-12T10:00:00Z',
+                customerName: null,
+              },
+              {
+                id: 3,
+                title: 'Спокійне',
+                isOverdue: false,
+                isUrgent: false,
+                dueAt: '2026-11-20T10:00:00Z',
+                customerName: null,
+              },
+            ],
+            total: 3,
+          },
+        },
 }));
 vi.mock('@admin/warehouse/data-access', () => ({
   useGetFabricBookingQuery: (_: unknown, options: { skip: boolean }) =>
@@ -122,7 +223,7 @@ vi.mock('@admin/quotes/data-access', () => ({
 const renderFor = (...pages: string[]) =>
   render(
     <MemoryRouter>
-      <DashboardPage useViewer={() => ({ canSee: (page) => pages.includes(page) })} />
+      <DashboardPage useViewer={() => ({ canSee: (page) => pages.includes(page), userId: 2 })} />
     </MemoryRouter>,
   );
 
@@ -173,15 +274,44 @@ describe('DashboardPage', () => {
     expect(screen.queryByRole('region', { name: 'Фурнітура до замовлення' })).toBeNull();
   });
 
-  it('gives a manager the latest КП and the quick actions', () => {
-    renderFor('desk-sales', 'quotes', 'production-orders');
+  it('gives a manager their day: calls, burning tasks, own КП and own orders in the workshop', () => {
+    renderFor('desk-sales', 'leads', 'tasks', 'quotes', 'production-orders', 'embroidery');
 
     expect(screen.getByRole('heading', { level: 1, name: 'Робочий стіл менеджера' })).toBeVisible();
+    const metrics = screen.getByRole('region', { name: 'Показники' });
+    expect(within(metrics).getByText('5 з 17')).toBeVisible();
+    expect(within(metrics).getByText('2 прострочено')).toBeVisible();
+    expect(within(metrics).getByText('1 запізнюється')).toBeVisible();
+
+    const calls = screen.getByRole('region', { name: 'Черга дзвінків' });
+    expect(within(calls).getByText('прострочено')).toBeVisible();
+    const tasks = screen.getByRole('region', { name: 'Завдання, що горять' });
+    expect(within(tasks).getByText('Надіслати КП · Кернел')).toBeVisible();
+    expect(within(tasks).getByText('терміново')).toBeVisible();
+    expect(within(tasks).queryByText('Спокійне')).toBeNull();
+
+    expect(screen.getByRole('heading', { name: 'Мої КП' })).toBeVisible();
     expect(screen.getByRole('link', { name: 'КП-0005' })).toHaveAttribute('href', '/crm/quotes/5');
+    const orders = screen.getByRole('region', { name: 'Мої замовлення в цеху' });
+    expect(within(orders).getByRole('link', { name: '№44 Метінвест' })).toHaveAttribute(
+      'href',
+      '/production/orders/9',
+    );
+    expect(within(orders).getByText('запізнюється')).toBeVisible();
+    expect(within(orders).getByText('до 18.11')).toBeVisible();
+    expect(ordersQuery).toHaveBeenCalledWith(
+      expect.objectContaining({ status: 'New', managerUserId: 2, sort: 'due' }),
+    );
+
+    expect(screen.getByRole('link', { name: 'Ціна вишивки' })).toHaveAttribute(
+      'href',
+      '/crm/embroidery',
+    );
     expect(screen.getByRole('link', { name: 'Новий розрахунок' })).toHaveAttribute(
       'href',
       '/crm/quotes/new',
     );
+    expect(screen.queryByRole('link', { name: 'Клієнти' })).toBeNull();
     expect(screen.queryByRole('region', { name: 'Дошка цеху' })).toBeNull();
   });
 
