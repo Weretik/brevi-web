@@ -53,4 +53,37 @@ describe('RichTextEditor', () => {
     );
     expect(screen.getByRole('button', { name: 'Жирний' })).toBeDisabled();
   });
+  it('has no «Фото» button unless the text may have photos', () => {
+    render(<RichTextEditor label="Опис" initialValue={doc} onChange={vi.fn()} />);
+
+    expect(screen.queryByRole('button', { name: 'Фото' })).not.toBeInTheDocument();
+  });
+
+  it('puts photos of the library into the text and lets staff describe them', async () => {
+    const onChange = vi.fn();
+    render(
+      <RichTextEditor
+        label="Текст"
+        initialValue={doc}
+        onChange={onChange}
+        onPickImages={(insert) =>
+          insert([{ photoId: 7, src: 'https://cdn.test/7.jpg', alt: 'Цех' }])
+        }
+      />,
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: 'Фото' }));
+
+    expect(await screen.findByRole('img', { name: 'Цех' })).toHaveAttribute(
+      'src',
+      'https://cdn.test/7.jpg',
+    );
+    await userEvent.type(screen.getByRole('textbox', { name: 'Опис фото' }), ' зранку');
+    const saved = onChange.mock.lastCall?.[0] as RichTextDocument;
+    expect(saved.content?.find((node) => node.type === 'photo')?.attrs).toEqual({
+      photoId: 7,
+      src: 'https://cdn.test/7.jpg',
+      alt: 'Цех зранку',
+    });
+  });
 });

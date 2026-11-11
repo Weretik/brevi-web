@@ -36,6 +36,7 @@ const defaults: Readonly<Record<string, Readonly<Record<string, readonly AccessA
     media: All,
     'content-products': All,
     'content-categories': All,
+    'content-articles': All,
   },
   Manager: {
     leads: VE,
@@ -56,6 +57,7 @@ const defaults: Readonly<Record<string, Readonly<Record<string, readonly AccessA
     media: All,
     'content-products': V,
     'content-categories': V,
+    'content-articles': V,
   },
   Accountant: {
     products: V,

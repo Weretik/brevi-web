@@ -16,6 +16,7 @@ import { createReferencesRoutes } from '@admin/references/feature';
 import { remindersRoutes } from '@admin/reminders/feature';
 import { createTasksRoutes } from '@admin/tasks/feature';
 
+import { useArticlesViewer } from './use-articles-viewer';
 import { useCanSeeFinance } from './use-can-see-finance';
 import { useCanSeePurchaseInvoices } from './use-can-see-purchase-invoices';
 import { useContentProductsViewer } from './use-content-products-viewer';
@@ -41,7 +42,11 @@ export const adminRouteDefinitions = [
   ...productsRoutes,
   ...remindersRoutes,
   ...mediaRoutes,
-  ...createContentRoutes({ useContentProductsViewer, useSiteCategoriesViewer }),
+  ...createContentRoutes({
+    useContentProductsViewer,
+    useSiteCategoriesViewer,
+    useArticlesViewer,
+  }),
 ];
 
 /** Task pages need a role check, so the router wraps them instead of listing them above. */

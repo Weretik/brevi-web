@@ -2,8 +2,10 @@ import { Box, FormHelperText, Typography } from '@mui/material';
 import { EditorContent, useEditor } from '@tiptap/react';
 import { useEffect, useId } from 'react';
 
-import { richTextExtensions } from './rich-text-extensions';
+import { richTextExtensions, richTextWithPhotoExtensions } from './rich-text-extensions';
 import { RichTextToolbar } from './rich-text-toolbar';
+
+import type { RichTextImage } from './rich-text-photo';
 
 /** The document of the editor (ProseMirror JSON): paragraphs, headings, lists, bold and italic text. */
 export interface RichTextDocument {
@@ -22,6 +24,11 @@ interface RichTextEditorProps {
   disabled?: boolean;
   error?: boolean;
   helperText?: string;
+  /**
+   * Lets the text have photos: «Фото» of the toolbar calls this, and the caller hands the chosen
+   * photos of the library to `insert`. Must be given from the first render or not at all.
+   */
+  onPickImages?: (insert: (images: RichTextImage[]) => void) => void;
 }
 
 /**
@@ -35,6 +42,7 @@ export function RichTextEditor({
   disabled = false,
   error = false,
   helperText,
+  onPickImages,
 }: RichTextEditorProps) {
   const labelId = useId();
   const editor = useEditor({
@@ -43,7 +51,7 @@ export function RichTextEditor({
     editorProps: {
       attributes: { 'aria-labelledby': labelId, 'aria-multiline': 'true', role: 'textbox' },
     },
-    extensions: richTextExtensions,
+    extensions: onPickImages ? richTextWithPhotoExtensions : richTextExtensions,
     immediatelyRender: true,
     onUpdate: ({ editor: current }) => onChange(current.getJSON() as RichTextDocument),
   });
@@ -80,9 +88,25 @@ export function RichTextEditor({
           '& .ProseMirror h2:first-of-type': { mt: 0 },
           '& .ProseMirror p': { my: 1 },
           '& .ProseMirror ul': { my: 1, pl: 2.5 },
+          '& .ProseMirror-selectednode': { outline: 'none' },
         })}
       >
-        <RichTextToolbar editor={editor} disabled={disabled} />
+        <RichTextToolbar
+          editor={editor}
+          disabled={disabled}
+          onPhoto={
+            onPickImages
+              ? () =>
+                  onPickImages((images) =>
+                    editor
+                      .chain()
+                      .focus()
+                      .insertContent(images.map((attrs) => ({ type: 'photo', attrs })))
+                      .run(),
+                  )
+              : undefined
+          }
+        />
         <EditorContent editor={editor} />
       </Box>
       {helperText ? <FormHelperText error={error}>{helperText}</FormHelperText> : null}

@@ -55,6 +55,7 @@ The Storefront currently has README files for its Nx feature libraries, but they
 - [Admin React: «Швейний цех» stage 8, «Архів цеху»](admin/production/008-workshop-archive/README.md) — implemented 2026-11-05.
 - [Admin React: «Контент → Товари», site pages of products](admin/content/001-product-pages/README.md) — implemented and locally verified 2026-11-11.
 - [Admin React: «Контент → Розділи», categories of the site catalog](admin/content/002-site-categories/README.md) — implemented and locally verified 2026-11-11.
+- [Admin React: «Контент → Статті», articles of the site](admin/content/003-articles/README.md) — implemented and locally verified 2026-11-11.
 - [Admin React: photo library with folders](admin/media/001-photo-library/README.md) — implemented and locally verified 2026-11-03; replaces 007-media.
 - [Admin React: «КП» commercial proposals](admin/quotes/001-quotes/README.md) — stages 1–3 (list, «Товари та ціни» editor, «Налаштування КП», PDF, Gmail sending) implemented 2026-11-04; stages 4–6 planned.
 - [Admin React: manager tasks and the «Мої завдання» board](admin/tasks/001-manager-tasks/README.md) — implemented 2026-11-04.

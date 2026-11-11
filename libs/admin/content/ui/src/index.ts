@@ -8,3 +8,7 @@ export * from './tables/site-categories/site-categories-table';
 export * from './components/site-categories/site-category-view';
 export * from './forms/site-categories/site-category-form';
 export * from './dialogs/site-category-delete-dialog';
+export * from './tables/articles/articles-table';
+export * from './components/articles/article-view';
+export * from './forms/articles/article-form';
+export * from './dialogs/article-delete-dialog';

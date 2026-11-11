@@ -1,5 +1,7 @@
 import StarterKit from '@tiptap/starter-kit';
 
+import { richTextPhoto } from './rich-text-photo';
+
 /**
  * What a site text may contain: paragraphs, one level of headings, bulleted lists, bold, and italic.
  * Everything else of the starter kit is off, so pasted text cannot bring formatting the site does not show.
@@ -17,3 +19,6 @@ export const richTextExtensions = [
     underline: false,
   }),
 ];
+
+/** The same with photos of the «Фото» library between paragraphs, for texts that have pictures. */
+export const richTextWithPhotoExtensions = [...richTextExtensions, richTextPhoto];

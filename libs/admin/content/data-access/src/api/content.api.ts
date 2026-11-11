@@ -1,3 +1,4 @@
+import { articleEndpoints } from './articles/article-endpoints';
 import { contentBaseApi } from './content-base-api';
 import { contentProductEndpoints } from './product-pages/content-product-endpoints';
 import { siteCategoryEndpoints } from './site-categories/site-category-endpoints';
@@ -6,6 +7,7 @@ export const contentApi = contentBaseApi.injectEndpoints({
   endpoints: (build) => ({
     ...contentProductEndpoints(build),
     ...siteCategoryEndpoints(build),
+    ...articleEndpoints(build),
   }),
 });
 
@@ -23,4 +25,9 @@ export const {
   useReorderSiteCategoriesMutation,
   useDeleteSiteCategoryMutation,
   useImportOldSiteCategoriesMutation,
+  useGetContentArticlesQuery,
+  useGetContentArticleQuery,
+  useSaveContentArticleMutation,
+  useSetContentArticleVisibilityMutation,
+  useDeleteContentArticleMutation,
 } = contentApi;

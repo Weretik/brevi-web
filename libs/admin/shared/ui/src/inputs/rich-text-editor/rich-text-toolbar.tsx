@@ -1,3 +1,4 @@
+import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
 import FormatBoldIcon from '@mui/icons-material/FormatBold';
 import FormatItalicIcon from '@mui/icons-material/FormatItalic';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
@@ -46,8 +47,15 @@ function ToolButton({
   );
 }
 
-/** Buttons of the text editor: heading, bold, italic, list, undo and redo. */
-export function RichTextToolbar({ editor, disabled }: { editor: Editor; disabled: boolean }) {
+interface RichTextToolbarProps {
+  editor: Editor;
+  disabled: boolean;
+  /** Shows «Фото»: the text may have photos of the library. */
+  onPhoto?: (() => void) | undefined;
+}
+
+/** Buttons of the text editor: heading, bold, italic, list, photo (when allowed), undo and redo. */
+export function RichTextToolbar({ editor, disabled, onPhoto }: RichTextToolbarProps) {
   const state = useEditorState({
     editor,
     selector: ({ editor: current }) => ({
@@ -102,6 +110,14 @@ export function RichTextToolbar({ editor, disabled }: { editor: Editor; disabled
       >
         <FormatListBulletedIcon fontSize="small" />
       </ToolButton>
+      {onPhoto && (
+        <>
+          <Divider flexItem orientation="vertical" />
+          <ToolButton disabled={disabled} label="Фото" onClick={onPhoto}>
+            <AddPhotoAlternateOutlinedIcon fontSize="small" />
+          </ToolButton>
+        </>
+      )}
       <Divider flexItem orientation="vertical" />
       <ToolButton
         disabled={disabled || !state.canUndo}
