@@ -1,3 +1,5 @@
+export { staticCertificateCards } from './lib/data/certificate-cards';
+export type { CertificateCard } from './lib/data/certificate-cards';
 export {
   CERTIFICATE_DOCUMENTS,
   certificateScanPath,

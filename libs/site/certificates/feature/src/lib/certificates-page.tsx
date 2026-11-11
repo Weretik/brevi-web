@@ -1,22 +1,41 @@
 import {
-  CERTIFICATE_DOCUMENTS,
   CertificatesCopies,
   CertificatesDocuments,
   getCertificatesDictionary,
+  staticCertificateCards,
 } from '@site/certificates/ui';
 import { SITE_PATHS, localizedPath } from '@site/core/i18n';
 import { JsonLd, buildBreadcrumbJsonLd } from '@site/core/seo';
+import { galleryText, loadSiteGalleries } from '@site/settings/data-access';
 import { PageHeader, PageSection } from '@site/shared/ui';
 
+import type { CertificateCard } from '@site/certificates/ui';
 import type { Locale } from '@site/core/i18n';
 
+/** Size reserved for a scan whose size is unknown: the scans are A4 pages. */
+const FALLBACK_SIZE = { width: 425, height: 600 };
+
 /**
- * «Сертифікати» page: the documents of the live `brevi.com.ua` page with their scans, and a note that
- * certified copies come with the shipment. Static: the scans are files in
+ * «Сертифікати» page: the documents from «Контент → Сертифікати» with their scans, and a note that certified
+ * copies come with the shipment. Without the Admin list the page shows its own scans in
  * `apps/site/public/assets/certificates`.
  */
-export function CertificatesPage({ locale }: { locale: Locale }) {
+export async function CertificatesPage({ locale }: { locale: Locale }) {
   const dictionary = getCertificatesDictionary(locale);
+  const { certificates } = await loadSiteGalleries();
+  const documents: readonly CertificateCard[] =
+    certificates.length > 0
+      ? certificates.map((document) => ({
+          key: document.url,
+          url: document.url,
+          thumbnailUrl: document.thumbnailUrl,
+          width: document.width ?? FALLBACK_SIZE.width,
+          height: document.height ?? FALLBACK_SIZE.height,
+          title: galleryText(document.title, locale),
+          scope: galleryText(document.note, locale),
+          standards: document.standards,
+        }))
+      : staticCertificateCards(dictionary.documents);
   const breadcrumbs = [
     { name: dictionary.home, href: localizedPath(locale) },
     { name: dictionary.breadcrumb, href: localizedPath(locale, SITE_PATHS.certificates) },
@@ -37,10 +56,7 @@ export function CertificatesPage({ locale }: { locale: Locale }) {
         title={dictionary.documents.title}
         label={{ index: '02', text: dictionary.documents.label }}
       >
-        <CertificatesDocuments
-          documents={CERTIFICATE_DOCUMENTS}
-          dictionary={dictionary.documents}
-        />
+        <CertificatesDocuments documents={documents} dictionary={dictionary.documents} />
       </PageSection>
 
       <CertificatesCopies

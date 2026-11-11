@@ -30,4 +30,7 @@ export {
   useGetSeoOverviewQuery,
   useGetSiteCompanyQuery,
   useSaveSiteCompanyMutation,
+  useGetSiteGalleryQuery,
+  useSaveSiteGalleryMutation,
+  useTransferSiteGalleryMutation,
 } from './api/content.api';

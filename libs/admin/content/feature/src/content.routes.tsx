@@ -2,6 +2,7 @@ import { lazy } from 'react';
 
 import {
   articlesPath,
+  certificatesPath,
   companyPath,
   contentProductsPath,
   redirectsPath,
@@ -9,6 +10,7 @@ import {
   seoSettingsPath,
   siteCategoriesPath,
   sitePagesPath,
+  worksPath,
 } from './model/content-paths';
 
 import type {
@@ -17,6 +19,7 @@ import type {
   RedirectsViewer,
   SeoSettingsViewer,
   SiteCompanyViewer,
+  SiteGalleryViewer,
   SitePagesViewer,
   SiteCategoriesViewer,
 } from '@admin/content/model';
@@ -27,6 +30,8 @@ const LegalDocumentsPage = lazy(() => import('./pages/legal/legal-documents-page
 const ContentProductsPage = lazy(() => import('./pages/product-pages/content-products-page'));
 const RedirectsPage = lazy(() => import('./pages/redirects/redirects-page'));
 const SiteCompanyPage = lazy(() => import('./pages/company/site-company-page'));
+const SiteCertificatesPage = lazy(() => import('./pages/galleries/site-certificates-page'));
+const SiteWorksPage = lazy(() => import('./pages/galleries/site-works-page'));
 const SeoOverviewPage = lazy(() => import('./pages/seo-overview/seo-overview-page'));
 const SeoSettingsPage = lazy(() => import('./pages/seo-settings/seo-settings-page'));
 const SitePagesPage = lazy(() => import('./pages/site-pages/site-pages-page'));
@@ -34,6 +39,7 @@ const SiteCategoriesPage = lazy(() => import('./pages/site-categories/site-categ
 
 export {
   articlesPath,
+  certificatesPath,
   companyPath,
   contentProductsPath,
   redirectsPath,
@@ -41,6 +47,7 @@ export {
   seoSettingsPath,
   siteCategoriesPath,
   sitePagesPath,
+  worksPath,
 };
 
 export interface ContentRouteOptions {
@@ -58,13 +65,18 @@ export interface ContentRouteOptions {
   useSitePagesViewer: () => SitePagesViewer;
   /** Rights on «Контакти та компанія», read the same way. */
   useSiteCompanyViewer: () => SiteCompanyViewer;
+  /** Rights on «Наші роботи», read the same way. */
+  useSiteWorksViewer: () => SiteGalleryViewer;
+  /** Rights on «Сертифікати», read the same way. */
+  useSiteCertificatesViewer: () => SiteGalleryViewer;
 }
 
 /**
  * «Контент»: public content of Brevi sites. «Товари сайту», «Розділи сайту», «Статті», «Переадресації»,
  * «Налаштування SEO сайту» and «Сторінки сайту» sit behind «Права доступу» (`content-products`, `content-categories`,
  * `content-articles`, `content-redirects`, `content-seo-settings`, `content-site-pages`); the read-only «SEO-огляд»
- * behind `content-seo-overview` and «Контакти та компанія» behind `content-company` too. The public BreviERP documents are open to every staff member.
+ * behind `content-seo-overview`, «Контакти та компанія» behind `content-company`, «Наші роботи» and «Сертифікати» behind
+ * `content-works` and `content-certificates` too. The public BreviERP documents are open to every staff member.
  */
 export function createContentRoutes({
   useContentProductsViewer,
@@ -74,6 +86,8 @@ export function createContentRoutes({
   useSeoSettingsViewer,
   useSitePagesViewer,
   useSiteCompanyViewer,
+  useSiteWorksViewer,
+  useSiteCertificatesViewer,
 }: ContentRouteOptions): (RouteObject & { path: string })[] {
   function Products() {
     return <ContentProductsPage viewer={useContentProductsViewer()} />;
@@ -96,6 +110,12 @@ export function createContentRoutes({
   function Company() {
     return <SiteCompanyPage viewer={useSiteCompanyViewer()} />;
   }
+  function Works() {
+    return <SiteWorksPage viewer={useSiteWorksViewer()} />;
+  }
+  function Certificates() {
+    return <SiteCertificatesPage viewer={useSiteCertificatesViewer()} />;
+  }
   return [
     { path: contentProductsPath, element: <Products /> },
     { path: siteCategoriesPath, element: <Categories /> },
@@ -105,6 +125,8 @@ export function createContentRoutes({
     { path: sitePagesPath, element: <SitePages /> },
     { path: seoOverviewPath, element: <SeoOverviewPage /> },
     { path: companyPath, element: <Company /> },
+    { path: worksPath, element: <Works /> },
+    { path: certificatesPath, element: <Certificates /> },
     { path: '/content/legal', element: <LegalDocumentsPage /> },
   ];
 }

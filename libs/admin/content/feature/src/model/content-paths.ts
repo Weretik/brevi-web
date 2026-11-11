@@ -7,3 +7,5 @@ export const seoSettingsPath = '/content/seo-settings';
 export const sitePagesPath = '/content/site-pages';
 export const seoOverviewPath = '/content/seo-overview';
 export const companyPath = '/content/company';
+export const worksPath = '/content/works';
+export const certificatesPath = '/content/certificates';

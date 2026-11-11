@@ -11,6 +11,8 @@ The site reads the settings of «Налаштування SEO сайту» from 
 
 The company facts of «Контакти та компанія» (phone, email, address, hours, managers, payment details, profile links) come from `/api/public/company` through `loadSiteCompany`, kept five minutes (a failed read one minute, with `COMPANY` of `site-core-config` as the fallback). The layout passes them to the shell and the Organization JSON-LD; every page that shows the phone, the address or the payment details reads them in its feature component and passes `company` to its blocks. The name and the logo always stay the site's own.
 
+The pictures of «Наші роботи» and «Сертифікати» (CNT-011) come from `/api/public/galleries` through `loadSiteGalleries`, kept five minutes; with empty lists or a failed read the two pages show their own files ([works](works.md), [certificates](certificates.md)).
+
 The same stage also lists `x-default` (the Ukrainian version) in the sitemap alternates, uses the small copy of a product photo in the photo row of the product page, and adds `dateModified` to the article JSON-LD.
 
 ## Structure diagram

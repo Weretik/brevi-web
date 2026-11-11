@@ -3,7 +3,12 @@ import path from 'node:path';
 
 import { render, screen } from '@testing-library/react';
 
-import { WORK_PHOTOS, workPhotoPath, workThumbPath } from './data/work-photos';
+import {
+  STATIC_WORK_PICTURES,
+  WORK_PHOTOS,
+  workPhotoPath,
+  workThumbPath,
+} from './data/work-photos';
 import { getWorksDictionary } from './i18n/works-dictionary';
 import { WorksGallery } from './sections/works-gallery';
 
@@ -34,7 +39,7 @@ describe('work photos', () => {
 
 describe('WorksGallery', () => {
   it('links each thumbnail to its large photo and loads the tail lazily', () => {
-    const photos = WORK_PHOTOS.slice(0, 6);
+    const photos = STATIC_WORK_PICTURES.slice(0, 6);
     render(<WorksGallery photos={photos} dictionary={getWorksDictionary('uk').gallery} />);
 
     const images = screen.getAllByRole('img');
@@ -45,5 +50,12 @@ describe('WorksGallery', () => {
     const links = screen.getAllByRole('link');
     expect(links[0].getAttribute('href')).toBe('/assets/works/work-001.webp');
     expect(links[0].getAttribute('target')).toBe('_blank');
+  });
+
+  it('uses the description staff wrote as the picture text', () => {
+    const photo = { ...STATIC_WORK_PICTURES[0], alt: 'Костюм для кухаря' };
+    render(<WorksGallery photos={[photo]} dictionary={getWorksDictionary('uk').gallery} />);
+
+    expect(screen.getByRole('img').getAttribute('alt')).toBe('Костюм для кухаря');
   });
 });

@@ -31,6 +31,7 @@ import { useRedirectsViewer } from './use-redirects-viewer';
 import { useSeoSettingsViewer } from './use-seo-settings-viewer';
 import { useSiteCategoriesViewer } from './use-site-categories-viewer';
 import { useSiteCompanyViewer } from './use-site-company-viewer';
+import { useSiteCertificatesViewer, useSiteWorksViewer } from './use-site-gallery-viewers';
 import { useSitePagesViewer } from './use-site-pages-viewer';
 import { useTaskViewer } from './use-task-viewer';
 import { useWorkshopPeopleAccess } from './use-workshop-people-access';
@@ -56,6 +57,8 @@ export const adminRouteDefinitions = [
     useSeoSettingsViewer,
     useSitePagesViewer,
     useSiteCompanyViewer,
+    useSiteWorksViewer,
+    useSiteCertificatesViewer,
   }),
   ...createWarehouseRoutes(),
 ];

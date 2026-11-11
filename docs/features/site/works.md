@@ -1,8 +1,8 @@
 # Site: «Наші роботи» page
 
-**Status:** code exists, checked 2026-11-10. Specification: [«Наші роботи» page](../../specs/site/works/001-works/README.md).
+**Status:** code exists, checked 2026-11-11. Specification: [«Наші роботи» page](../../specs/site/works/001-works/README.md).
 
-`/uk/our-work` and `/ru/our-work` show a gallery of 82 photos of workwear that Brevi sewed for clients, and a call to order with links to the request form and to «Виробництво». The photos are the originals of the live `brevi.com.ua` gallery, converted to WebP in two sizes: a thumbnail for the grid and a large file that opens in a new tab. The page is static and reads no API.
+`/uk/our-work` and `/ru/our-work` show a gallery of photos of workwear that Brevi sewed for clients, and a call to order with links to the request form and to «Виробництво». The photos come from «Контент → Наші роботи» through `loadSiteGalleries` (`/api/public/galleries`, kept five minutes), each with its small copy for the grid, its large file that opens in a new tab, and the description staff wrote as the picture text. While the Admin list is empty or the API is unavailable the page shows its own files: the originals of the live `brevi.com.ua` gallery, converted to WebP in two sizes.
 
 ## Structure diagram
 
@@ -13,7 +13,8 @@ flowchart LR
   Feature --> Ui["site-works-ui: gallery, order block, dictionary"]
   Feature --> Seo["site-core-seo: JsonLd, BreadcrumbList"]
   Feature --> Shared["site-shared-ui: PageHeader, PageSection"]
-  Ui --> Photos["apps/site/public/assets/works"]
+  Feature --> Data["site-settings-data-access: loadSiteGalleries"]
+  Ui --> Photos["apps/site/public/assets/works (fallback)"]
 ```
 
 ## Code structure
@@ -24,13 +25,13 @@ apps/site/public/assets/works/                # work-NNN.webp and work-NNN-thumb
 libs/site/
 ├── works/feature/src/lib/works-page.tsx      # block order, links, JSON-LD
 ├── works/ui/src/lib/
-│   ├── data/work-photos.ts                   # photo list with sizes, file paths
+│   ├── data/work-photos.ts                   # own photo list with sizes, file paths, STATIC_WORK_PICTURES
 │   ├── i18n/works-dictionary.ts              # uk and ru text
 │   └── sections/                             # works-gallery, works-order
 └── works/seo/src/lib/works-metadata.ts
 ```
 
-To add a photo: put both WebP files into `apps/site/public/assets/works/` and add a row to `WORK_PHOTOS`.
+To add a photo: «Контент → Наші роботи» in the Admin.
 
 ## Tests
 

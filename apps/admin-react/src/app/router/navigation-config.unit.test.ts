@@ -50,8 +50,8 @@ describe('legacy Admin navigation', () => {
       'Загальні звіти',
       'Адміністрування',
     ]);
-    expect(groups.map((group) => group.items.length)).toEqual([5, 8, 7, 4, 8, 1, 9, 1, 5]);
-    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(48);
+    expect(groups.map((group) => group.items.length)).toEqual([5, 8, 7, 4, 8, 1, 11, 1, 5]);
+    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(50);
     expect(groups[0].items.map((item) => item.id)).not.toContain('clients');
   });
   it('shows «Налаштування КП» only for the server Admin role', () => {
@@ -109,6 +109,9 @@ describe('legacy Admin navigation', () => {
     expect(item('Admin', 'site-company')?.to).toBe('/content/company');
     expect(item('Manager', 'site-company')?.to).toBe('/content/company');
     expect(item('Accountant', 'site-company')).toBeUndefined();
+    expect(item('Admin', 'site-works')?.to).toBe('/content/works');
+    expect(item('Manager', 'site-certificates')?.to).toBe('/content/certificates');
+    expect(item('Accountant', 'site-works')).toBeUndefined();
   });
 
   it('enables a legacy URL only when the React route is registered', () => {
