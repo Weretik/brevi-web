@@ -2,12 +2,12 @@ import { canAccess, useAdminSession } from '@admin/core/auth';
 
 import type { DashboardViewer } from '@admin/dashboard/feature';
 
-/** The home blocks follow «Права доступу»: the workshop for «Виробничі завдання», КП for «Комерційні пропозиції». */
+const nothing: DashboardViewer = { canSee: () => false };
+
+/** «Робочий стіл» follows «Права доступу»: the desks of «Робочі столи» and each block's own page. */
 export function useDashboardViewer(): DashboardViewer {
   const session = useAdminSession();
-  if (session.status !== 'authenticated') return { seesWorkshop: false, seesQuotes: false };
-  return {
-    seesWorkshop: canAccess(session.user, 'production-orders'),
-    seesQuotes: canAccess(session.user, 'quotes'),
-  };
+  if (session.status !== 'authenticated') return nothing;
+  const { user } = session;
+  return { canSee: (page) => canAccess(user, page) };
 }

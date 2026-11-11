@@ -1,10 +1,11 @@
-import { cleanup, render, screen, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import DashboardPage from './dashboard-page';
 
 import type { WorkshopDashboard } from '@admin/production/model';
+import type { BookingReport, HardwareReport } from '@admin/warehouse/model';
 
 const dashboard: WorkshopDashboard = {
   today: '2026-11-05',
@@ -36,9 +37,59 @@ const dashboard: WorkshopDashboard = {
   hours: [{ employeeId: 3, name: 'Андреева', minutes: 960 }],
 };
 
+const pair = (fabricName: string, color: string, toOrder: number, shortage: number) => ({
+  fabricCode: fabricName,
+  fabricName,
+  color,
+  stock: 0,
+  need: 0,
+  reserved: 0,
+  free: 0,
+  toOrder,
+  shortage,
+  items: [],
+});
+
+const booking: BookingReport = {
+  reserved: 0,
+  free: 0,
+  toOrder: 140,
+  pairs: [
+    pair('Грета', 'синій', 140, 0),
+    pair('Канвас', 'чорний', 0, 12),
+    pair('Оксфорд', 'сірий', 0, 0),
+  ],
+  unknown: [],
+  calculatedAt: '2026-11-11T10:00:00Z',
+};
+
+const hardware: HardwareReport = {
+  orders: 1,
+  items: 1,
+  needs: [
+    {
+      code: 'ACC-1',
+      name: 'Блискавка 18 см',
+      nameChecked: true,
+      note: null,
+      unit: 'Piece',
+      quantity: 120,
+      orders: [],
+    },
+  ],
+  incomplete: [],
+  calculatedAt: '2026-11-11T10:00:00Z',
+};
+
 vi.mock('@admin/production/data-access', () => ({
   useGetWorkshopDashboardQuery: (_: unknown, options: { skip: boolean }) =>
     options.skip ? {} : { data: dashboard },
+}));
+vi.mock('@admin/warehouse/data-access', () => ({
+  useGetFabricBookingQuery: (_: unknown, options: { skip: boolean }) =>
+    options.skip ? {} : { data: booking },
+  useGetHardwareOrderQuery: (_: unknown, options: { skip: boolean }) =>
+    options.skip ? {} : { data: hardware },
 }));
 vi.mock('@admin/quotes/data-access', () => ({
   useListQuotesQuery: (_: unknown, options: { skip: boolean }) =>
@@ -68,23 +119,31 @@ vi.mock('@admin/quotes/data-access', () => ({
         },
 }));
 
-const renderFor = (seesWorkshop: boolean, seesQuotes: boolean) =>
+const renderFor = (...pages: string[]) =>
   render(
     <MemoryRouter>
-      <DashboardPage useViewer={() => ({ seesWorkshop, seesQuotes })} />
+      <DashboardPage useViewer={() => ({ canSee: (page) => pages.includes(page) })} />
     </MemoryRouter>,
   );
 
+const chief = [
+  'desk-workshop',
+  'production-orders',
+  'fabric-booking',
+  'hardware-order',
+  'quotes',
+] as const;
+
+beforeEach(() => window.localStorage.clear());
 afterEach(cleanup);
 
 describe('DashboardPage', () => {
-  it('shows the real workshop board, metrics, hours and the latest КП', () => {
-    renderFor(true, true);
+  it('gives the head of the workshop the board, hours and shortages, without КП', () => {
+    renderFor(...chief);
 
-    expect(screen.getByRole('heading', { level: 1, name: 'Огляд виробництва' })).toBeVisible();
-    expect(screen.queryByText('Демо-дані')).toBeNull();
+    expect(screen.getByRole('heading', { level: 1, name: 'Робочий стіл цеху' })).toBeVisible();
+    expect(screen.queryByRole('tablist')).toBeNull();
     const metrics = screen.getByRole('region', { name: 'Показники' });
-    expect(within(metrics).getByText('Прострочено')).toBeVisible();
     expect(within(metrics).getByText('виробів 75')).toBeVisible();
 
     const board = screen.getByRole('region', { name: 'Дошка цеху' });
@@ -93,21 +152,55 @@ describe('DashboardPage', () => {
       'href',
       '/production/orders/7',
     );
-    expect(within(column).getByText('Халат робочий + ще 1')).toBeVisible();
-    expect(within(board).getAllByText(/прострочено/)).toHaveLength(1);
-
-    expect(screen.getByRole('link', { name: 'КП-0005' })).toHaveAttribute('href', '/crm/quotes/5');
     expect(screen.getByText('16 год')).toBeVisible();
+
+    const fabric = screen.getByRole('region', { name: 'Не вистачає тканини' });
+    expect(within(fabric).getByText('замовити 140 м')).toBeVisible();
+    expect(within(fabric).getByText('мінус 12 м')).toBeVisible();
+    expect(within(fabric).queryByText(/Оксфорд/)).toBeNull();
+    const parts = screen.getByRole('region', { name: 'Фурнітура до замовлення' });
+    expect(within(parts).getByText('120 шт')).toBeVisible();
+
+    expect(screen.queryByRole('link', { name: 'КП-0005' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Новий розрахунок' })).toBeNull();
+  });
+
+  it('hides a block whose page the role lacks', () => {
+    renderFor('desk-workshop', 'production-orders');
+
+    expect(screen.getByRole('region', { name: 'Дошка цеху' })).toBeVisible();
+    expect(screen.queryByRole('region', { name: 'Не вистачає тканини' })).toBeNull();
+    expect(screen.queryByRole('region', { name: 'Фурнітура до замовлення' })).toBeNull();
+  });
+
+  it('gives a manager the latest КП and the quick actions', () => {
+    renderFor('desk-sales', 'quotes', 'production-orders');
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Робочий стіл менеджера' })).toBeVisible();
+    expect(screen.getByRole('link', { name: 'КП-0005' })).toHaveAttribute('href', '/crm/quotes/5');
     expect(screen.getByRole('link', { name: 'Новий розрахунок' })).toHaveAttribute(
       'href',
       '/crm/quotes/new',
     );
+    expect(screen.queryByRole('region', { name: 'Дошка цеху' })).toBeNull();
   });
 
-  it('shows neither block to a role without them', () => {
-    renderFor(false, false);
+  it('lets a person with several desks switch them and remembers the choice', () => {
+    renderFor(...chief, 'desk-sales');
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Робочий стіл' })).toBeVisible();
+    expect(screen.getByRole('tab', { name: 'Цех' })).toHaveAttribute('aria-selected', 'true');
+    fireEvent.click(screen.getByRole('tab', { name: 'Продажі' }));
+
+    expect(screen.getByRole('link', { name: 'КП-0005' })).toBeVisible();
+    expect(window.localStorage.getItem('brevi-admin:desk')).toBe('sales');
+  });
+
+  it('shows no desk to a role without one', () => {
+    renderFor('quotes', 'production-orders');
 
     expect(screen.queryByRole('region', { name: 'Дошка цеху' })).toBeNull();
     expect(screen.queryByRole('link', { name: 'Новий розрахунок' })).toBeNull();
+    expect(screen.getByText('Оберіть розділ у меню ліворуч.')).toBeVisible();
   });
 });

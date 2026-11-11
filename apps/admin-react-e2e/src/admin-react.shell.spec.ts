@@ -5,7 +5,7 @@ test('keeps the Brevi shell on a direct unknown URL and returns home', async ({ 
 
   await expect(page.getByRole('heading', { name: 'Сторінку не знайдено' })).toBeVisible();
   await page.getByRole('link', { name: 'На початок' }).click();
-  await expect(page.getByRole('heading', { name: 'Огляд виробництва' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: /^Робочий стіл/ })).toBeVisible();
 });
 
 test('mobile menu opens by keyboard and closes with visible focus', async ({ page }) => {

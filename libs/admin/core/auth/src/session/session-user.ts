@@ -38,6 +38,7 @@ const builtInStaffRoles: readonly string[] = [
   'Accountant',
   'Manager',
   'WorkshopChief',
+  'Seo',
 ];
 
 const outsiderRoles: readonly string[] = ['User', 'Guest'];
