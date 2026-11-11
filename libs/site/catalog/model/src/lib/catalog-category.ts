@@ -1,26 +1,24 @@
-import type { CatalogLocalized } from './catalog-tree';
-import type { Locale } from '@site/core/i18n';
+import type { CatalogTreeNode } from './catalog-tree';
 
-/** A block of the text about a category, in the order the client wrote it. */
+/** A block of text, in the order staff wrote it. */
 export type CatalogTextBlock =
   | { type: 'heading'; text: string }
   | { type: 'paragraph'; text: string; /** Bold opening such as «Тканина:». */ lead?: string }
   | { type: 'list'; items: readonly string[] };
 
-/** A category page: names, search snippet, the text under the listing, and its products in listing order. */
+/** A category page: its node of the tree and the way to it from the product type. */
 export type CatalogCategory = {
-  slug: string;
-  parentSlug: string | null;
-  name: CatalogLocalized;
-  seo: Record<Locale, { title: string; description: string }>;
-  text: Record<Locale, readonly CatalogTextBlock[]>;
-  productSlugs: readonly string[];
+  node: CatalogTreeNode;
+  /** From the product type down to the category itself. */
+  trail: readonly CatalogTreeNode[];
 };
 
-/** What a listing card shows about a product. Prices are not part of the snapshot. */
+/** What a listing card shows about a product, in the language of the page. */
 export type CatalogProductCard = {
   slug: string;
-  name: CatalogLocalized;
-  /** Photo in `apps/site/public`; `null` when the product has none. */
-  image: { src: string; width: number; height: number } | null;
+  name: string;
+  /** Address of the photo on the media server; `null` when the product has none. */
+  image: string | null;
+  /** The lowest price in hryvnias (large wholesale); `null` when a manager quotes the price. */
+  priceFrom: number | null;
 };

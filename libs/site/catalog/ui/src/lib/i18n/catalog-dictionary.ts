@@ -5,7 +5,7 @@ type Plural = { one: string; few: string; many: string };
 
 /**
  * Text of the catalog root and category pages. Category names, snippets, and the text about a category
- * come from the catalog data, not from here. Listings show no prices: a manager quotes them on request.
+ * come from the catalog data, not from here. Prices come from the Admin; a product without one says so.
  */
 const uk = {
   breadcrumbsLabel: 'Хлібні крихти',
@@ -14,7 +14,7 @@ const uk = {
   label: 'Каталог',
   rootTitle: 'Каталог спецодягу та засобів захисту',
   rootLead:
-    'Спецодяг власного пошиття і засоби індивідуального захисту. Замовлення від 5 виробів, ціну під ваш обсяг порахує менеджер.',
+    'Спецодяг власного пошиття і засоби індивідуального захисту. Замовлення від 5 виробів, ціна залежить від кількості.',
   sectionsLabel: 'Розділи каталогу',
   subcategoriesLabel: 'Підрозділи',
   allInSection: 'Усі моделі розділу',
@@ -23,7 +23,9 @@ const uk = {
     label: 'Моделі',
     title: 'Моделі розділу',
     askPrice: 'Дізнатися ціну',
+    priceFrom: 'від',
     noPhoto: 'Фото готується',
+    empty: 'Моделі цього розділу скоро з’являться. Зателефонуйте, і менеджер підкаже наявність.',
   },
   about: { label: 'Про розділ' },
   product: {
@@ -33,6 +35,11 @@ const uk = {
     photo: 'Фото',
     priceNote: 'Ціну під вашу кількість порахує менеджер. Залиште номер, і ми передзвонимо.',
     askPrice: 'Дізнатися ціну',
+    request: 'Залишити заявку',
+    fabric: 'Тканина',
+    prices: 'Ціна за одиницю, грн',
+    tiers: { retail: '1–9 шт', wholesale: '10–39 шт', largeWholesale: 'від 40 шт' },
+    orderNote: 'Оформити замовлення допоможе менеджер: залиште номер або зателефонуйте.',
     facts: ['Від 5 виробів', 'З логотипом компанії', 'Доставка по Україні'],
     description: { label: 'Опис', title: 'Опис моделі' },
     specs: { label: 'Характеристики', title: 'Характеристики' },
@@ -57,7 +64,7 @@ const ru: CatalogDictionary = {
   label: 'Каталог',
   rootTitle: 'Каталог спецодежды и средств защиты',
   rootLead:
-    'Спецодежда собственного пошива и средства индивидуальной защиты. Заказ от 5 изделий, цену под ваш объём посчитает менеджер.',
+    'Спецодежда собственного пошива и средства индивидуальной защиты. Заказ от 5 изделий, цена зависит от количества.',
   sectionsLabel: 'Разделы каталога',
   subcategoriesLabel: 'Подразделы',
   allInSection: 'Все модели раздела',
@@ -66,7 +73,9 @@ const ru: CatalogDictionary = {
     label: 'Модели',
     title: 'Модели раздела',
     askPrice: 'Узнать цену',
+    priceFrom: 'от',
     noPhoto: 'Фото готовится',
+    empty: 'Модели этого раздела скоро появятся. Позвоните, и менеджер подскажет наличие.',
   },
   about: { label: 'О разделе' },
   product: {
@@ -76,6 +85,11 @@ const ru: CatalogDictionary = {
     photo: 'Фото',
     priceNote: 'Цену под ваше количество посчитает менеджер. Оставьте номер, и мы перезвоним.',
     askPrice: 'Узнать цену',
+    request: 'Оставить заявку',
+    fabric: 'Ткань',
+    prices: 'Цена за единицу, грн',
+    tiers: { retail: '1–9 шт', wholesale: '10–39 шт', largeWholesale: 'от 40 шт' },
+    orderNote: 'Оформить заказ поможет менеджер: оставьте номер или позвоните.',
     facts: ['От 5 изделий', 'С логотипом компании', 'Доставка по Украине'],
     description: { label: 'Описание', title: 'Описание модели' },
     specs: { label: 'Характеристики', title: 'Характеристики' },
@@ -103,4 +117,12 @@ export function formatModelCount(locale: Locale, count: number): string {
   const rule = new Intl.PluralRules(locale).select(count);
   const word = rule === 'one' ? forms.one : rule === 'few' ? forms.few : forms.many;
   return `${count} ${word}`;
+}
+
+const PRICE_FORMAT = new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 2 });
+
+/** «1 250» or «1 250,5»: hryvnias with a space between thousands; the unit is written next to it. */
+export function formatPrice(value: number): string {
+  // Intl separates thousands with a no-break space of another kind in each runtime; keep one.
+  return PRICE_FORMAT.format(value).replace(/\s/g, '\u00a0');
 }

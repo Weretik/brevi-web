@@ -1,4 +1,3 @@
-import { CATALOG_SECTIONS } from '@site/catalog/model';
 import { SITE_PATHS, catalogCategoryPath, localizedPath } from '@site/core/i18n';
 import {
   JsonLd,
@@ -19,6 +18,7 @@ import {
 } from '@site/home/ui';
 import { PageSection } from '@site/shared/ui';
 
+import type { CatalogSection } from '@site/catalog/model';
 import type { Locale } from '@site/core/i18n';
 
 /** Anchor of the contacts block; «Залишити заявку» scrolls to it until the request page exists. */
@@ -26,11 +26,17 @@ const CONTACTS_ID = 'zayavka';
 
 /**
  * Home page body in the order of the «Строчка» mockup: first screen, catalog sections, logo, process, own
- * production, industries, contacts, SEO text with FAQ. It reads no API: the text is in the home dictionary and
- * the catalog sections are the fixed list. The price calculator, product cards with prices, and the request
+ * production, industries, contacts, SEO text with FAQ. The text is in the home dictionary; the catalog sections
+ * come from the route, which reads them from the catalog API, and the block is left out while there are none. The price calculator, product cards with prices, and the request
  * form of the mockup come with the catalog and request steps (owner decision 2026-11-10).
  */
-export function HomePage({ locale }: { locale: Locale }) {
+export function HomePage({
+  locale,
+  catalogSections,
+}: {
+  locale: Locale;
+  catalogSections: readonly CatalogSection[];
+}) {
   const dictionary = getHomeDictionary(locale);
   const path = (key: keyof typeof SITE_PATHS) => localizedPath(locale, SITE_PATHS[key]);
   const catalogHref = path('catalog');
@@ -39,18 +45,20 @@ export function HomePage({ locale }: { locale: Locale }) {
     <div className="grid gap-14 pb-4 sm:gap-16">
       <HomeHero dictionary={dictionary.hero} requestHref={`#${CONTACTS_ID}`} />
 
-      <PageSection
-        id="home-catalog"
-        title={dictionary.catalog.title}
-        label={{ index: '02', text: dictionary.catalog.label }}
-        action={{ href: catalogHref, label: dictionary.catalog.all }}
-      >
-        <HomeCatalog
-          locale={locale}
-          sections={CATALOG_SECTIONS}
-          categoryHref={(slug) => localizedPath(locale, catalogCategoryPath(slug))}
-        />
-      </PageSection>
+      {catalogSections.length > 0 && (
+        <PageSection
+          id="home-catalog"
+          title={dictionary.catalog.title}
+          label={{ index: '02', text: dictionary.catalog.label }}
+          action={{ href: catalogHref, label: dictionary.catalog.all }}
+        >
+          <HomeCatalog
+            locale={locale}
+            sections={catalogSections}
+            categoryHref={(slug) => localizedPath(locale, catalogCategoryPath(slug))}
+          />
+        </PageSection>
+      )}
 
       <HomeLogo dictionary={dictionary.logo} moreHref={path('logoPrinting')} />
 

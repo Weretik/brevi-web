@@ -3,6 +3,8 @@ export {
   getCatalogCategoryProducts,
   getCatalogCategorySlugs,
   getCatalogProduct,
-  getCatalogProductSlugs,
+  getCatalogProductAddresses,
+  getCatalogProductCategory,
   getCatalogRelatedProducts,
+  getCatalogTree,
 } from './lib/catalog-source';

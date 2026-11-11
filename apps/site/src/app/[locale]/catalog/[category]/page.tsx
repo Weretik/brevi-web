@@ -6,8 +6,11 @@ import { notFound } from 'next/navigation';
 
 import type { Metadata } from 'next';
 
-/** Only the categories of the catalog exist; any other slug is a real 404. */
-export const dynamicParams = false;
+/**
+ * Categories come from the Admin, so a new one opens without a rebuild: it is rendered on the first visit
+ * and kept in the cache. A slug the catalog does not have is a real 404.
+ */
+export const dynamicParams = true;
 
 export async function generateStaticParams() {
   const slugs = await getCatalogCategorySlugs();
@@ -21,9 +24,8 @@ export async function generateMetadata({
   const category = await getCatalogCategory(slug);
   return isLocale(locale) && category
     ? buildCatalogCategoryMetadata(locale, {
-        slug: category.slug,
-        name: category.name[locale],
-        ...category.seo[locale],
+        slug: category.node.slug,
+        name: category.node.name[locale],
       })
     : {};
 }

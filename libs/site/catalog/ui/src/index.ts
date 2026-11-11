@@ -1,7 +1,8 @@
-export { formatModelCount, getCatalogDictionary } from './lib/i18n/catalog-dictionary';
+export { formatModelCount, formatPrice, getCatalogDictionary } from './lib/i18n/catalog-dictionary';
 export type { CatalogDictionary } from './lib/i18n/catalog-dictionary';
 export { CatalogOrder } from './lib/sections/catalog-order';
 export { CatalogProductBuy } from './lib/sections/catalog-product-buy';
+export { CatalogProductPrices } from './lib/sections/catalog-product-prices';
 export { CatalogProductGallery } from './lib/sections/catalog-product-gallery';
 export { CatalogProductSpecs } from './lib/sections/catalog-product-specs';
 export { CatalogProductGrid } from './lib/sections/catalog-product-grid';

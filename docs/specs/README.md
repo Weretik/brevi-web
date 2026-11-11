@@ -19,6 +19,7 @@ The Storefront currently has README files for its Nx feature libraries, but they
 - [Site Next.js: «Заявка» page (request form)](site/request/001-request/README.md) — page and form implemented 2026-11-10; delivery of requests postponed.
 - [Site Next.js: catalog, stage 1 (catalog root and category pages)](site/catalog/001-catalog/README.md) — implemented 2026-11-10 on a snapshot of the old site; product page is next.
 - [Site Next.js: catalog, stage 2 (product page)](site/catalog/002-product-page/README.md) — implemented 2026-11-11 on the snapshot of the old site, without prices.
+- [Site Next.js: catalog, stage 3 (products from the Admin)](site/catalog/003-catalog-from-admin/README.md) — implemented 2026-11-11: the catalog reads the BreviERP public API, shows prices, and refreshes without a rebuild.
 - [Site Next.js: «Договір» page (public offer)](site/agreement/001-agreement/README.md) — implemented and locally verified 2026-11-10.
 - [Site Next.js: header, menu, and footer redesign](site/shell/002-header-footer-redesign/README.md) — implemented 2026-11-10.
 - [Site Next.js: «Статті» pages](site/articles/001-articles/README.md) — implemented and locally verified 2026-11-10.

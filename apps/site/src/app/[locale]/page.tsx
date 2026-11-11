@@ -1,3 +1,5 @@
+import { getCatalogTree } from '@site/catalog/data-access';
+import { toCatalogSections } from '@site/catalog/model';
 import { isLocale } from '@site/core/i18n';
 import { HomePage } from '@site/home/feature';
 import { buildHomeMetadata } from '@site/home/seo';
@@ -14,5 +16,5 @@ export default async function Page({ params }: PageProps<'/[locale]'>) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
-  return <HomePage locale={locale} />;
+  return <HomePage locale={locale} catalogSections={toCatalogSections(await getCatalogTree())} />;
 }

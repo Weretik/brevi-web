@@ -4,8 +4,8 @@ import type { CatalogSpecGroup } from '@site/catalog/model';
 export function CatalogProductSpecs({ groups }: { groups: readonly CatalogSpecGroup[] }) {
   return (
     <div className="grid max-w-[48rem] gap-6">
-      {groups.map((group) => (
-        <table key={group.title} className="w-full border-collapse text-left">
+      {groups.map((group, index) => (
+        <table key={`${group.title}-${index}`} className="w-full border-collapse text-left">
           {group.title ? (
             <caption className="pb-2 text-left font-mono text-[0.8125rem] font-semibold text-brand-text uppercase">
               {group.title}

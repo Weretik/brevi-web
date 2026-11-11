@@ -1,6 +1,5 @@
 'use client';
 
-import { CATALOG_SECTIONS } from '@site/catalog/model';
 import { catalogCategoryPath, localizedPath } from '@site/core/i18n';
 import { cn } from '@site/shared/ui';
 import { ChevronDownIcon, ChevronRightIcon, LayoutGridIcon } from 'lucide-react';
@@ -12,6 +11,7 @@ import { useDismiss } from './use-dismiss';
 import { SHELL_PATHS } from '../navigation/site-navigation';
 
 import type { ShellDictionary } from '../i18n/shell-dictionary';
+import type { CatalogSection } from '@site/catalog/model';
 import type { Locale } from '@site/core/i18n';
 
 /**
@@ -23,12 +23,18 @@ import type { Locale } from '@site/core/i18n';
 export function CatalogMenu({
   locale,
   dictionary,
+  sections,
 }: {
   locale: Locale;
   dictionary: ShellDictionary;
+  sections: readonly CatalogSection[];
 }) {
   const [open, setOpen] = useState(false);
-  const [activeKey, setActiveKey] = useState<string>(CATALOG_SECTIONS[0].key);
+  const [chosenKey, setActiveKey] = useState<string | null>(null);
+  // Until the visitor points at a section, or when the chosen one has left the catalog, the first is open.
+  const activeKey = sections.some((section) => section.key === chosenKey)
+    ? chosenKey
+    : sections[0]?.key;
   const rootRef = useRef<HTMLDivElement>(null);
   const panelId = useId();
   const close = useCallback(() => setOpen(false), []);
@@ -74,7 +80,7 @@ export function CatalogMenu({
         className="absolute inset-x-4 top-full z-40 grid max-h-[calc(100vh-5rem)] grid-cols-[17.5rem_minmax(0,1fr)] overflow-y-auto rounded-b-xl border border-t-0 border-border-strong bg-background shadow-lg sm:inset-x-6 xl:grid-cols-[18.75rem_minmax(0,1fr)_17.5rem]"
       >
         <ul className="grid content-start gap-0.5 border-r border-border bg-muted p-3">
-          {CATALOG_SECTIONS.map((section) => {
+          {sections.map((section) => {
             const active = section.key === activeKey;
             return (
               <li key={section.key}>
@@ -112,7 +118,7 @@ export function CatalogMenu({
         </ul>
 
         <div className="p-7">
-          {CATALOG_SECTIONS.map((section) => (
+          {sections.map((section) => (
             <div
               key={section.key}
               id={`${panelId}-${section.key}`}
