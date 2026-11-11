@@ -69,6 +69,7 @@ function listParams(query: ProductionOrderListQuery) {
   return {
     page: query.page,
     pageSize: query.pageSize,
+    ...(query.sort ? { sort: query.sort } : {}),
     ...filterParams(query),
     ...(query.customerId ? { customerId: query.customerId } : {}),
     ...(query.quoteId ? { quoteId: query.quoteId } : {}),

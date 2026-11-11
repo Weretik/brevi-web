@@ -109,11 +109,15 @@ export type {
   ProductionOrderFilterOptions,
   ProductionOrderFilterValues,
   ProductionOrderImportRow,
+  ProductionOrderAttention,
   ProductionOrderListQuery,
   ProductionOrderPage,
   ProductionOrderPermissions,
+  ProductionOrderSort,
   ProductionOrderStatus,
   ProductionOrderSummary,
+  ProductionOrderSummaryItem,
+  ProductionStageCount,
   ProductionQuoteDraft,
   ProductionQuoteDraftItem,
   ProductionQuoteDraftOption,
@@ -156,6 +160,14 @@ export type {
   ProductionOrderHeaderValues,
 } from './forms/production-order-form';
 export { productionOrdersCsv } from './queries/production-orders-csv';
+export {
+  PRODUCTION_DUE_SOON_DAYS,
+  dueState,
+  orderModelsText,
+  orderStageSpread,
+  ordersWord,
+} from './queries/production-order-row';
+export type { DueState } from './queries/production-order-row';
 export {
   activeProductionOrderFilters,
   addModelSummarySortLevel,

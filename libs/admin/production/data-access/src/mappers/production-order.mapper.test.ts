@@ -178,5 +178,56 @@ describe('production order mappers', () => {
     });
     expect(page.counts.closed).toBe(2);
     expect(page.managers).toEqual(['Олена']);
+    expect(page.stages).toEqual([]);
+    expect(page.attention).toEqual({ overdue: 0, dueSoon: 0 });
+  });
+
+  it('maps the stage conveyor, attention and the item lines of a row (PRD-011)', () => {
+    const page = mapProductionOrderPage({
+      items: [
+        {
+          id: 7,
+          number: 38,
+          status: 'New',
+          clientName: 'Будмонтаж',
+          quoteId: null,
+          quoteNumber: null,
+          managerName: 'Олена',
+          orderDate: '2026-11-01',
+          itemsCount: 1,
+          totalQuantity: 15,
+          nearestDueDate: '2026-11-13',
+          isTransferred: false,
+          updatedAt: '2026-11-04T10:00:00Z',
+          stage: 'Cutting',
+          shippedQuantity: 5,
+          items: [{ modelName: 'Куртка утеплена', quantity: 15, stage: 'Cutting' }],
+        },
+      ],
+      page: 1,
+      pageSize: 50,
+      total: 1,
+      counts: { all: 1, new: 1, closed: 0, cancelled: 0 },
+      managers: [],
+      stages: [{ stage: 'Cutting', count: 1, overdue: 0 }],
+      attention: { overdue: 0, dueSoon: 1 },
+    });
+    expect(page.items[0]?.shippedQuantity).toBe(5);
+    expect(page.items[0]?.items).toEqual([
+      { modelName: 'Куртка утеплена', quantity: 15, stage: 'Cutting' },
+    ]);
+    expect(page.stages).toEqual([{ stage: 'Cutting', count: 1, overdue: 0 }]);
+    expect(page.attention).toEqual({ overdue: 0, dueSoon: 1 });
+    expect(() =>
+      mapProductionOrderPage({
+        items: [],
+        page: 1,
+        pageSize: 50,
+        total: 0,
+        counts: { all: 0, new: 0, closed: 0, cancelled: 0 },
+        managers: [],
+        stages: [{ stage: 'Done', count: 1, overdue: 0 }],
+      }),
+    ).toThrow('етап конвеєра');
   });
 });

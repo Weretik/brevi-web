@@ -31,6 +31,8 @@ vi.mock('@admin/production/data-access', () => ({
             isTransferred: false,
             updatedAt: '2026-11-04T10:00:00Z',
             stage: 'Cutting',
+            shippedQuantity: 0,
+            items: [{ modelName: 'Куртка', quantity: 40, stage: 'Cutting' }],
           },
         ],
         page: 1,
@@ -38,6 +40,8 @@ vi.mock('@admin/production/data-access', () => ({
         total: 1,
         counts: { all: 1, new: 1, closed: 0, cancelled: 0 },
         managers: ['Анастасія'],
+        stages: [],
+        attention: { overdue: 0, dueSoon: 0 },
       },
     };
   },

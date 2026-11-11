@@ -3648,7 +3648,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** Not deleted orders, newest number first; counts by status ignore the status filter */
+    /** Not deleted orders, newest number first unless sorted; counts by status ignore the status filter, the stage conveyor and attention take «Нове» orders and ignore the status and stage filters */
     get: operations['getProductionOrders'];
     put?: never;
     /** «Передати в цех»: an order from a КП «під запит» (saved or sent); a repeat with the same requestId returns the same order */
@@ -10373,6 +10373,22 @@ export interface components {
         error?: string | null;
       }[];
     };
+    ProductionOrderSummaryItem: {
+      modelName: string;
+      /** Format: int32 */
+      quantity: number;
+      /** @enum {string} */
+      stage:
+        | 'New'
+        | 'FabricOrdered'
+        | 'FabricAvailable'
+        | 'Cutting'
+        | 'Application'
+        | 'Sewing'
+        | 'Ready'
+        | 'Shipped'
+        | 'Complete';
+    };
     ProductionOrderSummaryResponse: {
       id: number;
       number: number;
@@ -10405,12 +10421,54 @@ export interface components {
         | 'Ready'
         | 'Shipped'
         | 'Complete';
+      /**
+       * Format: int32
+       * @description Pieces shipped over every item; cancelled shipments are gone.
+       */
+      shippedQuantity: number;
+      /** @description Items in the order of the card. */
+      items: components['schemas']['ProductionOrderSummaryItem'][];
     };
     ProductionOrderCounts: {
       all: number;
       new: number;
       closed: number;
       cancelled: number;
+    };
+    ProductionStageCount: {
+      /** @enum {string} */
+      stage:
+        | 'New'
+        | 'FabricOrdered'
+        | 'FabricAvailable'
+        | 'Cutting'
+        | 'Application'
+        | 'Sewing'
+        | 'Ready'
+        | 'Shipped'
+        | 'Complete';
+      /**
+       * Format: int32
+       * @description «Нове» orders whose least advanced item is at this stage.
+       */
+      count: number;
+      /**
+       * Format: int32
+       * @description Of them, due before today (Kyiv).
+       */
+      overdue: number;
+    };
+    ProductionOrderAttention: {
+      /**
+       * Format: int32
+       * @description «Нове» orders with an item due before today (Kyiv).
+       */
+      overdue: number;
+      /**
+       * Format: int32
+       * @description «Нове» orders whose nearest due date is today or within the next 3 days.
+       */
+      dueSoon: number;
     };
     ProductionOrderPageResponse: {
       items: components['schemas']['ProductionOrderSummaryResponse'][];
@@ -10419,6 +10477,9 @@ export interface components {
       total: number;
       counts: components['schemas']['ProductionOrderCounts'];
       managers: string[];
+      /** @description Every stage in workshop order, the «конвеєр» of the list. */
+      stages: components['schemas']['ProductionStageCount'][];
+      attention: components['schemas']['ProductionOrderAttention'];
     };
     ItemApplicationInput: {
       /** @enum {string} */
@@ -25268,6 +25329,8 @@ export interface operations {
         color?: string;
         /** @description «Сезон»; orders with an item whose Catalog model has this season. */
         season?: string;
+        /** @description «№», «Готово до» (the nearest item due date; orders without one last) or «Створено»; a leading «-» sorts from the largest. */
+        sort?: 'number' | '-number' | 'due' | '-due' | 'created' | '-created';
         page?: number;
         pageSize?: number;
       };
