@@ -22,7 +22,7 @@ flowchart LR
 
 ```text
 apps/site/src/app/[locale]/request/page.tsx  # route
-apps/site/next.config.ts                     # Server Action body limit for the file
+apps/site/next.config.mjs                     # Server Action body limit for the file
 libs/site/
 ├── request/model/src/lib/
 │   ├── request-form.ts                      # fields, form state, limits, file formats

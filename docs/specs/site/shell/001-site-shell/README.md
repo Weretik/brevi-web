@@ -49,7 +49,7 @@ Create the public Next.js application `apps/site` with the frame every page uses
 | `apps/site/src/app/[locale]/not-found.tsx`, `error.tsx`                    | 404 and 500 inside the frame                                                   |
 | `apps/site/src/app/global-not-found.tsx`                                   | 404 document for paths without a locale                                        |
 | `apps/site/src/app/{robots,sitemap,manifest}.ts`, `fonts.ts`, `global.css` | crawling files, fonts, design tokens                                           |
-| `apps/site/src/proxy.ts`, `next.config.ts`                                 | 404 for non-locale paths; `/` → `/uk`                                          |
+| `apps/site/src/proxy.ts`, `next.config.mjs`                                 | 404 for non-locale paths; `/` → `/uk`                                          |
 | `libs/site/core/config`                                                    | `siteConfig` from the environment, `COMPANY` facts                             |
 | `libs/site/core/i18n`                                                      | locales, language tags, localized paths                                        |
 | `libs/site/core/seo`                                                       | metadata, alternates, robots, sitemap, JSON-LD builders, `JsonLd`              |

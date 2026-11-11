@@ -1,7 +1,7 @@
 # Hosting — site
 
 **Checked:** 2026-11-10
-**Sources:** `apps/site/open-next.config.ts`, `apps/site/wrangler.jsonc`, `apps/site/project.json`, `libs/site/core/config/src/lib/site-config.ts`
+**Sources:** `apps/site/open-next.config.mjs`, `apps/site/wrangler.jsonc`, `apps/site/project.json`, `libs/site/core/config/src/lib/site-config.ts`
 
 The public site runs on Cloudflare Workers through the OpenNext adapter (`@opennextjs/cloudflare`, owner decision 2026-10-30). It is a separate Worker, `brevi-site`, with a `*.workers.dev` preview address. `brevi.com.ua` stays on the old site until the domain cutover in the [migration plan](../../../specs/site/migration/README.md).
 
@@ -14,7 +14,7 @@ The public site runs on Cloudflare Workers through the OpenNext adapter (`@openn
 | `npx nx run site:deploy-cloudflare`  | `opennextjs-cloudflare deploy`  | fills the cache with the prerendered pages and deploys the Worker       |
 
 - Cloudflare Workers Builds connects to `Weretik/brevi-web`: root directory empty (workspace root), build command `npx nx run site:build-cloudflare`, deploy command `npx nx run site:deploy-cloudflare`. Node comes from `.nvmrc`.
-- `apps/site` has no `package.json`, so `open-next.config.ts` sets `buildCommand` to run `next build` from `apps/site`.
+- `apps/site` has no `package.json`, so `open-next.config.mjs` sets `buildCommand` to run `next build` from `apps/site`.
 - `wrangler dev` straight after `build-cloudflare` serves pages without the cache (each request renders and logs a read-only cache error); use the preview target.
 
 ## Cache
@@ -28,7 +28,7 @@ The catalog comes from the BreviERP Admin and must refresh without a rebuild (ow
 | Revalidation      | `memory-queue`         | —                   | —                                                     |
 
 - `deploy` writes the prerendered pages into `brevi-site-cache`, so the deploy token needs write access to Workers KV.
-- `next.config.ts` has `experimental.useCache: true`; loaders in `site-catalog-data-access` cache API answers with `'use cache'`, `cacheTag('catalog')`, and `cacheLife` (five minutes; one minute after a failed read). Every page includes the catalog menu, so every page is revalidated on that schedule.
+- `next.config.mjs` has `experimental.useCache: true`; loaders in `site-catalog-data-access` cache API answers with `'use cache'`, `cacheTag('catalog')`, and `cacheLife` (five minutes; one minute after a failed read). Every page includes the catalog menu, so every page is revalidated on that schedule.
 - Cache Components stay off: on the Kedr site their runtime prerender hung on Workers.
 - The build reads the API too. When it is unreachable during a build, the pages are built with an empty catalog and fill in on the first revalidation.
 - Rendering a page on demand may exceed the 10 ms CPU limit of the free Workers plan (error 1102); the fix is the Workers Paid plan.
