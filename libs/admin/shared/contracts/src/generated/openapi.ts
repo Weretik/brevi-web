@@ -4411,6 +4411,74 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/warehouse/reports/plan-fact': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** «План і факт»: main fabric by model for items issued for all their products (access:fabric-plan-fact) */
+    get: operations['getFabricPlanFact'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/warehouse/reports/booking': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** «Бронь і що замовити»: stock handed to the plans of open orders by order date; reads only (access:fabric-booking) */
+    get: operations['getFabricBooking'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/warehouse/reports/valuation': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** «Вартість складу»: positive balances at today's prices of «Тканини»; owner only by default (access:fabric-valuation) */
+    get: operations['getFabricValuation'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/warehouse/reports/hardware': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** «Фурнітура до замовлення»: full accessory need of open orders by model composition (access:hardware-order) */
+    get: operations['getHardwareOrder'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/warehouse/orders/{id}/items/{itemId}/fabric': {
     parameters: {
       query?: never;
@@ -5712,6 +5780,40 @@ export interface paths {
     };
     /** @description Addresses of every product on the site, for the sitemap and for building pages ahead of time. */
     get: operations['getPublicCatalogProductSlugs'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/public/articles': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Every article on the site, the newest date first, with its title, excerpt and cover. */
+    get: operations['getPublicArticles'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/public/articles/{slug}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description An article page by its address with SEO and the text. */
+    get: operations['getPublicArticle'];
     put?: never;
     post?: never;
     delete?: never;
@@ -10958,6 +11060,8 @@ export interface components {
       revision: number;
       /** @description Edit, «Скасувати» and «Історія правок» actions are offered. */
       canEdit: boolean;
+      /** @description «На 1 виріб»: metres per product cut, to thousandths; null without a products count. */
+      perProduct: number | null;
     };
     FabricMovementPageResponse: {
       rows: components['schemas']['FabricMovementRowResponse'][];
@@ -11391,6 +11495,210 @@ export interface components {
     RefreshItemFabricPlanInput: {
       orderVersion: number;
       planVersion: number;
+    };
+    /** @description Totals of a model or of the report; weighted by products. */
+    FabricPlanFactRowResponse: {
+      /** @description Unique orders. */
+      orders: number;
+      /** @description Each item once. */
+      products: number;
+      /** @description Saved main-fabric plan over the products of the items with a plan, to thousandths. */
+      planPerProduct: number | null;
+      /** @description Issued main fabric over the products, to thousandths. */
+      factPerProduct: number;
+      /** @description Null when any item cannot be compared. */
+      differencePerProduct: number | null;
+      /** @description Fact − plan, metres; null when any item cannot be compared. */
+      difference: number | null;
+      /**
+       * @description Economy (fact < plan), Overrun, OnPlan, NoPlan, or NeedsCheck when the items cannot be compared.
+       * @enum {string}
+       */
+      result: 'Economy' | 'Overrun' | 'OnPlan' | 'NoPlan' | 'NeedsCheck';
+      uncomparableItems: number;
+    };
+    /** @description A planned part, or fabric issued beyond the plan (no plan fields). */
+    FabricPlanFactMaterialResponse: {
+      /** @enum {string|null} */
+      layer: 'Upper' | 'Lining' | 'Insulation' | 'Fleece' | null;
+      planFabricCode: string | null;
+      planFabricName: string | null;
+      planColor: string | null;
+      plan: number | null;
+      /** @description Null for a planned part with nothing issued («не зафіксовано»). */
+      fact: number | null;
+      difference: number | null;
+      /** @description Fabric code and colour actually issued. */
+      used: string[];
+    };
+    FabricPlanFactItemResponse: {
+      orderId: number;
+      orderNumber: number;
+      clientName: string;
+      itemId: number;
+      products: number;
+      /** @description Saved main-fabric plan; null without one. */
+      plan: number | null;
+      fact: number;
+      difference: number | null;
+      /**
+       * @description Economy (fact < plan), Overrun, OnPlan, NoPlan, or NeedsCheck when the items cannot be compared.
+       * @enum {string}
+       */
+      result: 'Economy' | 'Overrun' | 'OnPlan' | 'NoPlan' | 'NeedsCheck';
+      /** @description Why the item cannot be compared. */
+      reason: string | null;
+      materials: components['schemas']['FabricPlanFactMaterialResponse'][];
+    };
+    FabricPlanFactModelResponse: {
+      modelName: string;
+      modelCode: string | null;
+      summary: components['schemas']['FabricPlanFactRowResponse'];
+      items: components['schemas']['FabricPlanFactItemResponse'][];
+    };
+    FabricPlanFactResponse: {
+      models: components['schemas']['FabricPlanFactModelResponse'][];
+      total: components['schemas']['FabricPlanFactRowResponse'];
+      /** @description Items whose issues do not cover all their products yet; left out. */
+      inProgressItems: number;
+    };
+    FabricBookingItemResponse: {
+      orderId: number;
+      orderNumber: number;
+      clientName: string;
+      itemId: number;
+      modelName: string;
+      /** Format: date */
+      dueDate: string | null;
+      /** @enum {string} */
+      layer: 'Upper' | 'Lining' | 'Insulation' | 'Fleece';
+      plan: number;
+      /** @description What issues covered of the plan. */
+      covered: number;
+      /** @description Plan − covered, not below zero. */
+      remaining: number;
+      reserved: number;
+      toOrder: number;
+    };
+    /** @description A fabric and colour; items in order of order creation, then number and item. */
+    FabricBookingPairResponse: {
+      fabricCode: string;
+      fabricName: string;
+      color: string;
+      /** @description May be negative. */
+      stock: number;
+      need: number;
+      reserved: number;
+      free: number;
+      /** @description max(0, −stock) + what the queue misses. */
+      toOrder: number;
+      /** @description The negative balance as a positive figure. */
+      shortage: number;
+      items: components['schemas']['FabricBookingItemResponse'][];
+    };
+    /** @description An item whose need is unknown; not counted as zero. */
+    FabricBookingUnknownResponse: {
+      orderId: number;
+      orderNumber: number;
+      clientName: string;
+      itemId: number;
+      modelName: string;
+      reason: string;
+    };
+    FabricBookingResponse: {
+      reserved: number;
+      free: number;
+      toOrder: number;
+      pairs: components['schemas']['FabricBookingPairResponse'][];
+      unknown: components['schemas']['FabricBookingUnknownResponse'][];
+      /** Format: date-time */
+      calculatedAt: string;
+    };
+    FabricValuationColorResponse: {
+      color: string;
+      meters: number;
+      price: number | null;
+      /** @description Kopecks = round(hundredths × price), in UAH. */
+      value: number | null;
+    };
+    FabricValuationFabricResponse: {
+      fabricCode: string;
+      fabricName: string;
+      /** @description Lowest positive price of the group's active offers, UAH per metre. */
+      price: number | null;
+      priceFabricCode: string | null;
+      meters: number;
+      unpricedMeters: number;
+      /** @description Sum of the rounded values of its colours. */
+      value: number;
+      colors: components['schemas']['FabricValuationColorResponse'][];
+    };
+    FabricValuationShortageResponse: {
+      fabricCode: string;
+      fabricName: string;
+      color: string;
+      /** @description The shortage, positive. */
+      meters: number;
+      price: number | null;
+      value: number | null;
+    };
+    FabricValuationResponse: {
+      /** @description Sum of priced pairs, UAH. */
+      value: number;
+      positiveMeters: number;
+      unpricedPairs: number;
+      unpricedMeters: number;
+      /** @description Some positive pairs have no price. */
+      isPartial: boolean;
+      shortageMeters: number;
+      shortageValue: number;
+      fabrics: components['schemas']['FabricValuationFabricResponse'][];
+      shortages: components['schemas']['FabricValuationShortageResponse'][];
+      /** Format: date-time */
+      calculatedAt: string;
+      priceSource: string;
+    };
+    HardwareNeedOrderResponse: {
+      orderId: number;
+      orderNumber: number;
+      clientName: string;
+      itemId: number;
+      modelName: string;
+      norm: number;
+      products: number;
+      /** @description norm × products, to 6 decimals. */
+      quantity: number;
+    };
+    HardwareNeedResponse: {
+      code: string;
+      /** @description Reference name, or the code when it is unknown. */
+      name: string;
+      /** @description False: «Потрібна перевірка назв». */
+      nameChecked: boolean;
+      note: string | null;
+      /** @description Metre, Piece, Service or Kilogram. */
+      unit: string;
+      quantity: number;
+      orders: components['schemas']['HardwareNeedOrderResponse'][];
+    };
+    /** @description «Потреба неповна»: a line whose quantity is unknown. */
+    HardwareIncompleteResponse: {
+      orderId: number;
+      orderNumber: number;
+      clientName: string;
+      itemId: number;
+      modelName: string;
+      code: string | null;
+      name: string | null;
+      reason: string;
+    };
+    HardwareOrderResponse: {
+      orders: number;
+      items: number;
+      needs: components['schemas']['HardwareNeedResponse'][];
+      incomplete: components['schemas']['HardwareIncompleteResponse'][];
+      /** Format: date-time */
+      calculatedAt: string;
     };
     ReverseFabricIssueInput: {
       orderVersion: number;
@@ -13124,6 +13432,66 @@ export interface components {
       updatedAtUtc: string;
       /** @description false when the Russian page shows the Ukrainian texts. */
       hasRussian: boolean;
+    };
+    /**
+     * @description The language of the texts that came back.
+     * @enum {string}
+     */
+    PublicArticleLanguage: 'uk' | 'ru';
+    PublicArticlePhoto: {
+      url: string;
+      /** @description The small WebP copy for lists; null until the library has made it. */
+      thumbnailUrl?: string | null;
+      /** Format: int32 */
+      width?: number | null;
+      /** Format: int32 */
+      height?: number | null;
+    };
+    PublicArticleCard: {
+      slug: string;
+      /**
+       * Format: date
+       * @description The date readers see.
+       */
+      publishedOn: string;
+      language: components['schemas']['PublicArticleLanguage'];
+      title: string;
+      /** @description The short text for lists; may hold bold and italic as **…** and *…*. */
+      excerpt?: string | null;
+      cover?: components['schemas']['PublicArticlePhoto'] | null;
+      /** @description The article has a Russian title and text, so the Russian page is its own. */
+      hasRussian: boolean;
+      /** Format: date-time */
+      updatedAtUtc: string;
+    };
+    PublicArticleList: {
+      items: components['schemas']['PublicArticleCard'][];
+    };
+    /** @enum {string} */
+    PublicArticleBlockKind: 'Paragraph' | 'Heading' | 'List' | 'Image';
+    /** @description One block of the text. A paragraph may open with a bold lead; texts may hold bold and italic as **…** and *…* (a typed asterisk is \*). A list keeps its lines in items. An image carries its photo and alt text. */
+    PublicArticleBlock: {
+      kind: components['schemas']['PublicArticleBlockKind'];
+      text?: string | null;
+      lead?: string | null;
+      items: string[];
+      photo?: components['schemas']['PublicArticlePhoto'] | null;
+      alt?: string | null;
+    };
+    PublicArticle: {
+      slug: string;
+      /** Format: date */
+      publishedOn: string;
+      language: components['schemas']['PublicArticleLanguage'];
+      hasRussian: boolean;
+      title: string;
+      excerpt?: string | null;
+      seoTitle?: string | null;
+      seoDescription?: string | null;
+      cover?: components['schemas']['PublicArticlePhoto'] | null;
+      body: components['schemas']['PublicArticleBlock'][];
+      /** Format: date-time */
+      updatedAtUtc: string;
     };
   };
   responses: {
@@ -27133,6 +27501,154 @@ export interface operations {
       };
     };
   };
+  getFabricPlanFact: {
+    parameters: {
+      query?: {
+        model?: string | null;
+        client?: string | null;
+        /** @description A planned or issued fabric code, name or colour. */
+        fabric?: string | null;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FabricPlanFactResponse'];
+        };
+      };
+      /** @description A filter is too long */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to the page in «Права доступу» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getFabricBooking: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FabricBookingResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to the page in «Права доступу» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getFabricValuation: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FabricValuationResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to the page in «Права доступу» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getHardwareOrder: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['HardwareOrderResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to the page in «Права доступу» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   getProductionItemFabric: {
     parameters: {
       query?: never;
@@ -31335,6 +31851,73 @@ export interface operations {
         content: {
           'application/json': components['schemas']['PublicCatalogSlug'][];
         };
+      };
+    };
+  };
+  getPublicArticles: {
+    parameters: {
+      query?: {
+        language?: components['parameters']['Language'];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Articles */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PublicArticleList'];
+        };
+      };
+      /** @description Wrong language */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getPublicArticle: {
+    parameters: {
+      query?: {
+        language?: components['parameters']['Language'];
+      };
+      header?: never;
+      path: {
+        slug: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Article */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PublicArticle'];
+        };
+      };
+      /** @description Wrong language */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such address, or the article is hidden */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };
