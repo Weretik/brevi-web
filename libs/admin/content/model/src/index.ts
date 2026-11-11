@@ -208,3 +208,21 @@ export type {
   SitePageErrors,
   SitePageFormValues,
 } from './validators/site-pages/site-page-validation';
+export {
+  seoAreaLabels,
+  seoAreas,
+  seoProblemKinds,
+  seoProblemLabels,
+  seoProblemText,
+  seoSiteProblemLabels,
+  seoSiteProblems,
+} from './entities/seo-overview/seo-overview';
+export type {
+  SeoArea,
+  SeoAreaSummary,
+  SeoIssue,
+  SeoOverview,
+  SeoProblem,
+  SeoProblemKind,
+  SeoSiteProblem,
+} from './entities/seo-overview/seo-overview';

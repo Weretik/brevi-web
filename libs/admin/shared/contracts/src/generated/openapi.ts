@@ -5746,6 +5746,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/content/seo-overview': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Site-wide problems, counts per area and every page with at least one problem. */
+    get: operations['getSeoOverview'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/content/site-pages': {
     parameters: {
       query?: never;
@@ -13688,6 +13705,54 @@ export interface components {
       bingSiteVerification?: string | null;
       /** Format: int32 */
       defaultOgPhotoId?: number | null;
+    };
+    /**
+     * @description A site-wide setting of «Налаштування SEO сайту» that is not filled.
+     * @enum {string}
+     */
+    SeoSiteProblem:
+      'NoAnalytics' | 'NoGoogleVerification' | 'NoBingVerification' | 'NoSharePicture';
+    /** @enum {string} */
+    SeoArea: 'Product' | 'Category' | 'Article' | 'Page';
+    SeoAreaSummary: {
+      area: components['schemas']['SeoArea'];
+      /** Format: int32 */
+      onSite: number;
+      /** Format: int32 */
+      withProblems: number;
+    };
+    /**
+     * @description NoTitle and NoDescription: the SEO text is empty; TitleTooLong over 60 and DescriptionTooLong over 160 characters; DuplicateTitle: another page shows the same title in this language; NoRussian: the Russian page shows the Ukrainian texts.
+     * @enum {string}
+     */
+    SeoProblemKind:
+      | 'NoTitle'
+      | 'NoDescription'
+      | 'TitleTooLong'
+      | 'DescriptionTooLong'
+      | 'DuplicateTitle'
+      | 'NoRussian';
+    SeoProblem: {
+      kind: components['schemas']['SeoProblemKind'];
+      /**
+       * @description Null for a problem of the whole page.
+       * @enum {string|null}
+       */
+      language?: 'uk' | 'ru' | null;
+    };
+    SeoIssue: {
+      area: components['schemas']['SeoArea'];
+      /** @description The product, category or article id, or the page key. */
+      id: string;
+      name: string;
+      /** @description The address on the site without the language. */
+      path: string;
+      problems: components['schemas']['SeoProblem'][];
+    };
+    SeoOverviewResponse: {
+      siteProblems: components['schemas']['SeoSiteProblem'][];
+      areas: components['schemas']['SeoAreaSummary'][];
+      issues: components['schemas']['SeoIssue'][];
     };
     /** @description Texts of one language; null leaves the site its own text. */
     SitePageText: {
@@ -32484,6 +32549,40 @@ export interface operations {
         content: {
           'application/json': components['schemas']['Messages'];
         };
+      };
+    };
+  };
+  getSeoOverview: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SeoOverviewResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to view «SEO-огляд» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };

@@ -27,4 +27,5 @@ export {
   useSaveSiteSeoSettingsMutation,
   useGetSitePagesQuery,
   useSaveSitePageMutation,
+  useGetSeoOverviewQuery,
 } from './api/content.api';

@@ -3,6 +3,7 @@ export {
   contentProductsPath,
   createContentRoutes,
   redirectsPath,
+  seoOverviewPath,
   seoSettingsPath,
   sitePagesPath,
   siteCategoriesPath,

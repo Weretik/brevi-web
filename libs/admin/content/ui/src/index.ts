@@ -20,3 +20,4 @@ export * from './forms/seo-settings/seo-settings-form';
 export * from './tables/site-pages/site-pages-table';
 export * from './components/site-pages/site-page-view';
 export * from './forms/site-pages/site-page-form';
+export * from './tables/seo-overview/seo-issues-table';
