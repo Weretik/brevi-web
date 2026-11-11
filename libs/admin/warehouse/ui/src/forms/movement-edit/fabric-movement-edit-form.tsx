@@ -151,7 +151,7 @@ export function FabricMovementEditForm({
             />
           </>
         )}
-        {row.kind === 'Issue' && (
+        {row.kind === 'Issue' && row.itemId === null && (
           <TextField
             label="Куди використано / контрагент"
             value={values.destination}

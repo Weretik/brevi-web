@@ -3,9 +3,9 @@ import {
   ProductionItemShipments,
   ProductionItemStages,
 } from '@admin/production/ui';
+import { ItemFabricSection } from '@admin/warehouse/feature';
 import { Box, Typography } from '@mui/material';
 
-import { ProductionItemFabricSection } from '../stock/production-item-fabric-section';
 import { ProductionItemWorkSection } from '../work/production-item-work-section';
 
 import type {
@@ -78,7 +78,12 @@ export function ProductionItemWork({
         </Section>
       )}
       <Section title="Тканина">
-        <ProductionItemFabricSection orderId={order.id} item={item} onMessage={onMessage} />
+        <ItemFabricSection
+          orderId={order.id}
+          itemId={item.id}
+          scope="orders"
+          onMessage={onMessage}
+        />
       </Section>
       {(files.length > 0 || permissions.canManageFiles) && (
         <Section title="Файли">

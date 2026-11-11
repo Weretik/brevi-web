@@ -14,3 +14,11 @@ export {
   useReverseFabricMovementMutation,
   useVoidFabricMovementMutation,
 } from './api/fabric-stock.api';
+export {
+  useGetFabricIssueItemsQuery,
+  useGetItemFabricQuery,
+  useIssueFabricToItemMutation,
+  useRefreshItemFabricPlanMutation,
+  useReverseFabricIssueMutation,
+} from './api/item-fabric.api';
+export type { ItemFabricScope } from './api/item-fabric.api';

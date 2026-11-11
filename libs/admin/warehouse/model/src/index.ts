@@ -117,3 +117,44 @@ export {
   stockBalancesWorkbook,
 } from './mappers/exports/stock-exports';
 export { XLSX_MIME_TYPE } from './mappers/exports/xlsx-workbook';
+export {
+  FABRIC_ISSUE_ITEM_SEARCH_MAX_LENGTH,
+  FABRIC_ISSUE_LINE_NOTE_MAX_LENGTH,
+  FABRIC_ISSUE_MAX_LINES,
+  fabricIssuePurposeLabels,
+  fabricIssuePurposes,
+  fabricLayerLabels,
+  fabricLayers,
+} from './entities/issues/item-fabric';
+export type {
+  CreateItemIssueBody,
+  FabricIssue,
+  FabricIssueComparison,
+  FabricIssueItem,
+  FabricIssueItems,
+  FabricIssueLine,
+  FabricIssuePurpose,
+  FabricLayer,
+  FabricPlanPart,
+  ItemFabric,
+  RefreshItemPlanBody,
+} from './entities/issues/item-fabric';
+export {
+  comparisonPlan,
+  createItemIssueValues,
+  hasItemIssueErrors,
+  issueLineFor,
+  issueLinePair,
+  issueLinePart,
+  issueLinePurpose,
+  itemIssueBody,
+  itemIssuePreview,
+  planPartKey,
+  validateItemIssue,
+} from './forms/item-issue/item-issue-form';
+export type {
+  ItemIssueErrors,
+  ItemIssueFormValues,
+  ItemIssueLineValues,
+  ItemIssuePreview,
+} from './forms/item-issue/item-issue-form';

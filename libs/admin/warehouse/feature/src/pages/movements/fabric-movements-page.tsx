@@ -12,6 +12,7 @@ import {
   StockReasonDialog,
 } from '@admin/warehouse/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
+import ContentCutOutlinedIcon from '@mui/icons-material/ContentCutOutlined';
 import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined';
 import QueryStatsOutlinedIcon from '@mui/icons-material/QueryStatsOutlined';
 import RemoveOutlinedIcon from '@mui/icons-material/RemoveOutlined';
@@ -19,6 +20,7 @@ import { Box, Button, Stack } from '@mui/material';
 import { useState } from 'react';
 
 import { FabricConsumptionDrawer } from '../../components/consumption/fabric-consumption-drawer';
+import { IssueToItemDrawer } from '../../components/item-issue/issue-to-item-drawer';
 import { FabricMovementEditDrawer } from '../../components/movements/fabric-movement-edit-drawer';
 import { FabricMovementHistoryDrawer } from '../../components/movements/fabric-movement-history-drawer';
 import { FabricIssueDrawer } from '../../components/operations/fabric-issue-drawer';
@@ -30,10 +32,10 @@ import { useMovementsExport } from '../../hooks/movements/use-movements-export';
 import type { FabricMovementQuery, FabricMovementRow } from '@admin/warehouse/model';
 
 type Panel =
-  | { kind: 'receipt' | 'issue' | 'consumption' }
+  | { kind: 'receipt' | 'issue' | 'item-issue' | 'consumption' }
   | { kind: 'edit' | 'history'; row: FabricMovementRow };
 
-/** «Склад тканин › Рух тканини»: receipts, one-off issues and every movement, 50 per page. */
+/** «Склад тканин › Рух тканини»: receipts, one-off issues, issues to items and every movement, 50 per page. */
 export function FabricMovementsPage() {
   const [query, setQuery] = useState<FabricMovementQuery>(defaultFabricMovementQuery);
   const [panel, setPanel] = useState<Panel | null>(null);
@@ -74,6 +76,13 @@ export function FabricMovementsPage() {
                   onClick={() => setPanel({ kind: 'issue' })}
                 >
                   Разова витрата
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<ContentCutOutlinedIcon />}
+                  onClick={() => setPanel({ kind: 'item-issue' })}
+                >
+                  Видача на завдання
                 </Button>
               </>
             )}
@@ -134,6 +143,9 @@ export function FabricMovementsPage() {
           onClose={() => setPanel(null)}
           onSaved={saved}
         />
+      )}
+      {panel?.kind === 'item-issue' && (
+        <IssueToItemDrawer onClose={() => setPanel(null)} onMessage={setMessage} />
       )}
       {panel?.kind === 'consumption' && <FabricConsumptionDrawer onClose={() => setPanel(null)} />}
       {panel?.kind === 'edit' && (

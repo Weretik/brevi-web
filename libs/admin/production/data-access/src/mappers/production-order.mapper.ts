@@ -261,3 +261,7 @@ export function mapProductionQuoteDraft(value: unknown): ProductionQuoteDraft {
     }),
   };
 }
+
+/** Colour names of «Кольори» as the workshop endpoints give them. */
+export const productionColors = (value: unknown): string[] =>
+  list(value, 'кольори').map((item) => nonEmptyText(item, 'колір'));

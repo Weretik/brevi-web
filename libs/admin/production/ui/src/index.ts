@@ -29,8 +29,6 @@ export { ProductionOrderTelegram } from './tracking/production-order-telegram';
 export { ProductionShipmentForm } from './tracking/production-shipment-form';
 export { ProductionStagePill, productionStageTone } from './tracking/production-stage-pill';
 export { WorkshopSettingsForm } from './settings/workshop-settings-form';
-export { ProductionItemFabricPanel } from './stock/production-item-fabric';
-export { FabricIssueForm } from './stock/fabric-issue-form';
 export { ProductionReasonDialog } from './dialogs/production-reason-dialog';
 export { ProductionWorkTable } from './work/production-work-table';
 export { ProductionWorkForm } from './work/production-work-form';

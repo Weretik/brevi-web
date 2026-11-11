@@ -10,3 +10,7 @@ export { FabricIssueForm } from './forms/stock-operations/fabric-issue-form';
 export { FabricAdjustmentForm } from './forms/stock-operations/fabric-adjustment-form';
 export { StockReasonDialog } from './dialogs/stock-reason-dialog';
 export { FabricMovementEditForm } from './forms/movement-edit/fabric-movement-edit-form';
+export { ItemFabricCard } from './panels/item-fabric/item-fabric-card';
+export { ItemIssueForm } from './forms/item-issue/item-issue-form';
+export { ItemIssuePreviewPanel } from './forms/item-issue/item-issue-preview';
+export { FabricIssueItemList } from './components/issue-items/fabric-issue-item-list';
