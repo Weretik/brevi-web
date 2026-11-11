@@ -83,6 +83,7 @@ export type { ImportFileResult } from './validators/production-import-file';
 export {
   PRODUCTION_ORDER_MAX_ADDITIONAL_COLORS,
   PRODUCTION_ORDER_MAX_APPLICATIONS,
+  emptyProductionOrderFilters,
   itemApplicationKindLabels,
   productionOrderStatusLabels,
   reportPriceTierLabels,
@@ -100,7 +101,13 @@ export type {
   ProductionOrder,
   ProductionOrderActor,
   ProductionOrderChange,
+  ProductionFilterOption,
+  ProductionModelSummary,
+  ProductionModelSummaryRow,
   ProductionOrderCounts,
+  ProductionOrderFilterField,
+  ProductionOrderFilterOptions,
+  ProductionOrderFilterValues,
   ProductionOrderImportRow,
   ProductionOrderListQuery,
   ProductionOrderPage,
@@ -149,6 +156,20 @@ export type {
   ProductionOrderHeaderValues,
 } from './forms/production-order-form';
 export { productionOrdersCsv } from './queries/production-orders-csv';
+export {
+  activeProductionOrderFilters,
+  addModelSummarySortLevel,
+  defaultModelSummarySort,
+  modelSummarySortFieldLabels,
+  modelSummarySortFields,
+  moveModelSummarySortLevel,
+  sortModelSummary,
+} from './queries/model-summary-sort';
+export type {
+  ModelSummarySortDirection,
+  ModelSummarySortField,
+  ModelSummarySortLevel,
+} from './queries/model-summary-sort';
 export { parseProductionOrderImportFile } from './validators/production-order-import-file';
 export {
   PRODUCTION_FILE_MAX_BYTES,

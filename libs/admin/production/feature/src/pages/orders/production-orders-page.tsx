@@ -10,7 +10,13 @@ import {
   productionStageLabels,
   productionStages,
 } from '@admin/production/model';
-import { ProductionOrderChips, ProductionOrdersGrid } from '@admin/production/ui';
+import {
+  ModelSummarySortEditor,
+  ProductionModelSummaryTable,
+  ProductionOrderChips,
+  ProductionOrderFilters,
+  ProductionOrdersGrid,
+} from '@admin/production/ui';
 import {
   ReferenceFilterRow,
   ReferenceListAlerts,
@@ -20,11 +26,24 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
-import { Box, Button, MenuItem, Paper, TextField } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Button,
+  LinearProgress,
+  MenuItem,
+  Paper,
+  Stack,
+  Tab,
+  Tabs,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { ProductionImportDrawer } from '../../components/import/production-import-drawer';
+import { useProductionModelSummary } from '../../hooks/orders/use-production-model-summary';
 import { useProductionOrders } from '../../hooks/orders/use-production-orders';
 import { useProductionOrdersExport } from '../../hooks/orders/use-production-orders-export';
 
@@ -34,11 +53,19 @@ interface Props {
   useOrderActor: () => ProductionOrderActor;
 }
 
-/** «Швейний цех › Виробничі завдання»: what the workshop sews, made from sent КП. */
+type OrdersView = 'list' | 'summary';
+
+/**
+ * «Швейний цех › Виробничі завдання»: what the workshop sews, made from sent КП. «Фільтри» narrow both the list and
+ * «Зведення за моделями»; «Переглянути» in the summary opens the list of that model.
+ */
 export function ProductionOrdersPage({ useOrderActor }: Props) {
   const actor = useOrderActor();
   const navigate = useNavigate();
   const list = useProductionOrders();
+  const [view, setView] = useState<OrdersView>('list');
+  const [filtersOpen, setFiltersOpen] = useState(true);
+  const summary = useProductionModelSummary(list.query, view === 'summary');
   const [message, setMessage] = useState<string | null>(null);
   const [importing, setImporting] = useState<'orders' | 'progress' | 'prices' | null>(null);
   const exporter = useProductionOrdersExport(setMessage);
@@ -107,8 +134,16 @@ export function ProductionOrdersPage({ useOrderActor }: Props) {
         actionMessage={message}
         onCloseActionMessage={() => setMessage(null)}
       />
+      <ProductionOrderFilters
+        values={list.filters}
+        options={list.filterOptions}
+        expanded={filtersOpen}
+        onExpandedChange={setFiltersOpen}
+        onChange={list.setFilter}
+        onReset={list.resetFilters}
+      />
       <ReferenceSearchBar
-        placeholder="Знайти за номером, клієнтом, КП або моделлю"
+        placeholder="Номер завдання або КП, клієнт, модель"
         label="Пошук завдань"
         value={list.search}
         onChange={list.setSearch}
@@ -165,18 +200,60 @@ export function ProductionOrdersPage({ useOrderActor }: Props) {
         selectedCount={0}
         onClearSelection={() => undefined}
       />
-      <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
-        <ProductionOrdersGrid
-          rows={page?.items ?? []}
-          rowCount={page?.total ?? 0}
-          loading={list.loading}
-          searching={(page?.counts.all ?? 0) > 0}
-          today={list.today}
-          paginationModel={list.pagination}
-          onPaginationModelChange={list.setPagination}
-          onOpen={(row) => navigate(`/production/orders/${row.id}`)}
-        />
-      </Paper>
+      <Tabs
+        value={view}
+        onChange={(_event, next: OrdersView) => setView(next)}
+        sx={{ mb: 1.5, borderBottom: 1, borderColor: 'divider' }}
+      >
+        <Tab value="list" label="Завдання" />
+        <Tab value="summary" label="Зведення за моделями" />
+      </Tabs>
+      {view === 'list' ? (
+        <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
+          <ProductionOrdersGrid
+            rows={page?.items ?? []}
+            rowCount={page?.total ?? 0}
+            loading={list.loading}
+            searching={(page?.counts.all ?? 0) > 0}
+            today={list.today}
+            paginationModel={list.pagination}
+            onPaginationModelChange={list.setPagination}
+            onOpen={(row) => navigate(`/production/orders/${row.id}`)}
+          />
+        </Paper>
+      ) : (
+        <Stack spacing={1.5}>
+          <Paper variant="outlined" sx={{ p: 2 }}>
+            <Typography variant="subtitle2" sx={{ mb: 1.5 }}>
+              Сортування за пріоритетом
+            </Typography>
+            <ModelSummarySortEditor levels={summary.sort} onChange={summary.setSort} />
+          </Paper>
+          {summary.error && (
+            <Alert
+              severity="error"
+              action={
+                <Button color="inherit" size="small" onClick={() => void summary.reload()}>
+                  Повторити
+                </Button>
+              }
+            >
+              {summary.error}
+            </Alert>
+          )}
+          {summary.loading && <LinearProgress aria-label="Завантаження зведення" />}
+          {!summary.loading && !summary.error && (
+            <ProductionModelSummaryTable
+              rows={summary.rows}
+              totalQuantity={summary.totalQuantity}
+              onView={(row) => {
+                list.setFilter('model', row.modelCode);
+                setView('list');
+              }}
+            />
+          )}
+        </Stack>
+      )}
       {importing === 'progress' && (
         <ProductionImportDrawer
           title="Імпорт етапів"

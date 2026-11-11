@@ -3,6 +3,10 @@ import { productionOrderErrors, toProductionApiError } from '../errors/productio
 import { productionColors } from '../mappers/fabric-stock.mapper';
 import { mapOrderImportResult } from '../mappers/production-import.mapper';
 import {
+  mapProductionModelSummary,
+  mapProductionOrderFilterOptions,
+} from '../mappers/production-order-filters.mapper';
+import {
   mapProductionEmbroideryChoices,
   mapProductionOrder,
   mapProductionOrderHistory,
@@ -16,7 +20,9 @@ import type {
   ProductionEmbroideryChoice,
   ProductionImportResult,
   ProductionOrder,
+  ProductionModelSummary,
   ProductionOrderChange,
+  ProductionOrderFilterOptions,
   ProductionOrderImportRow,
   ProductionOrderListQuery,
   ProductionOrderPage,
@@ -40,15 +46,30 @@ const errors = (response: unknown) => toProductionApiError(response, productionO
 const list = { type: 'ProductionOrder' as const, id: 'LIST' };
 const one = (id: number) => ({ type: 'ProductionOrder' as const, id });
 
-function listParams(query: ProductionOrderListQuery) {
+function filterParams(query: ProductionOrderListQuery) {
+  const filters = query.filters;
+  const params: Record<string, string> = {};
+  if (filters) {
+    for (const [key, value] of Object.entries(filters)) {
+      const trimmed = value?.trim();
+      if (trimmed) params[key] = trimmed;
+    }
+  }
   return {
-    page: query.page,
-    pageSize: query.pageSize,
     ...(query.search.trim() ? { search: query.search.trim() } : {}),
     ...(query.status ? { status: query.status } : {}),
     ...(query.manager ? { manager: query.manager } : {}),
     ...(query.dueTo ? { dueTo: query.dueTo } : {}),
     ...(query.stage ? { stage: query.stage } : {}),
+    ...params,
+  };
+}
+
+function listParams(query: ProductionOrderListQuery) {
+  return {
+    page: query.page,
+    pageSize: query.pageSize,
+    ...filterParams(query),
     ...(query.customerId ? { customerId: query.customerId } : {}),
     ...(query.quoteId ? { quoteId: query.quoteId } : {}),
   };
@@ -59,6 +80,21 @@ export const productionOrdersApi = productionBaseApi.injectEndpoints({
     getProductionOrders: build.query<ProductionOrderPage, ProductionOrderListQuery>({
       query: (query) => ({ url: '/api/production/orders', params: listParams(query) }),
       transformResponse: mapProductionOrderPage,
+      transformErrorResponse: errors,
+      providesTags: [list],
+    }),
+    getProductionModelSummary: build.query<ProductionModelSummary, ProductionOrderListQuery>({
+      query: (query) => ({
+        url: '/api/production/orders/model-summary',
+        params: filterParams(query),
+      }),
+      transformResponse: mapProductionModelSummary,
+      transformErrorResponse: errors,
+      providesTags: [list],
+    }),
+    getProductionOrderFilterOptions: build.query<ProductionOrderFilterOptions, void>({
+      query: () => '/api/production/orders/filter-options',
+      transformResponse: mapProductionOrderFilterOptions,
       transformErrorResponse: errors,
       providesTags: [list],
     }),
@@ -164,6 +200,8 @@ export const {
   useDeleteProductionOrderMutation,
   useGetProductionColorsQuery,
   useGetProductionEmbroideriesQuery,
+  useGetProductionModelSummaryQuery,
+  useGetProductionOrderFilterOptionsQuery,
   useGetProductionOrderHistoryQuery,
   useGetProductionOrderQuery,
   useGetProductionOrdersQuery,

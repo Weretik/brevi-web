@@ -3732,6 +3732,43 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/production/orders/model-summary': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * «Зведення за моделями»: items of every order matching the list filters (all pages), grouped by model
+     * @description Takes the same filters as getProductionOrders without paging. Quantity is the ordered pieces. Season comes from the Catalog model; category is read from the model name.
+     */
+    get: operations['getProductionModelSummary'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/orders/filter-options': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Values «Фільтри» offer: clients, models, fabrics, colours and seasons used by not deleted orders */
+    get: operations['getProductionOrderFilterOptions'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/production/orders/import': {
     parameters: {
       query?: never;
@@ -10130,6 +10167,33 @@ export interface components {
       items: components['schemas']['ProductionQuoteDraftItem'][];
       /** @description «Вишивка» rows of the КП whose calculation still exists; the form puts them into the items' applications. */
       embroideries: components['schemas']['ProductionQuoteDraftEmbroidery'][];
+    };
+    ProductionModelSummaryRow: {
+      modelCode: string | null;
+      modelName: string;
+      season: string | null;
+      /** @description Read from the model name like the old «Цех»; «Інше» when unknown. */
+      category: string;
+      /** Format: int32 */
+      quantity: number;
+      /** Format: int32 */
+      ordersCount: number;
+    };
+    ProductionModelSummaryResponse: {
+      rows: components['schemas']['ProductionModelSummaryRow'][];
+      /** Format: int32 */
+      totalQuantity: number;
+    };
+    ProductionFilterOption: {
+      code: string;
+      name: string;
+    };
+    ProductionOrderFilterOptionsResponse: {
+      clients: string[];
+      models: components['schemas']['ProductionFilterOption'][];
+      fabrics: components['schemas']['ProductionFilterOption'][];
+      colors: string[];
+      seasons: string[];
     };
     ProductionItemImportRow: {
       modelCode?: string | null;
@@ -23718,6 +23782,20 @@ export interface operations {
         customerId?: number;
         /** @description The КП editor; only orders made from this КП. */
         quoteId?: number;
+        /** @description «Замовник»; the exact client name. */
+        client?: string;
+        /** @description «Період від»; order date on or after this day. */
+        from?: string;
+        /** @description «Період до»; order date on or before this day; not before «from». */
+        to?: string;
+        /** @description «Модель»; orders with an item of this model code (case ignored). */
+        model?: string;
+        /** @description «Тканина»; orders with an item of this fabric code (case ignored). */
+        fabric?: string;
+        /** @description «Колір»; orders with an item whose main or additional colour matches (case and outer spaces ignored). */
+        color?: string;
+        /** @description «Сезон»; orders with an item whose Catalog model has this season. */
+        season?: string;
         page?: number;
         pageSize?: number;
       };
@@ -23957,6 +24035,110 @@ export interface operations {
         };
         content: {
           'application/json': string[];
+        };
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description «Права доступу» page access:production-orders required (Manager, WorkshopChief and Admin by default). */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getProductionModelSummary: {
+    parameters: {
+      query?: {
+        search?: string;
+        status?: 'New' | 'Closed' | 'Cancelled';
+        manager?: string;
+        dueTo?: string;
+        stage?:
+          | 'New'
+          | 'FabricOrdered'
+          | 'FabricAvailable'
+          | 'Cutting'
+          | 'Application'
+          | 'Sewing'
+          | 'Ready'
+          | 'Shipped'
+          | 'Complete';
+        /** @description «Замовник»; the exact client name. */
+        client?: string;
+        /** @description «Період від»; order date on or after this day. */
+        from?: string;
+        /** @description «Період до»; order date on or before this day; not before «from». */
+        to?: string;
+        /** @description «Модель»; orders with an item of this model code (case ignored). */
+        model?: string;
+        /** @description «Тканина»; orders with an item of this fabric code (case ignored). */
+        fabric?: string;
+        /** @description «Колір»; orders with an item whose main or additional colour matches (case and outer spaces ignored). */
+        color?: string;
+        /** @description «Сезон»; orders with an item whose Catalog model has this season. */
+        season?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Rows by model and the total pieces. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionModelSummaryResponse'];
+        };
+      };
+      /** @description Unknown status or wrong period. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description «Права доступу» page access:production-orders required (Manager, WorkshopChief and Admin by default). */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getProductionOrderFilterOptions: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Filter values. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionOrderFilterOptionsResponse'];
         };
       };
       /** @description Unauthenticated. */

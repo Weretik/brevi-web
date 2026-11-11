@@ -245,6 +245,60 @@ export interface ProductionOrderListQuery {
   customerId?: number;
   /** The КП editor: only orders made from this КП. */
   quoteId?: number;
+  /** «Фільтри» of «Виробничі завдання». */
+  filters?: ProductionOrderFilterValues;
+}
+
+/** «Фільтри»: null = any. Dates are yyyy-mm-dd; model and fabric are codes. */
+export interface ProductionOrderFilterValues {
+  client: string | null;
+  from: string | null;
+  to: string | null;
+  model: string | null;
+  fabric: string | null;
+  color: string | null;
+  season: string | null;
+}
+
+export type ProductionOrderFilterField = keyof ProductionOrderFilterValues;
+
+export const emptyProductionOrderFilters: ProductionOrderFilterValues = {
+  client: null,
+  from: null,
+  to: null,
+  model: null,
+  fabric: null,
+  color: null,
+  season: null,
+};
+
+export interface ProductionFilterOption {
+  code: string;
+  name: string;
+}
+
+/** What «Фільтри» offer: values used by orders that are not deleted. */
+export interface ProductionOrderFilterOptions {
+  clients: string[];
+  models: ProductionFilterOption[];
+  fabrics: ProductionFilterOption[];
+  colors: string[];
+  seasons: string[];
+}
+
+/** A row of «Зведення за моделями»: ordered pieces of a model in every filtered order. */
+export interface ProductionModelSummaryRow {
+  modelCode: string | null;
+  modelName: string;
+  season: string | null;
+  category: string;
+  quantity: number;
+  ordersCount: number;
+}
+
+export interface ProductionModelSummary {
+  rows: ProductionModelSummaryRow[];
+  totalQuantity: number;
 }
 
 export interface ProductionItemDetails {
