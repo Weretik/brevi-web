@@ -5746,6 +5746,24 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/content/company': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description The facts; revision 0 only in an empty database. */
+    get: operations['getSiteCompany'];
+    /** @description Replaces the facts as a whole; spaces inside texts are joined, phones and the IBAN are formatted. */
+    put: operations['saveSiteCompany'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/content/seo-overview': {
     parameters: {
       query?: never;
@@ -5978,6 +5996,23 @@ export interface paths {
     };
     /** @description The settings; empty fields are null. */
     get: operations['getPublicSiteSettings'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/public/company': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description The facts; 404 before they exist, and the site then keeps its own. */
+    get: operations['getPublicSiteCompany'];
     put?: never;
     post?: never;
     delete?: never;
@@ -13706,6 +13741,75 @@ export interface components {
       /** Format: int32 */
       defaultOgPhotoId?: number | null;
     };
+    /** @description A text in Ukrainian and Russian. */
+    CompanyText: {
+      uk: string;
+      ru: string;
+    };
+    CompanySchedule: {
+      /** @description Working days, Monday = 1 … Sunday = 7, in order. */
+      days: number[];
+      /** @description Time as HH:mm. */
+      opens: string;
+      /** @description Time as HH:mm, later than opens. */
+      closes: string;
+    };
+    CompanyManager: {
+      name: components['schemas']['CompanyText'];
+      /** @description A picture of the «Фото» library (https) or of the site itself (/assets/…). */
+      photoUrl?: string | null;
+      phones: string[];
+      email?: string | null;
+    };
+    CompanyBankDetails: {
+      recipient: components['schemas']['CompanyText'];
+      /** @description 8 digits, or 10 for a sole trader. */
+      edrpou: string;
+      /** @description UA and 27 digits; the server stores it grouped as banks print it. */
+      iban: string;
+      bank: components['schemas']['CompanyText'];
+    };
+    /** @description Profile links (https); null hides the link. */
+    CompanySocials: {
+      instagram?: string | null;
+      youtube?: string | null;
+      facebook?: string | null;
+    };
+    SiteCompanyResponse: {
+      /** @description The company phone as the site shows it, 050 469 86 75. */
+      phone: string;
+      email: string;
+      city: components['schemas']['CompanyText'];
+      street: components['schemas']['CompanyText'];
+      /** @description What the map link and the embedded map look for. */
+      mapQuery: string;
+      schedule: components['schemas']['CompanySchedule'];
+      managers: components['schemas']['CompanyManager'][];
+      bankDetails: components['schemas']['CompanyBankDetails'];
+      socials: components['schemas']['CompanySocials'];
+      /** Format: int32 */
+      revision: number;
+      /** Format: date-time */
+      updatedAtUtc?: string | null;
+      updatedBy?: string | null;
+    };
+    SaveSiteCompanyRequest: {
+      /**
+       * Format: int32
+       * @description The revision that was read.
+       */
+      revision: number;
+      /** @description A Ukrainian number in any common form. */
+      phone: string;
+      email: string;
+      city: components['schemas']['CompanyText'];
+      street: components['schemas']['CompanyText'];
+      mapQuery: string;
+      schedule: components['schemas']['CompanySchedule'];
+      managers: components['schemas']['CompanyManager'][];
+      bankDetails: components['schemas']['CompanyBankDetails'];
+      socials: components['schemas']['CompanySocials'];
+    };
     /**
      * @description A site-wide setting of «Налаштування SEO сайту» that is not filled.
      * @enum {string}
@@ -14025,6 +14129,29 @@ export interface components {
       googleSiteVerification?: string | null;
       bingSiteVerification?: string | null;
       defaultOgImage?: components['schemas']['PublicSitePicture'] | null;
+    };
+    PublicPhone: {
+      /** @description The tel value, +380504698675. */
+      e164: string;
+      /** @description As the site shows it, 050 469 86 75. */
+      display: string;
+    };
+    PublicCompanyManager: {
+      name: components['schemas']['CompanyText'];
+      photoUrl?: string | null;
+      phones: components['schemas']['PublicPhone'][];
+      email?: string | null;
+    };
+    PublicSiteCompanyResponse: {
+      phone: components['schemas']['PublicPhone'];
+      email: string;
+      city: components['schemas']['CompanyText'];
+      street: components['schemas']['CompanyText'];
+      mapQuery: string;
+      schedule: components['schemas']['CompanySchedule'];
+      managers: components['schemas']['PublicCompanyManager'][];
+      bankDetails: components['schemas']['CompanyBankDetails'];
+      socials: components['schemas']['CompanySocials'];
     };
     'schemas-SitePageText': {
       title?: string | null;
@@ -32552,6 +32679,96 @@ export interface operations {
       };
     };
   };
+  getSiteCompany: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SiteCompanyResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to view «Контакти та компанія» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  saveSiteCompany: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SaveSiteCompanyRequest'];
+      };
+    };
+    responses: {
+      /** @description Saved */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SiteCompanyResponse'];
+        };
+      };
+      /** @description A field is wrong; the answer names it in Ukrainian */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': Record<string, never>;
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to edit «Контакти та компанія» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The revision is stale */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Messages'];
+        };
+      };
+    };
+  };
   getSeoOverview: {
     parameters: {
       query?: never;
@@ -32990,6 +33207,33 @@ export interface operations {
         content: {
           'application/json': components['schemas']['PublicSiteSettingsResponse'];
         };
+      };
+    };
+  };
+  getPublicSiteCompany: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Facts */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PublicSiteCompanyResponse'];
+        };
+      };
+      /** @description No facts yet */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };

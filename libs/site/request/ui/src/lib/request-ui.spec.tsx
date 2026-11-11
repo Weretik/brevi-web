@@ -1,3 +1,4 @@
+import { COMPANY } from '@site/core/config';
 import { fireEvent, render, screen } from '@testing-library/react';
 
 import { getRequestDictionary } from './i18n/request-dictionary';
@@ -19,6 +20,7 @@ const values = { phone: '050 123 45 67', workwear: 'куртки', quantity: '',
 const renderForm = (result: RequestFormState) => {
   render(
     <RequestForm
+      company={COMPANY}
       dictionary={dictionary}
       action={async () => result}
       agreementHref="/uk/agreement"
@@ -34,7 +36,7 @@ describe('request blocks', () => {
   });
 
   it('shows only the site phone next to the steps', () => {
-    render(<RequestIntro dictionary={dictionary} />);
+    render(<RequestIntro company={COMPANY} dictionary={dictionary} />);
 
     expect(screen.getAllByRole('listitem')).toHaveLength(3);
     expect(screen.getByRole('link', { name: '050 469 86 75' }).getAttribute('href')).toBe(

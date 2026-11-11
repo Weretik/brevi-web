@@ -1,11 +1,12 @@
-import { COMPANY } from '@site/core/config';
 import { buttonVariants, cn } from '@site/shared/ui';
 import Link from 'next/link';
 
 import type { WholesaleDictionary } from '../i18n/wholesale-dictionary';
+import type { Company } from '@site/core/config';
 
 /** Closing block: the four order steps, «Залишити заявку», the phone, and links to contacts and delivery. */
 export function WholesaleOrder({
+  company,
   id,
   index,
   dictionary,
@@ -14,6 +15,8 @@ export function WholesaleOrder({
   contactsHref,
   deliveryHref,
 }: {
+  /** Company facts from «Контакти та компанія». */
+  company: Company;
   id: string;
   /** Number of the block in the «Строчка» label, for example `05`. */
   index: string;
@@ -23,7 +26,7 @@ export function WholesaleOrder({
   contactsHref: string;
   deliveryHref: string;
 }) {
-  const [phone] = COMPANY.phones;
+  const [phone] = company.phones;
   const titleId = `${id}-title`;
 
   return (

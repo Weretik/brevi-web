@@ -1,23 +1,26 @@
-import { COMPANY } from '@site/core/config';
 import { StitchLabel, buttonVariants, cn } from '@site/shared/ui';
 import Link from 'next/link';
 
 import type { RequestDictionary } from '../i18n/request-dictionary';
+import type { Company } from '@site/core/config';
 
 /** Shown instead of the form after a request is accepted: repeats the number and says when to expect the call. */
 export function RequestSent({
+  company,
   dictionary,
   phone,
   catalogHref,
   onAgain,
 }: {
+  /** Company facts from «Контакти та компанія». */
+  company: Company;
   dictionary: RequestDictionary['sent'];
   /** Already formatted for reading, for example `+380 50 123 45 67`. */
   phone: string;
   catalogHref: string;
   onAgain: () => void;
 }) {
-  const [companyPhone] = COMPANY.phones;
+  const [companyPhone] = company.phones;
 
   return (
     <div

@@ -1,11 +1,12 @@
-import { COMPANY } from '@site/core/config';
 import { buttonVariants, cn } from '@site/shared/ui';
 import Link from 'next/link';
 
 import type { RegionsDictionary } from '../i18n/regions-dictionary';
+import type { Company } from '@site/core/config';
 
 /** Closing block: the call to order, «Залишити заявку», the phone, and links to wholesale prices and industries. */
 export function RegionsOrder({
+  company,
   id,
   index,
   dictionary,
@@ -14,6 +15,8 @@ export function RegionsOrder({
   wholesaleHref,
   industriesHref,
 }: {
+  /** Company facts from «Контакти та компанія». */
+  company: Company;
   id: string;
   /** Number of the block in the «Строчка» label, for example `05`. */
   index: string;
@@ -23,7 +26,7 @@ export function RegionsOrder({
   wholesaleHref: string;
   industriesHref: string;
 }) {
-  const [phone] = COMPANY.phones;
+  const [phone] = company.phones;
   const titleId = `${id}-title`;
 
   return (

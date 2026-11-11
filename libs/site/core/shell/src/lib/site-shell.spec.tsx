@@ -1,3 +1,4 @@
+import { COMPANY } from '@site/core/config';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 
 import { SiteShell } from './site-shell';
@@ -29,7 +30,7 @@ const CATALOG_SECTIONS: CatalogSection[] = [
 describe('SiteShell', () => {
   it('frames the page with the header menu, phones, and footer contacts', () => {
     render(
-      <SiteShell locale="ru" catalogSections={CATALOG_SECTIONS}>
+      <SiteShell company={COMPANY} locale="ru" catalogSections={CATALOG_SECTIONS}>
         <h1>Страница</h1>
       </SiteShell>,
     );
@@ -73,7 +74,7 @@ describe('SiteShell', () => {
 
   it('marks the current page in the header menu', () => {
     render(
-      <SiteShell locale="ru" catalogSections={CATALOG_SECTIONS}>
+      <SiteShell company={COMPANY} locale="ru" catalogSections={CATALOG_SECTIONS}>
         content
       </SiteShell>,
     );
@@ -89,7 +90,7 @@ describe('SiteShell', () => {
 
   it('keeps the request link out of search results', () => {
     render(
-      <SiteShell locale="uk" catalogSections={CATALOG_SECTIONS}>
+      <SiteShell company={COMPANY} locale="uk" catalogSections={CATALOG_SECTIONS}>
         content
       </SiteShell>,
     );
@@ -103,7 +104,7 @@ describe('SiteShell', () => {
 
   it('keeps every catalog section in the HTML and shows one section at a time', () => {
     render(
-      <SiteShell locale="uk" catalogSections={CATALOG_SECTIONS}>
+      <SiteShell company={COMPANY} locale="uk" catalogSections={CATALOG_SECTIONS}>
         content
       </SiteShell>,
     );
@@ -139,7 +140,7 @@ describe('SiteShell', () => {
 
   it('keeps the catalog entry when the catalog is empty', () => {
     render(
-      <SiteShell locale="uk" catalogSections={[]}>
+      <SiteShell company={COMPANY} locale="uk" catalogSections={[]}>
         content
       </SiteShell>,
     );
@@ -158,7 +159,7 @@ describe('SiteShell', () => {
 
   it('shows the phone in the menu row once the page is scrolled', () => {
     render(
-      <SiteShell locale="uk" catalogSections={CATALOG_SECTIONS}>
+      <SiteShell company={COMPANY} locale="uk" catalogSections={CATALOG_SECTIONS}>
         content
       </SiteShell>,
     );
@@ -174,7 +175,7 @@ describe('SiteShell', () => {
 
   it('gives phones a bottom bar with the catalog, the request, the call, and the menu', () => {
     render(
-      <SiteShell locale="uk" catalogSections={CATALOG_SECTIONS}>
+      <SiteShell company={COMPANY} locale="uk" catalogSections={CATALOG_SECTIONS}>
         content
       </SiteShell>,
     );
@@ -207,7 +208,7 @@ describe('SiteShell', () => {
 
   it('switches the language on the same page', () => {
     render(
-      <SiteShell locale="ru" catalogSections={CATALOG_SECTIONS}>
+      <SiteShell company={COMPANY} locale="ru" catalogSections={CATALOG_SECTIONS}>
         content
       </SiteShell>,
     );

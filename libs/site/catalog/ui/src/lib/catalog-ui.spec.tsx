@@ -1,3 +1,4 @@
+import { COMPANY } from '@site/core/config';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 
 import { formatModelCount, getCatalogDictionary } from './i18n/catalog-dictionary';
@@ -141,6 +142,7 @@ describe('catalog blocks', () => {
   it('shows the model, short facts, and the prices of the chosen fabric with the ways to order', () => {
     render(
       <CatalogProductBuy
+        company={COMPANY}
         model="992"
         summary={[{ type: 'paragraph', lead: 'Сезон:', text: 'літо' }]}
         fabrics={[
@@ -180,6 +182,7 @@ describe('catalog blocks', () => {
   it('asks to learn the price when the product has none', () => {
     render(
       <CatalogProductBuy
+        company={COMPANY}
         model={null}
         summary={[]}
         fabrics={[]}

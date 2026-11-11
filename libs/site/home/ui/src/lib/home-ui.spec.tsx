@@ -1,3 +1,4 @@
+import { COMPANY } from '@site/core/config';
 import { render, screen, within } from '@testing-library/react';
 
 import { getHomeDictionary } from './i18n/home-dictionary';
@@ -40,7 +41,7 @@ describe('home dictionary', () => {
 describe('HomeHero', () => {
   it('shows the offer, the request action, the sales phone, and the callouts', () => {
     const dictionary = getHomeDictionary('uk').hero;
-    render(<HomeHero dictionary={dictionary} requestHref="#zayavka" />);
+    render(<HomeHero company={COMPANY} dictionary={dictionary} requestHref="#zayavka" />);
 
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe(dictionary.title);
     expect(screen.getByRole('link', { name: 'Залишити заявку' }).getAttribute('href')).toBe(
@@ -77,7 +78,13 @@ describe('HomeContacts', () => {
   it('gives the phones, e-mail, address, and the contacts page link', () => {
     const dictionary = getHomeDictionary('uk').contacts;
     render(
-      <HomeContacts id="zayavka" locale="uk" dictionary={dictionary} contactsHref="/uk/contacts" />,
+      <HomeContacts
+        company={COMPANY}
+        id="zayavka"
+        locale="uk"
+        dictionary={dictionary}
+        contactsHref="/uk/contacts"
+      />,
     );
 
     const section = screen.getByRole('region', { name: dictionary.title });

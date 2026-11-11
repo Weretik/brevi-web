@@ -1,3 +1,4 @@
+import { COMPANY } from '@site/core/config';
 import { render, screen } from '@testing-library/react';
 
 import { getRegionsDictionary } from './i18n/regions-dictionary';
@@ -57,6 +58,7 @@ describe('regions blocks', () => {
   it('keeps the Poltava terms of the delivery page and shows the address', () => {
     const { container } = render(
       <RegionsLocal
+        company={COMPANY}
         dictionary={getRegionsDictionary('uk').local}
         locale="uk"
         contactsHref="/uk/contacts"
@@ -75,6 +77,7 @@ describe('regions blocks', () => {
     const dictionary = getRegionsDictionary('uk');
     render(
       <RegionsOrder
+        company={COMPANY}
         id="order"
         index="05"
         dictionary={dictionary.order}

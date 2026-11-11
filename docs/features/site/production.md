@@ -16,7 +16,7 @@ flowchart LR
   Feature --> Seo["site-core-seo: JsonLd, BreadcrumbList"]
   Feature --> Shared["site-shared-ui: PageSection"]
   Ui --> Shared
-  Ui --> Config["site-core-config: COMPANY"]
+  Feature --> Company["site-settings-data-access: loadSiteCompany"]
 ```
 
 ## Code structure

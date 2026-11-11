@@ -8,6 +8,7 @@ import {
   IndustriesSteps,
   getIndustriesDictionary,
 } from '@site/industries/ui';
+import { loadSiteCompany } from '@site/settings/data-access';
 import { PageSection } from '@site/shared/ui';
 
 import type { Locale } from '@site/core/i18n';
@@ -16,7 +17,8 @@ import type { Locale } from '@site/core/i18n';
  * «Галузі» page in the order of the live `brevi.com.ua` page «Спецодяг для підприємств»: lead with the terms,
  * industries, how to get a quote, frequent questions, and the call to order. Static: the text is in the dictionary.
  */
-export function IndustriesPage({ locale }: { locale: Locale }) {
+export async function IndustriesPage({ locale }: { locale: Locale }) {
+  const company = await loadSiteCompany();
   const dictionary = getIndustriesDictionary(locale);
   const path = (key: keyof typeof SITE_PATHS) => localizedPath(locale, SITE_PATHS[key]);
   const breadcrumbs = [
@@ -62,6 +64,7 @@ export function IndustriesPage({ locale }: { locale: Locale }) {
       </PageSection>
 
       <IndustriesOrder
+        company={company}
         id="industries-order"
         index="05"
         dictionary={dictionary.order}

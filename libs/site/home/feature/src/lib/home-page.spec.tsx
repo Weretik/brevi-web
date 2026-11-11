@@ -5,6 +5,11 @@ import { HomePage } from './home-page';
 
 import type { CatalogSection } from '@site/catalog/model';
 
+vi.mock('@site/settings/data-access', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  loadSiteCompany: async () => (await import('@site/core/config')).COMPANY,
+}));
+
 const CATALOG_SECTIONS: CatalogSection[] = [
   {
     key: 'spetsodyah',
@@ -26,9 +31,9 @@ const readJsonLd = (container: HTMLElement): Record<string, unknown>[] =>
   );
 
 describe('HomePage', () => {
-  it('renders one h1 and the blocks in the mockup order', () => {
+  it('renders one h1 and the blocks in the mockup order', async () => {
     const dictionary = getHomeDictionary('uk');
-    render(<HomePage locale="uk" catalogSections={CATALOG_SECTIONS} />);
+    render(await HomePage({ locale: 'uk', catalogSections: CATALOG_SECTIONS }));
 
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     const headings = screen.getAllByRole('heading', { level: 2 }).map((node) => node.textContent);
@@ -44,8 +49,10 @@ describe('HomePage', () => {
     ]);
   });
 
-  it('links to the localized pages and scrolls the request action to the contacts block', () => {
-    const { container } = render(<HomePage locale="ru" catalogSections={CATALOG_SECTIONS} />);
+  it('links to the localized pages and scrolls the request action to the contacts block', async () => {
+    const { container } = render(
+      await HomePage({ locale: 'ru', catalogSections: CATALOG_SECTIONS }),
+    );
 
     expect(screen.getByRole('link', { name: /Весь каталог/ }).getAttribute('href')).toBe(
       '/ru/catalog',
@@ -61,9 +68,11 @@ describe('HomePage', () => {
     expect(container.querySelector('#zayavka')).toBeTruthy();
   });
 
-  it('describes the site, the business, and the visible FAQ in JSON-LD', () => {
+  it('describes the site, the business, and the visible FAQ in JSON-LD', async () => {
     const dictionary = getHomeDictionary('uk');
-    const { container } = render(<HomePage locale="uk" catalogSections={CATALOG_SECTIONS} />);
+    const { container } = render(
+      await HomePage({ locale: 'uk', catalogSections: CATALOG_SECTIONS }),
+    );
     const data = readJsonLd(container);
 
     expect(data.map((item) => item['@type'])).toEqual(['WebSite', 'LocalBusiness', 'FAQPage']);

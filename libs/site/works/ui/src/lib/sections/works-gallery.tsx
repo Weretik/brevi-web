@@ -29,7 +29,7 @@ export function WorksGallery({
             <a
               href={workPhotoPath(photo)}
               target="_blank"
-              rel="noopener"
+              rel="noopener noreferrer"
               aria-label={`${dictionary.open}: ${alt}`}
               className="block overflow-hidden rounded-lg border border-border bg-muted hover:border-brand"
             >

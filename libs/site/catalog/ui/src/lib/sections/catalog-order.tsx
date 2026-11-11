@@ -1,11 +1,12 @@
-import { COMPANY } from '@site/core/config';
 import { buttonVariants, cn } from '@site/shared/ui';
 import Link from 'next/link';
 
 import type { CatalogDictionary } from '../i18n/catalog-dictionary';
+import type { Company } from '@site/core/config';
 
 /** Closing block of a catalog page: sewing to order, «Залишити заявку», the phone, and two related pages. */
 export function CatalogOrder({
+  company,
   id,
   index,
   dictionary,
@@ -13,6 +14,8 @@ export function CatalogOrder({
   logoHref,
   wholesaleHref,
 }: {
+  /** Company facts from «Контакти та компанія». */
+  company: Company;
   id: string;
   /** Number of the block in the «Строчка» label, for example `04`. */
   index: string;
@@ -21,7 +24,7 @@ export function CatalogOrder({
   logoHref: string;
   wholesaleHref: string;
 }) {
-  const [phone] = COMPANY.phones;
+  const [phone] = company.phones;
   const titleId = `${id}-title`;
 
   return (

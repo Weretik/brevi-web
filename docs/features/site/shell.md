@@ -9,7 +9,7 @@ Every page under `/uk` and `/ru` is rendered inside `SiteShell`: a skip link, th
 - **Phones and tablets (below 1024 px).** The header keeps the logo and the language toggle. The bar fixed to the bottom has «Каталог» and «Меню» (side sheets, rendered only while open), «Заявка», and «Дзвінок».
 - **Footer.** Call band with the phone and «Залишити заявку»; brand; catalog, buyer, and company links; contacts with the map link; social network names without links until the owner gives the addresses; legal name and ЄДРПОУ. Column titles are plain text, not headings.
 
-Company facts come from `COMPANY`. The catalog sections come as a prop from the layout, which reads the [catalog](catalog.md) tree on the server; every entry opens its category page, and with an empty catalog only «Весь каталог» remains. There is no search field until the catalog page exists.
+Company facts come as a prop from the layout, which reads «Контакти та компанія» with `loadSiteCompany` ([SEO settings](seo-settings.md)); `COMPANY` is the fallback and always gives the name and the logo. The catalog sections come as a prop from the layout, which reads the [catalog](catalog.md) tree on the server; every entry opens its category page, and with an empty catalog only «Весь каталог» remains. There is no search field until the catalog page exists.
 
 `/` redirects to `/uk`. Unknown paths under a locale get a 404 inside the frame; paths without a locale get a bare two-language 404. Indexing is off unless `SITE_ENV=production` and `SITE_INDEXING=true`.
 

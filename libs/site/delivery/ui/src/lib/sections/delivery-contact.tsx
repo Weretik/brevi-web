@@ -1,15 +1,18 @@
-import { COMPANY } from '@site/core/config';
 import { buttonVariants, cn } from '@site/shared/ui';
 import Link from 'next/link';
 
 import type { DeliveryDictionary } from '../i18n/delivery-dictionary';
+import type { Company } from '@site/core/config';
 
 /** Closing block: whom to call about delivery and payment, with the phone and a link to contacts. */
 export function DeliveryContact({
+  company,
   id,
   dictionary,
   contactsHref,
 }: {
+  /** Company facts from «Контакти та компанія». */
+  company: Company;
   id: string;
   dictionary: DeliveryDictionary['contact'];
   contactsHref: string;
@@ -30,7 +33,7 @@ export function DeliveryContact({
       </h2>
       <p className="max-w-[52rem] leading-relaxed text-muted-foreground">{dictionary.text}</p>
       <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
-        {COMPANY.phones.map((phone, index) => (
+        {company.phones.map((phone, index) => (
           <a
             key={phone.e164}
             href={`tel:${phone.e164}`}

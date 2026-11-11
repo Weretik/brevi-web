@@ -7,6 +7,7 @@ import {
 } from '@site/catalog/ui';
 import { SITE_PATHS, catalogCategoryPath, localizedPath } from '@site/core/i18n';
 import { JsonLd, buildBreadcrumbJsonLd } from '@site/core/seo';
+import { loadSiteCompany } from '@site/settings/data-access';
 import { PageHeader } from '@site/shared/ui';
 
 import type { Locale } from '@site/core/i18n';
@@ -16,6 +17,7 @@ import type { Locale } from '@site/core/i18n';
  * catalog is empty or unavailable the page keeps its heading and the call to order.
  */
 export async function CatalogRootPage({ locale }: { locale: Locale }) {
+  const company = await loadSiteCompany();
   const [tree, products] = await Promise.all([getCatalogTree(), getCatalogProductAddresses()]);
   const dictionary = getCatalogDictionary(locale);
   const path = (key: keyof typeof SITE_PATHS) => localizedPath(locale, SITE_PATHS[key]);
@@ -50,6 +52,7 @@ export async function CatalogRootPage({ locale }: { locale: Locale }) {
         </p>
       )}
       <CatalogOrder
+        company={company}
         id="catalog-order"
         index="02"
         dictionary={dictionary.order}

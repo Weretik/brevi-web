@@ -1,4 +1,5 @@
 import { articleEndpoints } from './articles/article-endpoints';
+import { siteCompanyEndpoints } from './company/site-company-endpoints';
 import { contentBaseApi } from './content-base-api';
 import { contentProductEndpoints } from './product-pages/content-product-endpoints';
 import { redirectEndpoints } from './redirects/redirect-endpoints';
@@ -16,6 +17,7 @@ export const contentApi = contentBaseApi.injectEndpoints({
     ...seoSettingsEndpoints(build),
     ...sitePageEndpoints(build),
     ...seoOverviewEndpoints(build),
+    ...siteCompanyEndpoints(build),
   }),
 });
 
@@ -48,4 +50,6 @@ export const {
   useGetSitePagesQuery,
   useSaveSitePageMutation,
   useGetSeoOverviewQuery,
+  useGetSiteCompanyQuery,
+  useSaveSiteCompanyMutation,
 } = contentApi;

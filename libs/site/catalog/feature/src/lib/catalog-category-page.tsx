@@ -15,6 +15,7 @@ import {
   localizedPath,
 } from '@site/core/i18n';
 import { JsonLd, buildBreadcrumbJsonLd } from '@site/core/seo';
+import { loadSiteCompany } from '@site/settings/data-access';
 import { PageHeader, PageSection } from '@site/shared/ui';
 
 import type { CatalogCategoryPage as CatalogCategoryPageData } from '@site/catalog/model';
@@ -31,6 +32,7 @@ export async function CatalogCategoryPage({
   locale: Locale;
   category: CatalogCategoryPageData;
 }) {
+  const company = await loadSiteCompany();
   const dictionary = getCatalogDictionary(locale);
   const products = await getCatalogCategoryProducts(category.node.slug, locale);
   const path = (key: keyof typeof SITE_PATHS) => localizedPath(locale, SITE_PATHS[key]);
@@ -90,6 +92,7 @@ export async function CatalogCategoryPage({
       ) : null}
 
       <CatalogOrder
+        company={company}
         id="catalog-order"
         index={text.length > 0 ? '03' : '02'}
         dictionary={dictionary.order}

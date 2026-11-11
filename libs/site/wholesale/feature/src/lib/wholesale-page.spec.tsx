@@ -3,10 +3,15 @@ import { render, screen } from '@testing-library/react';
 
 import { WholesalePage } from './wholesale-page';
 
+vi.mock('@site/settings/data-access', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  loadSiteCompany: async () => (await import('@site/core/config')).COMPANY,
+}));
+
 describe('WholesalePage', () => {
-  it('renders one h1 and the blocks in order', () => {
+  it('renders one h1 and the blocks in order', async () => {
     const dictionary = getWholesaleDictionary('uk');
-    render(<WholesalePage locale="uk" />);
+    render(await WholesalePage({ locale: 'uk' }));
 
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     expect(screen.getAllByRole('heading', { level: 2 }).map((node) => node.textContent)).toEqual([
@@ -17,8 +22,8 @@ describe('WholesalePage', () => {
     ]);
   });
 
-  it('links to the localized pages around the order', () => {
-    render(<WholesalePage locale="ru" />);
+  it('links to the localized pages around the order', async () => {
+    render(await WholesalePage({ locale: 'ru' }));
 
     expect(screen.getByRole('link', { name: 'Главная' }).getAttribute('href')).toBe('/ru');
     expect(screen.getByRole('link', { name: /Весь каталог/ }).getAttribute('href')).toBe(
@@ -36,8 +41,8 @@ describe('WholesalePage', () => {
     }
   });
 
-  it('describes the breadcrumb trail in JSON-LD and shows no prices', () => {
-    const { container } = render(<WholesalePage locale="uk" />);
+  it('describes the breadcrumb trail in JSON-LD and shows no prices', async () => {
+    const { container } = render(await WholesalePage({ locale: 'uk' }));
     const [breadcrumbs] = [...container.querySelectorAll('script[type="application/ld+json"]')].map(
       (node) => JSON.parse(node.textContent ?? '{}'),
     );

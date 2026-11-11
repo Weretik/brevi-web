@@ -1,3 +1,4 @@
+import { COMPANY } from '@site/core/config';
 import { render, screen } from '@testing-library/react';
 
 import { getProductionDictionary } from './i18n/production-dictionary';
@@ -64,6 +65,7 @@ describe('ProductionOrder', () => {
     const dictionary = getProductionDictionary('ru').order;
     render(
       <ProductionOrder
+        company={COMPANY}
         id="production-order"
         dictionary={dictionary}
         discussHref="/ru#zayavka"
