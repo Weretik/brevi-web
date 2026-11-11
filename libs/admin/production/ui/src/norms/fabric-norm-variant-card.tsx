@@ -21,10 +21,10 @@ const tones = [
 ] as const;
 
 /**
- * A colour variant of a norm. Its fabrics stand side by side in one row (each with a colour mark,
- * «Основна» / «Додаткова» and large metres), «Разом» sits in the header and a bar of their shares
- * at the bottom, so the three variant cards keep one height. With a batch, each fabric also shows
- * the batch metres.
+ * A colour variant of a norm. Its fabrics are stacked rows (colour mark and full label on the left,
+ * metres on the right, never wrapped or truncated, so three fabrics fit a narrow card), «Разом»
+ * sits in the header and a bar of their shares at the bottom. The cards stretch to one height.
+ * With a batch, each row also shows the batch metres.
  */
 export function FabricNormVariantCard({ variant, batchSize, onAdd }: Props) {
   const empty = variant.parts.length === 0;
@@ -83,25 +83,23 @@ export function FabricNormVariantCard({ variant, batchSize, onAdd }: Props) {
         </>
       ) : (
         <>
-          <Box
-            sx={{
-              display: 'grid',
-              gap: 1,
-              gridTemplateColumns: `repeat(${variant.parts.length}, minmax(0, 1fr))`,
-            }}
-          >
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
             {variant.parts.map((part, index) => (
               <Box
                 key={part.label}
                 sx={{
-                  px: 1.25,
+                  px: 1.5,
                   py: 1,
                   borderRadius: 1.5,
                   bgcolor: tones[index].row,
                   minWidth: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 1.5,
                 }}
               >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
                   <Box
                     aria-hidden
                     sx={{
@@ -112,18 +110,23 @@ export function FabricNormVariantCard({ variant, batchSize, onAdd }: Props) {
                       bgcolor: tones[index].swatch,
                     }}
                   />
-                  <Typography noWrap sx={{ fontSize: 14, fontWeight: 700 }}>
-                    {part.label}
-                  </Typography>
+                  <Typography sx={{ fontSize: 14, fontWeight: 700 }}>{part.label}</Typography>
                 </Box>
-                <Typography sx={{ ...mono, fontSize: 20, fontWeight: 600, mt: 0.5 }}>
-                  {formatMeters(part.meters)}
-                </Typography>
-                {batchSize !== null && (
-                  <Typography variant="caption" color="text.secondary" sx={mono} component="div">
-                    × {batchSize} = {formatMeters(forBatch(part.meters, batchSize))}
+                <Box sx={{ textAlign: 'right', flexShrink: 0 }}>
+                  <Typography sx={{ ...mono, fontSize: 20, fontWeight: 600, whiteSpace: 'nowrap' }}>
+                    {formatMeters(part.meters)}
                   </Typography>
-                )}
+                  {batchSize !== null && (
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ ...mono, whiteSpace: 'nowrap' }}
+                      component="div"
+                    >
+                      × {batchSize} = {formatMeters(forBatch(part.meters, batchSize))}
+                    </Typography>
+                  )}
+                </Box>
               </Box>
             ))}
           </Box>
