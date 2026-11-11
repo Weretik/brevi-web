@@ -358,3 +358,4 @@ export type {
   WorkshopArchiveRow,
 } from './entities/workshop-archive';
 export { parseWorkshopArchiveImportFile } from './validators/workshop-archive-import-file';
+export type { WorkshopPeopleAccess } from './entities/workshop-people-access';

@@ -17,8 +17,8 @@ interface LegacyNavigationItem {
   path?: string;
   /** Shown only to a user with one of these server roles. */
   requiredRoles?: readonly string[];
-  /** Page of «Права доступу»: shown only when the user's rights let them see it. */
-  access?: string;
+  /** Page of «Права доступу» (or any of several): shown only when the user's rights let them see it. */
+  access?: string | readonly string[];
 }
 
 interface LegacyNavigationGroup {
@@ -80,10 +80,10 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         access: 'forecast',
       },
       {
-        id: 'workshop-staff',
-        label: 'Працівники цеху',
-        path: '/production/staff',
-        access: 'workshop-staff',
+        id: 'workshop-people',
+        label: 'Персонал цеху',
+        path: '/production/people',
+        access: ['workshop-staff', 'timesheet', 'payroll'],
       },
       {
         id: 'fabric-norms',
@@ -104,26 +104,11 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         access: 'workshop-archive',
       },
       {
-        id: 'salary',
-        label: 'Зарплата',
-        path: '/production/payroll',
-        access: 'payroll',
-      },
-      { id: 'furnitura-stock', label: 'Фурнітура в цеху' },
-      {
-        id: 'work-time',
-        label: 'Робочий час',
-        path: '/production/timesheet',
-        access: 'timesheet',
-      },
-      {
         id: 'workshop-reports',
         label: 'Звіти цеху',
         path: '/production/reports',
         access: 'workshop-reports',
       },
-      { id: 'embroidery', label: 'Вишивка' },
-      { id: 'cashbox', label: 'Каса цеху' },
     ],
   },
   {

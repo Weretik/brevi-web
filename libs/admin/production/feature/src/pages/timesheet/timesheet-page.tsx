@@ -1,6 +1,11 @@
 import { formatHours, formatWorkMonth, shiftDay, workMonth } from '@admin/production/model';
-import { TimesheetDayTable, TimesheetHistory, TimesheetMonthSummary } from '@admin/production/ui';
-import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
+import {
+  TimesheetDayTable,
+  TimesheetHistory,
+  TimesheetMonthSummary,
+  WorkshopTabHeader,
+} from '@admin/production/ui';
+import { ReferenceListAlerts } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
 import ChevronLeftOutlinedIcon from '@mui/icons-material/ChevronLeftOutlined';
 import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
@@ -9,7 +14,7 @@ import { useState } from 'react';
 
 import { useTimesheetDay } from '../../hooks/timesheet/use-timesheet-day';
 
-/** «Швейний цех › Робочий час»: hours of each worker per day and the month in totals. */
+/** «Швейний цех › Персонал цеху › Робочий час»: hours of each worker per day and the month in totals. */
 export function TimesheetPage() {
   const [message, setMessage] = useState<string | null>(null);
   const sheet = useTimesheetDay(setMessage);
@@ -20,15 +25,12 @@ export function TimesheetPage() {
 
   return (
     <Box sx={{ minWidth: 0 }}>
-      <ReferencePageHeader
-        overline="Швейний цех"
-        title="Робочий час"
+      <WorkshopTabHeader
         subtitle={
           data
             ? `${marked.length} з ${sheet.rows.length} відмічено · ${formatHours(markedMinutes)} год`
             : 'Фактично відпрацьовані години. 0 — відсутність, порожньо — ще не відмічено.'
         }
-        actions={null}
       />
       <ReferenceListAlerts
         error={

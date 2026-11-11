@@ -1,7 +1,7 @@
 import { useGetPayrollMonthQuery, useGetPayrollYearQuery } from '@admin/production/data-access';
 import { formatWorkMonth, payrollMonthOf, shiftWorkMonth, todayIso } from '@admin/production/model';
-import { PayrollYearTable } from '@admin/production/ui';
-import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
+import { PayrollYearTable, WorkshopTabHeader } from '@admin/production/ui';
+import { ReferenceListAlerts } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
 import ChevronLeftOutlinedIcon from '@mui/icons-material/ChevronLeftOutlined';
 import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
@@ -34,7 +34,7 @@ function Stepper({
   );
 }
 
-/** «Швейний цех › Зарплата»: the pay of a month and the year in totals. */
+/** «Швейний цех › Персонал цеху › Зарплата»: the pay of a month and the year in totals. */
 export function PayrollPage() {
   const current = payrollMonthOf(todayIso());
   const [view, setView] = useState<View>('month');
@@ -47,12 +47,7 @@ export function PayrollPage() {
 
   return (
     <Box sx={{ minWidth: 0 }}>
-      <ReferencePageHeader
-        overline="Швейний цех"
-        title="Зарплата"
-        subtitle="З журналу робіт і «Параметрів ціноутворення»: пошив, крій, премія, частки, вишивка, виплати."
-        actions={null}
-      />
+      <WorkshopTabHeader subtitle="З журналу робіт і «Параметрів ціноутворення»: пошив, крій, премія, частки, вишивка, виплати." />
       <Tabs value={view} onChange={(_event, next: View) => setView(next)} sx={{ mb: 2 }}>
         <Tab value="month" label="Розрахунок" />
         <Tab value="year" label="Історія за рік" />
