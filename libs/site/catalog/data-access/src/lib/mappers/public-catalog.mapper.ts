@@ -1,6 +1,5 @@
-import { CATALOG_TYPES } from '@site/catalog/model';
-
 import type {
+  CatalogCategoryPage,
   CatalogFabric,
   CatalogPriceTiers,
   CatalogProduct,
@@ -66,37 +65,46 @@ function tiers(value: unknown): CatalogPriceTiers | null {
   };
 }
 
-/**
- * The tree of the site: the product types that have products, each with its sections. A section has only
- * the Ukrainian name in the Admin, so both languages show it.
- */
+function mapTreeNode(value: unknown): CatalogTreeNode {
+  const category = record(value, 'category');
+  return {
+    slug: text(category['slug'], 'category slug'),
+    name: {
+      uk: text(category['nameUk'], 'category name'),
+      ru: text(category['nameRu'], 'category name'),
+    },
+    productCount: count(category['productCount'], 'product count'),
+    children: list(category['children'], 'subcategories').map(mapTreeNode),
+  };
+}
+
+/** The category tree of the site as staff keep it in the Admin, with names in both languages. */
 export function mapCatalogTree(value: unknown): CatalogTreeNode[] {
-  const typeSlugs = new Set(Object.values(CATALOG_TYPES).map((type) => type.slug));
-  return list(record(value, 'tree')['types'], 'types').map((item) => {
-    const type = record(item, 'type');
-    const code = productType(type['type']);
-    return {
-      ...CATALOG_TYPES[code],
-      productCount: count(type['productCount'], 'product count'),
-      productType: code,
-      sectionId: null,
-      children: list(type['sections'], 'sections').map((entry) => {
-        const section = record(entry, 'section');
-        const id = count(section['id'], 'section id');
-        const slug = text(section['slug'], 'section slug');
-        const name = text(section['name'], 'section name');
-        return {
-          // A section may not take the address of a product type.
-          slug: typeSlugs.has(slug) ? `${slug}-${id}` : slug,
-          name: { uk: name, ru: name },
-          productCount: count(section['productCount'], 'product count'),
-          productType: code,
-          sectionId: id,
-          children: [],
-        };
-      }),
-    };
-  });
+  return list(record(value, 'tree')['categories'], 'categories').map(mapTreeNode);
+}
+
+/** What staff wrote about a category; its place in the tree is added by the source. */
+export function mapCatalogCategoryText(
+  value: unknown,
+): Pick<CatalogCategoryPage, 'name' | 'textLocale' | 'seo' | 'text'> {
+  const page = record(value, 'category page');
+  return {
+    name: text(page['name'], 'category name'),
+    textLocale: page['language'] === 'ru' ? 'ru' : 'uk',
+    seo: {
+      title: optionalText(page['seoTitle'], 'seo title') ?? '',
+      description: optionalText(page['seoDescription'], 'seo description') ?? '',
+    },
+    text: list(page['text'], 'category text').flatMap((item) => {
+      const block = mapBlock(item);
+      return block ? [block] : [];
+    }),
+  };
+}
+
+function mapLink(value: unknown): { slug: string; name: string } {
+  const link = record(value, 'category link');
+  return { slug: text(link['slug'], 'category slug'), name: text(link['name'], 'category name') };
 }
 
 export function mapCatalogCard(value: unknown): CatalogProductCard {
@@ -166,15 +174,18 @@ function mapFabric(value: unknown): CatalogFabric {
 
 export function mapCatalogProduct(value: unknown): CatalogProduct {
   const product = record(value, 'product');
-  const section =
-    product['section'] === null || product['section'] === undefined
-      ? null
-      : record(product['section'], 'section');
   const textLocale: Locale = product['language'] === 'ru' ? 'ru' : 'uk';
   return {
     slug: text(product['slug'], 'slug'),
     type: productType(product['type']),
-    sectionId: section ? count(section['id'], 'section id') : null,
+    categories: list(product['categories'], 'categories').map((item) => {
+      const category = record(item, 'category');
+      const parent = category['parent'];
+      return {
+        ...mapLink(category),
+        parent: parent === null || parent === undefined ? null : mapLink(parent),
+      };
+    }),
     model: optionalText(product['code'], 'code'),
     name: text(product['name'], 'name'),
     textLocale,

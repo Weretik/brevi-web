@@ -1,20 +1,26 @@
 import {
   getCatalogCategoryProducts,
+  getCatalogProductAddresses,
   getCatalogProductCategory,
   getCatalogRelatedProducts,
   getCatalogTree,
 } from '@site/catalog/data-access';
-import { CATALOG_TYPES } from '@site/catalog/model';
 import { render, screen, within } from '@testing-library/react';
 
 import { CatalogCategoryPage } from './catalog-category-page';
 import { CatalogProductPage } from './catalog-product-page';
 import { CatalogRootPage } from './catalog-root-page';
 
-import type { CatalogProduct, CatalogProductCard, CatalogTreeNode } from '@site/catalog/model';
+import type {
+  CatalogCategoryPage as CatalogCategoryPageData,
+  CatalogProduct,
+  CatalogProductCard,
+  CatalogTreeNode,
+} from '@site/catalog/model';
 
 vi.mock('@site/catalog/data-access', () => ({
   getCatalogTree: vi.fn(),
+  getCatalogProductAddresses: vi.fn(),
   getCatalogCategoryProducts: vi.fn(),
   getCatalogProductCategory: vi.fn(),
   getCatalogRelatedProducts: vi.fn(),
@@ -22,19 +28,30 @@ vi.mock('@site/catalog/data-access', () => ({
 
 const child: CatalogTreeNode = {
   slug: 'kostyumy',
-  name: { uk: 'Костюми', ru: 'Костюми' },
+  name: { uk: 'Костюми', ru: 'Костюмы' },
   productCount: 2,
-  productType: 'Sewing',
-  sectionId: 7,
   children: [],
 };
 const section: CatalogTreeNode = {
-  ...CATALOG_TYPES.Sewing,
+  slug: 'spetsodyah',
+  name: { uk: 'Спецодяг', ru: 'Спецодежда' },
   productCount: 2,
-  productType: 'Sewing',
-  sectionId: null,
   children: [child],
 };
+const page = (
+  node: CatalogTreeNode,
+  trail: CatalogTreeNode[],
+  locale: 'uk' | 'ru' = 'uk',
+  changes: Partial<CatalogCategoryPageData> = {},
+): CatalogCategoryPageData => ({
+  node,
+  trail,
+  name: node.name[locale],
+  textLocale: locale,
+  seo: { title: '', description: '' },
+  text: [],
+  ...changes,
+});
 const cards: CatalogProductCard[] = [
   { slug: 'kostyum-verde', name: 'Костюм ВЕРДЕ', image: null, priceFrom: 900 },
   { slug: 'kostyum-fort', name: 'Костюм ФОРТ', image: null, priceFrom: null },
@@ -42,7 +59,9 @@ const cards: CatalogProductCard[] = [
 const product: CatalogProduct = {
   slug: 'kostyum-verde',
   type: 'Sewing',
-  sectionId: 7,
+  categories: [
+    { slug: 'kostyumy', name: 'Костюми', parent: { slug: 'spetsodyah', name: 'Спецодяг' } },
+  ],
   model: 'MOD-014',
   name: 'Костюм ВЕРДЕ',
   textLocale: 'uk',
@@ -65,13 +84,17 @@ const product: CatalogProduct = {
 
 beforeEach(() => {
   vi.mocked(getCatalogTree).mockResolvedValue([section]);
+  vi.mocked(getCatalogProductAddresses).mockResolvedValue([
+    { slug: 'kostyum-verde', updatedAt: '2026-11-11T10:00:00Z', hasRussian: true },
+    { slug: 'kostyum-fort', updatedAt: '2026-11-11T10:00:00Z', hasRussian: true },
+  ]);
   vi.mocked(getCatalogCategoryProducts).mockResolvedValue(cards);
   vi.mocked(getCatalogProductCategory).mockResolvedValue({ node: child, trail: [section, child] });
   vi.mocked(getCatalogRelatedProducts).mockResolvedValue([cards[1]]);
 });
 
 describe('CatalogRootPage', () => {
-  it('renders one h1 and a link to every product type and section', async () => {
+  it('renders one h1, a link to every category and subcategory, and counts each model once', async () => {
     render(await CatalogRootPage({ locale: 'uk' }));
 
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
@@ -80,6 +103,7 @@ describe('CatalogRootPage', () => {
         `/uk/catalog/${node.slug}`,
       );
     }
+    expect(screen.getByText('Каталог · 2 моделі')).toBeTruthy();
   });
 
   it('keeps the heading and the call to order while the catalog is empty', async () => {
@@ -94,9 +118,7 @@ describe('CatalogRootPage', () => {
 
 describe('CatalogCategoryPage', () => {
   it('renders the category name as the only h1, its sections, and every product with its price', async () => {
-    render(
-      await CatalogCategoryPage({ locale: 'uk', category: { node: section, trail: [section] } }),
-    );
+    render(await CatalogCategoryPage({ locale: 'uk', category: page(section, [section]) }));
 
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe(section.name.uk);
     expect(screen.getByRole('link', { name: /^Костюми/ }).getAttribute('href')).toBe(
@@ -104,15 +126,14 @@ describe('CatalogCategoryPage', () => {
     );
     expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(cards.length);
     expect(screen.getByText('900')).toBeTruthy();
-    expect(getCatalogCategoryProducts).toHaveBeenCalledWith(section, 'uk');
+    expect(getCatalogCategoryProducts).toHaveBeenCalledWith('spetsodyah', 'uk');
+    // Without a text about the category there is no empty block for it.
+    expect(screen.queryByRole('heading', { level: 2, name: 'Про розділ' })).toBeNull();
   });
 
-  it('leads the breadcrumbs through the product type in the page language', async () => {
+  it('leads the breadcrumbs through the top-level category in the page language', async () => {
     render(
-      await CatalogCategoryPage({
-        locale: 'ru',
-        category: { node: child, trail: [section, child] },
-      }),
+      await CatalogCategoryPage({ locale: 'ru', category: page(child, [section, child], 'ru') }),
     );
 
     const crumbs = screen.getByRole('navigation', { name: 'Хлебные крошки' });
@@ -123,14 +144,27 @@ describe('CatalogCategoryPage', () => {
 
   it('says the models are coming when the category has none', async () => {
     vi.mocked(getCatalogCategoryProducts).mockResolvedValue([]);
+    render(await CatalogCategoryPage({ locale: 'uk', category: page(child, [section, child]) }));
+
+    expect(screen.getByText(/скоро з’являться/)).toBeTruthy();
+  });
+
+  it('shows the text staff wrote about the category under the products', async () => {
     render(
       await CatalogCategoryPage({
         locale: 'uk',
-        category: { node: child, trail: [section, child] },
+        category: page(child, [section, child], 'uk', {
+          text: [
+            { type: 'heading', text: 'Робочі костюми оптом' },
+            { type: 'paragraph', text: 'Шиємо **самі** у Полтаві.' },
+          ],
+        }),
       }),
     );
 
-    expect(screen.getByText(/скоро з’являться/)).toBeTruthy();
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    expect(screen.getByRole('heading', { level: 2, name: 'Про розділ' })).toBeTruthy();
+    expect(screen.getByText('самі').tagName).toBe('STRONG');
   });
 });
 

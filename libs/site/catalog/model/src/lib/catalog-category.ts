@@ -1,4 +1,5 @@
 import type { CatalogTreeNode } from './catalog-tree';
+import type { Locale } from '@site/core/i18n';
 
 /** A block of text, in the order staff wrote it. */
 export type CatalogTextBlock =
@@ -6,11 +7,21 @@ export type CatalogTextBlock =
   | { type: 'paragraph'; text: string; /** Bold opening such as «Тканина:». */ lead?: string }
   | { type: 'list'; items: readonly string[] };
 
-/** A category page: its node of the tree and the way to it from the product type. */
+/** A category in the tree: its node and the way to it from the top level. */
 export type CatalogCategory = {
   node: CatalogTreeNode;
-  /** From the product type down to the category itself. */
+  /** From the top-level category down to the category itself. */
   trail: readonly CatalogTreeNode[];
+};
+
+/** A category page in the language of the page: its place in the tree and what staff wrote about it. */
+export type CatalogCategoryPage = CatalogCategory & {
+  name: string;
+  /** Language of the texts: a category without Russian texts shows the Ukrainian ones on the Russian page. */
+  textLocale: Locale;
+  /** Title and description for search as staff wrote them; empty when they did not. */
+  seo: { title: string; description: string };
+  text: readonly CatalogTextBlock[];
 };
 
 /** What a listing card shows about a product, in the language of the page. */

@@ -1,5 +1,6 @@
 export {
   getCatalogCategory,
+  getCatalogCategoryAddresses,
   getCatalogCategoryProducts,
   getCatalogCategorySlugs,
   getCatalogProduct,

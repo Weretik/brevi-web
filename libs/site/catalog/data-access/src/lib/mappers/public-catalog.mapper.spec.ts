@@ -1,6 +1,7 @@
 import {
   mapCatalogAddresses,
   mapCatalogCardPage,
+  mapCatalogCategoryText,
   mapCatalogProduct,
   mapCatalogTree,
 } from './public-catalog.mapper';
@@ -12,6 +13,10 @@ const product = {
   name: 'Костюм ВЕРДЕ',
   language: 'uk',
   section: { id: 7, slug: 'kostyumy', name: 'Костюми' },
+  categories: [
+    { slug: 'spetsodyah', name: 'Спецодяг', parent: null },
+    { slug: 'kostyumy', name: 'Костюми', parent: { slug: 'spetsodyah', name: 'Спецодяг' } },
+  ],
   seoTitle: 'Костюм ВЕРДЕ оптом',
   seoDescription: null,
   summary: [
@@ -44,31 +49,67 @@ const product = {
 };
 
 describe('public catalog mapper', () => {
-  it('builds the tree from the product types and their sections', () => {
+  it('builds the tree of categories with names in both languages', () => {
     const tree = mapCatalogTree({
-      types: [
+      categories: [
         {
-          type: 'Sewing',
+          slug: 'spetsodyah',
+          nameUk: 'Спецодяг',
+          nameRu: 'Спецодежда',
           productCount: 3,
-          sections: [
-            { id: 7, slug: 'kostyumy', name: 'Костюми', productCount: 2 },
-            // A section named like a product type keeps its own address.
-            { id: 9, slug: 'spetsodyah', name: 'Спецодяг', productCount: 1 },
+          children: [
+            {
+              slug: 'kostyumy',
+              nameUk: 'Костюми',
+              nameRu: 'Костюмы',
+              productCount: 2,
+              children: [],
+            },
           ],
         },
-        { type: 'Ppe', productCount: 1, sections: [] },
+        {
+          slug: 'zasoby-zakhystu',
+          nameUk: 'Засоби захисту',
+          nameRu: 'Засоби захисту',
+          productCount: 0,
+          children: [],
+        },
       ],
     });
 
-    expect(tree.map((node) => [node.slug, node.productType, node.sectionId])).toEqual([
-      ['spetsodyah', 'Sewing', null],
-      ['zasoby-zakhystu', 'Ppe', null],
+    expect(tree.map((node) => [node.slug, node.name.ru, node.productCount])).toEqual([
+      ['spetsodyah', 'Спецодежда', 3],
+      ['zasoby-zakhystu', 'Засоби захисту', 0],
     ]);
-    expect(tree[0].name.ru).toBe('Спецодежда собственного пошива');
-    expect(tree[0].children.map((node) => [node.slug, node.sectionId, node.name.ru])).toEqual([
-      ['kostyumy', 7, 'Костюми'],
-      ['spetsodyah-9', 9, 'Спецодяг'],
+    expect(tree[0].children).toEqual([
+      { slug: 'kostyumy', name: { uk: 'Костюми', ru: 'Костюмы' }, productCount: 2, children: [] },
     ]);
+  });
+
+  it('maps what staff wrote about a category', () => {
+    expect(
+      mapCatalogCategoryText({
+        slug: 'kostyumy',
+        name: 'Костюми',
+        language: 'uk',
+        parent: { slug: 'spetsodyah', name: 'Спецодяг' },
+        children: [],
+        seoTitle: 'Купити робочі костюми',
+        seoDescription: null,
+        text: [
+          { kind: 'Paragraph', text: 'Шиємо самі.', lead: null, items: [] },
+          { kind: 'Paragraph', text: '', lead: null, items: [] },
+        ],
+        productCount: 2,
+        updatedAtUtc: '2026-11-11T10:00:00Z',
+      }),
+    ).toEqual({
+      name: 'Костюми',
+      textLocale: 'uk',
+      seo: { title: 'Купити робочі костюми', description: '' },
+      text: [{ type: 'paragraph', text: 'Шиємо самі.' }],
+    });
+    expect(() => mapCatalogCategoryText({ name: 'Костюми', language: 'uk' })).toThrow();
   });
 
   it('maps a page of cards with the photo and the lowest price', () => {
@@ -97,7 +138,10 @@ describe('public catalog mapper', () => {
     expect(mapped).toMatchObject({
       slug: 'kostyum-verde',
       type: 'Sewing',
-      sectionId: 7,
+      categories: [
+        { slug: 'spetsodyah', name: 'Спецодяг', parent: null },
+        { slug: 'kostyumy', name: 'Костюми', parent: { slug: 'spetsodyah', name: 'Спецодяг' } },
+      ],
       model: 'MOD-014',
       textLocale: 'uk',
       seo: { title: 'Костюм ВЕРДЕ оптом', description: '' },
@@ -131,7 +175,8 @@ describe('public catalog mapper', () => {
   it('refuses an answer of another shape instead of showing half of a product', () => {
     expect(() => mapCatalogProduct({ ...product, name: null })).toThrow(/unexpected name/);
     expect(() => mapCatalogProduct({ ...product, type: 'Other' })).toThrow();
-    expect(() => mapCatalogTree({ types: 'none' })).toThrow();
+    expect(() => mapCatalogTree({ categories: 'none' })).toThrow();
+    expect(() => mapCatalogProduct({ ...product, categories: undefined })).toThrow();
     expect(() => mapCatalogCardPage({ items: [{ slug: 'a' }], total: 1 })).toThrow();
   });
 

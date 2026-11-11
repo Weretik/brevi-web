@@ -11,7 +11,7 @@ const long = 'Щільна та практична модель для робо�
 const product: CatalogProduct = {
   slug: 'flisova-kurtka',
   type: 'Sewing',
-  sectionId: 7,
+  categories: [],
   model: '992',
   name: 'Флісова куртка',
   textLocale: 'uk',

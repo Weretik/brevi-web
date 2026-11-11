@@ -6,8 +6,8 @@ export type CatalogLocalized = Record<Locale, string>;
 export type CatalogProductType = 'Sewing' | 'Ppe';
 
 /**
- * One category in the catalog tree: enough for menus, breadcrumbs, and links. The upper level is the two
- * product types; under each are the sections of «Типи і розділи» of the Admin that have products on the site.
+ * One category in the catalog tree: enough for menus, breadcrumbs, and links. The tree is the one staff
+ * keep in the Admin («Контент → Розділи сайту»): categories with their subcategories, two levels.
  */
 export type CatalogTreeNode = {
   /** One slug in both languages; the category URL is `/catalog/{slug}`. */
@@ -15,13 +15,10 @@ export type CatalogTreeNode = {
   name: CatalogLocalized;
   /** Products of the category together with its subcategories. */
   productCount: number;
-  productType: CatalogProductType;
-  /** Section id in the Admin; `null` for a product type. */
-  sectionId: number | null;
   children: readonly CatalogTreeNode[];
 };
 
-/** Categories from a product type down to `slug`, or `null` when there is no such category. */
+/** Categories from the top level down to `slug`, or `null` when there is no such category. */
 export function findCatalogPath(
   slug: string,
   nodes: readonly CatalogTreeNode[],
