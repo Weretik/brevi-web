@@ -25,6 +25,7 @@ import { useLeadStatsViewer, useLeadViewer } from './use-lead-viewer';
 import { useProductionOrderActor } from './use-production-order-actor';
 import { useQuoteActor } from './use-quote-actor';
 import { useQuoteSupplierCard } from './use-quote-supplier-card';
+import { useSiteCategoriesViewer } from './use-site-categories-viewer';
 import { useTaskViewer } from './use-task-viewer';
 
 export const adminRouteDefinitions = [
@@ -40,7 +41,7 @@ export const adminRouteDefinitions = [
   ...productsRoutes,
   ...remindersRoutes,
   ...mediaRoutes,
-  ...createContentRoutes({ useContentProductsViewer }),
+  ...createContentRoutes({ useContentProductsViewer, useSiteCategoriesViewer }),
 ];
 
 /** Task pages need a role check, so the router wraps them instead of listing them above. */
