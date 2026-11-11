@@ -4,6 +4,7 @@ import { getShellDictionary } from './i18n/shell-dictionary';
 import { MobileBar } from './mobile/mobile-bar';
 
 import type { CatalogSection } from '@site/catalog/model';
+import type { Company } from '@site/core/config';
 import type { Locale } from '@site/core/i18n';
 import type { ReactNode } from 'react';
 
@@ -12,10 +13,13 @@ import type { ReactNode } from 'react';
  * on phones. The catalog sections come from the layout, which reads them on the server.
  */
 export function SiteShell({
+  company,
   locale,
   catalogSections,
   children,
 }: {
+  /** Company facts from «Контакти та компанія»; the layout reads them on the server. */
+  company: Company;
   locale: Locale;
   catalogSections: readonly CatalogSection[];
   children: ReactNode;
@@ -30,12 +34,27 @@ export function SiteShell({
       >
         {dictionary.skipToContent}
       </a>
-      <SiteHeader locale={locale} dictionary={dictionary} catalogSections={catalogSections} />
+      <SiteHeader
+        company={company}
+        locale={locale}
+        dictionary={dictionary}
+        catalogSections={catalogSections}
+      />
       <main id="content" className="mx-auto w-full max-w-[77.5rem] flex-1 px-4 sm:px-6">
         {children}
       </main>
-      <SiteFooter locale={locale} dictionary={dictionary} catalogSections={catalogSections} />
-      <MobileBar locale={locale} dictionary={dictionary} catalogSections={catalogSections} />
+      <SiteFooter
+        company={company}
+        locale={locale}
+        dictionary={dictionary}
+        catalogSections={catalogSections}
+      />
+      <MobileBar
+        company={company}
+        locale={locale}
+        dictionary={dictionary}
+        catalogSections={catalogSections}
+      />
     </>
   );
 }

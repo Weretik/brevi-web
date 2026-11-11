@@ -1,4 +1,3 @@
-import { COMPANY } from '@site/core/config';
 import { buttonVariants } from '@site/shared/ui';
 import Link from 'next/link';
 
@@ -7,6 +6,7 @@ import { CatalogText } from './catalog-text';
 
 import type { CatalogDictionary } from '../i18n/catalog-dictionary';
 import type { CatalogFabric, CatalogPriceTiers, CatalogTextBlock } from '@site/catalog/model';
+import type { Company } from '@site/core/config';
 
 /**
  * Right column of the product page: the model number, short facts, the prices by order size (of the chosen
@@ -14,6 +14,7 @@ import type { CatalogFabric, CatalogPriceTiers, CatalogTextBlock } from '@site/c
  * page and a call; a product without a price asks to learn it from a manager.
  */
 export function CatalogProductBuy({
+  company,
   model,
   summary,
   fabrics,
@@ -21,6 +22,8 @@ export function CatalogProductBuy({
   dictionary,
   requestHref,
 }: {
+  /** Company facts from «Контакти та компанія». */
+  company: Company;
   model: string | null;
   summary: readonly CatalogTextBlock[];
   /** Fabrics of a sewing model with their prices; empty for protective equipment. */
@@ -30,7 +33,7 @@ export function CatalogProductBuy({
   dictionary: CatalogDictionary['product'];
   requestHref: string;
 }) {
-  const [phone] = COMPANY.phones;
+  const [phone] = company.phones;
   const priced = prices !== null || fabrics.some((fabric) => fabric.prices !== null);
 
   return (

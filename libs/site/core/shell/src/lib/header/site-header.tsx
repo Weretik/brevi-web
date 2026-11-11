@@ -1,4 +1,3 @@
-import { COMPANY } from '@site/core/config';
 import { localizedPath } from '@site/core/i18n';
 import { Button } from '@site/shared/ui';
 import { PhoneIcon } from 'lucide-react';
@@ -13,6 +12,7 @@ import { MAIN_NAV_LINKS, SHELL_PATHS } from '../navigation/site-navigation';
 
 import type { ShellDictionary } from '../i18n/shell-dictionary';
 import type { CatalogSection } from '@site/catalog/model';
+import type { Company } from '@site/core/config';
 import type { Locale } from '@site/core/i18n';
 
 /** Height of the contacts row on wide screens, in px; the header slides up by it so only the menu row sticks. */
@@ -25,15 +25,18 @@ const CONTACTS_ROW_HEIGHT = 80;
  * Below `lg` only the logo and the language toggle remain; the actions live in the bottom bar.
  */
 export function SiteHeader({
+  company,
   locale,
   dictionary,
   catalogSections,
 }: {
+  /** Company facts from «Контакти та компанія». */
+  company: Company;
   locale: Locale;
   dictionary: ShellDictionary;
   catalogSections: readonly CatalogSection[];
 }) {
-  const [phone] = COMPANY.phones;
+  const [phone] = company.phones;
 
   return (
     <header className="sticky top-0 z-30 border-b border-border bg-background lg:-top-20">
@@ -44,10 +47,10 @@ export function SiteHeader({
           className="flex shrink-0 items-center gap-3.5"
         >
           <Image
-            src={COMPANY.logo.path}
-            alt={COMPANY.name}
-            width={COMPANY.logo.width}
-            height={COMPANY.logo.height}
+            src={company.logo.path}
+            alt={company.name}
+            width={company.logo.width}
+            height={company.logo.height}
             sizes="100px"
             priority
             className="h-9 w-auto lg:h-13"
@@ -75,9 +78,9 @@ export function SiteHeader({
               {phone.display}
             </a>
             <span className="text-xs text-muted-foreground">
-              {COMPANY.openingHours.label[locale]} ·{' '}
-              <a href={`mailto:${COMPANY.email}`} className="hover:text-brand-text">
-                {COMPANY.email}
+              {company.openingHours.label[locale]} ·{' '}
+              <a href={`mailto:${company.email}`} className="hover:text-brand-text">
+                {company.email}
               </a>
             </span>
           </span>

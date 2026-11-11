@@ -4,7 +4,7 @@
 
 `/uk/delivery-and-payment` and `/ru/delivery-and-payment` show how Brevi ships and how to pay: four delivery ways with their cost, the footnote about what the cost depends on, payment rules, bank details, and the phone. The text and numbers are from the live `brevi.com.ua` page; Russian is its translation. The page is static and reads no API.
 
-Bank details (`recipient`, `edrpou`, `iban`, `bank`) live in `COMPANY.bankDetails`. The sentence of the live page about paying by card on the site is left out: the new site has no online payment.
+Bank details (`recipient`, `edrpou`, `iban`, `bank`) come from «Контакти та компанія» (`loadSiteCompany`). The sentence of the live page about paying by card on the site is left out: the new site has no online payment.
 
 ## Structure diagram
 
@@ -16,7 +16,7 @@ flowchart LR
   Feature --> Seo["site-core-seo: JsonLd, BreadcrumbList"]
   Feature --> Shared["site-shared-ui: PageSection"]
   Ui --> Shared
-  Ui --> Config["site-core-config: COMPANY"]
+  Feature --> Company["site-settings-data-access: loadSiteCompany"]
 ```
 
 ## Code structure

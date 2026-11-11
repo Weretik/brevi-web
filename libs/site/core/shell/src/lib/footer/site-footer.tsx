@@ -1,4 +1,3 @@
-import { COMPANY } from '@site/core/config';
 import { catalogCategoryPath, localizedPath } from '@site/core/i18n';
 import { Button } from '@site/shared/ui';
 import Image from 'next/image';
@@ -12,6 +11,7 @@ import {
 
 import type { ShellDictionary } from '../i18n/shell-dictionary';
 import type { CatalogSection } from '@site/catalog/model';
+import type { Company } from '@site/core/config';
 import type { Locale } from '@site/core/i18n';
 
 type FooterColumn = { title: string; links: { key: string; href: string; label: string }[] };
@@ -25,15 +25,18 @@ const COLUMN_TITLE =
  * headings, so the footer adds nothing to the page outline; all links are crawlable.
  */
 export function SiteFooter({
+  company,
   locale,
   dictionary,
   catalogSections,
 }: {
+  /** Company facts from «Контакти та компанія». */
+  company: Company;
   locale: Locale;
   dictionary: ShellDictionary;
   catalogSections: readonly CatalogSection[];
 }) {
-  const [phone] = COMPANY.phones;
+  const [phone] = company.phones;
   const page = (links: typeof FOOTER_COMPANY_LINKS) =>
     links.map((link) => ({
       key: link.key,
@@ -92,10 +95,10 @@ export function SiteFooter({
         <div className="grid content-start gap-4 sm:col-span-2 lg:col-span-1">
           <span className="justify-self-start rounded-lg bg-background px-3 py-2">
             <Image
-              src={COMPANY.logo.path}
-              alt={COMPANY.name}
-              width={COMPANY.logo.width}
-              height={COMPANY.logo.height}
+              src={company.logo.path}
+              alt={company.name}
+              width={company.logo.width}
+              height={company.logo.height}
               sizes="78px"
               className="h-10 w-auto"
             />
@@ -133,23 +136,23 @@ export function SiteFooter({
           >
             {phone.display}
           </a>
-          <a href={`mailto:${COMPANY.email}`} className="hover:text-brand-soft">
-            {COMPANY.email}
+          <a href={`mailto:${company.email}`} className="hover:text-brand-soft">
+            {company.email}
           </a>
           <span>
-            {COMPANY.address.city[locale]}, {COMPANY.address.street[locale]}
+            {company.address.city[locale]}, {company.address.street[locale]}
           </span>
           <a
-            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(COMPANY.mapQuery)}`}
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(company.mapQuery)}`}
             target="_blank"
             rel="noopener noreferrer"
             className="font-semibold text-brand-soft hover:underline"
           >
             {dictionary.showOnMap} <span aria-hidden>→</span>
           </a>
-          <span>{COMPANY.openingHours.label[locale]}</span>
+          <span>{company.openingHours.label[locale]}</span>
           <ul aria-label={dictionary.footerSocials} className="mt-1 flex flex-wrap gap-x-3 gap-y-1">
-            {COMPANY.socials.map((social) => (
+            {company.socials.map((social) => (
               <li key={social.key}>
                 {social.url ? (
                   <a
@@ -171,8 +174,8 @@ export function SiteFooter({
 
       <div className="border-t border-primary-foreground/15">
         <p className="mx-auto max-w-[77.5rem] px-4 py-4 text-[0.8125rem] text-primary-foreground/60 sm:px-6">
-          © {new Date().getFullYear()} {COMPANY.bankDetails.recipient[locale]} · {dictionary.edrpou}{' '}
-          {COMPANY.bankDetails.edrpou} · {COMPANY.address.city[locale]}
+          © {new Date().getFullYear()} {company.bankDetails.recipient[locale]} · {dictionary.edrpou}{' '}
+          {company.bankDetails.edrpou} · {company.address.city[locale]}
         </p>
       </div>
     </footer>

@@ -7,6 +7,7 @@ import {
 } from '@site/agreement/ui';
 import { SITE_PATHS, localizedPath } from '@site/core/i18n';
 import { JsonLd, buildBreadcrumbJsonLd } from '@site/core/seo';
+import { loadSiteCompany } from '@site/settings/data-access';
 import { PageHeader, PageSection } from '@site/shared/ui';
 import Link from 'next/link';
 
@@ -16,7 +17,8 @@ import type { Locale } from '@site/core/i18n';
  * «Договір» page: the public offer of the live `brevi.com.ua` clause by clause, with a table of contents and
  * the seller details. Static: the offer is in the data files of `site-agreement-ui`.
  */
-export function AgreementPage({ locale }: { locale: Locale }) {
+export async function AgreementPage({ locale }: { locale: Locale }) {
+  const company = await loadSiteCompany();
   const dictionary = getAgreementDictionary(locale);
   const text = getAgreementText(locale);
   const path = (key: keyof typeof SITE_PATHS) => localizedPath(locale, SITE_PATHS[key]);
@@ -53,7 +55,11 @@ export function AgreementPage({ locale }: { locale: Locale }) {
         label={{ index: '12', text: dictionary.requisites.label }}
       >
         <div className="grid gap-6">
-          <AgreementRequisites dictionary={dictionary.requisites} locale={locale} />
+          <AgreementRequisites
+            company={company}
+            dictionary={dictionary.requisites}
+            locale={locale}
+          />
           <p className="flex flex-wrap gap-x-6 gap-y-2 font-bold">
             {related.map((link) => (
               <Link key={link.href} href={link.href} className="text-brand-text hover:underline">

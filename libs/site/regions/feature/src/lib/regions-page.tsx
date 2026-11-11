@@ -8,6 +8,7 @@ import {
   RegionsSteps,
   getRegionsDictionary,
 } from '@site/regions/ui';
+import { loadSiteCompany } from '@site/settings/data-access';
 import { PageSection } from '@site/shared/ui';
 
 import type { Locale } from '@site/core/i18n';
@@ -16,7 +17,8 @@ import type { Locale } from '@site/core/i18n';
  * «Регіони» page: one page about orders from any city of Ukraine. Lead with the delivery terms, how to order
  * from another city, the cities, what a buyer in Poltava gets, and the call to order. Static.
  */
-export function RegionsPage({ locale }: { locale: Locale }) {
+export async function RegionsPage({ locale }: { locale: Locale }) {
+  const company = await loadSiteCompany();
   const dictionary = getRegionsDictionary(locale);
   const path = (key: keyof typeof SITE_PATHS) => localizedPath(locale, SITE_PATHS[key]);
   const breadcrumbs = [
@@ -55,6 +57,7 @@ export function RegionsPage({ locale }: { locale: Locale }) {
         label={{ index: '04', text: dictionary.local.label }}
       >
         <RegionsLocal
+          company={company}
           dictionary={dictionary.local}
           locale={locale}
           contactsHref={path('contacts')}
@@ -63,6 +66,7 @@ export function RegionsPage({ locale }: { locale: Locale }) {
       </PageSection>
 
       <RegionsOrder
+        company={company}
         id="regions-order"
         index="05"
         dictionary={dictionary.order}

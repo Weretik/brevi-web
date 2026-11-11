@@ -2,7 +2,7 @@
 
 **Status:** code exists, checked 2026-11-10. Specification: [home page](../../specs/site/home/001-home/README.md).
 
-`/uk` and `/ru` show the home page of the «Строчка» mockup: first screen (offer, three facts, «Залишити заявку», sales phone, suit photo with four callouts), catalog sections, logo on the uniform, four work steps, own production, industries, contacts, SEO text with FAQ. Text is in the home dictionary and company facts in `COMPANY`; the catalog sections come from the [catalog](catalog.md) API through the route, and the block is left out while the catalog is empty.
+`/uk` and `/ru` show the home page of the «Строчка» mockup: first screen (offer, three facts, «Залишити заявку», sales phone, suit photo with four callouts), catalog sections, logo on the uniform, four work steps, own production, industries, contacts, SEO text with FAQ. Text is in the home dictionary and company facts in «Контакти та компанія» (`loadSiteCompany`); the catalog sections come from the [catalog](catalog.md) API through the route, and the block is left out while the catalog is empty.
 
 It shows no prices and has no form (owner decision 2026-11-10): the price calculator and product cards come with the catalog step, the request form with the request step. «Залишити заявку» scrolls to the contacts block.
 
@@ -16,7 +16,7 @@ flowchart LR
   Feature --> Model["site-catalog-model: sections"]
   Feature --> Seo["site-core-seo: JsonLd, WebSite, LocalBusiness, FAQPage"]
   Ui --> Shared["site-shared-ui"]
-  Ui --> Config["site-core-config: COMPANY"]
+  Feature --> Company["site-settings-data-access: loadSiteCompany"]
 ```
 
 ## Code structure

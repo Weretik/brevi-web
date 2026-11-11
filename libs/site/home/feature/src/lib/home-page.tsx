@@ -16,6 +16,7 @@ import {
   HomeSeoText,
   getHomeDictionary,
 } from '@site/home/ui';
+import { loadSiteCompany } from '@site/settings/data-access';
 import { PageSection } from '@site/shared/ui';
 
 import type { CatalogSection } from '@site/catalog/model';
@@ -30,20 +31,21 @@ const CONTACTS_ID = 'zayavka';
  * come from the route, which reads them from the catalog API, and the block is left out while there are none. The price calculator, product cards with prices, and the request
  * form of the mockup come with the catalog and request steps (owner decision 2026-11-10).
  */
-export function HomePage({
+export async function HomePage({
   locale,
   catalogSections,
 }: {
   locale: Locale;
   catalogSections: readonly CatalogSection[];
 }) {
+  const company = await loadSiteCompany();
   const dictionary = getHomeDictionary(locale);
   const path = (key: keyof typeof SITE_PATHS) => localizedPath(locale, SITE_PATHS[key]);
   const catalogHref = path('catalog');
 
   return (
     <div className="grid gap-14 pb-4 sm:gap-16">
-      <HomeHero dictionary={dictionary.hero} requestHref={`#${CONTACTS_ID}`} />
+      <HomeHero company={company} dictionary={dictionary.hero} requestHref={`#${CONTACTS_ID}`} />
 
       {catalogSections.length > 0 && (
         <PageSection
@@ -88,6 +90,7 @@ export function HomePage({
       </PageSection>
 
       <HomeContacts
+        company={company}
         id={CONTACTS_ID}
         locale={locale}
         dictionary={dictionary.contacts}
@@ -99,7 +102,7 @@ export function HomePage({
       <JsonLd
         data={[
           buildWebSiteJsonLd(locale),
-          buildLocalBusinessJsonLd(locale),
+          buildLocalBusinessJsonLd(locale, company),
           buildFaqPageJsonLd(
             dictionary.seo.faq.map((item) => ({ question: item.title, answer: item.text })),
           ),

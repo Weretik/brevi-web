@@ -6,15 +6,17 @@ import {
   DeliveryPayment,
   getDeliveryDictionary,
 } from '@site/delivery/ui';
+import { loadSiteCompany } from '@site/settings/data-access';
 import { PageHeader, PageSection } from '@site/shared/ui';
 
 import type { Locale } from '@site/core/i18n';
 
 /**
  * «Доставка та оплата» page in the order of the live `brevi.com.ua` page: delivery, payment with the bank
- * details, and whom to call. Static: the text is in the delivery dictionary, the facts in `COMPANY`.
+ * details, and whom to call. The text is in the delivery dictionary, the facts come from «Контакти та компанія».
  */
-export function DeliveryPage({ locale }: { locale: Locale }) {
+export async function DeliveryPage({ locale }: { locale: Locale }) {
+  const company = await loadSiteCompany();
   const dictionary = getDeliveryDictionary(locale);
   const breadcrumbs = [
     { name: dictionary.home, href: localizedPath(locale) },
@@ -44,10 +46,11 @@ export function DeliveryPage({ locale }: { locale: Locale }) {
         title={dictionary.payment.title}
         label={{ index: '03', text: dictionary.payment.label }}
       >
-        <DeliveryPayment locale={locale} dictionary={dictionary.payment} />
+        <DeliveryPayment company={company} locale={locale} dictionary={dictionary.payment} />
       </PageSection>
 
       <DeliveryContact
+        company={company}
         id="delivery-contact"
         dictionary={dictionary.contact}
         contactsHref={localizedPath(locale, SITE_PATHS.contacts)}

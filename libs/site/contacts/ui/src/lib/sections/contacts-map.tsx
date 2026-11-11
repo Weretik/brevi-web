@@ -1,18 +1,19 @@
-import { COMPANY } from '@site/core/config';
-
 import type { ContactsDictionary } from '../i18n/contacts-dictionary';
+import type { Company } from '@site/core/config';
 import type { Locale } from '@site/core/i18n';
-
-const mapQuery = encodeURIComponent(COMPANY.mapQuery);
 
 /** Google map of the workshop address, loaded lazily, with a link that opens the place in Maps. */
 export function ContactsMap({
+  company,
   locale,
   dictionary,
 }: {
+  /** Company facts from «Контакти та компанія». */
+  company: Company;
   locale: Locale;
   dictionary: ContactsDictionary['info'];
 }) {
+  const mapQuery = encodeURIComponent(company.mapQuery);
   return (
     <div className="grid content-start gap-3">
       <div className="overflow-hidden rounded-xl border-2 border-dashed border-brand-soft">

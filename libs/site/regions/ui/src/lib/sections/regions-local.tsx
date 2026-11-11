@@ -1,22 +1,25 @@
-import { COMPANY } from '@site/core/config';
 import Link from 'next/link';
 
 import type { RegionsDictionary } from '../i18n/regions-dictionary';
+import type { Company } from '@site/core/config';
 import type { Locale } from '@site/core/i18n';
 
 /** What a buyer in Poltava gets: pickup, a courier, the workshop nearby, and the address. */
 export function RegionsLocal({
+  company,
   dictionary,
   locale,
   contactsHref,
   productionHref,
 }: {
+  /** Company facts from «Контакти та компанія». */
+  company: Company;
   dictionary: RegionsDictionary['local'];
   locale: Locale;
   contactsHref: string;
   productionHref: string;
 }) {
-  const { city, street } = COMPANY.address;
+  const { city, street } = company.address;
 
   return (
     <div className="grid gap-8">

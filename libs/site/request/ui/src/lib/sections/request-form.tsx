@@ -1,6 +1,5 @@
 'use client';
 
-import { COMPANY } from '@site/core/config';
 import {
   REQUEST_ATTACHMENT_EXTENSIONS,
   REQUEST_FIELD_LIMITS,
@@ -14,6 +13,7 @@ import { useActionState, useState } from 'react';
 import { RequestSent } from './request-sent';
 
 import type { RequestDictionary } from '../i18n/request-dictionary';
+import type { Company } from '@site/core/config';
 import type { RequestField, RequestFormState, RequestTextField } from '@site/request/model';
 import type { ReactNode } from 'react';
 
@@ -23,6 +23,8 @@ export type RequestFormAction = (
 ) => Promise<RequestFormState>;
 
 type RequestFormProps = {
+  /** Company facts from «Контакти та компанія». */
+  company: Company;
   dictionary: Pick<RequestDictionary, 'form' | 'sent'>;
   /** Server Action that checks the request and passes it to a manager. */
   action: RequestFormAction;
@@ -43,6 +45,7 @@ export function RequestForm(props: RequestFormProps) {
 }
 
 function RequestFormAttempt({
+  company,
   dictionary,
   action,
   agreementHref,
@@ -50,12 +53,13 @@ function RequestFormAttempt({
   onAgain,
 }: RequestFormProps & { onAgain: () => void }) {
   const [state, formAction, pending] = useActionState(action, REQUEST_FORM_IDLE);
-  const [companyPhone] = COMPANY.phones;
+  const [companyPhone] = company.phones;
   const text = dictionary.form;
 
   if (state.status === 'sent') {
     return (
       <RequestSent
+        company={company}
         dictionary={dictionary.sent}
         phone={formatUkrainianPhone(state.phone)}
         catalogHref={catalogHref}

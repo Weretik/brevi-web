@@ -1,3 +1,4 @@
+import { COMPANY } from '@site/core/config';
 import { render, screen } from '@testing-library/react';
 
 import { getAgreementDictionary, getAgreementText } from './i18n/agreement-dictionary';
@@ -46,7 +47,11 @@ describe('agreement blocks', () => {
 
   it('shows the seller details with the site phone only', () => {
     const { container } = render(
-      <AgreementRequisites dictionary={getAgreementDictionary('uk').requisites} locale="uk" />,
+      <AgreementRequisites
+        company={COMPANY}
+        dictionary={getAgreementDictionary('uk').requisites}
+        locale="uk"
+      />,
     );
 
     expect(container.textContent).toContain('35521636');

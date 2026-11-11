@@ -11,6 +11,7 @@
 - **«Налаштування SEO сайту»** (`/content/seo-settings`, «Права доступу» page `content-seo-settings`: Admin view and edit, Manager view). The codes the site places on every page: Google Analytics 4 (`G-…`), Google Tag Manager (`GTM-…`), the Google Search Console and Bing Webmaster verification codes (the whole meta tag may be pasted, the `content` value is kept) and the sharing picture from the «Фото» library for pages without their own picture. Read view first; «Редагувати» opens the side panel. Connecting the services is the SEO specialist's job; this page only takes their codes (BreviERP CNT-006). [Site side](../site/seo-settings.md).
 - **«Сторінки сайту»** (`/content/site-pages`, «Права доступу» page `content-site-pages`: Admin view and edit, Manager view). The 16 fixed pages of the site (home, catalog, wholesale, contacts and others) with their address and the search title; only problems are marked (no title or description in a language, a text that search engines cut). The side panel shows the title and description in Ukrainian and Russian; «Редагувати» changes them with counters. An empty field gives the page back the site's own text. The server seeded the texts the site showed before (BreviERP CNT-007). [Site side](../site/seo-settings.md).
 - **«SEO-огляд»** (`/content/seo-overview`, «Права доступу» page `content-seo-overview`: Admin and Manager view; read-only). What the public site still misses for search, only problems: unfilled «Налаштування SEO сайту» (analytics, Google and Bing verification, sharing picture) with a link there; per section how many pages are on the site and how many have problems; and the list of pages shown on the site (products, categories, articles, fixed pages) with an empty or too long SEO title (over 60) or description (over 160), a title repeated by another page, or no Russian texts. Filters by section and problem; a row opens the section where the page is fixed. Reloaded on every visit (BreviERP CNT-008).
+- **«Контакти та компанія»** (`/content/company`, «Права доступу» page `content-company`: Admin view and edit, Manager view). What the site shows about the company: the company phone, email, city and street in two languages, the map query, working days and hours, the client managers of «Контакти» (name, photo from «Фото», up to three phones, email; order with the arrows), the payment details (recipient, ЄДРПОУ, IBAN, bank) and Instagram, YouTube and Facebook links. Read view first; «Редагувати» opens the side panel. Phones may be typed in any form; the site shows them as `050 469 86 75`. The server seeded the facts the site showed before (BreviERP CNT-009). [Site side](../site/seo-settings.md).
 - **«Конфіденційність та умови»** (`/content/legal`): cards for the BreviERP description, the privacy policy and the terms, with the edition date, «Відкрити» and «Копіювати посилання». The documents themselves stay static HTML ([public legal pages](public-legal-pages.md)).
 
 ## Code structure
@@ -30,6 +31,7 @@ libs/admin/content/model/src/
   entities|validators|mappers/redirects/           # redirect, source, address check, search and filter, transfer file
   entities|validators/seo-settings/                # settings, form values, code checks, meta tag → code
   entities/seo-overview/                           # overview, problem kinds, Ukrainian labels
+  entities|validators/company/                     # company facts, form values, phone and IBAN checks, schedule text
   entities|validators/site-pages/                  # page texts, form values, limits, problems
 libs/admin/content/data-access/src/
   api/articles/, mappers/articles/                 # article endpoints and runtime-checked responses
@@ -37,6 +39,7 @@ libs/admin/content/data-access/src/
   api/seo-settings/, mappers/seo-settings/         # settings endpoints (GET, PUT with revision)
   api/site-pages/, mappers/site-pages/             # page list and save of one page
   api/seo-overview/, mappers/seo-overview/         # read-only overview, refetched on every visit
+  api/company/, mappers/company/                   # company facts (GET, PUT with revision)
   api/site-categories/, mappers/site-categories/   # category endpoints and runtime-checked responses
   api/                                             # content API on adminApi, product page endpoints
   mappers/product-pages/content-product.mapper.ts  # runtime-checked responses
@@ -56,14 +59,16 @@ libs/admin/content/ui/src/
   components|forms/seo-settings/                   # settings view, code fields and sharing picture
   tables|components|forms/site-pages/              # pages table, page view, title and description fields
   tables/seo-overview/seo-issues-table.tsx         # pages with their problems
+  components|forms/company/                        # company view, form with managers
 libs/admin/content/feature/src/
   hooks|components|pages/articles/                 # article panel state, list page, side panel with the «Фото» library
   hooks|components|pages/redirects/                # redirect panel, list page with filter, old-site address transfer
   hooks|components|pages/seo-settings/             # settings page, side panel with the «Фото» library
   hooks|components|pages/site-pages/               # pages list, side panel
-  content.routes.tsx                               # createContentRoutes: /content/products, /content/categories, /content/articles, /content/redirects, /content/seo-settings, /content/site-pages, /content/seo-overview, /content/legal
+  content.routes.tsx                               # createContentRoutes: /content/products, /content/categories, /content/articles, /content/redirects, /content/seo-settings, /content/site-pages, /content/seo-overview, /content/company, /content/legal
   model/content-paths.ts                           # addresses of the «Контент» pages
   components|pages/seo-overview/                   # «SEO-огляд»: site alerts, section counts, filters, list
+  hooks|components|pages/company/                  # «Контакти та компанія»: view, side panel, photo picker
   hooks|components|pages/site-categories/          # category panel state, tree page, side panel
   hooks/product-pages/                             # list state in the URL, panel editor, old-site transfer
   hooks/old-site/use-old-site-transfer.ts          # file → count → «Перенести», shared by both transfers
@@ -72,7 +77,7 @@ libs/admin/content/feature/src/
   model/legal-documents.ts, components/legal/, pages/legal/ # «Конфіденційність та умови»
 apps/admin-react/src/app/router/
   legacy-menu.ts                                   # «Контент» group
-  use-content-products-viewer.ts, use-site-categories-viewer.ts, use-articles-viewer.ts, use-redirects-viewer.ts, use-seo-settings-viewer.ts, use-site-pages-viewer.ts # rights from the session
+  use-content-products-viewer.ts, use-site-categories-viewer.ts, use-articles-viewer.ts, use-redirects-viewer.ts, use-seo-settings-viewer.ts, use-site-pages-viewer.ts, use-site-company-viewer.ts # rights from the session
 libs/admin/shared/ui/src/inputs/rich-text-editor/  # visual editor; rich-text-photo.tsx is the photo block for texts with pictures
 ```
 
@@ -84,6 +89,7 @@ libs/admin/shared/ui/src/inputs/rich-text-editor/  # visual editor; rich-text-ph
 - `libs/admin/content/data-access/src/mappers/seo-settings/seo-settings.mapper.unit.test.ts`
 - `libs/admin/content/data-access/src/mappers/site-pages/site-page.mapper.unit.test.ts`
 - `libs/admin/content/data-access/src/mappers/seo-overview/seo-overview.mapper.unit.test.ts`
+- `libs/admin/content/data-access/src/mappers/company/site-company.mapper.unit.test.ts`
 - `libs/admin/content/ui/src/components/product-pages/content-text-preview.component.test.tsx`
 - `libs/admin/content/feature/src/components/product-pages/content-products-content.component.test.tsx`
 - `libs/admin/content/feature/src/components/site-categories/site-categories-content.component.test.tsx`

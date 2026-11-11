@@ -28,4 +28,6 @@ export {
   useGetSitePagesQuery,
   useSaveSitePageMutation,
   useGetSeoOverviewQuery,
+  useGetSiteCompanyQuery,
+  useSaveSiteCompanyMutation,
 } from './api/content.api';

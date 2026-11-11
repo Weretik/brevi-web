@@ -1,4 +1,4 @@
-import { createSiteConfig } from '@site/core/config';
+import { COMPANY, createSiteConfig } from '@site/core/config';
 import { renderToStaticMarkup } from 'react-dom/server';
 
 import { buildBreadcrumbJsonLd } from './breadcrumb-json-ld';
@@ -25,7 +25,7 @@ describe('JSON-LD', () => {
   });
 
   it('describes the organization with the localized address and the sales phone', () => {
-    expect(buildOrganizationJsonLd('ru', config)).toMatchObject({
+    expect(buildOrganizationJsonLd('ru', COMPANY, config)).toMatchObject({
       '@type': 'Organization',
       '@id': 'https://brevi.com.ua/#organization',
       url: 'https://brevi.com.ua/ru',
@@ -50,7 +50,7 @@ describe('JSON-LD', () => {
   });
 
   it('describes the workshop with the phone and opening hours', () => {
-    expect(buildLocalBusinessJsonLd('uk', config)).toMatchObject({
+    expect(buildLocalBusinessJsonLd('uk', COMPANY, config)).toMatchObject({
       '@type': 'LocalBusiness',
       telephone: ['+380504698675'],
       address: { streetAddress: 'вул. Кагамлика, 3А' },

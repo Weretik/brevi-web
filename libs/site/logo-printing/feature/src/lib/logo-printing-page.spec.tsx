@@ -3,10 +3,15 @@ import { render, screen } from '@testing-library/react';
 
 import { LogoPrintingPage } from './logo-printing-page';
 
+vi.mock('@site/settings/data-access', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  loadSiteCompany: async () => (await import('@site/core/config')).COMPANY,
+}));
+
 describe('LogoPrintingPage', () => {
-  it('renders one h1 and the blocks in the order of the live page', () => {
+  it('renders one h1 and the blocks in the order of the live page', async () => {
     const dictionary = getLogoPrintingDictionary('uk');
-    render(<LogoPrintingPage locale="uk" />);
+    render(await LogoPrintingPage({ locale: 'uk' }));
 
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     expect(screen.getAllByRole('heading', { level: 2 }).map((node) => node.textContent)).toEqual([
@@ -17,8 +22,8 @@ describe('LogoPrintingPage', () => {
     ]);
   });
 
-  it('links to the localized pages around the order', () => {
-    render(<LogoPrintingPage locale="ru" />);
+  it('links to the localized pages around the order', async () => {
+    render(await LogoPrintingPage({ locale: 'ru' }));
 
     expect(screen.getByRole('link', { name: 'Главная' }).getAttribute('href')).toBe('/ru');
     expect(screen.getByRole('link', { name: /О производстве/ }).getAttribute('href')).toBe(
@@ -33,8 +38,8 @@ describe('LogoPrintingPage', () => {
     }
   });
 
-  it('describes the breadcrumb trail and the service in JSON-LD', () => {
-    const { container } = render(<LogoPrintingPage locale="uk" />);
+  it('describes the breadcrumb trail and the service in JSON-LD', async () => {
+    const { container } = render(await LogoPrintingPage({ locale: 'uk' }));
     const [breadcrumbs, service] = [
       ...container.querySelectorAll('script[type="application/ld+json"]'),
     ].map((node) => JSON.parse(node.textContent ?? '{}'));

@@ -1,6 +1,5 @@
 'use client';
 
-import { COMPANY } from '@site/core/config';
 import { catalogCategoryPath, localizedPath } from '@site/core/i18n';
 import {
   Sheet,
@@ -24,6 +23,7 @@ import { MAIN_NAV_LINKS, SHELL_PATHS } from '../navigation/site-navigation';
 
 import type { ShellDictionary } from '../i18n/shell-dictionary';
 import type { CatalogSection } from '@site/catalog/model';
+import type { Company } from '@site/core/config';
 import type { Locale } from '@site/core/i18n';
 
 const ITEM =
@@ -34,15 +34,18 @@ const ITEM =
  * The catalog and the menu open in side sheets, which are rendered only while open.
  */
 export function MobileBar({
+  company,
   locale,
   dictionary,
   catalogSections,
 }: {
+  /** Company facts from «Контакти та компанія». */
+  company: Company;
   locale: Locale;
   dictionary: ShellDictionary;
   catalogSections: readonly CatalogSection[];
 }) {
-  const [phone] = COMPANY.phones;
+  const [phone] = company.phones;
   const catalogHref = localizedPath(locale, SHELL_PATHS.catalog);
 
   return (
@@ -161,10 +164,10 @@ export function MobileBar({
             <a href={`tel:${phone.e164}`} className="text-xl font-extrabold text-foreground">
               {phone.display}
             </a>
-            <span>{COMPANY.openingHours.label[locale]}</span>
-            <a href={`mailto:${COMPANY.email}`}>{COMPANY.email}</a>
+            <span>{company.openingHours.label[locale]}</span>
+            <a href={`mailto:${company.email}`}>{company.email}</a>
             <span>
-              {COMPANY.address.city[locale]}, {COMPANY.address.street[locale]} · {dictionary.vat}
+              {company.address.city[locale]}, {company.address.street[locale]} · {dictionary.vat}
             </span>
           </address>
         </SheetContent>

@@ -1,26 +1,29 @@
-import { COMPANY } from '@site/core/config';
 import { buttonVariants, cn } from '@site/shared/ui';
 import Link from 'next/link';
 
 import { ProductionProse } from './production-prose';
 
 import type { ProductionDictionary } from '../i18n/production-dictionary';
+import type { Company } from '@site/core/config';
 
 /** Closing block: how to start an order, links to contacts and works, and the two main actions. */
 export function ProductionOrder({
+  company,
   id,
   dictionary,
   discussHref,
   contactsHref,
   worksHref,
 }: {
+  /** Company facts from «Контакти та компанія». */
+  company: Company;
   id: string;
   dictionary: ProductionDictionary['order'];
   discussHref: string;
   contactsHref: string;
   worksHref: string;
 }) {
-  const [salesPhone] = COMPANY.phones;
+  const [salesPhone] = company.phones;
   const titleId = `${id}-title`;
 
   return (

@@ -2,41 +2,42 @@ import { COMPANY, siteConfig } from '@site/core/config';
 import { LOCALES, LOCALE_LANGUAGE_TAGS, localizedPath } from '@site/core/i18n';
 
 import type { JsonLdData } from './json-ld';
-import type { SiteConfig } from '@site/core/config';
+import type { Company, SiteConfig } from '@site/core/config';
 import type { Locale } from '@site/core/i18n';
 
 const organizationId = (config: SiteConfig) => `${config.siteUrl}/#organization`;
 
-const postalAddress = (locale: Locale) => ({
+const postalAddress = (locale: Locale, company: Company) => ({
   '@type': 'PostalAddress',
-  streetAddress: COMPANY.address.street[locale],
-  addressLocality: COMPANY.address.city[locale],
-  addressCountry: COMPANY.address.countryCode,
+  streetAddress: company.address.street[locale],
+  addressLocality: company.address.city[locale],
+  addressCountry: company.address.countryCode,
 });
 
 /** Organization with the sales contacts; rendered once in the root layout. */
 export function buildOrganizationJsonLd(
   locale: Locale,
+  company: Company,
   config: SiteConfig = siteConfig,
 ): JsonLdData {
-  const [salesPhone] = COMPANY.phones;
+  const [salesPhone] = company.phones;
 
   return {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     '@id': organizationId(config),
-    name: COMPANY.name,
+    name: company.name,
     url: `${config.siteUrl}${localizedPath(locale)}`,
-    logo: `${config.siteUrl}${COMPANY.logo.path}`,
-    email: COMPANY.email,
+    logo: `${config.siteUrl}${company.logo.path}`,
+    email: company.email,
     telephone: salesPhone.e164,
-    address: postalAddress(locale),
-    areaServed: { '@type': 'Country', name: COMPANY.address.countryCode },
+    address: postalAddress(locale, company),
+    areaServed: { '@type': 'Country', name: company.address.countryCode },
     contactPoint: {
       '@type': 'ContactPoint',
       telephone: salesPhone.e164,
       contactType: 'sales',
-      areaServed: COMPANY.address.countryCode,
+      areaServed: company.address.countryCode,
       availableLanguage: [...LOCALES],
     },
   };
@@ -57,20 +58,21 @@ export function buildWebSiteJsonLd(locale: Locale, config: SiteConfig = siteConf
 /** The Poltava workshop as a LocalBusiness: address, the phone, and opening hours. Home and contacts use it. */
 export function buildLocalBusinessJsonLd(
   locale: Locale,
+  company: Company,
   config: SiteConfig = siteConfig,
 ): JsonLdData {
-  const { days, opens, closes } = COMPANY.openingHours;
+  const { days, opens, closes } = company.openingHours;
 
   return {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
     '@id': `${config.siteUrl}/#local-business`,
-    name: COMPANY.name,
+    name: company.name,
     url: `${config.siteUrl}${localizedPath(locale)}`,
-    image: `${config.siteUrl}${COMPANY.logo.path}`,
-    email: COMPANY.email,
-    telephone: COMPANY.phones.map((phone) => phone.e164),
-    address: postalAddress(locale),
+    image: `${config.siteUrl}${company.logo.path}`,
+    email: company.email,
+    telephone: company.phones.map((phone) => phone.e164),
+    address: postalAddress(locale, company),
     openingHoursSpecification: {
       '@type': 'OpeningHoursSpecification',
       dayOfWeek: [...days],

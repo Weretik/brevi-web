@@ -50,6 +50,7 @@ const defaults: Readonly<Record<string, Readonly<Record<string, readonly AccessA
     'content-seo-settings': VE,
     'content-site-pages': VE,
     'content-seo-overview': V,
+    'content-company': VE,
   },
   Manager: {
     'desk-sales': V,
@@ -78,6 +79,7 @@ const defaults: Readonly<Record<string, Readonly<Record<string, readonly AccessA
     'content-seo-settings': V,
     'content-site-pages': V,
     'content-seo-overview': V,
+    'content-company': V,
   },
   Accountant: {
     'desk-accounting': V,
@@ -114,6 +116,7 @@ const defaults: Readonly<Record<string, Readonly<Record<string, readonly AccessA
     'content-seo-settings': VE,
     'content-site-pages': VE,
     'content-seo-overview': V,
+    'content-company': VE,
   },
 };
 
