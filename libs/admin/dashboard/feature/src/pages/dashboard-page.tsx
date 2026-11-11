@@ -8,6 +8,12 @@ import { visibleDesks } from '../model/desks';
 import type { DashboardViewer } from '../model/dashboard-view';
 import type { DeskKey } from '../model/desks';
 
+/** yyyy-mm-dd of the person's own day. */
+const today = () => {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+};
+
 interface DashboardPageProps {
   useViewer: () => DashboardViewer;
 }
@@ -53,7 +59,7 @@ export default function DashboardPage({ useViewer }: DashboardPageProps) {
           role={visible.length > 1 ? 'tabpanel' : undefined}
         >
           {current.key === 'workshop' && <WorkshopDesk viewer={viewer} />}
-          {current.key === 'sales' && <SalesDesk viewer={viewer} />}
+          {current.key === 'sales' && <SalesDesk today={today()} viewer={viewer} />}
         </Box>
       ) : (
         <Typography color="text.secondary">Оберіть розділ у меню ліворуч.</Typography>

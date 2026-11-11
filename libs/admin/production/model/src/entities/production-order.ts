@@ -278,6 +278,8 @@ export interface ProductionOrderListQuery {
   quoteId?: number;
   /** «Фільтри» of «Виробничі завдання». */
   filters?: ProductionOrderFilterValues;
+  /** «Робочий стіл менеджера»: only the orders of this manager (the КП responsible). */
+  managerUserId?: number;
 }
 
 /** «Фільтри»: null = any. Dates are yyyy-mm-dd; model and fabric are codes. */
