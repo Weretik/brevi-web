@@ -9,5 +9,6 @@ export const contentBaseApi = adminApi.enhanceEndpoints({
     'SiteSeoSettings',
     'SitePages',
     'SiteCompany',
+    'SiteGallery',
   ],
 });

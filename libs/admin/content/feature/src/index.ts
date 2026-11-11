@@ -1,5 +1,6 @@
 export {
   articlesPath,
+  certificatesPath,
   companyPath,
   contentProductsPath,
   createContentRoutes,
@@ -8,5 +9,6 @@ export {
   seoSettingsPath,
   sitePagesPath,
   siteCategoriesPath,
+  worksPath,
 } from './content.routes';
 export type { ContentRouteOptions } from './content.routes';

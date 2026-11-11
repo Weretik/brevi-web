@@ -1,6 +1,7 @@
 import { articleEndpoints } from './articles/article-endpoints';
 import { siteCompanyEndpoints } from './company/site-company-endpoints';
 import { contentBaseApi } from './content-base-api';
+import { siteGalleryEndpoints } from './galleries/site-gallery-endpoints';
 import { contentProductEndpoints } from './product-pages/content-product-endpoints';
 import { redirectEndpoints } from './redirects/redirect-endpoints';
 import { seoOverviewEndpoints } from './seo-overview/seo-overview-endpoints';
@@ -18,6 +19,7 @@ export const contentApi = contentBaseApi.injectEndpoints({
     ...sitePageEndpoints(build),
     ...seoOverviewEndpoints(build),
     ...siteCompanyEndpoints(build),
+    ...siteGalleryEndpoints(build),
   }),
 });
 
@@ -52,4 +54,7 @@ export const {
   useGetSeoOverviewQuery,
   useGetSiteCompanyQuery,
   useSaveSiteCompanyMutation,
+  useGetSiteGalleryQuery,
+  useSaveSiteGalleryMutation,
+  useTransferSiteGalleryMutation,
 } = contentApi;

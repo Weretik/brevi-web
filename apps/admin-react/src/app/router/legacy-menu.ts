@@ -372,6 +372,18 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         path: '/content/company',
         access: 'content-company',
       },
+      {
+        id: 'site-works',
+        label: 'Наші роботи',
+        path: '/content/works',
+        access: 'content-works',
+      },
+      {
+        id: 'site-certificates',
+        label: 'Сертифікати',
+        path: '/content/certificates',
+        access: 'content-certificates',
+      },
       { id: 'legal', label: 'Конфіденційність та умови', path: '/content/legal' },
     ],
   },

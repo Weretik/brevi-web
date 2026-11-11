@@ -20,3 +20,10 @@ export {
   loadSiteCompany,
   mapSiteCompany,
 } from './lib/site-company-loader';
+export {
+  SITE_GALLERIES_CACHE_TAG,
+  galleryText,
+  loadSiteGalleries,
+  mapSiteGalleries,
+} from './lib/site-galleries-loader';
+export type { GalleryPicture, GalleryText, SiteGalleries } from './lib/site-galleries-loader';

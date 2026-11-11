@@ -253,3 +253,28 @@ export type {
   SiteCompanyErrors,
   SiteCompanyFormValues,
 } from './validators/company/site-company-validation';
+export { siteGalleryLabels } from './entities/galleries/site-gallery';
+export type {
+  GalleryText,
+  SiteGallery,
+  SiteGalleryInput,
+  SiteGalleryItem,
+  SiteGalleryItemInput,
+  SiteGalleryKind,
+  SiteGalleryTransfer,
+  SiteGalleryViewer,
+} from './entities/galleries/site-gallery';
+export {
+  applySiteGalleryItemForm,
+  moveSiteGalleryItem,
+  newSiteGalleryItem,
+  siteGalleryInputOf,
+  siteGalleryItemFormOf,
+  siteGalleryItemInputOf,
+  siteGalleryLimits,
+  validateSiteGalleryItem,
+} from './validators/galleries/site-gallery-validation';
+export type {
+  SiteGalleryItemErrors,
+  SiteGalleryItemFormValues,
+} from './validators/galleries/site-gallery-validation';

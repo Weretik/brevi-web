@@ -95,3 +95,24 @@ export const WORK_PHOTOS: readonly WorkPhoto[] = [
 export const workPhotoPath = (photo: WorkPhoto) => `/assets/works/work-${photo.id}.webp`;
 
 export const workThumbPath = (photo: WorkPhoto) => `/assets/works/work-${photo.id}-thumb.webp`;
+
+/** A picture the gallery shows: from «Контент → Наші роботи» or one of the site's own files. */
+export type WorkPicture = {
+  key: string;
+  url: string;
+  thumbnailUrl: string;
+  width: number;
+  height: number;
+  /** The description staff wrote; null gives the numbered caption. */
+  alt: string | null;
+};
+
+/** The site's own photos, shown while the Admin has none. */
+export const STATIC_WORK_PICTURES: readonly WorkPicture[] = WORK_PHOTOS.map((photo) => ({
+  key: photo.id,
+  url: workPhotoPath(photo),
+  thumbnailUrl: workThumbPath(photo),
+  width: photo.width,
+  height: photo.height,
+  alt: null,
+}));

@@ -5764,6 +5764,76 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/content/works': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description The pictures in the order the site shows them; revision 0 only in an empty database. */
+    get: operations['getSiteWorks'];
+    /** @description Replaces the list as a whole. A new picture is a photo of the «Фото» library; a file the site still keeps may stay (by its legacyPath) but cannot be added. */
+    put: operations['saveSiteWorks'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/content/works/transfer': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Moves up to 10 pictures the site still keeps as its own files into the «Фото» library (folder «Сайт»), keeping the order and the texts. The Admin repeats the call while moved > 0 and left > 0. A picture already in the library is not downloaded again. */
+    post: operations['transferSiteWorks'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/content/certificates': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description The documents in the order the site shows them; revision 0 only in an empty database. */
+    get: operations['getSiteCertificates'];
+    /** @description Replaces the list as a whole. A new picture is a photo of the «Фото» library; a file the site still keeps may stay (by its legacyPath) but cannot be added. */
+    put: operations['saveSiteCertificates'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/content/certificates/transfer': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description Moves up to 10 pictures the site still keeps as its own files into the «Фото» library (folder «Сайт»), keeping the order and the texts. The Admin repeats the call while moved > 0 and left > 0. A picture already in the library is not downloaded again. */
+    post: operations['transferSiteCertificates'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/content/seo-overview': {
     parameters: {
       query?: never;
@@ -6013,6 +6083,23 @@ export interface paths {
     };
     /** @description The facts; 404 before they exist, and the site then keeps its own. */
     get: operations['getPublicSiteCompany'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/public/galleries': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Both lists; an empty list means the site keeps its own pictures. A file the site keeps has an address on the site itself (/assets/…); a library photo has its CDN address. A deleted library photo is left out. */
+    get: operations['getPublicSiteGalleries'];
     put?: never;
     post?: never;
     delete?: never;
@@ -13810,6 +13897,56 @@ export interface components {
       bankDetails: components['schemas']['CompanyBankDetails'];
       socials: components['schemas']['CompanySocials'];
     };
+    /** @description A text in Ukrainian and Russian; an empty Russian text shows the Ukrainian one on the site. */
+    GalleryText: {
+      uk?: string | null;
+      ru?: string | null;
+    };
+    /** @description One picture with full addresses for the Admin. missing is true when the library no longer has the photo; the site then leaves it out. */
+    SiteGalleryItemResponse: {
+      photoId?: number | null;
+      legacyPath?: string | null;
+      url?: string | null;
+      thumbnailUrl?: string | null;
+      width?: number | null;
+      height?: number | null;
+      missing: boolean;
+      title: components['schemas']['GalleryText'];
+      note: components['schemas']['GalleryText'];
+      standards: string[];
+    };
+    SiteGalleryResponse: {
+      /** @enum {string} */
+      key: 'works' | 'certificates';
+      items: components['schemas']['SiteGalleryItemResponse'][];
+      /** @description Pictures that are still files of the site and wait for the transfer. */
+      legacyCount: number;
+      revision: number;
+      /** Format: date-time */
+      updatedAtUtc?: string | null;
+      updatedBy?: string | null;
+    };
+    /** @description One picture as staff send it. Either photoId (a photo of the «Фото» library) or legacyPath (a file the list already has). Works use title as the picture description (up to 300 characters); certificates need a Ukrainian title and may have a note (up to 600) and up to 10 standards (up to 200 each). */
+    SiteGalleryItemInput: {
+      photoId?: number | null;
+      legacyPath?: string | null;
+      title?: components['schemas']['GalleryText'] | null;
+      note?: components['schemas']['GalleryText'] | null;
+      standards?: string[] | null;
+    };
+    SaveSiteGalleryRequest: {
+      revision: number;
+      /** @description Up to 300 works or 40 certificates; one photo or file only once. */
+      items: components['schemas']['SiteGalleryItemInput'][];
+    };
+    SiteGalleryTransferResponse: {
+      moved: number;
+      /** @description Pictures still waiting after this step, failed ones included. */
+      left: number;
+      /** @description Ukrainian texts for the pictures that failed to download. */
+      problems: string[];
+      gallery: components['schemas']['SiteGalleryResponse'];
+    };
     /**
      * @description A site-wide setting of «Налаштування SEO сайту» that is not filled.
      * @enum {string}
@@ -14161,6 +14298,19 @@ export interface components {
       managers: components['schemas']['PublicCompanyManager'][];
       bankDetails: components['schemas']['CompanyBankDetails'];
       socials: components['schemas']['CompanySocials'];
+    };
+    PublicGalleryItem: {
+      url: string;
+      thumbnailUrl: string;
+      width?: number | null;
+      height?: number | null;
+      title: components['schemas']['GalleryText'];
+      note: components['schemas']['GalleryText'];
+      standards: string[];
+    };
+    PublicSiteGalleriesResponse: {
+      works: components['schemas']['PublicGalleryItem'][];
+      certificates: components['schemas']['PublicGalleryItem'][];
     };
     'schemas-SitePageText': {
       title?: string | null;
@@ -32782,6 +32932,268 @@ export interface operations {
       };
     };
   };
+  getSiteWorks: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SiteGalleryResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to view «Наші роботи» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  saveSiteWorks: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SaveSiteGalleryRequest'];
+      };
+    };
+    responses: {
+      /** @description Saved */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SiteGalleryResponse'];
+        };
+      };
+      /** @description A picture or a text is wrong; the answer names it in Ukrainian */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': Record<string, never>;
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to edit «Наші роботи» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The revision is stale */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Messages'];
+        };
+      };
+    };
+  };
+  transferSiteWorks: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description One step done */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SiteGalleryTransferResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to edit «Наші роботи» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The list does not exist yet */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getSiteCertificates: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SiteGalleryResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to view «Сертифікати» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  saveSiteCertificates: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SaveSiteGalleryRequest'];
+      };
+    };
+    responses: {
+      /** @description Saved */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SiteGalleryResponse'];
+        };
+      };
+      /** @description A picture or a text is wrong; the answer names it in Ukrainian */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': Record<string, never>;
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to edit «Сертифікати» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The revision is stale */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Messages'];
+        };
+      };
+    };
+  };
+  transferSiteCertificates: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description One step done */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SiteGalleryTransferResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to edit «Сертифікати» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The list does not exist yet */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   getSeoOverview: {
     parameters: {
       query?: never;
@@ -33247,6 +33659,26 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+    };
+  };
+  getPublicSiteGalleries: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Pictures */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PublicSiteGalleriesResponse'];
+        };
       };
     };
   };

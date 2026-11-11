@@ -3,6 +3,7 @@ import path from 'node:path';
 
 import { render, screen } from '@testing-library/react';
 
+import { staticCertificateCards } from './data/certificate-cards';
 import {
   CERTIFICATE_DOCUMENTS,
   CONFORMITY_MARK_PATH,
@@ -43,7 +44,12 @@ describe('certificate documents', () => {
 describe('CertificatesDocuments', () => {
   it('shows each document with its scan link and standards', () => {
     const dictionary = getCertificatesDictionary('uk').documents;
-    render(<CertificatesDocuments documents={CERTIFICATE_DOCUMENTS} dictionary={dictionary} />);
+    render(
+      <CertificatesDocuments
+        documents={staticCertificateCards(dictionary)}
+        dictionary={dictionary}
+      />,
+    );
 
     expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(8);
     const links = screen.getAllByRole('link');
