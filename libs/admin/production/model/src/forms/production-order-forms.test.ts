@@ -217,10 +217,16 @@ describe('production order forms', () => {
       isTransferred: false,
       updatedAt: '2026-11-04T10:00:00Z',
       stage: 'Cutting',
+      shippedQuantity: 10,
+      items: [
+        { modelName: 'Куртка', quantity: 20, stage: 'Cutting' },
+        { modelName: 'Штани', quantity: 10, stage: 'Sewing' },
+      ],
     };
     const csv = productionOrdersCsv([row]);
     expect(csv.startsWith('﻿Номер;Статус;')).toBe(true);
-    expect(csv).toContain('5;Нове;Крій;"ТОВ ""Ромашка""; філія";КП-7;');
+    expect(csv).toContain('5;Нове;Крій;"ТОВ ""Ромашка""; філія";Куртка ×20 · Штани ×10;КП-7;');
+    expect(csv).toContain(';2;30;10;');
     expect(csv.endsWith('\r\n')).toBe(true);
   });
 

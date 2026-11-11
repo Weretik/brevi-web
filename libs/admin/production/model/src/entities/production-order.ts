@@ -94,7 +94,33 @@ export interface ProductionOrderSummary {
   updatedAt: string;
   /** The least advanced item: the order is only as far as its slowest item. */
   stage: ProductionStage;
+  /** Pieces shipped over every item. */
+  shippedQuantity: number;
+  /** Items in the order of the card: what the workshop sews and how far each item is. */
+  items: ProductionOrderSummaryItem[];
 }
+
+export interface ProductionOrderSummaryItem {
+  modelName: string;
+  quantity: number;
+  stage: ProductionStage;
+}
+
+/** A stage of the «конвеєр»: «Нове» orders whose slowest item is at it, and how many of them are overdue. */
+export interface ProductionStageCount {
+  stage: ProductionStage;
+  count: number;
+  overdue: number;
+}
+
+/** «Нове» orders due before today, and due today or in the next three days. */
+export interface ProductionOrderAttention {
+  overdue: number;
+  dueSoon: number;
+}
+
+/** Server sort of the list; a leading «-» is from the largest. */
+export type ProductionOrderSort = 'number' | '-number' | 'due' | '-due' | 'created' | '-created';
 
 export interface ProductionOrderCounts {
   all: number;
@@ -110,6 +136,9 @@ export interface ProductionOrderPage {
   total: number;
   counts: ProductionOrderCounts;
   managers: string[];
+  /** Every stage in workshop order over «Нове» orders; ignores the status and stage filters. */
+  stages: ProductionStageCount[];
+  attention: ProductionOrderAttention;
 }
 
 /** What the signed-in person may do; the server hides prices they may not see. */
@@ -241,6 +270,8 @@ export interface ProductionOrderListQuery {
   stage: ProductionStage | null;
   page: number;
   pageSize: number;
+  /** Newest number first when not set. */
+  sort?: ProductionOrderSort;
   /** The client card tab «Завдання в цех»: only orders made from this client's КП. */
   customerId?: number;
   /** The КП editor: only orders made from this КП. */

@@ -32,7 +32,9 @@ import type {
   ProductionOrderPage,
   ProductionOrderStatus,
   ProductionOrderSummary,
+  ProductionOrderSummaryItem,
   ProductionQuoteDraft,
+  ProductionStageCount,
   ProductionQuoteSource,
   ReportPriceTier,
 } from '@admin/production/model';
@@ -105,6 +107,38 @@ export function mapProductionOrderSummary(value: unknown): ProductionOrderSummar
     isTransferred: boolean(row['isTransferred'], 'перенесено'),
     updatedAt: dateTime(row['updatedAt'], 'час зміни'),
     stage: stage(row['stage'], 'етап завдання'),
+    // An API older than PRD-011 sends neither; the row then shows no models and no shipments.
+    shippedQuantity:
+      row['shippedQuantity'] === undefined ? 0 : integer(row['shippedQuantity'], 'відвантажено'),
+    items:
+      row['items'] === undefined ? [] : list(row['items'], 'позиції завдання').map(mapSummaryItem),
+  };
+}
+
+function mapSummaryItem(value: unknown): ProductionOrderSummaryItem {
+  const row = record(value, 'позиція завдання');
+  return {
+    modelName: nonEmptyText(row['modelName'], 'модель'),
+    quantity: integer(row['quantity'], 'кількість'),
+    stage: stage(row['stage'], 'етап позиції'),
+  };
+}
+
+function mapStageCount(value: unknown): ProductionStageCount {
+  const row = record(value, 'етап конвеєра');
+  return {
+    stage: stage(row['stage'], 'етап конвеєра'),
+    count: integer(row['count'], 'завдань на етапі'),
+    overdue: integer(row['overdue'], 'прострочених на етапі'),
+  };
+}
+
+function mapAttention(value: unknown) {
+  if (value === undefined) return { overdue: 0, dueSoon: 0 };
+  const row = record(value, 'термін завдань');
+  return {
+    overdue: integer(row['overdue'], 'прострочені'),
+    dueSoon: integer(row['dueSoon'], 'скоро термін'),
   };
 }
 
@@ -123,6 +157,8 @@ export function mapProductionOrderPage(value: unknown): ProductionOrderPage {
       cancelled: integer(counts['cancelled'], 'скасовані'),
     },
     managers: texts(page['managers'], 'менеджери'),
+    stages: page['stages'] === undefined ? [] : list(page['stages'], 'конвеєр').map(mapStageCount),
+    attention: mapAttention(page['attention']),
   };
 }
 

@@ -13,7 +13,15 @@ export { ProductionItemCard } from './orders/production-item-card';
 export { ProductionItemForm } from './orders/production-item-form';
 export type { EmbroideryPicker } from './orders/production-item-applications';
 export { ProductionOrderChips } from './orders/production-order-chips';
-export { ProductionOrderFilters } from './orders/production-order-filters';
+export {
+  ProductionOrderFilterChips,
+  ProductionOrderFilterPanel,
+  countProductionOrderFilters,
+} from './orders/production-order-filters';
+export { ProductionOrderAttention } from './orders/production-order-attention';
+export { ProductionStageConveyor } from './orders/production-stage-conveyor';
+export { ProductionOrdersMoreMenu } from './orders/production-orders-more-menu';
+export type { ProductionOrdersImport } from './orders/production-orders-more-menu';
 export { ProductionModelSummaryTable } from './orders/production-model-summary-table';
 export { ModelSummarySortEditor } from './orders/model-summary-sort-editor';
 export { ProductionOrderHistory } from './orders/production-order-history';

@@ -1,3 +1,4 @@
+import { orderModelsText } from './production-order-row';
 import { productionOrderStatusLabels } from '../entities/production-order';
 import { productionStageLabels } from '../entities/production-tracking';
 import { formatDay } from '../mappers/format-production';
@@ -9,11 +10,13 @@ const columns: [string, (row: ProductionOrderSummary) => string | number][] = [
   ['Статус', (row) => productionOrderStatusLabels[row.status]],
   ['Етап', (row) => productionStageLabels[row.stage]],
   ['Клієнт', (row) => row.clientName],
+  ['Моделі', (row) => orderModelsText(row.items)],
   ['КП', (row) => row.quoteNumber ?? ''],
   ['Менеджер', (row) => row.managerName],
   ['Дата створення', (row) => formatDay(row.orderDate)],
   ['Позицій', (row) => row.itemsCount],
   ['Кількість', (row) => row.totalQuantity],
+  ['Відвантажено', (row) => row.shippedQuantity],
   ['Найближче «Готово до»', (row) => (row.nearestDueDate ? formatDay(row.nearestDueDate) : '')],
 ];
 

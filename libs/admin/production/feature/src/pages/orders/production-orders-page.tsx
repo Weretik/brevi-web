@@ -7,36 +7,38 @@ import {
   parseProductionOrderImportFile,
   parseProductionProgressImportFile,
   parseProductionReportPriceImportFile,
-  productionStageLabels,
-  productionStages,
+  ordersWord,
 } from '@admin/production/model';
 import {
   ModelSummarySortEditor,
   ProductionModelSummaryTable,
+  ProductionOrderAttention,
   ProductionOrderChips,
-  ProductionOrderFilters,
+  ProductionOrderFilterChips,
+  ProductionOrderFilterPanel,
   ProductionOrdersGrid,
+  ProductionOrdersMoreMenu,
+  ProductionStageConveyor,
+  countProductionOrderFilters,
 } from '@admin/production/ui';
-import {
-  ReferenceFilterRow,
-  ReferenceListAlerts,
-  ReferencePageHeader,
-  ReferenceSearchBar,
-} from '@admin/references/ui';
+import { ReferenceListAlerts, ReferencePageHeader, ReferenceSearchBar } from '@admin/references/ui';
 import AddIcon from '@mui/icons-material/Add';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
-import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
+import TuneIcon from '@mui/icons-material/Tune';
 import {
   Alert,
+  Badge,
   Box,
   Button,
+  Chip,
+  Collapse,
   LinearProgress,
-  MenuItem,
   Paper,
   Stack,
-  Tab,
-  Tabs,
-  TextField,
+  ToggleButton,
+  ToggleButtonGroup,
   Typography,
 } from '@mui/material';
 import { useState } from 'react';
@@ -47,7 +49,8 @@ import { useProductionModelSummary } from '../../hooks/orders/use-production-mod
 import { useProductionOrders } from '../../hooks/orders/use-production-orders';
 import { useProductionOrdersExport } from '../../hooks/orders/use-production-orders-export';
 
-import type { ProductionOrderActor, ProductionStage } from '@admin/production/model';
+import type { ProductionOrderActor } from '@admin/production/model';
+import type { ProductionOrdersImport } from '@admin/production/ui';
 
 interface Props {
   useOrderActor: () => ProductionOrderActor;
@@ -56,23 +59,28 @@ interface Props {
 type OrdersView = 'list' | 'summary';
 
 /**
- * «Швейний цех › Виробничі завдання»: what the workshop sews, made from sent КП. «Фільтри» narrow both the list and
- * «Зведення за моделями»; «Переглянути» in the summary opens the list of that model.
+ * «Швейний цех › Виробничі завдання»: what the workshop sews, made from КП. The stage «конвеєр» shows the open
+ * orders by stage and filters the list; a strip appears only when orders are overdue or due soon. «Фільтри» narrow
+ * both the list and «Зведення за моделями»; «Переглянути» in the summary opens the list of that model. The one-time
+ * transfers from the old «Цех» live in «⋯».
  */
 export function ProductionOrdersPage({ useOrderActor }: Props) {
   const actor = useOrderActor();
   const navigate = useNavigate();
   const list = useProductionOrders();
   const [view, setView] = useState<OrdersView>('list');
-  const [filtersOpen, setFiltersOpen] = useState(true);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [sortOpen, setSortOpen] = useState(false);
   const summary = useProductionModelSummary(list.query, view === 'summary');
   const [message, setMessage] = useState<string | null>(null);
-  const [importing, setImporting] = useState<'orders' | 'progress' | 'prices' | null>(null);
+  const [importing, setImporting] = useState<ProductionOrdersImport | null>(null);
   const exporter = useProductionOrdersExport(setMessage);
   const [importOrders] = useImportProductionOrdersMutation();
   const [importProgress] = useImportProductionProgressMutation();
   const [importPrices] = useImportProductionReportPricesMutation();
   const page = list.page;
+  const panelFilters = countProductionOrderFilters(list.filters, list.manager);
+  const attention = page?.attention ?? { overdue: 0, dueSoon: 0 };
 
   return (
     <Box sx={{ minWidth: 0 }}>
@@ -90,31 +98,7 @@ export function ProductionOrdersPage({ useOrderActor }: Props) {
             >
               Експорт
             </Button>
-            {actor.canImport && (
-              <>
-                <Button
-                  variant="outlined"
-                  startIcon={<UploadFileOutlinedIcon />}
-                  onClick={() => setImporting('orders')}
-                >
-                  Імпорт
-                </Button>
-                <Button
-                  variant="outlined"
-                  startIcon={<UploadFileOutlinedIcon />}
-                  onClick={() => setImporting('progress')}
-                >
-                  Імпорт етапів
-                </Button>
-                <Button
-                  variant="outlined"
-                  startIcon={<UploadFileOutlinedIcon />}
-                  onClick={() => setImporting('prices')}
-                >
-                  Ціни КП
-                </Button>
-              </>
-            )}
+            {actor.canImport && <ProductionOrdersMoreMenu onImport={setImporting} />}
             {actor.canCreate && (
               <Button
                 variant="contained"
@@ -134,100 +118,117 @@ export function ProductionOrdersPage({ useOrderActor }: Props) {
         actionMessage={message}
         onCloseActionMessage={() => setMessage(null)}
       />
-      <ProductionOrderFilters
-        values={list.filters}
-        options={list.filterOptions}
-        expanded={filtersOpen}
-        onExpandedChange={setFiltersOpen}
-        onChange={list.setFilter}
-        onReset={list.resetFilters}
+      <ProductionStageConveyor
+        stages={page?.stages ?? []}
+        selected={list.stage}
+        onSelect={list.setStage}
       />
-      <ReferenceSearchBar
-        placeholder="Номер завдання або КП, клієнт, модель"
-        label="Пошук завдань"
-        value={list.search}
-        onChange={list.setSearch}
+      <ProductionOrderAttention
+        attention={attention}
+        active={list.urgency === 'dueSoon'}
+        onShow={() => list.setUrgency('dueSoon')}
+        onReset={() => list.setUrgency(null)}
       />
-      <ReferenceFilterRow
-        filters={
-          <>
-            <ProductionOrderChips
-              counts={page?.counts ?? { all: 0, new: 0, closed: 0, cancelled: 0 }}
-              status={list.status}
-              overdue={list.overdue}
-              onStatusChange={list.setStatus}
-              onOverdueChange={list.setOverdue}
-            />
-            <TextField
-              select
-              size="small"
-              label="Етап"
-              value={list.stage ?? ''}
-              sx={{ minWidth: 200 }}
-              onChange={(event) =>
-                list.setStage((event.target.value || null) as ProductionStage | null)
-              }
-            >
-              <MenuItem value="">Усі</MenuItem>
-              {productionStages.map((stage) => (
-                <MenuItem key={stage} value={stage}>
-                  {productionStageLabels[stage]}
-                </MenuItem>
-              ))}
-            </TextField>
-            {page && page.managers.length > 1 && (
-              <TextField
-                select
-                size="small"
-                label="Менеджер"
-                value={list.manager ?? ''}
-                sx={{ minWidth: 180 }}
-                onChange={(event) => list.setManager(event.target.value || null)}
-              >
-                <MenuItem value="">Усі</MenuItem>
-                {page.managers.map((name) => (
-                  <MenuItem key={name} value={name}>
-                    {name}
-                  </MenuItem>
-                ))}
-              </TextField>
-            )}
-          </>
-        }
-        count={page?.total ?? 0}
-        total={page?.counts.all ?? 0}
-        countLabel="Кількість завдань"
-        selectedCount={0}
-        onClearSelection={() => undefined}
-      />
-      <Tabs
-        value={view}
-        onChange={(_event, next: OrdersView) => setView(next)}
-        sx={{ mb: 1.5, borderBottom: 1, borderColor: 'divider' }}
+      <Stack
+        direction={{ xs: 'column', md: 'row' }}
+        sx={{ gap: 1, alignItems: { md: 'flex-start' }, '& > .MuiTextField-root': { mb: 0 } }}
       >
-        <Tab value="list" label="Завдання" />
-        <Tab value="summary" label="Зведення за моделями" />
-      </Tabs>
-      {view === 'list' ? (
-        <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
-          <ProductionOrdersGrid
-            rows={page?.items ?? []}
-            rowCount={page?.total ?? 0}
-            loading={list.loading}
-            searching={(page?.counts.all ?? 0) > 0}
-            today={list.today}
-            paginationModel={list.pagination}
-            onPaginationModelChange={list.setPagination}
-            onOpen={(row) => navigate(`/production/orders/${row.id}`)}
+        <ReferenceSearchBar
+          placeholder="Номер завдання або КП, клієнт, модель"
+          label="Пошук завдань"
+          value={list.search}
+          onChange={list.setSearch}
+        />
+        <Stack direction="row" sx={{ gap: 1, flexShrink: 0 }}>
+          <Badge badgeContent={panelFilters} color="primary">
+            <Button
+              variant="outlined"
+              startIcon={<TuneIcon />}
+              aria-haspopup="dialog"
+              onClick={() => setFiltersOpen(true)}
+              sx={{ height: 48, bgcolor: 'background.paper' }}
+            >
+              Фільтри
+            </Button>
+          </Badge>
+          <ToggleButtonGroup
+            exclusive
+            value={view}
+            aria-label="Вигляд"
+            onChange={(_event, next: OrdersView | null) => next && setView(next)}
+            sx={{ height: 48, bgcolor: 'background.paper' }}
+          >
+            <ToggleButton value="list">Список</ToggleButton>
+            <ToggleButton value="summary">Зведення за моделями</ToggleButton>
+          </ToggleButtonGroup>
+        </Stack>
+      </Stack>
+      <Stack
+        direction="row"
+        sx={{ gap: 1, flexWrap: 'wrap', alignItems: 'center', my: 1.5 }}
+        aria-label="Відбір завдань"
+        role="group"
+      >
+        <ProductionOrderChips
+          counts={page?.counts ?? { all: 0, new: 0, closed: 0, cancelled: 0 }}
+          status={list.urgency ? undefined : list.status}
+          overdue={list.urgency === 'overdue'}
+          overdueCount={attention.overdue}
+          onStatusChange={list.setStatus}
+          onOverdueChange={(on) => list.setUrgency(on ? 'overdue' : null)}
+        />
+        {list.urgency === 'dueSoon' && (
+          <Chip
+            sx={{ height: 32, bgcolor: 'primary.light', color: 'primary.dark', fontWeight: 600 }}
+            label="Термін горить"
+            onDelete={() => list.setUrgency(null)}
           />
-        </Paper>
+        )}
+        <ProductionOrderFilterChips
+          values={list.filters}
+          options={list.filterOptions}
+          manager={list.manager}
+          stage={list.stage}
+          onChange={list.setFilter}
+          onManagerChange={list.setManager}
+          onStageChange={list.setStage}
+        />
+        <Box sx={{ flexGrow: 1 }} />
+        {page && (
+          <Typography variant="body2" color="text.secondary" aria-live="polite">
+            Знайдено {page.total} {ordersWord(page.total)}
+          </Typography>
+        )}
+      </Stack>
+      {view === 'list' ? (
+        <ProductionOrdersGrid
+          rows={page?.items ?? []}
+          rowCount={page?.total ?? 0}
+          loading={list.loading}
+          searching={(page?.counts.all ?? 0) > 0}
+          today={list.today}
+          paginationModel={list.pagination}
+          onPaginationModelChange={list.setPagination}
+          onOpen={(row) => navigate(`/production/orders/${row.id}`)}
+          sort={list.sort}
+          onSortChange={list.setSort}
+        />
       ) : (
         <Stack spacing={1.5}>
-          <Paper variant="outlined" sx={{ p: 2 }}>
-            <Typography variant="subtitle2" sx={{ mb: 1.5 }}>
-              Сортування за пріоритетом
-            </Typography>
-            <ModelSummarySortEditor levels={summary.sort} onChange={summary.setSort} />
+          <Paper variant="outlined" sx={{ px: 2, py: 1 }}>
+            <Button
+              size="small"
+              aria-expanded={sortOpen}
+              endIcon={sortOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              onClick={() => setSortOpen(!sortOpen)}
+            >
+              Сортування за пріоритетом ({summary.sort.length})
+            </Button>
+            <Collapse in={sortOpen} unmountOnExit>
+              <Box sx={{ pt: 1, pb: 1 }}>
+                <ModelSummarySortEditor levels={summary.sort} onChange={summary.setSort} />
+              </Box>
+            </Collapse>
           </Paper>
           {summary.error && (
             <Alert
@@ -254,6 +255,18 @@ export function ProductionOrdersPage({ useOrderActor }: Props) {
           )}
         </Stack>
       )}
+      <ProductionOrderFilterPanel
+        open={filtersOpen}
+        values={list.filters}
+        options={list.filterOptions}
+        manager={list.manager}
+        managers={page?.managers ?? []}
+        count={page?.total ?? 0}
+        onChange={list.setFilter}
+        onManagerChange={list.setManager}
+        onReset={list.resetFilters}
+        onClose={() => setFiltersOpen(false)}
+      />
       {importing === 'progress' && (
         <ProductionImportDrawer
           title="Імпорт етапів"
