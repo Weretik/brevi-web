@@ -8,13 +8,9 @@ import {
   ProductionConfirmDialog,
   WorkshopStaffChips,
   WorkshopStaffGrid,
+  WorkshopTabHeader,
 } from '@admin/production/ui';
-import {
-  ReferenceFilterRow,
-  ReferenceListAlerts,
-  ReferencePageHeader,
-  ReferenceSearchBar,
-} from '@admin/references/ui';
+import { ReferenceFilterRow, ReferenceListAlerts, ReferenceSearchBar } from '@admin/references/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import { Box, Button, Paper } from '@mui/material';
@@ -28,7 +24,7 @@ import { useWorkshopStaff } from '../../hooks/staff/use-workshop-staff';
 import type { ProductionEditorMode } from '../../hooks/staff/use-workshop-employee-editor';
 import type { WorkshopEmployee, WorkshopStaffStatus } from '@admin/production/model';
 
-/** «Швейний цех › Працівники цеху»: the list the head of the workshop records work and pay for. */
+/** «Швейний цех › Персонал цеху › Працівники»: the list the head of the workshop records work and pay for. */
 export function WorkshopStaffPage() {
   const { rows, loading, error, reload } = useWorkshopStaff();
   const [search, setSearch] = useState('');
@@ -51,9 +47,7 @@ export function WorkshopStaffPage() {
 
   return (
     <Box sx={{ minWidth: 0 }}>
-      <ReferencePageHeader
-        overline="Швейний цех"
-        title="Працівники цеху"
+      <WorkshopTabHeader
         subtitle="Швачки, закрійники, майстер. Вони не входять у систему: роботу за них вносить начальник цеху"
         actions={
           <>

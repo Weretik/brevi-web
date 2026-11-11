@@ -29,6 +29,7 @@ import { useQuoteActor } from './use-quote-actor';
 import { useQuoteSupplierCard } from './use-quote-supplier-card';
 import { useSiteCategoriesViewer } from './use-site-categories-viewer';
 import { useTaskViewer } from './use-task-viewer';
+import { useWorkshopPeopleAccess } from './use-workshop-people-access';
 
 export const adminRouteDefinitions = [
   ...createDashboardRoutes({ useViewer: useDashboardViewer }),
@@ -58,7 +59,10 @@ export const tasksRoutes = createTasksRoutes({ useTaskViewer });
 export const embroideryRoutes = createEmbroideryRoutes({ useEmbroideryViewer });
 
 /** «Швейний цех» pages need the WorkshopChief or Admin role, so the router wraps them too. */
-export const productionRoutes = createProductionRoutes({ useOrderActor: useProductionOrderActor });
+export const productionRoutes = createProductionRoutes({
+  useOrderActor: useProductionOrderActor,
+  usePeopleAccess: useWorkshopPeopleAccess,
+});
 
 /** «Звіти цеху» are for Admin (the director holds Admin), so the router wraps them too. */
 export const productionReportRoutes = createProductionReportRoutes();

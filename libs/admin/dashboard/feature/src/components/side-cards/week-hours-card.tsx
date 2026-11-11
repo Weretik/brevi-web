@@ -20,7 +20,7 @@ export function WeekHoursCard({ rows }: WeekHoursCardProps) {
         <Link
           component={RouterLink}
           sx={{ fontSize: 13, fontWeight: 700 }}
-          to="/production/timesheet"
+          to="/production/people?tab=timesheet"
           underline="hover"
         >
           Робочий час

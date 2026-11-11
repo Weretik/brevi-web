@@ -25,7 +25,7 @@ export function createNavigation(
           (item) =>
             (!item.requiredRoles ||
               item.requiredRoles.some((role) => viewer.roles.includes(role))) &&
-            (!item.access || canAccess(viewer, item.access)),
+            (!item.access || [item.access].flat().some((page) => canAccess(viewer, page))),
         )
         .map((item) => ({
           id: item.id,

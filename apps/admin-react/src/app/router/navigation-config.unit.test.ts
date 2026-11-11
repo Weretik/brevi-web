@@ -50,8 +50,8 @@ describe('legacy Admin navigation', () => {
       'Загальні звіти',
       'Адміністрування',
     ]);
-    expect(groups.map((group) => group.items.length)).toEqual([5, 13, 7, 4, 8, 1, 5, 1, 5]);
-    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(49);
+    expect(groups.map((group) => group.items.length)).toEqual([5, 8, 7, 4, 8, 1, 5, 1, 5]);
+    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(44);
     expect(groups[0].items.map((item) => item.id)).not.toContain('clients');
   });
   it('shows «Налаштування КП» only for the server Admin role', () => {
@@ -150,10 +150,8 @@ describe('legacy Admin navigation', () => {
       '/production/orders',
       '/production/work',
       '/production/forecast',
-      '/production/staff',
+      '/production/people',
       '/production/fabric-norms',
-      '/production/payroll',
-      '/production/timesheet',
       '/production/reports',
       '/production/archive',
     ]);
@@ -168,16 +166,11 @@ describe('legacy Admin navigation', () => {
       '/production/orders',
       '/production/work',
       '/production/forecast',
-      '/production/staff',
+      '/production/people',
       '/production/fabric-norms',
     ]);
-    expect(shop(['Admin'])?.items[3].label).toBe('Працівники цеху');
-    expect(
-      shop(['WorkshopChief'])
-        ?.items.filter((item) => item.id === 'salary' || item.id === 'work-time')
-        .map((item) => item.to),
-    ).toEqual(['/production/payroll', '/production/timesheet']);
-    expect(shop(['Manager'])?.items.some((item) => item.id === 'workshop-staff')).toBe(false);
+    expect(shop(['Admin'])?.items[3].label).toBe('Персонал цеху');
+    expect(shop(['Manager'])?.items.some((item) => item.id === 'workshop-people')).toBe(false);
     expect(shop(['Manager'])?.items.some((item) => item.id === 'work-log')).toBe(false);
     expect(shop(['Manager'])?.items.some((item) => item.id === 'salary')).toBe(false);
     expect(shop(['Admin'])?.items.find((item) => item.id === 'workshop-reports')?.to).toBe(

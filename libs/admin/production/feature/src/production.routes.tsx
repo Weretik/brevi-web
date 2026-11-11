@@ -1,9 +1,9 @@
 import { lazy } from 'react';
 import { Navigate } from 'react-router-dom';
 
-import type { ProductionOrderActor } from '@admin/production/model';
+import type { ProductionOrderActor, WorkshopPeopleAccess } from '@admin/production/model';
 
-const WorkshopStaffPage = lazy(() => import('./pages/staff/workshop-staff-page'));
+const WorkshopPeoplePage = lazy(() => import('./pages/people/workshop-people-page'));
 const FabricNormsPage = lazy(() => import('./pages/norms/fabric-norms-page'));
 const WorkshopSettingsPage = lazy(() => import('./pages/settings/workshop-settings-page'));
 const ProductionOrdersPage = lazy(() => import('./pages/orders/production-orders-page'));
@@ -11,20 +11,30 @@ const ProductionOrderCreatePage = lazy(() => import('./pages/orders/production-o
 const ProductionOrderPage = lazy(() => import('./pages/orders/production-order-page'));
 const WorkLogPage = lazy(() => import('./pages/work/work-log-page'));
 const SewingForecastPage = lazy(() => import('./pages/forecast/sewing-forecast-page'));
-const TimesheetPage = lazy(() => import('./pages/timesheet/timesheet-page'));
-const PayrollPage = lazy(() => import('./pages/payroll/payroll-page'));
 const WorkshopReportPage = lazy(() => import('./pages/reports/workshop-report-page'));
 const WorkshopArchivePage = lazy(() => import('./pages/archive/workshop-archive-page'));
 
 interface ProductionRouteOptions {
   /** The signed-in person: may they import the old «Цех» log. */
   useOrderActor: () => ProductionOrderActor;
+  /** Tabs of «Персонал цеху» the signed-in person may open. */
+  usePeopleAccess: () => WorkshopPeopleAccess;
 }
 
 /** «Швейний цех»; the app puts these pages behind the WorkshopChief or Admin role. */
-export function createProductionRoutes({ useOrderActor }: ProductionRouteOptions) {
+export function createProductionRoutes({ useOrderActor, usePeopleAccess }: ProductionRouteOptions) {
   return [
-    { path: '/production/staff', element: <WorkshopStaffPage /> },
+    { path: '/production/people', element: <WorkshopPeoplePage useAccess={usePeopleAccess} /> },
+    // The three pages merged into «Персонал цеху»; the old addresses keep working.
+    { path: '/production/staff', element: <Navigate to="/production/people?tab=staff" replace /> },
+    {
+      path: '/production/timesheet',
+      element: <Navigate to="/production/people?tab=timesheet" replace />,
+    },
+    {
+      path: '/production/payroll',
+      element: <Navigate to="/production/people?tab=payroll" replace />,
+    },
     { path: '/production/fabric-norms', element: <FabricNormsPage /> },
     {
       path: '/production/payroll-rules',
@@ -32,8 +42,6 @@ export function createProductionRoutes({ useOrderActor }: ProductionRouteOptions
     },
     { path: '/production/settings', element: <WorkshopSettingsPage /> },
     { path: '/production/work', element: <WorkLogPage useOrderActor={useOrderActor} /> },
-    { path: '/production/timesheet', element: <TimesheetPage /> },
-    { path: '/production/payroll', element: <PayrollPage /> },
   ];
 }
 

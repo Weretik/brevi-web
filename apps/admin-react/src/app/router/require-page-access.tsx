@@ -1,16 +1,17 @@
 import { canAccess, NoAccessPage, useAdminSession } from '@admin/core/auth';
 import { Outlet, useLocation } from 'react-router-dom';
 
-import { accessPageOf } from './page-access';
+import { accessPagesOf } from './page-access';
 
 /** Layout route: a page of «Права доступу» opens only when the user's rights let them see it. */
 export function RequirePageAccess() {
   const session = useAdminSession();
   const { pathname } = useLocation();
-  const page = accessPageOf(pathname);
+  const pages = accessPagesOf(pathname);
 
-  if (page && (session.status !== 'authenticated' || !canAccess(session.user, page))) {
-    return <NoAccessPage />;
+  if (pages.length > 0) {
+    const user = session.status === 'authenticated' ? session.user : null;
+    if (!user || !pages.some((page) => canAccess(user, page))) return <NoAccessPage />;
   }
 
   return <Outlet />;

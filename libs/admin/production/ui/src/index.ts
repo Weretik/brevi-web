@@ -53,3 +53,4 @@ export {
 } from './reports/report-tables';
 export { WorkshopArchiveDetails } from './archive/workshop-archive-details';
 export { WorkshopArchiveGrid } from './archive/workshop-archive-grid';
+export { WorkshopTabHeader } from './people/workshop-tab-header';
