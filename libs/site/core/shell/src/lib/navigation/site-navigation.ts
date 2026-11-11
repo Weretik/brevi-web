@@ -37,5 +37,6 @@ export const FOOTER_BUYER_LINKS = links(
   'industries',
   'deliveryAndPayment',
   'returnsExchanges',
+  'sizeChart',
   'agreement',
 );

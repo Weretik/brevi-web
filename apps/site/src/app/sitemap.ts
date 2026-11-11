@@ -22,6 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: SITE_PATHS.deliveryAndPayment },
     { path: SITE_PATHS.contacts },
     { path: SITE_PATHS.returnsExchanges },
+    { path: SITE_PATHS.sizeChart },
     { path: SITE_PATHS.ourWork },
     { path: SITE_PATHS.certificates },
     { path: SITE_PATHS.articles },
