@@ -1,4 +1,6 @@
+import { inlineRuns } from '@admin/content/model';
 import { Box, Stack, Typography } from '@mui/material';
+
 
 import type { ContentProductText } from '@admin/content/model';
 
@@ -7,6 +9,19 @@ const empty = (
     Не заповнено
   </Typography>
 );
+
+/** A stored string with its bold and italic parts shown as formatting. */
+function Inline({ text }: { text: string | null }) {
+  return inlineRuns(text ?? '').map((run, index) => (
+    <Box
+      key={index}
+      component={run.bold ? 'strong' : run.italic ? 'em' : 'span'}
+      sx={{ fontStyle: run.italic ? 'italic' : undefined }}
+    >
+      {run.text}
+    </Box>
+  ));
+}
 
 function Part({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -64,7 +79,7 @@ export function ContentTextPreview({ text }: { text: ContentProductText }) {
                 <Box key={index} component="ul" sx={{ m: 0, pl: 2.5 }}>
                   {block.items.map((item, line) => (
                     <Typography key={line} component="li" variant="body2">
-                      {item}
+                      <Inline text={item} />
                     </Typography>
                   ))}
                 </Box>
@@ -75,7 +90,7 @@ export function ContentTextPreview({ text }: { text: ContentProductText }) {
                       {block.lead}{' '}
                     </Box>
                   )}
-                  {block.text}
+                  <Inline text={block.text} />
                 </Typography>
               ),
             )}
