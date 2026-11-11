@@ -32,7 +32,7 @@ const api = vi.hoisted(() => {
     meters: 5,
     pairs: 3,
     negative: 1,
-    permissions: { canMove, seesValue: canMove },
+    permissions: { canMove, seesValue: canMove, canTransfer: canMove },
   });
   return { adjust, stock, canMove: true };
 });
@@ -57,6 +57,7 @@ describe('FabricStockPage', () => {
     expect(screen.getByText('Відʼємний залишок у 1 парах', { exact: false })).toBeTruthy();
     expect(screen.getByText('FAB-023 = FAB-067')).toBeTruthy();
     expect(screen.getByText('Білий · 0 м')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Перенесення з v133' })).toBeNull();
     fireEvent.change(screen.getByLabelText('Пошук залишків'), { target: { value: 'чорн' } });
     expect(screen.queryByText('Синій · 15 м')).toBeNull();
     expect(screen.getByText(/^Чорний · .10 м$/)).toBeTruthy();

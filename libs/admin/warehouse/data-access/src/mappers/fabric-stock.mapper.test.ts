@@ -8,7 +8,7 @@ import {
   mapFabricStockOperation,
 } from './fabric-stock.mapper';
 
-const permissions = { canMove: true, seesValue: false };
+const permissions = { canMove: true, seesValue: false, canTransfer: false };
 
 describe('warehouse mappers', () => {
   it('maps «Залишки» with an alias group and a negative pair', () => {
