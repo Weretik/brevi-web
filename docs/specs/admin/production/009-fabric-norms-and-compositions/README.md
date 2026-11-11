@@ -30,4 +30,6 @@ The owner found the two tabs confusing (UI/UX audit and three concepts on the [c
 | PRD-S38 | «Рахувати на N шт.» multiplies every fabric, layer and composition line for a batch; empty by default, nothing is saved.                                                                                                                                                   |
 | PRD-S39 | «Задати норму» / «Редагувати норму» opens the side panel with the fields grouped «1 колір», «2 кольори», «3 кольори» and labelled «Основна», «Додаткова»; «Видалити норму» asks first.                                                                                     |
 
+Follow-up 2026-11-11 (owner): the three variant cards have one height, the fabrics of a variant stand side by side in one row with «Разом» in the card header, and «Решта складу» is on the left, «Підкладка, утеплювач, фліс» on the right.
+
 A difference between the workshop norm and the fabric in the composition (71 of 124 models in the transfer files) is not marked until the owner says whether it is an error.
