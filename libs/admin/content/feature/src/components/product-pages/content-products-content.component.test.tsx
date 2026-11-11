@@ -12,6 +12,7 @@ const fixture = vi.hoisted(() => ({
   visibility: vi.fn(),
   save: vi.fn(),
   remove: vi.fn(),
+  transfer: vi.fn(),
 }));
 
 const complete = {
@@ -111,12 +112,13 @@ vi.mock('@admin/content/data-access', () => ({
   useSetContentProductVisibilityMutation: () => [fixture.visibility, { isLoading: false }],
   useSaveContentProductMutation: () => [fixture.save, { isLoading: false }],
   useDeleteContentProductMutation: () => [fixture.remove, { isLoading: false }],
+  useImportOldSiteProductPagesMutation: () => [fixture.transfer, { isLoading: false }],
 }));
 
 const unwrapped = <T,>(value: T) => ({ unwrap: () => Promise.resolve(value) });
 
 function renderPage(
-  viewer: ContentProductsViewer = { canEdit: true, canDelete: true },
+  viewer: ContentProductsViewer = { canCreate: true, canEdit: true, canDelete: true },
   url = '/content/products',
 ) {
   const router = createMemoryRouter(
@@ -175,7 +177,7 @@ describe('ContentProductsContent', () => {
   });
 
   it('shows the switch and the panel read-only without the edit right', async () => {
-    renderPage({ canEdit: false, canDelete: false });
+    renderPage({ canCreate: false, canEdit: false, canDelete: false });
 
     expect(
       screen.getByRole('switch', { name: 'Показувати на сайті: Костюм Лідер' }),
@@ -259,5 +261,77 @@ describe('ContentProductsContent', () => {
 
     await waitFor(() => expect(fixture.remove).toHaveBeenCalledWith(1));
     expect(await screen.findByText('Сторінку товару «Костюм Лідер» видалено.')).toBeInTheDocument();
+  });
+
+  it('transfers old-site texts only after a check and «Перенести»', async () => {
+    const pages = [{ url: 'https://brevi.com.ua/kostyum-lider/' }, { url: '/halat-gera/' }];
+    const counted = {
+      dryRun: true,
+      total: 2,
+      created: 1,
+      updated: 0,
+      kept: 0,
+      notMatched: [{ url: '/halat-gera/', name: 'Халат ГЕРА', reason: 'Немає товару.' }],
+      problems: [],
+    };
+    fixture.transfer.mockImplementation(({ dryRun }: { dryRun: boolean }) =>
+      unwrapped({ ...counted, dryRun }),
+    );
+    renderPage();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Перенести зі старого сайту' }));
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByRole('button', { name: 'Перенести' })).toBeDisabled();
+    await userEvent.upload(
+      within(dialog).getByLabelText('Файл перенесення'),
+      new File([JSON.stringify({ items: pages })], 'old-site.json', { type: 'application/json' }),
+    );
+
+    expect(await within(dialog).findByText(/Буде створено: 1/)).toBeInTheDocument();
+    expect(within(dialog).getByText('Халат ГЕРА: Немає товару.')).toBeInTheDocument();
+    expect(fixture.transfer).toHaveBeenLastCalledWith({
+      items: pages,
+      dryRun: true,
+      showOnSite: false,
+      overwrite: false,
+    });
+
+    await userEvent.click(
+      within(dialog).getByRole('switch', { name: 'Одразу показувати перенесені товари на сайті' }),
+    );
+    await waitFor(() =>
+      expect(fixture.transfer).toHaveBeenLastCalledWith(
+        expect.objectContaining({ dryRun: true, showOnSite: true }),
+      ),
+    );
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Перенести' }));
+
+    expect(await within(dialog).findByText('Тексти перенесено.')).toBeInTheDocument();
+    expect(fixture.transfer).toHaveBeenLastCalledWith({
+      items: pages,
+      dryRun: false,
+      showOnSite: true,
+      overwrite: false,
+    });
+    expect(within(dialog).queryByRole('button', { name: 'Перенести' })).not.toBeInTheDocument();
+  });
+
+  it('refuses a wrong file and hides the transfer without the create right', async () => {
+    renderPage();
+    await userEvent.click(screen.getByRole('button', { name: 'Перенести зі старого сайту' }));
+    const dialog = await screen.findByRole('dialog');
+    await userEvent.upload(
+      within(dialog).getByLabelText('Файл перенесення'),
+      new File(['{"items":[]}'], 'empty.json', { type: 'application/json' }),
+    );
+
+    expect(await within(dialog).findByText(/немає сторінок/)).toBeInTheDocument();
+    expect(fixture.transfer).not.toHaveBeenCalled();
+
+    cleanup();
+    renderPage({ canCreate: false, canEdit: true, canDelete: true });
+    expect(
+      screen.queryByRole('button', { name: 'Перенести зі старого сайту' }),
+    ).not.toBeInTheDocument();
   });
 });

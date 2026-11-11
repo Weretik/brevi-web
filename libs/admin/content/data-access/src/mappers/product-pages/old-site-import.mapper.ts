@@ -1,0 +1,25 @@
+import { flag, integer, list, nullableText, record, text } from '../../validators/content-response';
+
+import type { OldSiteImportNote, OldSiteImportReport } from '@admin/content/model';
+
+function mapNote(value: unknown): OldSiteImportNote {
+  const note = record(value, 'сторінка старого сайту');
+  return {
+    url: text(note['url'], 'посилання'),
+    name: nullableText(note['name'], 'назва'),
+    reason: text(note['reason'], 'причина'),
+  };
+}
+
+export function mapOldSiteImportReport(value: unknown): OldSiteImportReport {
+  const report = record(value, 'звіт перенесення');
+  return {
+    dryRun: flag(report['dryRun'], 'перевірка'),
+    total: integer(report['total'], 'усього'),
+    created: integer(report['created'], 'створено'),
+    updated: integer(report['updated'], 'оновлено'),
+    kept: integer(report['kept'], 'залишено'),
+    notMatched: list(report['notMatched'], 'без товару').map(mapNote),
+    problems: list(report['problems'], 'проблеми').map(mapNote),
+  };
+}

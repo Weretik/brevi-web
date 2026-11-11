@@ -102,6 +102,8 @@ export interface ContentProductVisibility {
 
 /** What the signed-in staff member may do on «Контент → Товари» («Права доступу», page `content-products`). */
 export interface ContentProductsViewer {
+  /** May run the transfer of old-site texts. */
+  canCreate: boolean;
   canEdit: boolean;
   canDelete: boolean;
 }

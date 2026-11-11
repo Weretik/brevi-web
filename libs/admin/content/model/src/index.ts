@@ -19,6 +19,15 @@ export type {
   ContentTextBlock,
   ContentTextBlockKind,
 } from './entities/product-pages/content-product';
+export { oldSiteImportMaxItems } from './entities/product-pages/old-site-import';
+export type {
+  OldSiteImportItems,
+  OldSiteImportNote,
+  OldSiteImportOptions,
+  OldSiteImportReport,
+} from './entities/product-pages/old-site-import';
+export { readOldSiteImportFile } from './mappers/product-pages/old-site-import-file';
+export type { OldSiteImportFile } from './mappers/product-pages/old-site-import-file';
 export {
   contentProductPageSizes,
   contentProductSiteFilters,

@@ -1,6 +1,6 @@
 import { useSetContentProductVisibilityMutation } from '@admin/content/data-access';
 import { contentProductTypeLabel, contentProductTypes } from '@admin/content/model';
-import { ContentProductsTable } from '@admin/content/ui';
+import { ContentProductsTable, OldSiteImportDialog } from '@admin/content/ui';
 import {
   ReferenceFilterChip,
   ReferenceFilterRow,
@@ -9,11 +9,12 @@ import {
   ReferenceSearchBar,
 } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
-import { Alert, Box, Divider, Paper } from '@mui/material';
+import { Alert, Box, Button, Divider, Paper } from '@mui/material';
 import { useState } from 'react';
 
 import { ContentProductDrawer } from './content-product-drawer';
 import { useContentProductList } from '../../hooks/product-pages/use-content-product-list';
+import { useOldSiteImport } from '../../hooks/product-pages/use-old-site-import';
 
 import type { ContentProductRow, ContentProductsViewer } from '@admin/content/model';
 
@@ -29,6 +30,7 @@ const siteFilters = [
  */
 export function ContentProductsContent({ viewer }: { viewer: ContentProductsViewer }) {
   const state = useContentProductList();
+  const transfer = useOldSiteImport();
   const [notice, setNotice] = useState<{ text: string; ok: boolean } | null>(null);
   const [opened, setOpened] = useState<ContentProductRow | null>(null);
   const [savingId, setSavingId] = useState<number | null>(null);
@@ -60,7 +62,13 @@ export function ContentProductsContent({ viewer }: { viewer: ContentProductsView
     <Box sx={{ minWidth: 0 }}>
       <ReferencePageHeader
         title="Товари сайту"
-        actions={null}
+        actions={
+          viewer.canCreate ? (
+            <Button variant="outlined" onClick={transfer.start}>
+              Перенести зі старого сайту
+            </Button>
+          ) : null
+        }
         subtitle="Що публічний сайт показує про кожен товар: адреса сторінки, SEO, опис і характеристики двома мовами. Назва, фото, тканини й ціни беруться з «Товари»."
       />
       {notice && (
@@ -134,6 +142,19 @@ export function ContentProductsContent({ viewer }: { viewer: ContentProductsView
           onToggle={(row, showOnSite) => void toggle(row, showOnSite)}
         />
       </Paper>
+      <OldSiteImportDialog
+        open={transfer.open}
+        fileName={transfer.fileName}
+        options={transfer.options}
+        report={transfer.report}
+        message={transfer.message}
+        running={transfer.running}
+        canTransfer={transfer.canTransfer}
+        onPick={transfer.pick}
+        onOptions={transfer.setOptions}
+        onTransfer={transfer.transfer}
+        onClose={transfer.close}
+      />
       {opened && (
         <ContentProductDrawer
           key={opened.productId}
