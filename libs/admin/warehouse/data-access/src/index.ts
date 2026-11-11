@@ -22,3 +22,9 @@ export {
   useReverseFabricIssueMutation,
 } from './api/item-fabric.api';
 export type { ItemFabricScope } from './api/item-fabric.api';
+export {
+  useGetFabricBookingQuery,
+  useGetFabricPlanFactQuery,
+  useGetFabricValuationQuery,
+  useGetHardwareOrderQuery,
+} from './api/stock-reports.api';
