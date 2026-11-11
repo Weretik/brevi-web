@@ -4088,7 +4088,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/production/fabric-stock': {
+  '/api/warehouse/fabric-stock': {
     parameters: {
       query?: never;
       header?: never;
@@ -4105,7 +4105,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/production/fabric-stock/choices': {
+  '/api/warehouse/fabric-stock/choices': {
     parameters: {
       query?: never;
       header?: never;
@@ -4122,7 +4122,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/production/fabric-stock/{id}': {
+  '/api/warehouse/fabric-stock/{id}': {
     parameters: {
       query?: never;
       header?: never;
@@ -4139,7 +4139,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/production/fabric-stock/movements': {
+  '/api/warehouse/fabric-stock/movements': {
     parameters: {
       query?: never;
       header?: never;
@@ -4156,7 +4156,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/production/fabric-stock/{id}/correction': {
+  '/api/warehouse/fabric-stock/{id}/correction': {
     parameters: {
       query?: never;
       header?: never;
@@ -4173,7 +4173,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/production/fabric-stock/{id}/movements/{movementId}/reverse': {
+  '/api/warehouse/fabric-stock/{id}/movements/{movementId}/reverse': {
     parameters: {
       query?: never;
       header?: never;
@@ -4190,7 +4190,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/production/fabric-stock/consumption': {
+  '/api/warehouse/fabric-stock/consumption': {
     parameters: {
       query?: never;
       header?: never;
@@ -4207,7 +4207,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/production/fabric-stock/import': {
+  '/api/warehouse/fabric-stock/import': {
     parameters: {
       query?: never;
       header?: never;
@@ -4224,7 +4224,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/production/orders/{id}/items/{itemId}/fabric': {
+  '/api/warehouse/orders/{id}/items/{itemId}/fabric': {
     parameters: {
       query?: never;
       header?: never;
@@ -4241,7 +4241,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/production/orders/{id}/items/{itemId}/fabric-issues': {
+  '/api/warehouse/orders/{id}/items/{itemId}/fabric-issues': {
     parameters: {
       query?: never;
       header?: never;
@@ -4258,7 +4258,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  '/api/production/orders/{id}/fabric-issues/{issueId}/reverse': {
+  '/api/warehouse/orders/{id}/fabric-issues/{issueId}/reverse': {
     parameters: {
       query?: never;
       header?: never;
@@ -5380,6 +5380,57 @@ export interface paths {
     };
     /** @description A product page by its address. A Russian request for a product without Russian texts gets the Ukrainian texts, and language says which came back. */
     get: operations['getPublicCatalogProduct'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/public/catalog/categories': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description The category tree of the site. Categories marked «На сайті» in their order, each with its marked subcategories. A subcategory of a hidden category is left out. A marked category without products comes back too. */
+    get: operations['getPublicCatalogCategories'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/public/catalog/categories/{slug}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description A category page by its address with SEO and text. A Russian request for a category without Russian texts gets the Ukrainian ones, and language says which came back. */
+    get: operations['getPublicCatalogCategory'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/public/catalog/category-slugs': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Addresses of every shown category, for the sitemap and for building pages ahead of time. */
+    get: operations['getPublicCatalogCategorySlugs'];
     put?: never;
     post?: never;
     delete?: never;
@@ -12306,6 +12357,16 @@ export interface components {
       fabricDetails?: string | null;
       prices?: components['schemas']['ContentPriceTiersResponse'] | null;
     };
+    PublicCatalogCategoryLink: {
+      slug: string;
+      name: string;
+    };
+    PublicCatalogProductCategory: {
+      slug: string;
+      name: string;
+      /** @description The top-level category of a subcategory, for the breadcrumbs. */
+      parent?: components['schemas']['PublicCatalogCategoryLink'] | null;
+    };
     PublicCatalogProduct: {
       slug: string;
       /** @enum {string} */
@@ -12330,6 +12391,50 @@ export interface components {
       /** @description Prices of a PPE product, or the lowest tier prices of a sewing model. */
       prices?: components['schemas']['ContentPriceTiersResponse'] | null;
       variants: components['schemas']['PublicCatalogVariant'][];
+      /** Format: date-time */
+      updatedAtUtc: string;
+      /** @description Shown site categories the product is in, in tree order. */
+      categories: components['schemas']['PublicCatalogProductCategory'][];
+    };
+    PublicCatalogCategory: {
+      /** @description The same for both languages and unique in the tree. */
+      slug: string;
+      nameUk: string;
+      /** @description The Russian name, or the Ukrainian one when there is none. */
+      nameRu: string;
+      /**
+       * Format: int32
+       * @description Products on the site in the category and its subcategories, each counted once.
+       */
+      productCount: number;
+      /** @description Subcategories; empty for a subcategory. */
+      children: components['schemas']['PublicCatalogCategory'][];
+    };
+    PublicCatalogCategoryTree: {
+      categories: components['schemas']['PublicCatalogCategory'][];
+    };
+    PublicCatalogChildCategory: {
+      slug: string;
+      name: string;
+      /** Format: int32 */
+      productCount: number;
+    };
+    PublicCatalogCategoryPage: {
+      slug: string;
+      name: string;
+      /**
+       * @description Language of the texts that came back.
+       * @enum {string}
+       */
+      language: 'uk' | 'ru';
+      /** @description The top-level category of a subcategory. */
+      parent?: components['schemas']['PublicCatalogCategoryLink'] | null;
+      children: components['schemas']['PublicCatalogChildCategory'][];
+      seoTitle?: string | null;
+      seoDescription?: string | null;
+      text: components['schemas']['ProductTextBlock'][];
+      /** Format: int32 */
+      productCount: number;
       /** Format: date-time */
       updatedAtUtc: string;
     };
@@ -29470,6 +29575,8 @@ export interface operations {
         type?: 'Sewing' | 'Ppe';
         /** @description A section id from the tree. */
         sectionId?: number;
+        /** @description Address of a shown site category. Its products and those of its subcategories come back in the order of the category. */
+        category?: string;
         page?: number;
         pageSize?: number;
       };
@@ -29488,8 +29595,15 @@ export interface operations {
           'application/json': components['schemas']['PublicCatalogCardPage'];
         };
       };
-      /** @description Wrong language, type, section or paging */
+      /** @description Wrong language, type, section, category or paging */
       400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such category, or it is hidden */
+      404: {
         headers: {
           [name: string]: unknown;
         };
@@ -29532,6 +29646,84 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+    };
+  };
+  getPublicCatalogCategories: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Tree */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PublicCatalogCategoryTree'];
+        };
+      };
+    };
+  };
+  getPublicCatalogCategory: {
+    parameters: {
+      query?: {
+        language?: components['parameters']['Language'];
+      };
+      header?: never;
+      path: {
+        slug: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Category */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PublicCatalogCategoryPage'];
+        };
+      };
+      /** @description Wrong language */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such address, or the category is hidden */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getPublicCatalogCategorySlugs: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Addresses */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PublicCatalogSlug'][];
+        };
       };
     };
   };

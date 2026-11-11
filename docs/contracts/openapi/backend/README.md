@@ -20,7 +20,8 @@ docs/sdd/contracts/
 - Identity: [session](identity/session.openapi.yaml), [access rights](identity/access.openapi.yaml).
 - Catalog: [products](catalog/product-catalog.openapi.yaml), [«Товари» page overview](catalog/product-overview.openapi.yaml), [categories](catalog/product-dependencies.openapi.yaml).
 - Media: [photo library with folders](media/media-library.openapi.yaml).
-- Production: [workshop references](production/workshop-references.openapi.yaml), [orders](production/production-orders.openapi.yaml), [fabric stock](production/fabric-stock.openapi.yaml).
+- Production: [workshop references](production/workshop-references.openapi.yaml), [orders](production/production-orders.openapi.yaml).
+- Warehouse: [fabric stock](warehouse/fabric-stock.openapi.yaml).
 - Reference: [suppliers](reference/suppliers.openapi.yaml), [fabrics](reference/fabrics.openapi.yaml), [garment accessories](reference/garment-accessories.openapi.yaml), [garment parts](reference/garment-parts.openapi.yaml), [operations](reference/garment-part-operations.openapi.yaml), [pricing parameters and PPE markup rules](reference/pricing-parameters.openapi.yaml), [product sections](reference/product-sections.openapi.yaml), [fabric colours](reference/fabric-colors.openapi.yaml).
 
 OpenAPI files describe the contract of the actual code. They do not make an endpoint publicly accessible: the host endpoint conventions, authorization attributes and fallback policy determine runtime access.
@@ -35,7 +36,7 @@ Do not create a public OpenAPI document for internal-only changes. Before adding
 - Accounting: [«Бухгалтерія»](accounting/finance.openapi.yaml) — «Рахунки і каси» with balances, «Категорії», «Операції», «Перекази», «Огляд», «Контрагенти», «Потребують перевірки» and their change log; director only.
 - Content: [«Контент → Товари» site pages of products](content/content-products.openapi.yaml) — the «Показувати на сайті» mark, address and texts in two languages.
 - Content: [«Контент → Розділи» categories of the site](content/content-categories.openapi.yaml) — the two-level tree, the «Показувати на сайті» mark, address, order and texts in two languages.
-- Content: [public catalog of the site](content/content-public-catalog.openapi.yaml) — anonymous read-only tree, product cards with «від», product by address, addresses for the sitemap.
+- Content: [public catalog of the site](content/content-public-catalog.openapi.yaml) — anonymous read-only tree, site categories with SEO and text, product cards with «від» (also by category), product by address, addresses for the sitemap.
 - Purchasing: [«Рахунки на закупку» register](purchasing/purchase-invoices.openapi.yaml) — purchase invoices read from the Google Sheet «финансы».
 
 - Reminders: [Telegram reminders admin API](reminders/telegram-reminders.openapi.yaml) — tasks, periods, chats, non-working days and bot connection. The Telegram webhook is intentionally not in the contract.

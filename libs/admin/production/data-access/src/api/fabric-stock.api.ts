@@ -51,25 +51,25 @@ const issueChanged = (_result: unknown, error: unknown, { orderId }: { orderId: 
 export const fabricStockApi = productionBaseApi.injectEndpoints({
   endpoints: (build) => ({
     getFabricStock: build.query<FabricStockList, void>({
-      query: () => '/api/production/fabric-stock',
+      query: () => '/api/warehouse/fabric-stock',
       transformResponse: mapFabricStockList,
       transformErrorResponse: errors,
       providesTags: [stockList],
     }),
     getFabricStockChoices: build.query<FabricStockChoices, void>({
-      query: () => '/api/production/fabric-stock/choices',
+      query: () => '/api/warehouse/fabric-stock/choices',
       transformResponse: mapFabricStockChoices,
       transformErrorResponse: errors,
     }),
     getFabricStockLine: build.query<FabricStockLine, number>({
-      query: (id) => `/api/production/fabric-stock/${id}`,
+      query: (id) => `/api/warehouse/fabric-stock/${id}`,
       transformResponse: mapFabricStockLine,
       transformErrorResponse: errors,
       providesTags: (_result, _error, id) => [{ type: 'FabricStock', id }],
     }),
     createFabricMovement: build.mutation<FabricStockLine, CreateFabricMovementBody>({
       query: (body) => ({
-        url: '/api/production/fabric-stock/movements',
+        url: '/api/warehouse/fabric-stock/movements',
         method: 'POST',
         body: movementInput(body),
       }),
@@ -82,7 +82,7 @@ export const fabricStockApi = productionBaseApi.injectEndpoints({
       { id: number; body: CorrectFabricStockBody }
     >({
       query: ({ id, body }) => ({
-        url: `/api/production/fabric-stock/${id}/correction`,
+        url: `/api/warehouse/fabric-stock/${id}/correction`,
         method: 'POST',
         body: correctionInput(body),
       }),
@@ -95,7 +95,7 @@ export const fabricStockApi = productionBaseApi.injectEndpoints({
       { id: number; movementId: number; version: number; note: string }
     >({
       query: ({ id, movementId, version, note }) => ({
-        url: `/api/production/fabric-stock/${id}/movements/${movementId}/reverse`,
+        url: `/api/warehouse/fabric-stock/${id}/movements/${movementId}/reverse`,
         method: 'POST',
         body: { version, note } satisfies Schemas['ReverseFabricMovementInput'],
       }),
@@ -104,7 +104,7 @@ export const fabricStockApi = productionBaseApi.injectEndpoints({
       invalidatesTags: stockChanged,
     }),
     getFabricConsumption: build.query<FabricConsumption, { from: string; to: string }>({
-      query: (params) => ({ url: '/api/production/fabric-stock/consumption', params }),
+      query: (params) => ({ url: '/api/warehouse/fabric-stock/consumption', params }),
       transformResponse: mapFabricConsumption,
       transformErrorResponse: errors,
       providesTags: [{ type: 'FabricStock', id: 'CONSUMPTION' }],
@@ -114,7 +114,7 @@ export const fabricStockApi = productionBaseApi.injectEndpoints({
       { file: FabricStockImportFile; dryRun: boolean }
     >({
       query: ({ file, dryRun }) => ({
-        url: '/api/production/fabric-stock/import',
+        url: '/api/warehouse/fabric-stock/import',
         method: 'POST',
         params: { dryRun },
         body: file,
@@ -126,7 +126,7 @@ export const fabricStockApi = productionBaseApi.injectEndpoints({
     }),
     getProductionItemFabric: build.query<ProductionItemFabric, { orderId: number; itemId: number }>(
       {
-        query: ({ orderId, itemId }) => `/api/production/orders/${orderId}/items/${itemId}/fabric`,
+        query: ({ orderId, itemId }) => `/api/warehouse/orders/${orderId}/items/${itemId}/fabric`,
         transformResponse: mapProductionItemFabric,
         transformErrorResponse: errors,
         providesTags: (_result, _error, { itemId }) => [{ type: 'ItemFabric', id: itemId }],
@@ -137,7 +137,7 @@ export const fabricStockApi = productionBaseApi.injectEndpoints({
       { orderId: number; itemId: number; body: CreateFabricIssueBody }
     >({
       query: ({ orderId, itemId, body }) => ({
-        url: `/api/production/orders/${orderId}/items/${itemId}/fabric-issues`,
+        url: `/api/warehouse/orders/${orderId}/items/${itemId}/fabric-issues`,
         method: 'POST',
         body: issueInput(body),
       }),
@@ -150,7 +150,7 @@ export const fabricStockApi = productionBaseApi.injectEndpoints({
       { orderId: number; issueId: number; orderVersion: number; reason: string }
     >({
       query: ({ orderId, issueId, orderVersion, reason }) => ({
-        url: `/api/production/orders/${orderId}/fabric-issues/${issueId}/reverse`,
+        url: `/api/warehouse/orders/${orderId}/fabric-issues/${issueId}/reverse`,
         method: 'POST',
         body: { orderVersion, reason } satisfies Schemas['ReverseFabricIssueInput'],
       }),

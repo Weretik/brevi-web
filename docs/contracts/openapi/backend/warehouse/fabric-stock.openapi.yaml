@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
-  title: 'Production: fabric stock'
+  title: 'Warehouse: fabric stock'
   version: 1.0.0
-  description: 'Stage 4 of «Швейний цех» (PRD-004): «Склад тканин». A line is one fabric of «Тканини» (FAB- code) in one colour;
+  description: 'Warehouse module (WH-001), moved from stage 4 of «Швейний цех» (PRD-004): «Склад тканин». A line is one fabric of «Тканини» (FAB- code) in one colour;
     the balance changes only through movements (opening, receipt, issue, correction, reversal). Reservation is computed from
     the norms of items of «Нове» orders minus what issues covered. Everyone who sees production orders reads the stock; WorkshopChief
     and Admin move it and see its value in UAH; Admin alone moves the old stock.'
@@ -11,7 +11,7 @@ servers:
 security:
 - Bearer: []
 paths:
-  /api/production/fabric-stock:
+  /api/warehouse/fabric-stock:
     get:
       tags: &id001
       - Production
@@ -38,7 +38,7 @@ paths:
           description: Not allowed
         '400':
           description: Invalid
-  /api/production/fabric-stock/choices:
+  /api/warehouse/fabric-stock/choices:
     get:
       tags: *id001
       operationId: getFabricStockChoices
@@ -54,7 +54,7 @@ paths:
           description: Not signed in
         '403':
           description: Not allowed
-  /api/production/fabric-stock/{id}:
+  /api/warehouse/fabric-stock/{id}:
     get:
       tags: *id001
       operationId: getFabricStockLine
@@ -78,7 +78,7 @@ paths:
           description: Not allowed
         '404':
           description: No such line
-  /api/production/fabric-stock/movements:
+  /api/warehouse/fabric-stock/movements:
     post:
       tags: *id001
       operationId: createFabricMovement
@@ -106,7 +106,7 @@ paths:
           description: No such fabric or supplier
         '409':
           description: Stale version or opening not first
-  /api/production/fabric-stock/{id}/correction:
+  /api/warehouse/fabric-stock/{id}/correction:
     post:
       tags: *id001
       operationId: correctFabricStock
@@ -139,7 +139,7 @@ paths:
           description: No such line
         '409':
           description: Stale version
-  /api/production/fabric-stock/{id}/movements/{movementId}/reverse:
+  /api/warehouse/fabric-stock/{id}/movements/{movementId}/reverse:
     post:
       tags: *id001
       operationId: reverseFabricMovement
@@ -176,7 +176,7 @@ paths:
           description: No such line or movement
         '409':
           description: Stale, already reversed, or an issue
-  /api/production/fabric-stock/consumption:
+  /api/warehouse/fabric-stock/consumption:
     get:
       tags: *id001
       operationId: getFabricConsumption
@@ -205,7 +205,7 @@ paths:
           description: Not allowed
         '400':
           description: Invalid period
-  /api/production/fabric-stock/import:
+  /api/warehouse/fabric-stock/import:
     post:
       tags: *id001
       operationId: importFabricStock
@@ -236,7 +236,7 @@ paths:
           description: Not allowed
         '400':
           description: Invalid file
-  /api/production/orders/{id}/items/{itemId}/fabric:
+  /api/warehouse/orders/{id}/items/{itemId}/fabric:
     get:
       tags: *id001
       operationId: getProductionItemFabric
@@ -263,7 +263,7 @@ paths:
           description: Not allowed
         '404':
           description: No such order or item
-  /api/production/orders/{id}/items/{itemId}/fabric-issues:
+  /api/warehouse/orders/{id}/items/{itemId}/fabric-issues:
     post:
       tags: *id001
       operationId: createFabricIssue
@@ -300,7 +300,7 @@ paths:
           description: No such order, item or fabric
         '409':
           description: Stale order or stock
-  /api/production/orders/{id}/fabric-issues/{issueId}/reverse:
+  /api/warehouse/orders/{id}/fabric-issues/{issueId}/reverse:
     post:
       tags: *id001
       operationId: reverseFabricIssue
