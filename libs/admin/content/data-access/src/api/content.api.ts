@@ -30,4 +30,5 @@ export const {
   useSaveContentArticleMutation,
   useSetContentArticleVisibilityMutation,
   useDeleteContentArticleMutation,
+  useImportOldSiteArticlesMutation,
 } = contentApi;

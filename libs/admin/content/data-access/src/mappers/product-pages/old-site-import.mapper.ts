@@ -1,6 +1,7 @@
 import { flag, integer, list, nullableText, record, text } from '../../validators/content-response';
 
 import type {
+  ArticleImportReport,
   OldSiteImportNote,
   OldSiteImportReport,
   SiteCategoryImportReport,
@@ -33,5 +34,22 @@ export function mapSiteCategoryImportReport(value: unknown): SiteCategoryImportR
   return {
     ...mapOldSiteImportReport(value),
     productLinks: integer(report['productLinks'], 'додано товарів'),
+  };
+}
+
+export function mapArticleImportReport(value: unknown): ArticleImportReport {
+  const report = record(value, 'звіт перенесення статей');
+  const dryRun = flag(report['dryRun'], 'перевірка');
+  return {
+    dryRun,
+    total: integer(report['total'], 'усього'),
+    created: integer(report['created'], 'створено'),
+    updated: integer(report['updated'], 'оновлено'),
+    kept: integer(report['kept'], 'залишено'),
+    photos: dryRun
+      ? integer(report['photosToDownload'], 'фото до перенесення')
+      : integer(report['photosDownloaded'], 'перенесено фото'),
+    notMatched: [],
+    problems: list(report['problems'], 'проблеми').map(mapNote),
   };
 }

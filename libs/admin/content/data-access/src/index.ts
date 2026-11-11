@@ -18,4 +18,5 @@ export {
   useSaveContentArticleMutation,
   useSetContentArticleVisibilityMutation,
   useDeleteContentArticleMutation,
+  useImportOldSiteArticlesMutation,
 } from './api/content.api';

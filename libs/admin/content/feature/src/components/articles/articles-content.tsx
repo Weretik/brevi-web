@@ -3,15 +3,28 @@ import {
   useSetContentArticleVisibilityMutation,
 } from '@admin/content/data-access';
 import { articleTitle, filterArticles } from '@admin/content/model';
-import { ArticlesTable } from '@admin/content/ui';
+import { ArticlesTable, OldSiteImportDialog } from '@admin/content/ui';
 import { ReferenceListAlerts, ReferencePageHeader, ReferenceSearchBar } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
-import { Alert, Box, Button, Paper } from '@mui/material';
+import { Alert, Box, Button, Paper, Stack } from '@mui/material';
 import { useMemo, useState } from 'react';
 
 import { ArticleDrawer } from './article-drawer';
+import { useOldSiteArticleImport } from '../../hooks/articles/use-old-site-article-import';
 
 import type { ArticleRow, ArticlesViewer } from '@admin/content/model';
+import type { OldSiteImportCopy } from '@admin/content/ui';
+
+const transferCopy: OldSiteImportCopy = {
+  title: 'Перенести статті зі старого сайту',
+  intro:
+    'Файл перенесення містить статті старого сайту з датами, назвами, SEO і текстами двома мовами. Фото статей завантажуємо у «Фото», папка «Старий сайт / Статті», тому перенесення триває кілька хвилин. Спершу показуємо, що буде зроблено; нічого не зберігається, доки не натиснути «Перенести».',
+  showOnSite: 'Одразу показувати перенесені статті на сайті',
+  overwrite: 'Замінити статті, які вже є',
+  done: 'Статті перенесено.',
+  total: 'Статей у файлі',
+  notMatched: '',
+};
 
 const noRows: ArticleRow[] = [];
 
@@ -28,6 +41,7 @@ export function ArticlesContent({ viewer }: { viewer: ArticlesViewer }) {
   const [opened, setOpened] = useState<number | null | undefined>(undefined);
   const [savingId, setSavingId] = useState<number | null>(null);
   const [setVisibility] = useSetContentArticleVisibilityMutation();
+  const transfer = useOldSiteArticleImport();
   const shown = useMemo(() => filterArticles(rows, term), [rows, term]);
 
   async function toggle(row: ArticleRow, showOnSite: boolean) {
@@ -54,9 +68,14 @@ export function ArticlesContent({ viewer }: { viewer: ArticlesViewer }) {
         title="Статті"
         actions={
           viewer.canCreate ? (
-            <Button variant="contained" onClick={() => setOpened(null)}>
-              Додати статтю
-            </Button>
+            <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap' }}>
+              <Button variant="outlined" onClick={transfer.start}>
+                Перенести зі старого сайту
+              </Button>
+              <Button variant="contained" onClick={() => setOpened(null)}>
+                Додати статтю
+              </Button>
+            </Stack>
           ) : null
         }
         subtitle="Статті публічного сайту: дата, адреса, обкладинка, SEO і текст із фото двома мовами. Приховану статтю сайт не показує."
@@ -97,6 +116,22 @@ export function ArticlesContent({ viewer }: { viewer: ArticlesViewer }) {
           onToggle={(row, showOnSite) => void toggle(row, showOnSite)}
         />
       </Paper>
+      <OldSiteImportDialog
+        open={transfer.open}
+        copy={transferCopy}
+        photos={transfer.report?.photos ?? null}
+        progress={transfer.progress}
+        fileName={transfer.fileName}
+        options={transfer.options}
+        report={transfer.report}
+        message={transfer.message}
+        running={transfer.running}
+        canTransfer={transfer.canTransfer}
+        onPick={transfer.pick}
+        onOptions={transfer.setOptions}
+        onTransfer={transfer.transfer}
+        onClose={transfer.close}
+      />
       {opened !== undefined && (
         <ArticleDrawer
           key={opened ?? 'new'}

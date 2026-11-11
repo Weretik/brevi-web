@@ -5,14 +5,24 @@ import {
   mapArticleList,
   mapArticleVisibility,
 } from '../../mappers/articles/article.mapper';
+import { mapArticleImportReport } from '../../mappers/product-pages/old-site-import.mapper';
 
 import type { ContentEndpointBuilder } from '../content-endpoint-builder';
-import type { Article, ArticleInput, ArticleRow, ArticleVisibility } from '@admin/content/model';
+import type {
+  Article,
+  ArticleImportReport,
+  ArticleInput,
+  ArticleRow,
+  ArticleVisibility,
+  OldSiteImportItems,
+  OldSiteImportOptions,
+} from '@admin/content/model';
 import type { operations } from '@admin/shared/contracts';
 
 type SaveBody = operations['saveContentArticle']['requestBody']['content']['application/json'];
 type VisibilityBody =
   operations['setContentArticleVisibility']['requestBody']['content']['application/json'];
+type ImportBody = operations['importOldSiteArticles']['requestBody']['content']['application/json'];
 
 export function articleEndpoints(build: ContentEndpointBuilder) {
   return {
@@ -58,6 +68,21 @@ export function articleEndpoints(build: ContentEndpointBuilder) {
       query: (id) => ({ url: `/api/content/articles/${id}`, method: 'DELETE' }),
       transformErrorResponse: articleApiError,
       invalidatesTags: (_result, _error, id) => [articlesTag, articleTag(id)],
+    }),
+    /** One-time transfer of old-site articles: a check (`dryRun`) or the transfer of one part of the file. */
+    importOldSiteArticles: build.mutation<
+      ArticleImportReport,
+      OldSiteImportOptions & { items: OldSiteImportItems; dryRun: boolean }
+    >({
+      query: ({ items, dryRun, showOnSite, overwrite }) => ({
+        url: '/api/content/articles/old-site-import',
+        method: 'POST',
+        // The file is passed as it is; the server checks every article.
+        body: { items: items as unknown as ImportBody['items'], dryRun, showOnSite, overwrite },
+      }),
+      transformResponse: mapArticleImportReport,
+      transformErrorResponse: articleApiError,
+      invalidatesTags: (report) => (report && !report.dryRun ? ['ContentArticle'] : []),
     }),
   };
 }

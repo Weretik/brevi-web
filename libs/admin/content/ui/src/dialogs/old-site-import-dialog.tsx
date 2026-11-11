@@ -48,6 +48,10 @@ interface Props {
   copy?: OldSiteImportCopy;
   /** Products the transfer adds to categories; shown only by the category transfer. */
   productLinks?: number | null;
+  /** Pictures the transfer brings into «Фото»; shown only by the article transfer. */
+  photos?: number | null;
+  /** How far a transfer sent in parts has got, in words. */
+  progress?: string | null;
   fileName: string | null;
   options: OldSiteImportOptions;
   report: OldSiteImportReport | null;
@@ -88,6 +92,8 @@ export function OldSiteImportDialog({
   open,
   copy = productCopy,
   productLinks = null,
+  photos = null,
+  progress = null,
   fileName,
   options,
   report,
@@ -159,6 +165,11 @@ export function OldSiteImportDialog({
               />
             </Stack>
           )}
+          {progress && (
+            <Typography variant="body2" role="status">
+              {progress}
+            </Typography>
+          )}
           {message && <Alert severity="error">{message}</Alert>}
           {report && (
             <Stack sx={{ gap: 1.5 }}>
@@ -169,6 +180,8 @@ export function OldSiteImportDialog({
                 Залишено без змін: {report.kept}
                 {productLinks !== null &&
                   ` · ${done ? 'Додано товарів у розділи' : 'Буде додано товарів у розділи'}: ${productLinks}`}
+                {photos !== null &&
+                  ` · ${done ? 'Перенесено фото' : 'Буде перенесено фото'}: ${photos}`}
               </Typography>
               <Notes title={copy.notMatched} notes={report.notMatched} />
               <Notes title="Не вдалося перенести" notes={report.problems} />

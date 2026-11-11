@@ -13,7 +13,9 @@ The owner asked on 2026-11-11 to manage the articles of the public site in the A
 - Side panel: view first, then «Редагувати»; «Додати статтю» opens it as a form; delete with a confirmation.
 - The shared visual editor gets a «Фото» button for texts that may have pictures.
 
-Not here (later stages of CNT-004): the transfer of the old-site articles and the site reading the articles. Until then the site keeps its own articles.
+- «Перенести зі старого сайту» (stage 3 of CNT-004): the one-time transfer of the old-site articles from a prepared file.
+
+Not here (stage 4 of CNT-004): the site reading the articles. Until then the site keeps its own articles.
 
 ## Rules
 
@@ -26,6 +28,7 @@ Not here (later stages of CNT-004): the transfer of the old-site articles and th
 - R-07: Save sends the whole article with the revision that was opened. A stale revision, a taken address or a missing photo come back as the server's message in the panel.
 - R-08: «Видалити статтю» asks for a confirmation that says the photos stay in the library and that hiding is the switch.
 - R-09: «Права доступу», page `content-articles`: without «Створювати» there is no «Додати статтю»; without «Редагувати» the switch is disabled and the panel has no «Редагувати»; without «Видаляти» there is no «Видалити статтю». Defaults: Admin everything, Manager view.
+- R-10: «Перенести зі старого сайту» is shown with «Створювати». Staff choose the file; the server counts in one request what would happen (articles created, replaced, kept, photos to bring) and nothing is saved before «Перенести». The transfer itself is sent in parts of three articles, because the server downloads the photos into «Фото» while it runs; the dialog shows how many articles are done and one summed report with the photos that could not be brought. A part that fails stops the transfer; moved articles stay and a repeated run keeps them.
 
 ## Scenarios
 
@@ -34,6 +37,7 @@ Not here (later stages of CNT-004): the transfer of the old-site articles and th
 - SC-03: An admin switches an article on from the list.
 - SC-04: An admin opens an article, puts a photo into the text with the «Фото» button and saves.
 - SC-05: An admin deletes an article after the confirmation.
+- SC-06: An admin chooses the transfer file, sees the count and presses «Перенести»; the articles come in parts with their photos.
 
 ## File-role map
 
@@ -48,6 +52,9 @@ Not here (later stages of CNT-004): the transfer of the old-site articles and th
 | `libs/admin/content/model/src/validators/articles/article-validation.ts`                                                        | server limits, date, address                                   |
 | `libs/admin/content/data-access/src/api/articles/`, `mappers/articles/`, `errors/article-api-error.ts`, `cache/article-tags.ts` | endpoints and runtime-checked responses                        |
 | `libs/admin/content/ui/src/tables/articles/`, `forms/articles/`, `components/articles/`, `dialogs/article-delete-dialog.tsx`    | table, editor fields, read-only view, delete confirmation      |
+| `libs/admin/content/model/src/entities/articles/article-import.ts`, `mappers/articles/article-import-file.ts`                   | transfer report, file check, parts of three, summed report     |
+| `libs/admin/content/feature/src/hooks/articles/use-old-site-article-import.ts`                                                  | transfer state: check in one request, transfer in parts        |
+| `libs/admin/content/ui/src/dialogs/old-site-import-dialog.tsx`                                                                  | shared transfer dialog; shows photos and progress for articles |
 | `libs/admin/content/feature/src/hooks/articles/use-article-editor.ts`                                                           | panel state: view, edit, save, delete                          |
 | `libs/admin/content/feature/src/components/articles/`                                                                           | page content and the side panel with the «Фото» library        |
 | `libs/admin/content/feature/src/pages/articles/articles-page.tsx`, `content.routes.tsx`                                         | route `/content/articles`                                      |
@@ -62,3 +69,4 @@ Not here (later stages of CNT-004): the transfer of the old-site articles and th
 | R-05 editor              | `libs/admin/shared/ui/src/inputs/rich-text-editor/rich-text-editor.component.test.tsx`   |
 | SC-01..SC-05, R-03, R-09 | `libs/admin/content/feature/src/components/articles/articles-content.component.test.tsx` |
 | menu and rights          | `apps/admin-react/src/app/router/navigation-config.unit.test.ts`                         |
+| R-10, SC-06              | `article-import-file.unit.test.ts`, `articles-content.component.test.tsx`                |
