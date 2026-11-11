@@ -56,6 +56,8 @@ export interface ContentProductRow {
   hasRussianText: boolean;
   hasSeo: boolean;
   updatedAtUtc: string | null;
+  /** Number of site categories («Розділи сайту») the product is in. */
+  categoryCount: number;
 }
 
 export interface ContentProductPage {
@@ -90,6 +92,8 @@ export interface ContentProduct {
   ru: ContentProductText;
   prices: ContentPriceTiers | null;
   variants: ContentProductVariant[];
+  /** Site categories the product is in. */
+  categoryIds: number[];
 }
 
 export interface ContentProductVisibility {

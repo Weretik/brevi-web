@@ -1,4 +1,8 @@
-import { contentProductProblems, contentProductTypeLabel } from '@admin/content/model';
+import {
+  contentProductProblems,
+  contentProductTypeLabel,
+  siteCategoryPath,
+} from '@admin/content/model';
 import { ReferenceDetailsList, ReferenceFormSection } from '@admin/references/ui';
 import { Alert, Box, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
@@ -6,7 +10,12 @@ import { useState } from 'react';
 import { ContentLanguageTabs } from './content-language-tabs';
 import { ContentTextPreview } from './content-text-preview';
 
-import type { ContentLanguage, ContentPriceTiers, ContentProduct } from '@admin/content/model';
+import type {
+  ContentLanguage,
+  ContentPriceTiers,
+  ContentProduct,
+  SiteCategoryRow,
+} from '@admin/content/model';
 
 const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' };
 const money = (value: number) =>
@@ -20,11 +29,24 @@ const tiers = (prices: ContentPriceTiers | null) =>
  * Read-only side of the panel: what the site takes from «Товари» (cannot be changed here) and the
  * texts of the page in both languages.
  */
-export function ContentProductView({ product }: { product: ContentProduct }) {
+export function ContentProductView({
+  product,
+  categories,
+}: {
+  product: ContentProduct;
+  /** The tree of «Розділи сайту»; null when the staff member may not see it. */
+  categories: readonly SiteCategoryRow[] | null;
+}) {
   const [language, setLanguage] = useState<ContentLanguage>('uk');
   const row = product.product;
   const problems = contentProductProblems(row);
   const active = product.variants.filter((variant) => variant.isActive);
+  const inCategories = categories
+    ? categories
+        .filter((category) => product.categoryIds.includes(category.id))
+        .map((category) => siteCategoryPath(category, categories))
+        .join('; ') || 'немає'
+    : `обрано: ${product.categoryIds.length}`;
 
   return (
     <Stack sx={{ gap: 2 }}>
@@ -43,6 +65,7 @@ export function ContentProductView({ product }: { product: ContentProduct }) {
           items={[
             { label: 'Показувати на сайті', value: row.showOnSite ? 'Так' : 'Ні' },
             { label: 'Адреса', value: `/product/${product.slug}`, mono: true },
+            { label: 'Розділи сайту', value: inCategories },
           ]}
         />
       </ReferenceFormSection>

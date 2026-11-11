@@ -42,6 +42,7 @@ export function mapContentProductRow(value: unknown): ContentProductRow {
     hasRussianText: flag(row['hasRussianText'], 'текст російською'),
     hasSeo: flag(row['hasSeo'], 'SEO'),
     updatedAtUtc: nullableDateTime(row['updatedAtUtc'], 'час зміни'),
+    categoryCount: integer(row['categoryCount'], 'кількість розділів'),
   };
 }
 
@@ -121,6 +122,9 @@ export function mapContentProduct(value: unknown): ContentProduct {
         prices: mapPrices(variant['prices']),
       };
     }),
+    categoryIds: list(product['categoryIds'], 'розділи сайту').map((id) =>
+      integer(id, 'id розділу', 1),
+    ),
   };
 }
 

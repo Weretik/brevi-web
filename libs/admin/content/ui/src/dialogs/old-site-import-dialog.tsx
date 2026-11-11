@@ -20,8 +20,34 @@ import type {
   OldSiteImportReport,
 } from '@admin/content/model';
 
+/** Words of the dialog; the defaults are those of the product transfer. */
+export interface OldSiteImportCopy {
+  title: string;
+  intro: string;
+  showOnSite: string;
+  overwrite: string;
+  done: string;
+  /** «Сторінок у файлі» */
+  total: string;
+  notMatched: string;
+}
+
+const productCopy: OldSiteImportCopy = {
+  title: 'Перенести тексти зі старого сайту',
+  intro:
+    'Файл перенесення містить назви, SEO, опис і характеристики товарів старого сайту двома мовами. Сторінка знаходить свій товар за посиланням старого сайту з картки товару. Спершу показуємо, що буде зроблено; нічого не зберігається, доки не натиснути «Перенести».',
+  showOnSite: 'Одразу показувати перенесені товари на сайті',
+  overwrite: 'Замінити тексти сторінок, які вже заповнені',
+  done: 'Тексти перенесено.',
+  total: 'Сторінок у файлі',
+  notMatched: 'Не знайдено товар у «Товари»',
+};
+
 interface Props {
   open: boolean;
+  copy?: OldSiteImportCopy;
+  /** Products the transfer adds to categories; shown only by the category transfer. */
+  productLinks?: number | null;
   fileName: string | null;
   options: OldSiteImportOptions;
   report: OldSiteImportReport | null;
@@ -60,6 +86,8 @@ function Notes({ title, notes }: { title: string; notes: OldSiteImportNote[] }) 
  */
 export function OldSiteImportDialog({
   open,
+  copy = productCopy,
+  productLinks = null,
   fileName,
   options,
   report,
@@ -82,15 +110,12 @@ export function OldSiteImportDialog({
       maxWidth="sm"
       aria-labelledby="old-site-import-title"
     >
-      <DialogTitle id="old-site-import-title">Перенести тексти зі старого сайту</DialogTitle>
+      <DialogTitle id="old-site-import-title">{copy.title}</DialogTitle>
       {busy && <LinearProgress aria-label="Триває перенесення" />}
       <DialogContent>
         <Stack sx={{ gap: 2 }}>
           <Typography variant="body2" color="text.secondary">
-            Файл перенесення містить назви, SEO, опис і характеристики товарів старого сайту двома
-            мовами. Сторінка знаходить свій товар за посиланням старого сайту з картки товару.
-            Спершу показуємо, що буде зроблено; нічого не зберігається, доки не натиснути
-            «Перенести».
+            {copy.intro}
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
             <input
@@ -120,7 +145,7 @@ export function OldSiteImportDialog({
                     onChange={(_event, showOnSite) => onOptions({ ...options, showOnSite })}
                   />
                 }
-                label="Одразу показувати перенесені товари на сайті"
+                label={copy.showOnSite}
               />
               <FormControlLabel
                 control={
@@ -130,20 +155,22 @@ export function OldSiteImportDialog({
                     onChange={(_event, overwrite) => onOptions({ ...options, overwrite })}
                   />
                 }
-                label="Замінити тексти сторінок, які вже заповнені"
+                label={copy.overwrite}
               />
             </Stack>
           )}
           {message && <Alert severity="error">{message}</Alert>}
           {report && (
             <Stack sx={{ gap: 1.5 }}>
-              {done && <Alert severity="success">Тексти перенесено.</Alert>}
+              {done && <Alert severity="success">{copy.done}</Alert>}
               <Typography variant="body2" role="status">
-                Сторінок у файлі: {report.total} · {done ? 'Створено' : 'Буде створено'}:{' '}
+                {copy.total}: {report.total} · {done ? 'Створено' : 'Буде створено'}:{' '}
                 {report.created} · {done ? 'Замінено' : 'Буде замінено'}: {report.updated} ·
                 Залишено без змін: {report.kept}
+                {productLinks !== null &&
+                  ` · ${done ? 'Додано товарів у розділи' : 'Буде додано товарів у розділи'}: ${productLinks}`}
               </Typography>
-              <Notes title="Не знайдено товар у «Товари»" notes={report.notMatched} />
+              <Notes title={copy.notMatched} notes={report.notMatched} />
               <Notes title="Не вдалося перенести" notes={report.problems} />
             </Stack>
           )}

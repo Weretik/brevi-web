@@ -1,7 +1,7 @@
-import { contentProductLimits } from '@admin/content/model';
+import { contentProductLimits, siteCategoryPath } from '@admin/content/model';
 import { ReferenceFormSection } from '@admin/references/ui';
 import { RichTextEditor } from '@admin/shared/ui';
-import { FormControlLabel, InputAdornment, Switch, TextField } from '@mui/material';
+import { Autocomplete, FormControlLabel, InputAdornment, Switch, TextField } from '@mui/material';
 import { useState } from 'react';
 
 import { ContentFactsEditor } from './content-facts-editor';
@@ -13,12 +13,15 @@ import type {
   ContentProductErrors,
   ContentProductFormValues,
   ContentProductTextValues,
+  SiteCategoryRow,
 } from '@admin/content/model';
 
 interface Props {
   values: ContentProductFormValues;
   errors: ContentProductErrors;
   disabled: boolean;
+  /** The tree of «Розділи сайту»; null when the staff member may not see it. */
+  categories: readonly SiteCategoryRow[] | null;
   onChange: (values: ContentProductFormValues) => void;
 }
 
@@ -28,7 +31,8 @@ const counter = (value: string, limit: number) => `${value.trim().length} з ${l
  * Editor of a product page: the mark, the address and texts by language. The description is edited in
  * the visual editor, facts and characteristics as rows of fields; nothing is typed as markup.
  */
-export function ContentProductForm({ values, errors, disabled, onChange }: Props) {
+export function ContentProductForm({ values, errors, disabled, categories, onChange }: Props) {
+  const options = categories ?? [];
   const [language, setLanguage] = useState<ContentLanguage>('uk');
   const text = values[language];
   const textErrors = errors[language] ?? {};
@@ -64,6 +68,30 @@ export function ContentProductForm({ values, errors, disabled, onChange }: Props
             },
           }}
           fullWidth
+        />
+        <Autocomplete
+          multiple
+          disableCloseOnSelect
+          options={options}
+          value={options.filter((row) => values.categoryIds?.includes(row.id))}
+          disabled={disabled || categories === null || values.categoryIds === null}
+          getOptionLabel={(row) => siteCategoryPath(row, options)}
+          isOptionEqualToValue={(option, value) => option.id === value.id}
+          noOptionsText="Розділів ще немає. Додайте їх у «Розділи сайту»."
+          onChange={(_event, rows) =>
+            onChange({ ...values, categoryIds: rows.map((row) => row.id) })
+          }
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Розділи сайту"
+              helperText={
+                categories === null
+                  ? 'Немає права бачити «Розділи сайту», тому розділи товару лишаються як є.'
+                  : 'У яких розділах каталогу сайт показує товар. Можна обрати кілька.'
+              }
+            />
+          )}
         />
       </ReferenceFormSection>
       <ReferenceFormSection title="Тексти">

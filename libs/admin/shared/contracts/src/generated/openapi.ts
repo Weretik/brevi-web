@@ -5278,6 +5278,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/content/categories/old-site-import': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description One-time transfer of the old-site category tree with SEO, texts and products. A category is matched by its address; a product by the old-site link of its Catalog card (the whole path, then the last part). With dryRun (the default) nothing is written and the answer says what would happen. Categories that already exist keep their texts unless overwrite is true. Products are added to a category and never removed. showOnSite switches transferred categories on and never switches one off. A repeated run continues where the previous one stopped. Needs the create right. */
+    post: operations['importOldSiteCategories'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/content/categories/{id}': {
     parameters: {
       query?: never;
@@ -11943,6 +11960,11 @@ export interface components {
       hasSeo: boolean;
       /** Format: date-time */
       updatedAtUtc?: string | null;
+      /**
+       * Format: int32
+       * @description Number of site categories («Контент → Розділи») the product is in.
+       */
+      categoryCount: number;
     };
     ContentProductPage: {
       items: components['schemas']['ContentProductRow'][];
@@ -12017,6 +12039,8 @@ export interface components {
       ru: components['schemas']['ContentProductTextResponse'];
       prices?: components['schemas']['ContentPriceTiersResponse'] | null;
       variants: components['schemas']['ContentProductVariantResponse'][];
+      /** @description Site categories the product is in. */
+      categoryIds: number[];
     };
     /** @description Texts of one language as staff type them. */
     ProductPageTextInput: {
@@ -12036,6 +12060,8 @@ export interface components {
       showOnSite: boolean;
       uk?: components['schemas']['ProductPageTextInput'] | null;
       ru?: components['schemas']['ProductPageTextInput'] | null;
+      /** @description Replaces the site categories of the product; null or absent keeps them. An unknown id is a 409. */
+      categoryIds?: number[] | null;
     };
     ContentProductVisibilityRequest: {
       showOnSite: boolean;
@@ -12160,6 +12186,46 @@ export interface components {
       /** Format: int32 */
       parentId?: number | null;
       ids: number[];
+    };
+    /** @description A category of the old site with its products in the order of the old site. */
+    OldSiteCategory: {
+      /** @description Lower-case Latin letters, digits and single hyphens, 3 to 120 characters. */
+      slug: string;
+      /** @description Address of the parent category; null on the top level. */
+      parentSlug?: string | null;
+      uk?: components['schemas']['SiteCategoryTextInput'] | null;
+      ru?: components['schemas']['SiteCategoryTextInput'] | null;
+      /** @description Old-site links of the products, or only their last parts. */
+      productUrls?: string[] | null;
+    };
+    ImportOldSiteCategoriesRequest: {
+      items: components['schemas']['OldSiteCategory'][];
+      /** @default true */
+      dryRun: boolean;
+      /** @default false */
+      showOnSite: boolean;
+      /** @default false */
+      overwrite: boolean;
+    };
+    OldSiteCategoryImportResponse: {
+      dryRun: boolean;
+      /** Format: int32 */
+      total: number;
+      /** Format: int32 */
+      created: number;
+      /** Format: int32 */
+      updated: number;
+      /** Format: int32 */
+      kept: number;
+      /**
+       * Format: int32
+       * @description Products added to categories.
+       */
+      productLinks: number;
+      /** @description Old-site products without a Catalog product. */
+      notMatched: components['schemas']['OldSiteImportNote'][];
+      /** @description Categories left out, with the reason; url holds the category address. */
+      problems: components['schemas']['OldSiteImportNote'][];
     };
     SiteCategoryVisibilityRequest: {
       showOnSite: boolean;
@@ -29122,6 +29188,51 @@ export interface operations {
         content: {
           'application/json': components['schemas']['Messages'];
         };
+      };
+    };
+  };
+  importOldSiteCategories: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ImportOldSiteCategoriesRequest'];
+      };
+    };
+    responses: {
+      /** @description Counted (dryRun) or transferred */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['OldSiteCategoryImportResponse'];
+        };
+      };
+      /** @description No categories, more than 300 categories, an invalid address or a text over its limit */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to create in «Розділи сайту» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };

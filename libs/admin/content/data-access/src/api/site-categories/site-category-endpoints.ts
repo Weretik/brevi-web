@@ -1,5 +1,6 @@
 import { siteCategoriesTag, siteCategoryTag } from '../../cache/site-category-tags';
 import { siteCategoryApiError } from '../../errors/site-category-api-error';
+import { mapSiteCategoryImportReport } from '../../mappers/product-pages/old-site-import.mapper';
 import {
   mapSiteCategory,
   mapSiteCategoryList,
@@ -8,7 +9,10 @@ import {
 
 import type { ContentEndpointBuilder } from '../content-endpoint-builder';
 import type {
+  OldSiteImportItems,
+  OldSiteImportOptions,
   SiteCategory,
+  SiteCategoryImportReport,
   SiteCategoryInput,
   SiteCategoryRow,
   SiteCategoryVisibility,
@@ -18,6 +22,8 @@ import type { operations } from '@admin/shared/contracts';
 type SaveBody = operations['saveSiteCategory']['requestBody']['content']['application/json'];
 type VisibilityBody =
   operations['setSiteCategoryVisibility']['requestBody']['content']['application/json'];
+type ImportBody =
+  operations['importOldSiteCategories']['requestBody']['content']['application/json'];
 type OrderBody = operations['reorderSiteCategories']['requestBody']['content']['application/json'];
 
 export function siteCategoryEndpoints(build: ContentEndpointBuilder) {
@@ -73,6 +79,23 @@ export function siteCategoryEndpoints(build: ContentEndpointBuilder) {
       query: (id) => ({ url: `/api/content/categories/${id}`, method: 'DELETE' }),
       transformErrorResponse: siteCategoryApiError,
       invalidatesTags: (_result, _error, id) => [siteCategoriesTag, siteCategoryTag(id)],
+    }),
+    /** One-time transfer of the old-site category tree: a check (`dryRun`) or the transfer itself. */
+    importOldSiteCategories: build.mutation<
+      SiteCategoryImportReport,
+      OldSiteImportOptions & { items: OldSiteImportItems; dryRun: boolean }
+    >({
+      query: ({ items, dryRun, showOnSite, overwrite }) => ({
+        url: '/api/content/categories/old-site-import',
+        method: 'POST',
+        // The file is passed as it is; the server checks every category.
+        body: { items: items as unknown as ImportBody['items'], dryRun, showOnSite, overwrite },
+      }),
+      transformResponse: mapSiteCategoryImportReport,
+      transformErrorResponse: siteCategoryApiError,
+      // A transfer changes the tree and the categories of products.
+      invalidatesTags: (report) =>
+        report && !report.dryRun ? ['SiteCategory', 'ContentProduct'] : [],
     }),
   };
 }

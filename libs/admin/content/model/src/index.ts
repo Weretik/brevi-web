@@ -95,6 +95,7 @@ export {
   filterSiteCategories,
   moveSiteCategory,
   siteCategoryName,
+  siteCategoryPath,
   siteCategoryProblems,
 } from './mappers/site-categories/site-category-tree';
 export {
@@ -106,3 +107,7 @@ export type {
   SiteCategoryErrors,
   SiteCategoryTextErrors,
 } from './validators/site-categories/site-category-validation';
+export { siteCategoryImportMaxItems } from './entities/site-categories/site-category-import';
+export type { SiteCategoryImportReport } from './entities/site-categories/site-category-import';
+export { readSiteCategoryImportFile } from './mappers/site-categories/site-category-import-file';
+export type { SiteCategoryImportFile } from './mappers/site-categories/site-category-import-file';

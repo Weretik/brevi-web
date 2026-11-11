@@ -41,6 +41,8 @@ export interface ContentProductTextValues {
 export interface ContentProductFormValues {
   slug: string;
   showOnSite: boolean;
+  /** Site categories of the product; null when staff may not see «Розділи сайту», so they stay as they are. */
+  categoryIds: number[] | null;
   uk: ContentProductTextValues;
   ru: ContentProductTextValues;
 }
@@ -62,6 +64,8 @@ export interface ContentProductInput {
   showOnSite: boolean;
   uk: ContentProductTextInput;
   ru: ContentProductTextInput;
+  /** Null keeps the categories of the product. */
+  categoryIds: number[] | null;
 }
 
 const textValuesOf = (text: ContentProductText): ContentProductTextValues => ({
@@ -80,6 +84,7 @@ export function contentProductFormOf(product: ContentProduct): ContentProductFor
   return {
     slug: product.slug,
     showOnSite: product.product.showOnSite,
+    categoryIds: [...product.categoryIds],
     uk: textValuesOf(product.uk),
     ru: textValuesOf(product.ru),
   };
@@ -125,6 +130,7 @@ export function contentProductInputOf(
     showOnSite: values.showOnSite,
     uk: contentProductTextInputOf(values.uk),
     ru: contentProductTextInputOf(values.ru),
+    categoryIds: values.categoryIds,
   };
 }
 

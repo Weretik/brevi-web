@@ -4,16 +4,30 @@ import {
   useSetSiteCategoryVisibilityMutation,
 } from '@admin/content/data-access';
 import { filterSiteCategories, moveSiteCategory, siteCategoryName } from '@admin/content/model';
-import { SiteCategoriesTable } from '@admin/content/ui';
+import { OldSiteImportDialog, SiteCategoriesTable } from '@admin/content/ui';
 import { ReferenceListAlerts, ReferencePageHeader, ReferenceSearchBar } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
-import { Alert, Box, Button, Paper } from '@mui/material';
+import { Alert, Box, Button, Paper, Stack } from '@mui/material';
 import { useMemo, useState } from 'react';
 
 import { SiteCategoryDrawer } from './site-category-drawer';
+import { useOldSiteCategoryImport } from '../../hooks/site-categories/use-old-site-category-import';
+
 
 import type { SiteCategoryTarget } from '../../hooks/site-categories/use-site-category-editor';
 import type { SiteCategoriesViewer, SiteCategoryRow } from '@admin/content/model';
+import type { OldSiteImportCopy } from '@admin/content/ui';
+
+const transferCopy: OldSiteImportCopy = {
+  title: 'Перенести розділи зі старого сайту',
+  intro:
+    'Файл перенесення містить розділи й підрозділи старого сайту з назвами, SEO і текстами двома мовами та товари кожного розділу. Товар знаходимо за посиланням старого сайту з картки товару. Спершу показуємо, що буде зроблено; нічого не зберігається, доки не натиснути «Перенести».',
+  showOnSite: 'Одразу показувати перенесені розділи на сайті',
+  overwrite: 'Замінити назви, SEO і тексти розділів, які вже є',
+  done: 'Розділи перенесено.',
+  total: 'Розділів у файлі',
+  notMatched: 'Не знайдено товар у «Товари»',
+};
 
 const noRows: SiteCategoryRow[] = [];
 
@@ -30,6 +44,7 @@ export function SiteCategoriesContent({ viewer }: { viewer: SiteCategoriesViewer
   const [savingId, setSavingId] = useState<number | null>(null);
   const [setVisibility] = useSetSiteCategoryVisibilityMutation();
   const [reorder] = useReorderSiteCategoriesMutation();
+  const transfer = useOldSiteCategoryImport();
   const shown = useMemo(() => filterSiteCategories(rows, term), [rows, term]);
   const narrowed = term.trim().length > 0;
 
@@ -77,9 +92,14 @@ export function SiteCategoriesContent({ viewer }: { viewer: SiteCategoriesViewer
         title="Розділи сайту"
         actions={
           viewer.canCreate ? (
-            <Button variant="contained" onClick={() => setOpened({ id: null, parentId: null })}>
-              Додати розділ
-            </Button>
+            <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap' }}>
+              <Button variant="outlined" onClick={transfer.start}>
+                Перенести зі старого сайту
+              </Button>
+              <Button variant="contained" onClick={() => setOpened({ id: null, parentId: null })}>
+                Додати розділ
+              </Button>
+            </Stack>
           ) : null
         }
         subtitle="Каталог публічного сайту: розділи та підрозділи, їхній порядок, адреси, SEO і тексти двома мовами. Прихований розділ сайт не показує."
@@ -123,6 +143,21 @@ export function SiteCategoriesContent({ viewer }: { viewer: SiteCategoriesViewer
           onAddChild={(row) => setOpened({ id: null, parentId: row.id })}
         />
       </Paper>
+      <OldSiteImportDialog
+        open={transfer.open}
+        copy={transferCopy}
+        productLinks={transfer.report?.productLinks ?? null}
+        fileName={transfer.fileName}
+        options={transfer.options}
+        report={transfer.report}
+        message={transfer.message}
+        running={transfer.running}
+        canTransfer={transfer.canTransfer}
+        onPick={transfer.pick}
+        onOptions={transfer.setOptions}
+        onTransfer={transfer.transfer}
+        onClose={transfer.close}
+      />
       {opened && (
         <SiteCategoryDrawer
           key={opened.id ?? `new-${opened.parentId ?? 'top'}`}

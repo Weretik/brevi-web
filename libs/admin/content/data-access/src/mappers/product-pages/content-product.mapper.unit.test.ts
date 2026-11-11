@@ -24,6 +24,7 @@ const row = {
   hasRussianText: false,
   hasSeo: false,
   updatedAtUtc: '2026-11-11T08:00:00+00:00',
+  categoryCount: 2,
 };
 const emptyText = {
   name: null,
@@ -69,6 +70,7 @@ describe('content product mapper', () => {
           prices: null,
         },
       ],
+      categoryIds: [7, 9],
     });
     expect(product.revision).toBe(3);
     expect(product.uk.description).toEqual([
@@ -77,6 +79,8 @@ describe('content product mapper', () => {
     ]);
     expect(product.prices?.largeWholesale).toBe(1300);
     expect(product.variants[0]?.fabricName).toBe('Грета');
+    expect(product.product.categoryCount).toBe(2);
+    expect(product.categoryIds).toEqual([7, 9]);
   });
 
   it('maps the answer of the switch', () => {
