@@ -5,6 +5,7 @@ import {
   mapContentProductPage,
   mapContentProductVisibility,
 } from '../../mappers/product-pages/content-product.mapper';
+import { mapOldSiteImportReport } from '../../mappers/product-pages/old-site-import.mapper';
 
 import type { ContentEndpointBuilder } from '../content-endpoint-builder';
 import type {
@@ -13,12 +14,18 @@ import type {
   ContentProductPage,
   ContentProductQuery,
   ContentProductVisibility,
+  OldSiteImportItems,
+  OldSiteImportOptions,
+  OldSiteImportReport,
 } from '@admin/content/model';
 import type { operations } from '@admin/shared/contracts';
 
 type SaveBody = operations['saveContentProduct']['requestBody']['content']['application/json'];
 type VisibilityBody =
   operations['setContentProductVisibility']['requestBody']['content']['application/json'];
+
+type ImportBody =
+  operations['importOldSiteProductPages']['requestBody']['content']['application/json'];
 
 export function contentProductEndpoints(build: ContentEndpointBuilder) {
   return {
@@ -80,6 +87,22 @@ export function contentProductEndpoints(build: ContentEndpointBuilder) {
         contentProductsTag,
         contentProductTag(productId),
       ],
+    }),
+    /** One-time transfer of old-site texts and SEO: a check (`dryRun`) or the transfer itself. */
+    importOldSiteProductPages: build.mutation<
+      OldSiteImportReport,
+      OldSiteImportOptions & { items: OldSiteImportItems; dryRun: boolean }
+    >({
+      query: ({ items, dryRun, showOnSite, overwrite }) => ({
+        url: '/api/content/products/old-site-import',
+        method: 'POST',
+        // The file is passed as it is; the server checks every page.
+        body: { items: items as unknown as ImportBody['items'], dryRun, showOnSite, overwrite },
+      }),
+      transformResponse: mapOldSiteImportReport,
+      transformErrorResponse: contentApiError,
+      // A transfer changes many pages: reload the list and every opened page.
+      invalidatesTags: (report) => (report && !report.dryRun ? ['ContentProduct'] : []),
     }),
   };
 }
