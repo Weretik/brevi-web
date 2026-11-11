@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  mapFabricStockChoices,
   mapFabricStockImportResult,
   mapFabricStockList,
   mapProductionItemFabric,
@@ -93,5 +94,15 @@ describe('fabric stock mappers', () => {
     expect(result.lines[0]).toMatchObject({ key: 'Видача', action: 'error' });
     expect(result.lines[1].detail).toBe('чорний · рухів: 3');
     expect(result.notes?.length).toBe(2);
+  });
+
+  it('maps the stock form choices with the colours of «Кольори»', () => {
+    const choices = mapFabricStockChoices({
+      fabrics: [{ id: 23, code: 'FAB-023', name: 'Грета' }],
+      suppliers: [],
+      colors: ['Чорний', 'Темно-синій кол.1076'],
+    });
+    expect(choices.colors).toEqual(['Чорний', 'Темно-синій кол.1076']);
+    expect(() => mapFabricStockChoices({ fabrics: [], suppliers: [] })).toThrow();
   });
 });

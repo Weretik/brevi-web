@@ -18,6 +18,8 @@ import {
   Tooltip,
 } from '@mui/material';
 
+import { ProductionColorField } from '../colors/production-color-field';
+
 import type {
   FabricIssueErrors,
   FabricIssueFormValues,
@@ -32,6 +34,8 @@ interface Props {
   errors: FabricIssueErrors;
   fabric: ProductionItemFabric;
   fabrics: readonly FabricStockFabricChoice[];
+  /** Active colours of «Кольори»; the item's planned colours are offered too. */
+  colors: readonly string[];
   /** The item's fabric in «Тканини», for new lines. */
   itemFabricId: number | null;
   disabled: boolean;
@@ -50,10 +54,12 @@ export function FabricIssueForm({
   errors,
   fabric,
   fabrics,
+  colors,
   itemFabricId,
   disabled,
   onChange,
 }: Props) {
+  const colorOptions = [...new Set([...fabric.plan.map((part) => part.color), ...colors])];
   const setLine = (key: string, patch: Partial<FabricIssueLineValues>) =>
     onChange({
       ...values,
@@ -186,15 +192,15 @@ export function FabricIssueForm({
                     />
                   )}
                 />
-                <TextField
+                <ProductionColorField
                   label="Колір"
                   required
+                  colors={colorOptions}
                   value={line.color}
-                  error={Boolean(own.color)}
-                  helperText={own.color}
+                  error={own.color}
                   disabled={disabled}
                   sx={{ flex: 1 }}
-                  onChange={(event) => setLine(line.key, { color: event.target.value })}
+                  onChange={(color) => setLine(line.key, { color })}
                 />
                 <TextField
                   label="Метри"

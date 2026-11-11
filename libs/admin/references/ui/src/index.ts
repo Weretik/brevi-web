@@ -48,3 +48,7 @@ export * from './components/price-import/price-import-preview';
 export * from './components/price-import/price-source-details';
 export * from './components/price-import/price-source-discount-form';
 export * from './components/price-import/price-sources-table';
+export * from './components/fabric-colors/fabric-color-delete-dialog';
+export * from './components/fabric-colors/fabric-color-details';
+export * from './components/fabric-colors/fabric-color-form';
+export * from './components/fabric-colors/fabric-colors-grid';

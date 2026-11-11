@@ -1288,6 +1288,56 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/reference/fabric-colors': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List colours in list order
+     * @description Requires CatalogRead. Inactive colours are listed too; an empty list when there are none.
+     */
+    get: operations['getFabricColors'];
+    put?: never;
+    /**
+     * Add a colour
+     * @description Requires access:materials. The ID is assigned by Brevi; a name that differs from another colour only in case or spaces is a duplicate (400).
+     */
+    post: operations['createFabricColor'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/reference/fabric-colors/{id}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    get?: never;
+    /**
+     * Edit a colour
+     * @description Requires access:materials. The name stays unique; saved items and stock lines keep their text.
+     */
+    put: operations['updateFabricColor'];
+    post?: never;
+    /**
+     * Delete a colour
+     * @description Requires access:materials. Saved items and stock lines keep their colour text.
+     */
+    delete: operations['deleteFabricColor'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/reference/product-sections': {
     parameters: {
       query?: never;
@@ -3654,6 +3704,26 @@ export interface paths {
     };
     /** «Розрахунок вишивки»: saved «Ціна вишивки» calculations to link to an embroidery, newest first, at most 50; no prices */
     get: operations['getProductionEmbroideries'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/production/orders/colors': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Active colours of «Кольори» in list order: the main and additional colours of an item are picked from them
+     * @description An item's colours must be one of these (case and outer spaces ignored); a colour the item already has stays valid on edit. Without access to «Довідники».
+     */
+    get: operations['getProductionColors'];
     put?: never;
     post?: never;
     delete?: never;
@@ -6299,6 +6369,24 @@ export interface components {
       applied: boolean;
       parameters: components['schemas']['PricingSettingsImportSection'];
       ppeMarkupRules: components['schemas']['PricingSettingsImportSection'];
+    };
+    FabricColorRow: {
+      /** Format: int32 */
+      id: number;
+      name: string;
+      isActive: boolean;
+      /** Format: int32 */
+      sortOrder: number;
+    };
+    FabricColorFields: {
+      name: string;
+      /** @default true */
+      isActive: boolean;
+      /**
+       * Format: int32
+       * @default 0
+       */
+      sortOrder: number;
     };
     /** @enum {string} */
     ProductSectionType: 'Sewing' | 'Ppe';
@@ -10254,6 +10342,8 @@ export interface components {
       fabrics: components['schemas']['FabricStockFabricChoice'][];
       /** @description Active suppliers; empty for people who cannot move stock. */
       suppliers: components['schemas']['FabricStockSupplierChoice'][];
+      /** @description Active colours of «Кольори» in list order; a new stock line takes one of them. */
+      colors: string[];
     };
     FabricMovementResponse: {
       id: number;
@@ -16161,6 +16251,160 @@ export interface operations {
         content?: never;
       };
       /** @description Parameter not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getFabricColors: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Colours. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FabricColorRow'][];
+        };
+      };
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  createFabricColor: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FabricColorFields'];
+      };
+    };
+    responses: {
+      /** @description The new colour ID. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': number;
+        };
+      };
+      400: components['responses']['ValidationError'];
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description «Матеріали» access required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateFabricColor: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FabricColorFields'];
+      };
+    };
+    responses: {
+      /** @description Saved. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      400: components['responses']['ValidationError'];
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description «Матеріали» access required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  deleteFabricColor: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Deleted. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      400: components['responses']['ValidationError'];
+      /** @description Unauthorized. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description «Матеріали» access required. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not found. */
       404: {
         headers: {
           [name: string]: unknown;
@@ -23451,6 +23695,40 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['ProductionEmbroideryChoiceResponse'][];
+        };
+      };
+      /** @description Unauthenticated. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description «Права доступу» page access:production-orders required (Manager, WorkshopChief and Admin by default). */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getProductionColors: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Colour names. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': string[];
         };
       };
       /** @description Unauthenticated. */

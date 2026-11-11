@@ -1,5 +1,6 @@
 import { productionBaseApi } from './production-base-api';
 import { productionOrderErrors, toProductionApiError } from '../errors/production-api-error';
+import { productionColors } from '../mappers/fabric-stock.mapper';
 import { mapOrderImportResult } from '../mappers/production-import.mapper';
 import {
   mapProductionEmbroideryChoices,
@@ -90,6 +91,12 @@ export const productionOrdersApi = productionBaseApi.injectEndpoints({
       transformResponse: mapProductionEmbroideryChoices,
       transformErrorResponse: errors,
     }),
+    /** Colours of «Кольори» for the item form. */
+    getProductionColors: build.query<string[], void>({
+      query: () => '/api/production/orders/colors',
+      transformResponse: productionColors,
+      transformErrorResponse: errors,
+    }),
     getProductionQuoteDraft: build.query<ProductionQuoteDraft, number>({
       query: (quoteId) => `/api/production/orders/quote-sources/${quoteId}`,
       transformResponse: mapProductionQuoteDraft,
@@ -155,6 +162,7 @@ export const {
   useCopyProductionOrderMutation,
   useCreateProductionOrderMutation,
   useDeleteProductionOrderMutation,
+  useGetProductionColorsQuery,
   useGetProductionEmbroideriesQuery,
   useGetProductionOrderHistoryQuery,
   useGetProductionOrderQuery,

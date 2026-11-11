@@ -43,6 +43,7 @@ const api = vi.hoisted(() => ({
 }));
 
 vi.mock('@admin/production/data-access', () => ({
+  useGetProductionColorsQuery: () => ({ data: ['Чорний', 'Синій'] }),
   useGetProductionEmbroideriesQuery: () => ({ data: [], isFetching: false }),
   useGetProductionQuoteSourcesQuery: () => ({
     data: [
@@ -102,7 +103,8 @@ describe('ProductionOrderCreatePage', () => {
 
     fireEvent.change(screen.getByLabelText(/Кількість, шт\./), { target: { value: '10' } });
     fireEvent.change(screen.getByLabelText(/Готово до/), { target: { value: '2026-11-20' } });
-    fireEvent.change(screen.getByLabelText(/Основний колір/), { target: { value: 'чорний' } });
+    fireEvent.change(screen.getByLabelText(/Основний колір/), { target: { value: 'чор' } });
+    fireEvent.click(await screen.findByRole('option', { name: 'Чорний' }));
     fireEvent.click(screen.getByRole('button', { name: 'Передати в цех' }));
 
     expect(await screen.findByText('Картка завдання')).toBeTruthy();
@@ -110,7 +112,9 @@ describe('ProductionOrderCreatePage', () => {
     expect(api.create.mock.calls[0][0]).toMatchObject({
       quoteId: 7,
       requestId: expect.any(String),
-      items: [{ quoteItemId: 11, quoteOptionId: 21, details: { quantity: 10 } }],
+      items: [
+        { quoteItemId: 11, quoteOptionId: 21, details: { quantity: 10, mainColor: 'Чорний' } },
+      ],
     });
   });
 
