@@ -1,5 +1,5 @@
 import { siteConfig } from '@site/core/config';
-import { LOCALES, LOCALE_LANGUAGE_TAGS, localizedPath } from '@site/core/i18n';
+import { DEFAULT_LOCALE, LOCALES, LOCALE_LANGUAGE_TAGS, localizedPath } from '@site/core/i18n';
 
 import type { SiteConfig } from '@site/core/config';
 import type { Locale } from '@site/core/i18n';
@@ -13,7 +13,10 @@ export type SitemapPage = {
   locales?: readonly Locale[];
 };
 
-/** One sitemap entry per language version, each listing all versions as alternates. */
+/**
+ * One sitemap entry per language version, each listing all versions as alternates plus `x-default` (the
+ * Ukrainian version) when there is more than one, the same map as the `hreflang` links of the page.
+ */
 export function buildSitemapEntries(
   pages: SitemapPage[],
   config: SiteConfig = siteConfig,
@@ -21,12 +24,14 @@ export function buildSitemapEntries(
   const absolute = (path: string) => `${config.siteUrl}${path}`;
 
   return pages.flatMap(({ path, lastModified, locales = LOCALES }) => {
-    const languages = Object.fromEntries(
+    const languages: Record<string, string> = Object.fromEntries(
       locales.map((locale) => [
         LOCALE_LANGUAGE_TAGS[locale],
         absolute(localizedPath(locale, path)),
       ]),
     );
+    if (locales.length > 1 && locales.includes(DEFAULT_LOCALE))
+      languages['x-default'] = absolute(localizedPath(DEFAULT_LOCALE, path));
     return locales.map((locale) => ({
       url: absolute(localizedPath(locale, path)),
       lastModified,

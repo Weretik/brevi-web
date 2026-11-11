@@ -2,6 +2,7 @@ import { articleEndpoints } from './articles/article-endpoints';
 import { contentBaseApi } from './content-base-api';
 import { contentProductEndpoints } from './product-pages/content-product-endpoints';
 import { redirectEndpoints } from './redirects/redirect-endpoints';
+import { seoSettingsEndpoints } from './seo-settings/seo-settings-endpoints';
 import { siteCategoryEndpoints } from './site-categories/site-category-endpoints';
 
 export const contentApi = contentBaseApi.injectEndpoints({
@@ -10,6 +11,7 @@ export const contentApi = contentBaseApi.injectEndpoints({
     ...siteCategoryEndpoints(build),
     ...articleEndpoints(build),
     ...redirectEndpoints(build),
+    ...seoSettingsEndpoints(build),
   }),
 });
 
@@ -37,4 +39,6 @@ export const {
   useSaveSiteRedirectMutation,
   useDeleteSiteRedirectMutation,
   useImportOldSiteRedirectsMutation,
+  useGetSiteSeoSettingsQuery,
+  useSaveSiteSeoSettingsMutation,
 } = contentApi;

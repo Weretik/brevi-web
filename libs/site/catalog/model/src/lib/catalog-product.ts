@@ -2,7 +2,8 @@ import type { CatalogTextBlock } from './catalog-category';
 import type { CatalogProductType } from './catalog-tree';
 import type { Locale } from '@site/core/i18n';
 
-export type CatalogPhoto = { src: string };
+/** A product photo; `thumbnail` is its small copy for the row under the photo, when the media server has one. */
+export type CatalogPhoto = { src: string; thumbnail?: string | null };
 
 /** A titled group of characteristics, for example «Куртка» with its rows. */
 export type CatalogSpecGroup = {

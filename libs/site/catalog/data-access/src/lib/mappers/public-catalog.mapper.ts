@@ -193,9 +193,13 @@ export function mapCatalogProduct(value: unknown): CatalogProduct {
       title: optionalText(product['seoTitle'], 'seo title') ?? '',
       description: optionalText(product['seoDescription'], 'seo description') ?? '',
     },
-    photos: list(product['photos'], 'photos').map((item) => ({
-      src: text(record(item, 'photo')['url'], 'photo url'),
-    })),
+    photos: list(product['photos'], 'photos').map((item) => {
+      const photo = record(item, 'photo');
+      return {
+        src: text(photo['url'], 'photo url'),
+        thumbnail: optionalText(photo['thumbnailUrl'], 'small photo'),
+      };
+    }),
     summary: list(product['summary'], 'summary').map(mapFact),
     description: list(product['description'], 'description').flatMap((item) => {
       const block = mapBlock(item);

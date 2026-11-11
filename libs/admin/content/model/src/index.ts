@@ -175,3 +175,19 @@ export type {
   RedirectErrors,
   RedirectFormValues,
 } from './validators/redirects/redirect-validation';
+export type {
+  SeoSettings,
+  SeoSettingsInput,
+  SeoSettingsViewer,
+  SitePicture,
+} from './entities/seo-settings/seo-settings';
+export {
+  seoSettingsFormOf,
+  seoSettingsInputOf,
+  validateSeoSettings,
+  verificationCode,
+} from './validators/seo-settings/seo-settings-validation';
+export type {
+  SeoSettingsErrors,
+  SeoSettingsFormValues,
+} from './validators/seo-settings/seo-settings-validation';

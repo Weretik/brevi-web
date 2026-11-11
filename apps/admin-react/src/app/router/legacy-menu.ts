@@ -348,6 +348,12 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         path: '/content/redirects',
         access: 'content-redirects',
       },
+      {
+        id: 'site-seo-settings',
+        label: 'Налаштування SEO сайту',
+        path: '/content/seo-settings',
+        access: 'content-seo-settings',
+      },
       { id: 'site-pages', label: 'Сторінки сайту' },
       { id: 'legal', label: 'Конфіденційність та умови', path: '/content/legal' },
     ],

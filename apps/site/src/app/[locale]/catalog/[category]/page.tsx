@@ -3,6 +3,7 @@ import { CatalogCategoryPage } from '@site/catalog/feature';
 import { buildCatalogCategoryMetadata } from '@site/catalog/seo';
 import { isLocale } from '@site/core/i18n';
 import { redirectOrNotFound } from '@site/redirects/data-access';
+import { withSiteSharePicture } from '@site/settings/data-access';
 import { notFound } from 'next/navigation';
 
 import type { Metadata } from 'next';
@@ -24,12 +25,14 @@ export async function generateMetadata({
   const { locale, category: slug } = await params;
   const category = isLocale(locale) ? await getCatalogCategory(slug, locale) : null;
   return isLocale(locale) && category
-    ? buildCatalogCategoryMetadata(locale, {
-        slug: category.node.slug,
-        name: category.name,
-        seo: category.seo,
-        textLocale: category.textLocale,
-      })
+    ? withSiteSharePicture(
+        buildCatalogCategoryMetadata(locale, {
+          slug: category.node.slug,
+          name: category.name,
+          seo: category.seo,
+          textLocale: category.textLocale,
+        }),
+      )
     : {};
 }
 

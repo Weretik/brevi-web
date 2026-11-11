@@ -145,7 +145,7 @@ describe('public catalog mapper', () => {
       model: 'MOD-014',
       textLocale: 'uk',
       seo: { title: 'Костюм ВЕРДЕ оптом', description: '' },
-      photos: [{ src: 'https://media.example/1.webp' }],
+      photos: [{ src: 'https://media.example/1.webp', thumbnail: null }],
       priceFrom: 900,
       prices: null,
     });

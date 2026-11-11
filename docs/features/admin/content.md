@@ -8,6 +8,7 @@
 - **«Розділи сайту»** (`/content/categories`, «Права доступу» page `content-categories`: Admin everything, Manager view). The category tree of the public site, separate from «Типи і розділи»: categories with their subcategories, the «На сайті» switch, the number of products and what the site would miss (only problems are marked). «Додати розділ» and «Додати підрозділ» add, the arrows change the order among neighbours, the side panel edits the place in the tree, the address and, in Ukrainian and Russian, the name, SEO title and description and the text in the visual editor; «Видалити розділ» removes the category, not its products. A subcategory is on the site only together with its category. «Перенести зі старого сайту» (create right) loads the old-site tree with names, SEO, texts and the products of each category from a file: first a count, then «Перенести». The site does not read this tree yet (later stages). [SDD](../../specs/admin/content/002-site-categories/README.md).
 - **«Статті»** (`/content/articles`, «Права доступу» page `content-articles`: Admin everything, Manager view). Articles of the public site, the newest first: cover, title, address, date, the «На сайті» switch and what the site would miss (only problems are marked). «Додати статтю» and the side panel edit the date, the address, the cover and, in Ukrainian and Russian, the title, the short text for lists, SEO title and description and the text in the visual editor. The cover and the photos of the text are chosen in the «Фото» library (button «Фото» of the editor), so every picture lives on our CDN; each photo of the text has its «Опис фото». «Видалити статтю» removes the article, not its photos. «Перенести зі старого сайту» brings the old-site articles from a prepared file: a count first, then the transfer in parts of three articles with their photos downloaded into «Фото». The site does not read these articles yet (stage 4). [SDD](../../specs/admin/content/003-articles/README.md).
 - **«Переадресації»** (`/content/redirects`, «Права доступу» page `content-redirects`: Admin everything, Manager view). Old addresses that lead to pages of the new site with a permanent redirect: old address, new page, where it came from («Вручну», «Старий сайт», «Зміна адреси») and a note; search by address or note and the filter «Звідки». «Додати переадресацію» and the side panel add, change and delete one; a full link may be pasted, the server keeps the path. «Перенести зі старого сайту» takes the file of old-site addresses (`brevi-site/content-import/old-site-redirects.json`): the server finds the page of each address and lists what it could not place, then «Перенести» writes; redirects changed by hand are never replaced. A change of the address of a product page, a category or an article adds a redirect by itself (BreviERP CNT-005). [Site side](../site/redirects.md).
+- **«Налаштування SEO сайту»** (`/content/seo-settings`, «Права доступу» page `content-seo-settings`: Admin view and edit, Manager view). The codes the site places on every page: Google Analytics 4 (`G-…`), Google Tag Manager (`GTM-…`), the Google Search Console and Bing Webmaster verification codes (the whole meta tag may be pasted, the `content` value is kept) and the sharing picture from the «Фото» library for pages without their own picture. Read view first; «Редагувати» opens the side panel. Connecting the services is the SEO specialist's job; this page only takes their codes (BreviERP CNT-006). [Site side](../site/seo-settings.md).
 - **«Конфіденційність та умови»** (`/content/legal`): cards for the BreviERP description, the privacy policy and the terms, with the edition date, «Відкрити» and «Копіювати посилання». The documents themselves stay static HTML ([public legal pages](public-legal-pages.md)).
 - «Сторінки сайту» is shown as not yet available.
 
@@ -26,9 +27,11 @@ libs/admin/content/model/src/
   entities|forms|validators|mappers/site-categories/ # category row and editor, form, limits, problems, search, move, transfer file
   entities|forms|validators|mappers/articles/      # article row and editor, form, limits, problems, search, body <-> editor document with photos
   entities|validators|mappers/redirects/           # redirect, source, address check, search and filter, transfer file
+  entities|validators/seo-settings/                # settings, form values, code checks, meta tag → code
 libs/admin/content/data-access/src/
   api/articles/, mappers/articles/                 # article endpoints and runtime-checked responses
   api/redirects/, mappers/redirects/               # redirect endpoints, transfer report
+  api/seo-settings/, mappers/seo-settings/         # settings endpoints (GET, PUT with revision)
   api/site-categories/, mappers/site-categories/   # category endpoints and runtime-checked responses
   api/                                             # content API on adminApi, product page endpoints
   mappers/product-pages/content-product.mapper.ts  # runtime-checked responses
@@ -45,10 +48,12 @@ libs/admin/content/ui/src/
   tables|forms|components/site-categories/, dialogs/site-category-delete-dialog.tsx # tree table, editor, view
   tables|forms|components/articles/, dialogs/article-delete-dialog.tsx # articles table, editor with cover and photos, view
   tables|forms/redirects/, dialogs/redirect-delete-dialog.tsx # redirects table, editor fields
+  components|forms/seo-settings/                   # settings view, code fields and sharing picture
 libs/admin/content/feature/src/
   hooks|components|pages/articles/                 # article panel state, list page, side panel with the «Фото» library
   hooks|components|pages/redirects/                # redirect panel, list page with filter, old-site address transfer
-  content.routes.tsx                               # createContentRoutes: /content/products, /content/categories, /content/articles, /content/redirects, /content/legal
+  hooks|components|pages/seo-settings/             # settings page, side panel with the «Фото» library
+  content.routes.tsx                               # createContentRoutes: /content/products, /content/categories, /content/articles, /content/redirects, /content/seo-settings, /content/legal
   hooks|components|pages/site-categories/          # category panel state, tree page, side panel
   hooks/product-pages/                             # list state in the URL, panel editor, old-site transfer
   hooks/old-site/use-old-site-transfer.ts          # file → count → «Перенести», shared by both transfers
@@ -57,7 +62,7 @@ libs/admin/content/feature/src/
   model/legal-documents.ts, components/legal/, pages/legal/ # «Конфіденційність та умови»
 apps/admin-react/src/app/router/
   legacy-menu.ts                                   # «Контент» group
-  use-content-products-viewer.ts, use-site-categories-viewer.ts, use-articles-viewer.ts, use-redirects-viewer.ts # rights from the session
+  use-content-products-viewer.ts, use-site-categories-viewer.ts, use-articles-viewer.ts, use-redirects-viewer.ts, use-seo-settings-viewer.ts # rights from the session
 libs/admin/shared/ui/src/inputs/rich-text-editor/  # visual editor; rich-text-photo.tsx is the photo block for texts with pictures
 ```
 
@@ -66,6 +71,7 @@ libs/admin/shared/ui/src/inputs/rich-text-editor/  # visual editor; rich-text-ph
 - `libs/admin/content/model/src/**/*.unit.test.ts`
 - `libs/admin/content/data-access/src/mappers/product-pages/*.unit.test.ts`
 - `libs/admin/content/data-access/src/mappers/redirects/redirect.mapper.unit.test.ts`
+- `libs/admin/content/data-access/src/mappers/seo-settings/seo-settings.mapper.unit.test.ts`
 - `libs/admin/content/ui/src/components/product-pages/content-text-preview.component.test.tsx`
 - `libs/admin/content/feature/src/components/product-pages/content-products-content.component.test.tsx`
 - `libs/admin/content/feature/src/components/site-categories/site-categories-content.component.test.tsx`

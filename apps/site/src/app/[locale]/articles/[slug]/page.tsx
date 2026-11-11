@@ -4,6 +4,7 @@ import { pickMoreArticles } from '@site/articles/model';
 import { buildArticleMetadata } from '@site/articles/seo';
 import { isLocale } from '@site/core/i18n';
 import { redirectOrNotFound } from '@site/redirects/data-access';
+import { withSiteSharePicture } from '@site/settings/data-access';
 import { notFound } from 'next/navigation';
 
 import type { Metadata } from 'next';
@@ -25,7 +26,7 @@ export async function generateMetadata({
   const { locale, slug } = await params;
   const article = isLocale(locale) ? await getArticle(slug, locale) : null;
   return isLocale(locale) && article
-    ? buildArticleMetadata(locale, toArticleSeoInput(article))
+    ? withSiteSharePicture(buildArticleMetadata(locale, toArticleSeoInput(article)))
     : {};
 }
 

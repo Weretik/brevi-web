@@ -161,7 +161,8 @@
       "@site/sizes/ui": ["./libs/site/sizes/ui/src/index.ts"],
       "@site/sizes/seo": ["./libs/site/sizes/seo/src/index.ts"],
       "@site/sizes/feature": ["./libs/site/sizes/feature/src/index.ts"],
-      "@site/redirects/data-access": ["./libs/site/redirects/data-access/src/index.ts"]
+      "@site/redirects/data-access": ["./libs/site/redirects/data-access/src/index.ts"],
+      "@site/settings/data-access": ["./libs/site/settings/data-access/src/index.ts"]
     }
   }
 }
