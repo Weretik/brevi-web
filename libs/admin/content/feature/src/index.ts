@@ -1,1 +1,2 @@
-export { contentRoutes } from './content.routes';
+export { contentProductsPath, createContentRoutes } from './content.routes';
+export type { ContentRouteOptions } from './content.routes';

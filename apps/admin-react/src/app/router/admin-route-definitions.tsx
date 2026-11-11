@@ -1,5 +1,5 @@
 import { createClientsRoutes } from '@admin/clients/feature';
-import { contentRoutes } from '@admin/content/feature';
+import { createContentRoutes } from '@admin/content/feature';
 import { createDashboardRoutes } from '@admin/dashboard/feature';
 import { createEmbroideryRoutes } from '@admin/embroidery/feature';
 import { createLeadsRoutes } from '@admin/leads/feature';
@@ -18,6 +18,7 @@ import { createTasksRoutes } from '@admin/tasks/feature';
 
 import { useCanSeeFinance } from './use-can-see-finance';
 import { useCanSeePurchaseInvoices } from './use-can-see-purchase-invoices';
+import { useContentProductsViewer } from './use-content-products-viewer';
 import { useDashboardViewer } from './use-dashboard-viewer';
 import { useEmbroideryViewer } from './use-embroidery-viewer';
 import { useLeadStatsViewer, useLeadViewer } from './use-lead-viewer';
@@ -39,7 +40,7 @@ export const adminRouteDefinitions = [
   ...productsRoutes,
   ...remindersRoutes,
   ...mediaRoutes,
-  ...contentRoutes,
+  ...createContentRoutes({ useContentProductsViewer }),
 ];
 
 /** Task pages need a role check, so the router wraps them instead of listing them above. */
