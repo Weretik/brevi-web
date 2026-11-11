@@ -125,6 +125,7 @@ describe('ArticlePage', () => {
       title: article.title,
       description: 'Як обрати каску.',
       date: '2022-01-25',
+      modified: '2026-11-11T08:00:00Z',
       image: 'https://cdn.example/5.jpg',
     });
     expect(

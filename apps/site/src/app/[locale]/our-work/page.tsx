@@ -1,4 +1,5 @@
 import { isLocale } from '@site/core/i18n';
+import { withSiteSharePicture } from '@site/settings/data-access';
 import { WorksPage } from '@site/works/feature';
 import { buildWorksMetadata } from '@site/works/seo';
 import { notFound } from 'next/navigation';
@@ -9,7 +10,7 @@ export async function generateMetadata({
   params,
 }: PageProps<'/[locale]/our-work'>): Promise<Metadata> {
   const { locale } = await params;
-  return isLocale(locale) ? buildWorksMetadata(locale) : {};
+  return isLocale(locale) ? withSiteSharePicture(buildWorksMetadata(locale)) : {};
 }
 
 export default async function Page({ params }: PageProps<'/[locale]/our-work'>) {

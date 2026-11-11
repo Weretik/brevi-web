@@ -1,8 +1,16 @@
 import { getCatalogTree } from '@site/catalog/data-access';
 import { toCatalogSections } from '@site/catalog/model';
 import { LOCALES, LOCALE_LANGUAGE_TAGS, isLocale } from '@site/core/i18n';
-import { JsonLd, buildOrganizationJsonLd, buildRootMetadata } from '@site/core/seo';
+import {
+  JsonLd,
+  SiteAnalytics,
+  buildOrganizationJsonLd,
+  buildRootMetadata,
+  buildVerificationMetadata,
+  withSharePicture,
+} from '@site/core/seo';
 import { SiteShell } from '@site/core/shell';
+import { loadSiteSettings } from '@site/settings/data-access';
 import { notFound } from 'next/navigation';
 
 import '../global.css';
@@ -16,7 +24,13 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: LayoutProps<'/[locale]'>): Promise<Metadata> {
   const { locale } = await params;
-  return isLocale(locale) ? buildRootMetadata(locale) : {};
+  if (!isLocale(locale)) return {};
+  // Verification codes and the sharing picture of «Контент → Налаштування SEO сайту».
+  const settings = await loadSiteSettings();
+  return {
+    ...withSharePicture(buildRootMetadata(locale), settings.sharePicture),
+    verification: buildVerificationMetadata(settings),
+  };
 }
 
 export const viewport: Viewport = { themeColor: '#ffffff' };
@@ -24,7 +38,8 @@ export const viewport: Viewport = { themeColor: '#ffffff' };
 export default async function LocaleLayout({ children, params }: LayoutProps<'/[locale]'>) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
-  const catalogSections = toCatalogSections(await getCatalogTree());
+  const [tree, settings] = await Promise.all([getCatalogTree(), loadSiteSettings()]);
+  const catalogSections = toCatalogSections(tree);
 
   return (
     <html
@@ -37,6 +52,10 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
           {children}
         </SiteShell>
         <JsonLd data={buildOrganizationJsonLd(locale)} />
+        <SiteAnalytics
+          googleAnalyticsId={settings.googleAnalyticsId}
+          googleTagManagerId={settings.googleTagManagerId}
+        />
       </body>
     </html>
   );

@@ -23,4 +23,6 @@ export {
   useSaveSiteRedirectMutation,
   useDeleteSiteRedirectMutation,
   useImportOldSiteRedirectsMutation,
+  useGetSiteSeoSettingsQuery,
+  useSaveSiteSeoSettingsMutation,
 } from './api/content.api';

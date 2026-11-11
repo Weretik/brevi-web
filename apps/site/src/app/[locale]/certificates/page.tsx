@@ -1,6 +1,7 @@
 import { CertificatesPage } from '@site/certificates/feature';
 import { buildCertificatesMetadata } from '@site/certificates/seo';
 import { isLocale } from '@site/core/i18n';
+import { withSiteSharePicture } from '@site/settings/data-access';
 import { notFound } from 'next/navigation';
 
 import type { Metadata } from 'next';
@@ -9,7 +10,7 @@ export async function generateMetadata({
   params,
 }: PageProps<'/[locale]/certificates'>): Promise<Metadata> {
   const { locale } = await params;
-  return isLocale(locale) ? buildCertificatesMetadata(locale) : {};
+  return isLocale(locale) ? withSiteSharePicture(buildCertificatesMetadata(locale)) : {};
 }
 
 export default async function Page({ params }: PageProps<'/[locale]/certificates'>) {

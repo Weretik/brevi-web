@@ -23,7 +23,7 @@ describe('robots.txt', () => {
 });
 
 describe('sitemap entries', () => {
-  it('lists every language version with alternates', () => {
+  it('lists every language version with alternates and x-default', () => {
     const entries = buildSitemapEntries([{ path: '/' }], production);
 
     expect(entries.map((entry) => entry.url)).toEqual([
@@ -33,6 +33,7 @@ describe('sitemap entries', () => {
     expect(entries[0]?.alternates?.languages).toEqual({
       'uk-UA': 'https://brevi.com.ua/uk',
       'ru-UA': 'https://brevi.com.ua/ru',
+      'x-default': 'https://brevi.com.ua/uk',
     });
   });
 

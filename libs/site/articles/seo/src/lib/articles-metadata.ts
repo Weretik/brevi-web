@@ -14,6 +14,8 @@ export type ArticleSeoInput = {
   description: string;
   /** ISO date of publication. */
   date: string;
+  /** ISO time of the last change; search engines show it as «updated». */
+  modified?: string;
   /** Absolute address of the article cover on the CDN, when it has one. */
   image?: string;
 };

@@ -5728,6 +5728,24 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/content/seo-settings': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description The settings; every field empty and revision 0 before the first save. */
+    get: operations['getSiteSeoSettings'];
+    /** @description Replaces the settings as a whole; an empty field removes that code. Ids are kept in upper case. */
+    put: operations['saveSiteSeoSettings'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/public/catalog/tree': {
     parameters: {
       query?: never;
@@ -5890,6 +5908,23 @@ export interface paths {
     };
     /** @description Every redirect of the site, by the old address. */
     get: operations['getPublicRedirects'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/public/site-settings': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description The settings; empty fields are null. */
+    get: operations['getPublicSiteSettings'];
     put?: never;
     post?: never;
     delete?: never;
@@ -13562,6 +13597,45 @@ export interface components {
       /** @description One row per address of the file; a repeated address is listed once. */
       rows: components['schemas']['OldSiteRedirectRow'][];
     };
+    SitePicture: {
+      /** Format: int32 */
+      photoId: number;
+      url: string;
+      /** Format: int32 */
+      width?: number | null;
+      /** Format: int32 */
+      height?: number | null;
+    };
+    SiteSeoSettingsResponse: {
+      /** @description G-XXXXXXXXXX */
+      googleAnalyticsId?: string | null;
+      /** @description GTM-XXXXXXX */
+      googleTagManagerId?: string | null;
+      googleSiteVerification?: string | null;
+      bingSiteVerification?: string | null;
+      /** @description Null without a picture or when it was deleted from the library. */
+      defaultOgImage?: components['schemas']['SitePicture'] | null;
+      /** Format: int32 */
+      revision: number;
+      /** Format: date-time */
+      updatedAtUtc?: string | null;
+      updatedBy?: string | null;
+    };
+    SaveSiteSeoSettingsRequest: {
+      /**
+       * Format: int32
+       * @description The revision the editor read; 0 for the first save.
+       */
+      revision: number;
+      googleAnalyticsId?: string | null;
+      googleTagManagerId?: string | null;
+      /** @description Only the content value of the meta tag google-site-verification. */
+      googleSiteVerification?: string | null;
+      /** @description Only the content value of the meta tag msvalidate.01. */
+      bingSiteVerification?: string | null;
+      /** Format: int32 */
+      defaultOgPhotoId?: number | null;
+    };
     PublicCatalogSection: {
       /** Format: int32 */
       id: number;
@@ -13786,6 +13860,20 @@ export interface components {
     };
     PublicRedirectList: {
       items: components['schemas']['PublicRedirect'][];
+    };
+    PublicSitePicture: {
+      url: string;
+      /** Format: int32 */
+      width?: number | null;
+      /** Format: int32 */
+      height?: number | null;
+    };
+    PublicSiteSettingsResponse: {
+      googleAnalyticsId?: string | null;
+      googleTagManagerId?: string | null;
+      googleSiteVerification?: string | null;
+      bingSiteVerification?: string | null;
+      defaultOgImage?: components['schemas']['PublicSitePicture'] | null;
     };
   };
   responses: {
@@ -32211,6 +32299,96 @@ export interface operations {
       };
     };
   };
+  getSiteSeoSettings: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SiteSeoSettingsResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to view «Налаштування SEO сайту» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  saveSiteSeoSettings: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SaveSiteSeoSettingsRequest'];
+      };
+    };
+    responses: {
+      /** @description Saved */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['SiteSeoSettingsResponse'];
+        };
+      };
+      /** @description An id or a code of the wrong shape */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': Record<string, never>;
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to edit «Налаштування SEO сайту» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The revision is stale or the picture is not in the library */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['Messages'];
+        };
+      };
+    };
+  };
   getPublicCatalogTree: {
     parameters: {
       query?: never;
@@ -32493,6 +32671,26 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['PublicRedirectList'];
+        };
+      };
+    };
+  };
+  getPublicSiteSettings: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Settings */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PublicSiteSettingsResponse'];
         };
       };
     };

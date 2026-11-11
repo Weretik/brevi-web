@@ -19,6 +19,7 @@ export function toArticleSeoInput(article: Article): ArticleSeoInput {
     title: article.seo.title || article.title,
     description: article.seo.description || plainCatalogText(article.excerpt) || article.title,
     date: article.date,
+    modified: article.updatedAt,
     image: article.cover?.src,
   };
 }

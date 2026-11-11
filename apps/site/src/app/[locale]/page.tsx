@@ -3,13 +3,14 @@ import { toCatalogSections } from '@site/catalog/model';
 import { isLocale } from '@site/core/i18n';
 import { HomePage } from '@site/home/feature';
 import { buildHomeMetadata } from '@site/home/seo';
+import { withSiteSharePicture } from '@site/settings/data-access';
 import { notFound } from 'next/navigation';
 
 import type { Metadata } from 'next';
 
 export async function generateMetadata({ params }: PageProps<'/[locale]'>): Promise<Metadata> {
   const { locale } = await params;
-  return isLocale(locale) ? buildHomeMetadata(locale) : {};
+  return isLocale(locale) ? withSiteSharePicture(buildHomeMetadata(locale)) : {};
 }
 
 export default async function Page({ params }: PageProps<'/[locale]'>) {

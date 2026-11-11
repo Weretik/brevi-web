@@ -59,7 +59,7 @@ export function CatalogProductGallery({
                 )}
               >
                 <Image
-                  src={item.src}
+                  src={item.thumbnail ?? item.src}
                   alt=""
                   fill
                   sizes="4.5rem"

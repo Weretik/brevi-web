@@ -89,6 +89,13 @@ describe('article JSON-LD', () => {
     });
   });
 
+  it('adds the time of the last change when it is known', () => {
+    expect(buildArticleJsonLd('uk', article, config)).not.toHaveProperty('dateModified');
+    expect(
+      buildArticleJsonLd('uk', { ...article, modified: '2026-11-10T08:00:00Z' }, config),
+    ).toMatchObject({ dateModified: '2026-11-10T08:00:00Z' });
+  });
+
   it('adds the cover address only when the article has a cover', () => {
     expect(buildArticleJsonLd('uk', article, config)).not.toHaveProperty('image');
     expect(

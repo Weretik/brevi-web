@@ -3,6 +3,7 @@ import { CatalogProductPage } from '@site/catalog/feature';
 import { buildCatalogProductMetadata } from '@site/catalog/seo';
 import { isLocale } from '@site/core/i18n';
 import { redirectOrNotFound } from '@site/redirects/data-access';
+import { withSiteSharePicture } from '@site/settings/data-access';
 import { notFound } from 'next/navigation';
 
 import type { Metadata } from 'next';
@@ -23,7 +24,9 @@ export async function generateMetadata({
 }: PageProps<'/[locale]/product/[product]'>): Promise<Metadata> {
   const { locale, product: slug } = await params;
   const product = isLocale(locale) ? await getCatalogProduct(slug, locale) : null;
-  return isLocale(locale) && product ? buildCatalogProductMetadata(locale, product) : {};
+  return isLocale(locale) && product
+    ? withSiteSharePicture(buildCatalogProductMetadata(locale, product))
+    : {};
 }
 
 export default async function Page({ params }: PageProps<'/[locale]/product/[product]'>) {

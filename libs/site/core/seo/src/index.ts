@@ -14,3 +14,11 @@ export { buildCanonicalPath, buildLanguageAlternates } from './lib/metadata/alte
 export { buildPageMetadata, buildRootMetadata } from './lib/metadata/page-metadata';
 export type { PageMetadataInput } from './lib/metadata/page-metadata';
 export { buildRobotsMeta } from './lib/metadata/robots-policy';
+export { SiteAnalytics } from './lib/analytics/site-analytics';
+export {
+  analyticsId,
+  buildVerificationMetadata,
+  tagManagerId,
+  withSharePicture,
+} from './lib/metadata/site-codes';
+export type { SharePicture, SiteCodes } from './lib/metadata/site-codes';

@@ -27,6 +27,7 @@ export function buildArticleJsonLd(
     headline: article.title,
     description: article.description,
     datePublished: article.date,
+    ...(article.modified ? { dateModified: article.modified } : {}),
     inLanguage: LOCALE_LANGUAGE_TAGS[article.textLocale],
     mainEntityOfPage: url,
     author: organization,

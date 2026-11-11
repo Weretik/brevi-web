@@ -15,3 +15,5 @@ export * from './dialogs/article-delete-dialog';
 export * from './tables/redirects/redirects-table';
 export * from './forms/redirects/redirect-form';
 export * from './dialogs/redirect-delete-dialog';
+export * from './components/seo-settings/seo-settings-view';
+export * from './forms/seo-settings/seo-settings-form';
