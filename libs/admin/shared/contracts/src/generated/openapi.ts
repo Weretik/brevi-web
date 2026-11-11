@@ -5652,6 +5652,40 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/public/articles': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Every article on the site, the newest date first, with its title, excerpt and cover. */
+    get: operations['getPublicArticles'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/public/articles/{slug}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description An article page by its address with SEO and the text. */
+    get: operations['getPublicArticle'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -12981,6 +13015,66 @@ export interface components {
       updatedAtUtc: string;
       /** @description false when the Russian page shows the Ukrainian texts. */
       hasRussian: boolean;
+    };
+    /**
+     * @description The language of the texts that came back.
+     * @enum {string}
+     */
+    PublicArticleLanguage: 'uk' | 'ru';
+    PublicArticlePhoto: {
+      url: string;
+      /** @description The small WebP copy for lists; null until the library has made it. */
+      thumbnailUrl?: string | null;
+      /** Format: int32 */
+      width?: number | null;
+      /** Format: int32 */
+      height?: number | null;
+    };
+    PublicArticleCard: {
+      slug: string;
+      /**
+       * Format: date
+       * @description The date readers see.
+       */
+      publishedOn: string;
+      language: components['schemas']['PublicArticleLanguage'];
+      title: string;
+      /** @description The short text for lists; may hold bold and italic as **…** and *…*. */
+      excerpt?: string | null;
+      cover?: components['schemas']['PublicArticlePhoto'] | null;
+      /** @description The article has a Russian title and text, so the Russian page is its own. */
+      hasRussian: boolean;
+      /** Format: date-time */
+      updatedAtUtc: string;
+    };
+    PublicArticleList: {
+      items: components['schemas']['PublicArticleCard'][];
+    };
+    /** @enum {string} */
+    PublicArticleBlockKind: 'Paragraph' | 'Heading' | 'List' | 'Image';
+    /** @description One block of the text. A paragraph may open with a bold lead; texts may hold bold and italic as **…** and *…* (a typed asterisk is \*). A list keeps its lines in items. An image carries its photo and alt text. */
+    PublicArticleBlock: {
+      kind: components['schemas']['PublicArticleBlockKind'];
+      text?: string | null;
+      lead?: string | null;
+      items: string[];
+      photo?: components['schemas']['PublicArticlePhoto'] | null;
+      alt?: string | null;
+    };
+    PublicArticle: {
+      slug: string;
+      /** Format: date */
+      publishedOn: string;
+      language: components['schemas']['PublicArticleLanguage'];
+      hasRussian: boolean;
+      title: string;
+      excerpt?: string | null;
+      seoTitle?: string | null;
+      seoDescription?: string | null;
+      cover?: components['schemas']['PublicArticlePhoto'] | null;
+      body: components['schemas']['PublicArticleBlock'][];
+      /** Format: date-time */
+      updatedAtUtc: string;
     };
   };
   responses: {
@@ -30988,6 +31082,73 @@ export interface operations {
         content: {
           'application/json': components['schemas']['PublicCatalogSlug'][];
         };
+      };
+    };
+  };
+  getPublicArticles: {
+    parameters: {
+      query?: {
+        language?: components['parameters']['Language'];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Articles */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PublicArticleList'];
+        };
+      };
+      /** @description Wrong language */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getPublicArticle: {
+    parameters: {
+      query?: {
+        language?: components['parameters']['Language'];
+      };
+      header?: never;
+      path: {
+        slug: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Article */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['PublicArticle'];
+        };
+      };
+      /** @description Wrong language */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such address, or the article is hidden */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };

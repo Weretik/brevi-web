@@ -1,4 +1,4 @@
-import { ARTICLES, formatArticleDate } from '@site/articles/model';
+import { formatArticleDate } from '@site/articles/model';
 import { buildArticleJsonLd } from '@site/articles/seo';
 import { ArticleBody, ArticleCards, ArticlesOrder, getArticlesDictionary } from '@site/articles/ui';
 import { SITE_PATHS, localizedPath } from '@site/core/i18n';
@@ -7,31 +7,31 @@ import { Breadcrumbs, PageSection, StitchLabel } from '@site/shared/ui';
 
 import { articleHref, toArticleSeoInput } from './article-links';
 
-import type { Article } from '@site/articles/model';
+import type { Article, ArticleCard } from '@site/articles/model';
 import type { Locale } from '@site/core/i18n';
 
 /** Anchor of the home contacts block; «Обговорити пошиття» leads there until the request page exists. */
 const REQUEST_ANCHOR = '#zayavka';
 
-/** How many other articles the «Читайте також» block offers. */
-const MORE_ARTICLES = 3;
-
-/** The articles that follow this one in the list, wrapping around, so every article gets linked. */
-function pickMoreArticles(article: Article): readonly Article[] {
-  const start = ARTICLES.findIndex((item) => item.slug === article.slug) + 1;
-  return Array.from(
-    { length: MORE_ARTICLES },
-    (_, offset) => ARTICLES[(start + offset) % ARTICLES.length],
-  ).filter((item) => item.slug !== article.slug);
-}
-
 /**
- * One article: breadcrumbs, date, `h1`, the text, the call to order, and three more articles. Static.
+ * One article from the Admin: breadcrumbs, date, `h1`, the text, the call to order, and other articles.
  * `Article` and `BreadcrumbList` describe the page in JSON-LD.
  */
-export function ArticlePage({ locale, article }: { locale: Locale; article: Article }) {
+export function ArticlePage({
+  locale,
+  article,
+  more,
+}: {
+  locale: Locale;
+  article: Article;
+  /** Other articles for «Читайте також»; the block is left out when there are none. */
+  more: readonly ArticleCard[];
+}) {
   const dictionary = getArticlesDictionary(locale);
-  const title = article.title[locale];
+  const { title } = article;
+  const seo = toArticleSeoInput(article);
+  // An article without Russian texts shows the Ukrainian ones on the Russian page.
+  const textLang = article.textLocale === locale ? undefined : article.textLocale;
   const articlesHref = localizedPath(locale, SITE_PATHS.articles);
   const breadcrumbs = [
     { name: dictionary.home, href: localizedPath(locale) },
@@ -45,7 +45,10 @@ export function ArticlePage({ locale, article }: { locale: Locale; article: Arti
         <Breadcrumbs items={breadcrumbs} label={dictionary.breadcrumbsLabel} />
         <header className="grid gap-5">
           <StitchLabel index="01">{dictionary.breadcrumb}</StitchLabel>
-          <h1 className="max-w-[52rem] text-[2rem] leading-[1.1] font-extrabold tracking-[-0.025em] sm:text-[2.5rem]">
+          <h1
+            lang={textLang}
+            className="max-w-[52rem] text-[2rem] leading-[1.1] font-extrabold tracking-[-0.025em] sm:text-[2.5rem]"
+          >
             {title}
           </h1>
           <p className="font-mono text-[0.8125rem] text-muted-foreground">
@@ -53,7 +56,9 @@ export function ArticlePage({ locale, article }: { locale: Locale; article: Arti
             <time dateTime={article.date}>{formatArticleDate(article.date)}</time>
           </p>
         </header>
-        <ArticleBody blocks={article.body[locale]} />
+        <div lang={textLang}>
+          <ArticleBody blocks={article.body} />
+        </div>
       </article>
 
       <ArticlesOrder
@@ -63,21 +68,22 @@ export function ArticlePage({ locale, article }: { locale: Locale; article: Arti
         productionHref={localizedPath(locale, SITE_PATHS.production)}
       />
 
-      <PageSection
-        id="article-more"
-        title={dictionary.article.more.title}
-        label={{ index: '02', text: dictionary.article.more.label }}
-        action={{ href: articlesHref, label: dictionary.article.more.all }}
-      >
-        <ArticleCards
-          articles={pickMoreArticles(article)}
-          locale={locale}
-          readLabel={dictionary.list.read}
-          hrefFor={(item) => articleHref(locale, item)}
-        />
-      </PageSection>
+      {more.length > 0 ? (
+        <PageSection
+          id="article-more"
+          title={dictionary.article.more.title}
+          label={{ index: '02', text: dictionary.article.more.label }}
+          action={{ href: articlesHref, label: dictionary.article.more.all }}
+        >
+          <ArticleCards
+            articles={more}
+            readLabel={dictionary.list.read}
+            hrefFor={(item) => articleHref(locale, item)}
+          />
+        </PageSection>
+      ) : null}
 
-      <JsonLd data={buildArticleJsonLd(locale, toArticleSeoInput(locale, article))} />
+      <JsonLd data={buildArticleJsonLd(locale, seo)} />
       <JsonLd
         data={buildBreadcrumbJsonLd(
           breadcrumbs.map((item) => ({ name: item.name, path: item.href })),

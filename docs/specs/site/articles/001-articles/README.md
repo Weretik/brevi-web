@@ -1,6 +1,6 @@
 # «Статті» pages
 
-**Status:** implemented and verified locally 2026-11-10.
+**Status:** implemented and verified locally 2026-11-10; articles read from the Admin since 2026-11-11 (see «Change 2026-11-11»).
 **Variant:** `nextjs`.
 **Source:** [migration plan](../../migration/README.md) and its [feature inventory](../../migration/feature-inventory.md) («Статьи»); [SEO architecture](../../../../architecture/site/platform/seo-architecture.md) (`/uk/articles/{slug}`, `Article`); design «Строчка»; the 26 articles of the live `brevi.com.ua` blog in Ukrainian and Russian.
 **Feature card:** [site articles](../../../../features/site/articles.md).
@@ -66,3 +66,23 @@ Short check under the staged structure check in the [delivery rules](../../../..
 | Client code                 | None.                                                                                          |
 | No duplicates               | One card component serves the list and «Читайте також»; links are built in `article-links.ts`. |
 | Generator leftovers         | Removed sample files, `.babelrc`, the model `package.json` and `vitest.config.mts`.            |
+
+## Change 2026-11-11: articles from the Admin
+
+Stage 4 of BreviERP [CNT-004](https://github.com/Weretik/BreviERP/blob/master/docs/sdd/specs/content/004-articles/README.md). Staff keep articles in «Контент → Статті»; the old-site articles are moved there with their pictures to the CDN. The site now reads them from the public API (`getPublicArticles`, `getPublicArticle`) and the article files, `ARTICLES` and the two pictures in `apps/site/public/assets/articles/` are removed.
+
+| ID    | Rule                                                                                                                                                                              |
+| ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| R-008 | New library `site-articles-data-access` is the only reader of articles: answers are checked at run time, kept five minutes (a failure one minute) under the tag `articles`.       |
+| R-009 | The list shows the articles marked «Показувати на сайті», newest first; a card has the cover when there is one. With no articles or no API the list says they appear later.       |
+| R-010 | A new article opens without a rebuild (`dynamicParams`); a hidden or unknown slug is 404. «Читайте також» shows the next three articles and is left out when there are none.      |
+| R-011 | An article without Russian texts shows the Ukrainian ones on the Russian page with `lang="uk"`, a canonical to the Ukrainian page and is listed only in Ukrainian in the sitemap. |
+| R-012 | Title and description: what staff wrote for search, otherwise the title and the excerpt. Headings, a bold lead, bold and italic of the visual editor are shown.                   |
+
+| Rule         | Code                                                                           | Test                                                                      |
+| ------------ | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------- |
+| R-008        | `articles/data-access/src/lib/*`                                               | `public-articles.mapper.spec.ts`, `articles-source.spec.ts`               |
+| R-009, R-010 | `articles-page.tsx`, `article-page.tsx`, `articles.ts`, `[slug]/page.tsx`      | `articles-pages.spec.tsx`, `articles.spec.ts`                             |
+| R-011, R-012 | `article-links.ts`, `articles-metadata.ts`, `article-json-ld.ts`, `sitemap.ts` | `articles-seo.spec.ts`, `articles-pages.spec.tsx`, `articles-ui.spec.tsx` |
+
+Rollout: deploy after BreviERP's public article API and after the owner has run «Перенести зі старого сайту» on «Статті»; until then the list is empty.

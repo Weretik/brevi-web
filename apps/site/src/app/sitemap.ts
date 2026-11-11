@@ -1,4 +1,4 @@
-import { ARTICLES } from '@site/articles/model';
+import { getArticleAddresses } from '@site/articles/data-access';
 import { articlePath } from '@site/articles/seo';
 import { getCatalogCategoryAddresses, getCatalogProductAddresses } from '@site/catalog/data-access';
 import { SITE_PATHS, catalogCategoryPath, catalogProductPath } from '@site/core/i18n';
@@ -8,12 +8,13 @@ import type { MetadataRoute } from 'next';
 
 /**
  * Pages in both languages with `hreflang` alternates. Each migrated page adds its own entry. Catalog pages
- * come from the Admin; a category or a product without Russian texts is listed only in Ukrainian.
+ * and articles come from the Admin; a page without Russian texts is listed only in Ukrainian.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [categories, products] = await Promise.all([
+  const [categories, products, articles] = await Promise.all([
     getCatalogCategoryAddresses(),
     getCatalogProductAddresses(),
+    getArticleAddresses(),
   ]);
 
   return buildSitemapEntries([
@@ -41,6 +42,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(product.updatedAt),
       locales: product.hasRussian ? undefined : (['uk'] as const),
     })),
-    ...ARTICLES.map((article) => ({ path: articlePath(article.slug) })),
+    ...articles.map((article) => ({
+      path: articlePath(article.slug),
+      lastModified: new Date(article.updatedAt),
+      locales: article.hasRussian ? undefined : (['uk'] as const),
+    })),
   ]);
 }

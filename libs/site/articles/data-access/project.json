@@ -1,0 +1,7 @@
+{
+  "name": "site-articles-data-access",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/site/articles/data-access/src",
+  "projectType": "library",
+  "tags": ["scope:site", "domain:articles", "type:data-access"]
+}

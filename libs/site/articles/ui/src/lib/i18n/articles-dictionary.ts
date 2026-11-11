@@ -11,6 +11,7 @@ const uk = {
     label: 'Усі статті',
     title: 'Статті про робочий одяг',
     read: 'Читати',
+    empty: 'Статті скоро з’являться тут.',
   },
   article: {
     published: 'Опубліковано',
@@ -42,6 +43,7 @@ const ru: ArticlesDictionary = {
     label: 'Все статьи',
     title: 'Статьи о рабочей одежде',
     read: 'Читать',
+    empty: 'Статьи скоро появятся здесь.',
   },
   article: {
     published: 'Опубликовано',

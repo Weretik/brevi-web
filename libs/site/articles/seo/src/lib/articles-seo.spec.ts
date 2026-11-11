@@ -11,6 +11,7 @@ import {
 
 const article = {
   slug: 'navishcho-potriben-specodyag',
+  textLocale: 'ru' as const,
   title: 'Навіщо потрібен спецодяг?',
   description: 'Процвітання будь-якого підприємства залежить від багатьох факторів.',
   date: '2021-07-29',
@@ -56,10 +57,21 @@ describe('article metadata', () => {
     expect(metadata.openGraph).toMatchObject({ type: 'article', publishedTime: '2021-07-29' });
   });
 
-  it('adds the article picture to Open Graph when there is one', () => {
-    const metadata = buildArticleMetadata('uk', { ...article, image: '/assets/articles/a.webp' });
+  it('adds the article cover to Open Graph when there is one', () => {
+    const metadata = buildArticleMetadata('uk', {
+      ...article,
+      textLocale: 'uk',
+      image: 'https://cdn.example/5.jpg',
+    });
 
-    expect(metadata.openGraph).toMatchObject({ images: ['/assets/articles/a.webp'] });
+    expect(metadata.openGraph).toMatchObject({ images: ['https://cdn.example/5.jpg'] });
+  });
+
+  it('points the Russian page of an article without Russian texts at the Ukrainian one', () => {
+    const metadata = buildArticleMetadata('ru', { ...article, textLocale: 'uk' });
+
+    expect(metadata.alternates).toEqual({ canonical: '/uk/articles/navishcho-potriben-specodyag' });
+    expect(metadata.openGraph).toMatchObject({ url: '/uk/articles/navishcho-potriben-specodyag' });
   });
 });
 
@@ -67,7 +79,7 @@ describe('article JSON-LD', () => {
   const config = createSiteConfig({ SITE_ENV: 'production', SITE_INDEXING: 'true' });
 
   it('describes the article with its date, language, and Brevi as publisher', () => {
-    expect(buildArticleJsonLd('uk', article, config)).toMatchObject({
+    expect(buildArticleJsonLd('uk', { ...article, textLocale: 'uk' }, config)).toMatchObject({
       '@type': 'Article',
       headline: article.title,
       datePublished: '2021-07-29',
@@ -77,10 +89,16 @@ describe('article JSON-LD', () => {
     });
   });
 
-  it('adds an absolute picture URL only when the article has a picture', () => {
+  it('adds the cover address only when the article has a cover', () => {
     expect(buildArticleJsonLd('uk', article, config)).not.toHaveProperty('image');
     expect(
-      buildArticleJsonLd('uk', { ...article, image: '/assets/articles/a.webp' }, config),
-    ).toMatchObject({ image: 'https://brevi.com.ua/assets/articles/a.webp' });
+      buildArticleJsonLd('uk', { ...article, image: 'https://cdn.example/5.jpg' }, config),
+    ).toMatchObject({ image: 'https://cdn.example/5.jpg' });
+  });
+
+  it('names the language of the texts, not of the page', () => {
+    expect(buildArticleJsonLd('ru', { ...article, textLocale: 'uk' }, config)).toMatchObject({
+      inLanguage: 'uk-UA',
+    });
   });
 });
