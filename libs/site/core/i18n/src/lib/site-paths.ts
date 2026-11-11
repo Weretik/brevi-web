@@ -15,6 +15,7 @@ export const SITE_PATHS = {
   regions: '/regions',
   deliveryAndPayment: '/delivery-and-payment',
   returnsExchanges: '/returns-exchanges',
+  sizeChart: '/size-chart',
   agreement: '/agreement',
   /** Private request list: never indexed, links to it carry `rel="nofollow"`. */
   request: '/request',

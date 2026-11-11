@@ -47,6 +47,7 @@ const uk = {
     regions: 'Регіони',
     deliveryAndPayment: 'Доставка та оплата',
     returnsExchanges: 'Повернення та обмін',
+    sizeChart: 'Таблиця розмірів',
     agreement: 'Угода користувача',
   },
 };
@@ -100,6 +101,7 @@ const ru: ShellDictionary = {
     regions: 'Регионы',
     deliveryAndPayment: 'Доставка и оплата',
     returnsExchanges: 'Возврат и обмен',
+    sizeChart: 'Таблица размеров',
     agreement: 'Пользовательское соглашение',
   },
 };
