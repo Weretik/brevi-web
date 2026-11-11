@@ -192,6 +192,32 @@ vi.mock('@admin/warehouse/data-access', () => ({
   useGetHardwareOrderQuery: (_: unknown, options: { skip: boolean }) =>
     options.skip ? {} : { data: hardware },
 }));
+vi.mock('@admin/content/data-access', () => ({
+  useGetSeoOverviewQuery: (_: unknown, options: { skip: boolean }) =>
+    options.skip
+      ? {}
+      : {
+          data: {
+            siteProblems: ['NoGoogleVerification'],
+            areas: [
+              { area: 'Product', onSite: 40, withProblems: 2 },
+              { area: 'Article', onSite: 6, withProblems: 0 },
+            ],
+            issues: [
+              {
+                area: 'Product',
+                id: 'p1',
+                name: 'Халат робочий',
+                path: '/catalog/halat',
+                problems: [
+                  { kind: 'NoDescription', language: 'ru' },
+                  { kind: 'TitleTooLong', language: null },
+                ],
+              },
+            ],
+          },
+        },
+}));
 vi.mock('@admin/quotes/data-access', () => ({
   useListQuotesQuery: (_: unknown, options: { skip: boolean }) =>
     options.skip
@@ -313,6 +339,32 @@ describe('DashboardPage', () => {
     );
     expect(screen.queryByRole('link', { name: 'Клієнти' })).toBeNull();
     expect(screen.queryByRole('region', { name: 'Дошка цеху' })).toBeNull();
+  });
+
+  it('gives the SEO specialist what the site still misses for search', () => {
+    renderFor('desk-seo', 'content-seo-overview', 'content-products', 'content-seo-settings');
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Робочий стіл SEO' })).toBeVisible();
+    expect(screen.getByText('Немає коду підтвердження Google Search Console.')).toBeVisible();
+    expect(screen.getByRole('link', { name: 'Відкрити налаштування' })).toHaveAttribute(
+      'href',
+      '/content/seo-settings',
+    );
+    const metrics = screen.getByRole('region', { name: 'Показники' });
+    expect(within(metrics).getByText('з проблемами: 2')).toBeVisible();
+    expect(within(metrics).queryByText('з проблемами: 0')).toBeNull();
+
+    const fix = screen.getByRole('region', { name: 'Що виправити для пошуку' });
+    expect(within(fix).getByRole('link', { name: 'Товари сайту: Халат робочий' })).toHaveAttribute(
+      'href',
+      '/content/products',
+    );
+    expect(within(fix).getByText('Немає SEO-опису (рос.) · ще 1')).toBeVisible();
+    expect(screen.getByRole('link', { name: 'Товари сайту' })).toHaveAttribute(
+      'href',
+      '/content/products',
+    );
+    expect(screen.queryByRole('link', { name: 'Статті' })).toBeNull();
   });
 
   it('lets a person with several desks switch them and remembers the choice', () => {
