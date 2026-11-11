@@ -5130,6 +5130,65 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/content/products': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description One page of every Catalog product (sewing first, by code) with the state of its site page. Search matches the code, the name or the address, case-insensitive. */
+    get: operations['getContentProducts'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/content/products/{productId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Catalog product id. */
+        productId: components['parameters']['components-parameters-ProductId'];
+      };
+      cookie?: never;
+    };
+    /** @description The editor of one product. A product without a page comes with revision 0, empty texts and an offered address built from its name. */
+    get: operations['getContentProduct'];
+    /** @description Creates the page or replaces it as a whole. revision is the number the editor showed (0 without a page). An empty slug keeps the current address or builds one from the name. A language without any text is not kept. Texts are trimmed; empty facts, blocks and characteristic rows are dropped. */
+    put: operations['saveContentProduct'];
+    post?: never;
+    /** @description Removes the site page with its texts. The Catalog product stays and the site stops showing it. */
+    delete: operations['deleteContentProduct'];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/content/products/{productId}/visibility': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Catalog product id. */
+        productId: components['parameters']['components-parameters-ProductId'];
+      };
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    /** @description «Показувати на сайті» from the list. A product without a page gets an empty one with an address built from its name. */
+    patch: operations['setContentProductVisibility'];
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -11634,6 +11693,136 @@ export interface components {
       chatId?: number;
       organizations?: string[] | null;
     };
+    /** @description hasPage is false when nobody has made the page yet. onSite is true only when the mark is set and the Catalog product is active. The has… flags say what the site would miss. */
+    ContentProductRow: {
+      /** Format: int32 */
+      productId: number;
+      /** @enum {string} */
+      type: 'Sewing' | 'Ppe';
+      code?: string | null;
+      name: string;
+      /** Format: int32 */
+      sectionId?: number | null;
+      sectionName?: string | null;
+      isActive: boolean;
+      mainPhotoUrl?: string | null;
+      hasPrice: boolean;
+      hasPage: boolean;
+      showOnSite: boolean;
+      onSite: boolean;
+      slug?: string | null;
+      hasUkrainianText: boolean;
+      hasRussianText: boolean;
+      /** @description SEO title and description are written in both languages. */
+      hasSeo: boolean;
+      /** Format: date-time */
+      updatedAtUtc?: string | null;
+    };
+    ContentProductPage: {
+      items: components['schemas']['ContentProductRow'][];
+      /** Format: int32 */
+      page: number;
+      /** Format: int32 */
+      pageSize: number;
+      /** Format: int32 */
+      total: number;
+    };
+    /** @description A short fact next to the photo, for example «Сезон» and «весна, літо, осінь». The label may be empty. */
+    ProductFact: {
+      label?: string | null;
+      text: string;
+    };
+    /** @enum {string} */
+    ProductTextBlockKind: 'Paragraph' | 'Heading' | 'List';
+    /** @description One block of the description. A paragraph may open with a bold lead; a list keeps its lines in items. */
+    ProductTextBlock: {
+      kind: components['schemas']['ProductTextBlockKind'];
+      text?: string | null;
+      lead?: string | null;
+      items?: string[] | null;
+    };
+    ProductSpecRow: {
+      name: string;
+      value: string;
+    };
+    /** @description Characteristics of one garment part, for example «Куртка». */
+    ProductSpecGroup: {
+      title?: string | null;
+      rows: components['schemas']['ProductSpecRow'][];
+    };
+    ContentProductTextResponse: {
+      name?: string | null;
+      seoTitle?: string | null;
+      seoDescription?: string | null;
+      summary: components['schemas']['ProductFact'][];
+      description: components['schemas']['ProductTextBlock'][];
+      specs: components['schemas']['ProductSpecGroup'][];
+    };
+    /** @description Prices for 1–9, 10–40 and from 41 pieces. */
+    ContentPriceTiersResponse: {
+      /** Format: double */
+      retail: number;
+      /** Format: double */
+      wholesale: number;
+      /** Format: double */
+      largeWholesale: number;
+    };
+    /** @description A fabric variant of a sewing model with its published prices. PPE products have none. */
+    ContentProductVariantResponse: {
+      /** Format: int64 */
+      articleId: number;
+      saleSku: string;
+      isActive: boolean;
+      fabricName?: string | null;
+      fabricDetails?: string | null;
+      prices?: components['schemas']['ContentPriceTiersResponse'] | null;
+    };
+    ContentProductResponse: {
+      product: components['schemas']['ContentProductRow'];
+      /**
+       * Format: int32
+       * @description 0 when the product has no page yet.
+       */
+      revision: number;
+      /** @description The address of the page, or the offered one when there is no page yet. */
+      slug: string;
+      updatedBy?: string | null;
+      uk: components['schemas']['ContentProductTextResponse'];
+      ru: components['schemas']['ContentProductTextResponse'];
+      prices?: components['schemas']['ContentPriceTiersResponse'] | null;
+      variants: components['schemas']['ContentProductVariantResponse'][];
+    };
+    /** @description Texts of one language as staff type them. */
+    ProductPageTextInput: {
+      name?: string | null;
+      seoTitle?: string | null;
+      seoDescription?: string | null;
+      summary?: components['schemas']['ProductFact'][] | null;
+      /** @description At most 20000 characters in all blocks together. */
+      description?: components['schemas']['ProductTextBlock'][] | null;
+      specs?: components['schemas']['ProductSpecGroup'][] | null;
+    };
+    SaveContentProductRequest: {
+      /** Format: int32 */
+      revision: number;
+      /** @description Lower-case Latin letters, digits and single hyphens, 3 to 120 characters. */
+      slug?: string | null;
+      showOnSite: boolean;
+      uk?: components['schemas']['ProductPageTextInput'] | null;
+      ru?: components['schemas']['ProductPageTextInput'] | null;
+    };
+    ContentProductVisibilityRequest: {
+      showOnSite: boolean;
+    };
+    ContentProductVisibilityResponse: {
+      /** Format: int32 */
+      productId: number;
+      showOnSite: boolean;
+      onSite: boolean;
+      /** Format: int32 */
+      revision: number;
+      slug: string;
+    };
   };
   responses: {
     /** @description Validation failures including field identifiers. */
@@ -11762,6 +11951,8 @@ export interface components {
     TaskId: number;
     LeadId: number;
     FileId: string;
+    /** @description Catalog product id. */
+    'components-parameters-ProductId': number;
   };
   requestBodies: never;
   headers: never;
@@ -27917,6 +28108,259 @@ export interface operations {
       };
       /** @description Admin role required (normal mode) */
       403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getContentProducts: {
+    parameters: {
+      query?: {
+        page?: number;
+        pageSize?: number;
+        search?: string;
+        type?: 'Sewing' | 'Ppe';
+        /** @description A section of «Типи і розділи». */
+        sectionId?: number;
+        /** @description true keeps products the site shows (mark set and product active); false keeps the rest. */
+        onSite?: boolean;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ContentProductPage'];
+        };
+      };
+      /** @description Invalid page, page size, search, type or section */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to view «Товари сайту» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getContentProduct: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Catalog product id. */
+        productId: components['parameters']['components-parameters-ProductId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ContentProductResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to view «Товари сайту» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such Catalog product */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  saveContentProduct: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Catalog product id. */
+        productId: components['parameters']['components-parameters-ProductId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SaveContentProductRequest'];
+      };
+    };
+    responses: {
+      /** @description Saved */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ContentProductResponse'];
+        };
+      };
+      /** @description Invalid address or a text over its limit */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to edit «Товари сайту» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such Catalog product */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The page was changed by someone else, or the address belongs to another product */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  deleteContentProduct: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Catalog product id. */
+        productId: components['parameters']['components-parameters-ProductId'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Deleted */
+      204: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to delete in «Товари сайту» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The product has no page */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  setContentProductVisibility: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Catalog product id. */
+        productId: components['parameters']['components-parameters-ProductId'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ContentProductVisibilityRequest'];
+      };
+    };
+    responses: {
+      /** @description Saved (or unchanged) */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ContentProductVisibilityResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No right to edit «Товари сайту» */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such Catalog product */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The page was changed by someone else at the same moment */
+      409: {
         headers: {
           [name: string]: unknown;
         };
