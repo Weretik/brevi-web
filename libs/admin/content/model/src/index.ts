@@ -42,13 +42,13 @@ export {
   contentProductTypeLabel,
 } from './mappers/product-pages/content-product-problems';
 export {
-  blocksFromText,
-  blocksToText,
-  factsFromText,
-  factsToText,
-  specsFromText,
-  specsToText,
-} from './mappers/product-pages/content-text-markup';
+  blocksFromRichText,
+  blocksToRichText,
+  emptyRichText,
+  inlineRuns,
+  plainInline,
+} from './mappers/product-pages/content-rich-text';
+export type { ContentRichNode } from './mappers/product-pages/content-rich-text';
 export {
   contentLanguageLabel,
   contentProductFormOf,
@@ -56,6 +56,8 @@ export {
   contentProductTextInputOf,
 } from './forms/product-pages/content-product-form';
 export type {
+  ContentFactValues,
+  ContentSpecGroupValues,
   ContentProductFormValues,
   ContentProductInput,
   ContentProductTextInput,

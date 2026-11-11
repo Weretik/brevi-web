@@ -1,3 +1,4 @@
+import { plainCatalogText } from '@site/catalog/model';
 import { COMPANY, siteConfig } from '@site/core/config';
 import { catalogProductPath, localizedPath } from '@site/core/i18n';
 import { buildPageMetadata } from '@site/core/seo';
@@ -13,7 +14,9 @@ const DESCRIPTION_LIMIT = 160;
 /** The first paragraph of the product description, cut at a word within the search snippet length. */
 function firstParagraph(product: CatalogProduct): string {
   const blocks = [...product.description, ...product.summary];
-  const text = blocks.flatMap((block) => (block.type === 'paragraph' ? [block.text] : []))[0] ?? '';
+  const text = plainCatalogText(
+    blocks.flatMap((block) => (block.type === 'paragraph' ? [block.text] : []))[0] ?? '',
+  );
   if (text.length <= DESCRIPTION_LIMIT) return text;
   const cut = text.slice(0, DESCRIPTION_LIMIT - 1);
   return `${cut.slice(0, cut.lastIndexOf(' '))}…`;

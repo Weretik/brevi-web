@@ -200,9 +200,16 @@ describe('ContentProductsContent', () => {
     await userEvent.click(screen.getByText('Костюм Лідер'));
     const panel = await screen.findByRole('dialog');
     await userEvent.click(within(panel).getByRole('button', { name: 'Редагувати' }));
-    const specs = within(panel).getByLabelText('Характеристики');
-    expect(specs).toHaveValue('## Куртка\nЗастібка: блискавка');
-    await userEvent.type(specs, '\nКишені: дві');
+    // No markup is typed: the description opens in the visual editor, characteristics as rows.
+    expect(within(panel).getByRole('textbox', { name: 'Опис' })).toHaveTextContent(
+      'Зручний костюм.',
+    );
+    expect(within(panel).getByRole('toolbar', { name: 'Форматування тексту' })).toBeInTheDocument();
+    const jacket = within(within(panel).getByRole('group', { name: 'Характеристики: Куртка' }));
+    expect(jacket.getByLabelText('Назва, рядок 1')).toHaveValue('Застібка');
+    await userEvent.click(jacket.getByRole('button', { name: 'Додати рядок' }));
+    await userEvent.type(jacket.getByLabelText('Назва, рядок 2'), 'Кишені');
+    await userEvent.type(jacket.getByLabelText('Значення, рядок 2'), 'дві');
     await userEvent.click(within(panel).getByRole('tab', { name: 'Російська' }));
     await userEvent.type(within(panel).getByLabelText('Назва на сайті'), 'Костюм «Лидер»');
     await userEvent.click(within(panel).getByRole('button', { name: 'Зберегти' }));
@@ -214,6 +221,8 @@ describe('ContentProductsContent', () => {
       slug: 'kostyum-lider',
       showOnSite: true,
       uk: {
+        summary: [{ label: 'Сезон', text: 'весна, літо' }],
+        description: [{ kind: 'Paragraph', text: 'Зручний костюм.', lead: null, items: [] }],
         specs: [
           {
             title: 'Куртка',

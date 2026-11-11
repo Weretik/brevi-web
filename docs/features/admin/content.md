@@ -4,7 +4,7 @@
 
 «Контент» is the sidebar group for the public site's content.
 
-- **«Товари сайту»** (`/content/products`, «Права доступу» page `content-products`: Admin everything, Manager view). Every product of «Товари» with the «На сайті» switch and what its page still misses (only problems are marked). The side panel shows what the site takes from «Товари» (name, code, section, prices, fabrics) and the page itself; «Редагувати» changes the mark, the address and, in Ukrainian and Russian, the name, SEO title and description, short facts, description and characteristics. Long texts are plain text with light marks (`## `, `- `, `**…**`, «Назва: значення»). «Видалити сторінку» removes the texts, not the product. «Перенести зі старого сайту» (create right) loads the old-site texts and SEO from a file: the server first counts what would happen, «Перенести» writes. [SDD](../../specs/admin/content/001-product-pages/README.md), [API contract](../../specs/admin/content/001-product-pages/contracts/api-contract.md).
+- **«Товари сайту»** (`/content/products`, «Права доступу» page `content-products`: Admin everything, Manager view). Every product of «Товари» with the «На сайті» switch and what its page still misses (only problems are marked). The side panel shows what the site takes from «Товари» (name, code, section, prices, fabrics) and the page itself; «Редагувати» changes the mark, the address and, in Ukrainian and Russian, the name, SEO title and description, short facts, description and characteristics. Nothing is typed as markup ([rule](../../standards/admin/admin-ui.md#texts-for-the-site-visual-editor-no-typed-markup)): the description is edited in the visual editor (heading, bold, italic, list), short facts and characteristics as rows of fields. «Видалити сторінку» removes the texts, not the product. «Перенести зі старого сайту» (create right) loads the old-site texts and SEO from a file: the server first counts what would happen, «Перенести» writes. [SDD](../../specs/admin/content/001-product-pages/README.md), [API contract](../../specs/admin/content/001-product-pages/contracts/api-contract.md).
 - **«Конфіденційність та умови»** (`/content/legal`): cards for the BreviERP description, the privacy policy and the terms, with the edition date, «Відкрити» and «Копіювати посилання». The documents themselves stay static HTML ([public legal pages](public-legal-pages.md)).
 - «Сторінки сайту» is shown as not yet available.
 
@@ -16,7 +16,7 @@ libs/admin/content/model/src/
   entities/product-pages/old-site-import.ts        # transfer report and options
   mappers/product-pages/old-site-import-file.ts    # reads and checks the transfer file
   queries/product-pages/content-product-query.ts   # list query, site filter, page sizes
-  mappers/product-pages/content-text-markup.ts     # plain text <-> facts, blocks, spec groups
+  mappers/product-pages/content-rich-text.ts       # editor document <-> stored blocks, inline bold and italic
   mappers/product-pages/content-product-problems.ts # what the site would miss
   forms/product-pages/content-product-form.ts      # form values and the save body
   validators/product-pages/content-product-validation.ts # address rule and server limits
@@ -29,6 +29,8 @@ libs/admin/content/ui/src/
   tables/product-pages/content-products-table.tsx  # list with the «На сайті» switch
   components/product-pages/                        # read-only view, text preview, language tabs
   forms/product-pages/content-product-form.tsx     # editor fields with hints
+  forms/product-pages/content-facts-editor.tsx     # short facts as rows of fields
+  forms/product-pages/content-specs-editor.tsx     # characteristics: groups with rows of fields
   dialogs/content-product-delete-dialog.tsx
   dialogs/old-site-import-dialog.tsx               # file, options, count, «Перенести»
 libs/admin/content/feature/src/

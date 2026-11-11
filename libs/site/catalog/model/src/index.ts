@@ -7,6 +7,8 @@ export type {
   CatalogProductAddress,
   CatalogSpecGroup,
 } from './lib/catalog-product';
+export { parseCatalogInline, plainCatalogText } from './lib/catalog-inline';
+export type { CatalogInlineRun } from './lib/catalog-inline';
 export { toCatalogSections } from './lib/catalog-sections';
 export type { CatalogSection } from './lib/catalog-sections';
 export { findCatalogPath, flattenCatalogTree } from './lib/catalog-tree';

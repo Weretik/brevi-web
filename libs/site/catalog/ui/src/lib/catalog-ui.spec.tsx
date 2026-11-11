@@ -212,7 +212,7 @@ describe('catalog blocks', () => {
       <CatalogText
         blocks={[
           { type: 'heading', text: 'Тканини' },
-          { type: 'paragraph', text: 'Бавовна добре поглинає вологу.' },
+          { type: 'paragraph', text: '**Бавовна** добре поглинає *вологу*.' },
           { type: 'list', items: ['саржа', 'грета'] },
         ]}
       />,
@@ -220,5 +220,9 @@ describe('catalog blocks', () => {
 
     expect(screen.getByRole('heading', { level: 3, name: 'Тканини' })).toBeTruthy();
     expect(screen.getAllByRole('listitem')).toHaveLength(2);
+    // Formatting from the visual editor of the Admin is shown, never the marks themselves.
+    expect(screen.getByText('Бавовна').tagName).toBe('STRONG');
+    expect(screen.getByText('вологу').tagName).toBe('EM');
+    expect(screen.queryByText(/\*/)).toBeNull();
   });
 });

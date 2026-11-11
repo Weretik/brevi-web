@@ -1,8 +1,11 @@
 import { contentProductLimits } from '@admin/content/model';
 import { ReferenceFormSection } from '@admin/references/ui';
+import { RichTextEditor } from '@admin/shared/ui';
 import { FormControlLabel, InputAdornment, Switch, TextField } from '@mui/material';
 import { useState } from 'react';
 
+import { ContentFactsEditor } from './content-facts-editor';
+import { ContentSpecsEditor } from './content-specs-editor';
 import { ContentLanguageTabs } from '../../components/product-pages/content-language-tabs';
 
 import type {
@@ -22,8 +25,8 @@ interface Props {
 const counter = (value: string, limit: number) => `${value.trim().length} з ${limit}`;
 
 /**
- * Editor of a product page: the mark, the address and texts by language. Long texts are typed as
- * plain text with light marks, explained under each field.
+ * Editor of a product page: the mark, the address and texts by language. The description is edited in
+ * the visual editor, facts and characteristics as rows of fields; nothing is typed as markup.
  */
 export function ContentProductForm({ values, errors, disabled, onChange }: Props) {
   const [language, setLanguage] = useState<ContentLanguage>('uk');
@@ -103,49 +106,35 @@ export function ContentProductForm({ values, errors, disabled, onChange }: Props
           minRows={2}
           fullWidth
         />
-        <TextField
+        <ContentFactsEditor
           key={`${prefix}-summary`}
           label="Короткі відомості"
-          value={text.summary}
+          rows={text.summary}
           disabled={disabled}
-          error={Boolean(textErrors.summary)}
-          helperText={
-            textErrors.summary ??
-            'Кожен рядок окремо: «Сезон: весна, літо, осінь». Показуються біля фото.'
-          }
-          onChange={(event) => set({ summary: event.target.value })}
-          multiline
-          minRows={4}
-          fullWidth
+          error={textErrors.summary}
+          helperText="Показуються біля фото: наприклад «Сезон» і «весна, літо, осінь». Назву можна не заповнювати."
+          onChange={(summary) => set({ summary })}
         />
-        <TextField
+        <RichTextEditor
           key={`${prefix}-description`}
           label="Опис"
-          value={text.description}
+          initialValue={text.description}
           disabled={disabled}
           error={Boolean(textErrors.description)}
           helperText={
             textErrors.description ??
-            'Абзаци розділяйте порожнім рядком. «## » на початку рядка: заголовок. «- »: рядок списку. «**Куртка:**» на початку абзацу: жирний початок.'
+            'Виділіть текст і натисніть кнопку: заголовок, жирний, курсив або список.'
           }
-          onChange={(event) => set({ description: event.target.value })}
-          multiline
-          minRows={8}
-          fullWidth
+          onChange={(description) => set({ description })}
         />
-        <TextField
+        <ContentSpecsEditor
           key={`${prefix}-specs`}
           label="Характеристики"
-          value={text.specs}
+          groups={text.specs}
           disabled={disabled}
-          error={Boolean(textErrors.specs)}
-          helperText={
-            textErrors.specs ?? '«## Куртка» починає групу, далі рядки «Назва: значення».'
-          }
-          onChange={(event) => set({ specs: event.target.value })}
-          multiline
-          minRows={6}
-          fullWidth
+          error={textErrors.specs}
+          helperText="Група об’єднує характеристики однієї частини: «Куртка», «Брюки»."
+          onChange={(specs) => set({ specs })}
         />
       </ReferenceFormSection>
     </>
