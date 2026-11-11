@@ -17,3 +17,17 @@
 - The composition is not copied: it is read from «Товари» each time the tab opens, so there is one source.
 - No «all OK» marks: a model without a layer says so in one line, a missing composition says it is not set.
 - The norms of the 14 models the client sheet has and Brevi lacks, and MOD-095, are loaded through «Імпорт» after the owner's «да».
+
+## Revision 2026-11-11: one work card per model
+
+The owner found the two tabs confusing (UI/UX audit and three concepts on the [canvas](https://claude.ai/artifact/BJFf52pmG82YMi9hw8XptV)) and chose concept B «Робоча картка моделі», asking that «Основна» and «Додаткова» stand out. It replaces PRD-S30 to PRD-S33; PRD-S34 stays.
+
+| ID      | Scenario                                                                                                                                                                                                                                                                   |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PRD-S35 | The page has no tabs: on the left the list of models (search, chips «Усі / З нормою / Без норми / Проблеми», one-colour metres), on the right the work card of the chosen model (`?model=MOD-052`, else the first in the list). «Імпорт» stays in the header.              |
+| PRD-S36 | Three cards «1 колір», «2 кольори», «3 кольори»: each fabric on its own large line with a colour mark (graphite «Основна», orange «Додаткова», grey «Додаткова 2»), a bar of their shares and «Разом». An empty variant says «Не шиється у …» and offers «Додати варіант». |
+| PRD-S37 | Below: «Підкладка, утеплювач, фліс» and «Решта складу» (every other line of the composition from «Товари», with a link «Склад у «Товари»»). Nothing of the composition is edited here.                                                                                     |
+| PRD-S38 | «Рахувати на N шт.» multiplies every fabric, layer and composition line for a batch; empty by default, nothing is saved.                                                                                                                                                   |
+| PRD-S39 | «Задати норму» / «Редагувати норму» opens the side panel with the fields grouped «1 колір», «2 кольори», «3 кольори» and labelled «Основна», «Додаткова»; «Видалити норму» asks first.                                                                                     |
+
+A difference between the workshop norm and the fabric in the composition (71 of 124 models in the transfer files) is not marked until the owner says whether it is an error.

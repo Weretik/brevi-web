@@ -1,4 +1,9 @@
-import { fabricNormFieldLabels, fabricNormTotal, formatMeters } from '@admin/production/model';
+import {
+  fabricNormFieldLabels,
+  fabricNormFieldShortLabels,
+  fabricNormTotal,
+  formatMeters,
+} from '@admin/production/model';
 import { ReferenceFormSection } from '@admin/references/ui';
 import { InputAdornment, TextField, Typography } from '@mui/material';
 
@@ -15,14 +20,14 @@ interface Props {
 }
 
 const groups: { title: string; fields: FabricNormField[]; hint: string }[] = [
-  { title: 'Один колір', fields: ['oneColor'], hint: 'Виріб з однієї тканини.' },
+  { title: '1 колір', fields: ['oneColor'], hint: 'Виріб з однієї тканини.' },
   {
-    title: 'Два кольори',
+    title: '2 кольори',
     fields: ['twoColorsMain', 'twoColorsAdditional'],
-    hint: 'Основна тканина і вставки.',
+    hint: 'Основна тканина і додаткова (вставки).',
   },
   {
-    title: 'Три кольори',
+    title: '3 кольори',
     fields: ['threeColorsMain', 'threeColorsAdditional1', 'threeColorsAdditional2'],
     hint: 'Основна тканина і дві додаткові.',
   },
@@ -42,13 +47,13 @@ export function FabricNormForm({ values, errors, onChange }: Props) {
             {group.fields.map((field) => (
               <TextField
                 key={field}
-                label={fabricNormFieldLabels[field]}
+                label={fabricNormFieldShortLabels[field]}
                 value={values[field]}
                 onChange={(event) => onChange(field, event.target.value)}
                 error={Boolean(errors[field])}
                 helperText={errors[field]}
                 slotProps={{
-                  htmlInput: { inputMode: 'decimal' },
+                  htmlInput: { inputMode: 'decimal', 'aria-label': fabricNormFieldLabels[field] },
                   input: { endAdornment: <InputAdornment position="end">м</InputAdornment> },
                 }}
                 fullWidth
