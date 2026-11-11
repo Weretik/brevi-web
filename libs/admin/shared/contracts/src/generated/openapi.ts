@@ -4343,6 +4343,74 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/warehouse/fabric-stock/issue-items': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** «Видача на завдання»: open items found by order number (with or without «Ц-»), client, model or fabric; at most 30, newest first */
+    get: operations['getFabricIssueItems'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/warehouse/fabric-stock/issue-items/{orderId}/{itemId}': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** The fabric card of an item: plan by part, issued, reserved, issues with plan and fact */
+    get: operations['getFabricIssueItem'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/warehouse/fabric-stock/issue-items/{orderId}/{itemId}/issues': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** «Видача» by actual cutting: products cut and the real pairs; one package per operation id */
+    post: operations['issueFabricToItem'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/warehouse/fabric-stock/issue-items/{orderId}/{itemId}/plan': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** «Оновити план»: the saved plan of the item takes today's norm */
+    post: operations['refreshFabricItemPlan'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/warehouse/orders/{id}/items/{itemId}/fabric': {
     parameters: {
       query?: never;
@@ -4369,7 +4437,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** «Видати»: one package of planned, replacement and additional lines */
+    /** «Видача» by actual cutting from the item tab; same rules as issueFabricToItem */
     post: operations['createFabricIssue'];
     delete?: never;
     options?: never;
@@ -11175,27 +11243,63 @@ export interface components {
       lines: components['schemas']['FabricStockImportLine'][];
       issueErrors: string[];
     };
+    FabricIssueItemResponse: {
+      orderId: number;
+      orderNumber: number;
+      clientName: string;
+      itemId: number;
+      modelName: string;
+      fabricCode: string | null;
+      fabricName: string | null;
+      quantity: number;
+    };
+    FabricIssueItemsResponse: {
+      items: components['schemas']['FabricIssueItemResponse'][];
+      hasMore: boolean;
+    };
     FabricPlanPartResponse: {
       fabricCode: string;
       color: string;
       colorKey: string;
-      /** @description Norm part × quantity. */
+      /** @enum {string} */
+      layer: 'Upper' | 'Lining' | 'Insulation' | 'Fleece';
+      /** @description Norm part × quantity (of the saved plan once fabric was issued). */
       planned: number;
-      /** @description What issues covered of the part. */
+      /** @description The plan of the products cut that issues covered. */
       covered: number;
       /** @description Metres of planned and replacement lines for the part. */
       issued: number;
       /** @description Still held for this item; 0 unless the order is «Нове». */
       reserved: number;
+      /** @description The first stock line of the pair; null when the stock never held it. */
       stockId: number | null;
+      /** @description Metres of the pair (alias group and colour). */
       stockMeters: number;
+      /** @description The pair minus what open orders hold of it. */
       stockAvailable: number;
+      /** @description Plan minus covered. */
+      missing: number;
+    };
+    /** @description Plan and fact of one planned part in an issue by cutting. */
+    FabricIssueComparisonResponse: {
+      planFabricCode: string;
+      planColorKey: string;
+      color: string;
+      /** @description P × n / N, half up to hundredths, once per part. */
+      plan: number;
+      actual: number;
+      /** @description Fact minus plan; positive is overspending. */
+      difference: number;
+      /** @description Fact per product cut. */
+      perProduct: number;
     };
     FabricIssueLineResponse: {
       id: number;
       /** @enum {string} */
       purpose: 'Planned' | 'Replacement' | 'Additional';
+      planFabricCode: string | null;
       planColorKey: string | null;
+      /** @description The plan of the products cut for its part (the planned part for older issues). */
       plannedMeters: number | null;
       stockId: number;
       fabricCode: string;
@@ -11203,6 +11307,11 @@ export interface components {
       color: string;
       meters: number;
       coveredMeters: number;
+      /** @enum {string|null} */
+      layer: 'Upper' | 'Lining' | 'Insulation' | 'Fleece' | null;
+      note: string | null;
+      /** @description Every movement of the line is «Скасовано». */
+      isVoided: boolean;
     };
     FabricIssueResponse: {
       id: number;
@@ -11217,37 +11326,71 @@ export interface components {
       reversedAt: string | null;
       reversedByName: string | null;
       reverseReason: string | null;
+      /** @description Products cut; null for older issues. */
+      issuedQuantity: number | null;
+      comparison: components['schemas']['FabricIssueComparisonResponse'][];
       lines: components['schemas']['FabricIssueLineResponse'][];
     };
     ProductionItemFabricResponse: {
       orderId: number;
       itemId: number;
+      orderNumber: number;
+      clientName: string;
+      modelName: string;
       orderVersion: number;
+      /** @description The order is «Нове»: fabric may be issued. */
+      isOpen: boolean;
       fabricCode: string | null;
       fabricName: string | null;
       quantity: number;
       hasNorm: boolean;
+      /** @description Version of the saved plan; 0 while the plan follows today's norm. Send it back with an issue or a refresh. */
+      planVersion: number;
+      /** @description Why there is no plan; additional fabric may still be issued. */
+      planMissing: string | null;
       plan: components['schemas']['FabricPlanPartResponse'][];
       issued: number;
       issues: components['schemas']['FabricIssueResponse'][];
-      /** @description WorkshopChief and Admin on a «Нове» order. */
+      /** @description WorkshopChief and Admin on an open order. */
       canIssue: boolean;
     };
     FabricIssueLineInput: {
-      /** @enum {string} */
-      purpose: 'Planned' | 'Replacement' | 'Additional';
-      /** @description The planned colour a planned or replacement line stands for; null for additional. */
-      planColorKey: string | null;
-      fabricId: number;
+      /** @description A pair the stock holds. */
+      fabricCode: string;
       color: string;
+      /** @description The pair version shown on the form; another one is 409. */
+      expectedVersion: string | null;
       meters: number;
+      /** @description The planned part this line covers; null for additional fabric. */
+      planFabricCode: string | null;
+      /** @description Colour key of the planned part; required with planFabricCode. */
+      planColorKey: string | null;
+      /**
+       * @description Role of an additional line; a planned line takes the layer of its part.
+       * @enum {string|null}
+       */
+      layer: 'Upper' | 'Lining' | 'Insulation' | 'Fleece' | null;
+      note: string | null;
     };
     CreateFabricIssueInput: {
+      /**
+       * Format: uuid
+       * @description A new id per form; a repeat with the same data returns the saved result.
+       */
+      operationId: string;
       orderVersion: number;
+      /** @description planVersion of the card; another one is 409. */
+      planVersion: number;
       /** Format: date */
       issuedOn: string;
+      /** @description Products cut now, at most the item quantity. */
+      issuedQuantity: number;
       note: string | null;
       lines: components['schemas']['FabricIssueLineInput'][];
+    };
+    RefreshItemFabricPlanInput: {
+      orderVersion: number;
+      planVersion: number;
     };
     ReverseFabricIssueInput: {
       orderVersion: number;
@@ -26786,6 +26929,210 @@ export interface operations {
       };
     };
   };
+  getFabricIssueItems: {
+    parameters: {
+      query?: {
+        search?: string | null;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['FabricIssueItemsResponse'];
+        };
+      };
+      /** @description Invalid */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getFabricIssueItem: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        orderId: number;
+        itemId: number;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionItemFabricResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such order or item */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  issueFabricToItem: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        orderId: number;
+        itemId: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateFabricIssueInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionItemFabricResponse'];
+        };
+      };
+      /** @description Invalid, more products than the item has, a pair the stock never held, or a planned part not in the plan */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such order or item */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Order closed or changed, plan changed, pair changed, or the operation id was used for other data */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  refreshFabricItemPlan: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        orderId: number;
+        itemId: number;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RefreshItemFabricPlanInput'];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ProductionItemFabricResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not allowed */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No such order or item */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Order closed or changed, plan changed, nothing saved yet or the norm did not change */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
   getProductionItemFabric: {
     parameters: {
       query?: never;
@@ -26855,7 +27202,7 @@ export interface operations {
           'application/json': components['schemas']['ProductionItemFabricResponse'];
         };
       };
-      /** @description Invalid line */
+      /** @description Invalid, more products than the item has, a pair the stock never held, or a planned part not in the plan */
       400: {
         headers: {
           [name: string]: unknown;
@@ -26876,14 +27223,14 @@ export interface operations {
         };
         content?: never;
       };
-      /** @description No such order, item or fabric */
+      /** @description No such order or item */
       404: {
         headers: {
           [name: string]: unknown;
         };
         content?: never;
       };
-      /** @description Stale order or stock */
+      /** @description Order closed or changed, plan changed, pair changed, or the operation id was used for other data */
       409: {
         headers: {
           [name: string]: unknown;

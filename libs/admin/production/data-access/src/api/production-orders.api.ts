@@ -1,6 +1,5 @@
 import { productionBaseApi } from './production-base-api';
 import { productionOrderErrors, toProductionApiError } from '../errors/production-api-error';
-import { productionColors } from '../mappers/fabric-stock.mapper';
 import { mapOrderImportResult } from '../mappers/production-import.mapper';
 import {
   mapProductionModelSummary,
@@ -13,6 +12,7 @@ import {
   mapProductionOrderPage,
   mapProductionQuoteDraft,
   mapProductionQuoteSources,
+  productionColors,
 } from '../mappers/production-order.mapper';
 
 import type {

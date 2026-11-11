@@ -216,38 +216,7 @@ export type {
   WorkshopSettingsErrors,
   WorkshopSettingsFormValues,
 } from './forms/workshop-settings-form';
-export {
-  FABRIC_ISSUE_MAX_LINES,
-  FABRIC_STOCK_COLOR_MAX_LENGTH,
-  FABRIC_STOCK_NOTE_MAX_LENGTH,
-  fabricIssuePurposeLabels,
-  fabricIssuePurposes,
-} from './entities/fabric-stock';
-export type {
-  CreateFabricIssueBody,
-  FabricIssue,
-  FabricIssueLine,
-  FabricIssuePurpose,
-  FabricPlanPart,
-  FabricStockChoices,
-  FabricStockFabricChoice,
-  ProductionItemFabric,
-} from './entities/fabric-stock';
-export {
-  createFabricIssueValues,
-  emptyIssueLine,
-  fabricIssueBody,
-  hasFabricIssueErrors,
-  parseStockMeters,
-  stockColorKey,
-  validateFabricIssue,
-  validateStockReason,
-} from './forms/fabric-stock-forms';
-export type {
-  FabricIssueErrors,
-  FabricIssueFormValues,
-  FabricIssueLineValues,
-} from './forms/fabric-stock-forms';
+export { validateStockReason } from './forms/stock-reason';
 export {
   PRODUCTION_WORK_COMMENT_MAX_LENGTH,
   PRODUCTION_WORK_MAX_QUANTITY,

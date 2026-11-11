@@ -41,6 +41,10 @@ export function dateTime(value: unknown, what = 'час'): string {
   return date;
 }
 
+export function nullableDateTime(value: unknown, what = 'час'): string | null {
+  return value === null || value === undefined ? null : dateTime(value, what);
+}
+
 export function boolean(value: unknown, what = 'ознака'): boolean {
   if (typeof value !== 'boolean') throw invalid(what);
   return value;
