@@ -1,6 +1,6 @@
 # Admin «Робочий стіл» by role (DESK-001)
 
-**Status:** stages 1–2 implemented 2026-11-11. **Backend:** BreviERP [DESK-001](https://github.com/Weretik/BreviERP/blob/master/docs/sdd/specs/identity/003-role-desks/README.md) (role `Seo`, «Права доступу» group «Робочі столи»). **Source:** owner request 2026-11-11, [concept](https://claude.ai/artifact/BABr1LD9V1954wsa6w4Uip).
+**Status:** stages 1–3 implemented 2026-11-11. **Backend:** BreviERP [DESK-001](https://github.com/Weretik/BreviERP/blob/master/docs/sdd/specs/identity/003-role-desks/README.md) (role `Seo`, «Права доступу» group «Робочі столи»). **Source:** owner request 2026-11-11, [concept](https://claude.ai/artifact/BABr1LD9V1954wsa6w4Uip).
 
 ## Goal
 
@@ -15,7 +15,7 @@ The admin home `/` («Робочий стіл», the tile at the top of the side
 | D3  | One desk opens as it is, titled «Робочий стіл цеху» or «Робочий стіл менеджера». Several desks get tabs under «Робочий стіл»; the last chosen tab is kept in this browser (`brevi-admin:desk`). No desk: «Оберіть розділ у меню ліворуч.»                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | D4  | Workshop desk: the old «Огляд виробництва» without КП and «Новий розрахунок»; plus «Не вистачає тканини» (pairs to order in red, pairs below zero in amber, at most five, link to «Бронь і що замовити») and «Фурнітура до замовлення» (largest five, link to the report). Blocks with nothing missing are not shown.                                                                                                                                                                                                                                                                                                                                                                            |
 | D5  | Manager desk «Продажі» (`desk-sales`): quick actions «Клієнти» (`counterparties`), «Ціна вишивки» (`embroidery`), «Новий розрахунок» (`quotes`); metric strip «Дзвінки сьогодні» (done of planned, queue), «Мої завдання» (open, overdue in red), «Мої КП» (count), «Замовлення в цеху» (open, late in red); blocks «Черга дзвінків» (overdue calls marked), «Завдання, що горять» (only overdue or urgent), «Мої КП», «Мої замовлення в цеху» (open orders by the nearest due date, late ones marked; `managerUserId`). Blocks with nothing to show are hidden, except the call queue. Every block needs its own page; «мої» is the signed-in person, also for the director and administrators. |
-| D6  | New built-in role «SEO-фахівець» (`Seo`) is known to the session and «Користувачі» (title fallback); its desk comes in stage 3.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| D6  | New built-in role «SEO-фахівець» (`Seo`) is known to the session and «Користувачі» (title fallback); its desk «SEO» (`desk-seo`, stage 3) shows the short «SEO-огляд»: site settings problems, pages on the site per part with the ones that miss something, «Що виправити для пошуку» (five pages with their first problem), buttons to the «Контент» sections it may open. The «Контент → SEO-огляд» menu item stays for the full list with filters.                                                                                                                                                                                                                                           |
 
 ## Stages
 
@@ -23,10 +23,10 @@ The admin home `/` («Робочий стіл», the tile at the top of the side
 | ----- | -------------------------------------------------------------------------------------------- | ---------------------- |
 | 1     | Desk frame, tabs, workshop desk, interim «Продажі», role `Seo`                               | implemented 2026-11-11 |
 | 2     | Manager desk: «Мій день» of leads, tasks that burn, own КП, own orders in the workshop       | implemented 2026-11-11 |
-| 3     | SEO desk: «SEO-огляд» on the desk                                                            | planned                |
+| 3     | SEO desk: «SEO-огляд» on the desk                                                            | implemented 2026-11-11 |
 | 4     | Accountant desk: balances, the month, what waits for review, purchase invoices with problems | planned                |
 | 5     | Director and admin main desk with «Потребує уваги»; every desk as a foldable block           | planned                |
 
 ## Tests
 
-`npx nx test admin-dashboard-feature` (`dashboard-page.test.tsx`: workshop desk blocks, hidden blocks without rights, manager desk metrics and blocks with own orders, tabs and remembered choice, no desk), `npx nx test admin-react` (`app-router.integration.test.tsx`: manager desk on `/`).
+`npx nx test admin-dashboard-feature` (`dashboard-page.test.tsx`: workshop desk blocks, hidden blocks without rights, manager desk metrics and blocks with own orders, SEO desk, tabs and remembered choice, no desk), `npx nx test admin-react` (`app-router.integration.test.tsx`: manager desk on `/`).

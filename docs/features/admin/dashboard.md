@@ -1,11 +1,12 @@
 # Admin: «Робочий стіл»
 
-**Status:** stages 1–2 implemented 2026-11-11. SDD: [DESK-001](../../specs/admin/dashboard/001-role-desks/README.md); the workshop blocks come from [«Швейний цех» stage 7](../../specs/admin/production/007-workshop-reports/README.md) (PRD-S22).
+**Status:** stages 1–3 implemented 2026-11-11. SDD: [DESK-001](../../specs/admin/dashboard/001-role-desks/README.md); the workshop blocks come from [«Швейний цех» stage 7](../../specs/admin/production/007-workshop-reports/README.md) (PRD-S22).
 
 The root route `/` (the «Робочий стіл» tile at the top of the sidebar) shows the desks of «Права доступу» → «Робочі столи» the person may see, in the [design system «Цех»](../../standards/admin/design-system.md). One desk opens as it is; several get tabs, and the last chosen tab is kept in this browser. Every block also needs view on its own page; the server still refuses what the role may not see. Only problems are marked.
 
 - **Цех** (`desk-workshop`: head of the workshop, Admin): the metric strip («У цеху», «Прострочено», «Відвантажити») and «Дошка цеху» from `GET /api/production/dashboard` (`production-orders`); «Години цього тижня»; «Не вистачає тканини» from «Бронь і що замовити» (`fabric-booking`) and «Фурнітура до замовлення» (`hardware-order`), each at most five lines and only when something is missing.
 - **Продажі** (`desk-sales`: Manager, Admin): «Клієнти», «Ціна вишивки», «Новий розрахунок»; metrics «Дзвінки сьогодні», «Мої завдання», «Мої КП», «Замовлення в цеху»; «Черга дзвінків» from «Мій день» (`leads`), «Завдання, що горять» (`tasks`, only overdue or urgent), «Мої КП» (`quotes`, own), «Мої замовлення в цеху» (`production-orders`, `GET /api/production/orders?managerUserId=`, late ones marked). «Мої» is the signed-in person.
+- **SEO** (`desk-seo`: Seo, Admin): buttons «Товари сайту», «Статті», «Сторінки сайту», «Бібліотека фото»; from `GET /api/content/seo-overview` (`content-seo-overview`) the problems of «Налаштування SEO сайту», pages on the site per part with the number that miss something, and «Що виправити для пошуку» (at most five pages, first problem marked, link to «SEO-огляд»).
 
 ## Structure diagram
 
@@ -34,7 +35,7 @@ libs/admin/dashboard/feature/src/
 ├── hooks/
 │   └── use-chosen-desk.ts # remembered tab (localStorage `brevi-admin:desk`)
 ├── components/
-│   ├── desks/ # workshop-desk, sales-desk
+│   ├── desks/ # workshop-desk, sales-desk, seo-desk
 │   ├── desk-list/ # a short block of lines with problem marks or values
 │   ├── metrics/ # metric strip
 │   ├── workshop-board/ # stage columns and order cards
@@ -45,6 +46,7 @@ libs/admin/dashboard/feature/src/
     ├── dashboard-view.ts # viewer, view models from the API data
     ├── desk-list.ts # block lines, at most five
     ├── sales-view.ts # manager desk lines and metrics
+    ├── seo-view.ts # SEO desk lines and metrics
     ├── stock-shortages.ts # shortage lines from the warehouse reports
     └── numeric-text.ts # mono tabular figures
 apps/admin-react/src/app/router/use-dashboard-viewer.ts # canSee(page) and userId from the session
