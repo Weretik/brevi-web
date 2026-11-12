@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -219,6 +219,11 @@ vi.mock('@admin/production/data-access', () => {
 
 afterEach(cleanup);
 
+const openItem = () =>
+  fireEvent.click(screen.getByRole('row', { name: 'Відкрити позицію 1: Куртка' }));
+
+const openTab = (name: string) => fireEvent.click(screen.getByRole('tab', { name }));
+
 const openMore = () => fireEvent.click(screen.getByRole('button', { name: 'Ще дії' }));
 
 const renderPage = () =>
@@ -237,7 +242,7 @@ describe('ProductionOrderPage', () => {
     expect(screen.getByLabelText('Про завдання')).toBeTruthy();
     expect(screen.queryByText('Коментар')).toBeNull();
     expect(screen.queryByText(/Прострочено/)).toBeNull();
-    expect(screen.getByText('4 / 10')).toBeTruthy();
+    expect(within(screen.getByLabelText('Про завдання')).getByText('4 / 10')).toBeTruthy();
     cleanup();
     api.current = api.order(false, {
       items: [{ ...api.order(false).items[0], dueDate: '2020-01-01' }],
@@ -282,7 +287,8 @@ describe('ProductionOrderPage', () => {
   it('saves an edited item and shows «Історія змін»', async () => {
     api.current = api.order(false);
     renderPage();
-    fireEvent.click(screen.getByRole('button', { name: /Змінити позицію/ }));
+    openItem();
+    fireEvent.click(screen.getByRole('button', { name: 'Редагувати позицію' }));
     fireEvent.change(await screen.findByLabelText(/Кількість, шт\./, {}, { timeout: 3000 }), {
       target: { value: '11' },
     });
@@ -293,6 +299,7 @@ describe('ProductionOrderPage', () => {
       body: { version: 2, items: [{ id: 3, sewingRate: null, details: { quantity: 11 } }] },
     });
 
+    fireEvent.click(await screen.findByRole('button', { name: 'Закрити панель' }));
     openMore();
     fireEvent.click(screen.getByRole('menuitem', { name: 'Історія змін' }));
     expect(await screen.findByText('Куртка: Кількість')).toBeTruthy();
@@ -301,6 +308,7 @@ describe('ProductionOrderPage', () => {
   it('lets the head of the workshop tick a stage and ship the rest', async () => {
     api.current = api.order(true);
     renderPage();
+    openItem();
     fireEvent.click(screen.getByRole('button', { name: 'Крій' }));
     expect(api.stages).toHaveBeenCalledWith({
       id: 5,
@@ -320,9 +328,36 @@ describe('ProductionOrderPage', () => {
     });
   });
 
+  it('ticks the next stage from the row only after a confirmation', async () => {
+    api.stages.mockClear();
+    api.current = api.order(true);
+    renderPage();
+    expect(screen.getByRole('img', { name: 'Етап: Тканина в наявності (2 з 7)' })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Відмітити етап «Крій»: Куртка' }));
+    expect(api.stages).not.toHaveBeenCalled();
+    expect(screen.getByText('Позиція 1 «Куртка»: етап «Крій».')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Відмітити' }));
+    expect(api.stages).toHaveBeenCalledWith({
+      id: 5,
+      itemId: 3,
+      version: 2,
+      stages: ['FabricAvailable', 'Cutting'],
+    });
+  });
+
+  it('leaves «Нанесення» out of an item without applications', () => {
+    api.current = api.order(true);
+    renderPage();
+    openItem();
+    expect(screen.queryByRole('button', { name: 'Нанесення' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Пошив' })).toBeTruthy();
+  });
+
   it('shows stages to a manager without letting them tick', () => {
     api.current = api.order(false);
     renderPage();
+    expect(screen.queryByRole('button', { name: /Відмітити етап/ })).toBeNull();
+    openItem();
     expect(screen.getByRole('group', { name: 'Етапи: Куртка' })).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Крій' })).toBeNull();
     expect(screen.queryByRole('button', { name: /Відвантажити позицію/ })).toBeNull();
@@ -331,21 +366,27 @@ describe('ProductionOrderPage', () => {
   it('shows the fabric plan of an item and lets only the workshop issue it', () => {
     api.current = api.order(false);
     renderPage();
+    openItem();
+    openTab('Тканина');
     expect(screen.getByRole('table', { name: 'План тканини' })).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Видати тканину' })).toBeNull();
     cleanup();
     api.current = api.order(true);
     renderPage();
+    openItem();
+    openTab('Тканина');
     expect(screen.getByRole('button', { name: 'Видати тканину' })).toBeTruthy();
   });
 
   it('shows the work of an item to the workshop only', () => {
     api.current = api.order(false);
     renderPage();
+    openItem();
     expect(screen.queryByText(/Пошито 4 з 10/)).toBeNull();
     cleanup();
     api.current = api.order(true);
     renderPage();
+    openItem();
     expect(screen.getByText(/Пошито 4 з 10 · покроєно 10 з 10/)).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Додати роботу' })).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: /Сторнувати роботу Андреева/ }));

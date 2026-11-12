@@ -1,8 +1,8 @@
-import { productionOrderOverview, todayIso } from '@admin/production/model';
+import { productionOrderOverview, productionStageLabels, todayIso } from '@admin/production/model';
 import {
   ProductionCancelDialog,
   ProductionConfirmDialog,
-  ProductionItemCard,
+  ProductionItemsTable,
   ProductionOrderDueAlert,
   ProductionOrderFacts,
   ProductionOrderPrint,
@@ -14,13 +14,14 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { ProductionItemDrawer } from '../../components/orders/production-item-drawer';
+import { ProductionItemPanel } from '../../components/orders/production-item-panel';
 import { ProductionOrderActions } from '../../components/orders/production-order-actions';
 import { ProductionOrderHeaderDrawer } from '../../components/orders/production-order-header-drawer';
 import { ProductionOrderHistoryDrawer } from '../../components/orders/production-order-history-drawer';
-import { ProductionItemWork } from '../../components/tracking/production-item-work';
 import { ProductionOrderWork } from '../../components/tracking/production-order-work';
 import { ProductionShipmentDrawer } from '../../components/tracking/production-shipment-drawer';
 import { useProductionOrderFiles } from '../../hooks/files/use-production-order-files';
+import { useProductionItemPanel } from '../../hooks/orders/use-production-item-panel';
 import { useProductionOrder } from '../../hooks/orders/use-production-order';
 import { useProductionOrderActions } from '../../hooks/orders/use-production-order-actions';
 import { useProductionOrderEditor } from '../../hooks/orders/use-production-order-editor';
@@ -32,9 +33,10 @@ const parseId = (value: string | undefined) =>
   value && /^\d+$/.test(value) ? Number(value) : null;
 
 /**
- * «Виробниче завдання № …»: the header with «Друк», «⋯» and «Редагувати», one strip of facts, a strip only
- * when an item is late or due soon, the order files and the unsent message to the workshop group, then
- * every item with its stages, shipments, work, fabric and files. «Історія змін» opens in a side panel.
+ * «Виробниче завдання № …» (concept B): the header with «Друк», «⋯» and «Редагувати», one strip of facts, a
+ * strip only when an item is late or due soon, the table of items (stage bar, «→ next stage» with a
+ * confirmation), then the order files and the unsent message to the workshop group. A row opens the item
+ * side panel (`?item=`, `?tab=`); «Історія змін» opens in a side panel too.
  */
 export function ProductionOrderPage() {
   const id = parseId(useParams<{ id: string }>().id);
@@ -57,6 +59,7 @@ export function ProductionOrderPage() {
   const status = useProductionOrderStatus(order, setMessage);
   const files = useProductionOrderFiles(order, setMessage);
   const telegram = useProductionTelegram(order, setMessage);
+  const panel = useProductionItemPanel(order);
 
   if (id === null) return <Alert severity="error">Такого завдання немає.</Alert>;
   if (data.error)
@@ -80,6 +83,7 @@ export function ProductionOrderPage() {
   const editing = editor.editing;
   const overview = productionOrderOverview(order, todayIso());
   const quoteId = order.quoteId;
+  const openItem = panel.item;
 
   return (
     <Box sx={{ minWidth: 0 }}>
@@ -122,6 +126,14 @@ export function ProductionOrderPage() {
         onOpenQuote={quoteId === null ? undefined : () => navigate(`/crm/quotes/${quoteId}`)}
       />
       <Stack sx={{ gap: 2 }}>
+        <ProductionItemsTable
+          items={order.items}
+          overview={overview}
+          selectedId={panel.item?.id ?? null}
+          busy={tracking.busy}
+          onOpen={(item) => panel.open(item)}
+          onNextStage={permissions.canTrack ? panel.askStage : undefined}
+        />
         <ProductionOrderWork
           order={order}
           filesBusy={files.busy}
@@ -131,27 +143,42 @@ export function ProductionOrderPage() {
           onSendTelegram={() => void telegram.send()}
           onOpenSettings={permissions.canTrack ? () => navigate('/production/settings') : undefined}
         />
-        {order.items.map((item) => (
-          <ProductionItemCard
-            key={item.id}
-            item={item}
-            permissions={permissions}
-            onEdit={permissions.canEdit ? () => editor.editItem(item) : undefined}
-          >
-            <ProductionItemWork
-              order={order}
-              item={item}
-              busy={tracking.busy || files.busy}
-              onToggleStage={(stage) => void tracking.toggle(item, stage)}
-              onShip={() => tracking.openShipping(item)}
-              onCancelShipment={(shipmentId) => void tracking.cancel(shipmentId)}
-              onUpload={(kind, file) => void files.add(item.id, kind, file)}
-              onDeleteFile={files.requestDelete}
-              onMessage={setMessage}
-            />
-          </ProductionItemCard>
-        ))}
       </Stack>
+      {openItem && !editing && !tracking.shipping && (
+        <ProductionItemPanel
+          order={order}
+          item={openItem}
+          tab={panel.tab}
+          busy={tracking.busy || files.busy}
+          onTab={panel.setTab}
+          onMove={(item) => panel.open(item)}
+          onClose={panel.close}
+          onEdit={permissions.canEdit ? () => editor.editItem(openItem) : undefined}
+          onToggleStage={(stage) => void tracking.toggle(openItem, stage)}
+          onShip={() => tracking.openShipping(openItem)}
+          onCancelShipment={(shipmentId) => void tracking.cancel(shipmentId)}
+          onUpload={(kind, file) => void files.add(openItem.id, kind, file)}
+          onDeleteFile={files.requestDelete}
+          onMessage={setMessage}
+        />
+      )}
+      <ProductionConfirmDialog
+        open={panel.pending !== null}
+        title="Відмітити етап?"
+        text={
+          panel.pending
+            ? `Позиція ${panel.pending.item.position} «${panel.pending.item.modelName}»: етап «${productionStageLabels[panel.pending.stage]}».`
+            : ''
+        }
+        confirmLabel="Відмітити"
+        busy={tracking.busy}
+        onClose={panel.cancelStage}
+        onConfirm={() => {
+          const pending = panel.pending;
+          panel.cancelStage();
+          if (pending) void tracking.toggle(pending.item, pending.stage);
+        }}
+      />
       {historyOpen && (
         <ProductionOrderHistoryDrawer
           number={order.number}
