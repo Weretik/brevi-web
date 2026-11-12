@@ -363,4 +363,20 @@ describe('FabricMovementsPage', () => {
     );
     expect(api.queries[0]).toMatchObject({ kind: 'Opening', page: 1 });
   });
+
+  it('opens with the search from «Уся історія» of a pair', () => {
+    api.queries.length = 0;
+    render(
+      <MemoryRouter
+        initialEntries={['/warehouse/movements?search=FAB-023%20%D0%A1%D0%B8%D0%BD%D1%96%D0%B9']}
+      >
+        <FabricMovementsPage />
+      </MemoryRouter>,
+    );
+    expect(api.queries[0]).toMatchObject({ search: 'FAB-023 Синій', page: 1 });
+    expect(screen.getByRole('textbox', { name: 'Пошук руху тканини' })).toHaveProperty(
+      'value',
+      'FAB-023 Синій',
+    );
+  });
 });

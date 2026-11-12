@@ -26,6 +26,7 @@ import type {
   FabricStockChoices,
   FabricStockColor,
   FabricStockFabric,
+  FabricStockLastMovement,
   FabricStockList,
   FabricStockOperationResult,
   FabricStockPermissions,
@@ -55,6 +56,47 @@ const color = (value: unknown): FabricStockColor => {
         meters: decimal(x['meters'], 'метри рядка'),
       };
     }),
+    booked: optionalDecimal(row['booked'], 'у броні'),
+    free:
+      row['free'] === undefined
+        ? decimal(row['meters'], 'метри кольору')
+        : decimal(row['free'], 'вільно'),
+    toOrder: optionalDecimal(row['toOrder'], 'замовити'),
+    lastMovement: lastMovement(row['lastMovement']),
+    bookings: (row['bookings'] === undefined || row['bookings'] === null
+      ? []
+      : list(row['bookings'], 'бронь пари')
+    ).map((item) => {
+      const x = record(item, 'бронь');
+      return {
+        orderId: integer(x['orderId'], 'завдання', 1),
+        orderNumber: integer(x['orderNumber'], 'номер завдання', 1),
+        clientName: text(x['clientName'], 'замовник'),
+        modelName: text(x['modelName'], 'модель'),
+        dueDate:
+          x['dueDate'] === null || x['dueDate'] === undefined ? null : day(x['dueDate'], 'термін'),
+        need: decimal(x['need'], 'потреба'),
+        toOrder: decimal(x['toOrder'], 'замовити'),
+      };
+    }),
+  };
+};
+
+const optionalDecimal = (value: unknown, what: string) =>
+  value === undefined ? 0 : decimal(value, what);
+
+const lastMovement = (value: unknown): FabricStockLastMovement | null => {
+  if (value === undefined || value === null) return null;
+  const x = record(value, 'остання операція');
+  return {
+    id: integer(x['id'], 'id руху', 1),
+    kind: oneOf(x['kind'], fabricMovementKinds, 'вид руху'),
+    operationDate: day(x['operationDate'], 'дата операції'),
+    delta: decimal(x['delta'], 'зміна'),
+    orderNumber: nullableInteger(x['orderNumber'], 'номер завдання', 1),
+    document: nullableText(x['document'], 'документ'),
+    supplierName: nullableText(x['supplierName'], 'постачальник'),
+    destination: nullableText(x['destination'], 'куди використано'),
   };
 };
 
@@ -68,6 +110,12 @@ const fabric = (value: unknown): FabricStockFabric => {
     density: nullableText(row['density'], 'щільність'),
     meters: decimal(row['meters'], 'разом метрів'),
     colors: list(row['colors'], 'кольори тканини').map(color),
+    supplier: row['supplier'] === undefined ? null : nullableText(row['supplier'], 'постачальник'),
+    booked: optionalDecimal(row['booked'], 'у броні'),
+    free:
+      row['free'] === undefined
+        ? decimal(row['meters'], 'разом метрів')
+        : decimal(row['free'], 'вільно'),
   };
 };
 
@@ -79,6 +127,7 @@ export function mapFabricStockList(value: unknown): FabricStockList {
     pairs: integer(row['pairs'], 'пар'),
     negative: integer(row['negative'], 'відʼємних'),
     permissions: permissions(row['permissions']),
+    short: row['short'] === undefined ? 0 : integer(row['short'], 'не вистачає'),
   };
 }
 

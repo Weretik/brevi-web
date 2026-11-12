@@ -7,6 +7,9 @@ const meters = new Intl.NumberFormat('uk-UA', {
 export const formatMeters = (value: number | null) =>
   value === null ? '—' : `${meters.format(value)} м`;
 
+/** «1 234,5» for a column whose title says «м». */
+export const formatMetersNumber = (value: number) => meters.format(value);
+
 const perProduct = new Intl.NumberFormat('uk-UA', {
   minimumFractionDigits: 0,
   maximumFractionDigits: 3,

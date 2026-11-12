@@ -7,7 +7,7 @@ import type { FabricStockList } from '../../entities/stock/fabric-stock';
 
 /**
  * «Завантажити всі залишки Excel»: the whole merged stock whatever the search shows. Code, name,
- * composition, density, colour and metres, with the Kyiv export time, the count and the total.
+ * composition, density, colour, metres, booked and free, with the Kyiv export time, the count and the total.
  */
 export function stockBalancesWorkbook(stock: FabricStockList, now = new Date()): Uint8Array {
   const rows = stock.fabrics.flatMap((fabric) =>
@@ -18,6 +18,8 @@ export function stockBalancesWorkbook(stock: FabricStockList, now = new Date()):
       fabric.density,
       color.color,
       color.meters,
+      color.booked,
+      color.free,
     ]),
   );
   return xlsxWorkbook([
@@ -27,9 +29,18 @@ export function stockBalancesWorkbook(stock: FabricStockList, now = new Date()):
         ['Залишки тканин', `Вивантажено ${formatKyivTime(now)} (Київ)`],
         ['Позицій', rows.length, 'Разом, м', stock.meters],
       ],
-      header: ['Код', 'Тканина', 'Склад', 'Щільність', 'Колір', 'Залишок, м'],
+      header: [
+        'Код',
+        'Тканина',
+        'Склад',
+        'Щільність',
+        'Колір',
+        'Залишок, м',
+        'У броні, м',
+        'Вільно, м',
+      ],
       rows,
-      widths: [12, 36, 28, 14, 22, 14],
+      widths: [12, 36, 28, 14, 22, 14, 14, 14],
     },
   ]);
 }
