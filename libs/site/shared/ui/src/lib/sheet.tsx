@@ -12,11 +12,18 @@ export const SheetTrigger = SheetPrimitive.Trigger;
 export const SheetClose = SheetPrimitive.Close;
 
 type SheetContentProps = ComponentProps<typeof SheetPrimitive.Content> & {
-  side?: 'left' | 'right';
+  side?: 'left' | 'right' | 'bottom';
   closeLabel: string;
 };
 
-/** Side panel for the mobile menu. */
+const SIDES = {
+  left: 'inset-y-0 left-0 w-[min(22rem,88vw)] border-r border-border',
+  right: 'inset-y-0 right-0 w-[min(22rem,88vw)] border-l border-border',
+  bottom:
+    'inset-x-0 bottom-0 max-h-[85dvh] rounded-t-2xl border-t border-border pb-[max(1.25rem,env(safe-area-inset-bottom))]',
+} as const;
+
+/** Side panel for the mobile menu, or a panel from the bottom edge for filters. */
 export function SheetContent({
   className,
   children,
@@ -29,8 +36,8 @@ export function SheetContent({
       <SheetPrimitive.Overlay className="fixed inset-0 z-50 bg-black/40 data-[state=open]:animate-in data-[state=open]:fade-in-0" />
       <SheetPrimitive.Content
         className={cn(
-          'fixed inset-y-0 z-50 flex w-[min(22rem,88vw)] flex-col gap-4 overflow-y-auto bg-background p-5 shadow-lg outline-none',
-          side === 'left' ? 'left-0 border-r border-border' : 'right-0 border-l border-border',
+          'fixed z-50 flex flex-col gap-4 overflow-y-auto bg-background p-5 shadow-lg outline-none',
+          SIDES[side],
           className,
         )}
         {...props}

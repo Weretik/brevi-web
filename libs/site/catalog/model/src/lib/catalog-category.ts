@@ -1,4 +1,4 @@
-import type { CatalogTreeNode } from './catalog-tree';
+import type { CatalogProductType, CatalogTreeNode } from './catalog-tree';
 import type { Locale } from '@site/core/i18n';
 
 /** A block of text, in the order staff wrote it. */
@@ -27,6 +27,10 @@ export type CatalogCategoryPage = CatalogCategory & {
 /** What a listing card shows about a product, in the language of the page. */
 export type CatalogProductCard = {
   slug: string;
+  /** Own sewing or resold protective equipment. */
+  type: CatalogProductType;
+  /** Model or article number the manager knows the product by. */
+  code: string | null;
   name: string;
   /** Address of the photo on the media server; `null` when the product has none. */
   image: string | null;

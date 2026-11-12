@@ -45,7 +45,14 @@ const page = {
   productCount: 3,
   updatedAtUtc: '2026-11-11T10:00:00Z',
 };
-const card = (slug: string) => ({ slug, name: slug, photoUrl: null, priceFrom: 100 });
+const card = (slug: string) => ({
+  slug,
+  type: 'Sewing',
+  code: null,
+  name: slug,
+  photoUrl: null,
+  priceFrom: 100,
+});
 const product = {
   slug: 'b',
   type: 'Sewing',

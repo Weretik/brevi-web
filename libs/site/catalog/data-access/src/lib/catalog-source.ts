@@ -69,6 +69,11 @@ export async function getCatalogCategoryProducts(
   return (await loadCatalogCards(locale, slug)) ?? [];
 }
 
+/** Every product the site shows, in the order of the Admin list (own sewing first); empty when unavailable. */
+export async function getCatalogProducts(locale: Locale): Promise<readonly CatalogProductCard[]> {
+  return (await loadCatalogCards(locale)) ?? [];
+}
+
 export async function getCatalogProduct(
   slug: string,
   locale: Locale,

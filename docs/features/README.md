@@ -20,8 +20,8 @@ In each feature card, “Structure diagram” shows relationships between parts,
 
 ## Site Next.js (`apps/site`)
 
-- Frame: [shell: layout, header with the catalog mega menu, footer, languages, 404](site/shell.md); [redirects of old addresses](site/redirects.md); [SEO settings: analytics, verification, sharing picture, texts of the fixed pages, company facts](site/seo-settings.md).
-- Pages: [home page](site/home.md), [«Виробництво»](site/production.md), [«Доставка та оплата»](site/delivery.md), [«Контакти»](site/contacts.md), [«Повернення та обмін»](site/returns.md), [«Таблиця розмірів»](site/sizes.md), [«Наші роботи»](site/works.md), [«Сертифікати»](site/certificates.md), [«Статті»](site/articles.md), [«Пошиття з логотипом»](site/logo-printing.md), [«Ціни для опту»](site/wholesale.md), [«Галузі»](site/industries.md), [«Регіони»](site/regions.md), [«Договір»](site/agreement.md), [«Заявка»](site/request.md), [catalog, category, and product pages](site/catalog.md).
+- Frame: [shell: layout, header with the catalog mega menu and «Пошук», footer, languages, 404](site/shell.md); [redirects of old addresses](site/redirects.md); [SEO settings: analytics, verification, sharing picture, texts of the fixed pages, company facts](site/seo-settings.md).
+- Pages: [home page](site/home.md), [«Виробництво»](site/production.md), [«Доставка та оплата»](site/delivery.md), [«Контакти»](site/contacts.md), [«Повернення та обмін»](site/returns.md), [«Таблиця розмірів»](site/sizes.md), [«Наші роботи»](site/works.md), [«Сертифікати»](site/certificates.md), [«Статті»](site/articles.md), [«Пошиття з логотипом»](site/logo-printing.md), [«Ціни для опту»](site/wholesale.md), [«Галузі»](site/industries.md), [«Регіони»](site/regions.md), [«Договір»](site/agreement.md), [«Заявка»](site/request.md), [catalog, category, search, and product pages](site/catalog.md).
 
 ## Storefront Angular (`apps/storefront`)
 

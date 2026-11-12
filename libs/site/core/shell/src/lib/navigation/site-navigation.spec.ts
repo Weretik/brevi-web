@@ -24,10 +24,12 @@ describe('site navigation', () => {
     const linked = new Set(
       [...MAIN_NAV_LINKS, ...FOOTER_COMPANY_LINKS, ...FOOTER_BUYER_LINKS].map((link) => link.path),
     );
-    const { request, catalog, ...pages } = SHELL_PATHS;
+    // The request page has its own buttons, the catalog its own menu, and the search its own field.
+    const { request, catalog, search, ...pages } = SHELL_PATHS;
 
     expect(request).toBe('/request');
     expect(catalog).toBe('/catalog');
+    expect(search).toBe('/search');
     expect([...linked].sort()).toEqual(Object.values(pages).sort());
   });
 

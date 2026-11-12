@@ -19,6 +19,8 @@ export const SITE_PATHS = {
   agreement: '/agreement',
   /** Private request list: never indexed, links to it carry `rel="nofollow"`. */
   request: '/request',
+  /** Search results: never indexed, every query is its own address. */
+  search: '/search',
 } as const;
 
 /** Locale-free path of a product page: `/product/<slug>`. */
@@ -29,4 +31,12 @@ export function catalogProductPath(slug: string): string {
 /** Locale-free path of a catalog category: `/catalog/<slug>`. Every level of the tree has a flat URL. */
 export function catalogCategoryPath(slug: string): string {
   return `${SITE_PATHS.catalog}/${slug}`;
+}
+
+/**
+ * Address of the catalog search index of a language: every product and category for the search box. A
+ * route handler outside the localized pages, so the locale rewrite of old-site addresses skips it.
+ */
+export function catalogSearchIndexPath(locale: string): string {
+  return `/api/catalog-search/${locale}`;
 }
