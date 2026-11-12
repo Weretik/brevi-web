@@ -8,6 +8,8 @@ export type CatalogSearchProduct = {
   type: CatalogProductType;
   image: string | null;
   priceFrom: number | null;
+  /** Fabric names, so «куртка грета» finds the jackets made in that fabric. */
+  fabrics: readonly string[];
   /** Localized address of the product page. */
   href: string;
 };
@@ -90,12 +92,11 @@ function rank<T>(items: readonly T[], words: readonly string[], text: (item: T) 
 }
 
 /** Products whose name or model number has every word of the query, best matches first. */
-export function searchCatalogProducts<T extends { name: string; code: string | null }>(
-  products: readonly T[],
-  query: string,
-): T[] {
+export function searchCatalogProducts<
+  T extends { name: string; code: string | null; fabrics?: readonly string[] },
+>(products: readonly T[], query: string): T[] {
   return rank(products, catalogQueryWords(query), (product) =>
-    [product.name, product.code ?? ''].join(' '),
+    [product.name, product.code ?? '', ...(product.fabrics ?? [])].join(' '),
   );
 }
 

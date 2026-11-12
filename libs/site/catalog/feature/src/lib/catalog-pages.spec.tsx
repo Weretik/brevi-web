@@ -70,6 +70,7 @@ const cards: CatalogProductCard[] = [
     name: 'Костюм ВЕРДЕ',
     image: null,
     priceFrom: 900,
+    fabrics: ['Грета', 'Саржа'],
   },
   {
     slug: 'kostyum-fort',
@@ -78,6 +79,7 @@ const cards: CatalogProductCard[] = [
     name: 'Костюм ФОРТ',
     image: null,
     priceFrom: null,
+    fabrics: [],
   },
 ];
 const product: CatalogProduct = {

@@ -116,6 +116,11 @@ export function mapCatalogCard(value: unknown): CatalogProductCard {
     name: text(card['name'], 'name'),
     image: optionalText(card['photoUrl'], 'photo'),
     priceFrom: optionalPrice(card['priceFrom'], 'price'),
+    // An API older than the fabric filter sends no list: the listing then simply has no fabric filter.
+    fabrics:
+      card['fabrics'] === undefined
+        ? []
+        : list(card['fabrics'], 'fabrics').map((fabric) => text(fabric, 'fabric')),
   };
 }
 

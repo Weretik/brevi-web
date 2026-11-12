@@ -36,4 +36,6 @@ export type CatalogProductCard = {
   image: string | null;
   /** The lowest price in hryvnias (large wholesale); `null` when a manager quotes the price. */
   priceFrom: number | null;
+  /** Names of the fabrics a sewing model is made in, each once; empty for protective equipment. */
+  fabrics: readonly string[];
 };
