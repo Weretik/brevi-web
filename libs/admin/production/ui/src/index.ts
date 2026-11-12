@@ -25,6 +25,8 @@ export type { ProductionOrdersImport } from './orders/production-orders-more-men
 export { ProductionModelSummaryTable } from './orders/production-model-summary-table';
 export { ModelSummarySortEditor } from './orders/model-summary-sort-editor';
 export { ProductionOrderHistory } from './orders/production-order-history';
+export { ProductionOrderFacts } from './orders/production-order-facts';
+export { ProductionOrderDueAlert } from './orders/production-order-due-alert';
 export { ProductionOrderPrint } from './orders/production-order-print';
 export { ProductionOrderStatusPill } from './orders/production-order-status';
 export { ProductionOrdersGrid } from './orders/production-orders-grid';

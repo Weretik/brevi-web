@@ -168,6 +168,11 @@ export {
   ordersWord,
 } from './queries/production-order-row';
 export type { DueState } from './queries/production-order-row';
+export { itemsWord, productionOrderOverview } from './queries/production-order-overview';
+export type {
+  ProductionDueItem,
+  ProductionOrderOverview,
+} from './queries/production-order-overview';
 export {
   activeProductionOrderFilters,
   addModelSummarySortLevel,

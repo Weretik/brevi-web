@@ -18,7 +18,7 @@ interface Props {
   children?: ReactNode;
 }
 
-/** One position of an order as the workshop reads it; prices only for those who see them. */
+/** One position of an order as the workshop reads it; prices only for those who see them; empty fields are left out. */
 export function ProductionItemCard({ item, permissions, onEdit, children }: Props) {
   const details: ReferenceDetailsItem[] = [
     { label: 'Кількість', value: `${item.quantity} шт.`, mono: true },
@@ -27,7 +27,11 @@ export function ProductionItemCard({ item, permissions, onEdit, children }: Prop
       label: 'Кольори',
       value: [item.mainColor, ...item.additionalColors].join(' + '),
     },
-    { label: 'Плановий розхід тканини', value: formatMeters(item.plannedFabricMeters), mono: true },
+    {
+      label: 'Плановий розхід тканини',
+      value: item.plannedFabricMeters === null ? null : formatMeters(item.plannedFabricMeters),
+      mono: true,
+    },
     { label: 'Розміри', value: item.sizesText },
     { label: 'Технічні зміни', value: item.technicalChanges },
     { label: 'Коментар', value: item.comment },
@@ -37,11 +41,15 @@ export function ProductionItemCard({ item, permissions, onEdit, children }: Prop
     },
   ];
   if (permissions.seesSewingRate)
-    details.push({ label: 'Розцінка пошиття', value: formatMoney(item.sewingRate), mono: true });
+    details.push({
+      label: 'Розцінка пошиття',
+      value: item.sewingRate === null ? null : formatMoney(item.sewingRate),
+      mono: true,
+    });
   if (permissions.seesReportPrice)
     details.push({
       label: 'Ціна з КП для звіту',
-      value: formatMoney(item.reportUnitPrice),
+      value: item.reportUnitPrice === null ? null : formatMoney(item.reportUnitPrice),
       mono: true,
     });
 
@@ -94,7 +102,7 @@ export function ProductionItemCard({ item, permissions, onEdit, children }: Prop
           '& dl': { display: 'contents' },
         }}
       >
-        <ReferenceDetailsList items={details} />
+        <ReferenceDetailsList items={details.filter((x) => x.value?.trim())} />
       </Box>
       <ProductionItemEmbroideries
         applications={item.applications}

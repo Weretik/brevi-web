@@ -219,6 +219,8 @@ vi.mock('@admin/production/data-access', () => {
 
 afterEach(cleanup);
 
+const openMore = () => fireEvent.click(screen.getByRole('button', { name: 'Ще дії' }));
+
 const renderPage = () =>
   render(
     <MemoryRouter initialEntries={['/production/orders/5']}>
@@ -229,11 +231,42 @@ const renderPage = () =>
   );
 
 describe('ProductionOrderPage', () => {
+  it('shows the facts strip without empty fields and marks only a late item', () => {
+    api.current = api.order(false, { comment: null });
+    renderPage();
+    expect(screen.getByLabelText('Про завдання')).toBeTruthy();
+    expect(screen.queryByText('Коментар')).toBeNull();
+    expect(screen.queryByText(/Прострочено/)).toBeNull();
+    expect(screen.getByText('4 / 10')).toBeTruthy();
+    cleanup();
+    api.current = api.order(false, {
+      items: [{ ...api.order(false).items[0], dueDate: '2020-01-01' }],
+    });
+    renderPage();
+    expect(screen.getByText(/Прострочено: «Куртка» мала бути готова 01\.01\.2020/)).toBeTruthy();
+  });
+
+  it('does not show a message already sent to the workshop', () => {
+    api.current = api.order(false, {
+      telegram: {
+        status: 'Sent',
+        sentAt: '2026-11-04T10:00:00Z',
+        sentByName: 'Олена',
+        error: null,
+        ready: true,
+      },
+    });
+    renderPage();
+    expect(screen.queryByText(/Надіслано в цех/)).toBeNull();
+    expect(screen.queryByRole('heading', { name: 'Telegram' })).toBeNull();
+  });
+
   it('hides prices and «Видалити» from a manager', () => {
     api.current = api.order(false);
     renderPage();
     expect(screen.getByRole('heading', { name: 'Завдання № 12' })).toBeTruthy();
-    expect(screen.queryByRole('button', { name: 'Видалити' })).toBeNull();
+    openMore();
+    expect(screen.queryByRole('menuitem', { name: 'Видалити' })).toBeNull();
     expect(screen.queryByText('Розцінка пошиття')).toBeNull();
     expect(screen.queryByText('Ціна для звіту')).toBeNull();
   });
@@ -241,8 +274,9 @@ describe('ProductionOrderPage', () => {
   it('shows the owner the prices and lets them delete', () => {
     api.current = api.order(true);
     renderPage();
-    expect(screen.getByRole('button', { name: 'Видалити' })).toBeTruthy();
     expect(screen.getByText('Ціна для звіту')).toBeTruthy();
+    openMore();
+    expect(screen.getByRole('menuitem', { name: 'Видалити' })).toBeTruthy();
   });
 
   it('saves an edited item and shows «Історія змін»', async () => {
@@ -259,7 +293,8 @@ describe('ProductionOrderPage', () => {
       body: { version: 2, items: [{ id: 3, sewingRate: null, details: { quantity: 11 } }] },
     });
 
-    fireEvent.click(screen.getByRole('tab', { name: 'Історія змін' }));
+    openMore();
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Історія змін' }));
     expect(await screen.findByText('Куртка: Кількість')).toBeTruthy();
   });
 
@@ -335,7 +370,8 @@ describe('ProductionOrderPage', () => {
   it('asks for a reason before cancelling', async () => {
     api.current = api.order(false);
     renderPage();
-    fireEvent.click(screen.getByRole('button', { name: 'Скасувати' }));
+    openMore();
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Скасувати' }));
     fireEvent.click(await screen.findByRole('button', { name: 'Скасувати завдання' }));
     expect(await screen.findByText('Вкажіть причину скасування.')).toBeTruthy();
     expect(api.status).not.toHaveBeenCalled();
