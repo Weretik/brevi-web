@@ -4214,7 +4214,7 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
-    /** «Рух тканини»: 50 per page, newest operation date first (then record time and id) */
+    /** «Рух тканини»: 50 per page, newest operation date first (then record time and id), with kind counts */
     get: operations['getFabricMovements'];
     put?: never;
     post?: never;
@@ -11577,12 +11577,28 @@ export interface components {
       canEdit: boolean;
       /** @description «На 1 виріб»: metres per product cut, to thousandths; null without a products count. */
       perProduct: number | null;
+      /** @description «Залишок пари»: the merged pair (every code of the fabric, one colour) after the movement in ledger order; voided movements add nothing. */
+      pairMetersAfter?: number | null;
+    };
+    FabricMovementCountsResponse: {
+      all: number;
+      receipt: number;
+      itemIssue: number;
+      oneOffIssue: number;
+      adjustment: number;
+      opening: number;
+      /** @description Voided or reversed movements and the reversals themselves. */
+      cancelled: number;
     };
     FabricMovementPageResponse: {
       rows: components['schemas']['FabricMovementRowResponse'][];
       page: number;
       hasMore: boolean;
       permissions: components['schemas']['FabricStockPermissions'];
+      /** @description Movements of the chosen kind under every filter. */
+      total?: number;
+      /** @description Movements of each kind chip under every filter but the kind. */
+      counts?: components['schemas']['FabricMovementCountsResponse'] | null;
     };
     OpenFabricStockInput: {
       /**
@@ -27817,13 +27833,27 @@ export interface operations {
     parameters: {
       query?: {
         page?: number;
-        /** @description Opening lists openings not taken back («Внесені початкові залишки»). */
-        kind?: 'All' | 'Receipt' | 'Issue' | 'Opening';
+        /** @description Opening lists openings not taken back; Issue is both ItemIssue (to an order item) and OneOffIssue; Cancelled is voided or reversed movements and the reversals. */
+        kind?:
+          | 'All'
+          | 'Receipt'
+          | 'Issue'
+          | 'Opening'
+          | 'ItemIssue'
+          | 'OneOffIssue'
+          | 'Adjustment'
+          | 'Cancelled';
         /** @description Any code of an alias group selects the whole group. */
         fabricCode?: string;
         /** @description Matched by the normalised colour key. */
         color?: string;
         itemId?: number;
+        /** @description Every word must be found in the fabric code or name, colour, supplier, document, order number («Ц-14» or «14»), model, destination, note or who recorded it; case-insensitive. */
+        search?: string;
+        /** @description First operation date, inclusive. */
+        from?: string;
+        /** @description Last operation date, inclusive; not before from. */
+        to?: string;
       };
       header?: never;
       path?: never;

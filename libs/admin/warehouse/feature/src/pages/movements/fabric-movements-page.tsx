@@ -2,15 +2,16 @@ import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
 import { useGetFabricMovementsQuery, useGetFabricStockQuery } from '@admin/warehouse/data-access';
 import {
   defaultFabricMovementQuery,
-  formatMeters,
+  kyivToday,
   movementFilterOf,
+  movementPeriodRange,
   withMovementFilter,
 } from '@admin/warehouse/model';
 import {
   FabricMovementFilters,
   FabricMovementPager,
   FabricMovementsTable,
-  StockReasonDialog,
+  MovementCancelDialog,
   WarehouseMoreMenu,
 } from '@admin/warehouse/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
@@ -19,44 +20,66 @@ import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined';
 import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
 import RemoveOutlinedIcon from '@mui/icons-material/RemoveOutlined';
 import { Box, Button, Stack } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { IssueToItemDrawer } from '../../components/item-issue/issue-to-item-drawer';
+import { FabricMovementDrawer } from '../../components/movements/fabric-movement-drawer';
 import { FabricMovementEditDrawer } from '../../components/movements/fabric-movement-edit-drawer';
 import { FabricMovementHistoryDrawer } from '../../components/movements/fabric-movement-history-drawer';
 import { FabricIssueDrawer } from '../../components/operations/fabric-issue-drawer';
 import { FabricOpeningDrawer } from '../../components/operations/fabric-opening-drawer';
 import { FabricReceiptDrawer } from '../../components/operations/fabric-receipt-drawer';
-import { useMovementReversal } from '../../hooks/movements/use-movement-reversal';
-import { useMovementVoid } from '../../hooks/movements/use-movement-void';
+import { useDebouncedValue } from '../../hooks/debounce/use-debounced-value';
+import { useMovementCancel } from '../../hooks/movements/use-movement-cancel';
 import { useMovementsExport } from '../../hooks/movements/use-movements-export';
 
-import type { FabricMovementQuery, FabricMovementRow } from '@admin/warehouse/model';
+import type {
+  FabricMovementQuery,
+  FabricMovementRow,
+  MovementPeriod,
+} from '@admin/warehouse/model';
 
 type Panel =
   | { kind: 'receipt' | 'issue' | 'item-issue' | 'opening' }
-  | { kind: 'edit' | 'history'; row: FabricMovementRow };
+  | { kind: 'movement' | 'edit' | 'history'; row: FabricMovementRow };
 
-/** «Склад тканин › Рух тканини»: receipts, one-off issues, issues to items and every movement, 50 per page. */
+/**
+ * «Склад тканин › Рух тканини»: a compact journal of receipts, issues and every other movement, 50 per page, with
+ * one search, the kind chips and the period. A row opens its side panel with the actions it allows.
+ */
 export function FabricMovementsPage() {
   const [params] = useSearchParams();
   const [query, setQuery] = useState<FabricMovementQuery>(() => ({
     ...defaultFabricMovementQuery,
     kind: movementFilterOf(params.get('kind')),
   }));
+  const [search, setSearch] = useState('');
+  const [period, setPeriod] = useState<MovementPeriod>('all');
   const [panel, setPanel] = useState<Panel | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const typed = useDebouncedValue(search.trim());
+  useEffect(
+    () =>
+      setQuery((current) =>
+        current.search === typed ? current : withMovementFilter(current, { search: typed }),
+      ),
+    [typed],
+  );
   const movements = useGetFabricMovementsQuery(query);
   const stock = useGetFabricStockQuery();
-  const reversal = useMovementReversal(setMessage);
-  const voiding = useMovementVoid(setMessage);
-  const exporter = useMovementsExport(setMessage);
-  const canMove = Boolean(movements.data?.permissions.canMove ?? stock.data?.permissions.canMove);
-  const filtered = Boolean(query.fabricCode || query.color || query.kind !== 'All');
   const saved = (text: string) => {
     setMessage(text);
     setPanel(null);
+  };
+  const cancelling = useMovementCancel(saved);
+  const exporter = useMovementsExport(setMessage);
+  const canMove = Boolean(movements.data?.permissions.canMove ?? stock.data?.permissions.canMove);
+  const filtered = Boolean(query.search || query.from || query.to || query.kind !== 'All');
+  const choosePeriod = (value: MovementPeriod) => {
+    setPeriod(value);
+    if (value !== 'custom')
+      setQuery((current) => withMovementFilter(current, movementPeriodRange(value, kyivToday())));
   };
 
   return (
@@ -123,22 +146,25 @@ export function FabricMovementsPage() {
       />
       <FabricMovementFilters
         query={query}
-        fabrics={stock.data?.fabrics ?? []}
+        search={search}
+        counts={movements.data?.counts ?? null}
+        period={period}
+        onSearch={setSearch}
         onChange={(change) => setQuery((current) => withMovementFilter(current, change))}
+        onPeriod={choosePeriod}
       />
       {movements.data && (
         <>
           <FabricMovementsTable
             rows={movements.data.rows}
             filtered={filtered}
-            onReverse={canMove ? reversal.request : null}
-            onEdit={canMove ? (row) => setPanel({ kind: 'edit', row }) : null}
-            onVoid={canMove ? voiding.request : null}
-            onHistory={(row) => setPanel({ kind: 'history', row })}
+            onOpen={(row) => setPanel({ kind: 'movement', row })}
           />
           <FabricMovementPager
             page={query.page}
             hasMore={movements.data.hasMore}
+            total={movements.data.total}
+            shown={movements.data.rows.length}
             disabled={movements.isFetching}
             onPage={(page) => setQuery((current) => ({ ...current, page }))}
           />
@@ -160,6 +186,16 @@ export function FabricMovementsPage() {
       {panel?.kind === 'opening' && (
         <FabricOpeningDrawer onClose={() => setPanel(null)} onSaved={setMessage} />
       )}
+      {panel?.kind === 'movement' && (
+        <FabricMovementDrawer
+          row={panel.row}
+          canMove={canMove}
+          onClose={() => setPanel(null)}
+          onEdit={(row) => setPanel({ kind: 'edit', row })}
+          onCancel={cancelling.request}
+          onHistory={(row) => setPanel({ kind: 'history', row })}
+        />
+      )}
       {panel?.kind === 'edit' && (
         <FabricMovementEditDrawer
           row={panel.row}
@@ -176,37 +212,17 @@ export function FabricMovementsPage() {
           onRestored={saved}
         />
       )}
-      <StockReasonDialog
-        open={voiding.pending !== null}
-        title="Скасувати рух?"
-        text={
-          voiding.pending
-            ? `${voiding.pending.fabricName}, ${voiding.pending.color}: залишок зміниться на ${voiding.pending.delta < 0 ? '+' : ''}${formatMeters(-voiding.pending.delta)}. Запис лишиться в історії як «Скасовано», його можна повернути через «Історія правок».`
-            : ''
-        }
-        confirmLabel="Скасувати рух"
-        reason={voiding.reason}
-        error={voiding.error}
-        busy={voiding.busy}
-        onChange={voiding.change}
-        onClose={voiding.cancel}
-        onConfirm={() => void voiding.confirm()}
-      />
-      <StockReasonDialog
-        open={reversal.pending !== null}
-        title="Сторнувати рух?"
-        text={
-          reversal.pending
-            ? `${reversal.pending.fabricName}, ${reversal.pending.color}: рух на ${formatMeters(Math.abs(reversal.pending.delta))} буде відмінено зворотним записом. Обидва записи лишаться в історії.`
-            : ''
-        }
-        confirmLabel="Сторнувати"
-        reason={reversal.reason}
-        error={reversal.error}
-        busy={reversal.busy}
-        onChange={reversal.change}
-        onClose={reversal.cancel}
-        onConfirm={() => void reversal.confirm()}
+      <MovementCancelDialog
+        row={cancelling.pending}
+        mode={cancelling.mode}
+        modes={cancelling.modes}
+        reason={cancelling.reason}
+        error={cancelling.error}
+        busy={cancelling.busy}
+        onMode={cancelling.setMode}
+        onChange={cancelling.change}
+        onClose={cancelling.cancel}
+        onConfirm={() => void cancelling.confirm()}
       />
     </Box>
   );

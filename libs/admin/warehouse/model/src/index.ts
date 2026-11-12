@@ -12,6 +12,7 @@ export type {
 } from './entities/stock/fabric-stock-choices';
 export {
   FABRIC_MOVEMENTS_PAGE_SIZE,
+  fabricMovementChips,
   fabricMovementFilters,
   fabricMovementKindLabels,
   fabricMovementKinds,
@@ -19,6 +20,7 @@ export {
   fabricMovementRevisionActions,
 } from './entities/movements/fabric-movement';
 export type {
+  FabricMovementCounts,
   FabricMovementFilter,
   FabricMovementHistory,
   FabricMovementKind,
@@ -104,6 +106,17 @@ export {
   withMovementFilter,
 } from './queries/movements/fabric-movement-query';
 export type { FabricMovementQuery } from './queries/movements/fabric-movement-query';
+export {
+  movementPeriodLabels,
+  movementPeriodRange,
+  movementPeriods,
+} from './queries/movements/movement-period';
+export type { MovementPeriod } from './queries/movements/movement-period';
+export {
+  movementCancelMark,
+  movementOperationLabel,
+  movementSource,
+} from './mappers/movements/movement-labels';
 export {
   formatDay,
   formatKyivTime,

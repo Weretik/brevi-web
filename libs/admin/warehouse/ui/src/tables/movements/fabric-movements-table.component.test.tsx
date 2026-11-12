@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 
 import { FabricMovementsTable } from './fabric-movements-table';
 
@@ -24,26 +24,58 @@ const row = (patch: Partial<FabricMovementRow>): FabricMovementRow => ({
   destination: null,
   delta: -2.5,
   metersAfter: 7.5,
+  pairMetersAfter: -1.5,
+  perProduct: null,
   note: null,
   createdByName: 'Олена',
   isReversed: true,
   reversesMovementId: null,
   canReverse: false,
+  isVoided: false,
+  revision: 0,
+  canEdit: false,
   ...patch,
 });
 
 describe('FabricMovementsTable', () => {
-  it('names an order issue, keeps a reversed row in the history and offers no «Сторно» for it', () => {
-    render(<FabricMovementsTable rows={[row({})]} filtered={false} onReverse={() => undefined} />);
-    expect(screen.getByText('Видача на завдання')).toBeTruthy();
-    expect(screen.getByText('Завдання №12 · Куртка')).toBeTruthy();
+  it('shows a compact row with the task, the signed quantity and the pair balance, and opens it', () => {
+    const onOpen = vi.fn();
+    render(<FabricMovementsTable rows={[row({})]} filtered={false} onOpen={onOpen} />);
+    expect(screen.getByText('На завдання')).toBeTruthy();
+    expect(screen.getByText('Ц-12 · Куртка')).toBeTruthy();
     expect(screen.getByText('Сторновано')).toBeTruthy();
     expect(screen.getByText('10.11.2026')).toBeTruthy();
-    expect(screen.queryByRole('button', { name: /^Сторно/ })).toBeNull();
+    expect(screen.getByText(/−2,5/)).toBeTruthy();
+    expect(screen.getByText(/-1,5|−1,5/)).toBeTruthy();
+    fireEvent.click(screen.getByRole('row', { name: /На завдання: Грета, Синій/ }));
+    expect(onOpen).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
+  });
+
+  it('marks a receipt with a plus and nothing else when all is fine', () => {
+    render(
+      <FabricMovementsTable
+        rows={[
+          row({
+            kind: 'Receipt',
+            delta: 5,
+            orderId: null,
+            orderNumber: null,
+            isReversed: false,
+            supplierName: 'Тексика',
+            document: 'рах 7',
+          }),
+        ]}
+        filtered={false}
+        onOpen={() => undefined}
+      />,
+    );
+    expect(screen.getByText(/\+5/)).toBeTruthy();
+    expect(screen.getByText('Тексика · рах 7')).toBeTruthy();
+    expect(screen.queryByText('Сторновано')).toBeNull();
   });
 
   it('says when a filter hides everything', () => {
-    render(<FabricMovementsTable rows={[]} filtered onReverse={null} />);
+    render(<FabricMovementsTable rows={[]} filtered onOpen={() => undefined} />);
     expect(screen.getByText('За цим фільтром рухів немає.')).toBeTruthy();
   });
 });

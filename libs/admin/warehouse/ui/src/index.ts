@@ -9,6 +9,9 @@ export { FabricOpeningForm } from './forms/stock-operations/fabric-opening-form'
 export { FabricIssueForm } from './forms/stock-operations/fabric-issue-form';
 export { FabricAdjustmentForm } from './forms/stock-operations/fabric-adjustment-form';
 export { StockReasonDialog } from './dialogs/stock-reason-dialog';
+export { MovementCancelDialog } from './dialogs/movement-cancel-dialog';
+export type { MovementCancelMode } from './dialogs/movement-cancel-dialog';
+export { FabricMovementDetails } from './panels/movements/fabric-movement-details';
 export { FabricMovementEditForm } from './forms/movement-edit/fabric-movement-edit-form';
 export { ItemFabricCard } from './panels/item-fabric/item-fabric-card';
 export { ItemIssueForm } from './forms/item-issue/item-issue-form';

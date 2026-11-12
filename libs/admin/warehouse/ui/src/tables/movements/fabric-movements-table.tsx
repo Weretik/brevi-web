@@ -1,17 +1,12 @@
 import {
-  fabricMovementKindLabels,
   formatDay,
-  formatKyivTime,
   formatMeters,
   formatPerProduct,
-  movementTarget,
+  movementCancelMark,
+  movementOperationLabel,
+  movementSource,
 } from '@admin/warehouse/model';
-import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined';
-import UndoOutlinedIcon from '@mui/icons-material/UndoOutlined';
 import {
-  IconButton,
   Paper,
   Table,
   TableBody,
@@ -19,7 +14,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Tooltip,
   Typography,
 } from '@mui/material';
 
@@ -29,35 +23,21 @@ interface Props {
   rows: readonly FabricMovementRow[];
   /** A filter hides everything: say so instead of «рухів ще немає». */
   filtered: boolean;
-  /** «Сторно» for people who may move stock. */
-  onReverse: ((row: FabricMovementRow) => void) | null;
-  /** Edit and «Скасувати» of rows with `canEdit`, for people who may move stock. */
-  onEdit?: ((row: FabricMovementRow) => void) | null;
-  onVoid?: ((row: FabricMovementRow) => void) | null;
-  /** «Історія правок» of a changed row; everyone with access reads it. */
-  onHistory?: ((row: FabricMovementRow) => void) | null;
+  /** A row opens its side panel: details, edits, «Відмінити операцію…» and the history. */
+  onOpen: (row: FabricMovementRow) => void;
 }
 
 const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' };
 
-const kindLabel = (row: FabricMovementRow) =>
-  row.kind === 'Issue' && row.orderId !== null
-    ? 'Видача на завдання'
-    : fabricMovementKindLabels[row.kind];
+const signed = (delta: number) =>
+  `${delta > 0 ? '+' : delta < 0 ? '−' : ''}${formatMeters(Math.abs(delta))}`;
 
 /**
- * «Рух тканини»: newest operation date first. The balance is the moved line's own; the merged
- * metres of a fabric and colour are on «Залишки».
+ * «Рух тканини» as a compact journal, newest operation date first: one line per movement, the signed quantity and
+ * «Залишок пари» (every code of the fabric in this colour after it). A row opens its side panel; only a problem is
+ * marked: a cancelled movement or a balance below zero.
  */
-export function FabricMovementsTable({
-  rows,
-  filtered,
-  onReverse,
-  onEdit = null,
-  onVoid = null,
-  onHistory = null,
-}: Props) {
-  const actions = Boolean(onReverse || onEdit || onVoid || onHistory);
+export function FabricMovementsTable({ rows, filtered, onOpen }: Props) {
   if (rows.length === 0)
     return (
       <Paper variant="outlined" sx={{ p: 3 }}>
@@ -67,148 +47,109 @@ export function FabricMovementsTable({
       </Paper>
     );
   return (
-    <TableContainer component={Paper} variant="outlined">
-      <Table size="small" aria-label="Рух тканини">
-        <TableHead>
-          <TableRow sx={{ bgcolor: 'action.hover' }}>
+    <TableContainer
+      component={Paper}
+      variant="outlined"
+      sx={{ maxHeight: 'var(--admin-table-height)', overflow: 'auto' }}
+    >
+      <Table
+        size="small"
+        stickyHeader
+        aria-label="Рух тканини"
+        sx={{ minWidth: 860, '& td, & th': { px: 1.25 } }}
+      >
+        <TableHead sx={{ '& th': { bgcolor: 'background.paper' } }}>
+          <TableRow>
             <TableCell>Дата</TableCell>
-            <TableCell>Вид</TableCell>
-            <TableCell>Тканина і колір</TableCell>
-            <TableCell>Постачальник / документ</TableCell>
-            <TableCell>Замовлення / куди</TableCell>
-            <TableCell align="right">Прихід</TableCell>
-            <TableCell align="right">Витрата</TableCell>
-            <TableCell align="right">На 1 виріб</TableCell>
-            <TableCell align="right">Залишок рядка</TableCell>
-            {actions && <TableCell aria-label="Дії" />}
+            <TableCell>Операція</TableCell>
+            <TableCell>Тканина · колір</TableCell>
+            <TableCell>Звідки / куди</TableCell>
+            <TableCell align="right">Кількість</TableCell>
+            <TableCell align="right">Залишок пари</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {rows.map((row) => {
-            const struck = row.isReversed ? { textDecoration: 'line-through' } : undefined;
-            const label = `${kindLabel(row)} ${row.fabricName} ${row.color}`;
+            const cancelled = movementCancelMark(row);
+            const dim = cancelled ? { color: 'text.disabled' } : undefined;
+            const operation = movementOperationLabel(row);
+            const balance = row.pairMetersAfter ?? row.metersAfter;
             return (
-              <TableRow key={row.id} sx={{ verticalAlign: 'top' }}>
-                <TableCell>
-                  <Typography variant="body2" sx={mono}>
-                    {formatDay(row.operationDate)}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary" component="div">
-                    записано {formatKyivTime(row.createdAt)}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary" component="div">
-                    {row.createdByName}
-                  </Typography>
+              <TableRow
+                key={row.id}
+                hover
+                tabIndex={0}
+                aria-label={`${operation}: ${row.fabricName}, ${row.color}, ${formatDay(row.operationDate)}`}
+                sx={{
+                  cursor: 'pointer',
+                  '&:focus-visible': { outline: 2, outlineColor: 'primary.main' },
+                }}
+                onClick={() => onOpen(row)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    onOpen(row);
+                  }
+                }}
+              >
+                <TableCell sx={{ ...mono, whiteSpace: 'nowrap', ...dim }}>
+                  {formatDay(row.operationDate)}
                 </TableCell>
-                <TableCell>
-                  <Typography variant="body2" sx={struck}>
-                    {kindLabel(row)}
+                <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                  <Typography variant="body2" component="span" sx={dim}>
+                    {operation}
                   </Typography>
-                  {row.isReversed && (
-                    <Typography variant="caption" color="error" component="div">
-                      Сторновано
-                    </Typography>
-                  )}
-                  {row.isVoided && (
+                  {cancelled && (
                     <Typography variant="caption" color="warning.main" component="div">
-                      Скасовано
-                    </Typography>
-                  )}
-                  {row.note && (
-                    <Typography variant="caption" color="text.secondary" component="div">
-                      {row.note}
+                      {cancelled}
                     </Typography>
                   )}
                 </TableCell>
-                <TableCell>
-                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                <TableCell sx={dim}>
+                  <Typography variant="body2" component="span" sx={{ fontWeight: 600 }}>
                     {row.fabricName}
                   </Typography>
-                  <Typography variant="caption" color="text.secondary" component="div">
-                    <span style={{ fontFamily: 'var(--admin-font-mono)' }}>{row.fabricCode}</span>
-                    {row.fabricCode !== row.groupCode && ` (на складі як ${row.groupCode})`} ·{' '}
+                  <Typography variant="body2" component="span" color="text.secondary">
+                    {' · '}
                     {row.color}
                   </Typography>
+                  <Typography variant="caption" color="text.secondary" component="div" sx={mono}>
+                    {row.fabricCode}
+                    {row.fabricCode !== row.groupCode && ` → ${row.groupCode}`}
+                  </Typography>
                 </TableCell>
-                <TableCell>
-                  <Typography variant="body2">{row.supplierName ?? '—'}</Typography>
-                  {row.document && (
+                <TableCell sx={{ maxWidth: 320, ...dim }}>
+                  <Typography variant="body2" noWrap title={movementSource(row) ?? undefined}>
+                    {movementSource(row) ?? '—'}
+                  </Typography>
+                  {row.perProduct !== null && (
                     <Typography variant="caption" color="text.secondary" component="div">
-                      {row.document}
+                      {formatPerProduct(row.perProduct)} на 1 виріб
                     </Typography>
                   )}
-                </TableCell>
-                <TableCell>
-                  <Typography variant="body2">{movementTarget(row) ?? '—'}</Typography>
-                  {row.kind === 'Issue' && row.orderId === null && (
-                    <Typography variant="caption" color="text.secondary" component="div">
-                      Без замовлення
-                    </Typography>
-                  )}
-                </TableCell>
-                <TableCell align="right" sx={{ ...mono, ...struck }}>
-                  {row.delta > 0 ? formatMeters(row.delta) : ''}
-                </TableCell>
-                <TableCell align="right" sx={{ ...mono, ...struck }}>
-                  {row.delta < 0 ? formatMeters(-row.delta) : ''}
-                </TableCell>
-                <TableCell align="right" sx={mono}>
-                  {row.perProduct === null ? '—' : formatPerProduct(row.perProduct)}
                 </TableCell>
                 <TableCell
                   align="right"
-                  sx={{ ...mono, color: row.metersAfter < 0 ? 'error.main' : undefined }}
+                  sx={{
+                    ...mono,
+                    whiteSpace: 'nowrap',
+                    fontWeight: 600,
+                    color: cancelled ? 'text.disabled' : row.delta > 0 ? 'success.main' : undefined,
+                    textDecoration: cancelled ? 'line-through' : undefined,
+                  }}
                 >
-                  {formatMeters(row.metersAfter)}
+                  {signed(row.delta)}
                 </TableCell>
-                {actions && (
-                  <TableCell align="right" sx={{ whiteSpace: 'nowrap', px: 0.5 }}>
-                    {onEdit && row.canEdit && !row.isVoided && (
-                      <Tooltip title="Редагувати">
-                        <IconButton
-                          size="small"
-                          aria-label={`Редагувати: ${label}`}
-                          onClick={() => onEdit(row)}
-                        >
-                          <EditOutlinedIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                    {onVoid && row.canEdit && !row.isVoided && (
-                      <Tooltip title="Скасувати">
-                        <IconButton
-                          size="small"
-                          aria-label={`Скасувати: ${label}`}
-                          onClick={() => onVoid(row)}
-                        >
-                          <BlockOutlinedIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                    {onReverse && row.canReverse && (
-                      <Tooltip title="Сторно">
-                        <IconButton
-                          size="small"
-                          aria-label={`Сторно: ${label}`}
-                          onClick={() => onReverse(row)}
-                        >
-                          <UndoOutlinedIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                    {onHistory && row.revision > 0 && (
-                      <Tooltip title="Історія правок">
-                        <IconButton
-                          size="small"
-                          aria-label={`Історія правок: ${label}`}
-                          onClick={() => onHistory(row)}
-                        >
-                          <HistoryOutlinedIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                  </TableCell>
-                )}
+                <TableCell
+                  align="right"
+                  sx={{
+                    ...mono,
+                    whiteSpace: 'nowrap',
+                    color: balance < 0 ? 'error.main' : undefined,
+                  }}
+                >
+                  {formatMeters(balance)}
+                </TableCell>
               </TableRow>
             );
           })}

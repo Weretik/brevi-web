@@ -76,6 +76,27 @@ describe('warehouse mappers', () => {
     };
     const page = mapFabricMovementPage({ rows: [row], page: 1, hasMore: false, permissions });
     expect(page.rows[0]).toMatchObject({ groupCode: 'FAB-023', destination: 'Зразки' });
+    expect(page.rows[0]?.pairMetersAfter).toBeNull();
+    expect(page.counts).toBeNull();
+    const counted = mapFabricMovementPage({
+      rows: [{ ...row, pairMetersAfter: 6.5 }],
+      page: 1,
+      hasMore: false,
+      permissions,
+      total: 1,
+      counts: {
+        all: 9,
+        receipt: 3,
+        itemIssue: 2,
+        oneOffIssue: 1,
+        adjustment: 1,
+        opening: 1,
+        cancelled: 1,
+      },
+    });
+    expect(counted.rows[0]?.pairMetersAfter).toBe(6.5);
+    expect(counted.total).toBe(1);
+    expect(counted.counts).toMatchObject({ All: 9, ItemIssue: 2, Cancelled: 1 });
     expect(() =>
       mapFabricMovementPage({
         rows: [{ ...row, kind: 'Void' }],
