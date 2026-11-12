@@ -34,6 +34,7 @@ import { useSiteCompanyViewer } from './use-site-company-viewer';
 import { useSiteCertificatesViewer, useSiteWorksViewer } from './use-site-gallery-viewers';
 import { useSitePagesViewer } from './use-site-pages-viewer';
 import { useTaskViewer } from './use-task-viewer';
+import { useWarehouseAccess } from './use-warehouse-access';
 import { useWorkshopPeopleAccess } from './use-workshop-people-access';
 
 export const adminRouteDefinitions = [
@@ -60,7 +61,7 @@ export const adminRouteDefinitions = [
     useSiteWorksViewer,
     useSiteCertificatesViewer,
   }),
-  ...createWarehouseRoutes(),
+  ...createWarehouseRoutes({ useAccess: useWarehouseAccess }),
 ];
 
 /** Task pages need a role check, so the router wraps them instead of listing them above. */

@@ -1,3 +1,5 @@
+import { fabricMovementFilters } from '../../entities/movements/fabric-movement';
+
 import type { FabricMovementFilter } from '../../entities/movements/fabric-movement';
 
 /** What «Рух тканини» lists: one page of the filter, newest operation date first. */
@@ -22,3 +24,7 @@ export const withMovementFilter = (
   query: FabricMovementQuery,
   change: Partial<Omit<FabricMovementQuery, 'page'>>,
 ): FabricMovementQuery => ({ ...query, ...change, page: 1 });
+
+/** The kind filter of an address (`?kind=Opening` from the old «Початкові залишки»); anything else lists all. */
+export const movementFilterOf = (value: string | null): FabricMovementFilter =>
+  fabricMovementFilters.find((kind) => kind === value) ?? 'All';

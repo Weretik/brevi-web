@@ -5,18 +5,20 @@ import { ReportStats, ValuationShortageTable, ValuationTable } from '@admin/ware
 import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
 import { Alert, Box, Button, Typography } from '@mui/material';
 
+import type { WarehouseTabProps } from '../tabs/warehouse-tab';
+
 /**
  * «Склад тканин › Вартість складу» (WH-005): the positive stock at today's prices of «Тканини».
  * Not FIFO and not the purchase cost; shortages are apart and do not lower it.
  */
-export function FabricValuationPage() {
+export function FabricValuationPage({ title, tabs }: WarehouseTabProps) {
   const report = useGetFabricValuationQuery();
   const data = report.data;
   return (
     <Box sx={{ minWidth: 0 }}>
       <ReferencePageHeader
         overline="Склад тканин"
-        title="Вартість тканин на складі"
+        title={title ?? 'Вартість тканин на складі'}
         subtitle={
           data
             ? `Розраховано ${formatKyivTime(data.calculatedAt)}. ${data.priceSource}: найменша додатна ціна групи тканини. Це не закупівельна собівартість.`
@@ -32,6 +34,7 @@ export function FabricValuationPage() {
           </Button>
         }
       />
+      {tabs}
       <ReferenceListAlerts
         error={report.error ? 'Не вдалося порахувати вартість складу.' : null}
         loading={report.isFetching}

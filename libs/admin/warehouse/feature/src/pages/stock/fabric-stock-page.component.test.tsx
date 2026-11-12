@@ -113,4 +113,12 @@ describe('FabricStockPage', () => {
     expect(within(drawer).getByText('Уточнення не може збільшити нестачу.')).toBeTruthy();
     expect(api.adjust).not.toHaveBeenCalled();
   });
+  it('keeps Excel and «Перенесення з v133» in «Ще»', () => {
+    api.canMove = true;
+    render(<FabricStockPage />);
+    expect(screen.queryByRole('button', { name: 'Перенесення з v133' })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Ще' }));
+    expect(screen.getByRole('menuitem', { name: /Завантажити залишки в Excel/ })).toBeTruthy();
+    expect(screen.getByRole('menuitem', { name: /Перенесення з v133/ })).toBeTruthy();
+  });
 });

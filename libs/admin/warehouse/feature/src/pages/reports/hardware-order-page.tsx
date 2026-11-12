@@ -13,11 +13,13 @@ import { Alert, Box, Button, Stack, Typography } from '@mui/material';
 
 import { downloadFile } from '../../hooks/files/download-file';
 
+import type { WarehouseTabProps } from '../tabs/warehouse-tab';
+
 /**
  * «Склад тканин › Фурнітура до замовлення» (WH-005): the full accessory need of open orders by
  * the composition of their models. Stock and issues are not taken off.
  */
-export function HardwareOrderPage() {
+export function HardwareOrderPage({ title, tabs }: WarehouseTabProps) {
   const report = useGetHardwareOrderQuery();
   const data = report.data;
   const unchecked = data?.needs.filter((x) => !x.nameChecked) ?? [];
@@ -25,7 +27,7 @@ export function HardwareOrderPage() {
     <Box sx={{ minWidth: 0 }}>
       <ReferencePageHeader
         overline="Склад тканин"
-        title="Фурнітура до замовлення"
+        title={title ?? 'Фурнітура до замовлення'}
         subtitle={`Повна потреба відкритих замовлень за складом моделей. Складські залишки та видачі не віднімаються.${data ? ` Розраховано ${formatKyivTime(data.calculatedAt)}.` : ''}`}
         actions={
           <Stack direction="row" spacing={1}>
@@ -54,6 +56,7 @@ export function HardwareOrderPage() {
           </Stack>
         }
       />
+      {tabs}
       <ReferenceListAlerts
         error={report.error ? 'Не вдалося порахувати потребу у фурнітурі.' : null}
         loading={report.isFetching}

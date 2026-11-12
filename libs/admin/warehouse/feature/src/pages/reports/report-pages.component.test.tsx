@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 import FabricBookingPage from './fabric-booking-page';
 import FabricValuationPage from './fabric-valuation-page';
 import HardwareOrderPage from './hardware-order-page';
+import { WarehouseToOrderPage } from '../to-order/warehouse-to-order-page';
 
 const item = (orderNumber: number, toOrder: number) => ({
   orderId: orderNumber,
@@ -192,5 +193,32 @@ describe('stock report pages', () => {
     expect(screen.getByText(/назви немає в довіднику: FUR-007/)).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Розгорнути: Блискавка, FUR-005' }));
     expect(screen.getByText(/1 × 3 = 3 шт/)).toBeTruthy();
+  });
+  it('«Що замовити» shows only the tabs the rights open and opens the tab of the address', async () => {
+    const access = (hardware: boolean) => () => ({
+      stock: true,
+      planFact: false,
+      booking: true,
+      valuation: false,
+      hardware,
+    });
+    const first = render(
+      <MemoryRouter initialEntries={['/warehouse/to-order?tab=hardware']}>
+        <WarehouseToOrderPage useAccess={access(true)} />
+      </MemoryRouter>,
+    );
+    expect(await screen.findByText('Активних замовлень')).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Що замовити' })).toBeTruthy();
+    fireEvent.click(screen.getByRole('tab', { name: 'Тканина' }));
+    expect(await screen.findByText('Потрібно замовити')).toBeTruthy();
+    first.unmount();
+
+    render(
+      <MemoryRouter initialEntries={['/warehouse/to-order?tab=hardware']}>
+        <WarehouseToOrderPage useAccess={access(false)} />
+      </MemoryRouter>,
+    );
+    expect(await screen.findByText('Потрібно замовити')).toBeTruthy();
+    expect(screen.queryByRole('tab')).toBeNull();
   });
 });

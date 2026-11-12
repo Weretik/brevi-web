@@ -125,47 +125,30 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
     label: 'Склад тканин',
     items: [
       {
-        id: 'fabric-movements',
-        label: 'Рух тканини',
-        path: '/warehouse/movements',
-        access: 'fabric-stock',
-      },
-      {
         id: 'fabric-stock',
         label: 'Залишки',
         path: '/warehouse/stock',
         access: 'fabric-stock',
       },
       {
-        id: 'fabric-opening',
-        label: 'Початкові залишки',
-        path: '/warehouse/opening',
+        id: 'fabric-movements',
+        label: 'Рух тканини',
+        path: '/warehouse/movements',
         access: 'fabric-stock',
       },
-      // The reports (WH-005): each is its own page of «Права доступу»; «Вартість складу» is the owner's.
+      // Tabs «Тканина» (бронь) and «Фурнітура»: each its own page of «Права доступу».
       {
-        id: 'fabric-plan-fact',
-        label: 'План і факт',
-        path: '/warehouse/plan-fact',
-        access: 'fabric-plan-fact',
+        id: 'warehouse-to-order',
+        label: 'Що замовити',
+        path: '/warehouse/to-order',
+        access: ['fabric-booking', 'hardware-order'],
       },
+      // Tabs «План і факт», «Витрата за період» (fabric-stock) and «Вартість» (the owner's).
       {
-        id: 'fabric-booking',
-        label: 'Бронь і що замовити',
-        path: '/warehouse/booking',
-        access: 'fabric-booking',
-      },
-      {
-        id: 'fabric-valuation',
-        label: 'Вартість складу',
-        path: '/warehouse/valuation',
-        access: 'fabric-valuation',
-      },
-      {
-        id: 'hardware-to-order',
-        label: 'Фурнітура до замовлення',
-        path: '/warehouse/hardware',
-        access: 'hardware-order',
+        id: 'warehouse-reports',
+        label: 'Звіти',
+        path: '/warehouse/reports',
+        access: ['fabric-plan-fact', 'fabric-stock', 'fabric-valuation'],
       },
     ],
   },
