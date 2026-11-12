@@ -138,7 +138,7 @@ vi.mock('@admin/quotes/data-access', () => ({
 }));
 
 const sendDraft = {
-  fromEmail: 'olena.brevi@gmail.com',
+  fromEmail: 'olena@brevi.test',
   fromName: 'Олена',
   gmailConfigured: true,
   fileName: 'КП 1-11-2026.pdf',

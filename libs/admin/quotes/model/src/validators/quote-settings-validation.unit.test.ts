@@ -15,7 +15,7 @@ const settings: QuoteSettings = {
     taxId: '355216316015',
     iban: 'UA63 305299 00000 26004041206862',
     address: null,
-    phone: '+38 095 164 58 55',
+    phone: '+38 050 000 00 00',
     email: 'pp.brevi@gmail.com',
     site: 'https://brevi.com.ua/',
     logoUrl: null,

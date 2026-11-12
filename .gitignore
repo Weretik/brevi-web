@@ -65,3 +65,10 @@ out
 .vitest
 apps/site/next-env.d.ts
 apps/site/tsconfig.tsbuildinfo
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
