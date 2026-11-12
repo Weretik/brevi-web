@@ -142,6 +142,8 @@ const bookingPair = (value: unknown): BookingPair => {
     free: decimal(row['free'], 'вільно'),
     toOrder: decimal(row['toOrder'], 'замовити'),
     shortage: decimal(row['shortage'], 'нестача'),
+    supplier: nullableText(row['supplier'], 'постачальник'),
+    needBy: nullableDay(row['needBy'], 'потрібно до'),
     items: list(row['items'], 'позиції').map(bookingItem),
   };
 };
@@ -164,6 +166,7 @@ export function mapBooking(value: unknown): BookingReport {
     pairs: list(row['pairs'], 'пари').map(bookingPair),
     unknown: list(row['unknown'], 'невідомі плани').map(bookingUnknown),
     calculatedAt: dateTime(row['calculatedAt'], 'час розрахунку'),
+    canReceive: boolean(row['canReceive'], 'право на прихід'),
   };
 }
 
@@ -232,6 +235,7 @@ const needOrder = (value: unknown): HardwareNeedOrder => {
     norm: decimal(row['norm'], 'норма'),
     products: integer(row['products'], 'виробів'),
     quantity: decimal(row['quantity'], 'потреба'),
+    dueDate: nullableDay(row['dueDate'], 'термін'),
   };
 };
 
@@ -245,6 +249,7 @@ const need = (value: unknown): HardwareNeed => {
     unit: nonEmptyText(row['unit'], 'одиниця'),
     quantity: decimal(row['quantity'], 'потреба'),
     orders: list(row['orders'], 'замовлення').map(needOrder),
+    dueDate: nullableDay(row['dueDate'], 'найближчий термін'),
   };
 };
 

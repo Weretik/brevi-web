@@ -17,6 +17,7 @@ export function WarehouseToOrderPage({ useAccess }: Props) {
   return (
     <WarehouseTabsPage
       title="Що замовити"
+      access={access}
       tabs={[
         { value: 'fabric', label: 'Тканина', allowed: access.booking, Page: FabricBookingPage },
         {

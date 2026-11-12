@@ -8,21 +8,26 @@ import {
   fabricReceiptBody,
   kyivToday,
   nextFabricReceiptValues,
+  presetFabricReceiptValues,
   validateFabricReceipt,
 } from '@admin/warehouse/model';
 import { FabricReceiptForm } from '@admin/warehouse/ui';
 import { Alert, LinearProgress, Stack } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { operationMessage, useStockOperation } from '../../hooks/operations/use-stock-operation';
 
+import type { FabricReceiptPreset } from '@admin/warehouse/model';
+
 interface Props {
+  /** The pair to start from, e.g. «+ Прихід» on a row of «Що замовити». */
+  preset?: FabricReceiptPreset;
   onClose: () => void;
   onSaved: (message: string) => void;
 }
 
 /** «Прихід»: after a save the form stays open for the next roll, keeping fabric and colour. */
-export function FabricReceiptDrawer({ onClose, onSaved }: Props) {
+export function FabricReceiptDrawer({ preset, onClose, onSaved }: Props) {
   const choices = useGetFabricStockChoicesQuery();
   const [receive] = useReceiveFabricMutation();
   const [saved, setSaved] = useState<string | null>(null);
@@ -39,6 +44,13 @@ export function FabricReceiptDrawer({ onClose, onSaved }: Props) {
       form.reset(nextFabricReceiptValues(values));
     },
   });
+  const presetApplied = useRef(false);
+  const { change, values } = form;
+  useEffect(() => {
+    if (!preset || !choices.data || presetApplied.current) return;
+    presetApplied.current = true;
+    change(presetFabricReceiptValues(values, choices.data, preset));
+  }, [preset, choices.data, change, values]);
   return (
     <ReferenceEditorDrawer
       titleId="fabric-receipt-title"

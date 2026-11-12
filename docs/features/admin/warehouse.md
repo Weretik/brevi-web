@@ -1,6 +1,6 @@
 # Admin: «Склад тканин»
 
-**Status:** implementation exists, checked 2026-11-12 (menu of four items, UX stage 1; «Рух тканини» journal, UX stage 2; «Залишки» with booking, UX stage 3). SDD: [UX stage 2, movement journal](../../specs/admin/warehouse/005-movement-journal/README.md), [UX stage 3, stock with booking](../../specs/admin/warehouse/006-stock-booking/README.md), [warehouse stage 2, ledger rules and three pages](../../specs/admin/warehouse/001-ledger-pages/README.md), [stage 3, edit, void and restore](../../specs/admin/warehouse/002-movement-revisions/README.md), [stage 4, issue by actual cutting](../../specs/admin/warehouse/003-issue-by-cutting/README.md), [stage 5, the four reports](../../specs/admin/warehouse/004-reports/README.md); backend [WH-001](https://github.com/Weretik/BreviERP/tree/main/docs/sdd/specs/warehouse/001-warehouse-module) [WH-002](https://github.com/Weretik/BreviERP/tree/main/docs/sdd/specs/warehouse/002-ledger-rules) [WH-003](https://github.com/Weretik/BreviERP/tree/main/docs/sdd/specs/warehouse/003-movement-revisions) [WH-004](https://github.com/Weretik/BreviERP/tree/main/docs/sdd/specs/warehouse/004-issue-by-cutting) [WH-005](https://github.com/Weretik/BreviERP/tree/main/docs/sdd/specs/warehouse/005-reports) and [WH-006, transfer from v133](https://github.com/Weretik/BreviERP/tree/main/docs/sdd/specs/warehouse/006-v133-transfer) and [WH-007, movement journal](https://github.com/Weretik/BreviERP/tree/main/docs/sdd/specs/warehouse/007-movement-journal) and [WH-008, stock booking columns](https://github.com/Weretik/BreviERP/tree/main/docs/sdd/specs/warehouse/008-stock-booking-columns).
+**Status:** implementation exists, checked 2026-11-12 (menu of four items, UX stage 1; «Рух тканини» journal, UX stage 2; «Залишки» with booking, UX stage 3; «Що замовити», UX stage 4). SDD: [UX stage 2, movement journal](../../specs/admin/warehouse/005-movement-journal/README.md), [UX stage 3, stock with booking](../../specs/admin/warehouse/006-stock-booking/README.md), [UX stage 4, what to order](../../specs/admin/warehouse/007-to-order/README.md), [warehouse stage 2, ledger rules and three pages](../../specs/admin/warehouse/001-ledger-pages/README.md), [stage 3, edit, void and restore](../../specs/admin/warehouse/002-movement-revisions/README.md), [stage 4, issue by actual cutting](../../specs/admin/warehouse/003-issue-by-cutting/README.md), [stage 5, the four reports](../../specs/admin/warehouse/004-reports/README.md); backend [WH-001](https://github.com/Weretik/BreviERP/tree/main/docs/sdd/specs/warehouse/001-warehouse-module) [WH-002](https://github.com/Weretik/BreviERP/tree/main/docs/sdd/specs/warehouse/002-ledger-rules) [WH-003](https://github.com/Weretik/BreviERP/tree/main/docs/sdd/specs/warehouse/003-movement-revisions) [WH-004](https://github.com/Weretik/BreviERP/tree/main/docs/sdd/specs/warehouse/004-issue-by-cutting) [WH-005](https://github.com/Weretik/BreviERP/tree/main/docs/sdd/specs/warehouse/005-reports) and [WH-006, transfer from v133](https://github.com/Weretik/BreviERP/tree/main/docs/sdd/specs/warehouse/006-v133-transfer) and [WH-007, movement journal](https://github.com/Weretik/BreviERP/tree/main/docs/sdd/specs/warehouse/007-movement-journal) and [WH-008, stock booking columns](https://github.com/Weretik/BreviERP/tree/main/docs/sdd/specs/warehouse/008-stock-booking-columns) and [WH-009, to-order dates](https://github.com/Weretik/BreviERP/tree/main/docs/sdd/specs/warehouse/009-to-order-dates).
 
 «Склад тканин» is its own sidebar block right under «Швейний цех» (backend module Warehouse, `api/warehouse/...`, «Права доступу» page `fabric-stock`). Since 2026-11-12 it has four items: «Залишки», «Рух тканини», «Що замовити» (tabs «Тканина» and «Фурнітура», `?tab=fabric|hardware`) and «Звіти» (tabs «План і факт», «Витрата за період», «Вартість», `?tab=plan-fact|consumption|valuation`). A tab shows only when its own «Права доступу» page is open (`useAccess` from the app, `use-warehouse-access.ts`); the menu item shows when any of its tabs is open. The old addresses `/warehouse/opening`, `/booking`, `/hardware`, `/plan-fact` and `/valuation` redirect to the right item and tab. The four reports are their own «Права доступу» pages: `fabric-plan-fact`, `fabric-booking`, `fabric-valuation` (Admin by default) and `hardware-order` (Admin and WorkshopChief by default). Recording movements is for the head of the workshop and Admin; the server decides it and hides prices from everybody else.
 
@@ -10,9 +10,9 @@
 
 - **«Звіти › План і факт»** (`/warehouse/reports?tab=plan-fact`). Main fabric by model for items issued for all their products: orders, products, plan, fact and difference per product (weighted), result; filters model, client, fabric; a model opens its orders with every material by role. One item that cannot be compared makes the difference unknown and is counted.
 - **«Звіти › Витрата за період»** (`/warehouse/reports?tab=consumption`, page `fabric-stock`; was the «Зведення витрати» panel of «Рух тканини»). Received, issued and corrected per fabric and colour from the first day of this month to today, or another period.
-- **«Що замовити › Тканина»** (`/warehouse/to-order?tab=fabric`, page `fabric-booking`). Booked, free and to order; pairs sorted by what to order, each opening its queue of items in order of the orders; search and «Лише те, що потрібно замовити»; «Невідомий план» apart. Reads only.
+- **«Що замовити › Тканина»** (`/warehouse/to-order?tab=fabric`, page `fabric-booking`). Figures «Замовити X м» (pairs, suppliers), «У броні», «Вільно на складі», «Без плану» when there is any. Search (fabric, colour, supplier, client, `Ц-12`), chips «Замовити» (default), «Усі пари», «Без плану» with counts, supplier chip. One row per pair: «Постачальник», «Потрібно до» (nearest date of a task still short, red within three days), «Покриття» bar «є X з Y», «Замовити, м»; sorted by the date, then metres. A row opens the queue of tasks in a side panel. «+ Прихід» on a row and in the panel (server `canReceive` and the page «Залишки») opens the receipt with the offer, colour and supplier filled in. «Без плану» lists items with an unknown need and links to «Норми витрати тканини». Reads only.
 - **«Звіти › Вартість»** (`/warehouse/reports?tab=valuation`, page `fabric-valuation`). Positive stock at the lowest price of the fabric group in «Тканини»: colours, subtotals and total; «Без ціни» makes the total partial; «Дефіцит» apart; time of calculation and price source; «Оновити ціни і залишки».
-- **«Що замовити › Фурнітура»** (`/warehouse/to-order?tab=hardware`, page `hardware-order`). Full accessory need of open orders by model composition; a line opens norm × products by order; «Потреба неповна», «Потрібна перевірка назв»; Excel with «Зведена потреба» and «За замовленнями».
+- **«Що замовити › Фурнітура»** (`/warehouse/to-order?tab=hardware`, page `hardware-order`). Full accessory need of open orders by model composition, the nearest due date first. Search (code, name, note, client, task), chips «Усі», «Неповна потреба», «Назву не знайдено» (empty ones hide); columns «Найближчий термін», «Завдань» and «Потреба» with its unit; a missing reference name is marked on the row. A row opens norm × products by task in a side panel. Excel with «Зведена потреба» and «За замовленнями».
 
 Every form makes a new operation id and keeps it across failed tries, so a lost answer is replayed by the server instead of moving the stock twice; the default operation date is today in Kyiv. The «Тканина» section of an order item in «Швейний цех» ([production](production.md)) is `ItemFabricSection` of this library: the same card and issue form, read through the orders endpoint. An order-issue edit hides «Куди використано».
 
@@ -37,7 +37,8 @@ libs/admin/warehouse/model/src/
   mappers/movements/                      # «Операція», «Звідки / куди» and cancel marks of a journal row
   mappers/exports/                        # .xlsx writer (stored zip), stock, movement and accessory workbooks
   entities/reports/stock-reports.ts       # the four reports, result labels, units
-  queries/reports/booking-search.ts       # search and «Лише те, що потрібно замовити»
+  queries/reports/booking-filters.ts      # «Що замовити › Тканина»: search, chips, supplier, sort, coverage
+  queries/reports/hardware-filters.ts     # «Що замовити › Фурнітура»: search, chips, sort
   entities/transfer/, mappers/transfer/v133-export.ts # «Перенесення з v133»: result, JSONL files → transfer body
 libs/admin/warehouse/data-access/src/
   api/warehouse-base-api.ts, api/fabric-stock.api.ts # endpoints and hooks on adminApi
@@ -59,7 +60,8 @@ libs/admin/warehouse/ui/src/
   panels/item-fabric/item-fabric-card.tsx # item fabric card
   forms/item-issue/                       # issue form and check step
   components/issue-items/                 # items found for «Видача на завдання»
-  tables/reports/, components/reports/    # report tables, expandable row, order link, summary figures
+  tables/reports/, components/reports/    # report tables, expandable row, order link, summary figures, filter bar
+  panels/reports/                         # «Що замовити» pair: figures and queue of tasks
   panels/stock-transfer/                  # «Перенесення з v133» comparison, errors and notes
   components/menus/warehouse-more-menu.tsx # «Ще» menu of the rare page actions
 libs/admin/warehouse/feature/src/
@@ -70,6 +72,7 @@ libs/admin/warehouse/feature/src/
   components/operations/                  # receipt, opening, issue and adjustment side panels
   components/movements/                   # movement, «Правка руху» and «Історія правок» side panels
   components/stock/                       # «Залишок пари» side panel with its latest movements
+  components/reports/                     # «Що замовити» pair and accessory side panels
   components/item-issue/                  # ItemFabricSection (exported to production), issue drawer, «Видача на завдання»
   hooks/item-issue/                       # issue in two steps, «Сторно видачі»
   hooks/operations/use-stock-operation.ts # form state, operation id, save
@@ -102,7 +105,7 @@ apps/admin-react/src/app/router/
 - `libs/admin/warehouse/ui/src/tables/movements/fabric-movements-table.component.test.tsx`
 - `libs/admin/warehouse/feature/src/pages/stock/fabric-stock-page.component.test.tsx`
 - `libs/admin/warehouse/feature/src/pages/movements/fabric-movements-page.component.test.tsx`
-- `libs/admin/warehouse/model/src/queries/reports/booking-search.test.ts`, `libs/admin/warehouse/model/src/mappers/exports/hardware-exports.test.ts`
+- `libs/admin/warehouse/model/src/queries/reports/booking-filters.test.ts`, `libs/admin/warehouse/model/src/queries/reports/hardware-filters.test.ts`, `libs/admin/warehouse/model/src/mappers/exports/hardware-exports.test.ts`
 - `libs/admin/warehouse/data-access/src/mappers/stock-reports.mapper.test.ts`
 - `libs/admin/warehouse/feature/src/pages/reports/report-pages.component.test.tsx`
 - `apps/admin-react/src/app/router/app-router.integration.test.tsx`, `apps/admin-react/src/app/router/navigation-config.unit.test.ts`

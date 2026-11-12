@@ -102,6 +102,10 @@ export interface BookingPair {
   toOrder: number;
   /** The negative balance already there, as a positive figure. */
   shortage: number;
+  /** The fabric's supplier from the reference; null when unknown. */
+  supplier: string | null;
+  /** The nearest due date of the items still short, else of those not issued; null when none has one. */
+  needBy: string | null;
   items: BookingItem[];
 }
 
@@ -121,6 +125,8 @@ export interface BookingReport {
   pairs: BookingPair[];
   unknown: BookingUnknown[];
   calculatedAt: string;
+  /** The person may record «Прихід» (the stock keepers). */
+  canReceive: boolean;
 }
 
 // «Вартість складу» (TZ §13)
@@ -188,6 +194,7 @@ export interface HardwareNeedOrder {
   norm: number;
   products: number;
   quantity: number;
+  dueDate: string | null;
 }
 
 export interface HardwareNeed {
@@ -200,6 +207,8 @@ export interface HardwareNeed {
   unit: string;
   quantity: number;
   orders: HardwareNeedOrder[];
+  /** The nearest due date of its orders; null when none has one. */
+  dueDate: string | null;
 }
 
 export interface HardwareIncomplete {

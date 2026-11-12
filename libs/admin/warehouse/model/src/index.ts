@@ -66,6 +66,7 @@ export {
   fabricReceiptBody,
   hasStockFormErrors,
   nextFabricReceiptValues,
+  presetFabricReceiptValues,
   validateFabricAdjustment,
   validateFabricIssue,
   validateFabricOpening,
@@ -80,6 +81,7 @@ export type {
   FabricOpeningFormValues,
   FabricReceiptErrors,
   FabricReceiptFormValues,
+  FabricReceiptPreset,
 } from './forms/stock-operations/stock-operation-forms';
 export {
   createMovementEditValues,
@@ -217,7 +219,26 @@ export type {
   ValuationReport,
   ValuationShortage,
 } from './entities/reports/stock-reports';
-export { searchBooking } from './queries/reports/booking-search';
+export {
+  BOOKING_SOON_DAYS,
+  bookingCoverage,
+  bookingSuppliers,
+  bookingToOrderSummary,
+  bookingViewCounts,
+  bookingViewLabels,
+  bookingViews,
+  filterBooking,
+  isDueSoon,
+  searchBooking,
+} from './queries/reports/booking-filters';
+export type { BookingView } from './queries/reports/booking-filters';
+export {
+  filterHardware,
+  hardwareViewCounts,
+  hardwareViewLabels,
+  hardwareViews,
+} from './queries/reports/hardware-filters';
+export type { HardwareView } from './queries/reports/hardware-filters';
 export { hardwareWorkbook } from './mappers/exports/hardware-exports';
 export type {
   StockTransferCurrent,

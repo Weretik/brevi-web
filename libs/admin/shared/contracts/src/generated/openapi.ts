@@ -12271,6 +12271,13 @@ export interface components {
       /** @description The negative balance as a positive figure. */
       shortage: number;
       items: components['schemas']['FabricBookingItemResponse'][];
+      /** @description The supplier of the fabric in «Тканини». */
+      supplier?: string | null;
+      /**
+       * Format: date
+       * @description «Потрібно до», the nearest due date of the tasks still short of the pair, or else of those that need it.
+       */
+      needBy?: string | null;
     };
     /** @description An item whose need is unknown; not counted as zero. */
     FabricBookingUnknownResponse: {
@@ -12289,6 +12296,8 @@ export interface components {
       unknown: components['schemas']['FabricBookingUnknownResponse'][];
       /** Format: date-time */
       calculatedAt: string;
+      /** @description The person may record «Прихід»; the row offers it. */
+      canReceive: boolean;
     };
     FabricValuationColorResponse: {
       color: string;
@@ -12344,6 +12353,11 @@ export interface components {
       products: number;
       /** @description norm × products, to 6 decimals. */
       quantity: number;
+      /**
+       * Format: date
+       * @description The due date of the item.
+       */
+      dueDate?: string | null;
     };
     HardwareNeedResponse: {
       code: string;
@@ -12356,6 +12370,11 @@ export interface components {
       unit: string;
       quantity: number;
       orders: components['schemas']['HardwareNeedOrderResponse'][];
+      /**
+       * Format: date
+       * @description The nearest due date of the tasks that need it.
+       */
+      dueDate?: string | null;
     };
     /** @description «Потреба неповна»: a line whose quantity is unknown. */
     HardwareIncompleteResponse: {
