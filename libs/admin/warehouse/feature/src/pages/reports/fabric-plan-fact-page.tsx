@@ -6,6 +6,7 @@ import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
 import { Alert, Box, Button, Paper, Stack, TextField } from '@mui/material';
 import { useState } from 'react';
 
+import type { WarehouseTabProps } from '../tabs/warehouse-tab';
 import type { PlanFactFilter } from '@admin/warehouse/model';
 
 const empty: PlanFactFilter = { model: '', client: '', fabric: '' };
@@ -14,7 +15,7 @@ const empty: PlanFactFilter = { model: '', client: '', fabric: '' };
  * «Склад тканин › План і факт» (WH-005): main fabric by model for the items whose fabric was issued
  * for all their products. One item that cannot be compared makes the difference unknown.
  */
-export function FabricPlanFactPage() {
+export function FabricPlanFactPage({ title, tabs }: WarehouseTabProps) {
   const [draft, setDraft] = useState<PlanFactFilter>(empty);
   const [filter, setFilter] = useState<PlanFactFilter>(empty);
   const report = useGetFabricPlanFactQuery(filter);
@@ -33,7 +34,7 @@ export function FabricPlanFactPage() {
     <Box sx={{ minWidth: 0 }}>
       <ReferencePageHeader
         overline="Склад тканин"
-        title="План і факт"
+        title={title ?? 'План і факт'}
         subtitle="План і факт основної тканини за моделями: лише завдання, тканину яких видано на всі вироби."
         actions={
           <Button
@@ -45,6 +46,7 @@ export function FabricPlanFactPage() {
           </Button>
         }
       />
+      {tabs}
       <Paper
         variant="outlined"
         component="form"

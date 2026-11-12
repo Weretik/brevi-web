@@ -6,11 +6,13 @@ import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
 import { Alert, Box, Button, FormControlLabel, Switch, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 
+import type { WarehouseTabProps } from '../tabs/warehouse-tab';
+
 /**
  * «Склад тканин › Бронь і що замовити» (WH-005): the stock handed to the plans of open orders in
  * order of the orders. Opening or refreshing books nothing.
  */
-export function FabricBookingPage() {
+export function FabricBookingPage({ title, tabs }: WarehouseTabProps) {
   const report = useGetFabricBookingQuery();
   const [search, setSearch] = useState('');
   const [onlyToOrder, setOnlyToOrder] = useState(false);
@@ -23,7 +25,7 @@ export function FabricBookingPage() {
     <Box sx={{ minWidth: 0 }}>
       <ReferencePageHeader
         overline="Склад тканин"
-        title="Бронь і потреба в тканині"
+        title={title ?? 'Бронь і потреба в тканині'}
         subtitle={
           data
             ? `Розраховано ${formatKyivTime(data.calculatedAt)}. Раніші замовлення отримують тканину першими; звіт нічого не бронює і не списує.`
@@ -39,6 +41,7 @@ export function FabricBookingPage() {
           </Button>
         }
       />
+      {tabs}
       <ReferenceListAlerts
         error={report.error ? 'Не вдалося порахувати бронь.' : null}
         loading={report.isFetching}

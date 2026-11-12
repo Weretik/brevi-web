@@ -17,9 +17,10 @@ const kinds: [FabricMovementFilter, string][] = [
   ['All', 'Усі'],
   ['Receipt', 'Прихід'],
   ['Issue', 'Витрата'],
+  ['Opening', 'Початкові'],
 ];
 
-/** Fabric, colour and «Усі / Прихід / Витрата»; any code of an alias group selects the group. */
+/** Fabric, colour and «Усі / Прихід / Витрата / Початкові»; any code of an alias group selects the group. */
 export function FabricMovementFilters({ query, fabrics, onChange }: Props) {
   const fabric = fabrics.find((x) => x.codes.includes(query.fabricCode ?? '')) ?? null;
   const color = fabric?.colors.find((x) => x.color === query.color) ?? null;

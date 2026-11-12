@@ -7,10 +7,10 @@ import {
   stockBalancesWorkbook,
   XLSX_MIME_TYPE,
 } from '@admin/warehouse/model';
-import { FabricStockTable } from '@admin/warehouse/ui';
+import { FabricStockTable, WarehouseMoreMenu } from '@admin/warehouse/ui';
 import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined';
 import MoveDownOutlinedIcon from '@mui/icons-material/MoveDownOutlined';
-import { Alert, Box, Button, Stack } from '@mui/material';
+import { Alert, Box } from '@mui/material';
 import { useMemo, useState } from 'react';
 
 import { FabricAdjustmentDrawer } from '../../components/operations/fabric-adjustment-drawer';
@@ -45,32 +45,33 @@ export function FabricStockPage() {
             : 'Скільки тканини лежить на полицях'
         }
         actions={
-          <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap' }}>
-            {data?.permissions.canTransfer && (
-              <Button
-                variant="outlined"
-                startIcon={<MoveDownOutlinedIcon />}
-                onClick={() => setTransferring(true)}
-              >
-                Перенесення з v133
-              </Button>
-            )}
-            <Button
-              variant="outlined"
-              startIcon={<DownloadOutlinedIcon />}
-              disabled={!data?.fabrics.length}
-              onClick={() =>
-                data &&
-                downloadFile(
-                  stockBalancesWorkbook(data),
-                  `zalyshky-tkanyn-${kyivToday()}.xlsx`,
-                  XLSX_MIME_TYPE,
-                )
-              }
-            >
-              Завантажити всі залишки Excel
-            </Button>
-          </Stack>
+          <WarehouseMoreMenu
+            actions={[
+              {
+                label: 'Завантажити залишки в Excel',
+                icon: <DownloadOutlinedIcon fontSize="small" />,
+                disabled: !data?.fabrics.length,
+                onClick: () =>
+                  data &&
+                  downloadFile(
+                    stockBalancesWorkbook(data),
+                    `zalyshky-tkanyn-${kyivToday()}.xlsx`,
+                    XLSX_MIME_TYPE,
+                  ),
+              },
+              ...(data?.permissions.canTransfer
+                ? [
+                    {
+                      label: 'Перенесення з v133',
+                      secondary: 'Склад зі старого «Цеху»',
+                      icon: <MoveDownOutlinedIcon fontSize="small" />,
+                      divided: true,
+                      onClick: () => setTransferring(true),
+                    },
+                  ]
+                : []),
+            ]}
+          />
         }
       />
       <ReferenceListAlerts

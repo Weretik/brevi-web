@@ -21,3 +21,5 @@ export { HardwareIncompleteTable, HardwareNeedTable } from './tables/reports/har
 export { ReportStats } from './components/reports/report-stats';
 export type { ReportStat } from './components/reports/report-stats';
 export { StockTransferSummary } from './panels/stock-transfer/stock-transfer-summary';
+export { WarehouseMoreMenu } from './components/menus/warehouse-more-menu';
+export type { WarehouseMoreAction } from './components/menus/warehouse-more-menu';

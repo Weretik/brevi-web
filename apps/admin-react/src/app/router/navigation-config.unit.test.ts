@@ -50,8 +50,8 @@ describe('legacy Admin navigation', () => {
       'Загальні звіти',
       'Адміністрування',
     ]);
-    expect(groups.map((group) => group.items.length)).toEqual([6, 8, 7, 4, 8, 1, 11, 1, 5]);
-    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(51);
+    expect(groups.map((group) => group.items.length)).toEqual([6, 8, 4, 4, 8, 1, 11, 1, 5]);
+    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(48);
     expect(groups[0].items.map((item) => item.id)).not.toContain('clients');
   });
   it('shows «Налаштування КП» only for the server Admin role', () => {
@@ -233,17 +233,17 @@ describe('legacy Admin navigation', () => {
       to: '/warehouse/stock',
     });
     expect(warehouse(['Admin'])?.items.map((item) => item.label)).toEqual([
-      'Рух тканини',
       'Залишки',
-      'Початкові залишки',
-      'План і факт',
-      'Бронь і що замовити',
-      'Вартість складу',
-      'Фурнітура до замовлення',
+      'Рух тканини',
+      'Що замовити',
+      'Звіти',
     ]);
-    expect(warehouse(['WorkshopChief'])?.items.some((item) => item.id === 'fabric-valuation')).toBe(
-      false,
-    );
+    expect(warehouse(['WorkshopChief'])?.items.map((item) => item.id)).toEqual([
+      'fabric-stock',
+      'fabric-movements',
+      'warehouse-to-order',
+      'warehouse-reports',
+    ]);
     expect(warehouse(['Accountant'])).toBeUndefined();
   });
 
