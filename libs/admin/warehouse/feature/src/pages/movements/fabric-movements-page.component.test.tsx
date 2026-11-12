@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import FabricMovementsPage from './fabric-movements-page';
@@ -101,6 +102,7 @@ vi.mock('@admin/warehouse/data-access', () => ({
   useLazyGetFabricMovementsQuery: () => [vi.fn()],
   useReceiveFabricMutation: () => [(body: unknown) => ({ unwrap: () => api.receive(body) })],
   useIssueFabricMutation: () => [vi.fn()],
+  useOpenFabricStockMutation: () => [vi.fn()],
   useReverseFabricMovementMutation: () => [
     (body: unknown) => ({ unwrap: () => api.reverse(body) }),
   ],
@@ -174,7 +176,7 @@ const saved = {
 
 describe('FabricMovementsPage', () => {
   it('shows receipts and one-off issues with the line balance and pages by «Далі»', () => {
-    render(<FabricMovementsPage />);
+    render(<FabricMovementsPage />, { wrapper: MemoryRouter });
     const table = screen.getByRole('table', { name: 'Рух тканини' });
     expect(within(table).getByText('Зразки')).toBeTruthy();
     expect(within(table).getByText('Без замовлення')).toBeTruthy();
@@ -187,7 +189,7 @@ describe('FabricMovementsPage', () => {
 
   it('hides «Прихід» and «Сторно» from people who cannot move stock', () => {
     api.canMove = false;
-    render(<FabricMovementsPage />);
+    render(<FabricMovementsPage />, { wrapper: MemoryRouter });
     expect(screen.queryByRole('button', { name: 'Новий прихід' })).toBeNull();
     expect(screen.queryByRole('button', { name: /^Сторно/ })).toBeNull();
     expect(screen.queryByRole('button', { name: /^Редагувати/ })).toBeNull();
@@ -203,7 +205,7 @@ describe('FabricMovementsPage', () => {
       meters: 32.5,
       replayed: false,
     });
-    render(<FabricMovementsPage />);
+    render(<FabricMovementsPage />, { wrapper: MemoryRouter });
     fireEvent.click(screen.getByRole('button', { name: 'Новий прихід' }));
     const drawer = screen.getByRole('dialog');
     fireEvent.change(within(drawer).getByRole('combobox', { name: 'Тканина' }), {
@@ -234,7 +236,7 @@ describe('FabricMovementsPage', () => {
       meters: 0,
       replayed: false,
     });
-    render(<FabricMovementsPage />);
+    render(<FabricMovementsPage />, { wrapper: MemoryRouter });
     fireEvent.click(screen.getAllByRole('button', { name: /^Сторно/ })[0] as HTMLElement);
     const dialog = screen.getByRole('dialog');
     fireEvent.change(within(dialog).getByLabelText(/Причина/), { target: { value: 'Помилка' } });
@@ -246,7 +248,7 @@ describe('FabricMovementsPage', () => {
 
   it('edits a receipt with the revision it shows and the effect on the balance', async () => {
     api.edit.mockResolvedValue(saved);
-    render(<FabricMovementsPage />);
+    render(<FabricMovementsPage />, { wrapper: MemoryRouter });
     fireEvent.click(screen.getAllByRole('button', { name: /^Редагувати/ })[0] as HTMLElement);
     const drawer = screen.getByRole('dialog');
     fireEvent.change(within(drawer).getByLabelText(/Метри/), { target: { value: '18' } });
@@ -262,7 +264,7 @@ describe('FabricMovementsPage', () => {
 
   it('voids a movement with a reason', async () => {
     api.voidMovement.mockResolvedValue(saved);
-    render(<FabricMovementsPage />);
+    render(<FabricMovementsPage />, { wrapper: MemoryRouter });
     fireEvent.click(screen.getAllByRole('button', { name: /^Скасувати:/ })[1] as HTMLElement);
     const dialog = screen.getByRole('dialog');
     expect(within(dialog).getByText(/залишок зміниться на \+3,5 м/)).toBeTruthy();
@@ -278,7 +280,7 @@ describe('FabricMovementsPage', () => {
 
   it('shows the history before and after and takes the last edit back', async () => {
     api.restore.mockResolvedValue(saved);
-    render(<FabricMovementsPage />);
+    render(<FabricMovementsPage />, { wrapper: MemoryRouter });
     fireEvent.click(screen.getByRole('button', { name: /^Історія правок/ }));
     const drawer = screen.getByRole('dialog');
     const table = within(drawer).getByRole('table', { name: 'Історія правок' });
@@ -291,5 +293,28 @@ describe('FabricMovementsPage', () => {
         body: expect.objectContaining({ expectedRevision: 1 }),
       }),
     );
+  });
+  it('keeps the rare actions in «Ще», opens the opening panel there and has no «Зведення витрати»', () => {
+    api.canMove = true;
+    render(<FabricMovementsPage />, { wrapper: MemoryRouter });
+    expect(screen.queryByRole('button', { name: 'Зведення витрати' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Разова витрата' })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Ще' }));
+    expect(screen.getByRole('menuitem', { name: /Разова витрата/ })).toBeTruthy();
+    expect(screen.getByRole('menuitem', { name: /Вивантажити рух в Excel/ })).toBeTruthy();
+    fireEvent.click(screen.getByRole('menuitem', { name: /Внести початковий залишок/ }));
+    expect(
+      within(screen.getByRole('dialog')).getByRole('button', { name: 'Внести початковий залишок' }),
+    ).toBeTruthy();
+  });
+
+  it('opens on «Початкові» from the old «Початкові залишки» address', () => {
+    api.queries.length = 0;
+    render(
+      <MemoryRouter initialEntries={['/warehouse/movements?kind=Opening']}>
+        <FabricMovementsPage />
+      </MemoryRouter>,
+    );
+    expect(api.queries[0]).toMatchObject({ kind: 'Opening', page: 1 });
   });
 });

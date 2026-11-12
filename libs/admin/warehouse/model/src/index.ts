@@ -100,6 +100,7 @@ export {
 } from './queries/stock/fabric-stock-search';
 export {
   defaultFabricMovementQuery,
+  movementFilterOf,
   withMovementFilter,
 } from './queries/movements/fabric-movement-query';
 export type { FabricMovementQuery } from './queries/movements/fabric-movement-query';
@@ -201,3 +202,4 @@ export type {
 } from './entities/transfer/stock-transfer';
 export { readV133Export, v133Tables } from './mappers/transfer/v133-export';
 export type { V133ExportFile, V133ExportResult } from './mappers/transfer/v133-export';
+export type { WarehouseAccess } from './entities/access/warehouse-access';
