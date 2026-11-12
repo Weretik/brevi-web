@@ -184,6 +184,16 @@ describe('CatalogProductPage', () => {
       '/uk/request',
     );
     expect(screen.getByRole('table', { name: 'Куртка' })).toBeTruthy();
+    // The short facts open the characteristics; the price strip for phones links to the request.
+    const facts = within(screen.getByRole('table', { name: 'Коротко про модель' }));
+    expect(facts.getByRole('cell', { name: 'літо' })).toBeTruthy();
+    const bar = within(screen.getByRole('complementary', { name: 'Ціна моделі' }));
+    expect(bar.getByText('від 900 грн')).toBeTruthy();
+    expect(bar.getByRole('link', { name: 'Заявка' }).getAttribute('href')).toBe('/uk/request');
+    const nav = within(screen.getByRole('navigation', { name: 'Розділи сторінки' }));
+    expect(nav.getByRole('link', { name: 'Характеристики' }).getAttribute('href')).toBe(
+      '#product-specs',
+    );
   });
 
   it('leads the breadcrumbs through the product category and marks up the product', async () => {

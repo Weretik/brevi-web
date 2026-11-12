@@ -17,8 +17,8 @@ export function CatalogOrder({
   /** Company facts from «Контакти та компанія». */
   company: Company;
   id: string;
-  /** Number of the block in the «Строчка» label, for example `04`. */
-  index: string;
+  /** Number of the block in the «Строчка» label, for example `04`; a page without numbered blocks omits it. */
+  index?: string;
   dictionary: CatalogDictionary['order'];
   requestHref: string;
   logoHref: string;
@@ -34,7 +34,8 @@ export function CatalogOrder({
       className="grid gap-5 rounded-xl border-2 border-dashed border-brand-soft bg-muted p-6 sm:p-8"
     >
       <p className="font-mono text-[0.8125rem] font-semibold text-brand-text uppercase">
-        {index} · {dictionary.label}
+        {index ? `${index} · ` : null}
+        {dictionary.label}
       </p>
       <h2 id={titleId} className="text-2xl leading-tight font-extrabold tracking-[-0.015em]">
         {dictionary.title}

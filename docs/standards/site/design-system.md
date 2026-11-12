@@ -15,20 +15,21 @@ These are the visual rules for `apps/site`. The source is design «Строчк�
 
 ## Tokens
 
-| Token                            | Value                 | Use                                                                            |
-| -------------------------------- | --------------------- | ------------------------------------------------------------------------------ |
-| `background`                     | `#FFFFFF`             | page                                                                           |
-| `foreground`                     | `#262626`             | text, headings                                                                 |
-| `muted`                          | `#F6F6F4`             | quiet panels, inputs, table headers                                            |
-| `muted-foreground`               | `#5E5E58`             | secondary text                                                                 |
-| `border`                         | `#ECECE9`             | lines inside cards                                                             |
-| `border-strong`                  | `#E2E2DE`             | header and field borders                                                       |
-| `primary` / `primary-foreground` | `#262626` / `#FFFFFF` | main buttons (graphite), phone button                                          |
-| `brand`                          | `#FD9600`             | stitch line, callout rings, phone icon, best-price highlight. Never body text. |
-| `brand-soft`                     | `#F6C27A`             | the second, softer stitch line                                                 |
-| `brand-text`                     | `#9A5A00`             | orange text on white (labels such as «01 — ШИЄМО САМІ», links in accents)      |
-| `brand-surface`                  | `#FFF5E6`             | background of the highlighted 40+ price cell                                   |
-| `ring`                           | `#FD9600` at 45%      | focus                                                                          |
+| Token                            | Value                 | Use                                                                                    |
+| -------------------------------- | --------------------- | -------------------------------------------------------------------------------------- |
+| `background`                     | `#FFFFFF`             | page                                                                                   |
+| `foreground`                     | `#262626`             | text, headings                                                                         |
+| `muted`                          | `#F6F6F4`             | quiet panels, inputs, table headers                                                    |
+| `muted-foreground`               | `#5E5E58`             | secondary text                                                                         |
+| `border`                         | `#ECECE9`             | lines inside cards                                                                     |
+| `border-strong`                  | `#E2E2DE`             | header and field borders                                                               |
+| `primary` / `primary-foreground` | `#262626` / `#FFFFFF` | main buttons (graphite), phone button                                                  |
+| `brand`                          | `#FD9600`             | stitch line, callout rings, phone icon, best-price highlight. Never body text.         |
+| `brand-soft`                     | `#F6C27A`             | the second, softer stitch line                                                         |
+| `brand-text`                     | `#9A5A00`             | orange text on white (labels such as «01 — ШИЄМО САМІ», links in accents)              |
+| `brand-surface`                  | `#FFF5E6`             | background of the highlighted 40+ price cell                                           |
+| `sale`                           | `#C0261B`             | saving per piece under the price tiers («Економія 485 грн/шт»); text only, AA on white |
+| `ring`                           | `#FD9600` at 45%      | focus                                                                                  |
 
 `#FD9600` on white fails WCAG AA for text, so orange text always uses `brand-text`. Text on an orange fill is graphite (`foreground`), never white. There is no dark theme in the first version, because the client asked for a light site.
 

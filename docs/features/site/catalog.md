@@ -1,12 +1,12 @@
 # Site: catalog, category, and product pages
 
-**Status:** catalog root, category pages, and product pages read the BreviERP Admin, checked 2026-11-11. Specifications: [catalog, stage 1](../../specs/site/catalog/001-catalog/README.md), [product page](../../specs/site/catalog/002-product-page/README.md), [products from the Admin](../../specs/site/catalog/003-catalog-from-admin/README.md), [site categories from the Admin](../../specs/site/catalog/004-site-categories/README.md).
+**Status:** catalog root, category pages, and product pages read the BreviERP Admin, checked 2026-11-11. Specifications: [catalog, stage 1](../../specs/site/catalog/001-catalog/README.md), [product page](../../specs/site/catalog/002-product-page/README.md), [products from the Admin](../../specs/site/catalog/003-catalog-from-admin/README.md), [site categories from the Admin](../../specs/site/catalog/004-site-categories/README.md), [product page layout «Ціна поруч»](../../specs/site/catalog/005-product-page-layout/README.md).
 
 The catalog shows the categories staff keep in «Контент → Розділи сайту» and the products they mark «Показувати на сайті» in «Контент → Товари сайту». The data comes from the anonymous BreviERP API `/api/public/catalog`; the site keeps no copy of its own.
 
 `/uk/catalog` and `/ru/catalog` show the categories with their subcategories. `/{locale}/catalog/{slug}` is a category page: breadcrumbs, heading with the number of models, links to subcategories, every product of the category and its subcategories on one page (photo, name, lowest price «від»), the text staff wrote («Про розділ»), and the order block. Its title and description for search come from the Admin. There is no sorting, filtering, or pagination.
 
-`/{locale}/product/{slug}` is a product page: photos with thumbnails, the name, the model number, short facts, three prices by order size (of the chosen fabric for a sewing model), «Залишити заявку» and the phone, the description, the characteristics, four other models of the same category, and the order block. A product without a price shows «Дізнатися ціну». The site has no cart; the actions open the [request page](request.md).
+`/{locale}/product/{slug}` is a product page: photos with thumbnails (sticky on a wide screen); tags, the model number, the name, and who the model is for; then the order card with «від» and the lowest price, the fabrics as cards, three price tiles by order size with «Економія N грн/шт», «Залишити заявку» and the phone, and the size chart. Below are links to the blocks, the characteristics (the short facts first as «Коротко про модель»), the description folded to six lines, four other models of the same category, and the order block. Phones get a price strip with «Заявка» above the bottom bar. A product without a price shows «Дізнатися ціну». The site has no cart; the actions open the [request page](request.md).
 
 Answers of the API are cached for five minutes (`'use cache'`, tag `catalog`, Workers KV, see [hosting](../../architecture/site/platform/hosting.md#cache)), so a change in the Admin reaches the site without a rebuild. When the API is unavailable the catalog is empty, a product is 404, and the answer is asked again in a minute. The same tree feeds the mega menu, the footer, the mobile bar, the home page, and the sitemap: the layout and the routes read it on the server and pass it down.
 
@@ -48,6 +48,7 @@ libs/site/
 │   ├── catalog-tree.ts            # tree type, path lookup
 │   ├── catalog-category.ts        # category, category page and product card types
 │   ├── catalog-product.ts         # product page, fabrics, price tiers
+│   ├── catalog-product-facts.ts   # short facts sorted into tags, rows, audience, notes
 │   └── catalog-sections.ts        # sections for menus and the home page
 ├── catalog/data-access/src/lib/
 │   ├── catalog-source.ts          # what pages call: tree, categories, products, related
@@ -57,7 +58,8 @@ libs/site/
 ├── catalog/ui/src/lib/
 │   ├── i18n/catalog-dictionary.ts # uk and ru text, price format
 │   └── sections/                  # sections grid, subcategories, product grid, text, order,
-│                                  # product gallery and prices (client), buy block, specs
+│                                  # product gallery and prices (client), order card, specs,
+│                                  # block links, folded text and phone price strip (client)
 ├── catalog/seo/src/lib/           # catalog-metadata, catalog-product-seo
 └── catalog/feature/src/lib/       # catalog-root-page, catalog-category-page, catalog-product-page
 ```
@@ -66,6 +68,7 @@ libs/site/
 
 - `libs/site/shared/api-client/src/lib/site-api.spec.ts`
 - `libs/site/catalog/model/src/lib/catalog-sections.spec.ts`
+- `libs/site/catalog/model/src/lib/catalog-product-facts.spec.ts`
 - `libs/site/catalog/data-access/src/lib/catalog-source.spec.ts`
 - `libs/site/catalog/data-access/src/lib/mappers/public-catalog.mapper.spec.ts`
 - `libs/site/catalog/ui/src/lib/catalog-ui.spec.tsx`

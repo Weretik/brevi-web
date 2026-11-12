@@ -139,12 +139,10 @@ describe('catalog blocks', () => {
     );
   });
 
-  it('shows the model, short facts, and the prices of the chosen fabric with the ways to order', () => {
+  it('shows the lowest price, the fabrics, and the prices of the chosen fabric with the ways to order', () => {
     render(
       <CatalogProductBuy
         company={COMPANY}
-        model="992"
-        summary={[{ type: 'paragraph', lead: 'Сезон:', text: 'літо' }]}
         fabrics={[
           {
             sku: 'MOD-992-1',
@@ -160,11 +158,15 @@ describe('catalog blocks', () => {
       />,
     );
 
-    expect(screen.getByText('992')).toBeTruthy();
-    expect(screen.getByText('Сезон:').tagName).toBe('STRONG');
+    expect(screen.getByText(/^від 1\s250,5$/)).toBeTruthy();
     const prices = within(screen.getByRole('table', { name: 'Ціна за одиницю, грн' }));
     expect(prices.getByRole('row', { name: '1–9 шт 1\u00a0500' })).toBeTruthy();
-    expect(prices.getByRole('row', { name: 'від 40 шт 1\u00a0250,5' })).toBeTruthy();
+    expect(
+      prices.getByRole('row', { name: '10–39 шт 1\u00a0400 Економія 100 грн/шт' }),
+    ).toBeTruthy();
+    expect(
+      prices.getByRole('row', { name: 'від 40 шт 1\u00a0250,5 Економія 250 грн/шт' }),
+    ).toBeTruthy();
     expect(screen.getByText('бавовна 35 %, 210 г/м²')).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Залишити заявку' }).getAttribute('href')).toBe(
       '/uk/request',
@@ -183,8 +185,6 @@ describe('catalog blocks', () => {
     render(
       <CatalogProductBuy
         company={COMPANY}
-        model={null}
-        summary={[]}
         fabrics={[]}
         prices={null}
         dictionary={dictionary.product}

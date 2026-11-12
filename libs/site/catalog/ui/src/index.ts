@@ -9,3 +9,6 @@ export { CatalogProductGrid } from './lib/sections/catalog-product-grid';
 export { CatalogSectionsGrid } from './lib/sections/catalog-sections-grid';
 export { CatalogSubcategories } from './lib/sections/catalog-subcategories';
 export { CatalogText } from './lib/sections/catalog-text';
+export { CatalogExpandableText } from './lib/sections/catalog-expandable-text';
+export { CatalogProductNav } from './lib/sections/catalog-product-nav';
+export { CatalogProductPriceBar } from './lib/sections/catalog-product-price-bar';
