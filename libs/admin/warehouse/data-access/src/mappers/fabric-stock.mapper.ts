@@ -18,6 +18,7 @@ import {
 
 import type {
   FabricConsumption,
+  FabricMovementCounts,
   FabricMovementHistory,
   FabricMovementPage,
   FabricMovementRow,
@@ -102,6 +103,10 @@ export function mapFabricMovementRow(value: unknown): FabricMovementRow {
     destination: nullableText(row['destination'], 'куди використано'),
     delta: decimal(row['delta'], 'зміна'),
     metersAfter: decimal(row['metersAfter'], 'залишок рядка'),
+    pairMetersAfter:
+      row['pairMetersAfter'] === undefined
+        ? null
+        : nullableNumber(row['pairMetersAfter'], 'залишок пари'),
     perProduct: nullableNumber(row['perProduct'], 'на 1 виріб'),
     note: nullableText(row['note'], 'примітка'),
     createdByName: nonEmptyText(row['createdByName'], 'хто записав'),
@@ -158,8 +163,26 @@ export function mapFabricMovementPage(value: unknown): FabricMovementPage {
     page: integer(row['page'], 'сторінка', 1),
     hasMore: boolean(row['hasMore'], 'є ще'),
     permissions: permissions(row['permissions']),
+    total: row['total'] === undefined ? 0 : integer(row['total'], 'усього рухів'),
+    counts: movementCounts(row['counts']),
   };
 }
+
+const movementCounts = (value: unknown): FabricMovementCounts | null => {
+  if (value === undefined || value === null) return null;
+  const row = record(value, 'кількість рухів');
+  const count = (key: keyof FabricMovementCounts) =>
+    integer(row[key.charAt(0).toLowerCase() + key.slice(1)], 'кількість рухів');
+  return {
+    All: count('All'),
+    Receipt: count('Receipt'),
+    ItemIssue: count('ItemIssue'),
+    OneOffIssue: count('OneOffIssue'),
+    Adjustment: count('Adjustment'),
+    Opening: count('Opening'),
+    Cancelled: count('Cancelled'),
+  };
+};
 
 export function mapFabricStockChoices(value: unknown): FabricStockChoices {
   const row = record(value, 'вибір складу');

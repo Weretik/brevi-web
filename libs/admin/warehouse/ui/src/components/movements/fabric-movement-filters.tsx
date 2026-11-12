@@ -1,70 +1,120 @@
-import { formatMeters } from '@admin/warehouse/model';
-import { Autocomplete, Stack, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { ReferenceFilterChip, ReferenceSearchBar } from '@admin/references/ui';
+import {
+  fabricMovementChips,
+  formatDay,
+  movementPeriodLabels,
+  movementPeriods,
+} from '@admin/warehouse/model';
+import ExpandMoreOutlinedIcon from '@mui/icons-material/ExpandMoreOutlined';
+import { Box, Menu, MenuItem, Stack, TextField } from '@mui/material';
+import { useState } from 'react';
 
 import type {
-  FabricMovementFilter,
+  FabricMovementCounts,
   FabricMovementQuery,
-  FabricStockFabric,
+  MovementPeriod,
 } from '@admin/warehouse/model';
 
 interface Props {
   query: FabricMovementQuery;
-  fabrics: readonly FabricStockFabric[];
+  /** What is typed in the search, before it reaches the query. */
+  search: string;
+  /** Movements of each chip under the other filters; null while the server gives none. */
+  counts: FabricMovementCounts | null;
+  period: MovementPeriod;
+  onSearch: (value: string) => void;
   onChange: (change: Partial<Omit<FabricMovementQuery, 'page'>>) => void;
+  onPeriod: (period: MovementPeriod) => void;
 }
 
-const kinds: [FabricMovementFilter, string][] = [
-  ['All', 'Усі'],
-  ['Receipt', 'Прихід'],
-  ['Issue', 'Витрата'],
-  ['Opening', 'Початкові'],
-];
+const periodLabel = (period: MovementPeriod, query: FabricMovementQuery) => {
+  if (period !== 'custom' || (!query.from && !query.to)) return movementPeriodLabels[period];
+  return `${query.from ? formatDay(query.from) : '…'} – ${query.to ? formatDay(query.to) : '…'}`;
+};
 
-/** Fabric, colour and «Усі / Прихід / Витрата / Початкові»; any code of an alias group selects the group. */
-export function FabricMovementFilters({ query, fabrics, onChange }: Props) {
-  const fabric = fabrics.find((x) => x.codes.includes(query.fabricCode ?? '')) ?? null;
-  const color = fabric?.colors.find((x) => x.color === query.color) ?? null;
+/**
+ * «Рух тканини» filters: one search over every text of a movement, the kind chips with their counts and the period
+ * chip; «Свій період» shows the two dates.
+ */
+export function FabricMovementFilters({
+  query,
+  search,
+  counts,
+  period,
+  onSearch,
+  onChange,
+  onPeriod,
+}: Props) {
+  const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   return (
-    <Stack
-      direction={{ xs: 'column', md: 'row' }}
-      sx={{ gap: 1.5, mb: 2, alignItems: { md: 'center' } }}
-    >
-      <Autocomplete
-        size="small"
-        options={[...fabrics]}
-        value={fabric}
-        sx={{ minWidth: 280, flex: 1 }}
-        getOptionLabel={(option) => `${option.fabricCode} · ${option.fabricName}`}
-        isOptionEqualToValue={(option, selected) => option.fabricCode === selected.fabricCode}
-        onChange={(_event, selected) =>
-          onChange({ fabricCode: selected?.fabricCode ?? null, color: null })
-        }
-        renderInput={(params) => <TextField {...params} label="Тканина" />}
+    <Box sx={{ mb: 2 }}>
+      <ReferenceSearchBar
+        placeholder="Тканина, колір, постачальник, документ або Ц-12"
+        label="Пошук руху тканини"
+        value={search}
+        onChange={onSearch}
       />
-      <Autocomplete
-        size="small"
-        options={fabric?.colors ?? []}
-        value={color}
-        disabled={!fabric}
-        sx={{ minWidth: 220 }}
-        getOptionLabel={(option) => `${option.color} · ${formatMeters(option.meters)}`}
-        isOptionEqualToValue={(option, selected) => option.colorKey === selected.colorKey}
-        onChange={(_event, selected) => onChange({ color: selected?.color ?? null })}
-        renderInput={(params) => <TextField {...params} label="Колір" />}
-      />
-      <ToggleButtonGroup
-        exclusive
-        size="small"
-        value={query.kind}
+      <Stack
+        direction="row"
+        role="group"
         aria-label="Вид руху"
-        onChange={(_event, kind: FabricMovementFilter | null) => kind && onChange({ kind })}
+        sx={{ gap: 1, flexWrap: 'wrap', alignItems: 'center' }}
       >
-        {kinds.map(([kind, label]) => (
-          <ToggleButton key={kind} value={kind}>
-            {label}
-          </ToggleButton>
+        {fabricMovementChips.map(([kind, label]) => (
+          <ReferenceFilterChip
+            key={kind}
+            label={label}
+            count={counts?.[kind]}
+            selected={query.kind === kind}
+            onClick={() => onChange({ kind })}
+          />
         ))}
-      </ToggleButtonGroup>
-    </Stack>
+        <Box sx={{ flex: 1 }} />
+        <ReferenceFilterChip
+          label={periodLabel(period, query)}
+          selected={period !== 'all'}
+          ariaHasPopup
+          icon={<ExpandMoreOutlinedIcon fontSize="small" />}
+          onClick={(event) => setAnchor(event.currentTarget)}
+        />
+        <Menu anchorEl={anchor} open={anchor !== null} onClose={() => setAnchor(null)}>
+          {movementPeriods.map((value) => (
+            <MenuItem
+              key={value}
+              selected={value === period}
+              onClick={() => {
+                setAnchor(null);
+                onPeriod(value);
+              }}
+            >
+              {movementPeriodLabels[value]}
+            </MenuItem>
+          ))}
+        </Menu>
+      </Stack>
+      {period === 'custom' && (
+        <Stack direction="row" sx={{ gap: 1.5, mt: 1.5, justifyContent: 'flex-end' }}>
+          <TextField
+            type="date"
+            size="small"
+            label="Від"
+            value={query.from ?? ''}
+            slotProps={{ inputLabel: { shrink: true }, htmlInput: { max: query.to ?? undefined } }}
+            onChange={(event) => onChange({ from: event.target.value || null })}
+          />
+          <TextField
+            type="date"
+            size="small"
+            label="До"
+            value={query.to ?? ''}
+            slotProps={{
+              inputLabel: { shrink: true },
+              htmlInput: { min: query.from ?? undefined },
+            }}
+            onChange={(event) => onChange({ to: event.target.value || null })}
+          />
+        </Stack>
+      )}
+    </Box>
   );
 }

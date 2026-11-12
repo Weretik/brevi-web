@@ -19,9 +19,43 @@ export const fabricMovementKindLabels: Record<FabricMovementKind, string> = {
   Reversal: 'Сторно',
 };
 
-/** «Усі / Прихід / Витрата»; Opening lists the openings not taken back. */
-export const fabricMovementFilters = ['All', 'Receipt', 'Issue', 'Opening'] as const;
+/**
+ * The kind chips of «Рух тканини» (WH-007). Opening lists the openings not taken back; Cancelled is voided or
+ * reversed movements and the reversals; Issue (both issues) is kept for older addresses.
+ */
+export const fabricMovementFilters = [
+  'All',
+  'Receipt',
+  'ItemIssue',
+  'OneOffIssue',
+  'Adjustment',
+  'Opening',
+  'Cancelled',
+  'Issue',
+] as const;
 export type FabricMovementFilter = (typeof fabricMovementFilters)[number];
+
+/** Movements of each kind chip under every filter but the kind. */
+export interface FabricMovementCounts {
+  All: number;
+  Receipt: number;
+  ItemIssue: number;
+  OneOffIssue: number;
+  Adjustment: number;
+  Opening: number;
+  Cancelled: number;
+}
+
+/** The chips in their order, with the label of each. */
+export const fabricMovementChips: readonly [keyof FabricMovementCounts, string][] = [
+  ['All', 'Усі'],
+  ['Receipt', 'Прихід'],
+  ['ItemIssue', 'На завдання'],
+  ['OneOffIssue', 'Разова витрата'],
+  ['Adjustment', 'Уточнення'],
+  ['Opening', 'Початкові'],
+  ['Cancelled', 'Відмінені'],
+];
 
 /** A row of «Рух тканини». */
 export interface FabricMovementRow {
@@ -49,6 +83,8 @@ export interface FabricMovementRow {
   delta: number;
   /** Balance of that line after the movement. */
   metersAfter: number;
+  /** «Залишок пари»: every code of the fabric in this colour after the movement; null where not given. */
+  pairMetersAfter: number | null;
   /** «На 1 виріб»: metres per product cut for an issue by cutting; null otherwise. */
   perProduct: number | null;
   note: string | null;
@@ -69,6 +105,9 @@ export interface FabricMovementPage {
   page: number;
   hasMore: boolean;
   permissions: FabricStockPermissions;
+  /** Rows of the chosen kind under every filter. */
+  total: number;
+  counts: FabricMovementCounts | null;
 }
 
 export const fabricMovementRevisionActions = ['Edit', 'Void', 'Restore'] as const;
