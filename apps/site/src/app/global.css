@@ -19,6 +19,7 @@
   --brand-soft: #f6c27a;
   --brand-text: #9a5a00;
   --brand-surface: #fff5e6;
+  --sale: #c0261b;
   --ring: rgb(253 150 0 / 0.45);
   --radius: 0.5rem;
 }
@@ -38,6 +39,7 @@
   --color-brand-soft: var(--brand-soft);
   --color-brand-text: var(--brand-text);
   --color-brand-surface: var(--brand-surface);
+  --color-sale: var(--sale);
   --color-ring: var(--ring);
   /* 8 px for fields and buttons, 14 px for cards and panels. */
   --radius-sm: calc(var(--radius) - 4px);

@@ -1,11 +1,22 @@
+import { cn } from '@site/shared/ui';
+
 import type { CatalogSpecGroup } from '@site/catalog/model';
 
 /** Characteristics of a product as name and value rows, grouped the way the catalog groups them. */
-export function CatalogProductSpecs({ groups }: { groups: readonly CatalogSpecGroup[] }) {
+export function CatalogProductSpecs({
+  groups,
+  className,
+}: {
+  groups: readonly CatalogSpecGroup[];
+  className?: string;
+}) {
   return (
-    <div className="grid max-w-[48rem] gap-6">
+    <div className={cn('grid max-w-[48rem] gap-6', className)}>
       {groups.map((group, index) => (
-        <table key={`${group.title}-${index}`} className="w-full border-collapse text-left">
+        <table
+          key={`${group.title}-${index}`}
+          className="w-full self-start border-collapse text-left"
+        >
           {group.title ? (
             <caption className="pb-2 text-left font-mono text-[0.8125rem] font-semibold text-brand-text uppercase">
               {group.title}
