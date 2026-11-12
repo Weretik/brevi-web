@@ -89,6 +89,8 @@ const defaults: Readonly<Record<string, Readonly<Record<string, readonly AccessA
   },
   Accountant: {
     'desk-accounting': V,
+    accounting: VE,
+    'purchase-invoices': VE,
     products: V,
     'product-sections': V,
     materials: V,
