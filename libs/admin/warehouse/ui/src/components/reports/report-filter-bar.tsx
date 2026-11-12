@@ -3,6 +3,8 @@ import ExpandMoreOutlinedIcon from '@mui/icons-material/ExpandMoreOutlined';
 import { Box, Menu, MenuItem, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 
+import type { ReactNode } from 'react';
+
 interface Props<T extends string> {
   search: string;
   searchPlaceholder: string;
@@ -21,6 +23,10 @@ interface Props<T extends string> {
   onSearch: (value: string) => void;
   onView: (view: T) => void;
   onSupplier?: (supplier: string | null) => void;
+  /** More filters after the chips, e.g. the period chip. */
+  extra?: ReactNode;
+  /** Chips only, without the search. */
+  hideSearch?: boolean;
 }
 
 /** The search over a «Що замовити» report, its chips with counts and the supplier chip. */
@@ -39,16 +45,20 @@ export function ReportFilterBar<T extends string>({
   onSearch,
   onView,
   onSupplier,
+  extra,
+  hideSearch = false,
 }: Props<T>) {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   return (
     <Box sx={{ mb: 2 }}>
-      <ReferenceSearchBar
-        placeholder={searchPlaceholder}
-        label={searchLabel}
-        value={search}
-        onChange={onSearch}
-      />
+      {!hideSearch && (
+        <ReferenceSearchBar
+          placeholder={searchPlaceholder}
+          label={searchLabel}
+          value={search}
+          onChange={onSearch}
+        />
+      )}
       <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
         <Stack
           direction="row"
@@ -93,6 +103,7 @@ export function ReportFilterBar<T extends string>({
             </Menu>
           </>
         )}
+        {extra}
         <Box sx={{ flex: 1 }} />
         {shown !== null && (
           <Typography variant="body2" color="text.secondary" aria-live="polite">

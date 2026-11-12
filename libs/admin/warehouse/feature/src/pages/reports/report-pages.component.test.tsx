@@ -3,6 +3,8 @@ import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 
 import FabricBookingPage from './fabric-booking-page';
+import FabricConsumptionPage from './fabric-consumption-page';
+import FabricPlanFactPage from './fabric-plan-fact-page';
 import FabricValuationPage from './fabric-valuation-page';
 import HardwareOrderPage from './hardware-order-page';
 import { WarehouseToOrderPage } from '../to-order/warehouse-to-order-page';
@@ -37,7 +39,115 @@ const pair = (color: string, toOrder: number, items: ReturnType<typeof item>[]) 
   items,
 });
 
+const planFactSummary = (plan: number | null, fact: number, orders = 1) => ({
+  orders,
+  products: 10 * orders,
+  planPerProduct: plan,
+  factPerProduct: fact,
+  differencePerProduct: plan === null ? null : fact - plan,
+  difference: plan === null ? null : (fact - plan) * 10 * orders,
+  result: plan === null ? 'NeedsCheck' : fact > plan ? 'Overrun' : 'Economy',
+  uncomparableItems: plan === null ? 1 : 0,
+});
+
+const planFactModel = (modelName: string, plan: number | null, fact: number) => ({
+  modelName,
+  modelCode: null,
+  summary: planFactSummary(plan, fact),
+  items: [
+    {
+      orderId: 14,
+      orderNumber: 14,
+      clientName: 'Нафтогаз',
+      itemId: 140,
+      products: 10,
+      plan: plan === null ? null : plan * 10,
+      fact: fact * 10,
+      difference: plan === null ? null : (fact - plan) * 10,
+      result: plan === null ? 'NoPlan' : fact > plan ? 'Overrun' : 'Economy',
+      reason: plan === null ? 'Немає норми.' : null,
+      materials: [
+        {
+          layer: 'Upper',
+          planFabricCode: 'FAB-023',
+          planFabricName: 'Грета',
+          planColor: 'Темно-сірий',
+          plan: plan === null ? null : plan * 10,
+          fact: fact * 10,
+          difference: plan === null ? null : (fact - plan) * 10,
+          used: ['Грета · Темно-сірий'],
+        },
+      ],
+      issuedOn: '2026-11-04',
+    },
+  ],
+});
+
+const planFactQuery = vi.fn();
+const consumptionQuery = vi.fn();
+
 vi.mock('@admin/warehouse/data-access', () => ({
+  useGetFabricPlanFactQuery: (filter: unknown) => {
+    planFactQuery(filter);
+    return {
+      data: {
+        models: [
+          planFactModel('Жилет сигнальний', 0.62, 0.63),
+          planFactModel('Куртка «Віол»', 1.32, 1.45),
+          planFactModel('Халат медичний', null, 1.1),
+        ],
+        total: planFactSummary(null, 1.06, 3),
+        inProgressItems: 1,
+      },
+      isFetching: false,
+      error: undefined,
+      refetch: vi.fn(),
+    };
+  },
+  useGetFabricConsumptionQuery: (params: unknown) => {
+    consumptionQuery(params);
+    return {
+      data: {
+        from: '2026-11-01',
+        to: '2026-11-12',
+        rows: [
+          {
+            stockId: 1,
+            fabricCode: 'FAB-041',
+            fabricName: 'Тиса',
+            color: 'Хакі',
+            received: 120,
+            issued: 54,
+            corrected: -4.5,
+            issuedValue: null,
+            issuedToTasks: 54,
+            oneOff: 0,
+          },
+          {
+            stockId: 2,
+            fabricCode: 'FAB-023',
+            fabricName: 'Грета',
+            color: 'Темно-сірий',
+            received: 60,
+            issued: 132,
+            corrected: 0,
+            issuedValue: null,
+            issuedToTasks: 132,
+            oneOff: 0,
+          },
+        ],
+        received: 180,
+        issued: 186,
+        issuedValue: null,
+        issuedToTasks: 186,
+        oneOff: 0,
+        corrected: -4.5,
+      },
+      isFetching: false,
+      error: undefined,
+      refetch: vi.fn(),
+    };
+  },
   useGetFabricBookingQuery: () => ({
     data: {
       reserved: 8,
@@ -237,12 +347,64 @@ describe('stock report pages', () => {
     expect(screen.queryByRole('button', { name: /^Прихід:/ })).toBeNull();
   });
 
-  it('«Вартість складу» marks the partial total, the unpriced fabric and the shortage', () => {
+  it('«Вартість» lists fabrics by value with a share, marks the unpriced one and shows shortages on a chip', () => {
     inRouter(<FabricValuationPage />);
     expect(screen.getByText('Вартість оціненої частини')).toBeTruthy();
-    expect(screen.getByText('Без ціни', { selector: 'td' })).toBeTruthy();
+    const rows = screen.getAllByRole('button', { name: /^Розгорнути:/ });
+    expect(rows.map((x) => x.getAttribute('aria-label'))).toEqual([
+      'Розгорнути: Грета',
+      'Розгорнути: Фліс',
+    ]);
     expect(screen.getByText(/ціна з FAB-067/)).toBeTruthy();
-    expect(screen.getByText('Дефіцит (відʼємний залишок)')).toBeTruthy();
+    expect(screen.getByText('Немає ціни')).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'До «Тканини»' }).getAttribute('href')).toBe(
+      '/references/garment-accessory?tab=fabrics',
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Розгорнути: Грета' }));
+    expect(screen.getByText('Темно-сірий')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: /^Дефіцит/ }));
+    expect(screen.getByRole('table', { name: 'Дефіцит' })).toBeTruthy();
+  });
+
+  it('«План і факт» puts the largest overspending first, marks it over 5% and opens a model', () => {
+    inRouter(<FabricPlanFactPage />);
+    expect(planFactQuery).toHaveBeenLastCalledWith({ from: null, to: null });
+    const names = screen
+      .getAllByRole('row')
+      .map((x) => x.getAttribute('aria-label'))
+      .filter(Boolean);
+    expect(names).toEqual(['Куртка «Віол»', 'Жилет сигнальний', 'Халат медичний']);
+    expect(screen.getByText('+9,8%')).toBeTruthy();
+    expect(
+      within(screen.getByRole('row', { name: 'Халат медичний' })).getByText('Немає норми'),
+    ).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: /Перевитрата понад 5%/ }));
+    expect(screen.queryByRole('row', { name: 'Жилет сигнальний' })).toBeNull();
+    fireEvent.click(screen.getByRole('row', { name: 'Куртка «Віол»' }));
+    const panel = screen.getByRole('dialog');
+    expect(within(panel).getByRole('link', { name: 'Ц-14' })).toBeTruthy();
+    expect(within(panel).getByText(/видано 04\.11\.2026/)).toBeTruthy();
+  });
+
+  it('«План і факт» sends the period of a preset', () => {
+    inRouter(<FabricPlanFactPage />);
+    fireEvent.click(screen.getByRole('button', { name: 'Усі дати' }));
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Цей квартал' }));
+    const last = planFactQuery.mock.lastCall?.[0] as { from: string; to: string };
+    expect(last.from.endsWith('-01')).toBe(true);
+    expect(last.to).not.toBeNull();
+  });
+
+  it('«Витрата за період» shows the totals by kind and sorts the table', () => {
+    inRouter(<FabricConsumptionPage />);
+    expect(screen.getByText('Видано на завдання')).toBeTruthy();
+    expect(screen.getByText('Разова витрата')).toBeTruthy();
+    const first = () => screen.getAllByRole('row')[1]?.textContent ?? '';
+    expect(first()).toContain('Грета');
+    fireEvent.click(screen.getByRole('button', { name: 'Прийшло, м' }));
+    expect(first()).toContain('Тиса');
+    fireEvent.click(screen.getByRole('button', { name: 'Прийшло, м' }));
+    expect(first()).toContain('Грета');
   });
 
   it('«Що замовити › Фурнітура» shows the need with its date, the incomplete lines and the names to check', () => {

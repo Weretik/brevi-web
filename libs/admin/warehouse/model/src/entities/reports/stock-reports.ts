@@ -51,6 +51,8 @@ export interface PlanFactItem {
   result: PlanFactResult;
   reason: string | null;
   materials: PlanFactMaterial[];
+  /** The day of the last issue; the period goes by it. */
+  issuedOn: string | null;
 }
 
 export interface PlanFactModel {
@@ -67,10 +69,10 @@ export interface PlanFactReport {
   inProgressItems: number;
 }
 
+/** The period of «План і факт» by the day of the last issue; null leaves that end open. */
 export interface PlanFactFilter {
-  model: string;
-  client: string;
-  fabric: string;
+  from: string | null;
+  to: string | null;
 }
 
 // «Бронь і що замовити» (TZ §12)

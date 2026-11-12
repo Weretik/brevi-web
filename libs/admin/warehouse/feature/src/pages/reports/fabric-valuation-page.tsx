@@ -1,19 +1,38 @@
 import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
 import { useGetFabricValuationQuery } from '@admin/warehouse/data-access';
-import { formatKyivTime, formatMeters, formatMoney } from '@admin/warehouse/model';
-import { ReportStats, ValuationShortageTable, ValuationTable } from '@admin/warehouse/ui';
-import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
-import { Alert, Box, Button, Typography } from '@mui/material';
+import {
+  filterValuation,
+  formatKyivTime,
+  formatMeters,
+  formatMoney,
+  valuationViewCounts,
+  valuationViewLabels,
+  valuationViews,
+} from '@admin/warehouse/model';
+import {
+  ReportFilterBar,
+  ReportStats,
+  ValuationShortageTable,
+  ValuationTable,
+} from '@admin/warehouse/ui';
+import { Alert, Box } from '@mui/material';
+import { useMemo, useState } from 'react';
 
 import type { WarehouseTabProps } from '../tabs/warehouse-tab';
+import type { ValuationView } from '@admin/warehouse/model';
 
 /**
- * «Склад тканин › Вартість складу» (WH-005): the positive stock at today's prices of «Тканини».
- * Not FIFO and not the purchase cost; shortages are apart and do not lower it.
+ * «Склад тканин › Звіти › Вартість» (WH-005): the positive stock at today's prices of «Тканини», one row per fabric,
+ * the most valuable first. Not FIFO and not the purchase cost; shortages are apart and do not lower it.
  */
 export function FabricValuationPage({ title, tabs }: WarehouseTabProps) {
   const report = useGetFabricValuationQuery();
   const data = report.data;
+  const [view, setView] = useState<ValuationView>('all');
+  const fabrics = useMemo(
+    () => (data && view !== 'shortage' ? filterValuation(data.fabrics, view) : []),
+    [data, view],
+  );
   return (
     <Box sx={{ minWidth: 0 }}>
       <ReferencePageHeader
@@ -24,15 +43,7 @@ export function FabricValuationPage({ title, tabs }: WarehouseTabProps) {
             ? `Розраховано ${formatKyivTime(data.calculatedAt)}. ${data.priceSource}: найменша додатна ціна групи тканини. Це не закупівельна собівартість.`
             : 'Додатний залишок за ціною довідника «Тканини»'
         }
-        actions={
-          <Button
-            variant="outlined"
-            startIcon={<RefreshOutlinedIcon />}
-            onClick={() => void report.refetch()}
-          >
-            Оновити ціни і залишки
-          </Button>
-        }
+        actions={null}
       />
       {tabs}
       <ReferenceListAlerts
@@ -49,8 +60,9 @@ export function FabricValuationPage({ title, tabs }: WarehouseTabProps) {
               {
                 label: data.isPartial ? 'Вартість оціненої частини' : 'Вартість складу',
                 value: formatMoney(data.value),
+                hint: `за цінами «Тканини» на ${formatKyivTime(data.calculatedAt).slice(-5)}`,
               },
-              { label: 'Додатний залишок', value: formatMeters(data.positiveMeters) },
+              { label: 'Залишок', value: formatMeters(data.positiveMeters) },
               ...(data.isPartial
                 ? [
                     {
@@ -67,26 +79,34 @@ export function FabricValuationPage({ title, tabs }: WarehouseTabProps) {
                       label: 'Дефіцит',
                       value: formatMeters(data.shortageMeters),
                       tone: 'error' as const,
-                      hint: `оцінка ${formatMoney(data.shortageValue)}`,
+                      hint: `≈ ${formatMoney(data.shortageValue)}`,
                     },
                   ]
                 : []),
             ]}
           />
-          {data.isPartial && (
-            <Alert severity="warning" sx={{ mb: 2 }}>
-              У довіднику «Тканини» немає ціни для {data.unpricedPairs} пар: разом показано лише
-              оцінену частину.
-            </Alert>
-          )}
-          <ValuationTable report={data} />
-          {data.shortages.length > 0 && (
-            <Box sx={{ mt: 3 }}>
-              <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                Дефіцит (відʼємний залишок)
-              </Typography>
+          <ReportFilterBar
+            search=""
+            searchPlaceholder=""
+            searchLabel=""
+            views={valuationViews}
+            labels={valuationViewLabels}
+            counts={valuationViewCounts(data)}
+            view={view}
+            hideEmpty={['unpriced', 'shortage']}
+            hideSearch
+            onSearch={() => undefined}
+            onView={setView}
+          />
+          {view === 'shortage' ? (
+            <>
+              <Alert severity="info" sx={{ mb: 2 }}>
+                Відʼємний залишок не зменшує вартість складу; оцінка нестачі за тією ж ціною.
+              </Alert>
               <ValuationShortageTable rows={data.shortages} />
-            </Box>
+            </>
+          ) : (
+            <ValuationTable report={data} fabrics={fabrics} filtered={view !== 'all'} />
           )}
         </>
       )}

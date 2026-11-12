@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  mapFabricConsumption,
   mapFabricMovementHistory,
   mapFabricMovementPage,
   mapFabricStockChoices,
@@ -243,5 +244,34 @@ describe('warehouse mappers', () => {
         replayed: true,
       }).replayed,
     ).toBe(true);
+  });
+
+  it('maps «Витрата за період» with issues to tasks and one-off apart', () => {
+    const report = mapFabricConsumption({
+      from: '2026-11-01',
+      to: '2026-11-30',
+      rows: [
+        {
+          stockId: 1,
+          fabricCode: 'FAB-023',
+          fabricName: 'Грета',
+          color: 'Темно-сірий',
+          received: 10,
+          issued: 7.5,
+          corrected: 0,
+          issuedValue: null,
+          issuedToTasks: 6,
+          oneOff: 1.5,
+        },
+      ],
+      received: 10,
+      issued: 7.5,
+      issuedValue: null,
+      issuedToTasks: 6,
+      oneOff: 1.5,
+      corrected: -2,
+    });
+    expect(report.rows[0]).toMatchObject({ issuedToTasks: 6, oneOff: 1.5 });
+    expect(report).toMatchObject({ issuedToTasks: 6, oneOff: 1.5, corrected: -2 });
   });
 });

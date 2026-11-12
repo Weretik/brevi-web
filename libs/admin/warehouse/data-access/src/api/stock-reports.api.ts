@@ -19,11 +19,7 @@ import type {
 const reportTags = [{ type: 'FabricStock' as const }, { type: 'ItemFabric' as const }];
 
 const filterParams = (filter: PlanFactFilter) =>
-  Object.fromEntries(
-    Object.entries(filter)
-      .map(([key, value]) => [key, value.trim()] as const)
-      .filter(([, value]) => value.length > 0),
-  );
+  Object.fromEntries(Object.entries(filter).filter(([, value]) => value !== null));
 
 /** The four reports of «Склад тканин» (WH-005), each behind its own page of «Права доступу». */
 export const stockReportsApi = warehouseBaseApi.injectEndpoints({
