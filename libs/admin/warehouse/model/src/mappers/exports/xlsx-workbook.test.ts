@@ -31,6 +31,14 @@ describe('xlsx workbook', () => {
   });
 
   it('exports every pair of the stock with the total', () => {
+    const pair = {
+      version: 'a',
+      sources: [],
+      booked: 0,
+      toOrder: 0,
+      lastMovement: null,
+      bookings: [],
+    };
     const body = text(
       stockBalancesWorkbook(
         {
@@ -42,22 +50,26 @@ describe('xlsx workbook', () => {
               composition: null,
               density: null,
               meters: 7,
+              supplier: null,
+              booked: 1,
+              free: 6,
               colors: [
-                { color: 'Синій', colorKey: 'синій', meters: 4, version: 'a', sources: [] },
-                { color: 'Чорний', colorKey: 'чорний', meters: 3, version: 'b', sources: [] },
+                { ...pair, color: 'Синій', colorKey: 'синій', meters: 4, booked: 1, free: 3 },
+                { ...pair, color: 'Чорний', colorKey: 'чорний', meters: 3, free: 3 },
               ],
             },
           ],
           meters: 7,
           pairs: 2,
           negative: 0,
-          permissions: { canMove: true, seesValue: true },
+          short: 0,
+          permissions: { canMove: true, seesValue: true, canTransfer: false },
         },
         new Date('2026-11-11T10:00:00Z'),
       ),
     );
     expect(body).toContain('12:00');
-    expect(body).toContain('<autoFilter ref="A3:F5"/>');
+    expect(body).toContain('<autoFilter ref="A3:H5"/>');
     expect(body).toContain('Чорний');
   });
 });

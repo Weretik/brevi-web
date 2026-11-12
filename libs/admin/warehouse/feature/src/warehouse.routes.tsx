@@ -1,6 +1,13 @@
 import { lazy } from 'react';
 import { Navigate } from 'react-router-dom';
 
+import {
+  fabricMovementsPath,
+  fabricStockPath,
+  warehouseReportsPath,
+  warehouseToOrderPath,
+} from './warehouse-paths';
+
 import type { WarehouseAccess } from '@admin/warehouse/model';
 import type { RouteObject } from 'react-router-dom';
 
@@ -9,10 +16,12 @@ const FabricStockPage = lazy(() => import('./pages/stock/fabric-stock-page'));
 const WarehouseToOrderPage = lazy(() => import('./pages/to-order/warehouse-to-order-page'));
 const WarehouseReportsPage = lazy(() => import('./pages/reports/warehouse-reports-page'));
 
-export const fabricStockPath = '/warehouse/stock';
-export const fabricMovementsPath = '/warehouse/movements';
-export const warehouseToOrderPath = '/warehouse/to-order';
-export const warehouseReportsPath = '/warehouse/reports';
+export {
+  fabricMovementsPath,
+  fabricStockPath,
+  warehouseReportsPath,
+  warehouseToOrderPath,
+} from './warehouse-paths';
 
 export interface WarehouseRouteOptions {
   /** The «Права доступу» pages of the tabs of «Що замовити» and «Звіти». */

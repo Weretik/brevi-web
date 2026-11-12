@@ -1,6 +1,8 @@
 export type {
+  FabricStockBooking,
   FabricStockColor,
   FabricStockFabric,
+  FabricStockLastMovement,
   FabricStockList,
   FabricStockPair,
   FabricStockPermissions,
@@ -107,6 +109,19 @@ export {
 } from './queries/movements/fabric-movement-query';
 export type { FabricMovementQuery } from './queries/movements/fabric-movement-query';
 export {
+  filterFabricStock,
+  hasStockProblem,
+  LOW_STOCK_METERS,
+  sortFabricStock,
+  stockProblemCounts,
+  stockProblemLabels,
+  stockProblems,
+  stockSortKeys,
+  stockSuppliers,
+} from './queries/stock/stock-problems';
+export type { StockProblem, StockSortKey } from './queries/stock/stock-problems';
+export { stockLastMovementLabel } from './mappers/stock/stock-last-movement';
+export {
   movementPeriodLabels,
   movementPeriodRange,
   movementPeriods,
@@ -121,6 +136,7 @@ export {
   formatDay,
   formatKyivTime,
   formatMeters,
+  formatMetersNumber,
   formatMoney,
   formatPerProduct,
   formatQuantity,

@@ -1,4 +1,6 @@
 export { FabricStockTable } from './tables/stock/fabric-stock-table';
+export { FabricStockFilters } from './components/stock/fabric-stock-filters';
+export { FabricStockPairDetails } from './panels/stock/fabric-stock-pair-details';
 export { FabricMovementsTable } from './tables/movements/fabric-movements-table';
 export { FabricMovementHistoryTable } from './tables/movements/fabric-movement-history-table';
 export { FabricConsumptionTable } from './tables/consumption/fabric-consumption-table';

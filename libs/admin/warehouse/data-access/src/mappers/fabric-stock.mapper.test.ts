@@ -43,6 +43,76 @@ describe('warehouse mappers', () => {
     expect(list.fabrics[0]?.codes).toEqual(['FAB-023', 'FAB-067']);
     expect(list.fabrics[0]?.colors[0]?.sources[1]?.meters).toBe(-3.5);
     expect(list.negative).toBe(1);
+    expect(list.fabrics[0]?.colors[0]).toMatchObject({
+      booked: 0,
+      free: -1.5,
+      lastMovement: null,
+      bookings: [],
+    });
+    expect(list.short).toBe(0);
+  });
+
+  it('maps the booking and the latest movement of a pair', () => {
+    const list = mapFabricStockList({
+      fabrics: [
+        {
+          fabricCode: 'FAB-023',
+          codes: ['FAB-023'],
+          fabricName: 'Грета',
+          composition: null,
+          density: null,
+          meters: 12.3,
+          supplier: 'Черкаси',
+          booked: 18,
+          free: -5.7,
+          colors: [
+            {
+              color: 'Хакі',
+              colorKey: 'хакі',
+              meters: 12.3,
+              version: 'v',
+              sources: [],
+              booked: 18,
+              free: -5.7,
+              toOrder: 5.7,
+              lastMovement: {
+                id: 9,
+                kind: 'Issue',
+                operationDate: '2026-11-06',
+                delta: -3,
+                orderNumber: 9,
+                document: null,
+                supplierName: null,
+                destination: null,
+              },
+              bookings: [
+                {
+                  orderId: 4,
+                  orderNumber: 9,
+                  clientName: 'Нафтогаз',
+                  modelName: 'Куртка',
+                  dueDate: null,
+                  need: 18,
+                  toOrder: 5.7,
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      meters: 12.3,
+      pairs: 1,
+      negative: 0,
+      permissions,
+      short: 1,
+    });
+    expect(list.fabrics[0]).toMatchObject({ supplier: 'Черкаси', booked: 18, free: -5.7 });
+    expect(list.fabrics[0]?.colors[0]?.lastMovement).toMatchObject({
+      kind: 'Issue',
+      orderNumber: 9,
+    });
+    expect(list.fabrics[0]?.colors[0]?.bookings[0]).toMatchObject({ orderNumber: 9, toOrder: 5.7 });
+    expect(list.short).toBe(1);
   });
 
   it('maps a page of movements and refuses an unknown kind', () => {

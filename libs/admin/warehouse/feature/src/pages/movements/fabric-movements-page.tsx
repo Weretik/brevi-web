@@ -53,8 +53,9 @@ export function FabricMovementsPage() {
   const [query, setQuery] = useState<FabricMovementQuery>(() => ({
     ...defaultFabricMovementQuery,
     kind: movementFilterOf(params.get('kind')),
+    search: params.get('search')?.trim() ?? '',
   }));
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(() => params.get('search') ?? '');
   const [period, setPeriod] = useState<MovementPeriod>('all');
   const [panel, setPanel] = useState<Panel | null>(null);
   const [message, setMessage] = useState<string | null>(null);

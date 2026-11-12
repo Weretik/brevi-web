@@ -11469,6 +11469,42 @@ export interface components {
       /** Format: double */
       meters: number;
     };
+    /** @description The latest movement of a pair for «Остання операція». */
+    FabricStockLastMovementResponse: {
+      id: number;
+      /**
+       * @description An issue with an order number went to a task.
+       * @enum {string}
+       */
+      kind: 'Opening' | 'Receipt' | 'Issue' | 'Adjustment' | 'Reversal';
+      /** Format: date */
+      operationDate: string;
+      /** Format: double */
+      delta: number;
+      orderNumber: number | null;
+      document: string | null;
+      supplierName: string | null;
+      destination: string | null;
+    };
+    /** @description A task that needs a pair: what is left of its plan and what of it the stock does not cover. */
+    FabricStockBookingResponse: {
+      orderId: number;
+      orderNumber: number;
+      clientName: string;
+      modelName: string;
+      /** Format: date */
+      dueDate: string | null;
+      /**
+       * Format: double
+       * @description What is left of the plan of this task for the pair.
+       */
+      need: number;
+      /**
+       * Format: double
+       * @description What of it the stock does not cover.
+       */
+      toOrder: number;
+    };
     /** @description A fabric and colour on the shelf: every line of the alias group with that colour summed. */
     FabricStockColorResponse: {
       color: string;
@@ -11479,6 +11515,25 @@ export interface components {
       /** @description Changes whenever any line of the pair changes; goes back with «Уточнити» and a «Разова витрата». */
       version: string;
       sources: components['schemas']['FabricStockSourceResponse'][];
+      /**
+       * Format: double
+       * @description «У броні», what open production plans still need of this pair (plan − covered by issues).
+       */
+      booked?: number;
+      /**
+       * Format: double
+       * @description «Вільно», metres − booked; below zero when the stock does not cover the plans.
+       */
+      free?: number;
+      /**
+       * Format: double
+       * @description What to buy for the plans, the shortage already there included (as «Що замовити»).
+       */
+      toOrder?: number;
+      /** @description The latest movement that counts (not voided) by operation date. */
+      lastMovement?: components['schemas']['FabricStockLastMovementResponse'] | null;
+      /** @description The tasks that need this pair, oldest order first. */
+      bookings?: components['schemas']['FabricStockBookingResponse'][] | null;
     };
     FabricStockFabricResponse: {
       /** @description The canonical code (FAB-067 → FAB-023, FAB-077 → FAB-078). */
@@ -11491,6 +11546,12 @@ export interface components {
       /** Format: double */
       meters: number;
       colors: components['schemas']['FabricStockColorResponse'][];
+      /** @description The supplier of the canonical offer in «Тканини», for the supplier filter. */
+      supplier?: string | null;
+      /** Format: double */
+      booked?: number;
+      /** Format: double */
+      free?: number;
     };
     FabricStockPermissions: {
       /** @description Openings, receipts, issues and «Уточнити»: WorkshopChief and Admin. */
@@ -11509,6 +11570,8 @@ export interface components {
       /** @description Pairs below zero. */
       negative: number;
       permissions: components['schemas']['FabricStockPermissions'];
+      /** @description Pairs whose stock does not cover the open plans (toOrder above zero). */
+      short?: number;
     };
     /** @description An active offer of «Тканини» with a FAB- code. */
     FabricStockFabricChoice: {
