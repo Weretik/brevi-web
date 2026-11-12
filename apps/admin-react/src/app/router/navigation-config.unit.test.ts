@@ -289,6 +289,6 @@ describe('legacy Admin navigation', () => {
     ]);
     expect(accounting(['Director'])?.items).toHaveLength(12);
     expect(accounting(['Admin'])).toBeUndefined();
-    expect(accounting(['Accountant'])).toBeUndefined();
+    expect(accounting(['Accountant'])?.items).toHaveLength(12);
   });
 });
