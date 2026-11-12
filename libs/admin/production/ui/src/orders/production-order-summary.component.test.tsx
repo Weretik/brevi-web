@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ModelSummarySortEditor } from './model-summary-sort-editor';
 import { ProductionModelSummaryTable } from './production-model-summary-table';
-import { ProductionOrderAttention } from './production-order-attention';
+import { ProductionOrderChips } from './production-order-chips';
 import {
   ProductionOrderFilterChips,
   ProductionOrderFilterPanel,
@@ -90,7 +90,7 @@ describe('ProductionOrderFilterPanel and chips', () => {
   });
 });
 
-describe('ProductionStageConveyor and attention', () => {
+describe('ProductionStageConveyor and chips', () => {
   const stages = [
     { stage: 'New' as const, count: 2, overdue: 0 },
     { stage: 'Cutting' as const, count: 1, overdue: 1 },
@@ -113,31 +113,24 @@ describe('ProductionStageConveyor and attention', () => {
     expect(onSelect).toHaveBeenLastCalledWith(null);
   });
 
-  it('shows nothing when every order is on time', () => {
-    const { container } = render(
-      <ProductionOrderAttention
-        attention={{ overdue: 0, dueSoon: 0 }}
-        active={false}
-        onShow={vi.fn()}
-        onReset={vi.fn()}
-      />,
+  it('shows «Термін горить» only when orders are due soon and toggles it', () => {
+    const onDueSoonChange = vi.fn();
+    const props = {
+      counts: { all: 9, new: 7, closed: 2, cancelled: 0 },
+      status: 'New' as const,
+      overdue: false,
+      overdueCount: 0,
+      onStatusChange: vi.fn(),
+      onOverdueChange: vi.fn(),
+      onDueSoonChange,
+    };
+    const { rerender } = render(
+      <ProductionOrderChips {...props} dueSoon={false} dueSoonCount={0} />,
     );
-    expect(container.textContent).toBe('');
-  });
-
-  it('warns about orders due soon and switches back to all orders', () => {
-    const onReset = vi.fn();
-    render(
-      <ProductionOrderAttention
-        attention={{ overdue: 0, dueSoon: 5 }}
-        active
-        onShow={vi.fn()}
-        onReset={onReset}
-      />,
-    );
-    expect(screen.getByText('5 завдань мають термін у найближчі 3 дні')).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'Усі завдання' }));
-    expect(onReset).toHaveBeenCalled();
+    expect(screen.queryByRole('button', { name: /Термін горить/ })).toBeNull();
+    rerender(<ProductionOrderChips {...props} dueSoon={false} dueSoonCount={5} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Термін горить 5' }));
+    expect(onDueSoonChange).toHaveBeenCalledWith(true);
   });
 });
 

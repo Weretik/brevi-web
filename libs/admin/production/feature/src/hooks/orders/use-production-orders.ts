@@ -98,6 +98,8 @@ export function useProductionOrders() {
     setStatus: (value: ProductionOrderStatus | null) => {
       setStatusValue(value);
       setUrgencyValue(null);
+      // The «конвеєр» counts only «Нове» orders, so a stage does not stay on another status.
+      if (value !== 'New') setStageValue(null);
       firstPage();
     },
     setUrgency: (value: ProductionOrderUrgency | null) => {
@@ -114,6 +116,8 @@ export function useProductionOrders() {
     },
     setStage: (value: ProductionStage | null) => {
       setStageValue(value);
+      // A stage of the «конвеєр» is a stage of «Нове» orders.
+      if (value) setStatusValue('New');
       firstPage();
     },
     setFilter: (field: ProductionOrderFilterField, value: string | null) => {

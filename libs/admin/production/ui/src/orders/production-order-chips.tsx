@@ -9,18 +9,25 @@ interface Props {
   overdue: boolean;
   /** «Нове» orders due before today; the chip shows only when there are some or it is on. */
   overdueCount: number;
+  /** «Термін горить»: «Нове» orders due within three days, overdue included; shows only when there are some or it is on. */
+  dueSoon: boolean;
+  dueSoonCount: number;
   onStatusChange: (status: ProductionOrderStatus | null) => void;
   onOverdueChange: (overdue: boolean) => void;
+  onDueSoonChange: (dueSoon: boolean) => void;
 }
 
-/** «Нові», «Прострочені», «Закриті», «Скасовані», «Усі» with counts; an empty status hides unless it is chosen. */
+/** «Нові», «Прострочені», «Термін горить», «Закриті», «Скасовані», «Усі» with counts; an empty status hides unless it is chosen. */
 export function ProductionOrderChips({
   counts,
   status,
   overdue,
   overdueCount,
+  dueSoon,
+  dueSoonCount,
   onStatusChange,
   onOverdueChange,
+  onDueSoonChange,
 }: Props) {
   const chips: { label: string; value: ProductionOrderStatus | null; count: number }[] = [
     { label: 'Нові', value: 'New', count: counts.new },
@@ -49,6 +56,14 @@ export function ProductionOrderChips({
           count={overdueCount}
           selected={overdue}
           onClick={() => onOverdueChange(!overdue)}
+        />
+      )}
+      {(dueSoonCount > 0 || dueSoon) && (
+        <ReferenceFilterChip
+          label="Термін горить"
+          count={dueSoonCount}
+          selected={dueSoon}
+          onClick={() => onDueSoonChange(!dueSoon)}
         />
       )}
       {visible.slice(1).map((chip) => (

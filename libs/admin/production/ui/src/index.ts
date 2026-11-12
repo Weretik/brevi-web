@@ -19,7 +19,6 @@ export {
   ProductionOrderFilterPanel,
   countProductionOrderFilters,
 } from './orders/production-order-filters';
-export { ProductionOrderAttention } from './orders/production-order-attention';
 export { ProductionStageConveyor } from './orders/production-stage-conveyor';
 export { ProductionOrdersMoreMenu } from './orders/production-orders-more-menu';
 export type { ProductionOrdersImport } from './orders/production-orders-more-menu';
