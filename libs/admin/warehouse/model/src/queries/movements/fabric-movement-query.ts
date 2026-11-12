@@ -9,6 +9,11 @@ export interface FabricMovementQuery {
   fabricCode: string | null;
   color: string | null;
   itemId: number | null;
+  /** Every word must be found in the movement's texts (fabric, colour, supplier, document, order…). */
+  search: string;
+  /** Operation-date period, `YYYY-MM-DD`, inclusive. */
+  from: string | null;
+  to: string | null;
 }
 
 export const defaultFabricMovementQuery: FabricMovementQuery = {
@@ -17,6 +22,9 @@ export const defaultFabricMovementQuery: FabricMovementQuery = {
   fabricCode: null,
   color: null,
   itemId: null,
+  search: '',
+  from: null,
+  to: null,
 };
 
 /** Changing a filter starts again from the first page. */

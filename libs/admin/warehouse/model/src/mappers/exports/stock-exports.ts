@@ -1,6 +1,6 @@
 import { xlsxWorkbook } from './xlsx-workbook';
-import { fabricMovementKindLabels } from '../../entities/movements/fabric-movement';
 import { formatDay, formatKyivTime } from '../format/warehouse-format';
+import { movementCancelMark, movementOperationLabel } from '../movements/movement-labels';
 
 import type { FabricMovementRow } from '../../entities/movements/fabric-movement';
 import type { FabricStockList } from '../../entities/stock/fabric-stock';
@@ -62,14 +62,15 @@ export function movementsWorkbook(rows: readonly FabricMovementRow[], now = new 
         'Витрата, м',
         'На 1 виріб, м',
         'Залишок рядка, м',
+        'Залишок пари, м',
         'Хто записав',
         'Примітка',
-        'Сторновано',
+        'Відмінено',
       ],
       rows: rows.map((row) => [
         formatDay(row.operationDate),
         formatKyivTime(row.createdAt),
-        fabricMovementKindLabels[row.kind],
+        movementOperationLabel(row),
         row.fabricCode,
         row.fabricName,
         row.color,
@@ -80,11 +81,12 @@ export function movementsWorkbook(rows: readonly FabricMovementRow[], now = new 
         row.delta < 0 ? -row.delta : null,
         row.perProduct,
         row.metersAfter,
+        row.pairMetersAfter,
         row.createdByName,
         row.note,
-        row.isReversed ? 'так' : null,
+        movementCancelMark(row),
       ]),
-      widths: [13, 17, 18, 11, 30, 18, 22, 16, 28, 11, 11, 12, 14, 22, 30, 11],
+      widths: [13, 17, 18, 11, 30, 18, 22, 16, 28, 11, 11, 12, 14, 14, 22, 30, 18],
     },
   ]);
 }

@@ -64,6 +64,9 @@ const movementParams = (query: FabricMovementQuery) => ({
   ...(query.fabricCode ? { fabricCode: query.fabricCode } : {}),
   ...(query.color ? { color: query.color } : {}),
   ...(query.itemId ? { itemId: query.itemId } : {}),
+  ...(query.search.trim() ? { search: query.search.trim() } : {}),
+  ...(query.from ? { from: query.from } : {}),
+  ...(query.to ? { to: query.to } : {}),
 });
 
 export const fabricStockApi = warehouseBaseApi.injectEndpoints({

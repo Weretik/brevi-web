@@ -24,6 +24,8 @@ const api = vi.hoisted(() => {
     destination: null,
     delta: 20,
     metersAfter: 20,
+    pairMetersAfter: 20,
+    perProduct: null,
     note: null,
     createdByName: 'Олена',
     isReversed: false,
@@ -65,6 +67,16 @@ vi.mock('@admin/warehouse/data-access', () => ({
         page: query.page,
         hasMore: query.page < 2,
         permissions: { canMove: api.canMove, seesValue: false },
+        total: 52,
+        counts: {
+          All: 52,
+          Receipt: 30,
+          ItemIssue: 15,
+          OneOffIssue: 4,
+          Adjustment: 2,
+          Opening: 1,
+          Cancelled: 0,
+        },
       },
       isFetching: false,
       error: undefined,
@@ -175,26 +187,46 @@ const saved = {
 };
 
 describe('FabricMovementsPage', () => {
-  it('shows receipts and one-off issues with the line balance and pages by «Далі»', () => {
+  it('shows a compact journal with the pair balance, counts on the chips and «1–50 із N»', () => {
     render(<FabricMovementsPage />, { wrapper: MemoryRouter });
     const table = screen.getByRole('table', { name: 'Рух тканини' });
     expect(within(table).getByText('Зразки')).toBeTruthy();
-    expect(within(table).getByText('Без замовлення')).toBeTruthy();
-    expect(within(table).getAllByText(/на складі як FAB-023/)).toHaveLength(2);
+    expect(within(table).getByText('Разова витрата')).toBeTruthy();
+    expect(within(table).getByText('Тексика · Н-15')).toBeTruthy();
+    expect(within(table).getAllByText(/FAB-067 → FAB-023/)).toHaveLength(2);
+    expect(screen.getByRole('button', { name: 'На завдання 15' })).toBeTruthy();
+    expect(screen.getByText('1–2 із 52')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Назад' })).toHaveProperty('disabled', true);
     fireEvent.click(screen.getByRole('button', { name: 'Далі' }));
     expect(api.queries.at(-1)).toMatchObject({ page: 2, kind: 'All' });
     expect(screen.getByRole('button', { name: 'Далі' })).toHaveProperty('disabled', true);
   });
 
-  it('hides «Прихід» and «Сторно» from people who cannot move stock', () => {
+  it('filters by a kind chip, the search and the period, each from the first page', async () => {
+    render(<FabricMovementsPage />, { wrapper: MemoryRouter });
+    fireEvent.click(screen.getByRole('button', { name: 'Далі' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Прихід 30' }));
+    expect(api.queries.at(-1)).toMatchObject({ page: 1, kind: 'Receipt' });
+    fireEvent.change(screen.getByRole('textbox', { name: 'Пошук руху тканини' }), {
+      target: { value: ' ц-12 ' },
+    });
+    await waitFor(() => expect(api.queries.at(-1)).toMatchObject({ search: 'ц-12', page: 1 }));
+    fireEvent.click(screen.getByRole('button', { name: 'Усі дати' }));
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Свій період' }));
+    fireEvent.change(screen.getByLabelText('Від'), { target: { value: '2026-11-01' } });
+    expect(api.queries.at(-1)).toMatchObject({ from: '2026-11-01', to: null });
+  });
+
+  it('opens a row read-only for people who cannot move stock', () => {
     api.canMove = false;
     render(<FabricMovementsPage />, { wrapper: MemoryRouter });
     expect(screen.queryByRole('button', { name: 'Новий прихід' })).toBeNull();
-    expect(screen.queryByRole('button', { name: /^Сторно/ })).toBeNull();
-    expect(screen.queryByRole('button', { name: /^Редагувати/ })).toBeNull();
-    expect(screen.queryByRole('button', { name: /^Скасувати:/ })).toBeNull();
-    expect(screen.getByRole('button', { name: /^Історія правок/ })).toBeTruthy();
+    fireEvent.click(screen.getByRole('row', { name: /^Прихід: Грета/ }));
+    const drawer = screen.getByRole('dialog', { name: 'Прихід' });
+    expect(within(drawer).getByText('Н-15')).toBeTruthy();
+    expect(within(drawer).queryByRole('button', { name: 'Редагувати' })).toBeNull();
+    expect(within(drawer).queryByRole('button', { name: /Відмінити операцію/ })).toBeNull();
+    expect(within(drawer).getByRole('button', { name: 'Історія правок' })).toBeTruthy();
   });
 
   it('retries a failed receipt with the same operation id and keeps the form for the next roll', async () => {
@@ -228,7 +260,7 @@ describe('FabricMovementsPage', () => {
     expect((within(drawer).getByLabelText(/Метри/) as HTMLInputElement).value).toBe('');
   });
 
-  it('reverses a movement with a reason', async () => {
+  it('offers «Прибрати з обліку» first and records a storno when chosen', async () => {
     api.reverse.mockResolvedValue({
       operationId: null,
       fabricCode: 'FAB-023',
@@ -237,19 +269,27 @@ describe('FabricMovementsPage', () => {
       replayed: false,
     });
     render(<FabricMovementsPage />, { wrapper: MemoryRouter });
-    fireEvent.click(screen.getAllByRole('button', { name: /^Сторно/ })[0] as HTMLElement);
-    const dialog = screen.getByRole('dialog');
+    fireEvent.click(screen.getByRole('row', { name: /^Прихід: Грета/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'Відмінити операцію…' }));
+    const dialog = screen.getByRole('dialog', { name: 'Відмінити операцію?' });
+    expect(within(dialog).getByRole('radio', { name: /Прибрати з обліку/ })).toHaveProperty(
+      'checked',
+      true,
+    );
+    fireEvent.click(within(dialog).getByRole('radio', { name: /сторно/ }));
     fireEvent.change(within(dialog).getByLabelText(/Причина/), { target: { value: 'Помилка' } });
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Сторнувати' }));
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Відмінити операцію' }));
     await waitFor(() =>
       expect(api.reverse).toHaveBeenCalledWith({ movementId: 1, reason: 'Помилка' }),
     );
+    expect(api.voidMovement).not.toHaveBeenCalled();
   });
 
-  it('edits a receipt with the revision it shows and the effect on the balance', async () => {
+  it('edits a receipt from its panel with the revision it shows and the effect on the balance', async () => {
     api.edit.mockResolvedValue(saved);
     render(<FabricMovementsPage />, { wrapper: MemoryRouter });
-    fireEvent.click(screen.getAllByRole('button', { name: /^Редагувати/ })[0] as HTMLElement);
+    fireEvent.click(screen.getByRole('row', { name: /^Прихід: Грета/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'Редагувати' }));
     const drawer = screen.getByRole('dialog');
     fireEvent.change(within(drawer).getByLabelText(/Метри/), { target: { value: '18' } });
     expect(within(drawer).getByText(/зміниться на -2 м/)).toBeTruthy();
@@ -262,26 +302,31 @@ describe('FabricMovementsPage', () => {
     expect(await screen.findByText('Правку збережено. Залишки перераховано.')).toBeTruthy();
   });
 
-  it('voids a movement with a reason', async () => {
+  it('takes a movement out of the account with a reason by default', async () => {
     api.voidMovement.mockResolvedValue(saved);
     render(<FabricMovementsPage />, { wrapper: MemoryRouter });
-    fireEvent.click(screen.getAllByRole('button', { name: /^Скасувати:/ })[1] as HTMLElement);
-    const dialog = screen.getByRole('dialog');
+    fireEvent.click(screen.getByRole('row', { name: /^Разова витрата: Грета/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'Відмінити операцію…' }));
+    const dialog = screen.getByRole('dialog', { name: 'Відмінити операцію?' });
     expect(within(dialog).getByText(/залишок зміниться на \+3,5 м/)).toBeTruthy();
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Відмінити операцію' }));
+    expect(api.voidMovement).not.toHaveBeenCalled();
     fireEvent.change(within(dialog).getByLabelText(/Причина/), { target: { value: 'Дубль' } });
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Скасувати рух' }));
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Відмінити операцію' }));
     await waitFor(() =>
       expect(api.voidMovement).toHaveBeenCalledWith({
         movementId: 2,
         body: expect.objectContaining({ expectedRevision: 0, reason: 'Дубль' }),
       }),
     );
+    expect(await screen.findByText('Операцію прибрано з обліку. Залишок оновлено.')).toBeTruthy();
   });
 
   it('shows the history before and after and takes the last edit back', async () => {
     api.restore.mockResolvedValue(saved);
     render(<FabricMovementsPage />, { wrapper: MemoryRouter });
-    fireEvent.click(screen.getByRole('button', { name: /^Історія правок/ }));
+    fireEvent.click(screen.getByRole('row', { name: /^Прихід: Грета/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'Історія правок' }));
     const drawer = screen.getByRole('dialog');
     const table = within(drawer).getByRole('table', { name: 'Історія правок' });
     expect(within(table).getByText('Перерахували рулон')).toBeTruthy();
@@ -294,6 +339,7 @@ describe('FabricMovementsPage', () => {
       }),
     );
   });
+
   it('keeps the rare actions in «Ще», opens the opening panel there and has no «Зведення витрати»', () => {
     api.canMove = true;
     render(<FabricMovementsPage />, { wrapper: MemoryRouter });
