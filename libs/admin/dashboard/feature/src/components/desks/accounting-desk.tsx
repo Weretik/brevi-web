@@ -1,7 +1,7 @@
 import { useGetFinanceOverviewQuery } from '@admin/accounting/data-access';
 import { useGetPurchaseInvoicesQuery } from '@admin/purchasing/data-access';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
-import { Alert, Box, Button, Stack, Typography } from '@mui/material';
+import { Alert, Button, Stack, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
 import {
@@ -12,6 +12,7 @@ import {
   reviewList,
   topExpenses,
 } from '../../model/accounting-view';
+import { DeskGrid } from '../desk-grid/desk-grid';
 import { DeskListCard } from '../desk-list/desk-list-card';
 import { MetricStrip } from '../metrics/metric-strip';
 
@@ -85,14 +86,7 @@ export function AccountingDesk({ viewer, today }: AccountingDeskProps) {
         </Alert>
       ))}
       {money && <MetricStrip metrics={accountingMetrics(money, month.name)} />}
-      <Box
-        sx={{
-          alignItems: 'start',
-          display: 'grid',
-          gap: 2,
-          gridTemplateColumns: { xs: '1fr', lg: 'repeat(2, minmax(0, 1fr))' },
-        }}
-      >
+      <DeskGrid columns={2}>
         {review && review.rows.length > 0 && (
           <DeskListCard
             id="finance-review"
@@ -118,7 +112,7 @@ export function AccountingDesk({ viewer, today }: AccountingDeskProps) {
             title={`Куди пішли гроші: ${month.name}`}
           />
         )}
-      </Box>
+      </DeskGrid>
     </Stack>
   );
 }

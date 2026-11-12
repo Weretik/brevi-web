@@ -17,7 +17,8 @@ export function MetricStrip({ metrics }: MetricStripProps) {
       variant="outlined"
       sx={{
         display: 'grid',
-        gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)', lg: `repeat(${metrics.length}, 1fr)` },
+        // As many cells per row as fit at 160px each, so a narrow desk wraps them instead of squeezing.
+        gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
         overflow: 'hidden',
       }}
     >
@@ -37,7 +38,15 @@ export function MetricStrip({ metrics }: MetricStripProps) {
           <Typography color="text.secondary" component="p" variant="overline">
             {metric.label}
           </Typography>
-          <Box sx={{ alignItems: 'baseline', display: 'flex', gap: 1, mt: 0.25 }}>
+          <Box
+            sx={{
+              alignItems: 'baseline',
+              columnGap: 1,
+              display: 'flex',
+              flexWrap: 'wrap',
+              mt: 0.25,
+            }}
+          >
             <Typography component="p" sx={{ ...numericTextSx, fontSize: 22, fontWeight: 600 }}>
               {metric.value}
             </Typography>

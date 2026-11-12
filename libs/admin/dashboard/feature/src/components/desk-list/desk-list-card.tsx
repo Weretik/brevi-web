@@ -25,7 +25,13 @@ export function DeskListCard({ id, title, list, link, empty, moreText }: DeskLis
     <Card aria-labelledby={titleId} component="section" sx={{ minWidth: 0, p: 2 }}>
       <Stack
         direction="row"
-        sx={{ alignItems: 'center', gap: 1, justifyContent: 'space-between', mb: 1 }}
+        sx={{
+          alignItems: 'baseline',
+          columnGap: 1,
+          flexWrap: 'wrap',
+          justifyContent: 'space-between',
+          mb: 1,
+        }}
       >
         <Typography component="h2" id={titleId} variant="h6">
           {title}
