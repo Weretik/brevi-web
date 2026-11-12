@@ -11,6 +11,7 @@ import {
   fabricIssueBody,
   fabricReceiptBody,
   nextFabricReceiptValues,
+  presetFabricReceiptValues,
   validateFabricAdjustment,
   validateFabricIssue,
   validateFabricOpening,
@@ -109,5 +110,77 @@ describe('stock operation forms', () => {
       expectedVersion: 'abc',
       reason: 'Перерахунок',
     });
+  });
+});
+
+describe('presetFabricReceiptValues', () => {
+  const choices = {
+    fabrics: [
+      {
+        id: 7,
+        code: 'FAB-023',
+        groupCode: 'FAB-023',
+        name: 'Грета',
+        composition: null,
+        density: null,
+        supplier: 'Тексика',
+        price: null,
+      },
+      {
+        id: 9,
+        code: 'FAB-067',
+        groupCode: 'FAB-023',
+        name: 'Грета',
+        composition: null,
+        density: null,
+        supplier: 'Черкаси',
+        price: null,
+      },
+      {
+        id: 11,
+        code: 'FAB-101',
+        groupCode: 'FAB-100',
+        name: 'Оксфорд',
+        composition: null,
+        density: null,
+        supplier: null,
+        price: null,
+      },
+    ],
+    suppliers: ['Тексика', 'Черкаси'],
+    colors: ['Темно-сірий', 'Чорний'],
+  };
+  const empty = createFabricReceiptValues('2026-11-12');
+
+  it('takes the offer with the code, the colour as the list spells it and the supplier', () => {
+    expect(
+      presetFabricReceiptValues(empty, choices, {
+        fabricCode: 'FAB-067',
+        color: 'темно-сірий',
+        supplier: null,
+      }),
+    ).toMatchObject({
+      fabricId: 9,
+      color: 'Темно-сірий',
+      supplierName: 'Черкаси',
+      operationDate: '2026-11-12',
+    });
+  });
+
+  it('falls back to an offer of the group and keeps an unknown colour', () => {
+    expect(
+      presetFabricReceiptValues(empty, choices, {
+        fabricCode: 'FAB-100',
+        color: 'Хакі',
+        supplier: 'Склад',
+      }),
+    ).toMatchObject({ fabricId: 11, color: 'Хакі', supplierName: 'Склад' });
+    expect(
+      presetFabricReceiptValues(empty, choices, {
+        fabricCode: 'FAB-999',
+        color: 'Чорний',
+        supplier: null,
+      }),
+    ).toMatchObject({ fabricId: null, color: 'Чорний' });
   });
 });

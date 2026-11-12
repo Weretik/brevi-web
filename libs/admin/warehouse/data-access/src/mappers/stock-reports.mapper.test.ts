@@ -60,12 +60,71 @@ describe('stock report mappers', () => {
   });
 
   it('maps booking, valuation and hardware', () => {
+    const booking = mapBooking({
+      reserved: 6,
+      free: 0,
+      toOrder: 5,
+      pairs: [
+        {
+          fabricCode: 'FAB-023',
+          fabricName: 'Грета',
+          color: 'Синій',
+          stock: 6,
+          need: 11,
+          reserved: 6,
+          free: 0,
+          toOrder: 5,
+          shortage: 0,
+          supplier: 'Тексика',
+          needBy: '2026-11-20',
+          items: [],
+        },
+      ],
+      unknown: [],
+      calculatedAt: '2026-11-11T10:00:00Z',
+      canReceive: true,
+    });
+    expect(booking.pairs[0]).toMatchObject({ supplier: 'Тексика', needBy: '2026-11-20' });
+    expect(booking.canReceive).toBe(true);
+    expect(
+      mapHardware({
+        orders: 1,
+        items: 1,
+        needs: [
+          {
+            code: 'FUR-003',
+            name: 'Кнопка',
+            nameChecked: true,
+            note: null,
+            unit: 'Piece',
+            quantity: 6,
+            dueDate: '2026-11-14',
+            orders: [
+              {
+                orderId: 1,
+                orderNumber: 12,
+                clientName: 'Г',
+                itemId: 3,
+                modelName: 'К',
+                norm: 3,
+                products: 2,
+                quantity: 6,
+                dueDate: null,
+              },
+            ],
+          },
+        ],
+        incomplete: [],
+        calculatedAt: '2026-11-11T10:00:00Z',
+      }).needs[0],
+    ).toMatchObject({ dueDate: '2026-11-14', orders: [{ dueDate: null }] });
     expect(
       mapBooking({
         reserved: 6,
         free: 0,
         toOrder: 5,
         pairs: [],
+        canReceive: false,
         unknown: [
           {
             orderId: 1,

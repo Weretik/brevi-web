@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -32,6 +32,8 @@ const pair = (color: string, toOrder: number, items: ReturnType<typeof item>[]) 
   free: 0,
   toOrder,
   shortage: 0,
+  supplier: color === 'Синій' ? 'Черкаси' : 'Тексика',
+  needBy: items.length > 0 ? '2026-11-19' : null,
   items,
 });
 
@@ -53,11 +55,33 @@ vi.mock('@admin/warehouse/data-access', () => ({
         },
       ],
       calculatedAt: '2026-11-11T10:00:00Z',
+      canReceive: true,
     },
     isFetching: false,
     error: undefined,
     refetch: vi.fn(),
   }),
+  useGetFabricStockChoicesQuery: () => ({
+    data: {
+      fabrics: [
+        {
+          id: 7,
+          code: 'FAB-023',
+          groupCode: 'FAB-023',
+          name: 'Грета',
+          composition: null,
+          density: null,
+          supplier: 'Тексика',
+          price: null,
+        },
+      ],
+      suppliers: ['Тексика'],
+      colors: ['Темно-сірий', 'Синій'],
+    },
+    isFetching: false,
+    error: undefined,
+  }),
+  useReceiveFabricMutation: () => [vi.fn()],
   useGetFabricValuationQuery: () => ({
     data: {
       value: 1155,
@@ -118,6 +142,7 @@ vi.mock('@admin/warehouse/data-access', () => ({
           note: '65 см',
           unit: 'Piece',
           quantity: 6,
+          dueDate: '2026-11-19',
           orders: [
             {
               orderId: 12,
@@ -128,6 +153,7 @@ vi.mock('@admin/warehouse/data-access', () => ({
               norm: 1,
               products: 3,
               quantity: 3,
+              dueDate: '2026-11-19',
             },
           ],
         },
@@ -138,6 +164,7 @@ vi.mock('@admin/warehouse/data-access', () => ({
           note: null,
           unit: 'Metre',
           quantity: 1.5,
+          dueDate: null,
           orders: [],
         },
       ],
@@ -164,17 +191,50 @@ vi.mock('@admin/warehouse/data-access', () => ({
 const inRouter = (node: React.ReactNode) => render(<MemoryRouter>{node}</MemoryRouter>);
 
 describe('stock report pages', () => {
-  it('«Бронь» shows the totals, the queue of a pair, unknown plans and «Лише те, що потрібно замовити»', () => {
-    inRouter(<FabricBookingPage />);
-    expect(screen.getByText('Потрібно замовити')).toBeTruthy();
-    expect(screen.getByText(/У 1 позицій план невідомий/)).toBeTruthy();
-    expect(screen.getByText('Для моделі немає норми витрати: план не порахувати.')).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'Розгорнути: Грета, Темно-сірий' }));
-    expect(screen.getByRole('link', { name: 'Ц-14' }).getAttribute('href')).toBe(
+  it('«Що замовити › Тканина» shows what to order first, the queue of a pair and plans that are unknown', () => {
+    inRouter(
+      <FabricBookingPage
+        access={{ stock: true, planFact: false, booking: true, valuation: false, hardware: false }}
+      />,
+    );
+    expect(screen.getByText('1 пара · 1 постачальник')).toBeTruthy();
+    expect(screen.queryByText('Грета · Синій')).toBeNull();
+    expect(screen.getByText('19.11.2026')).toBeTruthy();
+    expect(screen.getByText('є 8 з 13,2')).toBeTruthy();
+
+    fireEvent.click(screen.getByRole('row', { name: 'Грета, Темно-сірий' }));
+    const panel = screen.getByRole('dialog');
+    expect(within(panel).getByRole('link', { name: 'Ц-14' }).getAttribute('href')).toBe(
       '/production/orders/14',
     );
-    fireEvent.click(screen.getByLabelText('Лише те, що потрібно замовити'));
-    expect(screen.queryByText('Грета · Синій')).toBeNull();
+    expect(within(panel).getByText(/не вистачає 5,2 м/)).toBeTruthy();
+    fireEvent.click(within(panel).getByRole('button', { name: 'Закрити' }));
+
+    fireEvent.click(screen.getByRole('button', { name: /Усі пари/ }));
+    expect(screen.getByText('Грета · Синій')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: /Без плану/ }));
+    expect(screen.getByText('Для моделі немає норми витрати: план не порахувати.')).toBeTruthy();
+  });
+
+  it('«+ Прихід» on a row opens the receipt with the pair and its supplier', () => {
+    inRouter(
+      <FabricBookingPage
+        access={{ stock: true, planFact: false, booking: true, valuation: false, hardware: false }}
+      />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Прихід: Грета, Темно-сірий' }));
+    const panel = screen.getByRole('dialog');
+    expect(within(panel).getByText('Прихід тканини')).toBeTruthy();
+    expect(within(panel).getByDisplayValue('Тексика')).toBeTruthy();
+  });
+
+  it('«+ Прихід» is not offered without the page «Залишки»', () => {
+    inRouter(
+      <FabricBookingPage
+        access={{ stock: false, planFact: false, booking: true, valuation: false, hardware: false }}
+      />,
+    );
+    expect(screen.queryByRole('button', { name: /^Прихід:/ })).toBeNull();
   });
 
   it('«Вартість складу» marks the partial total, the unpriced fabric and the shortage', () => {
@@ -185,15 +245,21 @@ describe('stock report pages', () => {
     expect(screen.getByText('Дефіцит (відʼємний залишок)')).toBeTruthy();
   });
 
-  it('«Фурнітура до замовлення» shows the need, the incomplete lines and the names to check', () => {
+  it('«Що замовити › Фурнітура» shows the need with its date, the incomplete lines and the names to check', () => {
     inRouter(<HardwareOrderPage />);
-    expect(screen.getByText('Активних замовлень')).toBeTruthy();
-    expect(screen.getByText('Назву не підтверджено')).toBeTruthy();
-    expect(screen.getByText('Потреба неповна')).toBeTruthy();
-    expect(screen.getByText(/назви немає в довіднику: FUR-007/)).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'Розгорнути: Блискавка, FUR-005' }));
-    expect(screen.getByText(/1 × 3 = 3 шт/)).toBeTruthy();
+    expect(screen.getByText('Позицій фурнітури')).toBeTruthy();
+    expect(screen.getByText('Назву не знайдено в довіднику')).toBeTruthy();
+    expect(screen.getByText('19.11.2026')).toBeTruthy();
+    fireEvent.click(screen.getByRole('row', { name: 'Блискавка, FUR-005' }));
+    expect(within(screen.getByRole('dialog')).getByText(/1 × 3 = 3 шт/)).toBeTruthy();
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Закрити' }));
+    fireEvent.change(screen.getByLabelText('Пошук фурнітури'), { target: { value: 'FUR-007' } });
+    fireEvent.click(screen.getByRole('button', { name: /Неповна потреба/ }));
+    expect(
+      screen.getByText('Не визначено, чи це фурнітура: кількість не порахована.'),
+    ).toBeTruthy();
   });
+
   it('«Що замовити» shows only the tabs the rights open and opens the tab of the address', async () => {
     const access = (hardware: boolean) => () => ({
       stock: true,
@@ -207,10 +273,10 @@ describe('stock report pages', () => {
         <WarehouseToOrderPage useAccess={access(true)} />
       </MemoryRouter>,
     );
-    expect(await screen.findByText('Активних замовлень')).toBeTruthy();
+    expect(await screen.findByText('Позицій фурнітури')).toBeTruthy();
     expect(screen.getByRole('heading', { name: 'Що замовити' })).toBeTruthy();
     fireEvent.click(screen.getByRole('tab', { name: 'Тканина' }));
-    expect(await screen.findByText('Потрібно замовити')).toBeTruthy();
+    expect(await screen.findByText('Вільно на складі')).toBeTruthy();
     first.unmount();
 
     render(
@@ -218,7 +284,7 @@ describe('stock report pages', () => {
         <WarehouseToOrderPage useAccess={access(false)} />
       </MemoryRouter>,
     );
-    expect(await screen.findByText('Потрібно замовити')).toBeTruthy();
+    expect(await screen.findByText('Вільно на складі')).toBeTruthy();
     expect(screen.queryByRole('tab')).toBeNull();
   });
 });

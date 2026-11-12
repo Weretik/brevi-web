@@ -15,6 +15,7 @@ import type {
   ReceiveFabricBody,
 } from '../../entities/operations/stock-operation';
 import type { FabricStockPair } from '../../entities/stock/fabric-stock';
+import type { FabricStockChoices } from '../../entities/stock/fabric-stock-choices';
 
 type Errors<T> = Partial<Record<keyof T, string>>;
 
@@ -85,6 +86,35 @@ export const createFabricReceiptValues = (today: string): FabricReceiptFormValue
   document: '',
   note: '',
 });
+
+/** A pair a receipt starts from: «+ Прихід» on a row of «Що замовити». */
+export interface FabricReceiptPreset {
+  fabricCode: string;
+  color: string;
+  supplier: string | null;
+}
+
+/**
+ * The receipt form filled from a pair: the offer with that code (or of that group), the colour as the list spells
+ * it and the supplier. A fabric that is no longer offered is left to choose.
+ */
+export function presetFabricReceiptValues(
+  values: FabricReceiptFormValues,
+  choices: FabricStockChoices,
+  preset: FabricReceiptPreset,
+): FabricReceiptFormValues {
+  const fabric =
+    choices.fabrics.find((x) => x.code === preset.fabricCode) ??
+    choices.fabrics.find((x) => x.groupCode === preset.fabricCode);
+  const key = preset.color.trim().toLocaleLowerCase('uk-UA');
+  const color = choices.colors.find((x) => x.toLocaleLowerCase('uk-UA') === key) ?? preset.color;
+  return {
+    ...values,
+    fabricId: fabric?.id ?? values.fabricId,
+    color,
+    supplierName: preset.supplier ?? fabric?.supplier ?? values.supplierName,
+  };
+}
 
 /** After a saved receipt the next one keeps the fabric, colour, date and supplier. */
 export const nextFabricReceiptValues = (
