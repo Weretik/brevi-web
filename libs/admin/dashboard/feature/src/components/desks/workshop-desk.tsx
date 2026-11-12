@@ -1,10 +1,11 @@
 import { useGetWorkshopDashboardQuery } from '@admin/production/data-access';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
 import { useGetFabricBookingQuery, useGetHardwareOrderQuery } from '@admin/warehouse/data-access';
-import { Alert, Box, Stack, Typography } from '@mui/material';
+import { Alert, Stack, Typography } from '@mui/material';
 
 import { workshopMetrics, workshopStages, weekHours } from '../../model/dashboard-view';
 import { fabricShortages, hardwareToOrder } from '../../model/stock-shortages';
+import { DeskGrid } from '../desk-grid/desk-grid';
 import { DeskListCard } from '../desk-list/desk-list-card';
 import { MetricStrip } from '../metrics/metric-strip';
 import { WeekHoursCard } from '../side-cards/week-hours-card';
@@ -92,22 +93,7 @@ export function WorkshopDesk({ viewer }: WorkshopDeskProps) {
           {adminApiErrorMessage(hardware.error, 'Не вдалося завантажити фурнітуру до замовлення.')}
         </Alert>
       )}
-      {sideCards.length > 0 && (
-        <Box
-          sx={{
-            alignItems: 'start',
-            display: 'grid',
-            gap: 2,
-            gridTemplateColumns: {
-              xs: '1fr',
-              md: 'repeat(2, minmax(0, 1fr))',
-              xl: 'repeat(3, minmax(0, 1fr))',
-            },
-          }}
-        >
-          {sideCards}
-        </Box>
-      )}
+      {sideCards.length > 0 && <DeskGrid columns={3}>{sideCards}</DeskGrid>}
     </Stack>
   );
 }

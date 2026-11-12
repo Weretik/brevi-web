@@ -5,11 +5,12 @@ import { useGetWorkshopDashboardQuery } from '@admin/production/data-access';
 import { useGetPurchaseInvoicesQuery } from '@admin/purchasing/data-access';
 import { useGetQuotePeriodQuery } from '@admin/quotes/data-access';
 import { useGetFabricBookingQuery, useGetHardwareOrderQuery } from '@admin/warehouse/data-access';
-import { Box, Stack } from '@mui/material';
+import { Stack } from '@mui/material';
 
 import { mainCurrency, monthSoFar } from '../../model/accounting-view';
 import { attentionList, mainMetrics, managerLines } from '../../model/main-view';
 import { fabricShortages, hardwareToOrder } from '../../model/stock-shortages';
+import { DeskGrid } from '../desk-grid/desk-grid';
 import { DeskListCard } from '../desk-list/desk-list-card';
 import { MetricStrip } from '../metrics/metric-strip';
 
@@ -74,14 +75,7 @@ export function MainDesk({ viewer, today }: MainDeskProps) {
   return (
     <Stack spacing={2}>
       {metrics.length > 0 && <MetricStrip metrics={metrics} />}
-      <Box
-        sx={{
-          alignItems: 'start',
-          display: 'grid',
-          gap: 2,
-          gridTemplateColumns: { xs: '1fr', lg: 'repeat(2, minmax(0, 1fr))' },
-        }}
-      >
+      <DeskGrid columns={2}>
         {attention.rows.length > 0 && (
           <DeskListCard id="attention" list={attention} title="Потребує уваги" />
         )}
@@ -94,7 +88,7 @@ export function MainDesk({ viewer, today }: MainDeskProps) {
             title="Менеджери сьогодні"
           />
         )}
-      </Box>
+      </DeskGrid>
     </Stack>
   );
 }

@@ -4,11 +4,12 @@ import { useListQuotesQuery } from '@admin/quotes/data-access';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
 import { useGetTaskOverviewQuery, useListTasksQuery } from '@admin/tasks/data-access';
 import AddIcon from '@mui/icons-material/Add';
-import { Alert, Box, Button, Stack, Typography } from '@mui/material';
+import { Alert, Button, Stack, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
 import { recentQuotes } from '../../model/dashboard-view';
 import { burningTasks, callQueue, lateCount, myOrders, salesMetrics } from '../../model/sales-view';
+import { DeskGrid } from '../desk-grid/desk-grid';
 import { DeskListCard } from '../desk-list/desk-list-card';
 import { MetricStrip } from '../metrics/metric-strip';
 import { RecentQuotesCard } from '../quotes/recent-quotes-card';
@@ -119,14 +120,7 @@ export function SalesDesk({ viewer, today }: SalesDeskProps) {
         </Alert>
       ))}
       {metrics.length > 0 && <MetricStrip metrics={metrics} />}
-      <Box
-        sx={{
-          alignItems: 'start',
-          display: 'grid',
-          gap: 2,
-          gridTemplateColumns: { xs: '1fr', lg: 'repeat(2, minmax(0, 1fr))' },
-        }}
-      >
+      <DeskGrid columns={2}>
         {day.data && (
           <DeskListCard
             empty="На сьогодні дзвінків у черзі немає."
@@ -158,7 +152,7 @@ export function SalesDesk({ viewer, today }: SalesDeskProps) {
             title="Мої замовлення в цеху"
           />
         )}
-      </Box>
+      </DeskGrid>
     </Stack>
   );
 }
