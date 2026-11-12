@@ -1,5 +1,5 @@
 import { lazy } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 
 import type { QuoteSupplierCard, QuoteWorkshopCard } from './pages/editor/quote-supplier-card';
 import type { QuoteActor } from '@admin/quotes/model';
@@ -29,8 +29,8 @@ const noSupplierCard: QuoteSupplierCard = { open: null, element: null };
 const useNoSupplierCard = () => noSupplierCard;
 
 /**
- * «Менеджер сервісу → КП»: the list, the «Товари та ціни» editor, «КП для знайомства» and «Налаштування КП»
- * (Director and Admin).
+ * «Менеджер сервісу → КП»: the list, the «Товари та ціни» editor and «КП для знайомства»; plus
+ * «Адміністрування → Налаштування КП» (Director and Admin), with `/crm/quote-settings` redirecting to it.
  */
 export function createQuotesRoutes({
   useQuoteActor,
@@ -59,10 +59,16 @@ export function createQuotesRoutes({
       <Navigate to="/crm/quotes" replace />
     );
   }
+  /** The page moved from «Менеджер сервісу» to «Адміністрування»: old links and bookmarks keep working. */
+  function LegacySettingsLink() {
+    const { search, hash } = useLocation();
+    return <Navigate to={{ pathname: '/admin/quote-settings', search, hash }} replace />;
+  }
   return [
     { path: '/crm/quotes', element: <List /> },
     { path: '/crm/quotes/new', element: <Editor /> },
-    { path: '/crm/quote-settings', element: <Settings /> },
+    { path: '/admin/quote-settings', element: <Settings /> },
+    { path: '/crm/quote-settings', element: <LegacySettingsLink /> },
     { path: '/crm/quotes/:quoteId', element: <Editor /> },
     { path: '/crm/quote-introductions/new', element: <Introduction /> },
     { path: '/crm/quote-introductions/:quoteId', element: <Introduction /> },

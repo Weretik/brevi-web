@@ -4,6 +4,7 @@ import { legacyGroups } from './legacy-menu';
 const innerPages: readonly (readonly [string, string | readonly string[]])[] = [
   ['/crm/clients', 'counterparties'],
   ['/crm/quote-introductions', 'quotes'],
+  ['/crm/quote-settings', 'quote-settings'],
   ['/references/fabric', 'materials'],
   ['/references/garment-accessory', 'materials'],
   ['/references/supplier', 'counterparties'],

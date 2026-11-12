@@ -75,8 +75,8 @@ describe('owner menu', () => {
     renderApp();
 
     const navigation = await screen.findByRole('navigation', { name: 'Основна навігація' });
-    await user.click(within(navigation).getByRole('button', { name: 'Швейний цех' }));
-    const list = within(navigation).getByRole('list', { name: 'Швейний цех' });
+    await user.click(within(navigation).getByRole('button', { name: 'Загальні звіти' }));
+    const list = within(navigation).getByRole('list', { name: 'Загальні звіти' });
     expect(within(list).getByRole('link', { name: 'Звіти цеху' })).toHaveAttribute(
       'href',
       '/production/reports',
@@ -100,7 +100,7 @@ describe('React Admin routing', () => {
         ['Ліди', 'Заявки з сайту', 'Комерційні пропозиції', 'Ціна вишивки', 'Мої завдання'],
       ],
       ['Швейний цех', ['Виробничі завдання', 'Прогноз пошиття', 'Архів цеху']],
-      ['Склад тканин', ['Залишки', 'Рух тканини', 'Що замовити', 'Звіти']],
+      ['Склад тканин', ['Залишки', 'Рух тканини', 'Що замовити']],
       [
         'Загальні довідники',
         [
@@ -109,13 +109,12 @@ describe('React Admin routing', () => {
           'Тканини та фурнітура',
           'Операції',
           'Контрагенти',
-          'Розрахунки',
           'Параметри ціноутворення',
           'Імпорт цін',
         ],
       ],
       ['Фото', ['Бібліотека фото']],
-      ['Загальні звіти', ['Загальні звіти']],
+      ['Загальні звіти', ['Загальні звіти', 'Звіти складу']],
     ] as const;
 
     for (const [section, entries] of sections) {
@@ -135,8 +134,8 @@ describe('React Admin routing', () => {
             : section === 'Швейний цех'
               ? 3
               : section === 'Склад тканин'
-                ? 4
-                : section === 'Фото'
+                ? 3
+                : section === 'Фото' || section === 'Загальні звіти'
                   ? 1
                   : 0,
       );
