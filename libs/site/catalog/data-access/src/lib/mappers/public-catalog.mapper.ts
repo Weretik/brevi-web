@@ -111,6 +111,8 @@ export function mapCatalogCard(value: unknown): CatalogProductCard {
   const card = record(value, 'card');
   return {
     slug: text(card['slug'], 'slug'),
+    type: productType(card['type']),
+    code: optionalText(card['code'], 'code'),
     name: text(card['name'], 'name'),
     image: optionalText(card['photoUrl'], 'photo'),
     priceFrom: optionalPrice(card['priceFrom'], 'price'),

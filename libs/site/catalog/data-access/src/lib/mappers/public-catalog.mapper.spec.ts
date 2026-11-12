@@ -116,8 +116,15 @@ describe('public catalog mapper', () => {
     expect(
       mapCatalogCardPage({
         items: [
-          { slug: 'a', name: 'А', photoUrl: 'https://media.example/a.webp', priceFrom: 10.5 },
-          { slug: 'b', name: 'Б', photoUrl: null, priceFrom: null },
+          {
+            slug: 'a',
+            type: 'Sewing',
+            code: '1031',
+            name: 'А',
+            photoUrl: 'https://media.example/a.webp',
+            priceFrom: 10.5,
+          },
+          { slug: 'b', type: 'Ppe', code: null, name: 'Б', photoUrl: null, priceFrom: null },
         ],
         page: 1,
         pageSize: 100,
@@ -125,8 +132,15 @@ describe('public catalog mapper', () => {
       }),
     ).toEqual({
       items: [
-        { slug: 'a', name: 'А', image: 'https://media.example/a.webp', priceFrom: 10.5 },
-        { slug: 'b', name: 'Б', image: null, priceFrom: null },
+        {
+          slug: 'a',
+          type: 'Sewing',
+          code: '1031',
+          name: 'А',
+          image: 'https://media.example/a.webp',
+          priceFrom: 10.5,
+        },
+        { slug: 'b', type: 'Ppe', code: null, name: 'Б', image: null, priceFrom: null },
       ],
       total: 2,
     });

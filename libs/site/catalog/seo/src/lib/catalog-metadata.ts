@@ -22,6 +22,29 @@ export function buildCatalogMetadata(locale: Locale): Metadata {
   return buildPageMetadata({ locale, path: SITE_PATHS.catalog, ...CATALOG_SEO_TEXT[locale] });
 }
 
+const SEARCH_SEO_TEXT: Record<Locale, { title: string; description: string }> = {
+  uk: {
+    title: 'Пошук по каталогу',
+    description:
+      'Пошук спецодягу та засобів захисту Brevi за назвою моделі, її номером або видом виробу.',
+  },
+  ru: {
+    title: 'Поиск по каталогу',
+    description:
+      'Поиск спецодежды и средств защиты Brevi по названию модели, её номеру или виду изделия.',
+  },
+};
+
+/** Search results are a utility page: `noindex, follow`, out of the sitemap, one canonical without a query. */
+export function buildCatalogSearchMetadata(locale: Locale): Metadata {
+  return buildPageMetadata({
+    locale,
+    path: SITE_PATHS.search,
+    indexable: false,
+    ...SEARCH_SEO_TEXT[locale],
+  });
+}
+
 export type CatalogCategorySeoInput = {
   slug: string;
   /** Category name in the page language. */

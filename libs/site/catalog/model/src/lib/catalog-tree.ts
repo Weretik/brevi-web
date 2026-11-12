@@ -35,3 +35,18 @@ export function findCatalogPath(
 export function flattenCatalogTree(nodes: readonly CatalogTreeNode[]): readonly CatalogTreeNode[] {
   return nodes.flatMap((node) => [node, ...flattenCatalogTree(node.children)]);
 }
+
+/**
+ * The tabs of a category page: the category with its subcategories, or, on a subcategory without its own,
+ * the parent with all its subcategories so the visitor can move to a neighbour. `parent` is the «Усі» tab.
+ * A top-level category without subcategories has no tabs.
+ */
+export function catalogCategoryFamily(
+  trail: readonly CatalogTreeNode[],
+): { parent: CatalogTreeNode; items: readonly CatalogTreeNode[] } | null {
+  const node = trail.at(-1);
+  if (!node) return null;
+  if (node.children.length > 0) return { parent: node, items: node.children };
+  const parent = trail.at(-2);
+  return parent ? { parent, items: parent.children } : null;
+}

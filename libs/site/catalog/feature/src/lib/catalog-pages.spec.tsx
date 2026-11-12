@@ -2,6 +2,7 @@ import {
   getCatalogCategoryProducts,
   getCatalogProductAddresses,
   getCatalogProductCategory,
+  getCatalogProducts,
   getCatalogRelatedProducts,
   getCatalogTree,
 } from '@site/catalog/data-access';
@@ -10,6 +11,7 @@ import { render, screen, within } from '@testing-library/react';
 import { CatalogCategoryPage } from './catalog-category-page';
 import { CatalogProductPage } from './catalog-product-page';
 import { CatalogRootPage } from './catalog-root-page';
+import { CatalogSearchPage } from './catalog-search-page';
 
 import type {
   CatalogCategoryPage as CatalogCategoryPageData,
@@ -23,7 +25,10 @@ vi.mock('@site/settings/data-access', async (importOriginal) => ({
   loadSiteCompany: async () => (await import('@site/core/config')).COMPANY,
 }));
 
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
+
 vi.mock('@site/catalog/data-access', () => ({
+  getCatalogProducts: vi.fn(),
   getCatalogTree: vi.fn(),
   getCatalogProductAddresses: vi.fn(),
   getCatalogCategoryProducts: vi.fn(),
@@ -58,8 +63,22 @@ const page = (
   ...changes,
 });
 const cards: CatalogProductCard[] = [
-  { slug: 'kostyum-verde', name: 'Костюм ВЕРДЕ', image: null, priceFrom: 900 },
-  { slug: 'kostyum-fort', name: 'Костюм ФОРТ', image: null, priceFrom: null },
+  {
+    slug: 'kostyum-verde',
+    type: 'Sewing',
+    code: 'MOD-014',
+    name: 'Костюм ВЕРДЕ',
+    image: null,
+    priceFrom: 900,
+  },
+  {
+    slug: 'kostyum-fort',
+    type: 'Sewing',
+    code: null,
+    name: 'Костюм ФОРТ',
+    image: null,
+    priceFrom: null,
+  },
 ];
 const product: CatalogProduct = {
   slug: 'kostyum-verde',
@@ -94,6 +113,7 @@ beforeEach(() => {
     { slug: 'kostyum-fort', updatedAt: '2026-11-11T10:00:00Z', hasRussian: true },
   ]);
   vi.mocked(getCatalogCategoryProducts).mockResolvedValue(cards);
+  vi.mocked(getCatalogProducts).mockResolvedValue(cards);
   vi.mocked(getCatalogProductCategory).mockResolvedValue({ node: child, trail: [section, child] });
   vi.mocked(getCatalogRelatedProducts).mockResolvedValue([cards[1]]);
 });
@@ -108,7 +128,13 @@ describe('CatalogRootPage', () => {
         `/uk/catalog/${node.slug}`,
       );
     }
-    expect(screen.getByText('Каталог · 2 моделі')).toBeTruthy();
+    expect(screen.getByText('2 моделі')).toBeTruthy();
+    // A category of own sewing goes to its group with its lowest price.
+    const own = within(screen.getByRole('region', { name: 'Власне пошиття' }));
+    expect(own.getByText('2 моделі · від 900 грн')).toBeTruthy();
+    expect(screen.getByRole('search', { name: 'Пошук по каталогу' }).getAttribute('action')).toBe(
+      '/uk/search',
+    );
   });
 
   it('keeps the heading and the call to order while the catalog is empty', async () => {
@@ -116,7 +142,7 @@ describe('CatalogRootPage', () => {
     render(await CatalogRootPage({ locale: 'uk' }));
 
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
-    expect(screen.queryByRole('list', { name: 'Розділи каталогу' })).toBeNull();
+    expect(screen.queryByRole('region', { name: 'Власне пошиття' })).toBeNull();
     expect(screen.getByRole('link', { name: 'Залишити заявку' })).toBeTruthy();
   });
 });
@@ -134,6 +160,16 @@ describe('CatalogCategoryPage', () => {
     expect(getCatalogCategoryProducts).toHaveBeenCalledWith('spetsodyah', 'uk');
     // Without a text about the category there is no empty block for it.
     expect(screen.queryByRole('heading', { level: 2, name: 'Про розділ' })).toBeNull();
+  });
+
+  it('shows the neighbours of a subcategory as tabs with the open one marked', async () => {
+    render(await CatalogCategoryPage({ locale: 'uk', category: page(child, [section, child]) }));
+
+    const tabs = within(screen.getByRole('navigation', { name: 'Підрозділи' }));
+    expect(tabs.getByRole('link', { name: /^Усі/ }).getAttribute('href')).toBe(
+      '/uk/catalog/spetsodyah',
+    );
+    expect(tabs.getByRole('link', { name: /^Костюми/ }).getAttribute('aria-current')).toBe('page');
   });
 
   it('leads the breadcrumbs through the top-level category in the page language', async () => {
@@ -170,6 +206,34 @@ describe('CatalogCategoryPage', () => {
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     expect(screen.getByRole('heading', { level: 2, name: 'Про розділ' })).toBeTruthy();
     expect(screen.getByText('самі').tagName).toBe('STRONG');
+  });
+});
+
+describe('CatalogSearchPage', () => {
+  it('finds models by a word of the name and by the model number', async () => {
+    render(await CatalogSearchPage({ locale: 'uk', query: 'верде' }));
+
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Пошук по каталогу');
+    expect(screen.getByRole('link', { name: 'Костюм ВЕРДЕ' }).getAttribute('href')).toBe(
+      '/uk/product/kostyum-verde',
+    );
+    expect(screen.queryByRole('link', { name: 'Костюм ФОРТ' })).toBeNull();
+    expect(screen.getByRole('combobox')).toHaveProperty('value', 'верде');
+  });
+
+  it('links the categories whose name matches', async () => {
+    render(await CatalogSearchPage({ locale: 'ru', query: 'костюмы' }));
+
+    expect(screen.getByRole('link', { name: /Спецодежда · Костюмы/ }).getAttribute('href')).toBe(
+      '/ru/catalog/kostyumy',
+    );
+  });
+
+  it('says nothing was found and keeps the call to order', async () => {
+    render(await CatalogSearchPage({ locale: 'uk', query: 'парасолька' }));
+
+    expect(screen.getByText(/нічого не знайшли/)).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Залишити заявку' })).toBeTruthy();
   });
 });
 

@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { CatalogMenu } from './catalog-menu';
+import { HeaderSearch } from './header-search';
 import { ShowWhenStuck } from './show-when-stuck';
 import { LocaleSwitch } from '../controls/locale-switch';
 import { NavLink } from '../controls/nav-link';
@@ -20,9 +21,9 @@ const CONTACTS_ROW_HEIGHT = 80;
 
 /**
  * Two-row header. Contacts row: logo with the brand line, the short terms, phone with hours and e-mail,
- * «Залишити заявку». Menu row: the «Каталог» button, the site menu, and the language toggle; it stays on
- * screen while scrolling and then also shows the phone.
- * Below `lg` only the logo and the language toggle remain; the actions live in the bottom bar.
+ * «Залишити заявку». Menu row: the «Каталог» button, the site menu, «Пошук», and the language toggle; it
+ * stays on screen while scrolling and then also shows the phone.
+ * Below `lg` only the logo, the search icon, and the language toggle remain; the actions live in the bottom bar.
  */
 export function SiteHeader({
   company,
@@ -90,7 +91,8 @@ export function SiteHeader({
             {dictionary.requestLong}
           </Link>
         </Button>
-        <div className="lg:hidden">
+        <div className="flex items-center gap-1 lg:hidden">
+          <HeaderSearch locale={locale} variant="icon" />
           <LocaleSwitch locale={locale} label={dictionary.languageSwitch} />
         </div>
       </div>
@@ -112,6 +114,7 @@ export function SiteHeader({
               </NavLink>
             ))}
           </nav>
+          <HeaderSearch locale={locale} variant="menu" />
           <ShowWhenStuck offset={CONTACTS_ROW_HEIGHT}>
             <a
               href={`tel:${phone.e164}`}

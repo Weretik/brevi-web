@@ -4,9 +4,9 @@
 
 Every page under `/uk` and `/ru` is rendered inside `SiteShell`: a skip link, the two-row header, `<main id="content">`, the dark footer, and on phones the bottom bar.
 
-- **Header.** Contacts row: logo with the brand line, the short terms («Від 5 одиниць · Працюємо з ПДВ»), the one company phone with hours and e-mail, «Залишити заявку». Menu row: the «Каталог» button, the site menu, the UA/RU toggle. Only the menu row stays on screen while scrolling, and from 1280 px it then also shows the phone.
-- **Catalog menu.** Two panes: sections with icons on the left, subsections of the chosen section on the right, the logo sewing card from 1280 px. The whole menu is in the HTML while closed.
-- **Phones and tablets (below 1024 px).** The header keeps the logo and the language toggle. The bar fixed to the bottom has «Каталог» and «Меню» (side sheets, rendered only while open), «Заявка», and «Дзвінок».
+- **Header.** Contacts row: logo with the brand line, the short terms («Від 5 одиниць · Працюємо з ПДВ»), the one company phone with hours and e-mail, «Залишити заявку». Menu row: the «Каталог» button, the site menu, «Пошук» (opens the catalog search under the header, see [catalog](catalog.md)), the UA/RU toggle. Only the menu row stays on screen while scrolling, and from 1280 px it then also shows the phone.
+- **Catalog menu.** Two panes: sections with icons (the same as on the catalog root) on the left, subsections of the chosen section on the right, the logo sewing card from 1280 px. The whole menu is in the HTML while closed.
+- **Phones and tablets (below 1024 px).** The header keeps the logo, the search icon, and the language toggle. The bar fixed to the bottom has «Каталог» and «Меню» (side sheets, rendered only while open), «Заявка», and «Дзвінок».
 - **Footer.** Call band with the phone and «Залишити заявку»; brand; catalog, buyer, and company links; contacts with the map link; social network names without links until the owner gives the addresses; legal name and ЄДРПОУ. Column titles are plain text, not headings.
 
 Company facts come as a prop from the layout, which reads «Контакти та компанія» with `loadSiteCompany` ([SEO settings](seo-settings.md)); `COMPANY` is the fallback and always gives the name and the logo. The catalog sections come as a prop from the layout, which reads the [catalog](catalog.md) tree on the server; every entry opens its category page, and with an empty catalog only «Весь каталог» remains. There is no search field until the catalog page exists.
@@ -59,7 +59,7 @@ libs/site/
 │   └── json-ld/              # JsonLd, Organization, WebSite, LocalBusiness, BreadcrumbList, FAQPage
 ├── core/shell/src/lib/
 │   ├── site-shell.tsx        # page frame
-│   ├── header/               # site-header, catalog-menu, catalog-section-icon, show-when-stuck
+│   ├── header/               # site-header, catalog-menu, catalog-section-icon, header-search, show-when-stuck
 │   ├── mobile/mobile-bar.tsx # bottom bar with the catalog and menu sheets
 │   ├── footer/site-footer.tsx
 │   ├── controls/             # locale-switch, nav-link

@@ -5,7 +5,10 @@ import { SiteShell } from './site-shell';
 
 import type { CatalogSection } from '@site/catalog/model';
 
-vi.mock('next/navigation', () => ({ usePathname: () => '/ru/contacts' }));
+vi.mock('next/navigation', () => ({
+  usePathname: () => '/ru/contacts',
+  useRouter: () => ({ push: vi.fn() }),
+}));
 
 const CATALOG_SECTIONS: CatalogSection[] = [
   {
@@ -171,6 +174,24 @@ describe('SiteShell', () => {
     fireEvent.scroll(window);
     expect(within(header).getAllByRole('link', { name: /050 469 86 75/ })).toHaveLength(2);
     Object.defineProperty(window, 'scrollY', { value: 0, configurable: true });
+  });
+
+  it('opens the catalog search from the header menu', () => {
+    render(
+      <SiteShell company={COMPANY} locale="uk" catalogSections={CATALOG_SECTIONS}>
+        content
+      </SiteShell>,
+    );
+    const header = screen.getByRole('banner');
+    expect(within(header).queryByRole('search')).toBeNull();
+
+    // One button in the phone header, one in the menu row of wider screens.
+    const buttons = within(header).getAllByRole('button', { name: 'Пошук' });
+    expect(buttons).toHaveLength(2);
+    fireEvent.click(buttons[1]);
+    const form = within(header).getByRole('search', { name: 'Пошук по каталогу' });
+    expect(form.getAttribute('action')).toBe('/uk/search');
+    expect(within(form).getByRole('combobox')).toBeTruthy();
   });
 
   it('gives phones a bottom bar with the catalog, the request, the call, and the menu', () => {
