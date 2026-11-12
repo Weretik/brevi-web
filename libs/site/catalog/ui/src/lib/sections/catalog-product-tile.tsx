@@ -2,16 +2,17 @@ import { cn } from '@site/shared/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { formatPrice } from '../i18n/catalog-dictionary';
+import { formatCount, formatPrice } from '../i18n/catalog-dictionary';
 
 import type { CatalogDictionary } from '../i18n/catalog-dictionary';
 import type { CatalogProductCard } from '@site/catalog/model';
 
 /**
  * One product of a listing: the photo on white, «Власне пошиття» on own sewing, the name, the model number,
- * and «від 1 480 грн/шт» with the order size that price is for. The whole card opens the product page (the
- * name is the link). A product without a price links «Дізнатися ціну» to the request page. It has no state,
- * so both the server grid and the client listing render it.
+ * the fabrics («3 тканини», or the name of the only one), and «від 1 480 грн/шт» with the order size that
+ * price is for. The whole card opens the product page (the name is the link). A product without a price
+ * links «Дізнатися ціну» to the request page. It has no state, so both the server grid and the client
+ * listing render it.
  */
 export function CatalogProductTile({
   product,
@@ -68,6 +69,16 @@ export function CatalogProductTile({
         {product.code ? (
           <p className="font-mono text-xs text-muted-foreground">
             {dictionary.model} {product.code}
+          </p>
+        ) : null}
+        {product.fabrics.length > 0 ? (
+          <p
+            className="text-xs text-muted-foreground"
+            title={product.fabrics.length > 1 ? product.fabrics.join(', ') : undefined}
+          >
+            {product.fabrics.length === 1
+              ? `${dictionary.fabric}: ${product.fabrics[0]}`
+              : formatCount(product.fabrics.length, dictionary.fabrics)}
           </p>
         ) : null}
         {product.priceFrom === null ? (

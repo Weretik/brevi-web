@@ -6,7 +6,7 @@ import {
 } from './catalog-search';
 
 const products = [
-  { name: 'Куртка ЗАМЕТІЛЬ медіум', code: '1031' },
+  { name: 'Куртка ЗАМЕТІЛЬ медіум', code: '1031', fabrics: ['Грета', 'Оксфорд'] },
   { name: 'Напівкомбінезон ЗАМЕТІЛЬ', code: '1045' },
   { name: 'Жилет КУР’ЄР', code: null },
   { name: 'Куртка ВЕЛЕС оrange', code: null },
@@ -32,6 +32,12 @@ describe('catalog search', () => {
     expect(searchCatalogProducts(products, 'кур’єр')).toHaveLength(1);
     expect(searchCatalogProducts(products, 'halwill')).toHaveLength(1);
     expect(searchCatalogProducts(products, 'orange')).toHaveLength(1);
+  });
+
+  it('finds a product by its fabric', () => {
+    expect(searchCatalogProducts(products, 'куртка грета').map((item) => item.code)).toEqual([
+      '1031',
+    ]);
   });
 
   it('finds a product by its model number', () => {

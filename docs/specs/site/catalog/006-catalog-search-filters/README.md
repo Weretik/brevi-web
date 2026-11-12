@@ -1,6 +1,6 @@
 # Catalog, stage 6: search, category tabs, and filters («Рядок над товарами»)
 
-**Status:** stage 1 implemented and verified locally 2026-11-12.
+**Status:** stage 1 implemented and verified locally 2026-11-12; stage 2 (fabrics) implemented 2026-11-12, needs BreviERP «fabric names on cards» (CNT-002 R-13) in production.
 **Variant:** `nextjs`.
 **Source:** owner request 2026-11-12 («не зрозуміло, де пошук, де фільтрація, де категорії»), UX audit with three concepts; the owner chose concept B «Рядок над товарами».
 **Feature card:** [site catalog](../../../../features/site/catalog.md).
@@ -34,11 +34,19 @@ The site had no search at all. Category pages listed every model in one grid wit
 7. On a phone «Фільтри» opens the bottom panel; the button shows the number of filters on.
 8. The catalog root shows own sewing first, protective equipment second, each category with «від N грн».
 
+## Stage 2: fabrics
+
+- The public API card carries `fabrics`, the names of the active fabrics of a sewing model (BreviERP CNT-002 R-13, contract 1.2.0). The site reads it as optional: an older API gives an empty list, and the listing then has no fabric filter.
+- **«Тканина»** in the row above the listing (and in the phone panel), between «Ціна» and «Тип»: every fabric of the listing, the most common first; only when the models differ in fabric. The choice is kept as `?fabric=Грета`; names compare without case.
+- **Card:** «3 тканини» (the names in the tooltip), or «Тканина: Грета» when the model has one fabric.
+- **Search** finds a model by its fabric too: «куртка грета».
+
+Scenario 9: in «Спецодяг літній» choosing «Тканина: Грета» leaves only the models made in Грета; the address gets `?fabric=Грета`.
+
 ## Not in this stage
 
-- Filter «Тканина» and «3 тканини» on the card: the public API card has no fabric names yet (stage 2, BreviERP + site).
 - Season, gender, profession, industry, colour, size: no structured data in the Admin.
 
 ## Structure check
 
-No new library. Pure search and listing rules are in `site-catalog-model` (`catalog-search`, `catalog-listing`, `catalogCategoryFamily`). `site-catalog-data-access` reads all cards (`getCatalogProducts`) and maps `type` and `code` of a card. `site-catalog-ui` has the server blocks (tabs, product tile and grid, section groups, category icon) and three client blocks (listing with filters, search box, tab scroller). `site-catalog-feature` builds the search index and the search page. The app adds the route handler and the search route. `site-shared-ui`: `PageHeader` without a label and with a note next to the heading; `Sheet` from the bottom. `site-core-shell`: «Пошук» in the header.
+No new library. Pure search and listing rules are in `site-catalog-model` (`catalog-search`, `catalog-listing`, `catalogCategoryFamily`). `site-catalog-data-access` reads all cards (`getCatalogProducts`) and maps `type` and `code` of a card. `site-catalog-ui` has the server blocks (tabs, product tile and grid, section groups, category icon) and three client blocks (listing with filters, search box, tab scroller). `site-catalog-feature` builds the search index and the search page. The app adds the route handler and the search route. `site-shared-ui`: `PageHeader` without a label and with a note next to the heading; `Sheet` from the bottom. `site-core-shell`: «Пошук» in the header. Stage 2 adds `catalogFabrics` and the `fabric` choice to `catalog-listing`, `fabrics` to the card type, mapper, search index, and tile; no new file.

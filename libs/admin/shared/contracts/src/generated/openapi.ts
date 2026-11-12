@@ -14229,6 +14229,8 @@ export interface components {
        * @description The lowest large-wholesale price among active fabrics, or the PPE price; null means «ціну уточнюйте».
        */
       priceFrom?: number | null;
+      /** @description Names of the active fabrics of a sewing model, each once, in the order of the model; empty for PPE. */
+      fabrics: string[];
     };
     PublicCatalogCardPage: {
       items: components['schemas']['PublicCatalogCard'][];

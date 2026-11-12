@@ -4,6 +4,7 @@ import {
   CATALOG_SORTS,
   EMPTY_CATALOG_CHOICE,
   applyCatalogChoice,
+  catalogFabrics,
   catalogPriceBands,
   countCatalogFilters,
   readCatalogChoice,
@@ -167,8 +168,8 @@ function FilterMenu({
 }
 
 /**
- * The products of a category with the row above them: price ranges, own sewing or protective equipment
- * (only when the category has both), and the order. Every card stays in the page for search engines; the
+ * The products of a category with the row above them: price ranges, fabrics (only when the models differ
+ * in them), own sewing or protective equipment (only when the category has both), and the order. Every card stays in the page for search engines; the
  * filters and «Показати ще» only hide some. The choice is kept in the address (`?price=…&sort=…`) so a
  * link opens the same view; the page itself is the same for every address.
  */
@@ -187,6 +188,7 @@ export function CatalogListing({
     () => catalogPriceBands(items.map((item) => item.product.priceFrom)),
     [items],
   );
+  const fabrics = useMemo(() => catalogFabrics(items.map((item) => item.product)), [items]);
   const types = useMemo(
     () => [...new Set(items.map((item) => item.product.type))] as CatalogProductType[],
     [items],
@@ -195,8 +197,8 @@ export function CatalogListing({
   const [limit, setLimit] = useState(PAGE_SIZE);
 
   useEffect(() => {
-    setChoice(readCatalogChoice(new URLSearchParams(window.location.search), bands));
-  }, [bands]);
+    setChoice(readCatalogChoice(new URLSearchParams(window.location.search), { bands, fabrics }));
+  }, [bands, fabrics]);
 
   const choose = (change: Partial<CatalogListingChoice>) => {
     const next = { ...choice, ...change };
@@ -217,6 +219,7 @@ export function CatalogListing({
           ...item,
           type: item.product.type,
           priceFrom: item.product.priceFrom,
+          fabrics: item.product.fabrics,
         })),
         choice,
         bands,
@@ -232,6 +235,10 @@ export function CatalogListing({
     { value: null, label: text.any },
     ...bands.map((band) => ({ value: band.key, label: bandLabel(band, text) })),
   ];
+  const fabricOptions: Option<string>[] = [
+    { value: null, label: text.any },
+    ...fabrics.map((fabric) => ({ value: fabric, label: fabric })),
+  ];
   const typeOptions: Option<CatalogProductType>[] = [
     { value: null, label: text.anyType },
     ...types.map((type) => ({ value: type, label: text.types[type] })),
@@ -244,6 +251,7 @@ export function CatalogListing({
   const filters = countCatalogFilters(choice);
   const hasBands = bands.length > 0;
   const hasTypes = types.length > 1;
+  const hasFabrics = fabrics.length > 0;
   const found = (
     <span className="text-sm text-muted-foreground">
       {text.found} {shown.length}
@@ -290,6 +298,18 @@ export function CatalogListing({
                   options={bandOptions}
                   value={choice.band}
                   onChange={(band) => choose({ band })}
+                />
+              </div>
+            ) : null}
+            {hasFabrics ? (
+              <div className="grid gap-2 border-b border-border pb-4">
+                <p className="text-sm font-bold">{text.fabric}</p>
+                <Choices
+                  wrap
+                  label={text.fabric}
+                  options={fabricOptions}
+                  value={choice.fabric}
+                  onChange={(fabric) => choose({ fabric })}
                 />
               </div>
             ) : null}
@@ -343,6 +363,23 @@ export function CatalogListing({
             </FilterMenu>
           </div>
         ) : null}
+        {hasFabrics ? (
+          <div className="max-md:hidden">
+            <FilterMenu label={text.fabric} chosen={choice.fabric}>
+              {(close) => (
+                <Choices
+                  label={text.fabric}
+                  options={fabricOptions}
+                  value={choice.fabric}
+                  onChange={(fabric) => {
+                    choose({ fabric });
+                    close();
+                  }}
+                />
+              )}
+            </FilterMenu>
+          </div>
+        ) : null}
         {hasTypes ? (
           <div className="max-md:hidden">
             <FilterMenu label={text.type} chosen={choice.type ? text.types[choice.type] : null}>
@@ -363,7 +400,7 @@ export function CatalogListing({
         {filters > 0 ? (
           <button
             type="button"
-            onClick={() => choose({ type: null, band: null })}
+            onClick={() => choose({ type: null, band: null, fabric: null })}
             className="text-sm font-bold text-brand-text hover:underline max-md:hidden"
           >
             {text.reset}

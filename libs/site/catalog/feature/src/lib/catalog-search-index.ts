@@ -34,6 +34,7 @@ export async function buildCatalogSearchIndex(locale: Locale): Promise<CatalogSe
       type: product.type,
       image: product.image,
       priceFrom: product.priceFrom,
+      fabrics: product.fabrics,
       href: localizedPath(locale, catalogProductPath(product.slug)),
     })),
     sections: sections(tree, null),

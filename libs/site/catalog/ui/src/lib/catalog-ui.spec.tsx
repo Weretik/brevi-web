@@ -1,7 +1,7 @@
 import { COMPANY } from '@site/core/config';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 
-import { formatModelCount, getCatalogDictionary } from './i18n/catalog-dictionary';
+import { formatCount, formatModelCount, getCatalogDictionary } from './i18n/catalog-dictionary';
 import { CatalogCategoryTabs } from './sections/catalog-category-tabs';
 import { CatalogListing } from './sections/catalog-listing';
 import { CatalogProductBuy } from './sections/catalog-product-buy';
@@ -29,6 +29,7 @@ const card = (
   slug: string,
   priceFrom: number | null,
   type: CatalogProductCard['type'] = 'Sewing',
+  fabrics: string[] = [],
 ): CatalogProductCard => ({
   slug,
   type,
@@ -36,6 +37,7 @@ const card = (
   name: `Модель ${slug}`,
   image: null,
   priceFrom,
+  fabrics,
 });
 
 describe('catalog blocks', () => {
@@ -49,6 +51,8 @@ describe('catalog blocks', () => {
     expect(formatModelCount('uk', 85)).toBe('85 моделей');
     expect(formatModelCount('ru', 22)).toBe('22 модели');
     expect(formatModelCount('ru', 11)).toBe('11 моделей');
+    expect(formatCount(5, getCatalogDictionary('ru').products.fabrics)).toBe('5 тканей');
+    expect(formatCount(21, dictionary.products.fabrics)).toBe('21 тканина');
   });
 
   it('shows the categories in two groups with their lowest price and subcategories', () => {
@@ -122,11 +126,11 @@ describe('catalog blocks', () => {
     expect(links[0].getAttribute('aria-current')).toBeNull();
   });
 
-  it('filters a listing by price and kind, sorts it, and keeps the choice in the address', () => {
+  it('filters a listing by price, fabric, and kind, sorts it, and keeps the choice in the address', () => {
     window.history.replaceState(null, '', '/uk/catalog/zyma');
     const items = [
-      card('a', 1480),
-      card('b', 890),
+      card('a', 1480, 'Sewing', ['Грета', 'Саржа']),
+      card('b', 890, 'Sewing', ['Саржа']),
       card('c', null),
       card('d', 1350),
       card('e', 1040, 'Ppe'),
@@ -162,6 +166,14 @@ describe('catalog blocks', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Тип' }));
     fireEvent.click(screen.getByRole('button', { name: 'Засоби захисту' }));
     expect(shown()).toEqual(['Модель e']);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Скинути' }));
+    // The fabrics of the listing, the most common first.
+    fireEvent.click(screen.getByRole('button', { name: 'Тканина' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Саржа' }));
+    expect(shown()).toEqual(['Модель a', 'Модель b']);
+    expect(decodeURIComponent(window.location.search)).toBe('?fabric=Саржа');
+    expect(screen.getByRole('button', { name: 'Тканина: Саржа' })).toBeTruthy();
 
     fireEvent.click(screen.getByRole('button', { name: 'Скинути' }));
     fireEvent.click(screen.getByRole('button', { name: 'Порядок' }));
@@ -272,6 +284,16 @@ describe('catalog blocks', () => {
             name: 'Костюм ВЕРДЕ',
             image: 'https://media.example/kostyum-verde.webp',
             priceFrom: 1250,
+            fabrics: ['Грета', 'Саржа', 'Оксфорд'],
+          },
+          {
+            slug: 'kurtka-lito',
+            type: 'Sewing',
+            code: null,
+            name: 'Куртка ЛІТО',
+            image: null,
+            priceFrom: 900,
+            fabrics: ['Грета'],
           },
           {
             slug: 'bez-foto',
@@ -280,6 +302,7 @@ describe('catalog blocks', () => {
             name: 'Модель без фото',
             image: null,
             priceFrom: null,
+            fabrics: [],
           },
         ]}
       />,
@@ -288,12 +311,15 @@ describe('catalog blocks', () => {
     expect(screen.getByRole('img', { name: 'Костюм ВЕРДЕ' }).getAttribute('src')).toBe(
       'https://media.example/kostyum-verde.webp',
     );
-    expect(screen.getByText(dictionary.products.noPhoto)).toBeTruthy();
+    expect(screen.getAllByText(dictionary.products.noPhoto)).toHaveLength(2);
     expect(screen.getByText('1 250')).toBeTruthy();
-    expect(screen.getByText('від 40 шт')).toBeTruthy();
+    expect(screen.getAllByText('від 40 шт')).toHaveLength(2);
     expect(screen.getByText('Модель 1031')).toBeTruthy();
+    // Several fabrics are counted; the only one is named.
+    expect(screen.getByText('3 тканини').getAttribute('title')).toBe('Грета, Саржа, Оксфорд');
+    expect(screen.getByText('Тканина: Грета')).toBeTruthy();
     // Own sewing is marked; protective equipment is not.
-    expect(screen.getAllByText('Власне пошиття')).toHaveLength(1);
+    expect(screen.getAllByText('Власне пошиття')).toHaveLength(2);
     expect(screen.queryByRole('link', { name: 'Дізнатися ціну: Костюм ВЕРДЕ' })).toBeNull();
     // A product without a price asks to learn it from a manager.
     const link = screen.getByRole('link', { name: 'Дізнатися ціну: Модель без фото' });

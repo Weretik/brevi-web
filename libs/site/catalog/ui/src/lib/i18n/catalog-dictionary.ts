@@ -30,6 +30,8 @@ const uk = {
     tierNote: 'від 40 шт',
     own: 'Власне пошиття',
     model: 'Модель',
+    fabric: 'Тканина',
+    fabrics: { one: 'тканина', few: 'тканини', many: 'тканин' } as Plural,
   },
   listing: {
     all: 'Усі',
@@ -42,6 +44,7 @@ const uk = {
     priceOver: 'понад',
     type: 'Тип',
     types: { Sewing: 'Власне пошиття', Ppe: 'Засоби захисту' },
+    fabric: 'Тканина',
     sort: 'Порядок',
     sorts: { default: 'Як у розділі', cheap: 'Спочатку дешевші', expensive: 'Спочатку дорожчі' },
     any: 'Будь-яка',
@@ -134,6 +137,8 @@ const ru: CatalogDictionary = {
     tierNote: 'от 40 шт',
     own: 'Собственный пошив',
     model: 'Модель',
+    fabric: 'Ткань',
+    fabrics: { one: 'ткань', few: 'ткани', many: 'тканей' },
   },
   listing: {
     all: 'Все',
@@ -146,6 +151,7 @@ const ru: CatalogDictionary = {
     priceOver: 'более',
     type: 'Тип',
     types: { Sewing: 'Собственный пошив', Ppe: 'Средства защиты' },
+    fabric: 'Ткань',
     sort: 'Порядок',
     sorts: { default: 'Как в разделе', cheap: 'Сначала дешевле', expensive: 'Сначала дороже' },
     any: 'Любая',
@@ -231,6 +237,15 @@ export function formatModelCount(locale: Locale, count: number): string {
   const rule = new Intl.PluralRules(locale).select(count);
   const word = rule === 'one' ? forms.one : rule === 'few' ? forms.few : forms.many;
   return `${count} ${word}`;
+}
+
+/**
+ * «3 тканини»: a count with the form of its noun. Ukrainian and Russian pick the form by the same rule for
+ * whole numbers, so the forms of either language work without the language itself.
+ */
+export function formatCount(count: number, forms: Plural): string {
+  const rule = new Intl.PluralRules('uk').select(count);
+  return `${count} ${rule === 'one' ? forms.one : rule === 'few' ? forms.few : forms.many}`;
 }
 
 const PRICE_FORMAT = new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 2 });

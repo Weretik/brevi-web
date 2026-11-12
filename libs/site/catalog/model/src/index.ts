@@ -22,12 +22,18 @@ export {
   CATALOG_SORTS,
   EMPTY_CATALOG_CHOICE,
   applyCatalogChoice,
+  catalogFabrics,
   catalogPriceBands,
   countCatalogFilters,
   readCatalogChoice,
   writeCatalogChoice,
 } from './lib/catalog-listing';
-export type { CatalogListingChoice, CatalogPriceBand, CatalogSort } from './lib/catalog-listing';
+export type {
+  CatalogListingChoice,
+  CatalogListingOptions,
+  CatalogPriceBand,
+  CatalogSort,
+} from './lib/catalog-listing';
 export {
   catalogQueryWords,
   normalizeCatalogText,
