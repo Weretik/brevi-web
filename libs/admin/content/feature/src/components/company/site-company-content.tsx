@@ -2,7 +2,7 @@ import { useGetSiteCompanyQuery } from '@admin/content/data-access';
 import { SiteCompanyView } from '@admin/content/ui';
 import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
-import { Alert, Box, Button, Paper } from '@mui/material';
+import { Alert, Box, Button } from '@mui/material';
 import { useState } from 'react';
 
 import { SiteCompanyDrawer } from './site-company-drawer';
@@ -46,11 +46,7 @@ export function SiteCompanyContent({ viewer }: { viewer: SiteCompanyViewer }) {
         actionMessage={null}
         onCloseActionMessage={() => undefined}
       />
-      {company && (
-        <Paper variant="outlined" sx={{ p: 2.5, maxWidth: 820 }}>
-          <SiteCompanyView company={company} />
-        </Paper>
-      )}
+      {company && <SiteCompanyView company={company} />}
       {editing && company && (
         <SiteCompanyDrawer
           key={company.revision}

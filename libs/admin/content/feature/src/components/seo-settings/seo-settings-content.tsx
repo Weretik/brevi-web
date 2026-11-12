@@ -2,7 +2,7 @@ import { useGetSiteSeoSettingsQuery } from '@admin/content/data-access';
 import { SeoSettingsView } from '@admin/content/ui';
 import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
-import { Alert, Box, Button, Paper } from '@mui/material';
+import { Alert, Box, Button } from '@mui/material';
 import { useState } from 'react';
 
 import { SeoSettingsDrawer } from './seo-settings-drawer';
@@ -49,11 +49,7 @@ export function SeoSettingsContent({ viewer }: { viewer: SeoSettingsViewer }) {
         actionMessage={null}
         onCloseActionMessage={() => undefined}
       />
-      {settings && (
-        <Paper variant="outlined" sx={{ p: 2.5, maxWidth: 720 }}>
-          <SeoSettingsView settings={settings} />
-        </Paper>
-      )}
+      {settings && <SeoSettingsView settings={settings} />}
       {editing && settings && (
         <SeoSettingsDrawer
           settings={settings}
