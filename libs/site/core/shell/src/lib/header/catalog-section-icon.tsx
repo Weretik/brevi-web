@@ -1,15 +1,8 @@
-import { HardHatIcon, LayoutGridIcon, ShirtIcon } from 'lucide-react';
+import { CatalogCategoryIcon } from '@site/catalog/ui';
 
-import type { LucideIcon, LucideProps } from 'lucide-react';
+import type { LucideProps } from 'lucide-react';
 
-/** Icons by the slug of a catalog section. */
-const ICONS: Record<string, LucideIcon> = {
-  spetsodyah: ShirtIcon,
-  'zasoby-zakhystu': HardHatIcon,
-};
-
-/** Icon of a catalog section by its key; a section without its own icon gets the catalog grid. */
+/** Icon of a catalog section by its key (the category slug), the same as on the catalog root. */
 export function CatalogSectionIcon({ sectionKey, ...props }: LucideProps & { sectionKey: string }) {
-  const Icon = ICONS[sectionKey] ?? LayoutGridIcon;
-  return <Icon aria-hidden strokeWidth={1.75} {...props} />;
+  return <CatalogCategoryIcon slug={sectionKey} {...props} />;
 }

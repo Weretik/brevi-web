@@ -1,16 +1,20 @@
 import { COMPANY } from '@site/core/config';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 
-import { formatModelCount, getCatalogDictionary } from './i18n/catalog-dictionary';
+import { formatCount, formatModelCount, getCatalogDictionary } from './i18n/catalog-dictionary';
+import { CatalogCategoryTabs } from './sections/catalog-category-tabs';
+import { CatalogListing } from './sections/catalog-listing';
 import { CatalogProductBuy } from './sections/catalog-product-buy';
 import { CatalogProductGallery } from './sections/catalog-product-gallery';
 import { CatalogProductGrid } from './sections/catalog-product-grid';
 import { CatalogProductSpecs } from './sections/catalog-product-specs';
-import { CatalogSectionsGrid } from './sections/catalog-sections-grid';
-import { CatalogSubcategories } from './sections/catalog-subcategories';
+import { CatalogSearchBox } from './sections/catalog-search-box';
+import { CatalogSectionGroups } from './sections/catalog-section-groups';
 import { CatalogText } from './sections/catalog-text';
 
-import type { CatalogTreeNode } from '@site/catalog/model';
+import type { CatalogProductCard } from '@site/catalog/model';
+
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
 
 const shape = (value: unknown): unknown =>
   Array.isArray(value)
@@ -21,22 +25,20 @@ const shape = (value: unknown): unknown =>
 
 const dictionary = getCatalogDictionary('uk');
 const href = (slug: string) => `/uk/catalog/${slug}`;
-const child: CatalogTreeNode = {
-  slug: 'zhylety',
-  name: { uk: 'Жилети', ru: 'Жилеты' },
-  productCount: 5,
-  productType: 'Sewing',
-  sectionId: 7,
-  children: [],
-};
-const section: CatalogTreeNode = {
-  slug: 'specodyag-zymovyj',
-  name: { uk: 'Спецодяг зимовий', ru: 'Зимняя спецодежда' },
-  productCount: 33,
-  productType: 'Sewing',
-  sectionId: null,
-  children: [child],
-};
+const card = (
+  slug: string,
+  priceFrom: number | null,
+  type: CatalogProductCard['type'] = 'Sewing',
+  fabrics: string[] = [],
+): CatalogProductCard => ({
+  slug,
+  type,
+  code: null,
+  name: `Модель ${slug}`,
+  image: null,
+  priceFrom,
+  fabrics,
+});
 
 describe('catalog blocks', () => {
   it('has the same text items in both languages', () => {
@@ -49,37 +51,223 @@ describe('catalog blocks', () => {
     expect(formatModelCount('uk', 85)).toBe('85 моделей');
     expect(formatModelCount('ru', 22)).toBe('22 модели');
     expect(formatModelCount('ru', 11)).toBe('11 моделей');
+    expect(formatCount(5, getCatalogDictionary('ru').products.fabrics)).toBe('5 тканей');
+    expect(formatCount(21, dictionary.products.fabrics)).toBe('21 тканина');
   });
 
-  it('links a section card and its subsections to their category pages', () => {
+  it('shows the categories in two groups with their lowest price and subcategories', () => {
     render(
-      <CatalogSectionsGrid locale="uk" sections={[section]} label="Розділи" categoryHref={href} />,
+      <CatalogSectionGroups
+        locale="uk"
+        dictionary={dictionary}
+        categoryHref={href}
+        groups={[
+          {
+            type: 'Sewing',
+            sections: [
+              {
+                slug: 'specodyag-zymovyj',
+                name: 'Спецодяг зимовий',
+                productCount: 33,
+                priceFrom: 890,
+                children: [{ slug: 'zhylety', name: 'Жилети' }],
+              },
+            ],
+          },
+          {
+            type: 'Ppe',
+            sections: [
+              {
+                slug: 'zahyst-ruk',
+                name: 'Захист рук',
+                productCount: 1,
+                priceFrom: null,
+                children: [],
+              },
+            ],
+          },
+        ]}
+      />,
     );
 
-    const card = within(screen.getByRole('list', { name: 'Розділи' }));
-    expect(card.getByRole('link', { name: 'Спецодяг зимовий' }).getAttribute('href')).toBe(
+    const own = within(screen.getByRole('region', { name: 'Власне пошиття' }));
+    expect(own.getByRole('link', { name: 'Спецодяг зимовий' }).getAttribute('href')).toBe(
       '/uk/catalog/specodyag-zymovyj',
     );
-    expect(card.getByRole('link', { name: 'Жилети' }).getAttribute('href')).toBe(
+    expect(own.getByRole('link', { name: 'Жилети' }).getAttribute('href')).toBe(
       '/uk/catalog/zhylety',
     );
-    expect(card.getByText('33 моделі')).toBeTruthy();
+    expect(own.getByText('33 моделі · від 890 грн')).toBeTruthy();
+    const ppe = within(screen.getByRole('region', { name: 'Засоби захисту' }));
+    expect(ppe.getByText('1 модель')).toBeTruthy();
   });
 
-  it('shows subsections as links with their model counts', () => {
+  it('shows the subcategories as tabs with «Усі» first and the open one marked', () => {
     render(
-      <CatalogSubcategories
-        locale="ru"
-        categories={[child]}
-        label="Подразделы"
+      <CatalogCategoryTabs
+        parent={{ slug: 'specodyag-zymovyj', name: 'Спецодяг зимовий', count: 33 }}
+        items={[
+          { slug: 'kurtky', name: 'Куртки', count: 20 },
+          { slug: 'zhylety', name: 'Жилети', count: 5 },
+        ]}
+        current="zhylety"
+        label="Підрозділи"
+        allLabel="Усі"
         categoryHref={href}
       />,
     );
 
-    const nav = within(screen.getByRole('navigation', { name: 'Подразделы' }));
-    expect(nav.getByRole('link', { name: /Жилеты/ }).getAttribute('href')).toBe(
-      '/uk/catalog/zhylety',
+    const links = within(screen.getByRole('navigation', { name: 'Підрозділи' })).getAllByRole(
+      'link',
     );
+    expect(links.map((link) => link.textContent)).toEqual(['Усі33', 'Куртки20', 'Жилети5']);
+    expect(links[0].getAttribute('href')).toBe('/uk/catalog/specodyag-zymovyj');
+    expect(links[2].getAttribute('aria-current')).toBe('page');
+    expect(links[0].getAttribute('aria-current')).toBeNull();
+  });
+
+  it('filters a listing by price, fabric, and kind, sorts it, and keeps the choice in the address', () => {
+    window.history.replaceState(null, '', '/uk/catalog/zyma');
+    const items = [
+      card('a', 1480, 'Sewing', ['Грета', 'Саржа']),
+      card('b', 890, 'Sewing', ['Саржа']),
+      card('c', null),
+      card('d', 1350),
+      card('e', 1040, 'Ppe'),
+      card('f', 2400),
+      card('g', 650),
+      card('h', 1190),
+    ].map((product) => ({ product, href: `/uk/product/${product.slug}` }));
+    render(
+      <CatalogListing
+        items={items}
+        products={dictionary.products}
+        text={dictionary.listing}
+        requestHref="/uk/request"
+      />,
+    );
+    const shown = () =>
+      screen
+        .getAllByRole('listitem')
+        .filter((item) => !item.hidden)
+        .map((item) => within(item).getByRole('heading').textContent);
+
+    expect(shown()).toHaveLength(8);
+    expect(screen.getByText('Знайдено 8')).toBeTruthy();
+
+    // Wider screens: the price chip opens its ranges.
+    fireEvent.click(screen.getByRole('button', { name: 'Ціна' }));
+    fireEvent.click(screen.getByRole('button', { name: /^1.000 – 1.400$/ }));
+    expect(shown()).toEqual(['Модель d', 'Модель e', 'Модель h']);
+    expect(window.location.search).toBe('?price=1000-1400');
+    // Every product link stays in the page for search engines.
+    expect(screen.getAllByRole('listitem', { hidden: true })).toHaveLength(8);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Тип' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Засоби захисту' }));
+    expect(shown()).toEqual(['Модель e']);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Скинути' }));
+    // The fabrics of the listing, the most common first.
+    fireEvent.click(screen.getByRole('button', { name: 'Тканина' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Саржа' }));
+    expect(shown()).toEqual(['Модель a', 'Модель b']);
+    expect(decodeURIComponent(window.location.search)).toBe('?fabric=Саржа');
+    expect(screen.getByRole('button', { name: 'Тканина: Саржа' })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Скинути' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Порядок' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Спочатку дешевші' }));
+    expect(shown()).toEqual([
+      'Модель g',
+      'Модель b',
+      'Модель e',
+      'Модель h',
+      'Модель d',
+      'Модель a',
+      'Модель f',
+      'Модель c',
+    ]);
+    expect(window.location.search).toBe('?sort=cheap');
+  });
+
+  it('shows 24 models and adds more on «Показати ще»', () => {
+    window.history.replaceState(null, '', '/uk/catalog/lito');
+    const items = Array.from({ length: 30 }, (_, index) => card(`p${index}`, 100 + index)).map(
+      (product) => ({ product, href: `/uk/product/${product.slug}` }),
+    );
+    render(
+      <CatalogListing
+        items={items}
+        products={dictionary.products}
+        text={dictionary.listing}
+        requestHref="/uk/request"
+      />,
+    );
+    const visible = () => screen.getAllByRole('listitem').filter((item) => !item.hidden).length;
+
+    expect(visible()).toBe(24);
+    fireEvent.click(screen.getByRole('button', { name: 'Показати ще (6)' }));
+    expect(visible()).toBe(30);
+    expect(screen.queryByRole('button', { name: /Показати ще/ })).toBeNull();
+  });
+
+  it('suggests models and categories as the visitor types', async () => {
+    const fetchIndex = vi.fn(async () =>
+      Response.json({
+        products: [
+          {
+            slug: 'kurtka-zametil',
+            name: 'Куртка ЗАМЕТІЛЬ медіум',
+            code: '1031',
+            type: 'Sewing',
+            image: null,
+            priceFrom: 1350,
+            href: '/uk/product/kurtka-zametil',
+          },
+          {
+            slug: 'zhylet-lider',
+            name: 'Жилет ЛІДЕР',
+            code: null,
+            type: 'Sewing',
+            image: null,
+            priceFrom: null,
+            href: '/uk/product/zhylet-lider',
+          },
+        ],
+        sections: [
+          {
+            slug: 'kurtky',
+            name: 'Куртки зимові робочі',
+            parent: 'Спецодяг зимовий',
+            productCount: 20,
+            href: '/uk/catalog/kurtky',
+          },
+        ],
+      }),
+    );
+    vi.stubGlobal('fetch', fetchIndex);
+    render(
+      <CatalogSearchBox
+        indexUrl="/api/catalog-search/uk"
+        action="/uk/search"
+        text={dictionary.search}
+      />,
+    );
+
+    const field = screen.getByRole('combobox', { name: 'Пошук по каталогу' });
+    fireEvent.focus(field);
+    fireEvent.change(field, { target: { value: 'кур' } });
+
+    const list = within(await screen.findByRole('listbox'));
+    expect(list.getByRole('option', { name: /Куртка ЗАМЕТІЛЬ медіум/ })).toBeTruthy();
+    expect(list.getByRole('option', { name: /Куртки зимові робочі/ })).toBeTruthy();
+    expect(list.queryByRole('option', { name: /ЛІДЕР/ })).toBeNull();
+    expect(list.getByRole('link', { name: /Усі результати \(1\)/ }).getAttribute('href')).toBe(
+      '/uk/search?q=%D0%BA%D1%83%D1%80',
+    );
+    expect(fetchIndex).toHaveBeenCalledTimes(1);
+    vi.unstubAllGlobals();
   });
 
   it('shows a product with its photo, name, and the lowest price', () => {
@@ -91,11 +279,31 @@ describe('catalog blocks', () => {
         products={[
           {
             slug: 'kostyum-verde',
+            type: 'Sewing',
+            code: '1031',
             name: 'Костюм ВЕРДЕ',
             image: 'https://media.example/kostyum-verde.webp',
             priceFrom: 1250,
+            fabrics: ['Грета', 'Саржа', 'Оксфорд'],
           },
-          { slug: 'bez-foto', name: 'Модель без фото', image: null, priceFrom: null },
+          {
+            slug: 'kurtka-lito',
+            type: 'Sewing',
+            code: null,
+            name: 'Куртка ЛІТО',
+            image: null,
+            priceFrom: 900,
+            fabrics: ['Грета'],
+          },
+          {
+            slug: 'bez-foto',
+            type: 'Ppe',
+            code: null,
+            name: 'Модель без фото',
+            image: null,
+            priceFrom: null,
+            fabrics: [],
+          },
         ]}
       />,
     );
@@ -103,8 +311,15 @@ describe('catalog blocks', () => {
     expect(screen.getByRole('img', { name: 'Костюм ВЕРДЕ' }).getAttribute('src')).toBe(
       'https://media.example/kostyum-verde.webp',
     );
-    expect(screen.getByText(dictionary.products.noPhoto)).toBeTruthy();
+    expect(screen.getAllByText(dictionary.products.noPhoto)).toHaveLength(2);
     expect(screen.getByText('1 250')).toBeTruthy();
+    expect(screen.getAllByText('від 40 шт')).toHaveLength(2);
+    expect(screen.getByText('Модель 1031')).toBeTruthy();
+    // Several fabrics are counted; the only one is named.
+    expect(screen.getByText('3 тканини').getAttribute('title')).toBe('Грета, Саржа, Оксфорд');
+    expect(screen.getByText('Тканина: Грета')).toBeTruthy();
+    // Own sewing is marked; protective equipment is not.
+    expect(screen.getAllByText('Власне пошиття')).toHaveLength(2);
     expect(screen.queryByRole('link', { name: 'Дізнатися ціну: Костюм ВЕРДЕ' })).toBeNull();
     // A product without a price asks to learn it from a manager.
     const link = screen.getByRole('link', { name: 'Дізнатися ціну: Модель без фото' });

@@ -6,6 +6,7 @@ export {
   getCatalogProduct,
   getCatalogProductAddresses,
   getCatalogProductCategory,
+  getCatalogProducts,
   getCatalogRelatedProducts,
   getCatalogTree,
 } from './lib/catalog-source';

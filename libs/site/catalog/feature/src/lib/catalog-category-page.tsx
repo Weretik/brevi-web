@@ -1,9 +1,12 @@
 import { getCatalogCategoryProducts } from '@site/catalog/data-access';
+import { catalogCategoryFamily } from '@site/catalog/model';
 import { buildCatalogItemListJsonLd } from '@site/catalog/seo';
 import {
+  CatalogCategoryTabs,
+  CatalogExpandableText,
+  CatalogListing,
   CatalogOrder,
-  CatalogProductGrid,
-  CatalogSubcategories,
+  CatalogSearchBox,
   CatalogText,
   formatModelCount,
   getCatalogDictionary,
@@ -12,6 +15,7 @@ import {
   SITE_PATHS,
   catalogCategoryPath,
   catalogProductPath,
+  catalogSearchIndexPath,
   localizedPath,
 } from '@site/core/i18n';
 import { JsonLd, buildBreadcrumbJsonLd } from '@site/core/seo';
@@ -22,8 +26,10 @@ import type { CatalogCategoryPage as CatalogCategoryPageData } from '@site/catal
 import type { Locale } from '@site/core/i18n';
 
 /**
- * Category page: breadcrumbs through the top-level category, the subcategories, every product of the
- * category on one page with its lowest price, the text staff wrote about the category, and the call to order.
+ * Category page: breadcrumbs, the heading with the number of models and the search, the subcategories as
+ * tabs (on a subcategory: its neighbours, so the visitor can move between them), every product of the
+ * category with the price and kind filters and the order, the text staff wrote folded to its first lines,
+ * and the call to order.
  */
 export async function CatalogCategoryPage({
   locale,
@@ -39,40 +45,53 @@ export async function CatalogCategoryPage({
   const categoryHref = (slug: string) => localizedPath(locale, catalogCategoryPath(slug));
   const productHref = (slug: string) => localizedPath(locale, catalogProductPath(slug));
   const { node, trail, text } = category;
-  const children = node.children;
+  const family = catalogCategoryFamily(trail);
   const breadcrumbs = [
     { name: dictionary.home, href: localizedPath(locale) },
     { name: dictionary.catalog, href: path('catalog') },
     ...trail.map((node) => ({ name: node.name[locale], href: categoryHref(node.slug) })),
   ];
-  const name = category.name;
+  const tab = (item: (typeof trail)[number]) => ({
+    slug: item.slug,
+    name: item.name[locale],
+    count: item.productCount,
+  });
 
   return (
-    <div className="grid gap-10 pb-4 sm:gap-14">
-      <div className="grid gap-6">
+    <div className="grid gap-8 pb-4 sm:gap-12">
+      <div className="grid gap-5">
         <PageHeader
           breadcrumbs={breadcrumbs}
           breadcrumbsLabel={dictionary.breadcrumbsLabel}
-          label={`${dictionary.label} · ${formatModelCount(locale, products.length)}`}
-          title={name}
+          title={category.name}
+          titleNote={formatModelCount(locale, products.length)}
         />
-        {children.length > 0 ? (
-          <CatalogSubcategories
-            locale={locale}
-            categories={children}
-            label={dictionary.subcategoriesLabel}
+        <CatalogSearchBox
+          indexUrl={catalogSearchIndexPath(locale)}
+          action={path('search')}
+          text={dictionary.search}
+          size="compact"
+          className="max-w-[30rem]"
+        />
+      </div>
+
+      <section aria-label={dictionary.products.title} className="grid gap-3">
+        {family ? (
+          <CatalogCategoryTabs
+            parent={tab(family.parent)}
+            items={family.items.map(tab)}
+            current={node.slug}
+            label={dictionary.listing.tabs}
+            allLabel={dictionary.listing.all}
             categoryHref={categoryHref}
           />
         ) : null}
-      </div>
-
-      <section aria-label={dictionary.products.title}>
         {products.length > 0 ? (
-          <CatalogProductGrid
-            products={products}
-            dictionary={dictionary.products}
+          <CatalogListing
+            items={products.map((product) => ({ product, href: productHref(product.slug) }))}
+            products={dictionary.products}
+            text={dictionary.listing}
             requestHref={path('request')}
-            productHref={productHref}
           />
         ) : (
           <p className="max-w-[48rem] leading-relaxed text-muted-foreground">
@@ -82,19 +101,19 @@ export async function CatalogCategoryPage({
       </section>
 
       {text.length > 0 ? (
-        <PageSection
-          id="catalog-about"
-          title={dictionary.about.label}
-          label={{ index: '02', text: dictionary.label }}
-        >
-          <CatalogText blocks={text} />
+        <PageSection id="catalog-about" title={dictionary.about.label}>
+          <CatalogExpandableText
+            more={dictionary.product.description.more}
+            less={dictionary.product.description.less}
+          >
+            <CatalogText blocks={text} />
+          </CatalogExpandableText>
         </PageSection>
       ) : null}
 
       <CatalogOrder
         company={company}
         id="catalog-order"
-        index={text.length > 0 ? '03' : '02'}
         dictionary={dictionary.order}
         requestHref={path('request')}
         logoHref={path('logoPrinting')}

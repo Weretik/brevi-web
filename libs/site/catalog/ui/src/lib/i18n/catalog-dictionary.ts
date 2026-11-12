@@ -26,6 +26,57 @@ const uk = {
     priceFrom: 'від',
     noPhoto: 'Фото готується',
     empty: 'Моделі цього розділу скоро з’являться. Зателефонуйте, і менеджер підкаже наявність.',
+    perPiece: 'грн/шт',
+    tierNote: 'від 40 шт',
+    own: 'Власне пошиття',
+    model: 'Модель',
+    fabric: 'Тканина',
+    fabrics: { one: 'тканина', few: 'тканини', many: 'тканин' } as Plural,
+  },
+  listing: {
+    all: 'Усі',
+    tabs: 'Підрозділи',
+    filters: 'Фільтри',
+    filtersTitle: 'Фільтри та порядок',
+    price: 'Ціна',
+    priceTitle: 'Ціна за шт, грн',
+    priceUpTo: 'до',
+    priceOver: 'понад',
+    type: 'Тип',
+    types: { Sewing: 'Власне пошиття', Ppe: 'Засоби захисту' },
+    fabric: 'Тканина',
+    sort: 'Порядок',
+    sorts: { default: 'Як у розділі', cheap: 'Спочатку дешевші', expensive: 'Спочатку дорожчі' },
+    any: 'Будь-яка',
+    anyType: 'Усі',
+    reset: 'Скинути',
+    show: 'Показати',
+    close: 'Закрити',
+    showMore: 'Показати ще',
+    nothing:
+      'Таких моделей у розділі немає. Змініть фільтри або зателефонуйте, і менеджер підбере схожу.',
+    found: 'Знайдено',
+  },
+  search: {
+    label: 'Пошук по каталогу',
+    placeholder: 'Що шукаєте? Наприклад: куртка зимова, рукавички, ПРАЙМ',
+    shortPlaceholder: 'Пошук: назва або модель',
+    submit: 'Знайти',
+    open: 'Пошук',
+    products: 'Моделі',
+    sections: 'Розділи',
+    all: 'Усі результати',
+    loading: 'Шукаємо…',
+    priceFrom: 'від',
+    none: 'Нічого не знайшли. Спробуйте інше слово: «куртка», «рукавички», «каска».',
+    title: 'Пошук по каталогу',
+    resultsFor: 'Результати для',
+    empty: 'За цим запитом нічого не знайшли. Спробуйте інше слово або виберіть розділ каталогу.',
+    lead: 'Шукайте за назвою моделі, її номером або видом виробу.',
+  },
+  groups: {
+    Sewing: { title: 'Власне пошиття', lead: 'Шиємо в Полтаві: оберіть тканину, нанесемо логотип' },
+    Ppe: { title: 'Засоби захисту', lead: 'Взуття, рукавички, каски, захист очей і дихання' },
   },
   about: { label: 'Про розділ' },
   product: {
@@ -82,6 +133,58 @@ const ru: CatalogDictionary = {
     priceFrom: 'от',
     noPhoto: 'Фото готовится',
     empty: 'Модели этого раздела скоро появятся. Позвоните, и менеджер подскажет наличие.',
+    perPiece: 'грн/шт',
+    tierNote: 'от 40 шт',
+    own: 'Собственный пошив',
+    model: 'Модель',
+    fabric: 'Ткань',
+    fabrics: { one: 'ткань', few: 'ткани', many: 'тканей' },
+  },
+  listing: {
+    all: 'Все',
+    tabs: 'Подразделы',
+    filters: 'Фильтры',
+    filtersTitle: 'Фильтры и порядок',
+    price: 'Цена',
+    priceTitle: 'Цена за шт, грн',
+    priceUpTo: 'до',
+    priceOver: 'более',
+    type: 'Тип',
+    types: { Sewing: 'Собственный пошив', Ppe: 'Средства защиты' },
+    fabric: 'Ткань',
+    sort: 'Порядок',
+    sorts: { default: 'Как в разделе', cheap: 'Сначала дешевле', expensive: 'Сначала дороже' },
+    any: 'Любая',
+    anyType: 'Все',
+    reset: 'Сбросить',
+    show: 'Показать',
+    close: 'Закрыть',
+    showMore: 'Показать ещё',
+    nothing:
+      'Таких моделей в разделе нет. Измените фильтры или позвоните, и менеджер подберёт похожую.',
+    found: 'Найдено',
+  },
+  search: {
+    label: 'Поиск по каталогу',
+    placeholder: 'Что ищете? Например: куртка зимняя, перчатки, ПРАЙМ',
+    shortPlaceholder: 'Поиск: название или модель',
+    submit: 'Найти',
+    open: 'Поиск',
+    products: 'Модели',
+    sections: 'Разделы',
+    all: 'Все результаты',
+    loading: 'Ищем…',
+    priceFrom: 'от',
+    none: 'Ничего не нашли. Попробуйте другое слово: «куртка», «перчатки», «каска».',
+    title: 'Поиск по каталогу',
+    resultsFor: 'Результаты для',
+    empty:
+      'По этому запросу ничего не нашли. Попробуйте другое слово или выберите раздел каталога.',
+    lead: 'Ищите по названию модели, её номеру или виду изделия.',
+  },
+  groups: {
+    Sewing: { title: 'Собственный пошив', lead: 'Шьём в Полтаве: выберите ткань, нанесём логотип' },
+    Ppe: { title: 'Средства защиты', lead: 'Обувь, перчатки, каски, защита глаз и дыхания' },
   },
   about: { label: 'О разделе' },
   product: {
@@ -134,6 +237,15 @@ export function formatModelCount(locale: Locale, count: number): string {
   const rule = new Intl.PluralRules(locale).select(count);
   const word = rule === 'one' ? forms.one : rule === 'few' ? forms.few : forms.many;
   return `${count} ${word}`;
+}
+
+/**
+ * «3 тканини»: a count with the form of its noun. Ukrainian and Russian pick the form by the same rule for
+ * whole numbers, so the forms of either language work without the language itself.
+ */
+export function formatCount(count: number, forms: Plural): string {
+  const rule = new Intl.PluralRules('uk').select(count);
+  return `${count} ${rule === 'one' ? forms.one : rule === 'few' ? forms.few : forms.many}`;
 }
 
 const PRICE_FORMAT = new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 2 });

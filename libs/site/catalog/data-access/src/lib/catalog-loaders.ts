@@ -55,12 +55,12 @@ export async function loadCatalogTree(): Promise<CatalogTreeNode[] | null> {
 }
 
 /**
- * Every product card of a category with its subcategories, in the order of the category; `null` when
- * unavailable or when the site does not show such a category.
+ * Every product card of a category with its subcategories, in the order of the category, or of the whole
+ * site when `category` is left out; `null` when unavailable or when the site does not show such a category.
  */
 export async function loadCatalogCards(
   locale: Locale,
-  category: string,
+  category?: string,
 ): Promise<CatalogProductCard[] | null> {
   'use cache';
   cacheTag(CATALOG_CACHE_TAG);
