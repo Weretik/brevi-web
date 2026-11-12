@@ -47,12 +47,6 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
       },
       { id: 'quotes', label: 'Комерційні пропозиції', path: '/crm/quotes', access: 'quotes' },
       {
-        id: 'quote-settings',
-        label: 'Налаштування КП',
-        path: '/crm/quote-settings',
-        access: 'quote-settings',
-      },
-      {
         id: 'embroidery-price',
         label: 'Ціна вишивки',
         path: '/crm/embroidery',
@@ -98,22 +92,10 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         access: 'fabric-norms',
       },
       {
-        id: 'workshop-settings',
-        label: 'Налаштування цеху',
-        path: '/production/settings',
-        access: 'workshop-settings',
-      },
-      {
         id: 'workshop-archive',
         label: 'Архів цеху',
         path: '/production/archive',
         access: 'workshop-archive',
-      },
-      {
-        id: 'workshop-reports',
-        label: 'Звіти цеху',
-        path: '/production/reports',
-        access: 'workshop-reports',
       },
     ],
   },
@@ -142,13 +124,6 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         label: 'Що замовити',
         path: '/warehouse/to-order',
         access: ['fabric-booking', 'hardware-order'],
-      },
-      // Tabs «План і факт», «Витрата за період» (fabric-stock) and «Вартість» (the owner's).
-      {
-        id: 'warehouse-reports',
-        label: 'Звіти',
-        path: '/warehouse/reports',
-        access: ['fabric-plan-fact', 'fabric-stock', 'fabric-valuation'],
       },
     ],
   },
@@ -219,12 +194,6 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         access: 'accounting',
       },
       {
-        id: 'finance-reports',
-        label: 'Звіти',
-        path: '/accounting/reports',
-        access: 'accounting',
-      },
-      {
         id: 'finance-audit',
         label: 'Журнал змін',
         path: '/accounting/audit',
@@ -285,7 +254,6 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         path: '/references/counterparties',
         access: 'counterparties',
       },
-      { id: 'calculations', label: 'Розрахунки' },
       {
         id: 'pricing-parameters',
         label: 'Параметри ціноутворення',
@@ -381,7 +349,28 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
     icon: InsertChartOutlinedIcon,
     section: 'Дані',
     label: 'Загальні звіти',
-    items: [{ id: 'reports-overview', label: 'Загальні звіти' }],
+    items: [
+      { id: 'reports-overview', label: 'Загальні звіти' },
+      {
+        id: 'workshop-reports',
+        label: 'Звіти цеху',
+        path: '/production/reports',
+        access: 'workshop-reports',
+      },
+      // Tabs «План і факт», «Витрата за період» (fabric-stock) and «Вартість» (the owner's).
+      {
+        id: 'warehouse-reports',
+        label: 'Звіти складу',
+        path: '/warehouse/reports',
+        access: ['fabric-plan-fact', 'fabric-stock', 'fabric-valuation'],
+      },
+      {
+        id: 'finance-reports',
+        label: 'Звіти бухгалтерії',
+        path: '/accounting/reports',
+        access: 'accounting',
+      },
+    ],
   },
   {
     id: 'administration',
@@ -399,6 +388,18 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
       { id: 'lead-stats', label: 'Статистика лідів', path: '/admin/leads', access: 'lead-stats' },
       { id: 'ai-settings', label: 'Налаштування ШІ', path: '/admin/ai', requiredRoles: admin },
       { id: 'access-rights', label: 'Права доступу', path: '/admin/access', requiredRoles: admin },
+      {
+        id: 'quote-settings',
+        label: 'Налаштування КП',
+        path: '/admin/quote-settings',
+        access: 'quote-settings',
+      },
+      {
+        id: 'workshop-settings',
+        label: 'Налаштування цеху',
+        path: '/production/settings',
+        access: 'workshop-settings',
+      },
     ],
   },
 ];

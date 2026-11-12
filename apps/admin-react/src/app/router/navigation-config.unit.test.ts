@@ -9,18 +9,20 @@ const as = (...roles: string[]) => ({ roles, access: defaultAccess(roles) });
 describe('legacy Admin navigation', () => {
   it('links «КП» and «Налаштування КП»; later КП pages have no link', () => {
     const paths = new Set(adminRouteDefinitions.map((route) => route.path));
-    const manager = createNavigation(paths, as('Admin')).find(
-      (group) => group.id === 'service-manager',
-    );
+    const groups = createNavigation(paths, as('Admin'));
+    const manager = groups.find((group) => group.id === 'service-manager');
+    const administration = groups.find((group) => group.id === 'administration');
     expect(manager?.items.find((item) => item.id === 'quotes')?.to).toBe('/crm/quotes');
     expect(paths.has('/crm/quotes/new')).toBe(true);
     expect(paths.has('/crm/quotes/:quoteId')).toBe(true);
     expect(manager?.items.some((item) => item.id === 'quote-introductions')).toBe(false);
     expect(paths.has('/crm/quote-introductions/new')).toBe(true);
     expect(paths.has('/crm/quote-introductions/:quoteId')).toBe(true);
-    expect(manager?.items.find((item) => item.id === 'quote-settings')?.to).toBe(
-      '/crm/quote-settings',
+    expect(manager?.items.some((item) => item.id === 'quote-settings')).toBe(false);
+    expect(administration?.items.find((item) => item.id === 'quote-settings')?.to).toBe(
+      '/admin/quote-settings',
     );
+    expect(paths.has('/crm/quote-settings')).toBe(true);
     expect(paths.has('/crm/quotes/archive')).toBe(false);
     expect(paths.has('/crm/issuer-settings')).toBe(false);
   });
@@ -50,16 +52,19 @@ describe('legacy Admin navigation', () => {
       'Загальні звіти',
       'Адміністрування',
     ]);
-    expect(groups.map((group) => group.items.length)).toEqual([6, 8, 4, 4, 8, 1, 11, 1, 5]);
-    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(48);
+    expect(groups.map((group) => group.items.length)).toEqual([5, 6, 3, 4, 7, 1, 11, 3, 7]);
+    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(47);
     expect(groups[0].items.map((item) => item.id)).not.toContain('clients');
   });
   it('shows «Налаштування КП» only for the server Admin role', () => {
-    const paths = new Set(['/crm/quotes']);
-    const admin = createNavigation(paths, as('Admin'));
+    const paths = new Set(['/crm/quotes', '/admin/quote-settings']);
+    const has = (roles: string[]) =>
+      createNavigation(paths, as(...roles))
+        .find((group) => group.id === 'administration')
+        ?.items.some((item) => item.id === 'quote-settings');
     const manager = createNavigation(paths, as('Manager'));
-    expect(admin[0].items.some((item) => item.id === 'quote-settings')).toBe(true);
-    expect(manager[0].items.some((item) => item.id === 'quote-settings')).toBe(false);
+    expect(has(['Admin'])).toBe(true);
+    expect(has(['Manager'])).toBeFalsy();
     expect(manager[0].items.find((item) => item.id === 'quotes')?.to).toBe('/crm/quotes');
   });
 
@@ -133,6 +138,8 @@ describe('legacy Admin navigation', () => {
       '/admin/leads',
       '/admin/ai',
       '/admin/access',
+      '/admin/quote-settings',
+      '/production/settings',
     ]);
     const admin = createNavigation(paths, as('Admin')).find(
       (group) => group.id === 'administration',
@@ -144,6 +151,8 @@ describe('legacy Admin navigation', () => {
       { id: 'lead-stats', label: 'Статистика лідів', to: '/admin/leads' },
       { id: 'ai-settings', label: 'Налаштування ШІ', to: '/admin/ai' },
       { id: 'access-rights', label: 'Права доступу', to: '/admin/access' },
+      { id: 'quote-settings', label: 'Налаштування КП', to: '/admin/quote-settings' },
+      { id: 'workshop-settings', label: 'Налаштування цеху', to: '/production/settings' },
     ]);
     expect(
       createNavigation(paths, as('Manager')).some((group) => group.id === 'administration'),
@@ -191,12 +200,17 @@ describe('legacy Admin navigation', () => {
     expect(shop(['Manager'])?.items.some((item) => item.id === 'workshop-people')).toBe(false);
     expect(shop(['Manager'])?.items.some((item) => item.id === 'work-log')).toBe(false);
     expect(shop(['Manager'])?.items.some((item) => item.id === 'salary')).toBe(false);
-    expect(shop(['Admin'])?.items.find((item) => item.id === 'workshop-reports')?.to).toBe(
-      '/production/reports',
+    const moved = (roles: string[], group: string, id: string) =>
+      createNavigation(paths.add('/production/settings'), as(...roles))
+        .find((x) => x.id === group)
+        ?.items.find((x) => x.id === id);
+    expect(moved(['Admin'], 'general-reports', 'workshop-reports')?.to).toBe('/production/reports');
+    expect(moved(['Admin'], 'administration', 'workshop-settings')?.to).toBe(
+      '/production/settings',
     );
-    expect(shop(['WorkshopChief'])?.items.some((item) => item.id === 'workshop-reports')).toBe(
-      false,
-    );
+    expect(moved(['WorkshopChief'], 'general-reports', 'workshop-reports')).toBeUndefined();
+    expect(shop(['Admin'])?.items.some((item) => item.id === 'workshop-reports')).toBe(false);
+    expect(shop(['Admin'])?.items.some((item) => item.id === 'workshop-settings')).toBe(false);
     expect(shop(['Manager'])?.items.find((item) => item.id === 'workshop-archive')?.to).toBe(
       '/production/archive',
     );
@@ -236,13 +250,11 @@ describe('legacy Admin navigation', () => {
       'Залишки',
       'Рух тканини',
       'Що замовити',
-      'Звіти',
     ]);
     expect(warehouse(['WorkshopChief'])?.items.map((item) => item.id)).toEqual([
       'fabric-stock',
       'fabric-movements',
       'warehouse-to-order',
-      'warehouse-reports',
     ]);
     expect(warehouse(['Accountant'])).toBeUndefined();
   });
@@ -284,11 +296,10 @@ describe('legacy Admin navigation', () => {
         label: 'Перенесення архіву',
         to: '/accounting/legacy-import',
       },
-      { id: 'finance-reports', label: 'Звіти', to: '/accounting/reports' },
       { id: 'finance-audit', label: 'Журнал змін', to: '/accounting/audit' },
     ]);
-    expect(accounting(['Director'])?.items).toHaveLength(12);
+    expect(accounting(['Director'])?.items).toHaveLength(11);
     expect(accounting(['Admin'])).toBeUndefined();
-    expect(accounting(['Accountant'])?.items).toHaveLength(12);
+    expect(accounting(['Accountant'])?.items).toHaveLength(11);
   });
 });

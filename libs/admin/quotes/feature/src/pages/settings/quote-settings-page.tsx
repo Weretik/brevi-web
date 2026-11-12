@@ -45,13 +45,14 @@ const viewOf = (path: string): QuotePreviewView | null =>
       ? 'pdf'
       : null;
 
-/** «Налаштування КП» (`/crm/quote-settings`): only Director and Admin open it. */
+/** «Налаштування КП» (`/admin/quote-settings`): only Director and Admin open it. */
 export default function QuoteSettingsPage() {
   const navigate = useNavigate();
   const theme = useTheme();
   const wideNav = useMediaQuery(theme.breakpoints.up('lg'));
   const widePreview = useMediaQuery(theme.breakpoints.up(1400));
   const editor = useQuoteSettingsEditor();
+  // The backend only allows known return paths; `/crm/quote-settings` redirects to this page.
   const mailbox = useMailboxConnect('/crm/quote-settings');
   const gmail = useGmailReturnNotice();
   const sections = useSettingsSections(Boolean(editor.draft));
