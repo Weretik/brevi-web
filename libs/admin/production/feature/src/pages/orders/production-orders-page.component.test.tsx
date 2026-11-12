@@ -119,19 +119,27 @@ describe('ProductionOrdersPage', () => {
     expect(fixture.lists.at(-1)).toEqual(expect.objectContaining({ stage: null }));
   });
 
-  it('the attention strip shows overdue and due-soon orders and narrows the list to them', async () => {
+  it('«Термін горить» narrows the list to «Нове» orders due within three days', async () => {
     const user = userEvent.setup();
     renderPage();
 
-    expect(
-      screen.getByText('1 завдання прострочене, 2 завдання мають термін у найближчі 3 дні'),
-    ).toBeVisible();
-    await user.click(screen.getByRole('button', { name: 'Показати' }));
-
+    await user.click(screen.getByRole('button', { name: 'Термін горить 3' }));
     const query = fixture.lists.at(-1);
     expect(query).toEqual(expect.objectContaining({ status: 'New' }));
     expect(query?.['dueTo']).toEqual(expect.any(String));
-    expect(screen.getByText('Термін горить')).toBeVisible();
+  });
+
+  it('a stage of the conveyor brings the list back to «Нові»', async () => {
+    const user = userEvent.setup();
+    renderPage();
+    await user.click(screen.getByRole('button', { name: 'Усі 4' }));
+    expect(fixture.lists.at(-1)).toEqual(expect.objectContaining({ status: null }));
+
+    const conveyor = screen.getByRole('group', { name: 'Етапи цеху' });
+    await user.click(within(conveyor).getByRole('button', { name: 'Пошив: 1' }));
+    expect(fixture.lists.at(-1)).toEqual(
+      expect.objectContaining({ status: 'New', stage: 'Sewing' }),
+    );
   });
 
   it('keeps the transfers from the old «Цех» in «⋯» for Admin only', async () => {

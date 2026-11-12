@@ -12,7 +12,6 @@ import {
 import {
   ModelSummarySortEditor,
   ProductionModelSummaryTable,
-  ProductionOrderAttention,
   ProductionOrderChips,
   ProductionOrderFilterChips,
   ProductionOrderFilterPanel,
@@ -32,7 +31,6 @@ import {
   Badge,
   Box,
   Button,
-  Chip,
   Collapse,
   LinearProgress,
   Paper,
@@ -42,9 +40,10 @@ import {
   Typography,
 } from '@mui/material';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { ProductionImportDrawer } from '../../components/import/production-import-drawer';
+import { ProductionOrderQuickPanel } from '../../components/orders/production-order-quick-panel';
 import { useProductionModelSummary } from '../../hooks/orders/use-production-model-summary';
 import { useProductionOrders } from '../../hooks/orders/use-production-orders';
 import { useProductionOrdersExport } from '../../hooks/orders/use-production-orders-export';
@@ -60,7 +59,8 @@ type OrdersView = 'list' | 'summary';
 
 /**
  * «Швейний цех › Виробничі завдання»: what the workshop sews, made from КП. The stage «конвеєр» shows the open
- * orders by stage and filters the list; a strip appears only when orders are overdue or due soon. «Фільтри» narrow
+ * orders by stage and filters the list (a stage keeps the list on «Нові»); «Прострочені» and «Термін горить» chips
+ * appear only when there are such orders. A row opens the order in a side panel (`?order=`). «Фільтри» narrow
  * both the list and «Зведення за моделями»; «Переглянути» in the summary opens the list of that model. The one-time
  * transfers from the old «Цех» live in «⋯».
  */
@@ -81,6 +81,18 @@ export function ProductionOrdersPage({ useOrderActor }: Props) {
   const page = list.page;
   const panelFilters = countProductionOrderFilters(list.filters, list.manager);
   const attention = page?.attention ?? { overdue: 0, dueSoon: 0 };
+  const [params, setParams] = useSearchParams();
+  const quickId = Number(params.get('order')) || null;
+  const setQuick = (id: number | null) =>
+    setParams(
+      (current) => {
+        const copy = new URLSearchParams(current);
+        if (id === null) copy.delete('order');
+        else copy.set('order', String(id));
+        return copy;
+      },
+      { replace: id === null },
+    );
 
   return (
     <Box sx={{ minWidth: 0 }}>
@@ -122,12 +134,6 @@ export function ProductionOrdersPage({ useOrderActor }: Props) {
         stages={page?.stages ?? []}
         selected={list.stage}
         onSelect={list.setStage}
-      />
-      <ProductionOrderAttention
-        attention={attention}
-        active={list.urgency === 'dueSoon'}
-        onShow={() => list.setUrgency('dueSoon')}
-        onReset={() => list.setUrgency(null)}
       />
       <Stack
         direction={{ xs: 'column', md: 'row' }}
@@ -174,16 +180,12 @@ export function ProductionOrdersPage({ useOrderActor }: Props) {
           status={list.urgency ? undefined : list.status}
           overdue={list.urgency === 'overdue'}
           overdueCount={attention.overdue}
+          dueSoon={list.urgency === 'dueSoon'}
+          dueSoonCount={attention.overdue + attention.dueSoon}
           onStatusChange={list.setStatus}
           onOverdueChange={(on) => list.setUrgency(on ? 'overdue' : null)}
+          onDueSoonChange={(on) => list.setUrgency(on ? 'dueSoon' : null)}
         />
-        {list.urgency === 'dueSoon' && (
-          <Chip
-            sx={{ height: 32, bgcolor: 'primary.light', color: 'primary.dark', fontWeight: 600 }}
-            label="Термін горить"
-            onDelete={() => list.setUrgency(null)}
-          />
-        )}
         <ProductionOrderFilterChips
           values={list.filters}
           options={list.filterOptions}
@@ -209,7 +211,7 @@ export function ProductionOrdersPage({ useOrderActor }: Props) {
           today={list.today}
           paginationModel={list.pagination}
           onPaginationModelChange={list.setPagination}
-          onOpen={(row) => navigate(`/production/orders/${row.id}`)}
+          onOpen={(row) => setQuick(row.id)}
           sort={list.sort}
           onSortChange={list.setSort}
         />
@@ -254,6 +256,9 @@ export function ProductionOrdersPage({ useOrderActor }: Props) {
             />
           )}
         </Stack>
+      )}
+      {quickId !== null && (
+        <ProductionOrderQuickPanel orderId={quickId} onClose={() => setQuick(null)} />
       )}
       <ProductionOrderFilterPanel
         open={filtersOpen}
