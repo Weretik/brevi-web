@@ -9,6 +9,7 @@ import {
   EmbroiderySavedSummaryView,
 } from '@admin/embroidery/ui';
 import { ReferenceEditorDrawer } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import PostAddOutlinedIcon from '@mui/icons-material/PostAddOutlined';
 import {
   Alert,
@@ -47,6 +48,8 @@ export function EmbroiderySavedDrawer({ id, canDelete, onClose, onRepeat }: Prop
   const copier = useEmbroideryCopy();
   const navigate = useNavigate();
   const [adding, setAdding] = useState(false);
+  // Adding the price to a КП creates a line there: «Створення» on «Комерційні пропозиції».
+  const canAddToQuote = usePageRights().can('create', 'quotes');
   const [addedTo, setAddedTo] = useState<{ id: number; number: string } | null>(null);
   const saved = query.data;
 
@@ -70,6 +73,7 @@ export function EmbroiderySavedDrawer({ id, canDelete, onClose, onRepeat }: Prop
       readOnly
       saving={removing.isLoading}
       editLabel={saved ? 'Повторити розрахунок' : null}
+      editRight={null}
       onClose={onClose}
       onEdit={() => saved && onRepeat(saved.input)}
       onSubmit={() => undefined}
@@ -98,7 +102,7 @@ export function EmbroiderySavedDrawer({ id, canDelete, onClose, onRepeat }: Prop
                 'Не вдалося видалити розрахунок.'}
             </Alert>
           )}
-          {saved.result.prices.length > 0 && (
+          {canAddToQuote && saved.result.prices.length > 0 && (
             <Box>
               <Button
                 variant="outlined"

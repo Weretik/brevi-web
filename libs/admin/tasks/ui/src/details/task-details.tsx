@@ -1,4 +1,4 @@
-import { UserAvatar } from '@admin/shared/ui';
+import { UserAvatar, usePageRights } from '@admin/shared/ui';
 import { describeTaskEvent, formatTaskDue, formatTaskMoment } from '@admin/tasks/model';
 import {
   Box,
@@ -43,11 +43,13 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
 /** Read view of the side panel: the manager works here — status buttons and steps (R-07, R-10). */
 export function TaskDetails({ task, busy, onStatus, onStep, assignees, onReassign }: Props) {
   const now = new Date();
+  // Status, steps and the assignee are «Редагування» on «Мої завдання».
+  const { canEdit } = usePageRights();
   return (
     <Stack sx={{ gap: 2 }}>
       <Stack direction="row" sx={{ alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
         <TaskStatePill task={task} />
-        {task.status === 'New' && (
+        {canEdit && task.status === 'New' && (
           <Button
             size="small"
             variant="outlined"
@@ -57,7 +59,7 @@ export function TaskDetails({ task, busy, onStatus, onStep, assignees, onReassig
             Взяти в роботу
           </Button>
         )}
-        {task.status === 'Done' && (
+        {canEdit && task.status === 'Done' && (
           <Button
             size="small"
             variant="outlined"
@@ -71,7 +73,7 @@ export function TaskDetails({ task, busy, onStatus, onStep, assignees, onReassig
 
       <Box>
         <Row label="Менеджер">
-          {onReassign && assignees && assignees.length > 0 ? (
+          {canEdit && onReassign && assignees && assignees.length > 0 ? (
             <TextField
               select
               size="small"
@@ -137,7 +139,7 @@ export function TaskDetails({ task, busy, onStatus, onStep, assignees, onReassig
             <Stack key={step.id} direction="row" sx={{ alignItems: 'center' }}>
               <Checkbox
                 checked={step.isDone}
-                disabled={busy}
+                disabled={busy || !canEdit}
                 onChange={(event) => onStep(step.id, event.target.checked)}
                 slotProps={{ input: { 'aria-label': step.text } }}
               />

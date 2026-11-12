@@ -1,4 +1,5 @@
 import { describePurchasePayment, formatPurchaseMinor } from '@admin/purchasing/model';
+import { usePageRights } from '@admin/shared/ui';
 import { Button, Stack, TextField, Typography } from '@mui/material';
 
 import type { PurchaseInvoicePayment, PurchasePaymentCandidate } from '@admin/purchasing/model';
@@ -22,6 +23,8 @@ export function PurchasePaymentsView({
   busy,
   onUnlink,
 }: PaymentsProps) {
+  // Every change of the register is «Редагування» on «Рахунки на закупку», also where it sits on another page.
+  const canChange = usePageRights().can('edit', 'purchase-invoices');
   return (
     <Stack sx={{ gap: 1.5 }}>
       {totalPayableMinor !== null && (
@@ -53,14 +56,16 @@ export function PurchasePaymentsView({
               >
                 {payment.missing ? 'Операцію не знайдено' : describePurchasePayment(payment)}
               </Typography>
-              <Button
-                size="small"
-                color="inherit"
-                disabled={busy}
-                onClick={() => onUnlink(payment)}
-              >
-                Відвʼязати
-              </Button>
+              {canChange && (
+                <Button
+                  size="small"
+                  color="inherit"
+                  disabled={busy}
+                  onClick={() => onUnlink(payment)}
+                >
+                  Відвʼязати
+                </Button>
+              )}
             </Stack>
           ))}
         </Stack>

@@ -4,6 +4,7 @@ import {
   FinanceTransferForm,
 } from '@admin/accounting/ui';
 import { ReferenceEditorDrawer, ReferenceFormSection } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import { Alert, Button, Stack } from '@mui/material';
 
 import {
@@ -34,6 +35,7 @@ const titles: Record<FinanceMovementEditorMode, string> = {
 };
 
 export function FinanceTransferDrawer({ choices, onClose, onVoid, ...props }: Props) {
+  const { canEdit } = usePageRights();
   const editor = useFinanceTransferEditor({ ...props, currencyOf: choices.currencyOf });
   const transfer = editor.transfer;
   const readOnly = editor.mode === 'view';
@@ -63,9 +65,11 @@ export function FinanceTransferDrawer({ choices, onClose, onVoid, ...props }: Pr
             </ReferenceFormSection>
             {editable && (
               <Stack direction="row">
-                <Button color="error" variant="outlined" onClick={() => onVoid(transfer)}>
-                  Анулювати
-                </Button>
+                {canEdit && (
+                  <Button color="error" variant="outlined" onClick={() => onVoid(transfer)}>
+                    Анулювати
+                  </Button>
+                )}
               </Stack>
             )}
           </>

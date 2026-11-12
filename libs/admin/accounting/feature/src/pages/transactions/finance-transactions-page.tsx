@@ -12,6 +12,7 @@ import {
 } from '@admin/accounting/ui';
 import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
+import { usePageRights } from '@admin/shared/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import RemoveOutlinedIcon from '@mui/icons-material/RemoveOutlined';
 import { Box, Button, Paper, Stack } from '@mui/material';
@@ -56,6 +57,7 @@ interface JournalProps {
 }
 
 function TransactionsJournal({ scope, cutoverDate, today, onScopeChange }: JournalProps) {
+  const { canCreate } = usePageRights();
   const journal = useFinanceJournal(scope, cutoverDate, today);
   const choices = useFinanceChoices(scope);
   const query = useGetFinanceTransactionsQuery(
@@ -100,20 +102,24 @@ function TransactionsJournal({ scope, cutoverDate, today, onScopeChange }: Journ
         subtitle="Надходження й витрати. Перекази між своїми рахунками — окремо"
         actions={
           <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap' }}>
-            <Button
-              variant="outlined"
-              startIcon={<AddOutlinedIcon />}
-              onClick={() => add('Income')}
-            >
-              Надходження
-            </Button>
-            <Button
-              variant="contained"
-              startIcon={<RemoveOutlinedIcon />}
-              onClick={() => add('Expense')}
-            >
-              Витрата
-            </Button>
+            {canCreate && (
+              <Button
+                variant="outlined"
+                startIcon={<AddOutlinedIcon />}
+                onClick={() => add('Income')}
+              >
+                Надходження
+              </Button>
+            )}
+            {canCreate && (
+              <Button
+                variant="contained"
+                startIcon={<RemoveOutlinedIcon />}
+                onClick={() => add('Expense')}
+              >
+                Витрата
+              </Button>
+            )}
           </Stack>
         }
       />

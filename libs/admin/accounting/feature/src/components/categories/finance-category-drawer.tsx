@@ -5,6 +5,7 @@ import {
   FinanceHistoryList,
 } from '@admin/accounting/ui';
 import { ReferenceEditorDrawer, ReferenceFormSection } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import { Alert, Button, Stack } from '@mui/material';
 
 import { useFinanceCategoryEditor } from '../../hooks/categories/use-finance-category-editor';
@@ -48,6 +49,7 @@ export function FinanceCategoryDrawer({
   onClose,
   onSaved,
 }: Props) {
+  const { canCreate } = usePageRights();
   const editor = useFinanceCategoryEditor(
     mode,
     category,
@@ -83,9 +85,11 @@ export function FinanceCategoryDrawer({
             <FinanceCategoryDetails category={category} />
             {category.level === 0 && (
               <Stack direction="row">
-                <Button variant="outlined" onClick={() => onAddChild(category)}>
-                  Додати підкатегорію
-                </Button>
+                {canCreate && (
+                  <Button variant="outlined" onClick={() => onAddChild(category)}>
+                    Додати підкатегорію
+                  </Button>
+                )}
               </Stack>
             )}
             <ReferenceFormSection title="Історія змін">

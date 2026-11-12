@@ -5,6 +5,7 @@ import {
   ReferenceListAlerts,
   ReferencePageHeader,
 } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import SendOutlinedIcon from '@mui/icons-material/SendOutlined';
 import { Box, Button, CircularProgress, Paper, Stack, Typography } from '@mui/material';
@@ -13,6 +14,7 @@ import { useWorkshopSettings } from '../../hooks/settings/use-workshop-settings'
 
 /** «Швейний цех › Налаштування цеху»: where the Brevi bot posts new orders. */
 export function WorkshopSettingsPage() {
+  const { canEdit } = usePageRights();
   const page = useWorkshopSettings();
   const busy = page.saving || page.testing;
 
@@ -24,22 +26,26 @@ export function WorkshopSettingsPage() {
         subtitle="Куди бот Brevi надсилає нові виробничі завдання"
         actions={
           <>
-            <Button
-              variant="outlined"
-              startIcon={<SendOutlinedIcon />}
-              disabled={busy || !page.canTest || page.dirty}
-              onClick={() => void page.sendTest()}
-            >
-              Надіслати перевірку
-            </Button>
-            <Button
-              variant="contained"
-              startIcon={<SaveOutlinedIcon />}
-              disabled={busy || !page.dirty}
-              onClick={() => void page.save()}
-            >
-              Зберегти
-            </Button>
+            {canEdit && (
+              <Button
+                variant="outlined"
+                startIcon={<SendOutlinedIcon />}
+                disabled={busy || !page.canTest || page.dirty}
+                onClick={() => void page.sendTest()}
+              >
+                Надіслати перевірку
+              </Button>
+            )}
+            {canEdit && (
+              <Button
+                variant="contained"
+                startIcon={<SaveOutlinedIcon />}
+                disabled={busy || !page.dirty}
+                onClick={() => void page.save()}
+              >
+                Зберегти
+              </Button>
+            )}
           </>
         }
       />
@@ -59,7 +65,7 @@ export function WorkshopSettingsPage() {
                 chats={page.settings.chats}
                 botConfigured={page.settings.botConfigured}
                 errors={page.errors}
-                disabled={busy}
+                disabled={busy || !canEdit}
                 onChange={page.change}
               />
             </ReferenceFormSection>

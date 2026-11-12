@@ -1,6 +1,7 @@
 import { legacyFinanceFileLimits } from '@admin/accounting/model';
 import { FinanceDeleteDialog, LegacyImportReport } from '@admin/accounting/ui';
 import { ReferencePageHeader } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import { Alert, Box, Button, LinearProgress, Paper, Stack, Typography } from '@mui/material';
 import { useRef, useState } from 'react';
@@ -10,6 +11,7 @@ import { useLegacyFinanceImport } from '../../hooks/import/use-legacy-finance-im
 
 /** «Бухгалтерія → Перенесення архіву»: the one-off move of the old Calculator «Фінанси» (ACC-001 stage 5). */
 export function LegacyFinanceImportPage() {
+  const { canCreate } = usePageRights();
   const input = useRef<HTMLInputElement>(null);
   const [confirming, setConfirming] = useState(false);
   const { file, report, message, running, toAdd, canMove, pick, move } = useLegacyFinanceImport();
@@ -22,7 +24,8 @@ export function LegacyFinanceImportPage() {
         title="Перенесення архіву"
         subtitle="Рахунки, категорії, контрагенти, операції й перекази зі старих «Фінансів» Калькулятора"
         actions={
-          canMove && (
+          canMove &&
+          canCreate && (
             <Button variant="contained" disabled={busy} onClick={() => setConfirming(true)}>
               Перенести
             </Button>

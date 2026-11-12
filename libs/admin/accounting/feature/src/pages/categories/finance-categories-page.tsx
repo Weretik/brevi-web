@@ -20,6 +20,7 @@ import {
   ReferenceSearchBar,
 } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
+import { usePageRights } from '@admin/shared/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import { Box, Button, Paper } from '@mui/material';
 import { useMemo, useState } from 'react';
@@ -34,6 +35,7 @@ import type { CategoryDirection, FinanceCategoryRow } from '@admin/accounting/mo
 
 /** «Бухгалтерія → Категорії»: current books and «Домашня бухгалтерія» on tabs (`?tab=archive`). */
 export function FinanceCategoriesPage() {
+  const { canCreate } = usePageRights();
   const query = useGetFinanceCategoriesQuery();
   const all = useMemo(() => query.data ?? [], [query.data]);
   const loading = query.isLoading || query.isFetching;
@@ -83,14 +85,16 @@ export function FinanceCategoriesPage() {
         title="Категорії"
         subtitle="Статті надходжень і витрат: коренева категорія і підкатегорії в ній"
         actions={
-          <Button
-            variant="contained"
-            startIcon={<AddOutlinedIcon />}
-            disabled={loading || Boolean(error)}
-            onClick={() => setActive({ mode: 'create', category: null, parentId: null })}
-          >
-            Додати категорію
-          </Button>
+          canCreate ? (
+            <Button
+              variant="contained"
+              startIcon={<AddOutlinedIcon />}
+              disabled={loading || Boolean(error)}
+              onClick={() => setActive({ mode: 'create', category: null, parentId: null })}
+            >
+              Додати категорію
+            </Button>
+          ) : null
         }
       />
       <LedgerScopeTabs

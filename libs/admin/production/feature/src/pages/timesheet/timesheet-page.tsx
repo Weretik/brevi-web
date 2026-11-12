@@ -7,6 +7,7 @@ import {
 } from '@admin/production/ui';
 import { ReferenceListAlerts } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
+import { usePageRights } from '@admin/shared/ui';
 import ChevronLeftOutlinedIcon from '@mui/icons-material/ChevronLeftOutlined';
 import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 import { Alert, Box, Button, IconButton, Paper, Stack, TextField, Typography } from '@mui/material';
@@ -19,7 +20,8 @@ export function TimesheetPage() {
   const [message, setMessage] = useState<string | null>(null);
   const sheet = useTimesheetDay(setMessage);
   const data = sheet.day.data;
-  const canEdit = data?.canEdit ?? false;
+  const rights = usePageRights();
+  const canEdit = (data?.canEdit ?? false) && rights.canEdit;
   const marked = sheet.rows.filter((row) => row.minutes !== null);
   const markedMinutes = marked.reduce((sum, row) => sum + (row.minutes ?? 0), 0);
 

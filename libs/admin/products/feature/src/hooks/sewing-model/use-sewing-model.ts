@@ -4,6 +4,7 @@ import {
 } from '@admin/products/data-access';
 import { sewingCardToDraft, sewingVariantsFromSummary } from '@admin/products/model';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
+import { usePageRights } from '@admin/shared/ui';
 import { useMemo } from 'react';
 
 /**
@@ -13,6 +14,7 @@ import { useMemo } from 'react';
  */
 export function useSewingModel(productId: number) {
   const access = useGetSewingAccessQuery();
+  const { canEdit } = usePageRights();
   const canRead = access.data?.canRead === true;
   const card = useGetSewingArticleSummaryQuery(productId, { skip: !canRead });
   const data = card.data;
@@ -31,7 +33,7 @@ export function useSewingModel(productId: number) {
         : null;
 
   return {
-    canManage: access.data?.canManage === true,
+    canManage: access.data?.canManage === true && canEdit,
     loading: access.isLoading || card.isLoading,
     /** A save is being followed by a fresh calculation. */
     refreshing: card.isFetching,

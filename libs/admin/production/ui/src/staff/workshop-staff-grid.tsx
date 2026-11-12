@@ -51,6 +51,7 @@ export function WorkshopStaffGrid({ rows, archived, onToggleActive, ...props }: 
       selection={{ type: 'include', ids: new Set() }}
       onSelectionChange={() => undefined}
       deleteLabel={archived ? 'Повернути в цех' : 'В архів'}
+      deleteRight="edit"
       onDelete={(id) => {
         const employee = rows.find((row) => row.id === id);
         if (employee) onToggleActive(employee);

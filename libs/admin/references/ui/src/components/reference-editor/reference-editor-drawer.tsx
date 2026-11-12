@@ -1,3 +1,4 @@
+import { usePageRights } from '@admin/shared/ui';
 import CloseIcon from '@mui/icons-material/Close';
 import {
   Box,
@@ -10,6 +11,7 @@ import {
   Typography,
 } from '@mui/material';
 
+import type { PageAction } from '@admin/shared/ui';
 import type { ReactNode } from 'react';
 
 interface Props {
@@ -25,6 +27,11 @@ interface Props {
   submitLabel?: string;
   /** Text of the read-only main button; «Редагувати» by default, null hides it. */
   editLabel?: string | null;
+  /**
+   * The «Права доступу» action the read-only main button needs (edit by default); it is hidden without it. Null for a
+   * button that only opens or reads, such as «Відкрити повністю».
+   */
+  editRight?: PageAction | null;
   /** Extra buttons of the read-only footer, between «Закрити» and the main button. */
   readActions?: ReactNode;
   children: ReactNode;
@@ -44,12 +51,15 @@ export function ReferenceEditorDrawer({
   saveDisabled = false,
   submitLabel = 'Зберегти',
   editLabel = 'Редагувати',
+  editRight = 'edit',
   readActions,
   children,
   onClose,
   onEdit,
   onSubmit,
 }: Props) {
+  const { can } = usePageRights();
+  const showEdit = Boolean(editLabel) && (editRight === null || can(editRight));
   return (
     <Drawer
       anchor="right"
@@ -113,7 +123,7 @@ export function ReferenceEditorDrawer({
           </Button>
           {readOnly && readActions}
           {readOnly ? (
-            editLabel && (
+            showEdit && (
               <Button key="edit" type="button" variant="contained" onClick={onEdit}>
                 {editLabel}
               </Button>

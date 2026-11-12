@@ -4,6 +4,7 @@ import {
   ReferenceBulkDeleteButton,
   ReferencePageHeader,
 } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import { Alert, Box, Button, Paper, Stack } from '@mui/material';
 import { useState } from 'react';
@@ -30,6 +31,7 @@ interface Props {
 
 /** «Група деталей» list; a group that still has operations cannot be deleted. */
 export function GarmentPartsContent({ tabs }: Props) {
+  const { canCreate } = usePageRights();
   const { rows, loading, error, reload } = useGarmentParts();
   const [actionResult, setActionResult] = useState<GarmentPartActionResult | null>(null);
   const [activeEditor, setActiveEditor] = useState<ActiveEditor | null>(null);
@@ -49,14 +51,16 @@ export function GarmentPartsContent({ tabs }: Props) {
               disabled={deleting || loading}
               onDelete={() => requestDelete(selectedIds)}
             />
-            <Button
-              variant="contained"
-              startIcon={<AddOutlinedIcon />}
-              disabled={loading || Boolean(error)}
-              onClick={() => setActiveEditor({ mode: 'create', garmentPart: null })}
-            >
-              Додати групу
-            </Button>
+            {canCreate && (
+              <Button
+                variant="contained"
+                startIcon={<AddOutlinedIcon />}
+                disabled={loading || Boolean(error)}
+                onClick={() => setActiveEditor({ mode: 'create', garmentPart: null })}
+              >
+                Додати групу
+              </Button>
+            )}
           </>
         }
       />

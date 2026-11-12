@@ -8,6 +8,7 @@ import {
   SupplierDeleteDialog,
   SuppliersGrid,
 } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import SyncOutlinedIcon from '@mui/icons-material/SyncOutlined';
 import { Alert, Box, Button, Paper } from '@mui/material';
@@ -42,6 +43,7 @@ export function SuppliersPage({
   openSupplierId = null,
   onSupplierOpened,
 }: Props = {}) {
+  const { canCreate, canEdit } = usePageRights();
   const { rows, loading, error, reload } = useSuppliers();
   const [active, setActive] = useState<{
     mode: SupplierDialogMode;
@@ -91,21 +93,25 @@ export function SuppliersPage({
               disabled={deletion.deleting || loading}
               onDelete={() => deletion.requestDelete(deletion.selectedIds)}
             />
-            <Button
-              variant="outlined"
-              startIcon={<SyncOutlinedIcon />}
-              disabled={syncing}
-              onClick={() => void sync()}
-            >
-              {syncing ? 'Оновлення…' : 'Оновити з KeepinCRM'}
-            </Button>
-            <Button
-              variant="contained"
-              startIcon={<AddOutlinedIcon />}
-              onClick={() => setActive({ mode: 'create', supplier: null })}
-            >
-              Додати постачальника
-            </Button>
+            {canEdit && (
+              <Button
+                variant="outlined"
+                startIcon={<SyncOutlinedIcon />}
+                disabled={syncing}
+                onClick={() => void sync()}
+              >
+                {syncing ? 'Оновлення…' : 'Оновити з KeepinCRM'}
+              </Button>
+            )}
+            {canCreate && (
+              <Button
+                variant="contained"
+                startIcon={<AddOutlinedIcon />}
+                onClick={() => setActive({ mode: 'create', supplier: null })}
+              >
+                Додати постачальника
+              </Button>
+            )}
           </>
         }
       />

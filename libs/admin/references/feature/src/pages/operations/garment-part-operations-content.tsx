@@ -9,6 +9,7 @@ import {
   ReferenceSearchBar,
   ReferenceSupplierFilter,
 } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import { Box, Button, Paper } from '@mui/material';
 import { useMemo, useState } from 'react';
@@ -29,6 +30,7 @@ interface Props {
 }
 
 export function GarmentPartOperationsContent({ tabs }: Props) {
+  const { canCreate } = usePageRights();
   const { rows, loading, error, reload } = useGarmentPartOperations();
   const { rates, unavailable: ratesUnavailable } = useOperationLabourRates();
   const [active, setActive] = useState<{
@@ -57,14 +59,16 @@ export function GarmentPartOperationsContent({ tabs }: Props) {
               disabled={deletion.deleting || loading}
               onDelete={() => deletion.requestDelete(deletion.selectedIds)}
             />
-            <Button
-              variant="contained"
-              startIcon={<AddOutlinedIcon />}
-              disabled={loading || Boolean(error)}
-              onClick={() => setActive({ mode: 'create', operation: null })}
-            >
-              Додати операцію
-            </Button>
+            {canCreate && (
+              <Button
+                variant="contained"
+                startIcon={<AddOutlinedIcon />}
+                disabled={loading || Boolean(error)}
+                onClick={() => setActive({ mode: 'create', operation: null })}
+              >
+                Додати операцію
+              </Button>
+            )}
           </>
         }
       />

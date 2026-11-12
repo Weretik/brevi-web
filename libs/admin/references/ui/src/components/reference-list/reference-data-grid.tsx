@@ -1,3 +1,4 @@
+import { usePageRights } from '@admin/shared/ui';
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import OpenInFullOutlinedIcon from '@mui/icons-material/OpenInFullOutlined';
 import { Box, IconButton, Tooltip } from '@mui/material';
@@ -9,6 +10,7 @@ import { ReferenceGridFooter } from './reference-grid-footer';
 import { ReferenceRowMenu } from './reference-row-menu';
 import { useReferenceRowContextMenu } from '../../hooks/reference-row-actions/use-reference-row-context-menu';
 
+import type { PageAction } from '@admin/shared/ui';
 import type {
   GridColDef,
   GridColumnGroupingModel,
@@ -52,6 +54,8 @@ interface Props<Row extends ReferenceRow> {
   openHref?: (row: Row) => string;
   /** Label of the menu's delete action; «Видалити» by default. */
   deleteLabel?: string;
+  /** The «Права доступу» action of the last menu item: delete by default, edit when it archives or voids. */
+  deleteRight?: PageAction;
   /** Checkbox column and selected count; off for lists without bulk actions. */
   selectable?: boolean;
   /**
@@ -95,12 +99,16 @@ export function ReferenceDataGrid<Row extends ReferenceRow>({
   viewLabel,
   openHref,
   deleteLabel,
+  deleteRight,
   selectable = true,
   server,
   columnGroupingModel,
   rowHeight = 52,
 }: Props<Row>) {
   const theme = useTheme();
+  // Rows are selected only for bulk delete, so without «Видалення» there is nothing to select.
+  const { canDelete } = usePageRights();
+  const selecting = selectable && canDelete;
   const menuRows = isDetailRow ? rows.filter((row) => !isDetailRow(row)) : rows;
   const { rowMenu, openRowMenu, closeRowMenu, rowSlotProps } = useReferenceRowContextMenu(menuRows);
   const actionsColumn: GridColDef<Row> = {
@@ -174,7 +182,7 @@ export function ReferenceDataGrid<Row extends ReferenceRow>({
                 ? notFoundLabel
                 : emptyLabel,
           }}
-          checkboxSelection={selectable}
+          checkboxSelection={selecting}
           disableRowSelectionOnClick
           disableRowSelectionExcludeModel
           keepNonExistentRowsSelected
@@ -192,7 +200,7 @@ export function ReferenceDataGrid<Row extends ReferenceRow>({
                 onSortModelChange: server.onSortModelChange,
               }
             : { initialState: { pagination: { paginationModel: { pageSize: 10, page: 0 } } } })}
-          slots={selectable ? { footer: ReferenceGridFooter } : undefined}
+          slots={selecting ? { footer: ReferenceGridFooter } : undefined}
           slotProps={{ row: rowSlotProps }}
           sx={{
             minWidth: 0,
@@ -223,6 +231,7 @@ export function ReferenceDataGrid<Row extends ReferenceRow>({
         viewLabel={viewLabel}
         openHref={openHref}
         deleteLabel={deleteLabel}
+        deleteRight={deleteRight}
       />
     </>
   );

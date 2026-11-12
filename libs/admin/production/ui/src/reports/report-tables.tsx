@@ -20,7 +20,6 @@ import type {
 } from '@admin/production/model';
 import type { ReactNode } from 'react';
 
-
 const mono = { fontFamily: 'var(--admin-font-mono)', whiteSpace: 'nowrap' } as const;
 const unknown = (
   <Typography component="span" variant="body2" color="warning.main">
@@ -109,8 +108,16 @@ export function ReportOutputTable({ rows }: { rows: ReportOutputRow[] }) {
         { label: 'Замовник', cell: (row) => row.clientName },
         { label: 'Модель', cell: (row) => row.modelName },
         { label: 'Пошито, шт.', numeric: true, cell: (row) => row.quantity },
-        { label: 'Ціна КП', numeric: true, cell: (row) => (row.unitPrice === null ? unknown : formatMoney(row.unitPrice)) },
-        { label: 'Вартість', numeric: true, cell: (row) => (row.value === null ? '—' : formatMoney(row.value)) },
+        {
+          label: 'Ціна КП',
+          numeric: true,
+          cell: (row) => (row.unitPrice === null ? unknown : formatMoney(row.unitPrice)),
+        },
+        {
+          label: 'Вартість',
+          numeric: true,
+          cell: (row) => (row.value === null ? '—' : formatMoney(row.value)),
+        },
       ]}
     />
   );
@@ -163,8 +170,16 @@ export function ReportMaterialsTable({ rows }: { rows: ReportIssueRow[] }) {
         { label: 'Завдання', cell: (row) => order(row.orderId, row.orderNumber) },
         { label: 'Модель', cell: (row) => row.modelName ?? '—' },
         { label: 'Кількість', numeric: true, cell: (row) => formatMeters(row.meters) },
-        { label: 'Ціна за м', numeric: true, cell: (row) => (row.pricePerMeter === null ? unknown : formatMoney(row.pricePerMeter)) },
-        { label: 'Сума', numeric: true, cell: (row) => (row.value === null ? '—' : formatMoney(row.value)) },
+        {
+          label: 'Ціна за м',
+          numeric: true,
+          cell: (row) => (row.pricePerMeter === null ? unknown : formatMoney(row.pricePerMeter)),
+        },
+        {
+          label: 'Сума',
+          numeric: true,
+          cell: (row) => (row.value === null ? '—' : formatMoney(row.value)),
+        },
       ]}
     />
   );
@@ -185,13 +200,25 @@ export function ReportStockTable({ rows }: { rows: ReportStockRow[] }) {
           label: 'Залишок',
           numeric: true,
           cell: (row) => (
-            <Typography component="span" variant="body2" color={row.meters < 0 ? 'error.main' : undefined}>
+            <Typography
+              component="span"
+              variant="body2"
+              color={row.meters < 0 ? 'error.main' : undefined}
+            >
               {formatMeters(row.meters)}
             </Typography>
           ),
         },
-        { label: 'Ціна за м', numeric: true, cell: (row) => (row.pricePerMeter === null ? unknown : formatMoney(row.pricePerMeter)) },
-        { label: 'Вартість', numeric: true, cell: (row) => (row.value === null ? '—' : formatMoney(row.value)) },
+        {
+          label: 'Ціна за м',
+          numeric: true,
+          cell: (row) => (row.pricePerMeter === null ? unknown : formatMoney(row.pricePerMeter)),
+        },
+        {
+          label: 'Вартість',
+          numeric: true,
+          cell: (row) => (row.value === null ? '—' : formatMoney(row.value)),
+        },
       ]}
     />
   );

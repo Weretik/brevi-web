@@ -1,4 +1,5 @@
 import { MEDIA_FOLDER_MAX_DEPTH } from '@admin/media/model';
+import { usePageRights } from '@admin/shared/ui';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { IconButton, Menu, MenuItem } from '@mui/material';
 import { useState } from 'react';
@@ -14,10 +15,12 @@ interface Props {
 
 export function MediaFolderMenu({ node, onAction }: Props) {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
+  const { canCreate, canEdit, canDelete } = usePageRights();
   const run = (action: MediaFolderAction) => {
     setAnchor(null);
     onAction(action, node);
   };
+  if (!canCreate && !canEdit && !canDelete) return null;
   return (
     <>
       <IconButton
@@ -30,13 +33,20 @@ export function MediaFolderMenu({ node, onAction }: Props) {
         <MoreVertIcon fontSize="small" />
       </IconButton>
       <Menu anchorEl={anchor} open={Boolean(anchor)} onClose={() => setAnchor(null)}>
-        <MenuItem disabled={node.depth >= MEDIA_FOLDER_MAX_DEPTH} onClick={() => run('add-child')}>
-          Нова підпапка
-        </MenuItem>
-        <MenuItem onClick={() => run('edit')}>Перейменувати або перемістити</MenuItem>
-        <MenuItem onClick={() => run('delete')} sx={{ color: 'error.main' }}>
-          Видалити папку
-        </MenuItem>
+        {canCreate && (
+          <MenuItem
+            disabled={node.depth >= MEDIA_FOLDER_MAX_DEPTH}
+            onClick={() => run('add-child')}
+          >
+            Нова підпапка
+          </MenuItem>
+        )}
+        {canEdit && <MenuItem onClick={() => run('edit')}>Перейменувати або перемістити</MenuItem>}
+        {canDelete && (
+          <MenuItem onClick={() => run('delete')} sx={{ color: 'error.main' }}>
+            Видалити папку
+          </MenuItem>
+        )}
       </Menu>
     </>
   );

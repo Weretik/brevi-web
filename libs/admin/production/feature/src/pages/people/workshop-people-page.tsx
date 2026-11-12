@@ -3,6 +3,7 @@ import { formatWorkMonth, payrollMonthOf, shiftWorkMonth, todayIso } from '@admi
 import { PayrollYearTable, PeriodStepper } from '@admin/production/ui';
 import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
+import { PageRightsScope } from '@admin/shared/ui';
 import { Box, Tab, Tabs } from '@mui/material';
 import { lazy, Suspense, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -113,13 +114,15 @@ export function WorkshopPeoplePage({ useAccess }: Props) {
           )}
           {inMonth &&
             (monthQuery.data ? (
-              <PayrollMonthView
-                month={monthQuery.data}
-                section={current.value === 'payments' ? 'payments' : 'people'}
-                stepper={stepper}
-                onMarkDay={access.timesheet ? () => setMarkDay(true) : undefined}
-                onMessage={setMessage}
-              />
+              <PageRightsScope page="payroll">
+                <PayrollMonthView
+                  month={monthQuery.data}
+                  section={current.value === 'payments' ? 'payments' : 'people'}
+                  stepper={stepper}
+                  onMarkDay={access.timesheet ? () => setMarkDay(true) : undefined}
+                  onMessage={setMessage}
+                />
+              </PageRightsScope>
             ) : (
               stepper
             ))}
@@ -130,8 +133,16 @@ export function WorkshopPeoplePage({ useAccess }: Props) {
             </>
           )}
           <Suspense fallback={null}>
-            {current.value === 'timesheet' && <TimesheetPage />}
-            {current.value === 'staff' && <WorkshopStaffPage />}
+            {current.value === 'timesheet' && (
+              <PageRightsScope page="timesheet">
+                <TimesheetPage />
+              </PageRightsScope>
+            )}
+            {current.value === 'staff' && (
+              <PageRightsScope page="workshop-staff">
+                <WorkshopStaffPage />
+              </PageRightsScope>
+            )}
           </Suspense>
           {access.timesheet && access.payroll && (
             <TimesheetDrawer open={markDay} onClose={() => setMarkDay(false)} />

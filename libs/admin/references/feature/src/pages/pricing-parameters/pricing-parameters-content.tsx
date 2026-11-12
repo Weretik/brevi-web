@@ -10,6 +10,7 @@ import {
   ReferencePageHeader,
   ReferenceSearchBar,
 } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import { Box, Button, Paper } from '@mui/material';
 import { useMemo, useState } from 'react';
@@ -36,6 +37,7 @@ interface Props {
 const distinct = (values: string[]) => [...new Set(values)];
 
 export function PricingParametersContent({ tabs }: Props) {
+  const { canCreate } = usePageRights();
   const { rows, loading, error, reload } = usePricingParameters();
   const [search, setSearch] = useState('');
   const [section, setSection] = useState<PricingParameterSectionFilter>(null);
@@ -64,14 +66,16 @@ export function PricingParametersContent({ tabs }: Props) {
               disabled={deletion.deleting || loading}
               onDelete={() => deletion.requestDelete(deletion.selectedIds)}
             />
-            <Button
-              variant="contained"
-              startIcon={<AddOutlinedIcon />}
-              disabled={loading || Boolean(error)}
-              onClick={() => setActive({ mode: 'create', parameter: null })}
-            >
-              Додати параметр
-            </Button>
+            {canCreate && (
+              <Button
+                variant="contained"
+                startIcon={<AddOutlinedIcon />}
+                disabled={loading || Boolean(error)}
+                onClick={() => setActive({ mode: 'create', parameter: null })}
+              >
+                Додати параметр
+              </Button>
+            )}
           </>
         }
       />

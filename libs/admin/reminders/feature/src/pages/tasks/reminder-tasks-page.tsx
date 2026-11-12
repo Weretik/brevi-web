@@ -8,6 +8,7 @@ import {
   RemindersLoadState,
   RemindersPageHeader,
 } from '@admin/reminders/ui';
+import { usePageRights } from '@admin/shared/ui';
 import { Box, Button, Card, Stack } from '@mui/material';
 import { useMemo, useState } from 'react';
 
@@ -26,6 +27,7 @@ export default function ReminderTasksPage() {
   const editor = useReminderTaskEditor(notice.success);
   const archive = useReminderTaskArchive(notice);
   const [filter, setFilter] = useState<TaskOrganizationFilter>('all');
+  const { canCreate } = usePageRights();
 
   const all = tasks.currentData ?? [];
   const rows = useMemo(() => filterTasks(all, filter), [all, filter]);
@@ -42,9 +44,15 @@ export default function ReminderTasksPage() {
           title="Задачі"
           subtitle={subtitle}
           actions={
-            <Button variant="contained" disabled={!tasks.currentData} onClick={() => editor.open()}>
-              Нова задача
-            </Button>
+            canCreate ? (
+              <Button
+                variant="contained"
+                disabled={!tasks.currentData}
+                onClick={() => editor.open()}
+              >
+                Нова задача
+              </Button>
+            ) : null
           }
         />
         <RemindersLoadState

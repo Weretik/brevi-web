@@ -34,7 +34,10 @@ export function useFabricColorEditor(
   const [update, updateState] = useUpdateFabricColorMutation();
   const saving = createState.isLoading || updateState.isLoading;
 
-  function change<Field extends FabricColorField>(field: Field, value: FabricColorFormValues[Field]) {
+  function change<Field extends FabricColorField>(
+    field: Field,
+    value: FabricColorFormValues[Field],
+  ) {
     setValues((current) => ({ ...current, [field]: value }));
     setErrors((current) => ({ ...current, [field]: undefined }));
   }

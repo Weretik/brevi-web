@@ -1,4 +1,5 @@
 import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import { useGetFabricBookingQuery } from '@admin/warehouse/data-access';
 import {
   bookingSuppliers,
@@ -54,7 +55,10 @@ export function FabricBookingPage({ title, tabs, access }: WarehouseTabProps) {
   const [panel, setPanel] = useState<Panel>(null);
   const [message, setMessage] = useState<string | null>(null);
   const today = kyivToday();
-  const canReceive = Boolean(data?.canReceive && (access?.stock ?? true));
+  const { can } = usePageRights();
+  const canReceive = Boolean(
+    data?.canReceive && (access?.stock ?? true) && can('create', 'fabric-stock'),
+  );
 
   const pairs = useMemo(
     () => (data && view !== 'unknown' ? filterBooking(data.pairs, view, supplier, debounced) : []),
