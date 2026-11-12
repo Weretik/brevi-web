@@ -17,6 +17,7 @@ import {
   ReferencePageHeader,
   ReferenceSearchBar,
 } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import { Box, Button, Paper } from '@mui/material';
 import { useState } from 'react';
@@ -42,6 +43,7 @@ const noSort = [{ field: 'date', sort: 'desc' as const }];
  * and one-off names of operations.
  */
 export function FinanceCounterpartiesPage() {
+  const { canCreate } = usePageRights();
   const list = useFinanceCounterpartyList();
   const navigate = useNavigate();
   const categories = useGetFinanceCategoriesQuery().data ?? [];
@@ -84,13 +86,15 @@ export function FinanceCounterpartiesPage() {
         title="Контрагенти"
         subtitle="З ким рухаються гроші. Клієнти й постачальники беруться з їхніх розділів"
         actions={
-          <Button
-            variant="contained"
-            startIcon={<AddOutlinedIcon />}
-            onClick={() => setActive({ mode: 'create', counterparty: null })}
-          >
-            Додати контрагента
-          </Button>
+          canCreate ? (
+            <Button
+              variant="contained"
+              startIcon={<AddOutlinedIcon />}
+              onClick={() => setActive({ mode: 'create', counterparty: null })}
+            >
+              Додати контрагента
+            </Button>
+          ) : null
         }
       />
       <ReferenceListAlerts

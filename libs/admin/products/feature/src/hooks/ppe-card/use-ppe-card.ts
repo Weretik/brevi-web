@@ -2,6 +2,7 @@ import { useGetPpeSupplierOfferQuery, useGetProductAccessQuery } from '@admin/pr
 import { ppeBlockerReasons } from '@admin/products/model';
 import { useListPpeMarkupRulesQuery, useListSuppliersQuery } from '@admin/references/data-access';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
+import { usePageRights } from '@admin/shared/ui';
 import { useMemo } from 'react';
 
 import { useProductOverviewRow } from '../product-overview/use-product-overview-row';
@@ -13,6 +14,7 @@ export function usePpeCard(productId: number) {
   const overview = useProductOverviewRow(productId, 'Ppe');
   const offer = useGetPpeSupplierOfferQuery(productId);
   const access = useGetProductAccessQuery();
+  const { canEdit } = usePageRights();
   const suppliersResult = useListSuppliersQuery();
   const rulesResult = useListPpeMarkupRulesQuery();
   const row = overview.row;
@@ -48,7 +50,7 @@ export function usePpeCard(productId: number) {
       ? adminApiErrorMessage(offer.error, 'Не вдалося завантажити дані постачальника.')
       : null,
     reloadOffer: () => void offer.refetch(),
-    canManage: access.currentData?.canManage === true && !access.isError,
+    canManage: access.currentData?.canManage === true && !access.isError && canEdit,
     suppliers,
     ruleNames: rules.map((item) => item.name),
     rule,

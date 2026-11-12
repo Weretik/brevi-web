@@ -1,4 +1,5 @@
 import { ReferenceEditorDrawer } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import { TaskDeleteDialog, TaskDetails, TaskFormFields } from '@admin/tasks/ui';
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
@@ -28,6 +29,7 @@ function description(editor: TaskEditor, viewer: TaskViewer): string {
 
 /** Side panel of both task pages (ReferenceEditorDrawer, like every Admin side panel). */
 export function TaskDrawer({ editor, viewer }: Props) {
+  const { canEdit, canDelete } = usePageRights();
   if (!editor.mode) return null;
   const reading = editor.mode.kind === 'view';
   const task = editor.task;
@@ -45,6 +47,7 @@ export function TaskDrawer({ editor, viewer }: Props) {
         submitLabel={editor.mode.kind === 'create' ? 'Поставити завдання' : 'Зберегти'}
         editLabel={viewer.isAdmin && task ? 'Редагувати' : null}
         readActions={
+          canEdit &&
           task &&
           task.status !== 'Done' && (
             <Button
@@ -84,7 +87,7 @@ export function TaskDrawer({ editor, viewer }: Props) {
                     ? { assignees: editor.assignees, onReassign: editor.reassign }
                     : {})}
                 />
-                {viewer.isAdmin && (
+                {viewer.isAdmin && canDelete && (
                   <Button
                     color="error"
                     startIcon={<DeleteOutlinedIcon />}

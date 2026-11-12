@@ -1,4 +1,5 @@
 import { ReferencePageHeader, ReferenceSearchBar } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import { TaskLoadTable, TaskMetricStrip, TasksTable } from '@admin/tasks/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import { Alert, Box, Button, Chip, Tab, Tabs } from '@mui/material';
@@ -24,6 +25,7 @@ export default function ManagerTasksPage({ viewer }: { viewer: TaskViewer }) {
   const list = useTaskList();
   const editor = useTaskEditor(viewer, notice.notify);
   const [tab, setTab] = useState<PageTab>('tasks');
+  const { canCreate } = usePageRights();
   const rows = list.page?.items ?? [];
   const selected = list.load.find((row) => row.userId === list.assigneeUserId);
 
@@ -34,13 +36,15 @@ export default function ManagerTasksPage({ viewer }: { viewer: TaskViewer }) {
         title="Завдання менеджерам"
         subtitle="Ставте завдання, стежте за строками та навантаженням менеджерів"
         actions={
-          <Button
-            variant="contained"
-            startIcon={<AddOutlinedIcon />}
-            onClick={() => editor.create(list.assigneeUserId)}
-          >
-            Нове завдання
-          </Button>
+          canCreate ? (
+            <Button
+              variant="contained"
+              startIcon={<AddOutlinedIcon />}
+              onClick={() => editor.create(list.assigneeUserId)}
+            >
+              Нове завдання
+            </Button>
+          ) : null
         }
       />
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>

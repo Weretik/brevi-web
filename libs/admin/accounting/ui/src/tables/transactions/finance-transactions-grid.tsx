@@ -171,6 +171,7 @@ export function FinanceTransactionsGrid({
       onEdit={props.onEdit}
       onDelete={onVoid}
       deleteLabel={actionLabel}
+      deleteRight="edit"
       server={{
         rowCount,
         paginationModel: props.paginationModel,

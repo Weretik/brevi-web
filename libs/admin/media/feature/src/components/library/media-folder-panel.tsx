@@ -1,4 +1,5 @@
 import { MediaFolderTree } from '@admin/media/ui';
+import { usePageRights } from '@admin/shared/ui';
 import CreateNewFolderOutlinedIcon from '@mui/icons-material/CreateNewFolderOutlined';
 import { Alert, Box, Button, CircularProgress, Paper, Stack, Typography } from '@mui/material';
 
@@ -24,6 +25,7 @@ export function MediaFolderPanel({
   onCreate,
   onAction,
 }: Props) {
+  const { canCreate } = usePageRights();
   return (
     <Paper
       variant="outlined"
@@ -43,9 +45,11 @@ export function MediaFolderPanel({
         <Typography variant="h6" component="h2">
           Папки
         </Typography>
-        <Button size="small" startIcon={<CreateNewFolderOutlinedIcon />} onClick={onCreate}>
-          Нова папка
-        </Button>
+        {canCreate && (
+          <Button size="small" startIcon={<CreateNewFolderOutlinedIcon />} onClick={onCreate}>
+            Нова папка
+          </Button>
+        )}
       </Stack>
       {folders.error && (
         <Alert

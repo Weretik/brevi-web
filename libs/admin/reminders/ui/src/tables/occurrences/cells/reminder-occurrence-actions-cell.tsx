@@ -1,3 +1,4 @@
+import { usePageRights } from '@admin/shared/ui';
 import HistoryIcon from '@mui/icons-material/History';
 import { Button, IconButton, Stack, Tooltip } from '@mui/material';
 
@@ -19,16 +20,19 @@ export function ReminderOccurrenceActionsCell({
   onHistory,
 }: Props) {
   const done = occurrence.status === 'done';
+  const { canEdit } = usePageRights();
   return (
     <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
-      <Button
-        size="small"
-        variant="outlined"
-        disabled={busy}
-        onClick={() => (done ? onReopen(occurrence) : onClose(occurrence))}
-      >
-        {done ? 'Відкрити' : 'Виконано'}
-      </Button>
+      {canEdit && (
+        <Button
+          size="small"
+          variant="outlined"
+          disabled={busy}
+          onClick={() => (done ? onReopen(occurrence) : onClose(occurrence))}
+        >
+          {done ? 'Відкрити' : 'Виконано'}
+        </Button>
+      )}
       <Tooltip title="Історія">
         <IconButton
           size="small"

@@ -7,6 +7,7 @@ import {
   ProductionConfirmDialog,
   ProductionReasonDialog,
 } from '@admin/production/ui';
+import { usePageRights } from '@admin/shared/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined';
 import ExpandMoreOutlinedIcon from '@mui/icons-material/ExpandMoreOutlined';
@@ -60,7 +61,17 @@ export function PayrollMonthView({ month, section, stepper, onMarkDay, onMessage
         .map((line) => ({ employeeId: line.employeeId, name: line.name, position: line.position })),
     [month.lines],
   );
-  const { permissions } = month;
+  const { permissions: serverPermissions } = month;
+  const rights = usePageRights();
+  // The server's role rules, narrowed by «Права доступу» → «Персонал цеху: зарплата».
+  const permissions = {
+    ...serverPermissions,
+    canPay: serverPermissions.canPay && rights.canCreate,
+    canClose: serverPermissions.canClose && rights.canEdit,
+    canReopen: serverPermissions.canReopen && rights.canEdit,
+  };
+  // «Видано», cancelling a payment or an adjustment change what is there: «Редагування».
+  const canChange = serverPermissions.canPay && rights.canEdit;
   const closedBy = [
     month.closedByName,
     month.closedAt ? new Date(month.closedAt).toLocaleDateString('uk-UA') : null,
@@ -177,7 +188,7 @@ export function PayrollMonthView({ month, section, stepper, onMarkDay, onMessage
           <PayrollMonthTable
             lines={month.lines}
             totals={month.totals}
-            canEditIssued={permissions.canPay}
+            canEditIssued={canChange}
             busy={actions.savingIssued}
             onOpen={setOpen}
             onSaveIssued={actions.saveIssued}
@@ -193,9 +204,7 @@ export function PayrollMonthView({ month, section, stepper, onMarkDay, onMessage
             <PayrollPaymentsTable
               rows={month.payments}
               busy={cancel.busy}
-              onCancel={
-                permissions.canPay ? (row) => cancel.request({ kind: 'payment', row }) : undefined
-              }
+              onCancel={canChange ? (row) => cancel.request({ kind: 'payment', row }) : undefined}
             />
           </Box>
           <Box>
@@ -214,9 +223,7 @@ export function PayrollMonthView({ month, section, stepper, onMarkDay, onMessage
               rows={month.adjustments}
               busy={cancel.busy}
               onCancel={
-                permissions.canPay
-                  ? (row) => cancel.request({ kind: 'adjustment', row })
-                  : undefined
+                canChange ? (row) => cancel.request({ kind: 'adjustment', row }) : undefined
               }
             />
           </Box>

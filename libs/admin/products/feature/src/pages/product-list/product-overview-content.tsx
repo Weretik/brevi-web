@@ -12,6 +12,7 @@ import {
   ReferencePageHeader,
   ReferenceSearchBar,
 } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import { Box, Button, Paper } from '@mui/material';
 import { useState } from 'react';
@@ -32,6 +33,8 @@ interface Props {
 
 /** One «Товари» tab: sewing models (sheet «Товари») or PPE (sheet «ЗІЗ»). */
 export function ProductOverviewContent({ type, tabs }: Props) {
+  const rights = usePageRights();
+  const { canCreate } = rights;
   const list = useProductOverview(type);
   const { sections, sectionNames, loading, error, reload } = list;
   const [active, setActive] = useState<{
@@ -42,7 +45,7 @@ export function ProductOverviewContent({ type, tabs }: Props) {
   const [deleteProduct] = useDeleteProductMutation();
   const activeSwitch = useProductActiveSwitch(setActionMessage);
   const access = useGetProductAccessQuery();
-  const canManage = access.currentData?.canManage === true;
+  const canManage = access.currentData?.canManage === true && rights.canEdit;
   const deletion = useReferenceDeletion((id) => deleteProduct(id).unwrap(), setActionMessage);
   const open = (mode: ProductOverviewEditorMode, row: ProductListRow) => {
     if (row.kind === 'model') setActive({ mode, row: row.product });
@@ -61,14 +64,16 @@ export function ProductOverviewContent({ type, tabs }: Props) {
               disabled={deletion.deleting || loading}
               onDelete={() => deletion.requestDelete(deletion.selectedIds)}
             />
-            <Button
-              variant="contained"
-              startIcon={<AddOutlinedIcon />}
-              component={RouterLink}
-              to={sewing ? '/references/products/new/sewing' : '/references/products/new/ppe'}
-            >
-              {sewing ? 'Додати модель' : 'Додати ЗІЗ'}
-            </Button>
+            {canCreate && (
+              <Button
+                variant="contained"
+                startIcon={<AddOutlinedIcon />}
+                component={RouterLink}
+                to={sewing ? '/references/products/new/sewing' : '/references/products/new/ppe'}
+              >
+                {sewing ? 'Додати модель' : 'Додати ЗІЗ'}
+              </Button>
+            )}
           </>
         }
       />

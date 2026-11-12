@@ -23,6 +23,7 @@ export function BookingPairDrawer({ pair, today, onReceive, onClose }: Props) {
       readOnly
       saving={false}
       editLabel={onReceive ? 'Прихід' : null}
+      editRight={null}
       onClose={onClose}
       onEdit={() => onReceive?.()}
       onSubmit={() => undefined}

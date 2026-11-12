@@ -18,6 +18,7 @@ import {
 } from '@admin/accounting/ui';
 import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
+import { usePageRights } from '@admin/shared/ui';
 import SwapHorizOutlinedIcon from '@mui/icons-material/SwapHorizOutlined';
 import { Box, Button, Paper } from '@mui/material';
 import { useState } from 'react';
@@ -60,6 +61,7 @@ interface JournalProps {
 }
 
 function TransfersJournal({ scope, cutoverDate, today, onScopeChange }: JournalProps) {
+  const { canCreate } = usePageRights();
   const journal = useFinanceJournal(scope, cutoverDate, today);
   const choices = useFinanceChoices(scope);
   const query = useGetFinanceTransfersQuery(
@@ -110,13 +112,15 @@ function TransfersJournal({ scope, cutoverDate, today, onScopeChange }: JournalP
         title="Перекази"
         subtitle="Гроші між власними рахунками однієї валюти. Переказ не є ні доходом, ні витратою"
         actions={
-          <Button
-            variant="contained"
-            startIcon={<SwapHorizOutlinedIcon />}
-            onClick={() => setActive({ mode: 'create', transfer: null })}
-          >
-            Додати переказ
-          </Button>
+          canCreate ? (
+            <Button
+              variant="contained"
+              startIcon={<SwapHorizOutlinedIcon />}
+              onClick={() => setActive({ mode: 'create', transfer: null })}
+            >
+              Додати переказ
+            </Button>
+          ) : null
         }
       />
       <LedgerScopeTabs scope={scope} cutoverDate={cutoverDate} onChange={onScopeChange} />

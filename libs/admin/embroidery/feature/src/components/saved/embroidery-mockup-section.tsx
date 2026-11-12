@@ -1,5 +1,6 @@
 import { useSetEmbroideryMockupMutation } from '@admin/embroidery/data-access';
 import { MediaPickerDrawer } from '@admin/media/feature';
+import { usePageRights } from '@admin/shared/ui';
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
 import { Alert, Box, Button, Link, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
@@ -15,6 +16,7 @@ export function EmbroideryMockupSection({ summary }: Props) {
   const [picking, setPicking] = useState(false);
   const [save, saving] = useSetEmbroideryMockupMutation();
   const mockup = summary.mockup;
+  const { canEdit } = usePageRights();
   const set = (mediaFileId: number | null) => void save({ id: summary.id, mediaFileId });
 
   return (
@@ -52,27 +54,29 @@ export function EmbroideryMockupSection({ summary }: Props) {
             Цех побачить макет у завданні, коли ви його оберете.
           </Typography>
         )}
-        <Stack direction="row" sx={{ gap: 1 }}>
-          <Button
-            variant="outlined"
-            size="small"
-            startIcon={<AddPhotoAlternateOutlinedIcon />}
-            disabled={saving.isLoading}
-            onClick={() => setPicking(true)}
-          >
-            {mockup ? 'Змінити макет' : 'Обрати макет'}
-          </Button>
-          {mockup && (
+        {canEdit && (
+          <Stack direction="row" sx={{ gap: 1 }}>
             <Button
+              variant="outlined"
               size="small"
-              color="inherit"
+              startIcon={<AddPhotoAlternateOutlinedIcon />}
               disabled={saving.isLoading}
-              onClick={() => set(null)}
+              onClick={() => setPicking(true)}
             >
-              Прибрати
+              {mockup ? 'Змінити макет' : 'Обрати макет'}
             </Button>
-          )}
-        </Stack>
+            {mockup && (
+              <Button
+                size="small"
+                color="inherit"
+                disabled={saving.isLoading}
+                onClick={() => set(null)}
+              >
+                Прибрати
+              </Button>
+            )}
+          </Stack>
+        )}
       </Stack>
       {picking && (
         <MediaPickerDrawer

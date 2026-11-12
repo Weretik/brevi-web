@@ -43,6 +43,7 @@ export function FabricStockPairDrawer({ pair, canMove, onClose, onAdjust, onRece
       readOnly
       saving={false}
       editLabel={canMove ? 'Прихід' : null}
+      editRight="create"
       readActions={
         canMove ? (
           <Button variant="outlined" onClick={() => onAdjust(pair)}>

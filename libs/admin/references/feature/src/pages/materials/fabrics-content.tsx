@@ -9,6 +9,7 @@ import {
   ReferenceSearchBar,
   ReferenceSupplierFilter,
 } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import { Box, Button, Paper } from '@mui/material';
 import { useMemo, useState } from 'react';
@@ -29,6 +30,7 @@ interface Props {
 }
 
 export function FabricsContent({ tabs }: Props) {
+  const { canCreate } = usePageRights();
   const { rows, loading, error, reload } = useFabrics();
   const [active, setActive] = useState<{ mode: FabricEditorMode; fabric: Fabric | null } | null>(
     null,
@@ -52,14 +54,16 @@ export function FabricsContent({ tabs }: Props) {
               disabled={deletion.deleting || loading}
               onDelete={() => deletion.requestDelete(deletion.selectedIds)}
             />
-            <Button
-              variant="contained"
-              startIcon={<AddOutlinedIcon />}
-              disabled={loading || Boolean(error)}
-              onClick={() => setActive({ mode: 'create', fabric: null })}
-            >
-              Додати тканину
-            </Button>
+            {canCreate && (
+              <Button
+                variant="contained"
+                startIcon={<AddOutlinedIcon />}
+                disabled={loading || Boolean(error)}
+                onClick={() => setActive({ mode: 'create', fabric: null })}
+              >
+                Додати тканину
+              </Button>
+            )}
           </>
         }
       />

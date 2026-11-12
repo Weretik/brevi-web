@@ -14,6 +14,7 @@ import {
 import { ProductionWorkTable } from '@admin/production/ui';
 import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
+import { usePageRights } from '@admin/shared/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import ChevronLeftOutlinedIcon from '@mui/icons-material/ChevronLeftOutlined';
 import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
@@ -37,6 +38,8 @@ type Panel = 'record' | 'import';
 
 /** «Швейний цех › Журнал робіт»: who sewed or cut how much, by month. */
 export function WorkLogPage({ useOrderActor }: Props) {
+  const rights = usePageRights();
+  const { canCreate } = rights;
   const actor = useOrderActor();
   const today = todayIso();
   const [month, setMonth] = useState(() => workMonth(today));
@@ -83,15 +86,17 @@ export function WorkLogPage({ useOrderActor }: Props) {
         }
         actions={
           <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap' }}>
-            <Button
-              variant="contained"
-              startIcon={<AddOutlinedIcon />}
-              disabled={!choices.data}
-              onClick={() => setPanel('record')}
-            >
-              Додати роботу
-            </Button>
-            {actor.canImport && (
+            {canCreate && (
+              <Button
+                variant="contained"
+                startIcon={<AddOutlinedIcon />}
+                disabled={!choices.data}
+                onClick={() => setPanel('record')}
+              >
+                Додати роботу
+              </Button>
+            )}
+            {actor.canImport && canCreate && (
               <Button
                 variant="outlined"
                 startIcon={<UploadFileOutlinedIcon />}
@@ -160,7 +165,7 @@ export function WorkLogPage({ useOrderActor }: Props) {
         showItem
         busy={reversal.busy}
         canVoid={(row) => openOrders.has(row.orderId)}
-        onVoid={reversal.request}
+        onVoid={rights.canEdit ? reversal.request : undefined}
         empty={log.isLoading ? 'Завантаження…' : 'За цей місяць записів немає.'}
       />
       {panel === 'record' && choices.data && (

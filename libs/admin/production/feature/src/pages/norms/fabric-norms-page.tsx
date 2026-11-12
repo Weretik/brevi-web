@@ -17,6 +17,7 @@ import {
   ReferencePageHeader,
   ReferenceSearchBar,
 } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import { Box, Button, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
@@ -36,6 +37,8 @@ import type { FabricNormFilter, FabricNormRow } from '@admin/production/model';
  * lining and insulation, the rest of the composition from «Товари», and a batch count.
  */
 export function FabricNormsPage() {
+  const rights = usePageRights();
+  const { canCreate } = rights;
   const [searchParams, setSearchParams] = useSearchParams();
   const { rows, loading, error, reload } = useFabricNorms();
   const compositions = useModelCompositions();
@@ -66,14 +69,16 @@ export function FabricNormsPage() {
         title="Норми витрати тканини"
         subtitle="Скільки тканини, підкладки й утеплювача йде на один виріб і на партію"
         actions={
-          <Button
-            variant="outlined"
-            startIcon={<UploadFileOutlinedIcon />}
-            disabled={loading || Boolean(error)}
-            onClick={() => setImporting(true)}
-          >
-            Імпорт
-          </Button>
+          canCreate ? (
+            <Button
+              variant="outlined"
+              startIcon={<UploadFileOutlinedIcon />}
+              disabled={loading || Boolean(error)}
+              onClick={() => setImporting(true)}
+            >
+              Імпорт
+            </Button>
+          ) : null
         }
       />
       <ReferenceListAlerts
@@ -132,8 +137,8 @@ export function FabricNormsPage() {
             batchText={batchText}
             batchSize={batchSize}
             onBatchChange={setBatchText}
-            onEdit={selected.modelName ? () => setEditing(selected) : null}
-            onDelete={selected.norm ? () => deletion.request(selected) : null}
+            onEdit={selected.modelName && rights.canEdit ? () => setEditing(selected) : null}
+            onDelete={selected.norm && rights.canDelete ? () => deletion.request(selected) : null}
           />
         ) : (
           !loading &&

@@ -1,4 +1,5 @@
 import { formatReminderDate } from '@admin/reminders/model';
+import { usePageRights } from '@admin/shared/ui';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import {
   IconButton,
@@ -28,6 +29,7 @@ interface Props {
 }
 
 export function NonWorkingDaysTable({ days, busyDate, onRemove }: Props) {
+  const { canDelete } = usePageRights();
   return (
     <TableContainer component={Paper} variant="outlined">
       <Table size="small" aria-label="Неробочі дні">
@@ -36,7 +38,7 @@ export function NonWorkingDaysTable({ days, busyDate, onRemove }: Props) {
             <TableCell>Дата</TableCell>
             <TableCell>День тижня</TableCell>
             <TableCell>Примітка</TableCell>
-            <TableCell width={56} />
+            {canDelete && <TableCell width={56} />}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -49,20 +51,22 @@ export function NonWorkingDaysTable({ days, busyDate, onRemove }: Props) {
               </TableCell>
               <TableCell>{weekday(day.date)}</TableCell>
               <TableCell>{day.note ?? '—'}</TableCell>
-              <TableCell>
-                <Tooltip title="Прибрати">
-                  <span>
-                    <IconButton
-                      size="small"
-                      aria-label={`Прибрати ${formatReminderDate(day.date)}`}
-                      disabled={busyDate === day.date}
-                      onClick={() => onRemove(day)}
-                    >
-                      <DeleteOutlinedIcon fontSize="small" />
-                    </IconButton>
-                  </span>
-                </Tooltip>
-              </TableCell>
+              {canDelete && (
+                <TableCell>
+                  <Tooltip title="Прибрати">
+                    <span>
+                      <IconButton
+                        size="small"
+                        aria-label={`Прибрати ${formatReminderDate(day.date)}`}
+                        disabled={busyDate === day.date}
+                        onClick={() => onRemove(day)}
+                      >
+                        <DeleteOutlinedIcon fontSize="small" />
+                      </IconButton>
+                    </span>
+                  </Tooltip>
+                </TableCell>
+              )}
             </TableRow>
           ))}
         </TableBody>

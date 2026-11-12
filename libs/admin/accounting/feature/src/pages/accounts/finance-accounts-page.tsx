@@ -17,6 +17,7 @@ import {
   ReferenceSearchBar,
 } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
+import { usePageRights } from '@admin/shared/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import { Box, Button, Paper } from '@mui/material';
 import { useMemo, useState } from 'react';
@@ -35,6 +36,7 @@ const filters: { value: FinanceAccountFilter; label: string }[] = [
 
 /** «Бухгалтерія → Рахунки і каси» with counted balances (ACC-001). */
 export function FinanceAccountsPage() {
+  const { canCreate } = usePageRights();
   const query = useGetFinanceAccountsQuery();
   const rows = useMemo(() => query.data ?? [], [query.data]);
   const loading = query.isLoading || query.isFetching;
@@ -78,14 +80,16 @@ export function FinanceAccountsPage() {
         title="Рахунки і каси"
         subtitle={`Банківські рахунки, картки й каси. Поточний облік починається із залишку на ${formatLedgerDate(cutoverDate)}`}
         actions={
-          <Button
-            variant="contained"
-            startIcon={<AddOutlinedIcon />}
-            disabled={loading || Boolean(error)}
-            onClick={() => setActive({ mode: 'create', account: null })}
-          >
-            Додати рахунок
-          </Button>
+          canCreate ? (
+            <Button
+              variant="contained"
+              startIcon={<AddOutlinedIcon />}
+              disabled={loading || Boolean(error)}
+              onClick={() => setActive({ mode: 'create', account: null })}
+            >
+              Додати рахунок
+            </Button>
+          ) : null
         }
       />
       <ReferenceListAlerts

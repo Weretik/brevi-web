@@ -1,3 +1,4 @@
+import { usePageRights } from '@admin/shared/ui';
 import { Button, Stack } from '@mui/material';
 
 import type { ReminderChat } from '@admin/reminders/model';
@@ -11,6 +12,8 @@ interface Props {
 }
 
 export function ReminderChatActionsCell({ chat, busy, onEdit, onTest, onAssign }: Props) {
+  // Approving, setting up, testing and assigning a chat are «Редагування» on «Нагадування».
+  if (!usePageRights().canEdit) return null;
   return (
     <Stack direction="row" spacing={0.5}>
       <Button

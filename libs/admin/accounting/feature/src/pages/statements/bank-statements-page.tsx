@@ -1,6 +1,7 @@
 import { bankStatementFileLimits } from '@admin/accounting/model';
 import { BankStatementsGrid } from '@admin/accounting/ui';
 import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import {
   Alert,
@@ -24,6 +25,7 @@ import { useBankStatementUpload } from '../../hooks/statements/use-bank-statemen
  * of uploads. A statement opens as a preview; nothing reaches the books until «Провести виписку».
  */
 export function BankStatementsPage() {
+  const { canCreate } = usePageRights();
   const input = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const upload = useBankStatementUpload((statement) =>
@@ -67,15 +69,17 @@ export function BankStatementsPage() {
                   </MenuItem>
                 ))}
               </TextField>
-              <Button
-                variant="contained"
-                startIcon={<UploadFileOutlinedIcon />}
-                disabled={upload.uploading || !upload.accountId}
-                onClick={() => input.current?.click()}
-                sx={{ alignSelf: { xs: 'stretch', sm: 'flex-start' }, height: 40 }}
-              >
-                Завантажити виписку
-              </Button>
+              {canCreate && (
+                <Button
+                  variant="contained"
+                  startIcon={<UploadFileOutlinedIcon />}
+                  disabled={upload.uploading || !upload.accountId}
+                  onClick={() => input.current?.click()}
+                  sx={{ alignSelf: { xs: 'stretch', sm: 'flex-start' }, height: 40 }}
+                >
+                  Завантажити виписку
+                </Button>
+              )}
               <input
                 ref={input}
                 type="file"

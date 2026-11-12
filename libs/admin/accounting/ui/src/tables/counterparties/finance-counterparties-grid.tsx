@@ -103,6 +103,7 @@ export function FinanceCounterpartiesGrid({ rowCount, onArchive, cutoverDate, ..
       onEdit={props.onEdit}
       onDelete={onArchive}
       deleteLabel="Архівувати"
+      deleteRight="edit"
       sortable={false}
       server={{
         rowCount,
