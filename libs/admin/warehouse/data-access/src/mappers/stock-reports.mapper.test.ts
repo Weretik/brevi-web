@@ -45,6 +45,7 @@ describe('stock report mappers', () => {
                   used: [],
                 },
               ],
+              issuedOn: '2026-11-04',
             },
           ],
         },
@@ -54,6 +55,7 @@ describe('stock report mappers', () => {
     });
     expect(report.models[0]?.items[0]?.materials[0]?.fact).toBeNull();
     expect(report.inProgressItems).toBe(2);
+    expect(report.models[0]?.items[0]?.issuedOn).toBe('2026-11-04');
     expect(() =>
       mapPlanFact({ models: [], total: { ...summary, result: 'Good' }, inProgressItems: 0 }),
     ).toThrow(/результат/);

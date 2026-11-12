@@ -281,10 +281,15 @@ export function mapFabricConsumption(value: unknown): FabricConsumption {
         issued: decimal(x['issued'], 'видано'),
         corrected: decimal(x['corrected'], 'коригування'),
         issuedValue: nullableNumber(x['issuedValue'], 'вартість видачі'),
+        issuedToTasks: decimal(x['issuedToTasks'], 'видано на завдання'),
+        oneOff: decimal(x['oneOff'], 'разова витрата'),
       };
     }),
     received: decimal(row['received'], 'разом прихід'),
     issued: decimal(row['issued'], 'разом видано'),
     issuedValue: nullableNumber(row['issuedValue'], 'разом вартість'),
+    issuedToTasks: decimal(row['issuedToTasks'], 'разом на завдання'),
+    oneOff: decimal(row['oneOff'], 'разом разова витрата'),
+    corrected: decimal(row['corrected'], 'разом коригування'),
   };
 }

@@ -1,6 +1,34 @@
+/** Every period preset of «Склад тканин»: «Рух тканини» and «Звіти» each show their own list. */
+export type MovementPeriod =
+  'all' | 'today' | 'week' | 'month' | 'lastMonth' | 'quarter' | 'custom';
+
 /** The period chip of «Рух тканини». */
-export const movementPeriods = ['all', 'today', 'week', 'month', 'lastMonth', 'custom'] as const;
-export type MovementPeriod = (typeof movementPeriods)[number];
+export const movementPeriods: readonly MovementPeriod[] = [
+  'all',
+  'today',
+  'week',
+  'month',
+  'lastMonth',
+  'custom',
+];
+
+/** «План і факт»: by the day of the last issue. */
+export const planFactPeriods: readonly MovementPeriod[] = [
+  'all',
+  'month',
+  'lastMonth',
+  'quarter',
+  'custom',
+];
+
+/** «Витрата за період»: always a period. */
+export const consumptionPeriods: readonly MovementPeriod[] = [
+  'week',
+  'month',
+  'lastMonth',
+  'quarter',
+  'custom',
+];
 
 export const movementPeriodLabels: Record<MovementPeriod, string> = {
   all: 'Усі дати',
@@ -8,6 +36,7 @@ export const movementPeriodLabels: Record<MovementPeriod, string> = {
   week: 'Цей тиждень',
   month: 'Цей місяць',
   lastMonth: 'Минулий місяць',
+  quarter: 'Цей квартал',
   custom: 'Свій період',
 };
 
@@ -33,6 +62,12 @@ export function movementPeriodRange(
     }
     case 'month':
       return { from: `${today.slice(0, 8)}01`, to: today };
+    case 'quarter': {
+      const first = new Date(
+        Date.UTC(day.getUTCFullYear(), day.getUTCMonth() - (day.getUTCMonth() % 3), 1),
+      );
+      return { from: iso(first), to: today };
+    }
     case 'lastMonth': {
       const first = new Date(Date.UTC(day.getUTCFullYear(), day.getUTCMonth() - 1, 1));
       const last = new Date(Date.UTC(day.getUTCFullYear(), day.getUTCMonth(), 0));

@@ -11854,6 +11854,10 @@ export interface components {
       issued: number;
       corrected: number;
       issuedValue: number | null;
+      /** @description Issued to items of orders; part of `issued`. */
+      issuedToTasks: number;
+      /** @description «Разова витрата», issued without a task; part of `issued`. */
+      oneOff: number;
     };
     FabricConsumptionResponse: {
       /** Format: date */
@@ -11864,6 +11868,9 @@ export interface components {
       received: number;
       issued: number;
       issuedValue: number | null;
+      issuedToTasks: number;
+      oneOff: number;
+      corrected: number;
     };
     V133StockRow: {
       id: string;
@@ -12225,6 +12232,11 @@ export interface components {
       /** @description Why the item cannot be compared. */
       reason: string | null;
       materials: components['schemas']['FabricPlanFactMaterialResponse'][];
+      /**
+       * Format: date
+       * @description The day of the item's last issue; the period goes by it.
+       */
+      issuedOn: string | null;
     };
     FabricPlanFactModelResponse: {
       modelName: string;
@@ -28803,6 +28815,10 @@ export interface operations {
         client?: string | null;
         /** @description A planned or issued fabric code, name or colour. */
         fabric?: string | null;
+        /** @description Keeps the items whose last issue is on or after this day. */
+        from?: string | null;
+        /** @description Keeps the items whose last issue is on or before this day; not before `from` (400). */
+        to?: string | null;
       };
       header?: never;
       path?: never;

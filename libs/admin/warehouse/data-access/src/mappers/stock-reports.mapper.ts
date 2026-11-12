@@ -91,6 +91,7 @@ const planFactItem = (value: unknown): PlanFactItem => {
     result: oneOf(row['result'], planFactResults, 'результат'),
     reason: nullableText(row['reason'], 'причина'),
     materials: list(row['materials'], 'матеріали').map(material),
+    issuedOn: nullableDay(row['issuedOn'], 'день видачі'),
   };
 };
 

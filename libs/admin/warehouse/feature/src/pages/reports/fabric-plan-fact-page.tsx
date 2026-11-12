@@ -1,70 +1,67 @@
 import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
 import { useGetFabricPlanFactQuery } from '@admin/warehouse/data-access';
-import { formatMeters, formatPerProduct, planFactResultLabels } from '@admin/warehouse/model';
-import { PlanFactTable, ReportStats } from '@admin/warehouse/ui';
-import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
-import { Alert, Box, Button, Paper, Stack, TextField } from '@mui/material';
-import { useState } from 'react';
+import {
+  filterPlanFact,
+  formatMeters,
+  formatPerProduct,
+  isPlanFactOverrun,
+  kyivToday,
+  movementPeriodRange,
+  planFactDeviation,
+  planFactPeriods,
+  planFactViewCounts,
+  planFactViewLabels,
+  planFactViews,
+} from '@admin/warehouse/model';
+import { PeriodChip, PlanFactTable, ReportFilterBar, ReportStats } from '@admin/warehouse/ui';
+import { Alert, Box } from '@mui/material';
+import { useMemo, useState } from 'react';
+
+import { PlanFactModelDrawer } from '../../components/reports/plan-fact-model-drawer';
+import { useDebouncedValue } from '../../hooks/debounce/use-debounced-value';
 
 import type { WarehouseTabProps } from '../tabs/warehouse-tab';
-import type { PlanFactFilter } from '@admin/warehouse/model';
+import type {
+  MovementPeriod,
+  PlanFactFilter,
+  PlanFactModel,
+  PlanFactView,
+} from '@admin/warehouse/model';
 
-const empty: PlanFactFilter = { model: '', client: '', fabric: '' };
+const percent = new Intl.NumberFormat('uk-UA', {
+  maximumFractionDigits: 1,
+  signDisplay: 'exceptZero',
+});
 
 /**
- * «Склад тканин › План і факт» (WH-005): main fabric by model for the items whose fabric was issued
- * for all their products. One item that cannot be compared makes the difference unknown.
+ * «Склад тканин › Звіти › План і факт» (WH-005, WH-010): main fabric by model for the items issued for all their
+ * products, the largest overspending first; red only above 5%. The period goes by the day of the last issue.
  */
 export function FabricPlanFactPage({ title, tabs }: WarehouseTabProps) {
-  const [draft, setDraft] = useState<PlanFactFilter>(empty);
-  const [filter, setFilter] = useState<PlanFactFilter>(empty);
-  const report = useGetFabricPlanFactQuery(filter);
+  const [period, setPeriod] = useState<MovementPeriod>('all');
+  const [filter, setFilter] = useState<PlanFactFilter>({ from: null, to: null });
+  const [search, setSearch] = useState('');
+  const debounced = useDebouncedValue(search, 200);
+  const [view, setView] = useState<PlanFactView>('all');
+  const [open, setOpen] = useState<PlanFactModel | null>(null);
+  const valid = !filter.from || !filter.to || filter.from <= filter.to;
+  const report = useGetFabricPlanFactQuery(filter, { skip: !valid });
   const data = report.data;
-  const field = (key: keyof PlanFactFilter, label: string) => (
-    <TextField
-      size="small"
-      label={label}
-      value={draft[key]}
-      onChange={(event) => setDraft({ ...draft, [key]: event.target.value })}
-      slotProps={{ htmlInput: { maxLength: 200 } }}
-      sx={{ flex: 1, minWidth: 160 }}
-    />
+  const models = useMemo(
+    () => (data ? filterPlanFact(data.models, view, debounced) : []),
+    [data, view, debounced],
   );
+  const total = data?.total;
+  const deviation = total ? planFactDeviation(total) : null;
   return (
     <Box sx={{ minWidth: 0 }}>
       <ReferencePageHeader
         overline="Склад тканин"
         title={title ?? 'План і факт'}
-        subtitle="План і факт основної тканини за моделями: лише завдання, тканину яких видано на всі вироби."
-        actions={
-          <Button
-            variant="outlined"
-            startIcon={<RefreshOutlinedIcon />}
-            onClick={() => void report.refetch()}
-          >
-            Оновити
-          </Button>
-        }
+        subtitle="Основна тканина за моделями: лише завдання, тканину яких видано на всі вироби. Період — за днем останньої видачі."
+        actions={null}
       />
       {tabs}
-      <Paper
-        variant="outlined"
-        component="form"
-        sx={{ p: 1.5, mb: 2 }}
-        onSubmit={(event) => {
-          event.preventDefault();
-          setFilter(draft);
-        }}
-      >
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
-          {field('model', 'Модель')}
-          {field('client', 'Замовник')}
-          {field('fabric', 'Тканина')}
-          <Button type="submit" variant="contained">
-            Показати
-          </Button>
-        </Stack>
-      </Paper>
       <ReferenceListAlerts
         error={report.error ? 'Не вдалося порахувати план і факт.' : null}
         loading={report.isFetching}
@@ -72,46 +69,85 @@ export function FabricPlanFactPage({ title, tabs }: WarehouseTabProps) {
         actionMessage={null}
         onCloseActionMessage={() => undefined}
       />
-      {data && (
-        <>
-          <ReportStats
-            stats={[
-              { label: 'Замовлень', value: String(data.total.orders) },
-              { label: 'Виробів', value: String(data.total.products) },
-              {
-                label: 'План / факт на виріб',
-                value: `${formatPerProduct(data.total.planPerProduct)} / ${formatPerProduct(data.total.factPerProduct)}`,
-              },
-              {
-                label: 'Різниця разом',
-                value:
-                  data.total.difference === null
-                    ? planFactResultLabels[data.total.result]
-                    : formatMeters(data.total.difference),
-                tone: data.total.result === 'NeedsCheck' ? 'warning' : undefined,
-                hint:
-                  data.total.uncomparableItems > 0
-                    ? `Без оцінки завдань: ${data.total.uncomparableItems}`
-                    : undefined,
-              },
-            ]}
-          />
-          {data.total.uncomparableItems > 0 && (
-            <Alert severity="warning" sx={{ mb: 2 }}>
-              {data.total.uncomparableItems} завдань не можна порівняти (немає плану, видача без
-              кількості виробів або тканина без ролі), тому загальна різниця невідома. Розгорніть
-              модель, щоб побачити причину.
-            </Alert>
-          )}
-          {data.inProgressItems > 0 && (
-            <Alert severity="info" sx={{ mb: 2 }}>
-              Ще не видано на всі вироби: {data.inProgressItems} завдань. Вони зʼявляться тут після
-              повної видачі.
-            </Alert>
-          )}
-          <PlanFactTable report={data} />
-        </>
+      {data && total && (
+        <ReportStats
+          stats={[
+            { label: 'Завдань', value: String(total.orders), hint: `${total.products} виробів` },
+            {
+              label: 'План / факт на виріб',
+              value: `${formatPerProduct(total.planPerProduct)} / ${formatPerProduct(total.factPerProduct)}`,
+            },
+            {
+              label: total.difference !== null && total.difference > 0 ? 'Перевитрата' : 'Різниця',
+              value:
+                total.difference === null
+                  ? '—'
+                  : `${total.difference > 0 ? '+' : ''}${formatMeters(total.difference)}`,
+              tone: isPlanFactOverrun(total) ? 'error' : undefined,
+              hint:
+                deviation === null
+                  ? 'Невідома: є завдання, які не порівняти'
+                  : `${percent.format(deviation)}% до плану`,
+            },
+            ...(total.uncomparableItems > 0
+              ? [
+                  {
+                    label: 'Не порівняти',
+                    value: String(total.uncomparableItems),
+                    tone: 'warning' as const,
+                    hint: 'Немає плану або видача без виробів',
+                  },
+                ]
+              : []),
+          ]}
+        />
       )}
+      <ReportFilterBar
+        search={search}
+        searchPlaceholder="Модель, замовник, тканина або Ц-12"
+        searchLabel="Пошук у «План і факт»"
+        views={planFactViews}
+        labels={planFactViewLabels}
+        counts={data ? planFactViewCounts(data.models) : { all: 0, overrun: 0, uncomparable: 0 }}
+        view={view}
+        hideEmpty={['overrun', 'uncomparable']}
+        shown={data ? models.length : null}
+        onSearch={setSearch}
+        onView={setView}
+        extra={
+          <PeriodChip
+            periods={planFactPeriods}
+            period={period}
+            from={filter.from}
+            to={filter.to}
+            onPeriod={(next) => {
+              setPeriod(next);
+              if (next !== 'custom') setFilter(movementPeriodRange(next, kyivToday()));
+            }}
+            onDates={setFilter}
+          />
+        }
+      />
+      {!valid && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          Кінець періоду раніше за початок.
+        </Alert>
+      )}
+      {data && data.inProgressItems > 0 && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          Ще не видано на всі вироби: {data.inProgressItems} завд. Вони зʼявляться тут після повної
+          видачі.
+        </Alert>
+      )}
+      {data && total && (
+        <PlanFactTable
+          models={models}
+          total={total}
+          filtered={debounced.trim().length > 0 || view !== 'all' || period !== 'all'}
+          onOpen={setOpen}
+        />
+      )}
+      {open && <PlanFactModelDrawer model={open} onClose={() => setOpen(null)} />}
     </Box>
   );
 }

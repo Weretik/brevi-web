@@ -127,6 +127,8 @@ export {
   movementPeriodLabels,
   movementPeriodRange,
   movementPeriods,
+  planFactPeriods,
+  consumptionPeriods,
 } from './queries/movements/movement-period';
 export type { MovementPeriod } from './queries/movements/movement-period';
 export {
@@ -239,6 +241,26 @@ export {
   hardwareViews,
 } from './queries/reports/hardware-filters';
 export type { HardwareView } from './queries/reports/hardware-filters';
+export {
+  PLAN_FACT_OVERRUN_PERCENT,
+  filterPlanFact,
+  isPlanFactOverrun,
+  planFactDeviation,
+  planFactViewCounts,
+  planFactViewLabels,
+  planFactViews,
+} from './queries/reports/plan-fact-filters';
+export type { PlanFactView } from './queries/reports/plan-fact-filters';
+export { consumptionSortKeys, filterConsumption } from './queries/reports/consumption-filters';
+export type { ConsumptionSortKey } from './queries/reports/consumption-filters';
+export {
+  filterValuation,
+  valuationShare,
+  valuationViewCounts,
+  valuationViewLabels,
+  valuationViews,
+} from './queries/reports/valuation-filters';
+export type { ValuationView } from './queries/reports/valuation-filters';
 export { hardwareWorkbook } from './mappers/exports/hardware-exports';
 export type {
   StockTransferCurrent,

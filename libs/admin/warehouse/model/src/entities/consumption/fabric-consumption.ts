@@ -7,9 +7,13 @@ export interface FabricConsumptionRow {
   issued: number;
   corrected: number;
   issuedValue: number | null;
+  /** Issued to items of orders; part of `issued`. */
+  issuedToTasks: number;
+  /** «Разова витрата»; part of `issued`. */
+  oneOff: number;
 }
 
-/** «Зведення витрати» over a period by operation date. */
+/** «Витрата за період» by operation date. */
 export interface FabricConsumption {
   from: string;
   to: string;
@@ -17,4 +21,7 @@ export interface FabricConsumption {
   received: number;
   issued: number;
   issuedValue: number | null;
+  issuedToTasks: number;
+  oneOff: number;
+  corrected: number;
 }

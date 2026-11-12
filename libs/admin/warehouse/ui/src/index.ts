@@ -19,9 +19,17 @@ export { ItemFabricCard } from './panels/item-fabric/item-fabric-card';
 export { ItemIssueForm } from './forms/item-issue/item-issue-form';
 export { ItemIssuePreviewPanel } from './forms/item-issue/item-issue-preview';
 export { FabricIssueItemList } from './components/issue-items/fabric-issue-item-list';
-export { PlanFactTable } from './tables/reports/plan-fact-table';
+export {
+  PlanFactDeviation,
+  PlanFactItemDetails,
+  PlanFactTable,
+} from './tables/reports/plan-fact-table';
 export { BookingTable, BookingUnknownTable } from './tables/reports/booking-table';
-export { ValuationShortageTable, ValuationTable } from './tables/reports/valuation-table';
+export {
+  FABRICS_REFERENCE_PATH,
+  ValuationShortageTable,
+  ValuationTable,
+} from './tables/reports/valuation-table';
 export {
   HardwareIncompleteTable,
   HardwareNeedShares,
@@ -30,6 +38,7 @@ export {
 } from './tables/reports/hardware-table';
 export { BookingPairDetails } from './panels/reports/booking-pair-details';
 export { ReportFilterBar } from './components/reports/report-filter-bar';
+export { PeriodChip } from './components/reports/period-chip';
 export { ReportStats } from './components/reports/report-stats';
 export type { ReportStat } from './components/reports/report-stats';
 export { StockTransferSummary } from './panels/stock-transfer/stock-transfer-summary';
