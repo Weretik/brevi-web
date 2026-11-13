@@ -10,14 +10,14 @@ describe('production tracking mappers', () => {
   it('keeps negative Telegram group ids', () => {
     const settings = mapWorkshopSettings({
       telegramEnabled: true,
-      telegramChatId: -1003339287606,
+      telegramChatId: -1001234567890,
       telegramThreadId: 434,
       botConfigured: true,
-      chats: [{ chatId: -1003339287606, title: 'Цех' }],
+      chats: [{ chatId: -1001234567890, title: 'Цех' }],
       updatedByName: null,
       updatedAt: null,
     });
-    expect(settings.telegramChatId).toBe(-1003339287606);
+    expect(settings.telegramChatId).toBe(-1001234567890);
     expect(settings.chats[0].title).toBe('Цех');
   });
 
