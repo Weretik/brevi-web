@@ -3,11 +3,21 @@
 Front ends for **Brevi**, a Ukrainian workwear manufacturer:
 
 - **Admin panel** for staff (`apps/admin-react`). Pricing, commercial offers, CRM, production, warehouse, purchasing, accounting, website content and access rights, all in one place. It replaced a set of Google Sheets.
-- **Public website** (`apps/site`). A fast, SEO-first catalogue site in Ukrainian and Russian that replaces the old OpenCart site. It has a product catalogue with prices and a request form, with no cart or online payment by design.
+- **Public website** (`apps/site`). A fast, SEO-first catalogue site in two languages that replaces the old OpenCart site. It has a product catalogue with prices and a request form, with no cart or online payment by design.
 
 The backend and the API are in [BreviERP](https://github.com/Weretik/BreviERP).
 
 > Status: in production and in active development.
+
+**Results for the business:** a commercial offer takes **5 minutes instead of half a day**, a workshop task **5–10 minutes instead of 2 hours**, and monthly profit grew by **+15%** after launch.
+
+| Commercial offer editor                                             | Fabric shortages: what to order                                  |
+| ------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| ![Commercial offer editor](docs/screenshots/admin-quote-editor.png) | ![Fabric shortages](docs/screenshots/admin-fabric-shortages.png) |
+
+![Public site: product page](docs/screenshots/site-product.png)
+
+_Screenshots use demo data._
 
 ## Tech stack
 
