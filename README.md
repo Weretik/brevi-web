@@ -75,10 +75,12 @@ The API base URL is set in `apps/admin-react/src/environments/environment.ts`.
 
 ```bash
 # apps/site/.env.local  (not committed)
-BREVI_API_URL=http://localhost:5231
+BREVI_API_URL=https://localhost:7142
 
 npx nx dev site
 ```
+
+The API redirects HTTP to HTTPS, so use its HTTPS address. Node must trust the local development certificate (`dotnet dev-certs https --trust`, or `NODE_EXTRA_CA_CERTS` pointing to it).
 
 ### Checks
 
