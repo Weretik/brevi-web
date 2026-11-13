@@ -10,6 +10,7 @@ import {
   ReferencePageHeader,
   ReferenceSearchBar,
 } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import { Box, Button, Paper } from '@mui/material';
 import { useMemo, useState } from 'react';
@@ -27,6 +28,7 @@ import type {
 
 /** «Типи і розділи»: product sections of the Calculator sheet, sewing and PPE. */
 export function ProductSectionsPage() {
+  const { canCreate } = usePageRights();
   const { rows, loading, error, reload } = useProductSections();
   const [search, setSearch] = useState('');
   const [type, setType] = useState<ProductSectionTypeFilter>(null);
@@ -54,14 +56,16 @@ export function ProductSectionsPage() {
               disabled={deletion.deleting || loading}
               onDelete={() => deletion.requestDelete(deletion.selectedIds)}
             />
-            <Button
-              variant="contained"
-              startIcon={<AddOutlinedIcon />}
-              disabled={loading || Boolean(error)}
-              onClick={() => setActive({ mode: 'create', section: null })}
-            >
-              Додати розділ
-            </Button>
+            {canCreate && (
+              <Button
+                variant="contained"
+                startIcon={<AddOutlinedIcon />}
+                disabled={loading || Boolean(error)}
+                onClick={() => setActive({ mode: 'create', section: null })}
+              >
+                Додати розділ
+              </Button>
+            )}
           </>
         }
       />

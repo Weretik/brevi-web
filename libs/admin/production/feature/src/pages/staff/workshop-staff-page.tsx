@@ -11,6 +11,7 @@ import {
   WorkshopTabHeader,
 } from '@admin/production/ui';
 import { ReferenceFilterRow, ReferenceListAlerts, ReferenceSearchBar } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import { Box, Button, Paper } from '@mui/material';
@@ -26,6 +27,7 @@ import type { WorkshopEmployee, WorkshopStaffStatus } from '@admin/production/mo
 
 /** «Швейний цех › Персонал цеху › Працівники»: the list the head of the workshop records work and pay for. */
 export function WorkshopStaffPage() {
+  const { canCreate } = usePageRights();
   const { rows, loading, error, reload } = useWorkshopStaff();
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<WorkshopStaffStatus>('active');
@@ -51,22 +53,26 @@ export function WorkshopStaffPage() {
         subtitle="Швачки, закрійники, майстер. Вони не входять у систему: роботу за них вносить начальник цеху"
         actions={
           <>
-            <Button
-              variant="outlined"
-              startIcon={<UploadFileOutlinedIcon />}
-              disabled={loading || Boolean(error)}
-              onClick={() => setImporting(true)}
-            >
-              Імпорт
-            </Button>
-            <Button
-              variant="contained"
-              startIcon={<AddOutlinedIcon />}
-              disabled={loading || Boolean(error)}
-              onClick={() => setActive({ mode: 'create', employee: null })}
-            >
-              Додати працівника
-            </Button>
+            {canCreate && (
+              <Button
+                variant="outlined"
+                startIcon={<UploadFileOutlinedIcon />}
+                disabled={loading || Boolean(error)}
+                onClick={() => setImporting(true)}
+              >
+                Імпорт
+              </Button>
+            )}
+            {canCreate && (
+              <Button
+                variant="contained"
+                startIcon={<AddOutlinedIcon />}
+                disabled={loading || Boolean(error)}
+                onClick={() => setActive({ mode: 'create', employee: null })}
+              >
+                Додати працівника
+              </Button>
+            )}
           </>
         }
       />

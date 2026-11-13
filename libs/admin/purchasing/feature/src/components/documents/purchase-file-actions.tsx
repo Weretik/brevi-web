@@ -1,3 +1,4 @@
+import { usePageRights } from '@admin/shared/ui';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { Alert, Button, Stack } from '@mui/material';
 
@@ -16,28 +17,32 @@ interface Props {
 export function PurchaseFileActions({ link, busy, notice, onFix, onRecognize }: Props) {
   const working = busy === link.id;
   const tried = Boolean(link.document || link.recognition);
+  // Every change of the register is «Редагування» on «Рахунки на закупку», also where it sits on another page.
+  const canChange = usePageRights().can('edit', 'purchase-invoices');
 
   return (
     <Stack sx={{ gap: 1 }}>
-      <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
-        <Button
-          size="small"
-          variant={link.document ? 'outlined' : 'contained'}
-          startIcon={<EditOutlinedIcon />}
-          disabled={busy !== null}
-          onClick={() => onFix(link)}
-        >
-          {link.document ? 'Виправити' : 'Заповнити вручну'}
-        </Button>
-        <Button
-          size="small"
-          variant="outlined"
-          disabled={busy !== null}
-          onClick={() => onRecognize(link)}
-        >
-          {working ? 'Зачекайте…' : tried ? 'Розпізнати знову' : 'Розпізнати'}
-        </Button>
-      </Stack>
+      {canChange && (
+        <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
+          <Button
+            size="small"
+            variant={link.document ? 'outlined' : 'contained'}
+            startIcon={<EditOutlinedIcon />}
+            disabled={busy !== null}
+            onClick={() => onFix(link)}
+          >
+            {link.document ? 'Виправити' : 'Заповнити вручну'}
+          </Button>
+          <Button
+            size="small"
+            variant="outlined"
+            disabled={busy !== null}
+            onClick={() => onRecognize(link)}
+          >
+            {working ? 'Зачекайте…' : tried ? 'Розпізнати знову' : 'Розпізнати'}
+          </Button>
+        </Stack>
+      )}
       {notice?.fileId === link.id && (
         <Alert severity={notice.ok ? 'success' : 'warning'}>{notice.text}</Alert>
       )}

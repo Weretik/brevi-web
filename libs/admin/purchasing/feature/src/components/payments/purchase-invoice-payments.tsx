@@ -1,4 +1,5 @@
 import { PurchasePaymentCandidates, PurchasePaymentsView } from '@admin/purchasing/ui';
+import { usePageRights } from '@admin/shared/ui';
 import { Alert, Button, Stack } from '@mui/material';
 
 import { usePurchasePayments } from '../../hooks/payments/use-purchase-payments';
@@ -8,6 +9,8 @@ import type { PurchaseInvoice } from '@admin/purchasing/model';
 /** Section «Оплата» of the invoice panel: linked expenses of «Бухгалтерія» and «Прив'язати оплату». */
 export function PurchaseInvoicePayments({ invoice }: { invoice: PurchaseInvoice }) {
   const payments = usePurchasePayments(invoice);
+  // Every change of the register is «Редагування» on «Рахунки на закупку», also where it sits on another page.
+  const canChange = usePageRights().can('edit', 'purchase-invoices');
   return (
     <Stack sx={{ gap: 1.5 }}>
       {payments.message && <Alert severity="error">{payments.message}</Alert>}
@@ -30,11 +33,13 @@ export function PurchaseInvoicePayments({ invoice }: { invoice: PurchaseInvoice 
           onCancel={payments.stopPicking}
         />
       ) : (
-        <Stack direction="row">
-          <Button variant="outlined" disabled={payments.busy} onClick={payments.startPicking}>
-            Привʼязати оплату
-          </Button>
-        </Stack>
+        canChange && (
+          <Stack direction="row">
+            <Button variant="outlined" disabled={payments.busy} onClick={payments.startPicking}>
+              Привʼязати оплату
+            </Button>
+          </Stack>
+        )
       )}
     </Stack>
   );

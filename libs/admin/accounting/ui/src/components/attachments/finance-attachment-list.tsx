@@ -1,4 +1,5 @@
 import { financeAttachmentLimits, formatFileSize } from '@admin/accounting/model';
+import { usePageRights } from '@admin/shared/ui';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import {
@@ -42,11 +43,15 @@ export function FinanceAttachmentList({
   loading,
   error,
   busy,
-  onAdd,
+  onAdd: addFiles,
   onOpen,
-  onDelete,
+  onDelete: deleteFile,
 }: Props) {
   const input = useRef<HTMLInputElement>(null);
+  const rights = usePageRights();
+  // «Права доступу» → «Бухгалтерія»: adding a file is «Створення», removing one «Видалення».
+  const onAdd = rights.canCreate ? addFiles : null;
+  const onDelete = rights.canDelete ? deleteFile : null;
   return (
     <Stack sx={{ gap: 1, alignItems: 'flex-start' }}>
       {error && (

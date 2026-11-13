@@ -1,3 +1,4 @@
+import { usePageRights } from '@admin/shared/ui';
 import { Box, Button, Card, Stack, Typography } from '@mui/material';
 
 interface Props {
@@ -12,6 +13,7 @@ const steps = [
 ];
 
 export function ReminderBotSetupCard({ connecting, onConnect }: Props) {
+  const { canEdit } = usePageRights();
   return (
     <Card variant="outlined" sx={{ p: 2 }}>
       <Stack
@@ -31,11 +33,13 @@ export function ReminderBotSetupCard({ connecting, onConnect }: Props) {
             ))}
           </Stack>
         </Box>
-        <Box sx={{ flexShrink: 0 }}>
-          <Button variant="outlined" disabled={connecting} onClick={onConnect}>
-            {connecting ? 'Підключаємо…' : 'Підключити бота'}
-          </Button>
-        </Box>
+        {canEdit && (
+          <Box sx={{ flexShrink: 0 }}>
+            <Button variant="outlined" disabled={connecting} onClick={onConnect}>
+              {connecting ? 'Підключаємо…' : 'Підключити бота'}
+            </Button>
+          </Box>
+        )}
       </Stack>
     </Card>
   );

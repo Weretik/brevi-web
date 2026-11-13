@@ -5,6 +5,7 @@ import {
 import { PAYROLL_MAX_STITCHES } from '@admin/production/model';
 import { PayrollSetupForm } from '@admin/production/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
+import { usePageRights } from '@admin/shared/ui';
 import { useState } from 'react';
 
 import type { PayrollMonth } from '@admin/production/model';
@@ -26,6 +27,7 @@ const initial = (month: PayrollMonth): PayrollSetupValues => ({
 
 /** Parent gives it a `key` of the month's roles and embroidery, so a fresh month resets the form. */
 export function PayrollSetupSection({ month, people, onDone, onError }: Props) {
+  const { canEdit } = usePageRights();
   const [values, setValues] = useState(() => initial(month));
   const [stitchesError, setStitchesError] = useState<string | null>(null);
   const [setRoles, roles] = useSetPayrollRolesMutation();
@@ -68,7 +70,7 @@ export function PayrollSetupSection({ month, people, onDone, onError }: Props) {
       month={month}
       people={people}
       values={values}
-      canEdit={month.permissions.canSetUp}
+      canEdit={month.permissions.canSetUp && canEdit}
       busy={busy}
       stitchesError={stitchesError}
       onChange={(next) => {

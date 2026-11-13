@@ -12,7 +12,10 @@ import type {
 interface Props {
   values: FabricColorFormValues;
   errors: FabricColorFieldErrors;
-  onChange: <Field extends FabricColorField>(field: Field, value: FabricColorFormValues[Field]) => void;
+  onChange: <Field extends FabricColorField>(
+    field: Field,
+    value: FabricColorFormValues[Field],
+  ) => void;
 }
 
 export function FabricColorForm({ values, errors, onChange }: Props) {

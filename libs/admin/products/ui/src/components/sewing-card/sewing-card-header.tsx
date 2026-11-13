@@ -1,3 +1,4 @@
+import { usePageRights } from '@admin/shared/ui';
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import { Button, FormControlLabel, Stack, Switch, Typography } from '@mui/material';
 
@@ -28,6 +29,7 @@ interface Props {
 
 /** Page header of a product card: what the sheet tab «Товари» or «ЗІЗ» holds for the product. */
 export function SewingCardHeader(props: Props) {
+  const { canDelete } = usePageRights();
   const line = [props.code, props.sectionName, props.season].filter(Boolean).join(' · ');
   return (
     <Stack
@@ -84,14 +86,16 @@ export function SewingCardHeader(props: Props) {
             Продовжити заповнення
           </Button>
         )}
-        <Button
-          variant="outlined"
-          color="error"
-          disabled={props.deleteDisabled}
-          onClick={props.onDelete}
-        >
-          Видалити
-        </Button>
+        {canDelete && (
+          <Button
+            variant="outlined"
+            color="error"
+            disabled={props.deleteDisabled}
+            onClick={props.onDelete}
+          >
+            Видалити
+          </Button>
+        )}
         {props.canEdit && (
           <Button variant="contained" onClick={props.onEdit}>
             Редагувати

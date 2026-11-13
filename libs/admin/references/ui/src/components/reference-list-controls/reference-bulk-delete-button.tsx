@@ -1,3 +1,4 @@
+import { usePageRights } from '@admin/shared/ui';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
 import { Button } from '@mui/material';
 
@@ -9,7 +10,8 @@ interface Props {
 
 /** Bulk delete next to the primary action; rendered only while rows are selected. */
 export function ReferenceBulkDeleteButton({ selectedCount, disabled, onDelete }: Props) {
-  if (!selectedCount) return null;
+  const { canDelete } = usePageRights();
+  if (!selectedCount || !canDelete) return null;
   return (
     <Button
       variant="outlined"

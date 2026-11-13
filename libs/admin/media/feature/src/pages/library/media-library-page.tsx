@@ -4,6 +4,7 @@ import {
   ReferencePageHeader,
   ReferenceSearchBar,
 } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import DriveFileMoveOutlinedIcon from '@mui/icons-material/DriveFileMoveOutlined';
 import { Box, Button } from '@mui/material';
 import { useEffect } from 'react';
@@ -35,6 +36,7 @@ import type { MediaFolderAction } from '@admin/media/ui';
 
 export function MediaLibraryPage() {
   const { state, update } = useMediaLibraryUrlState();
+  const { canCreate, canEdit } = usePageRights();
   const toasts = useMediaToasts();
   const notify = toasts.show;
   const folders = useMediaFolders(state.folderId);
@@ -110,7 +112,7 @@ export function MediaLibraryPage() {
     const summary = describeMediaUpload(result);
     toasts.show(summary.text, summary.tone);
   }
-  const drop = useFileDrop((files) => void uploadFiles(files));
+  const drop = useFileDrop((files) => void uploadFiles(files), canCreate);
   const selectedIds = [...selection.selectedIds];
 
   return (
@@ -126,7 +128,7 @@ export function MediaLibraryPage() {
               disabled={fileDeletion.deleting}
               onDelete={() => fileDeletion.request(selectedIds)}
             />
-            {selectedIds.length > 0 && (
+            {canEdit && selectedIds.length > 0 && (
               <Button
                 variant="outlined"
                 startIcon={<DriveFileMoveOutlinedIcon />}
@@ -135,10 +137,12 @@ export function MediaLibraryPage() {
                 Перемістити
               </Button>
             )}
-            <MediaUploadButton
-              disabled={upload.active}
-              onFiles={(files) => void uploadFiles(files)}
-            />
+            {canCreate && (
+              <MediaUploadButton
+                disabled={upload.active}
+                onFiles={(files) => void uploadFiles(files)}
+              />
+            )}
           </>
         }
       />

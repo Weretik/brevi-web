@@ -6,6 +6,7 @@ import {
   FinanceTransactionForm,
 } from '@admin/accounting/ui';
 import { ReferenceEditorDrawer, ReferenceFormSection } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import { Alert, Button, Stack } from '@mui/material';
 
 import { useFinanceAttachments } from '../../hooks/attachments/use-finance-attachments';
@@ -51,6 +52,7 @@ export function FinanceTransactionDrawer({
   onVoid,
   ...props
 }: Props) {
+  const { canEdit } = usePageRights();
   const editor = useFinanceTransactionEditor({
     ...props,
     scope,
@@ -101,9 +103,11 @@ export function FinanceTransactionDrawer({
             </ReferenceFormSection>
             {editable && (
               <Stack direction="row">
-                <Button color="error" variant="outlined" onClick={() => onVoid(transaction)}>
-                  Анулювати
-                </Button>
+                {canEdit && (
+                  <Button color="error" variant="outlined" onClick={() => onVoid(transaction)}>
+                    Анулювати
+                  </Button>
+                )}
               </Stack>
             )}
           </>

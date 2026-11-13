@@ -1,4 +1,5 @@
 import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import { useGetFabricMovementsQuery, useGetFabricStockQuery } from '@admin/warehouse/data-access';
 import {
   defaultFabricMovementQuery,
@@ -75,7 +76,13 @@ export function FabricMovementsPage() {
   };
   const cancelling = useMovementCancel(saved);
   const exporter = useMovementsExport(setMessage);
-  const canMove = Boolean(movements.data?.permissions.canMove ?? stock.data?.permissions.canMove);
+  const rights = usePageRights();
+  const canMoveStock = Boolean(
+    movements.data?.permissions.canMove ?? stock.data?.permissions.canMove,
+  );
+  // New operations need «Створення»; changing, cancelling or restoring a movement needs «Редагування».
+  const canMove = canMoveStock && rights.canCreate;
+  const canChange = canMoveStock && rights.canEdit;
   const filtered = Boolean(query.search || query.from || query.to || query.kind !== 'All');
   const choosePeriod = (value: MovementPeriod) => {
     setPeriod(value);
@@ -190,7 +197,7 @@ export function FabricMovementsPage() {
       {panel?.kind === 'movement' && (
         <FabricMovementDrawer
           row={panel.row}
-          canMove={canMove}
+          canMove={canChange}
           onClose={() => setPanel(null)}
           onEdit={(row) => setPanel({ kind: 'edit', row })}
           onCancel={cancelling.request}
@@ -208,7 +215,7 @@ export function FabricMovementsPage() {
       {panel?.kind === 'history' && (
         <FabricMovementHistoryDrawer
           row={panel.row}
-          canMove={canMove}
+          canMove={canChange}
           onClose={() => setPanel(null)}
           onRestored={saved}
         />

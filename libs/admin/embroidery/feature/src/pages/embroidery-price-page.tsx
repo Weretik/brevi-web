@@ -1,5 +1,6 @@
 import { useGetEmbroideryFormQuery } from '@admin/embroidery/data-access';
 import { ReferencePageHeader } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import { Alert, Box, Button, CircularProgress, Tab, Tabs } from '@mui/material';
 import { useSearchParams } from 'react-router-dom';
 
@@ -53,9 +54,15 @@ function EmbroideryPriceContent({
   viewer: EmbroideryViewer;
 }) {
   const [search, setSearch] = useSearchParams();
-  const tab = embroideryTabOf(search, viewer);
+  const rights = usePageRights();
+  const tab = embroideryTabOf(search, {
+    ...viewer,
+    canEditSettings: viewer.canEditSettings && rights.canEdit,
+  });
   const calculator = useEmbroideryCalculation(setup);
-  const canEdit = viewer.canEditSettings && setup.seesCost;
+  // «Налаштування» need «Редагування» on «Ціна вишивки»; deleting a saved calculation needs «Видалення».
+  const canEdit = viewer.canEditSettings && setup.seesCost && rights.canEdit;
+  const canDelete = viewer.canEditSettings && setup.seesCost && rights.canDelete;
   const setTab = (next: EmbroideryTab) =>
     setSearch(next === 'calculation' ? {} : { tab: next }, { replace: true });
   const since = dateOf(setup.settingsUpdatedAt);
@@ -93,7 +100,7 @@ function EmbroideryPriceContent({
       </Box>
       {tab === 'saved' && (
         <EmbroiderySavedTab
-          canDelete={canEdit}
+          canDelete={canDelete}
           onRepeat={(request) => {
             calculator.load(request);
             setTab('calculation');

@@ -1,4 +1,5 @@
 import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import { useGetFabricStockQuery } from '@admin/warehouse/data-access';
 import {
   filterFabricStock,
@@ -83,7 +84,9 @@ export function FabricStockPage() {
     if (narrowed) setClosed(flip);
     else setOpened(flip);
   };
-  const canMove = Boolean(data?.permissions.canMove);
+  // Openings, receipts, issues and «Уточнити» are new records: «Створення» on «Склад тканин».
+  const { canCreate } = usePageRights();
+  const canMove = Boolean(data?.permissions.canMove) && canCreate;
   const saved = (text: string) => {
     setMessage(text);
     setPanel(null);

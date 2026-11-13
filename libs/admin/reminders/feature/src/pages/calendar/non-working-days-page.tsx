@@ -8,6 +8,7 @@ import {
   RemindersLoadState,
   RemindersPageHeader,
 } from '@admin/reminders/ui';
+import { usePageRights } from '@admin/shared/ui';
 import { Alert, Box, Card, Stack } from '@mui/material';
 
 import { reminderError } from '../../errors/reminder-error';
@@ -19,6 +20,7 @@ export default function NonWorkingDaysPage() {
   const notice = useReminderNotice();
   const actions = useNonWorkingDayActions(notice);
   const rows = days.currentData ?? [];
+  const { canCreate } = usePageRights();
 
   return (
     <Box sx={{ p: { xs: 2, sm: 3, lg: 3.5 }, minWidth: 0 }}>
@@ -31,9 +33,11 @@ export default function NonWorkingDaysPage() {
           Під час воєнного стану державні свята — робочі дні. Додавайте сюди лише дні, коли
           нагадування не потрібні; «останній робочий день» зсунеться раніше.
         </Alert>
-        <Card variant="outlined" sx={{ p: 2 }}>
-          <NonWorkingDayForm saving={actions.adding} onAdd={actions.addDay} />
-        </Card>
+        {canCreate && (
+          <Card variant="outlined" sx={{ p: 2 }}>
+            <NonWorkingDayForm saving={actions.adding} onAdd={actions.addDay} />
+          </Card>
+        )}
         <RemindersLoadState
           loading={days.isLoading}
           error={days.error ? reminderError(days.error, 'Не вдалося завантажити дні.') : null}

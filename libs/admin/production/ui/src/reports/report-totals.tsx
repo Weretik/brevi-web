@@ -30,8 +30,10 @@ export function ReportTotals({ report, comparison }: Props) {
   const { totals } = report;
   const gaps = [
     totals.unpricedPieces > 0 && `${pieces(totals.unpricedPieces)} без ціни КП`,
-    totals.unpricedIssuedMeters > 0 && `${formatMeters(totals.unpricedIssuedMeters)} виданої тканини без ціни`,
-    totals.unpricedStockMeters !== 0 && `${formatMeters(totals.unpricedStockMeters)} залишку без ціни`,
+    totals.unpricedIssuedMeters > 0 &&
+      `${formatMeters(totals.unpricedIssuedMeters)} виданої тканини без ціни`,
+    totals.unpricedStockMeters !== 0 &&
+      `${formatMeters(totals.unpricedStockMeters)} залишку без ціни`,
   ].filter(Boolean);
   return (
     <Stack spacing={2}>

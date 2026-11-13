@@ -9,6 +9,7 @@ import {
   EmbroideryProgramSection,
   EmbroiderySubjectSection,
 } from '@admin/embroidery/ui';
+import { usePageRights } from '@admin/shared/ui';
 import { Alert, Box, Button, Link, Snackbar, Stack, useMediaQuery, useTheme } from '@mui/material';
 import { useState } from 'react';
 
@@ -35,6 +36,7 @@ export function EmbroideryCalculationTab({
   const copier = useEmbroideryCopy();
   const [saving, setSaving] = useState(false);
   const [savedNumber, setSavedNumber] = useState<string | null>(null);
+  const { canCreate } = usePageRights();
   const wide = useMediaQuery(useTheme().breakpoints.up('lg'));
   const rows = calculation?.cost?.rows ?? [];
   const program = rows.find((row) => row.kind === 'Program');
@@ -72,7 +74,7 @@ export function EmbroideryCalculationTab({
           onCopy={(price) =>
             void copier.copy(calculation?.prices ?? [], price, values.quantity ?? 0)
           }
-          onSave={calculator.priced ? () => setSaving(true) : undefined}
+          onSave={calculator.priced && canCreate ? () => setSaving(true) : undefined}
         />
       )}
       {calculation?.cost && <EmbroideryCostCard cost={calculation.cost} />}

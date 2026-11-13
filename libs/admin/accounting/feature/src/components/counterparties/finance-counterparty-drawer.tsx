@@ -7,6 +7,7 @@ import {
   FinanceMergeDialog,
 } from '@admin/accounting/ui';
 import { ReferenceEditorDrawer, ReferenceFormSection } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import { Alert, Button, Stack } from '@mui/material';
 import { useDeferredValue, useState } from 'react';
 
@@ -36,6 +37,7 @@ export function FinanceCounterpartyDrawer({
   onClose,
   onSaved,
 }: Props) {
+  const { canEdit } = usePageRights();
   const editor = useFinanceCounterpartyEditor(mode, counterparty, categories, onSaved);
   const current = editor.counterparty;
   const readOnly = editor.mode === 'view';
@@ -73,7 +75,7 @@ export function FinanceCounterpartyDrawer({
         {readOnly && current ? (
           <>
             <FinanceCounterpartyDetails counterparty={current} />
-            {editable && (
+            {editable && canEdit && (
               <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap' }}>
                 {current.active && !current.verified && (
                   <Button variant="contained" disabled={editor.busy} onClick={editor.verify}>

@@ -1,3 +1,4 @@
+import { usePageRights } from '@admin/shared/ui';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { IconButton, Stack, Tooltip } from '@mui/material';
@@ -11,26 +12,31 @@ interface Props {
 }
 
 export function ReminderTaskActionsCell({ task, onEdit, onArchive }: Props) {
+  const { canEdit, canDelete } = usePageRights();
   return (
     <Stack direction="row" spacing={0.5}>
-      <Tooltip title="Редагувати">
-        <IconButton
-          size="small"
-          aria-label={`Редагувати «${task.title}»`}
-          onClick={() => onEdit(task)}
-        >
-          <EditOutlinedIcon fontSize="small" />
-        </IconButton>
-      </Tooltip>
-      <Tooltip title="Видалити">
-        <IconButton
-          size="small"
-          aria-label={`Видалити «${task.title}»`}
-          onClick={() => onArchive(task)}
-        >
-          <DeleteOutlinedIcon fontSize="small" />
-        </IconButton>
-      </Tooltip>
+      {canEdit && (
+        <Tooltip title="Редагувати">
+          <IconButton
+            size="small"
+            aria-label={`Редагувати «${task.title}»`}
+            onClick={() => onEdit(task)}
+          >
+            <EditOutlinedIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      )}
+      {canDelete && (
+        <Tooltip title="Видалити">
+          <IconButton
+            size="small"
+            aria-label={`Видалити «${task.title}»`}
+            onClick={() => onArchive(task)}
+          >
+            <DeleteOutlinedIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      )}
     </Stack>
   );
 }

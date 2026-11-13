@@ -21,6 +21,7 @@ import {
   countProductionOrderFilters,
 } from '@admin/production/ui';
 import { ReferenceListAlerts, ReferencePageHeader, ReferenceSearchBar } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import AddIcon from '@mui/icons-material/Add';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -66,6 +67,7 @@ type OrdersView = 'list' | 'summary';
  */
 export function ProductionOrdersPage({ useOrderActor }: Props) {
   const actor = useOrderActor();
+  const { canCreate } = usePageRights();
   const navigate = useNavigate();
   const list = useProductionOrders();
   const [view, setView] = useState<OrdersView>('list');
@@ -110,7 +112,7 @@ export function ProductionOrdersPage({ useOrderActor }: Props) {
             >
               Експорт
             </Button>
-            {actor.canImport && <ProductionOrdersMoreMenu onImport={setImporting} />}
+            {actor.canImport && canCreate && <ProductionOrdersMoreMenu onImport={setImporting} />}
             {actor.canCreate && (
               <Button
                 variant="contained"

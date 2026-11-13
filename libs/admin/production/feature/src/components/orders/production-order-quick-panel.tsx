@@ -47,6 +47,7 @@ export function ProductionOrderQuickPanel({ orderId, onClose }: Props) {
       readOnly
       saving={false}
       editLabel="Відкрити повністю"
+      editRight={null}
       onClose={onClose}
       onEdit={() => full()}
       onSubmit={onClose}

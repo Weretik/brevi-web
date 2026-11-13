@@ -4,6 +4,7 @@ import {
   useVoidProductionWorkMutation,
 } from '@admin/production/data-access';
 import { ProductionItemWorkPanel } from '@admin/production/ui';
+import { usePageRights } from '@admin/shared/ui';
 import { Alert, LinearProgress } from '@mui/material';
 import { useState } from 'react';
 
@@ -25,6 +26,7 @@ export function ProductionItemWorkSection({ order, item, onMessage }: Props) {
     orderId: order.id,
     itemId: item.id,
   });
+  const { can } = usePageRights();
   const [recording, setRecording] = useState(false);
   const choices = useGetWorkChoicesQuery(undefined, { skip: !recording });
   const [voidWork] = useVoidProductionWorkMutation();
@@ -41,8 +43,10 @@ export function ProductionItemWorkSection({ order, item, onMessage }: Props) {
       <ProductionItemWorkPanel
         work={data}
         busy={reversal.busy}
-        onRecord={data.canRecord ? () => setRecording(true) : undefined}
-        onVoid={data.canRecord ? reversal.request : undefined}
+        onRecord={
+          data.canRecord && can('create', 'work-log') ? () => setRecording(true) : undefined
+        }
+        onVoid={data.canRecord && can('edit', 'work-log') ? reversal.request : undefined}
       />
       {recording && choices.isFetching && <LinearProgress />}
       {recording && choices.error && (

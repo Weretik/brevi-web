@@ -6,6 +6,7 @@ import { formatDay, formatMoney } from '@admin/production/model';
 import { SewingForecastTable } from '@admin/production/ui';
 import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
+import { usePageRights } from '@admin/shared/ui';
 import { Alert, Box, Typography } from '@mui/material';
 import { useState } from 'react';
 
@@ -16,6 +17,8 @@ export function SewingForecastPage() {
   const [message, setMessage] = useState<string | null>(null);
   const data = forecast.data;
   const settings = data?.settings ?? null;
+  const { canEdit } = usePageRights();
+  const canReorder = Boolean(data?.canReorder) && canEdit;
 
   async function move(index: number, by: -1 | 1) {
     if (!data || saving.isLoading) return;
@@ -62,14 +65,14 @@ export function SewingForecastPage() {
         Орієнтовне завершення пошиття, не обіцяна дата доставки.
         {settings &&
           ` Швачок: ${settings.seamstressCount}, хвилин у зміні: ${settings.shiftMinutes}${settings.minuteCost !== null ? `, хвилина ${formatMoney(settings.minuteCost)}` : ''}.`}
-        {data?.canReorder && ' Порядок черги змінюйте стрілками.'}
+        {canReorder && ' Порядок черги змінюйте стрілками.'}
       </Typography>
       {data && (
         <SewingForecastTable
           rows={data.rows}
           showMinutes={data.settings !== null}
           busy={saving.isLoading || forecast.isFetching}
-          onMove={data.canReorder ? (index, by) => void move(index, by) : undefined}
+          onMove={canReorder ? (index, by) => void move(index, by) : undefined}
         />
       )}
     </Box>

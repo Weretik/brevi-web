@@ -4,6 +4,7 @@ import {
   PriceSourceDiscountForm,
   ReferenceEditorDrawer,
 } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import { Alert, Stack } from '@mui/material';
 
 import { PriceFileUpload } from './price-file-upload';
@@ -29,6 +30,7 @@ export function PriceSourceDrawer({
   onDiscountSaved,
   onApplied,
 }: Props) {
+  const rights = usePageRights();
   const supplierPreview = useSupplierPreview();
   const discount = usePriceSourceDiscount(source, onDiscountSaved);
   const readOnly = !discount.editing;
@@ -63,8 +65,12 @@ export function PriceSourceDrawer({
             onChange={discount.change}
           />
         )}
-        {readOnly && refresh && <PriceRefresh source={source} onApplied={onApplied} />}
-        {readOnly && upload && <PriceFileUpload source={source} onApplied={onApplied} />}
+        {readOnly && refresh && rights.canEdit && (
+          <PriceRefresh source={source} onApplied={onApplied} />
+        )}
+        {readOnly && upload && rights.canCreate && (
+          <PriceFileUpload source={source} onApplied={onApplied} />
+        )}
         <PriceSourceDetails
           source={source}
           onOpenSupplier={() =>

@@ -9,6 +9,7 @@ import {
 } from '@admin/accounting/model';
 import { BankLinesGrid, FinanceDeleteDialog, FinanceSegmentedButtons } from '@admin/accounting/ui';
 import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
 import { Alert, Box, Button, Paper, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
@@ -29,6 +30,7 @@ const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabula
  * line marked «Проводити» in one save, and «Відкотити виписку» cancels what a booked statement added.
  */
 export function BankStatementPage() {
+  const { canEdit } = usePageRights();
   const { id = '' } = useParams();
   const location = useLocation();
   const existing = Boolean((location.state as { existing?: boolean } | null)?.existing);
@@ -69,6 +71,7 @@ export function BankStatementPage() {
         }
         actions={
           statement &&
+          canEdit &&
           (booked ? (
             <Button
               variant="outlined"

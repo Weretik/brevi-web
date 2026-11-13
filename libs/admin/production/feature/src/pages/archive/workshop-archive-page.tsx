@@ -11,6 +11,7 @@ import {
   ReferencePageHeader,
   ReferenceSearchBar,
 } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import { Alert, Box, Button, Paper, Stack, Tab, Tabs, TextField } from '@mui/material';
 import { useState } from 'react';
@@ -56,6 +57,7 @@ function DayField({
 
 /** «Швейний цех › Архів цеху»: the old books of the «Цех» and the closed orders, read only. */
 export function WorkshopArchivePage({ useOrderActor }: Props) {
+  const { canEdit } = usePageRights();
   const actor = useOrderActor();
   const navigate = useNavigate();
   const list = useWorkshopArchive();
@@ -71,7 +73,7 @@ export function WorkshopArchivePage({ useOrderActor }: Props) {
         title="Архів цеху"
         subtitle="Старий «Графік роботи», старі заявки й закриті завдання. Лише перегляд."
         actions={
-          actor.canImport ? (
+          actor.canImport && canEdit ? (
             <Button
               variant="outlined"
               startIcon={<UploadFileOutlinedIcon />}

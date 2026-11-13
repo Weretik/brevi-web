@@ -1,5 +1,6 @@
 import { purchaseInvoiceStatus, purchaseLinkStatus } from '@admin/purchasing/model';
 import { PurchaseDocumentView, PurchaseStatusChip } from '@admin/purchasing/ui';
+import { usePageRights } from '@admin/shared/ui';
 import { Box, Button, Link, Stack, Typography } from '@mui/material';
 
 import { PurchaseLinkDraft } from '../documents/purchase-link-draft';
@@ -16,6 +17,7 @@ interface Props {
 /** An open register row: the message, the reasons of its state, and each original with its facts. */
 export function PurchaseInvoiceRowDetails({ invoice, renderActions, onOpenReview }: Props) {
   const { notes } = purchaseInvoiceStatus(invoice);
+  const canChange = usePageRights().can('edit', 'purchase-invoices');
   return (
     <Stack sx={{ gap: 1.5, pt: 1 }}>
       <Stack
@@ -35,9 +37,11 @@ export function PurchaseInvoiceRowDetails({ invoice, renderActions, onOpenReview
               .join(' · ')}
           </Typography>
         </Typography>
-        <Button size="small" onClick={() => onOpenReview(invoice)} sx={{ flexShrink: 0 }}>
-          Постачальник і примітка
-        </Button>
+        {canChange && (
+          <Button size="small" onClick={() => onOpenReview(invoice)} sx={{ flexShrink: 0 }}>
+            Постачальник і примітка
+          </Button>
+        )}
       </Stack>
       {notes.length > 0 && (
         <Stack component="ul" sx={{ m: 0, pl: 2.5, gap: 0.25 }} aria-label="Що перевірити">

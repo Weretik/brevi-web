@@ -7,3 +7,5 @@ export {
   avatarInitial,
   UserAvatar,
 } from './data-display/user-avatar';
+export { PageRightsProvider, PageRightsScope, usePageRights } from './access/page-rights';
+export type { CanDo, PageAction } from './access/page-rights';

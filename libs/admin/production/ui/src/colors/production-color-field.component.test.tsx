@@ -9,7 +9,12 @@ describe('ProductionColorField', () => {
   it('offers only the colours of «Кольори»', async () => {
     const onChange = vi.fn();
     render(
-      <ProductionColorField label="Колір" value="" colors={['Чорний', 'Синій']} onChange={onChange} />,
+      <ProductionColorField
+        label="Колір"
+        value=""
+        colors={['Чорний', 'Синій']}
+        onChange={onChange}
+      />,
     );
     fireEvent.change(screen.getByLabelText('Колір'), { target: { value: 'син' } });
     fireEvent.click(await screen.findByRole('option', { name: 'Синій' }));

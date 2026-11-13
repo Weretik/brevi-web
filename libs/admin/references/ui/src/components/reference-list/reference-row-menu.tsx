@@ -1,9 +1,12 @@
+import { usePageRights } from '@admin/shared/ui';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import OpenInFullOutlinedIcon from '@mui/icons-material/OpenInFullOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Divider, ListItemIcon, Menu, MenuItem } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
+
+import type { PageAction } from '@admin/shared/ui';
 
 interface MenuRow {
   /** Numeric ids in references; text ids (uuid) in other modules. */
@@ -26,9 +29,11 @@ interface Props<Row extends MenuRow> {
   openHref?: (row: Row) => string;
   /** «Видалити» by default; e.g. «В архів» when the row is archived instead. */
   deleteLabel?: string;
+  /** The «Права доступу» action the last item needs: delete by default, edit when it archives or voids. */
+  deleteRight?: PageAction;
 }
 
-/** Row actions of «Цех» reference grids: view, open the full page (optional), edit, delete. */
+/** Row actions of «Цех» reference grids: view, open the full page (optional), edit, delete; edit and delete only with those rights. */
 export function ReferenceRowMenu<Row extends MenuRow>({
   row,
   anchorPosition,
@@ -40,7 +45,10 @@ export function ReferenceRowMenu<Row extends MenuRow>({
   viewLabel = 'Переглянути',
   openHref,
   deleteLabel = 'Видалити',
+  deleteRight = 'delete',
 }: Props<Row>) {
+  const { can, canEdit } = usePageRights();
+  const canDelete = can(deleteRight);
   function run(action: (value: Row) => void) {
     onClose(false);
     if (row) action(row);
@@ -68,19 +76,23 @@ export function ReferenceRowMenu<Row extends MenuRow>({
           Відкрити повну картку
         </MenuItem>
       )}
-      <MenuItem onClick={() => run(onEdit)}>
-        <ListItemIcon>
-          <EditOutlinedIcon fontSize="small" />
-        </ListItemIcon>
-        Редагувати
-      </MenuItem>
-      <Divider />
-      <MenuItem sx={{ color: 'error.main' }} onClick={() => run((value) => onDelete(value.id))}>
-        <ListItemIcon sx={{ color: 'inherit' }}>
-          <DeleteOutlineIcon fontSize="small" />
-        </ListItemIcon>
-        {deleteLabel}
-      </MenuItem>
+      {canEdit && (
+        <MenuItem onClick={() => run(onEdit)}>
+          <ListItemIcon>
+            <EditOutlinedIcon fontSize="small" />
+          </ListItemIcon>
+          Редагувати
+        </MenuItem>
+      )}
+      {canDelete && <Divider />}
+      {canDelete && (
+        <MenuItem sx={{ color: 'error.main' }} onClick={() => run((value) => onDelete(value.id))}>
+          <ListItemIcon sx={{ color: 'inherit' }}>
+            <DeleteOutlineIcon fontSize="small" />
+          </ListItemIcon>
+          {deleteLabel}
+        </MenuItem>
+      )}
     </Menu>
   );
 }

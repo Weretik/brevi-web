@@ -1,4 +1,5 @@
 import { ReferencePageHeader } from '@admin/references/ui';
+import { usePageRights } from '@admin/shared/ui';
 import { tasksForToday } from '@admin/tasks/model';
 import { TaskBoard, TaskMetricStrip, TaskTodayCard } from '@admin/tasks/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
@@ -23,6 +24,7 @@ export default function TaskBoardPage({ viewer }: { viewer: TaskViewer }) {
   const board = useTaskBoard(viewer, notice.notify);
   const editor = useTaskEditor(viewer, notice.notify);
   const today = tasksForToday(board.tasks, new Date());
+  const { canCreate } = usePageRights();
 
   return (
     <Box>
@@ -35,7 +37,8 @@ export default function TaskBoardPage({ viewer }: { viewer: TaskViewer }) {
             : 'Перетягніть картку, коли берете завдання в роботу або завершуєте його'
         }
         actions={
-          viewer.isAdmin && (
+          viewer.isAdmin &&
+          canCreate && (
             <Button
               variant="contained"
               startIcon={<AddOutlinedIcon />}

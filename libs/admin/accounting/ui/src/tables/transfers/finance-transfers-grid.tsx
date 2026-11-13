@@ -105,6 +105,7 @@ export function FinanceTransfersGrid({ rows, rowCount, onVoid, ...props }: Props
       onEdit={props.onEdit}
       onDelete={onVoid}
       deleteLabel="Анулювати"
+      deleteRight="edit"
       server={{
         rowCount,
         paginationModel: props.paginationModel,

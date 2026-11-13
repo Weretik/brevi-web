@@ -7,6 +7,7 @@ import {
   ReferenceSearchBar,
 } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
+import { usePageRights } from '@admin/shared/ui';
 import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined';
 import SyncOutlinedIcon from '@mui/icons-material/SyncOutlined';
 import { Alert, Box, Button, Paper, Stack } from '@mui/material';
@@ -40,6 +41,8 @@ export function PurchaseInvoicesContent() {
   );
   const batch = usePurchaseRecognitionBatch((text, ok) => setNotice({ text, ok }));
   const files = usePurchaseFileActions();
+  // Updating, recognising and reviewing change the register: «Редагування» on «Рахунки на закупку».
+  const { canEdit } = usePageRights();
   const [fixing, setFixing] = useState<PurchaseInvoiceLink | null>(null);
   const { list } = state;
   const page = list.currentData;
@@ -67,30 +70,32 @@ export function PurchaseInvoicesContent() {
           )
         }
         actions={
-          <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap' }}>
-            {batch.running ? (
-              <Button variant="outlined" color="warning" onClick={batch.stop}>
-                Зупинити
-              </Button>
-            ) : (
+          canEdit ? (
+            <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap' }}>
+              {batch.running ? (
+                <Button variant="outlined" color="warning" onClick={batch.stop}>
+                  Зупинити
+                </Button>
+              ) : (
+                <Button
+                  variant="outlined"
+                  startIcon={<AutoAwesomeOutlinedIcon />}
+                  disabled={syncing}
+                  onClick={() => void batch.start()}
+                >
+                  Розпізнати всі нові
+                </Button>
+              )}
               <Button
                 variant="outlined"
-                startIcon={<AutoAwesomeOutlinedIcon />}
-                disabled={syncing}
-                onClick={() => void batch.start()}
+                startIcon={<SyncOutlinedIcon />}
+                disabled={syncing || batch.running}
+                onClick={() => void sync()}
               >
-                Розпізнати всі нові
+                {syncing ? 'Оновлення…' : 'Оновити зараз'}
               </Button>
-            )}
-            <Button
-              variant="outlined"
-              startIcon={<SyncOutlinedIcon />}
-              disabled={syncing || batch.running}
-              onClick={() => void sync()}
-            >
-              {syncing ? 'Оновлення…' : 'Оновити зараз'}
-            </Button>
-          </Stack>
+            </Stack>
+          ) : null
         }
       />
       {batch.running && (
