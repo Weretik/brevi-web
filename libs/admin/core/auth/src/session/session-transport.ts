@@ -13,7 +13,9 @@ type SessionUserResponse =
 type SessionAccessResponse =
   operations['getSessionAccess']['responses'][200]['content']['application/json'];
 
-const getAuthUrl = (path: string): string => new URL(path, appConfig.apiBaseUrl).toString();
+/** In development the API base URL is empty and the Vite dev server proxies `/api`, so the path stays relative. */
+const getAuthUrl = (path: string): string =>
+  appConfig.apiBaseUrl ? new URL(path, appConfig.apiBaseUrl).toString() : path;
 
 const toSessionAccess = (response: SessionAccessResponse): SessionAccess => ({
   allowAll: response.allowAll,

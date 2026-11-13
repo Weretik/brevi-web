@@ -55,6 +55,21 @@ describe('cookie session transport', () => {
     });
   });
 
+  it('keeps the path relative in development, where Vite proxies /api', async () => {
+    configureAppConfig({ production: false, api: { baseUrl: 'https://localhost:7142' } });
+    post.mockResolvedValue({ data: meResponse });
+    get.mockResolvedValue({ data: accessResponse });
+
+    await requestLogin({ email: 'admin@brevi.com.ua', password: 'secret-pass' });
+
+    expect(post).toHaveBeenCalledWith(
+      '/api/auth/cookie/login',
+      { email: 'admin@brevi.com.ua', password: 'secret-pass' },
+      { withCredentials: true },
+    );
+    expect(get).toHaveBeenCalledWith('/api/auth/session/access', { withCredentials: true });
+  });
+
   it('signs out with the CSRF cookie value and no bearer token', async () => {
     document.cookie = 'brevi.csrf=csrf%20value; Path=/';
     post.mockResolvedValue({ data: undefined });
