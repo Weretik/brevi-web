@@ -13,19 +13,14 @@ import { usePageRights } from '@admin/shared/ui';
 import AddIcon from '@mui/icons-material/Add';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import { Box, Button, Stack, Typography } from '@mui/material';
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { ProductionOrdersImportDrawers } from '../../components/import/production-orders-import-drawers';
 import { ProductionModelSummaryView } from '../../components/orders/production-model-summary-view';
 import { ProductionOrderQuickPanel } from '../../components/orders/production-order-quick-panel';
-import { useOrderQuickParam } from '../../hooks/orders-list/use-order-quick-param';
-import { useProductionModelSummary } from '../../hooks/orders-list/use-production-model-summary';
-import { useProductionOrders } from '../../hooks/orders-list/use-production-orders';
-import { useProductionOrdersExport } from '../../hooks/orders-list/use-production-orders-export';
+import { useProductionOrdersPage } from '../../hooks/orders-list/use-production-orders-page';
 
 import type { ProductionOrderActor } from '@admin/production/model';
-import type { ProductionOrdersImport, ProductionOrdersView } from '@admin/production/ui';
 
 interface Props {
   useOrderActor: () => ProductionOrderActor;
@@ -42,17 +37,22 @@ export function ProductionOrdersPage({ useOrderActor }: Props) {
   const actor = useOrderActor();
   const { canCreate } = usePageRights();
   const navigate = useNavigate();
-  const list = useProductionOrders();
-  const [view, setView] = useState<ProductionOrdersView>('list');
-  const [filtersOpen, setFiltersOpen] = useState(false);
-  const summary = useProductionModelSummary(list.query, view === 'summary');
-  const [message, setMessage] = useState<string | null>(null);
-  const [importing, setImporting] = useState<ProductionOrdersImport | null>(null);
-  const exporter = useProductionOrdersExport(setMessage);
-  const quick = useOrderQuickParam();
-  const page = list.page;
-  const attention = page?.attention ?? { overdue: 0, dueSoon: 0 };
-
+  const {
+    list,
+    view,
+    setView,
+    filtersOpen,
+    setFiltersOpen,
+    summary,
+    message,
+    setMessage,
+    importing,
+    setImporting,
+    exporter,
+    quick,
+    page,
+    attention,
+  } = useProductionOrdersPage();
   return (
     <Box sx={{ minWidth: 0 }}>
       <ReferencePageHeader

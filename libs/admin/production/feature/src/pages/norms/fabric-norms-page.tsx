@@ -1,10 +1,4 @@
-import { useImportFabricNormsMutation } from '@admin/production/data-access';
-import {
-  countFabricNorms,
-  filterFabricNorms,
-  parseBatchSize,
-  parseFabricNormImportFile,
-} from '@admin/production/model';
+import { countFabricNorms, parseFabricNormImportFile } from '@admin/production/model';
 import {
   FabricNormFilterChips,
   FabricNormModelList,
@@ -20,16 +14,10 @@ import {
 import { usePageRights } from '@admin/shared/ui';
 import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import { Box, Button, Typography } from '@mui/material';
-import { useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
 
 import { ProductionImportDrawer } from '../../components/import/production-import-drawer';
 import { FabricNormDrawer } from '../../components/norms/fabric-norm-drawer';
-import { useFabricNormDeletion } from '../../hooks/norms/use-fabric-norm-deletion';
-import { useFabricNorms } from '../../hooks/norms/use-fabric-norms';
-import { useModelCompositions } from '../../hooks/norms/use-model-compositions';
-
-import type { FabricNormFilter, FabricNormRow } from '@admin/production/model';
+import { useFabricNormsPage } from '../../hooks/norms/use-fabric-norms-page';
 
 /**
  * «Швейний цех › Норми витрати тканини»: the list of models on the left and the work card of the
@@ -39,29 +27,32 @@ import type { FabricNormFilter, FabricNormRow } from '@admin/production/model';
 export function FabricNormsPage() {
   const rights = usePageRights();
   const { canCreate } = rights;
-  const [searchParams, setSearchParams] = useSearchParams();
-  const { rows, loading, error, reload } = useFabricNorms();
-  const compositions = useModelCompositions();
-  const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState<FabricNormFilter>(null);
-  const [batchText, setBatchText] = useState('');
-  const [editing, setEditing] = useState<FabricNormRow | null>(null);
-  const [importing, setImporting] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const deletion = useFabricNormDeletion(setMessage);
-  const [importNorms] = useImportFabricNormsMutation();
-  const filtered = useMemo(() => filterFabricNorms(rows, search, filter), [rows, search, filter]);
-
-  const requested = searchParams.get('model');
-  const selected = filtered.find((row) => row.modelCode === requested) ?? filtered[0] ?? null;
-  const composition = selected
-    ? compositions.rows.find((model) => model.modelCode === selected.modelCode)
-    : undefined;
-  const batchSize = parseBatchSize(batchText);
-
-  const select = (row: FabricNormRow) =>
-    setSearchParams({ model: row.modelCode }, { replace: true });
-
+  const {
+    rows,
+    loading,
+    error,
+    reload,
+    compositions,
+    search,
+    setSearch,
+    filter,
+    setFilter,
+    batchText,
+    setBatchText,
+    editing,
+    setEditing,
+    importing,
+    setImporting,
+    message,
+    setMessage,
+    deletion,
+    importNorms,
+    filtered,
+    selected,
+    composition,
+    batchSize,
+    select,
+  } = useFabricNormsPage();
   return (
     <Box sx={{ minWidth: 0 }}>
       <ReferencePageHeader

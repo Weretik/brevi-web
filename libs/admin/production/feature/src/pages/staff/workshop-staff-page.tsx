@@ -1,9 +1,4 @@
-import { useImportWorkshopStaffMutation } from '@admin/production/data-access';
-import {
-  countWorkshopPositions,
-  filterWorkshopStaff,
-  parseStaffImportFile,
-} from '@admin/production/model';
+import { countWorkshopPositions, parseStaffImportFile } from '@admin/production/model';
 import {
   ProductionConfirmDialog,
   WorkshopStaffChips,
@@ -15,38 +10,37 @@ import { usePageRights } from '@admin/shared/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import { Box, Button, Paper } from '@mui/material';
-import { useMemo, useState } from 'react';
 
 import { ProductionImportDrawer } from '../../components/import/production-import-drawer';
 import { WorkshopEmployeeDrawer } from '../../components/staff/workshop-employee-drawer';
-import { useWorkshopEmployeeActivation } from '../../hooks/staff/use-workshop-employee-activation';
-import { useWorkshopStaff } from '../../hooks/staff/use-workshop-staff';
-
-import type { ProductionEditorMode } from '../../hooks/staff/use-workshop-employee-editor';
-import type { WorkshopEmployee, WorkshopStaffStatus } from '@admin/production/model';
+import { useWorkshopStaffPage } from '../../hooks/staff/use-workshop-staff-page';
 
 /** «Швейний цех › Персонал цеху › Працівники»: the list the head of the workshop records work and pay for. */
 export function WorkshopStaffPage() {
   const { canCreate } = usePageRights();
-  const { rows, loading, error, reload } = useWorkshopStaff();
-  const [search, setSearch] = useState('');
-  const [status, setStatus] = useState<WorkshopStaffStatus>('active');
-  const [position, setPosition] = useState<string | null>(null);
-  const [active, setActive] = useState<{
-    mode: ProductionEditorMode;
-    employee: WorkshopEmployee | null;
-  } | null>(null);
-  const [importing, setImporting] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const activation = useWorkshopEmployeeActivation(setMessage);
-  const [importStaff] = useImportWorkshopStaffMutation();
-  const filtered = useMemo(
-    () => filterWorkshopStaff(rows, search, status, position),
-    [rows, search, status, position],
-  );
-  const inStatus = rows.filter((row) => row.isActive === (status === 'active')).length;
-  const activeCount = rows.filter((row) => row.isActive).length;
-
+  const {
+    rows,
+    loading,
+    error,
+    reload,
+    search,
+    setSearch,
+    status,
+    setStatus,
+    position,
+    setPosition,
+    active,
+    setActive,
+    importing,
+    setImporting,
+    message,
+    setMessage,
+    activation,
+    importStaff,
+    filtered,
+    inStatus,
+    activeCount,
+  } = useWorkshopStaffPage();
   return (
     <Box sx={{ minWidth: 0 }}>
       <WorkshopTabHeader
