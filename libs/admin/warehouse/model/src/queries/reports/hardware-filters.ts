@@ -43,3 +43,7 @@ export function filterHardware(
         (a.dueDate ?? '9999').localeCompare(b.dueDate ?? '9999') || a.code.localeCompare(b.code),
     );
 }
+
+/** How many production orders a hardware need serves (several items of one order count once). */
+export const hardwareTasks = (need: HardwareNeed) =>
+  new Set(need.orders.map((x) => x.orderId)).size;

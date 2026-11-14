@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { filterHardware, hardwareViewCounts } from './hardware-filters';
+import { filterHardware, hardwareTasks, hardwareViewCounts } from './hardware-filters';
 
 import type { HardwareNeed } from '../../entities/reports/stock-reports';
 
@@ -59,5 +59,19 @@ describe('filterHardware', () => {
     expect(
       hardwareViewCounts({ orders: 1, items: 1, needs, incomplete: [], calculatedAt: '' }),
     ).toEqual({ all: 3, incomplete: 0, unchecked: 1 });
+  });
+});
+
+describe('hardwareTasks', () => {
+  it('counts distinct orders of a need', () => {
+    const base = need('F-1', null);
+    const twoRowsOneOrder = {
+      ...base,
+      orders: [base.orders[0], { ...base.orders[0], itemId: 11 }],
+    };
+    const twoOrders = { ...base, orders: [base.orders[0], { ...base.orders[0], orderId: 2 }] };
+
+    expect(hardwareTasks(twoRowsOneOrder)).toBe(1);
+    expect(hardwareTasks(twoOrders)).toBe(2);
   });
 });
