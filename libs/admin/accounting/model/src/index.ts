@@ -33,3 +33,4 @@ export * from './validators/categories/finance-category-validation';
 export * from './validators/counterparties/finance-counterparty-validation';
 export * from './validators/transactions/finance-transaction-validation';
 export * from './validators/transfers/finance-transfer-validation';
+export { financeReviewReasons } from './queries/overview/finance-review-reasons';
