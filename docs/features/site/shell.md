@@ -37,6 +37,7 @@ apps/site/
         ├── global.css        # «Строчка» tokens
         ├── fonts.ts          # Manrope, IBM Plex Mono
         ├── global-not-found.tsx
+        ├── global-error.tsx     # 500 when the root layout itself fails
         ├── robots.ts, sitemap.ts, manifest.ts
         └── [locale]/
             ├── layout.tsx    # html, SiteShell, Organization JSON-LD
