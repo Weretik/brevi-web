@@ -1,7 +1,7 @@
 import { formatLeadMoment } from '@admin/leads/model';
 import { Box, Stack, Typography } from '@mui/material';
 
-import { mono } from '../mono';
+import { mono } from '../status/mono';
 
 import type { LeadCall } from '@admin/leads/model';
 

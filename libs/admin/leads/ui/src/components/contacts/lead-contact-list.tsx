@@ -4,7 +4,7 @@ import LinkOutlinedIcon from '@mui/icons-material/LinkOutlined';
 import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import { Button, Stack, Typography } from '@mui/material';
 
-import { mono } from '../mono';
+import { mono } from '../status/mono';
 
 import type { LeadDetail } from '@admin/leads/model';
 

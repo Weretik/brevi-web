@@ -1,7 +1,7 @@
-import { sitePageApiError } from '../../errors/site-page-api-error';
+import { sitePageApiError } from '../../errors/site/site-page-api-error';
 import { mapSitePage, mapSitePages } from '../../mappers/site-pages/site-page.mapper';
 
-import type { ContentEndpointBuilder } from '../content-endpoint-builder';
+import type { ContentEndpointBuilder } from '../base/content-endpoint-builder';
 import type { SitePage, SitePageInput } from '@admin/content/model';
 import type { operations } from '@admin/shared/contracts';
 

@@ -100,7 +100,7 @@ libs/admin/shared/ui/src/inputs/rich-text-editor/  # visual editor; rich-text-ph
 - `libs/admin/content/feature/src/components/product-pages/content-products-content.component.test.tsx`
 - `libs/admin/content/feature/src/components/site-categories/site-categories-content.component.test.tsx`
 - `libs/admin/content/feature/src/components/articles/articles-content.component.test.tsx`
-- `libs/admin/shared/ui/src/inputs/rich-text-editor/rich-text-editor.component.test.tsx`
+- `libs/admin/shared/ui/src/inputs/rich-text-editor.component.test.tsx`
 - `libs/admin/content/feature/src/pages/legal/legal-documents-page.component.test.tsx`
 - `apps/admin-react/src/app/router/navigation/navigation-config.unit.test.ts`
 

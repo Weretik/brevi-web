@@ -12,8 +12,8 @@ SC-009: Given anonymous mode and no session, when opening Admin and querying acc
 
 - apps/admin-react/src/environments/environment{,.prod}.ts: enable temporary flag in each build environment.
 - libs/admin/shared/config/src/{env/admin-environment.types.ts,config/app-config.types.ts,config/app-config.ts}: typed environment flag and normalized default false.
-- libs/admin/core/auth/src/session/auth-session.ts: anonymous lifecycle branch before normal session flow.
-- libs/admin/core/auth/src/session/session-roles.api.ts: anonymous local role projection for existing navigation; normal /me mapper unchanged.
+- libs/admin/core/auth/src/session/store/auth-session.ts: anonymous lifecycle branch before normal session flow.
+- libs/admin/core/auth/src/session/roles/session-roles.api.ts: anonymous local role projection for existing navigation; normal /me mapper unchanged.
 - libs/admin/products/data-access/src/api/sewing-access/sewing-access.api.ts: anonymous local read/manage access projection; normal API mapping/errors retained.
 - Tests colocated with config/auth/access API; API-client transport regression verifies no bearer and no 401 refresh. No new dependency or backend contract/DTO changes. Local role projection does not grant backend permissions; backend anonymous mode must actually be deployed/enabled.
 

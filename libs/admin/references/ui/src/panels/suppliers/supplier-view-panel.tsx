@@ -2,13 +2,13 @@ import CloseIcon from '@mui/icons-material/Close';
 import { Box, Button, Chip, Divider, Drawer, IconButton, Stack, Typography } from '@mui/material';
 import { useId } from 'react';
 
-import { SupplierContacts, supplierSectionTitle as sectionTitle } from './view/supplier-contacts';
-import { SupplierRelatedList } from './view/supplier-related-list';
+import { SupplierContacts, supplierSectionTitle as sectionTitle } from './supplier-contacts';
+import { SupplierRelatedList } from './supplier-related-list';
 
-import type { SupplierViewRelatedRow } from './view/supplier-related-list';
+import type { SupplierViewRelatedRow } from './supplier-related-list';
 import type { Supplier } from '@admin/references/model';
 
-export type { SupplierViewRelatedRow } from './view/supplier-related-list';
+export type { SupplierViewRelatedRow } from './supplier-related-list';
 
 interface Props {
   supplier: Supplier;

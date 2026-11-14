@@ -2,7 +2,7 @@ import { fabricNormErrors, toProductionApiError } from '../../errors/production-
 import { mapFabricNormRow, mapFabricNormRows } from '../../mappers/norms/fabric-norm.mapper';
 import { mapModelCompositions } from '../../mappers/norms/model-composition.mapper';
 import { mapFabricNormImportResult } from '../../mappers/orders/production-import.mapper';
-import { productionBaseApi } from '../production-base-api';
+import { productionBaseApi } from '../base/production-base-api';
 
 import type {
   FabricNormImportRow,

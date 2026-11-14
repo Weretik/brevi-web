@@ -5,7 +5,7 @@ import {
   mapReminderOccurrencePage,
 } from '../../mappers/occurrences/reminder-occurrence.mapper';
 
-import type { RemindersEndpointBuilder } from '../reminders-endpoint-builder';
+import type { RemindersEndpointBuilder } from '../base/reminders-endpoint-builder';
 import type {
   ReminderOccurrence,
   ReminderOccurrencePage,

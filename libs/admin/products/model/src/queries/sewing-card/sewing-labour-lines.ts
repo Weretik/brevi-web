@@ -1,4 +1,4 @@
-import type { SewingOperationDraft } from '../../entities/sewing-composition/sewing-operation-draft';
+import type { SewingOperationDraft } from '../../entities/sewing-composition/operations/sewing-operation-draft';
 
 export interface SewingLabourLine {
   key: string;

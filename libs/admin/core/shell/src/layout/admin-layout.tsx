@@ -3,7 +3,7 @@ import { Suspense, useEffect, useRef, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 
 import { RouteErrorBoundary } from '../components/error-pages/route-error-boundary';
-import { AdminTopBar } from '../components/top-bar/admin-top-bar';
+import { AdminTopBar } from '../components/top-bar/header/admin-top-bar';
 import {
   AdminNavigationDrawers,
   navigationWidth,

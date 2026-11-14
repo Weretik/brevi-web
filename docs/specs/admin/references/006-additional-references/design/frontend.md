@@ -4,7 +4,7 @@
 
 - Angular-джерело таблиці, діалогів і контекстних дій: `libs/admin/feature/references/src/lib/pages/additional-reference/` та `libs/admin/feature/references/src/lib/components/dialogs/`.
 - Старий transport: `libs/admin/data-access/src/lib/references/additional-references/additional-references.api.ts`; backend controller: `src/Modules/Reference/Reference.Api/Reference.Api/Controllers/` у BreviERP.
-- React route підключено в `apps/admin-react/src/app/router/app-router.tsx`; `libs/admin/references/data-access` і `libs/admin/references/feature` мають lint/typecheck/test targets. Код feature розміщено в їхніх каталогах `src/additional-references/`, `src/components/additional-references/`, `src/hooks/`, `src/model/` та `src/pages/`.
+- React route підключено в `apps/admin-react/src/app/router/routes/app-router.tsx`; `libs/admin/references/data-access` і `libs/admin/references/feature` мають lint/typecheck/test targets. Код feature розміщено в їхніх каталогах `src/additional-references/`, `src/components/additional-references/`, `src/hooks/`, `src/model/` та `src/pages/`.
 - Візуальна композиція: [приклад таблиці](../../../assets/visual-references/customers-search-list.png) і [приклад форми](../../../assets/visual-references/product-edit.png); це зразки структури, не полів чи бренду. Застосовувати Brevi MUI theme й безкоштовний `@mui/x-data-grid`, без PrimeNG у React.
 
 ## Межа сторінки й таблиці

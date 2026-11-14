@@ -2,7 +2,7 @@ import { Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { DataGrid } from '@mui/x-data-grid';
 
-import { bankLineMono as mono, bankLinesColumns } from './columns/bank-lines-columns';
+import { bankLineMono as mono, bankLinesColumns } from './bank-lines-columns';
 
 import type { BankStatementLine } from '@admin/accounting/model';
 import type { GridPaginationModel } from '@mui/x-data-grid';

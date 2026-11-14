@@ -46,17 +46,19 @@ test('rejects a shared folder inside a domain library but not the shared scope',
       'libs/site/cart/ui/project.json': '{}',
       'libs/site/cart/ui/src/lib/shared/cart-format.ts': '',
       'libs/site/cart/ui/src/lib/shared/cart-format.spec.ts': '',
+      'libs/site/cart/ui/src/lib/summary/cart-summary.tsx': '',
       'libs/admin/shared/ui/project.json': '{}',
       'libs/admin/shared/ui/src/lib/inputs/slug-field.tsx': '',
       'libs/admin/shared/ui/src/lib/inputs/slug-field.spec.tsx': '',
+      'libs/admin/shared/ui/src/lib/dialogs/confirm-dialog.tsx': '',
     }),
     ['forbidden-name: libs/site/cart/ui/src/lib/shared'],
   );
 });
 
-test('flags a folder with eight or more production files', () => {
+test('flags a folder with more than six production files', () => {
   const tree = { [`${lib}/feature/project.json`]: '{}' };
-  for (let index = 0; index < 8; index += 1) tree[`${lib}/feature/src/hooks/use-${index}.ts`] = '';
+  for (let index = 0; index < 7; index += 1) tree[`${lib}/feature/src/hooks/use-${index}.ts`] = '';
   tree[`${lib}/feature/src/hooks/use-0.spec.ts`] = '';
   tree[`${lib}/feature/src/hooks/index.ts`] = '';
   assert.deepEqual(check(tree), [`crowded-folder: ${lib}/feature/src/hooks`]);
@@ -89,18 +91,60 @@ test('allows mobile data-access local, store, and sync roles', () => {
   );
 });
 
-test('rejects loose files in src/lib of a site library with more than eight files', () => {
-  const tree = { 'libs/site/content/seo/project.json': '{}' };
-  for (let index = 0; index < 8; index += 1) {
-    tree[`libs/site/content/seo/src/lib/metadata/page-${index}.ts`] = '';
+test('accepts six production files in a folder, with their tests and index', () => {
+  const tree = { [`${lib}/feature/project.json`]: '{}' };
+  for (let index = 0; index < 6; index += 1) {
+    tree[`${lib}/feature/src/hooks/use-${index}.ts`] = '';
+    tree[`${lib}/feature/src/hooks/use-${index}.spec.ts`] = '';
   }
+  tree[`${lib}/feature/src/hooks/index.ts`] = '';
+  assert.deepEqual(check(tree), []);
+});
+
+test('does not count generated code in a folder', () => {
+  const tree = { 'libs/admin/shared/contracts/project.json': '{}' };
+  for (let index = 0; index < 9; index += 1) {
+    tree[`libs/admin/shared/contracts/src/generated/part-${index}.ts`] = '';
+  }
+  tree['libs/admin/shared/contracts/src/generated/part-0.spec.ts'] = '';
+  assert.deepEqual(check(tree), []);
+});
+
+test('rejects a folder that mixes files and subfolders', () => {
+  const tree = { 'libs/site/content/seo/project.json': '{}' };
+  tree['libs/site/content/seo/src/lib/metadata/page-metadata.ts'] = '';
   tree['libs/site/content/seo/src/lib/contacts-json-ld.ts'] = '';
-  tree['libs/site/content/seo/src/lib/cache-tags.ts'] = '';
   tree['libs/site/content/seo/src/lib/contacts-json-ld.spec.ts'] = '';
-  assert.deepEqual(check(tree), [
-    'crowded-folder: libs/site/content/seo/src/lib/metadata',
-    'loose-file: libs/site/content/seo/src/lib/contacts-json-ld.ts',
-  ]);
+  assert.deepEqual(check(tree), ['mixed-folder: libs/site/content/seo/src/lib']);
+});
+
+test('allows files beside folders only at a library root, the app entry and Next.js routes', () => {
+  assert.deepEqual(
+    check({
+      [`${lib}/feature/project.json`]: '{}',
+      [`${lib}/feature/src/index.ts`]: '',
+      [`${lib}/feature/src/orders.routes.tsx`]: '',
+      [`${lib}/feature/src/pages/orders-page.tsx`]: '',
+      [`${lib}/feature/src/pages/orders-page.spec.tsx`]: '',
+      'apps/admin-react/src/main.tsx': '',
+      'apps/admin-react/src/app/app.tsx': '',
+      'apps/admin-react/src/app/router/app-router.tsx': '',
+      'apps/site/src/app/[locale]/page.tsx': '',
+      'apps/site/src/app/[locale]/catalog/page.tsx': '',
+    }),
+    [],
+  );
+});
+
+test('rejects a folder that only wraps one folder', () => {
+  assert.deepEqual(
+    check({
+      'libs/admin/clients/ui/project.json': '{}',
+      'libs/admin/clients/ui/src/tables/customers/customers-table.tsx': '',
+      'libs/admin/clients/ui/src/tables/customers/customers-table.spec.tsx': '',
+    }),
+    ['wrapper-folder: libs/admin/clients/ui/src/tables'],
+  );
 });
 
 test('keeps a small one-page site library flat', () => {

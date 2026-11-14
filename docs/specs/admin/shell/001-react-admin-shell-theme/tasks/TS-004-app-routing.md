@@ -3,7 +3,7 @@
 - **ID задачі:** TS-004
 - **Охоплює:** SC-001, SC-002, SC-006
 - **Залежить від:** TS-002, TS-003
-- **Точні шляхи:** `apps/admin-react/src/app/app.tsx`, `apps/admin-react/src/app/router/app-router.tsx`, `apps/admin-react/src/app/pages/start-page.tsx`, `apps/admin-react/src/app/pages/not-found-page.tsx`, `apps/admin-react/src/app/providers/app-providers.tsx`, `apps/admin-react/src/app/providers/color-mode-provider.tsx`, `apps/admin-react/src/app/router/app-router.integration.test.tsx`, `apps/admin-react-e2e/src/admin-react.shell.spec.ts`
+- **Точні шляхи:** `apps/admin-react/src/app/app.tsx`, `apps/admin-react/src/app/router/routes/app-router.tsx`, `apps/admin-react/src/app/pages/start-page.tsx`, `apps/admin-react/src/app/pages/not-found-page.tsx`, `apps/admin-react/src/app/providers/app-providers.tsx`, `apps/admin-react/src/app/providers/color-mode-provider.tsx`, `apps/admin-react/src/app/router/routes/app-router.integration.test.tsx`, `apps/admin-react-e2e/src/admin-react.shell.spec.ts`
 - **Рівень тестування:** інтеграційний + один критичний E2E
 
 ## Робота

@@ -1,4 +1,7 @@
-import type { SewingMaterialKind, SewingMaterialUnit } from '../sewing-composition';
+import type {
+  SewingMaterialKind,
+  SewingMaterialUnit,
+} from '../sewing-composition/composition/sewing-composition';
 import type { SewingPriceCalculation } from '../sewing-pricing/sewing-price-calculation';
 import type { SewingPriceTiers } from '../sewing-pricing/sewing-price-tiers';
 

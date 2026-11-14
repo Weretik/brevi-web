@@ -1,6 +1,6 @@
 import { toProductionApiError } from '../../errors/production-api-error';
 import { mapWorkshopSettings } from '../../mappers/orders/production-tracking.mapper';
-import { productionBaseApi } from '../production-base-api';
+import { productionBaseApi } from '../base/production-base-api';
 
 import type { WorkshopSettings, WorkshopSettingsBody } from '@admin/production/model';
 import type { AdminApiErrorMessages } from '@admin/shared/api-client';

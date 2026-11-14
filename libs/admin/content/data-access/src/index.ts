@@ -33,4 +33,4 @@ export {
   useGetSiteGalleryQuery,
   useSaveSiteGalleryMutation,
   useTransferSiteGalleryMutation,
-} from './api/content.api';
+} from './api/base/content.api';

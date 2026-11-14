@@ -9,7 +9,7 @@ import {
   parseProductOverviewItem,
   parseProductOverviewPage,
 } from '../../validators/product-overview/validate-product-overview';
-import { productErrorMessages } from '../product-api.shared';
+import { productErrorMessages } from '../base/product-api.shared';
 
 import type { UpdateProductOverviewBody } from '../../contracts/product-overview/product-overview.dto';
 import type {

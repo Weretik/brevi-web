@@ -2,10 +2,10 @@ import { COMPANY } from '@site/core/config';
 import { render, screen, within } from '@testing-library/react';
 
 import { getHomeDictionary } from './i18n/home-dictionary';
-import { HomeCatalog } from './sections/home-catalog';
-import { HomeContacts } from './sections/home-contacts';
-import { HomeHero } from './sections/home-hero';
-import { HomeSeoText } from './sections/home-seo-text';
+import { HomeContacts } from './sections/contact/home-contacts';
+import { HomeSeoText } from './sections/contact/home-seo-text';
+import { HomeHero } from './sections/intro/home-hero';
+import { HomeCatalog } from './sections/offer/home-catalog';
 
 import type { CatalogSection } from '@site/catalog/model';
 

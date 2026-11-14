@@ -2,9 +2,9 @@ import { reminderOrganizationLabels } from '@admin/reminders/model';
 import { Box, Typography } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 
-import { ReminderNextDueCell } from './cells/reminder-next-due-cell';
-import { ReminderTaskActionsCell } from './cells/reminder-task-actions-cell';
-import { ReminderTaskTitleCell } from './cells/reminder-task-title-cell';
+import { ReminderNextDueCell } from './reminder-next-due-cell';
+import { ReminderTaskActionsCell } from './reminder-task-actions-cell';
+import { ReminderTaskTitleCell } from './reminder-task-title-cell';
 import { ReminderStatusPill } from '../../components/status/reminder-status-pill';
 
 import type { ReminderTask } from '@admin/reminders/model';

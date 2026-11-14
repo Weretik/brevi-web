@@ -1,5 +1,5 @@
 import { siteCategoriesTag, siteCategoryTag } from '../../cache/site-category-tags';
-import { siteCategoryApiError } from '../../errors/site-category-api-error';
+import { siteCategoryApiError } from '../../errors/site/site-category-api-error';
 import { mapSiteCategoryImportReport } from '../../mappers/product-pages/old-site-import.mapper';
 import {
   mapSiteCategory,
@@ -7,7 +7,7 @@ import {
   mapSiteCategoryVisibility,
 } from '../../mappers/site-categories/site-category.mapper';
 
-import type { ContentEndpointBuilder } from '../content-endpoint-builder';
+import type { ContentEndpointBuilder } from '../base/content-endpoint-builder';
 import type {
   OldSiteImportItems,
   OldSiteImportOptions,

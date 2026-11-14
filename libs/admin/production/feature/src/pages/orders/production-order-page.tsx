@@ -12,10 +12,10 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { ProductionItemPanel } from '../../components/order-items/production-item-panel';
-import { ProductionOrderActions } from '../../components/orders/production-order-actions';
-import { ProductionOrderDialogs } from '../../components/orders/production-order-dialogs';
-import { ProductionOrderEditDrawers } from '../../components/orders/production-order-edit-drawers';
-import { ProductionOrderHistoryDrawer } from '../../components/orders/production-order-history-drawer';
+import { ProductionOrderActions } from '../../components/orders/page/production-order-actions';
+import { ProductionOrderDialogs } from '../../components/orders/page/production-order-dialogs';
+import { ProductionOrderEditDrawers } from '../../components/orders/page/production-order-edit-drawers';
+import { ProductionOrderHistoryDrawer } from '../../components/orders/page/production-order-history-drawer';
 import { ProductionOrderWork } from '../../components/tracking/production-order-work';
 import { useProductionOrderFiles } from '../../hooks/files/use-production-order-files';
 import { useProductionOrder } from '../../hooks/order-editor/use-production-order';

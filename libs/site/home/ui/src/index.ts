@@ -1,10 +1,10 @@
 export { getHomeDictionary } from './lib/i18n/home-dictionary';
 export type { HomeDictionary } from './lib/i18n/home-dictionary';
-export { HomeCatalog } from './lib/sections/home-catalog';
-export { HomeContacts } from './lib/sections/home-contacts';
-export { HomeHero } from './lib/sections/home-hero';
-export { HomeIndustries } from './lib/sections/home-industries';
-export { HomeLogo } from './lib/sections/home-logo';
-export { HomeProcess } from './lib/sections/home-process';
-export { HomeProduction } from './lib/sections/home-production';
-export { HomeSeoText } from './lib/sections/home-seo-text';
+export { HomeCatalog } from './lib/sections/offer/home-catalog';
+export { HomeContacts } from './lib/sections/contact/home-contacts';
+export { HomeHero } from './lib/sections/intro/home-hero';
+export { HomeIndustries } from './lib/sections/intro/home-industries';
+export { HomeLogo } from './lib/sections/intro/home-logo';
+export { HomeProcess } from './lib/sections/offer/home-process';
+export { HomeProduction } from './lib/sections/offer/home-production';
+export { HomeSeoText } from './lib/sections/contact/home-seo-text';

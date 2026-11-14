@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { oneOffItemDraft } from './quote-draft-mapper';
 import { quoteModelChanges } from './quote-model-changes';
 
-import type { QuoteModelComposition } from '../../entities/quote-custom-sewing';
+import type { QuoteModelComposition } from '../../entities/items/quote-custom-sewing';
 import type { QuoteItemDraft, QuoteOptionDraft } from '../../forms/editor/quote-draft';
 
 const base: QuoteModelComposition = {

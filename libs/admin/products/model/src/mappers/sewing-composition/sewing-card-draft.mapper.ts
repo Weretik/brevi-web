@@ -4,7 +4,7 @@ import {
 } from '../../queries/sewing-card/sewing-material-lines';
 
 import type { SewingArticleSummary } from '../../entities/sewing-card/sewing-article-summary';
-import type { SewingCompositionDraft } from '../../entities/sewing-composition';
+import type { SewingCompositionDraft } from '../../entities/sewing-composition/composition/sewing-composition';
 
 /** The shared composition of the card response as `replaceSewingComposition` sends it (CAT-016). */
 export function sewingCardToDraft(card: SewingArticleSummary): SewingCompositionDraft {

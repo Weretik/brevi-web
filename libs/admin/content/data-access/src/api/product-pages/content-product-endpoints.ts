@@ -1,5 +1,5 @@
 import { contentProductTag, contentProductsTag } from '../../cache/content-product-tags';
-import { contentApiError } from '../../errors/content-api-error';
+import { contentApiError } from '../../errors/site/content-api-error';
 import {
   mapContentProduct,
   mapContentProductPage,
@@ -7,7 +7,7 @@ import {
 } from '../../mappers/product-pages/content-product.mapper';
 import { mapOldSiteImportReport } from '../../mappers/product-pages/old-site-import.mapper';
 
-import type { ContentEndpointBuilder } from '../content-endpoint-builder';
+import type { ContentEndpointBuilder } from '../base/content-endpoint-builder';
 import type {
   ContentProduct,
   ContentProductInput,

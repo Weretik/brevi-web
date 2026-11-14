@@ -16,7 +16,7 @@ in [domains.md](domains.md).
 | Dashboard    | `libs/admin/dashboard/feature`                         | «Робочий стіл» on `/`: desks by role              |
 | Admin shared | `libs/admin/shared/{api-client,config,contracts}`      | API transport, configuration, and Admin contracts |
 
-The route list in `apps/admin-react/src/app/router/admin-route-definitions.tsx`
+The route list in `apps/admin-react/src/app/router/routes/admin-route-definitions.tsx`
 wires dashboard, clients, products, and references. `orders`, `shared/ui`,
 and `core/permissions` in the [target structure](domains.md) do not mean the
 corresponding Nx projects already exist. Check shared `libs/shared/*` against

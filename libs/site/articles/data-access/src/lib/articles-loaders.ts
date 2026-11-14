@@ -2,7 +2,7 @@ import { siteApiGet } from '@site/shared/api-client';
 import { cacheLife, cacheTag } from 'next/cache';
 
 import { ARTICLES_CACHE_TAG, ARTICLES_LIFE, FAILURE_LIFE } from './articles-cache';
-import { mapArticle, mapArticleList } from './mappers/public-articles.mapper';
+import { mapArticle, mapArticleList } from './public-articles.mapper';
 
 import type { Article, ArticleCard } from '@site/articles/model';
 import type { Locale } from '@site/core/i18n';

@@ -5,10 +5,10 @@ import {
   financeMovementTags,
 } from '../../cache/accounting-tags';
 import { accountingApiError } from '../../errors/accounting-api-error';
-import { mapLegacyFinanceImportReport } from '../../mappers/accounting-import.mapper';
+import { mapLegacyFinanceImportReport } from '../../mappers/imports/accounting-import.mapper';
 import { compressFinanceFile } from '../files/compress-finance-file';
 
-import type { AccountingEndpointBuilder } from '../accounting-endpoint-builder';
+import type { AccountingEndpointBuilder } from '../base/accounting-endpoint-builder';
 import type { LegacyFinanceImportReport } from '@admin/accounting/model';
 
 export function legacyFinanceImportEndpoints(build: AccountingEndpointBuilder) {

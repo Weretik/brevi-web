@@ -39,7 +39,7 @@ libs/site/
 
 ## Tests
 
-- `libs/site/request/model/src/lib/validators/request-validators.spec.ts`
+- `libs/site/request/model/src/lib/request-validators.spec.ts`
 - `libs/site/request/ui/src/lib/request-ui.spec.tsx`
 - `libs/site/request/feature/src/lib/request-page.spec.tsx`
 - `libs/site/request/feature/src/lib/submit-request.spec.ts`

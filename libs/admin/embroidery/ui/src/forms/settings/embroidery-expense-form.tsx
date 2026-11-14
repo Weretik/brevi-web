@@ -6,7 +6,7 @@ import {
 } from '@admin/embroidery/model';
 import { FormControlLabel, MenuItem, Stack, Switch, TextField } from '@mui/material';
 
-import { EmbroideryNumberField } from '../embroidery-number-field';
+import { EmbroideryNumberField } from '../fields/embroidery-number-field';
 
 import type {
   EmbroideryExpenseBasis,

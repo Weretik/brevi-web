@@ -8,22 +8,19 @@ import {
   mapPurchaseDocumentSave,
   mapPurchaseRecognition,
   mapPurchaseRecognitionBatch,
-} from '../../mappers/invoices/purchase-document.mapper';
-import { mapPurchaseInvoicePage } from '../../mappers/invoices/purchase-invoice.mapper';
+} from '../../mappers/purchase-document.mapper';
+import { mapPurchaseInvoicePage } from '../../mappers/purchase-invoice.mapper';
 import {
   mapPurchaseInvoicePayments,
   mapPurchasePaymentCandidates,
-} from '../../mappers/invoices/purchase-payment.mapper';
+} from '../../mappers/purchase-payment.mapper';
 import {
   mapPurchaseInvoiceReview,
   mapPurchaseSupplierOptions,
-} from '../../mappers/invoices/purchase-review.mapper';
-import {
-  mapPurchaseSyncResult,
-  mapPurchaseSyncState,
-} from '../../mappers/invoices/purchase-sync.mapper';
+} from '../../mappers/purchase-review.mapper';
+import { mapPurchaseSyncResult, mapPurchaseSyncState } from '../../mappers/purchase-sync.mapper';
 
-import type { PurchasingEndpointBuilder } from '../purchasing-endpoint-builder';
+import type { PurchasingEndpointBuilder } from '../base/purchasing-endpoint-builder';
 import type {
   PurchaseDocumentSave,
   PurchaseDocumentUpload,

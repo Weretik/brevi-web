@@ -1,6 +1,6 @@
 import { parseSewingMetres } from '../sewing-variant/sewing-variant-form';
 
-import type { SewingOperationDraft } from '../../entities/sewing-composition';
+import type { SewingOperationDraft } from '../../entities/sewing-composition/composition/sewing-composition';
 
 /** Side panel «Операція» of «Трудовитрати». Empty manual time means the reference norm. */
 export interface SewingOperationFormValues {

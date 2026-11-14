@@ -14,5 +14,5 @@ export type {
   AdminShellLogoutAction,
   AdminShellSessionProviderProps,
 } from './providers/admin-shell-session-provider';
-export { getNavigationPalette } from './navigation/navigation-palette';
-export type { NavigationPalette } from './navigation/navigation-palette';
+export { getNavigationPalette } from './navigation/menu/routes/navigation-palette';
+export type { NavigationPalette } from './navigation/menu/routes/navigation-palette';

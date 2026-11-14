@@ -1,4 +1,4 @@
-import type { PpeProductPricing } from '../../entities/ppe-pricing/ppe-product-pricing';
+import type { PpeProductPricing } from '../../entities/ppe-pricing/prices/ppe-product-pricing';
 import type { Product } from '../../entities/product-list/product';
 
 export function applyPpePrice<T extends Product>(

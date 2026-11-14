@@ -24,7 +24,7 @@ export * from './tables/pricing-parameters/pricing-parameters-grid';
 export * from './components/pricing-parameters/pricing-section-chips';
 export * from './dialogs/suppliers/supplier-delete-dialog';
 export * from './tables/suppliers/suppliers-grid';
-export * from './tables/reference-list/toolbar/reference-bulk-delete-button';
+export * from './tables/reference-list/reference-bulk-delete-button';
 export * from './components/reference-list-controls/reference-filter-bar';
 export * from './components/reference-list-controls/reference-filter-row';
 export * from './feedback/reference-list-alerts';

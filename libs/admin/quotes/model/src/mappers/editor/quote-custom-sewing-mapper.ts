@@ -1,12 +1,12 @@
 import { quoteChangedModelSubtitle, quoteItemSubtitles } from '../../forms/editor/quote-draft';
 
-import type { QuoteItemLine, QuoteItemLineKind, QuoteTier } from '../../entities/quote';
 import type {
   QuoteCustomSewingPrice,
   QuoteCustomSewingPriceRequest,
   QuoteCustomSewingVariantPrice,
   QuoteModelComposition,
-} from '../../entities/quote-custom-sewing';
+} from '../../entities/items/quote-custom-sewing';
+import type { QuoteItemLine, QuoteItemLineKind, QuoteTier } from '../../entities/quote/quote';
 import type {
   QuoteCustomFabricDraft,
   QuoteCustomLineDraft,

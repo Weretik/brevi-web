@@ -11,7 +11,7 @@ import {
 import { Box, Card, Stack } from '@mui/material';
 import { useSearchParams } from 'react-router-dom';
 
-import { ReminderOccurrenceMetrics } from '../../components/occurrences/reminder-occurrence-metrics';
+import { ReminderOccurrenceMetrics } from '../../components/reminder-occurrence-metrics';
 import { reminderError } from '../../errors/reminder-error';
 import { useReminderNotice } from '../../hooks/notice/use-reminder-notice';
 import { useReminderOccurrenceActions } from '../../hooks/occurrences/use-reminder-occurrence-actions';

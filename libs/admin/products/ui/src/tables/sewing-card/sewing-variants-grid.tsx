@@ -8,7 +8,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import { useMemo } from 'react';
 
 import { SewingCardStatusPill } from '../../components/sewing-card/sewing-card-status-pill';
-import { sewingPriceFormat } from '../../components/sewing-pricing/sewing-price-format';
+import { sewingPriceFormat } from '../../components/sewing-pricing/tiers/sewing-price-format';
 
 import type { SewingCostKind, SewingVariantRow } from '@admin/products/model';
 import type { GridColDef } from '@mui/x-data-grid';

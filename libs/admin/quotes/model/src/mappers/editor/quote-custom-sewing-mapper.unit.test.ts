@@ -16,7 +16,7 @@ import { catalogItemDraft } from './quote-draft-mapper';
 import type {
   QuoteCustomSewingPrice,
   QuoteModelComposition,
-} from '../../entities/quote-custom-sewing';
+} from '../../entities/items/quote-custom-sewing';
 
 const composed = () => {
   let draft = { ...customSewingDraft(), name: 'Фартух з логотипом' };

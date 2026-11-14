@@ -12,4 +12,4 @@ export type { CustomerKeepinSyncResult } from './entities/customers/customer-kee
 export {
   describeCustomerKeepinSync,
   lastCustomerKeepinSync,
-} from './mappers/customers/describe-customer-keepin-sync';
+} from './mappers/describe-customer-keepin-sync';

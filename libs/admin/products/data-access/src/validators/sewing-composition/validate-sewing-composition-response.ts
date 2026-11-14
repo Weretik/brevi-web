@@ -1,12 +1,12 @@
-import { record } from '../response-validation';
+import { validateSewingMaterialResponse } from './validate-sewing-material-response';
+import { validateSewingOperationResponse } from './validate-sewing-operation-response';
+import { record } from '../base/response-validation';
 import {
   ensureSewingResponse,
   sewingResponseInteger,
   sewingResponseNullableId,
   sewingResponseNullableText,
-} from '../sewing-response-values';
-import { validateSewingMaterialResponse } from './validate-sewing-material-response';
-import { validateSewingOperationResponse } from './validate-sewing-operation-response';
+} from '../base/sewing-response-values';
 
 import type { SewingCompositionDto } from '../../contracts/sewing-composition/sewing-composition.dto';
 

@@ -41,7 +41,7 @@ libs/site/settings/data-access/src/lib/
   metadata/site-metadata.ts                             # sitePageMetadata, withSiteSharePicture
 libs/site/settings/feature/src/lib/
   site-page-text-section.tsx                            # SitePageTextSection: saved main text, questions, FAQPage
-libs/site/shared/ui/src/lib/faq-list.tsx                # FaqList: questions as <details>, also used by home and «Галузі»
+libs/site/shared/ui/src/lib/layout/faq-list.tsx                # FaqList: questions as <details>, also used by home and «Галузі»
 libs/site/core/seo/src/lib/
   metadata/site-codes.ts                                # id checks, verification metadata, withSharePicture
   analytics/site-analytics.tsx                          # GA4 and GTM scripts

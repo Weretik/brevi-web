@@ -1,4 +1,4 @@
-import type { QuoteFabricFacts } from '../../entities/quote-catalog';
+import type { QuoteFabricFacts } from '../../entities/items/quote-catalog';
 import type { QuoteDraft, QuoteOptionDraft } from '../../forms/editor/quote-draft';
 
 /** One fabric of a price row for the manager line; `label` names it when the row is sewn from several. */

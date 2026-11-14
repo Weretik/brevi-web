@@ -3,7 +3,7 @@ import type {
   QuoteItemLine,
   QuoteOptionFabric,
   QuoteTier,
-} from '../../entities/quote';
+} from '../../entities/quote/quote';
 
 /** One editable price box; `manual` is the typed text, empty for the Catalog price. */
 export interface QuotePriceDraft {

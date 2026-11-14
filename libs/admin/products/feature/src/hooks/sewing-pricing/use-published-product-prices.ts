@@ -1,7 +1,7 @@
 import { useGetPublishedSewingProductsQuery } from '@admin/products/data-access';
 import { applyPublishedSewingPrice } from '@admin/products/model';
 
-import { pricingErrorMessage } from '../../model/pricing/pricing-error-message';
+import { pricingErrorMessage } from '../../model/pricing-error-message';
 
 import type { Product } from '@admin/products/model';
 

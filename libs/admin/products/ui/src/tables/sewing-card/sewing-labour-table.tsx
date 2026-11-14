@@ -10,8 +10,8 @@ import {
   Typography,
 } from '@mui/material';
 
-import { SewingLineActions } from './cells/sewing-line-actions';
-import { sewingPriceFormat } from '../../components/sewing-pricing/sewing-price-format';
+import { SewingLineActions } from './sewing-line-actions';
+import { sewingPriceFormat } from '../../components/sewing-pricing/tiers/sewing-price-format';
 
 import type { SewingLabourLine } from '@admin/products/model';
 

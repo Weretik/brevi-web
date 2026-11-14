@@ -55,13 +55,13 @@ export {
   reminderFormToInput,
   reminderFormToSchedule,
   reminderTaskToForm,
-} from './forms/tasks/reminder-task-form';
-export type { ReminderTaskFormValues } from './forms/tasks/reminder-task-form';
+} from './forms/reminder-task-form';
+export type { ReminderTaskFormValues } from './forms/reminder-task-form';
 export {
   hasReminderTaskErrors,
   validateReminderTaskForm,
-} from './validators/tasks/reminder-task-validation';
-export type { ReminderTaskFormErrors } from './validators/tasks/reminder-task-validation';
+} from './validators/reminder-task-validation';
+export type { ReminderTaskFormErrors } from './validators/reminder-task-validation';
 export { describeReminderSchedule } from './mappers/schedules/describe-reminder-schedule';
 export {
   formatReminderDate,

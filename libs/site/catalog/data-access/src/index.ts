@@ -9,4 +9,4 @@ export {
   getCatalogProducts,
   getCatalogRelatedProducts,
   getCatalogTree,
-} from './lib/loaders/catalog-source';
+} from './lib/catalog-source';

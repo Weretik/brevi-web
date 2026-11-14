@@ -2,8 +2,8 @@ import { adminApi, createAdminApiStore } from '@admin/shared/api-client';
 import { configureAppConfig } from '@admin/shared/config';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { productMediaApi } from './api/product-media.api';
-import { productsApi } from './api/products.api';
+import { productMediaApi } from './api/base/product-media.api';
+import { productsApi } from './api/base/products.api';
 
 const adminStore = createAdminApiStore();
 

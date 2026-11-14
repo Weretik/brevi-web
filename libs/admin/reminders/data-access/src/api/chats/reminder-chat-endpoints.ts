@@ -3,7 +3,7 @@ import { reminderApiError } from '../../errors/reminder-api-error';
 import { mapReminderChat, mapReminderChats } from '../../mappers/chats/reminder-chat.mapper';
 
 import type { UpdateReminderChatRequest } from '../../models/reminder-requests';
-import type { RemindersEndpointBuilder } from '../reminders-endpoint-builder';
+import type { RemindersEndpointBuilder } from '../base/reminders-endpoint-builder';
 import type { ReminderChat } from '@admin/reminders/model';
 import type { components } from '@admin/shared/contracts';
 

@@ -1,5 +1,5 @@
-export * from './forms/embroidery-number-field';
-export * from './forms/embroidery-form-card';
+export * from './forms/fields/embroidery-number-field';
+export * from './forms/fields/embroidery-form-card';
 export * from './forms/calculation/embroidery-subject-section';
 export * from './forms/calculation/embroidery-program-section';
 export * from './forms/calculation/embroidery-material-section';

@@ -1,6 +1,6 @@
 import { Typography } from '@mui/material';
 
-import { mono } from '../../components/mono';
+import { mono } from '../../components/status/mono';
 
 export const num = { ...mono, textAlign: 'right' } as const;
 

@@ -39,7 +39,7 @@ apps/admin-react/src/app/router/
   admin-route-definitions.tsx      tasksRoutes = createTasksRoutes({ useTaskViewer })
   create-admin-router.tsx          /admin/tasks behind Admin, /crm/tasks behind Manager or Admin
   legacy-menu.ts                   «Мої завдання», «Завдання менеджерам»
-libs/admin/core/shell/src/navigation/menu/admin-home-tile.tsx   «Робочий стіл» tile (H2)
+libs/admin/core/shell/src/navigation/menu/tree/admin-home-tile.tsx   «Робочий стіл» tile (H2)
 libs/admin/tasks/
   model/src/
     entities/manager-task.ts       task, lanes, overview, viewer

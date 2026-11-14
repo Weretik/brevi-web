@@ -5,7 +5,7 @@ import {
 import { sewingBlockerReasons } from '../sewing-card/sewing-blocker-reasons';
 
 import type { SewingArticleSummaryRow } from '../../entities/sewing-card/sewing-article-summary';
-import type { SewingOperationDraft } from '../../entities/sewing-composition/sewing-operation-draft';
+import type { SewingOperationDraft } from '../../entities/sewing-composition/operations/sewing-operation-draft';
 import type {
   SewingCreateCheck,
   SewingCreateCheckKey,

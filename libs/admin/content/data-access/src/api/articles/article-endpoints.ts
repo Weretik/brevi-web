@@ -1,5 +1,5 @@
 import { articleTag, articlesTag } from '../../cache/article-tags';
-import { articleApiError } from '../../errors/article-api-error';
+import { articleApiError } from '../../errors/publishing/article-api-error';
 import {
   mapArticle,
   mapArticleList,
@@ -7,7 +7,7 @@ import {
 } from '../../mappers/articles/article.mapper';
 import { mapArticleImportReport } from '../../mappers/product-pages/old-site-import.mapper';
 
-import type { ContentEndpointBuilder } from '../content-endpoint-builder';
+import type { ContentEndpointBuilder } from '../base/content-endpoint-builder';
 import type {
   Article,
   ArticleImportReport,

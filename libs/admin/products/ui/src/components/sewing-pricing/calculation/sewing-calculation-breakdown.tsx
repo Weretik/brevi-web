@@ -1,7 +1,7 @@
 import { Stack, Table, TableBody, TableCell, TableContainer, TableRow } from '@mui/material';
 
 import { SewingCardMetricStrip } from '../../sewing-card/sewing-card-metric-strip';
-import { sewingPriceFormat } from '../sewing-price-format';
+import { sewingPriceFormat } from '../tiers/sewing-price-format';
 
 import type { SewingCostKind, SewingPriceCalculation } from '@admin/products/model';
 

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { validatePurchaseReview } from './purchase-review-validation';
 import { purchaseReviewInputOf } from '../../forms/review/purchase-review-form';
 
-import type { PurchaseInvoice } from '../../entities/invoices/purchase-invoice';
+import type { PurchaseInvoice } from '../../entities/purchase-invoice';
 
 describe('purchase review form', () => {
   it('allows a note of 1000 characters and refuses a longer one', () => {

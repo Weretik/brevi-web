@@ -1,8 +1,8 @@
 import { financeOverviewTag } from '../../cache/accounting-tags';
 import { accountingApiError } from '../../errors/accounting-api-error';
-import { mapFinanceOverview } from '../../mappers/accounting-movement.mapper';
+import { mapFinanceOverview } from '../../mappers/ledger/accounting-movement.mapper';
 
-import type { AccountingEndpointBuilder } from '../accounting-endpoint-builder';
+import type { AccountingEndpointBuilder } from '../base/accounting-endpoint-builder';
 import type { FinanceOverview, LedgerScope } from '@admin/accounting/model';
 
 export function financeOverviewEndpoints(build: AccountingEndpointBuilder) {

@@ -86,8 +86,8 @@ libs/site/
 - `libs/site/catalog/model/src/lib/mappers/catalog-product-facts.spec.ts`
 - `libs/site/catalog/model/src/lib/queries/catalog-search.spec.ts`
 - `libs/site/catalog/model/src/lib/queries/catalog-listing.spec.ts`
-- `libs/site/catalog/data-access/src/lib/loaders/catalog-source.spec.ts`
-- `libs/site/catalog/data-access/src/lib/mappers/public-catalog.mapper.spec.ts`
+- `libs/site/catalog/data-access/src/lib/catalog-source.spec.ts`
+- `libs/site/catalog/data-access/src/lib/public-catalog.mapper.spec.ts`
 - `libs/site/catalog/ui/src/lib/catalog-ui.spec.tsx`
 - `libs/site/catalog/seo/src/lib/metadata/catalog-metadata.spec.ts`
 - `libs/site/catalog/seo/src/lib/catalog-product-seo.spec.ts`

@@ -1,4 +1,4 @@
-import { entries, number, record } from '../response-validation';
+import { entries, number, record } from '../base/response-validation';
 
 import type { ProductPhotoListResponse } from '../../contracts/product-photos/product-photos.dto';
 

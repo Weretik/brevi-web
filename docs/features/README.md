@@ -31,6 +31,6 @@ In each feature card, “Structure diagram” shows relationships between parts,
 - Orders: [bulk order](storefront/order-in-bulk.md).
 - Navigation: [404 page](storefront/not-found.md).
 
-`apps/storefront/src/app/app.routes.ts` assembles localized `/uk` and `/ru` routes; `apps/admin-react/src/app/router/app-router.tsx` assembles Admin routes. Requirements and task specifications have a [separate SDD index](../specs/README.md); this map explains existing code and relationships. Add a new feature here together with its short description, and update the relevant page after architecture changes.
+`apps/storefront/src/app/app.routes.ts` assembles localized `/uk` and `/ru` routes; `apps/admin-react/src/app/router/routes/app-router.tsx` assembles Admin routes. Requirements and task specifications have a [separate SDD index](../specs/README.md); this map explains existing code and relationships. Add a new feature here together with its short description, and update the relevant page after architecture changes.
 
 - BreviERP public information: [description, privacy and terms](admin/public-legal-pages.md).

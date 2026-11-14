@@ -1,10 +1,10 @@
-import { record } from '../response-validation';
+import { isSewingLineComment } from './is-sewing-line-comment';
+import { record } from '../base/response-validation';
 import {
   ensureSewingResponse,
   sewingResponseInteger,
   sewingResponsePositive,
-} from '../sewing-response-values';
-import { isSewingLineComment } from './is-sewing-line-comment';
+} from '../base/sewing-response-values';
 
 import type { SewingOperationDto } from '../../contracts/sewing-composition/sewing-operation.dto';
 

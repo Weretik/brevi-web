@@ -21,8 +21,8 @@ Step 4 of moving the client's Calculator into Brevi. The product owner asked on 
 
 ## Tests
 
-- `libs/admin/clients/feature/src/pages/customers/reference/customers-reference-content.component.test.tsx`
-- `libs/admin/clients/data-access/src/mappers/customers/customer-response.unit.test.ts`
-- `libs/admin/clients/model/src/mappers/customers/describe-customer-keepin-sync.unit.test.ts`
+- `libs/admin/clients/feature/src/pages/reference/customers-reference-content.component.test.tsx`
+- `libs/admin/clients/data-access/src/mappers/customer-response.unit.test.ts`
+- `libs/admin/clients/model/src/mappers/describe-customer-keepin-sync.unit.test.ts`
 - `apps/admin-react/src/app/router/{app-router.integration.test.tsx,navigation-config.unit.test.ts}`
 - `apps/admin-react-e2e/src/admin-react.shell.spec.ts`

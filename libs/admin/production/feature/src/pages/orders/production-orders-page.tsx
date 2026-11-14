@@ -16,8 +16,8 @@ import { Box, Button, Stack, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 import { ProductionOrdersImportDrawers } from '../../components/import/production-orders-import-drawers';
-import { ProductionModelSummaryView } from '../../components/orders/production-model-summary-view';
-import { ProductionOrderQuickPanel } from '../../components/orders/production-order-quick-panel';
+import { ProductionModelSummaryView } from '../../components/orders/list/production-model-summary-view';
+import { ProductionOrderQuickPanel } from '../../components/orders/list/production-order-quick-panel';
 import { useProductionOrdersPage } from '../../hooks/orders-list/use-production-orders-page';
 
 import type { ProductionOrderActor } from '@admin/production/model';

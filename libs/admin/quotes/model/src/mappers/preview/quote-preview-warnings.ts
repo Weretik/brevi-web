@@ -1,4 +1,4 @@
-import type { Quote } from '../../entities/quote';
+import type { Quote } from '../../entities/quote/quote';
 
 /** A problem the manager should see before sending: only problems, never «all good» (admin rule). */
 export interface QuotePreviewWarning {

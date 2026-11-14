@@ -1,12 +1,12 @@
 import { ReferenceDataGrid } from '@admin/references/ui';
 import { useMemo } from 'react';
 
-import { productOverviewColumns } from './columns/product-overview-columns';
+import { productOverviewColumns } from './product-overview-columns';
 
 import type { ProductListRow, ProductOverview, ProductOverviewType } from '@admin/products/model';
 import type { GridPaginationModel, GridRowSelectionModel, GridSortModel } from '@mui/x-data-grid';
 
-export { productSortFields } from './columns/product-overview-columns';
+export { productSortFields } from './product-overview-columns';
 
 interface Props {
   type: ProductOverviewType;

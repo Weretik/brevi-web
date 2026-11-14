@@ -1,11 +1,11 @@
-import { customerListTag, changedCustomerTags } from '../../cache/customers/customer-cache';
+import { customerListTag, changedCustomerTags } from '../../cache/customer-cache';
 import { customerApiError } from '../../errors/customer-api-error';
-import { customerBody } from '../../mappers/customers/customer-body';
-import { mapCustomerDetail } from '../../mappers/customers/customer-detail.mapper';
+import { customerBody } from '../../mappers/customer-body';
+import { mapCustomerDetail } from '../../mappers/customer-detail.mapper';
 
-import type { CreateCustomerIntent } from '../../models/customers/create-customer-intent';
-import type { ReviseCustomerIntent } from '../../models/customers/revise-customer-intent';
-import type { CustomerEndpointBuilder } from '../customer-endpoint-builder';
+import type { CreateCustomerIntent } from '../../models/create-customer-intent';
+import type { ReviseCustomerIntent } from '../../models/revise-customer-intent';
+import type { CustomerEndpointBuilder } from '../base/customer-endpoint-builder';
 import type { CustomerDetail } from '@admin/clients/model';
 import type { operations } from '@admin/shared/contracts';
 

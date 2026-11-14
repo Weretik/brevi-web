@@ -1,5 +1,5 @@
-import { record } from '../response-validation';
-import { ensureSewingResponse } from '../sewing-response-values';
+import { record } from '../base/response-validation';
+import { ensureSewingResponse } from '../base/sewing-response-values';
 
 import type { operations } from '@admin/shared/contracts';
 

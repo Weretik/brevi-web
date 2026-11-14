@@ -59,20 +59,27 @@ const appFolderEntries = new Set([
   'slots',
 ]);
 
-/** The Admin application folder of this repository. */
-const adminAppFolder = 'apps/admin-react/src/app/';
-
 const componentLineLimit = 150;
 const moduleLineLimit = 200;
-const crowdedFolderSize = 8;
-/** Static copy, generated code, and test helpers: long by nature, not by responsibility. */
-const isExemptFromLength = (path) => /\/(i18n|data|generated|testing)\//.test(path);
+const maxFolderFiles = 6;
 const styleSheetStart = /^(export )?const \w+ = (createStyles|StyleSheet\.create)\(/m;
 
 const isCode = (path) => /\.(ts|tsx)$/.test(path) && !path.endsWith('.d.ts');
 const isSpec = (path) => /\.(spec|test)\.(ts|tsx|mjs)$/.test(path);
 const isProduction = (path) =>
   isCode(path) && !isSpec(path) && !/(^|\/)(index\.ts|test-setup\.ts)$/.test(path);
+const isGenerated = (path) => /\/generated\//.test(path);
+/** Folders whose shape is fixed elsewhere: library roots (entry files), file-based routers, the Admin app folder. */
+const mayMixFilesAndFolders = (folder) =>
+  /^libs\/.+\/src$/.test(folder) ||
+  /^apps\/[^/]+\/src$/.test(folder) ||
+  /^apps\/(site|mobile)\/src\/app(\/|$)/.test(folder) ||
+  folder === 'apps/admin-react/src/app';
+/** Files a library may keep next to its folders: entry points and the site cache tags. */
+const isLooseEntry = (path) => /\/src\/lib\/cache-tags\.ts$/.test(path);
+/** The Admin application folder of this repository. */
+const adminAppFolder = 'apps/admin-react/src/app/';
+const isExemptFromLength = (path) => /\/(i18n|data|generated|testing)\//.test(path);
 const dirOf = (path) => path.slice(0, path.lastIndexOf('/'));
 const baseOf = (path) => path.slice(path.lastIndexOf('/') + 1);
 
@@ -130,12 +137,33 @@ export function findStructureViolations({ files, read }) {
 
   // Crowded folders.
   const productionByFolder = new Map();
-  for (const path of scoped.filter(isProduction)) {
+  for (const path of scoped.filter((file) => isProduction(file) && !isGenerated(file))) {
     const dir = dirOf(path);
     productionByFolder.set(dir, (productionByFolder.get(dir) ?? 0) + 1);
   }
   for (const [dir, size] of productionByFolder) {
-    if (size >= crowdedFolderSize) add('crowded-folder', dir);
+    if (size > maxFolderFiles) add('crowded-folder', dir);
+  }
+
+  // Wrapper folders (one subfolder, no files) and folders mixing files with subfolders.
+  const subfolders = new Map();
+  for (const folder of folders) {
+    const parent = dirOf(folder);
+    if (folders.has(parent) && baseOf(folder) !== 'generated')
+      subfolders.set(parent, (subfolders.get(parent) ?? 0) + 1);
+  }
+  const filesByFolder = new Map();
+  for (const path of scoped.filter((file) => folders.has(dirOf(file)))) {
+    filesByFolder.set(dirOf(path), [...(filesByFolder.get(dirOf(path)) ?? []), path]);
+  }
+  for (const folder of folders) {
+    if (mayMixFilesAndFolders(folder)) continue;
+    const files = filesByFolder.get(folder) ?? [];
+    const children = subfolders.get(folder) ?? 0;
+    const isLibraryRoot = /\/src\/lib$/.test(folder);
+    if (children === 1 && files.length === 0 && !isLibraryRoot) add('wrapper-folder', folder);
+    const loose = files.filter((path) => isProduction(path) && !isLooseEntry(path));
+    if (children > 0 && loose.length > 0) add('mixed-folder', folder);
   }
 
   // Role folders in Admin and Mobile domain libraries.
@@ -151,21 +179,6 @@ export function findStructureViolations({ files, read }) {
         : []),
     ];
     if (!allowed.includes(rest[1])) add('role-folder', folder);
-  }
-
-  // Loose files in src/lib of a multi-capability site library.
-  const siteFiles = new Map();
-  for (const path of scoped.filter(isProduction)) {
-    const match = /^(libs\/site\/[^/]+\/[^/]+)\/src\/lib\//.exec(path);
-    if (!match) continue;
-    siteFiles.set(match[1], [...(siteFiles.get(match[1]) ?? []), path]);
-  }
-  for (const [root, paths] of siteFiles) {
-    if (paths.length <= crowdedFolderSize) continue;
-    for (const path of paths) {
-      if (dirOf(path) === `${root}/src/lib` && baseOf(path) !== 'cache-tags.ts')
-        add('loose-file', path);
-    }
   }
 
   // Long files and components with too much state.

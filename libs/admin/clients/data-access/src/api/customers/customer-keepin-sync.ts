@@ -1,8 +1,8 @@
-import { customerListTag } from '../../cache/customers/customer-cache';
+import { customerListTag } from '../../cache/customer-cache';
 import { customerApiError } from '../../errors/customer-api-error';
-import { mapCustomerKeepinSyncResult } from '../../mappers/customers/customer-keepin-sync.mapper';
+import { mapCustomerKeepinSyncResult } from '../../mappers/customer-keepin-sync.mapper';
 
-import type { CustomerEndpointBuilder } from '../customer-endpoint-builder';
+import type { CustomerEndpointBuilder } from '../base/customer-endpoint-builder';
 import type { CustomerKeepinSyncResult } from '@admin/clients/model';
 import type { operations } from '@admin/shared/contracts';
 

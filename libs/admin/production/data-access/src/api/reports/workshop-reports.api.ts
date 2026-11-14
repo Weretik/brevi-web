@@ -3,7 +3,7 @@ import {
   mapWorkshopDashboard,
   mapWorkshopReportPair,
 } from '../../mappers/reports/workshop-report.mapper';
-import { productionBaseApi } from '../production-base-api';
+import { productionBaseApi } from '../base/production-base-api';
 
 import type {
   WorkshopDashboard,

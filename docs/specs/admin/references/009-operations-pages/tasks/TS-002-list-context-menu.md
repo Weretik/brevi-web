@@ -20,7 +20,7 @@
 - Tests:
   `libs/admin/references/feature/src/pages/garment-parts/garment-parts-page.component.test.tsx`,
   `libs/admin/references/feature/src/pages/garment-part-operations/garment-part-operations-page.component.test.tsx`,
-  `apps/admin-react/src/app/router/app-router.integration.test.tsx` та paired
+  `apps/admin-react/src/app/router/routes/app-router.integration.test.tsx` та paired
   Playwright specs.
 - Red:
   `npx nx test admin-references-feature -- src/pages/garment-parts/garment-parts-page.component.test.tsx src/pages/garment-part-operations/garment-part-operations-page.component.test.tsx`

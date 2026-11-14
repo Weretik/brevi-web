@@ -133,7 +133,7 @@ libs/admin/accounting/
     ├── components/journal/                                       # area tabs, quick bar (search, periods, type, «Ще фільтри»)
     ├── hooks/                                                    # editors, journal, choices, settings, files of an operation, archive move
     └── testing/{render.tsx,finance-api-stub.ts}                  # render with the API store, stubbed API
-libs/admin/core/auth/src/session/session-user.ts                  # canUseAccounting
+libs/admin/core/auth/src/session/store/session-user.ts                  # canUseAccounting
 apps/admin-react/src/app/router/{create-admin-router.tsx,legacy-menu.ts,admin-route-layout.tsx}
 ```
 

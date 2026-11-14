@@ -3,9 +3,9 @@ import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 
 import { RequireAdminSession } from './require-admin-session';
-import { setSessionState } from '../session/session-store';
+import { setSessionState } from '../session/store/session-store';
 
-import type { SessionUser } from '../session/session-user';
+import type { SessionUser } from '../session/store/session-user';
 
 const staff = (roles: SessionUser['roles']): SessionUser => ({
   id: 'u-1',

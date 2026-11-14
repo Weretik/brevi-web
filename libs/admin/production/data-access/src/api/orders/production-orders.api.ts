@@ -13,7 +13,7 @@ import {
   mapProductionQuoteSources,
   productionColors,
 } from '../../mappers/orders/production-order.mapper';
-import { productionBaseApi } from '../production-base-api';
+import { productionBaseApi } from '../base/production-base-api';
 
 import type {
   CreateProductionOrderBody,

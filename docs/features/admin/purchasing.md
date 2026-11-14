@@ -95,8 +95,8 @@ libs/admin/references/feature/src/pages/counterparties/counterparties-page.tsx  
 libs/admin/references/feature/src/components/suppliers/supplier-drawer.tsx      # passes the supplier tab to the card
 libs/admin/references/feature/src/references.routes.tsx                          # createReferencesRoutes
 apps/admin-react/src/app/slots/purchasing/use-can-see-purchase-invoices.ts                 # supplier tab role check
-apps/admin-react/src/app/router/create-admin-router.tsx, legacy-menu.ts          # route guard, menu item
-libs/admin/core/auth/src/session/session-user.ts                                 # canUsePurchaseInvoices
+apps/admin-react/src/app/router/routes/create-admin-router.tsx, legacy-menu.ts          # route guard, menu item
+libs/admin/core/auth/src/session/store/session-user.ts                                 # canUsePurchaseInvoices
 ```
 
 ## Tests

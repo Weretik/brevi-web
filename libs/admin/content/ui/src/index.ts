@@ -24,7 +24,7 @@ export * from './components/site-pages/site-page-view';
 export * from './forms/site-pages/site-page-form';
 export * from './tables/seo-overview/seo-issues-table';
 export * from './components/company/site-company-view';
-export * from './forms/company/site-company-form';
+export * from './forms/company/form/site-company-form';
 export * from './tables/galleries/site-gallery-grid';
 export * from './forms/galleries/site-gallery-item-form';
 export * from './dialogs/site-gallery-delete-dialog';

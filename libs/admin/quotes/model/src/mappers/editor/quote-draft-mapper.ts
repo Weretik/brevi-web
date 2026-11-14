@@ -1,8 +1,8 @@
 import { priceInputText } from './quote-price-text';
 import { quoteItemSubtitles } from '../../forms/editor/quote-draft';
 
-import type { Quote, QuoteItem, QuoteOption, QuoteTier } from '../../entities/quote';
-import type { QuoteCatalogProduct, QuoteCatalogVariant } from '../../entities/quote-catalog';
+import type { QuoteCatalogProduct, QuoteCatalogVariant } from '../../entities/items/quote-catalog';
+import type { Quote, QuoteItem, QuoteOption, QuoteTier } from '../../entities/quote/quote';
 import type {
   QuoteDraft,
   QuoteItemDraft,

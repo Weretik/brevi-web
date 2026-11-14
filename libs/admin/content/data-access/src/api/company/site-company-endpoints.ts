@@ -1,7 +1,7 @@
-import { siteCompanyApiError } from '../../errors/site-company-api-error';
+import { siteCompanyApiError } from '../../errors/site/site-company-api-error';
 import { mapSiteCompany } from '../../mappers/company/site-company.mapper';
 
-import type { ContentEndpointBuilder } from '../content-endpoint-builder';
+import type { ContentEndpointBuilder } from '../base/content-endpoint-builder';
 import type { SiteCompany, SiteCompanyInput } from '@admin/content/model';
 import type { operations } from '@admin/shared/contracts';
 

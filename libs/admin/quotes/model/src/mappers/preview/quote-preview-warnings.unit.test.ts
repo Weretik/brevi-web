@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { quotePreviewWarnings } from './quote-preview-warnings';
 
-import type { Quote, QuoteItem, QuotePrice } from '../../entities/quote';
+import type { Quote, QuoteItem, QuotePrice } from '../../entities/quote/quote';
 
 const price = (amount: number | null, shown = true): QuotePrice =>
   ({ amount, shown }) as unknown as QuotePrice;

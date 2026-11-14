@@ -3,7 +3,7 @@ import { PayrollMonthTable } from '@admin/production/ui';
 import ExpandMoreOutlinedIcon from '@mui/icons-material/ExpandMoreOutlined';
 import { Accordion, AccordionDetails, AccordionSummary, Typography } from '@mui/material';
 
-import { PayrollSetupSection } from '../payroll-setup-section';
+import { PayrollSetupSection } from '../employee/payroll-setup-section';
 
 import type { usePayrollMonthActions } from '../../../hooks/payroll/use-payroll-month-actions';
 import type { PayrollLine, PayrollMonth, payrollMonthPeople } from '@admin/production/model';

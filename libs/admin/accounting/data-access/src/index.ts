@@ -47,6 +47,6 @@ export {
   useVerifyFinanceCounterpartyMutation,
   useVoidFinanceTransactionMutation,
   useVoidFinanceTransferMutation,
-} from './api/accounting.api';
+} from './api/base/accounting.api';
 export { fetchFinanceAttachmentContent } from './api/files/finance-attachment-content';
 export { fetchFinanceExport, fetchFinanceReportCsv } from './api/files/finance-report-files';

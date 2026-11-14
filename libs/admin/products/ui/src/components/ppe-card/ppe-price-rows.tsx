@@ -1,6 +1,6 @@
 import { Stack, Typography } from '@mui/material';
 
-import { sewingPriceFormat } from '../sewing-pricing/sewing-price-format';
+import { sewingPriceFormat } from '../sewing-pricing/tiers/sewing-price-format';
 
 import type { PpePriceTiers } from '@admin/products/model';
 

@@ -2,8 +2,8 @@ import { leadScript } from '@admin/leads/model';
 import { Box, Stack, Typography } from '@mui/material';
 
 import { LeadContactList } from '../contacts/lead-contact-list';
-import { mono } from '../mono';
 import { LeadStagePill } from '../status/lead-stage-pill';
+import { mono } from '../status/mono';
 
 import type { LeadDetail } from '@admin/leads/model';
 

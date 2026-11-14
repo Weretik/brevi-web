@@ -3,7 +3,7 @@
 - **ID задачі:** TS-001
 - **Охоплює:** SC-001, SC-004
 - **Залежить від:** EN-001
-- **Точні шляхи:** `apps/admin-react/src/app/theme/brevi-palette.ts`, `apps/admin-react/src/app/theme/brevi-theme.ts`, `apps/admin-react/src/app/theme/color-mode.ts`, `apps/admin-react/src/app/providers/color-mode-provider.tsx`, `apps/admin-react/src/app/providers/app-providers.tsx`, `apps/admin-react/src/app/theme/brevi-theme.unit.test.ts`, `apps/admin-react/src/app/router/app-router.integration.test.tsx`; джерела: `apps/admin/src/styles.css`, `libs/shared/theme/src/lib/design-tokens.json`
+- **Точні шляхи:** `apps/admin-react/src/app/theme/brevi-palette.ts`, `apps/admin-react/src/app/theme/brevi-theme.ts`, `apps/admin-react/src/app/theme/color-mode.ts`, `apps/admin-react/src/app/providers/color-mode-provider.tsx`, `apps/admin-react/src/app/providers/app-providers.tsx`, `apps/admin-react/src/app/theme/brevi-theme.unit.test.ts`, `apps/admin-react/src/app/router/routes/app-router.integration.test.tsx`; джерела: `apps/admin/src/styles.css`, `libs/shared/theme/src/lib/design-tokens.json`
 - **Рівень тестування:** модульний + інтеграційний
 
 ## Робота

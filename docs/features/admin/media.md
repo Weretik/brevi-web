@@ -53,7 +53,7 @@ libs/admin/media/
 
 **«Вибрати фото» (stage 4).** `MediaPickerDrawer` (exported from `@admin/media/feature`) is the library in a wide side panel: folder tree (a folder select on narrow screens), search, ticks kept across folders and pages, upload by button or drop into the open folder (uploaded photos are ticked at once), toasts, and «Додати (N)». Photos the caller already has show ticked and are not added twice. The product card uses it through `libs/admin/products/feature/src/components/product-editor/product-photo-picker.tsx` instead of the old dropdown and single upload. The card still reads previews of attached photos from `products/data-access/src/api/product-media.api.ts` (whole library list); its `uploadProductMedia` endpoint is no longer used by the UI.
 
-**Where to look:** [route](../../../libs/admin/media/feature/src/media.routes.tsx), [page](../../../libs/admin/media/feature/src/pages/library/media-library-page.tsx), [tree](../../../libs/admin/media/model/src/mappers/media-folder-tree.ts), [API](../../../libs/admin/media/data-access/src/api/media-files.api.ts).
+**Where to look:** [route](../../../libs/admin/media/feature/src/media.routes.tsx), [page](../../../libs/admin/media/feature/src/pages/media-library-page.tsx), [tree](../../../libs/admin/media/model/src/mappers/media-folder-tree.ts), [API](../../../libs/admin/media/data-access/src/api/media-files.api.ts).
 
 ## Tests
 
@@ -61,7 +61,7 @@ libs/admin/media/
 - `libs/admin/media/data-access/src/mappers/media-file.mapper.test.ts`
 - `libs/admin/media/ui/src/components/folder-tree/media-folder-tree.component.test.tsx`
 - `libs/admin/media/ui/src/components/gallery/media-file-preview.component.test.tsx` (preview → original → note)
-- `libs/admin/media/feature/src/pages/library/media-library-page.component.test.tsx` (includes drop upload)
+- `libs/admin/media/feature/src/pages/media-library-page.component.test.tsx` (includes drop upload)
 - `libs/admin/media/feature/src/hooks/library/use-media-toasts.unit.test.ts`
 - `libs/admin/media/feature/src/components/picker/media-picker-drawer.component.test.tsx` (ticks, already added, folder + search, upload → ticked)
 - `libs/admin/products/data-access/src/products.api.integration.test.ts` (product editor paging and upload)

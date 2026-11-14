@@ -2,10 +2,10 @@ import { reminderOccurrenceState } from '@admin/reminders/model';
 import { Box, Typography } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 
-import { ReminderClosedByCell } from './cells/reminder-closed-by-cell';
-import { ReminderOccurrenceActionsCell } from './cells/reminder-occurrence-actions-cell';
-import { ReminderOccurrenceDueCell } from './cells/reminder-occurrence-due-cell';
-import { ReminderOccurrenceTaskCell } from './cells/reminder-occurrence-task-cell';
+import { ReminderClosedByCell } from './reminder-closed-by-cell';
+import { ReminderOccurrenceActionsCell } from './reminder-occurrence-actions-cell';
+import { ReminderOccurrenceDueCell } from './reminder-occurrence-due-cell';
+import { ReminderOccurrenceTaskCell } from './reminder-occurrence-task-cell';
 import { ReminderOccurrenceStatePill } from '../../components/status/reminder-occurrence-state-pill';
 
 import type { ReminderOccurrence } from '@admin/reminders/model';

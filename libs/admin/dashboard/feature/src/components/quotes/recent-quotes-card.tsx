@@ -13,7 +13,7 @@ import {
 import { Link as RouterLink } from 'react-router-dom';
 
 import { QuoteStatusPill } from './quote-status-pill';
-import { numericTextSx } from '../../model/numeric-text';
+import { numericTextSx } from '../../model/desks/numeric-text';
 
 import type { RecentQuote } from '../../model/desk-views/dashboard-view';
 

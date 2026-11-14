@@ -1,9 +1,9 @@
 import { Box, Card, Chip, Link, Stack, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
-import { numericTextSx } from '../../model/numeric-text';
+import { numericTextSx } from '../../model/desks/numeric-text';
 
-import type { DeskList } from '../../model/desk-list';
+import type { DeskList } from '../../model/desks/desk-list';
 
 interface DeskListCardProps {
   /** Id prefix of the heading; the card is the region named by it. */

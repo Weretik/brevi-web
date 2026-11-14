@@ -1,4 +1,4 @@
-import type { PurchaseDocumentVat } from '../entities/invoices/purchase-document';
+import type { PurchaseDocumentVat } from '../entities/purchase-document';
 
 export const purchaseInvoiceFilters = [
   'All',

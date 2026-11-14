@@ -4,7 +4,7 @@
 
 - Angular-джерело таблиці, діалогів і контекстних дій: `libs/admin/feature/references/src/lib/pages/garment-part-operation/` та `libs/admin/feature/references/src/lib/components/dialogs/`.
 - Старий transport: `libs/admin/data-access/src/lib/references/garment-parts/garment-parts.api.ts`; backend controller: `src/Modules/Reference/Reference.Api/Reference.Api/Controllers/` у BreviERP.
-- React route підключено в `apps/admin-react/src/app/router/app-router.tsx`. Наявні `libs/admin/references/feature` і `libs/admin/references/data-access` використано для цієї feature без нових libraries.
+- React route підключено в `apps/admin-react/src/app/router/routes/app-router.tsx`. Наявні `libs/admin/references/feature` і `libs/admin/references/data-access` використано для цієї feature без нових libraries.
 - Візуальна композиція: [приклад таблиці](../../../assets/visual-references/customers-status-list.png) і [приклад форми](../../../assets/visual-references/customer-create.png); це зразки структури, не полів чи бренду. Застосовувати Brevi MUI theme й безкоштовний `@mui/x-data-grid`, без PrimeNG у React.
 
 ## Межа сторінки й таблиці

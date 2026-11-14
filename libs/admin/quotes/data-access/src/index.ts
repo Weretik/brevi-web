@@ -13,7 +13,7 @@ export {
   useRepriceQuoteMutation,
   useSaveQuoteMutation,
   useSetQuoteResponsibleMutation,
-} from './api/quotes.api';
+} from './api/quotes/quotes.api';
 export {
   useCalculateQuoteCustomSewingMutation,
   useGetQuoteFabricFactsQuery,
@@ -22,17 +22,20 @@ export {
   useGetQuoteStaffQuery,
   useSearchQuoteCatalogQuery,
   useUploadQuotePhotoMutation,
-} from './api/quote-lookups.api';
-export type { QuoteCatalogQuery } from './api/quote-lookups.api';
+} from './api/quotes/quote-lookups.api';
+export type { QuoteCatalogQuery } from './api/quotes/quote-lookups.api';
 export { toSaveQuoteInput } from './mappers/quote-input.mapper';
-export { useGetQuoteSettingsQuery, useSaveQuoteSettingsMutation } from './api/quote-settings.api';
+export {
+  useGetQuoteSettingsQuery,
+  useSaveQuoteSettingsMutation,
+} from './api/quotes/quote-settings.api';
 export { downloadQuotePdf, fetchQuotePdf, saveQuotePdf } from './api/files/quote-pdf';
 export {
   useConnectMailboxMutation,
   useDisconnectMailboxMutation,
   useGetQuoteSendDraftQuery,
   useSendQuoteMutation,
-} from './api/quote-send.api';
+} from './api/quotes/quote-send.api';
 export {
   useCreateQuoteIntroductionMutation,
   useCreateQuoteIntroTemplateMutation,
@@ -42,5 +45,5 @@ export {
   useGetQuoteIntroTemplatesQuery,
   useLazyGetQuoteCatalogProductsQuery,
   useSaveQuoteIntroductionMutation,
-} from './api/quote-introductions.api';
+} from './api/quotes/quote-introductions.api';
 export { toSaveQuoteIntroductionInput } from './mappers/quote-introduction.mapper';

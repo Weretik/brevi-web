@@ -11,11 +11,11 @@ import {
 } from '@mui/material';
 import { Navigate, useLocation } from 'react-router-dom';
 
-import { LoginIntroPanel } from '../components/login/login-intro-panel';
-import { PasswordField } from '../components/login/password-field';
-import { useLoginForm } from '../hooks/login/use-login-form';
+import { LoginIntroPanel } from '../components/login-intro-panel';
+import { PasswordField } from '../components/password-field';
+import { useLoginForm } from '../hooks/use-login-form';
 import { readReturnPath } from '../routes/login-return-path';
-import { useAdminSession } from '../session/use-admin-session';
+import { useAdminSession } from '../session/store/use-admin-session';
 
 const defaultReturnPath = '/';
 

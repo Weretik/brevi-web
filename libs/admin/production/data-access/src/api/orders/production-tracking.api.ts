@@ -4,7 +4,7 @@ import {
   mapProgressImportResult,
   mapReportPriceImportResult,
 } from '../../mappers/orders/production-tracking.mapper';
-import { productionBaseApi } from '../production-base-api';
+import { productionBaseApi } from '../base/production-base-api';
 
 import type {
   CreateProductionShipmentBody,

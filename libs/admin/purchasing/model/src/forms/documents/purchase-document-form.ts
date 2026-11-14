@@ -1,4 +1,4 @@
-import type { PurchaseDocumentVat } from '../../entities/invoices/purchase-document';
+import type { PurchaseDocumentVat } from '../../entities/purchase-document';
 
 /** One editable line; numbers stay text while typing so «12,5» or an empty cell can be shown. */
 export interface PurchaseDocumentFormItem {

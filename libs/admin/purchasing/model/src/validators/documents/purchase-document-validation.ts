@@ -1,5 +1,5 @@
 import { purchaseNumberText } from '../../forms/documents/purchase-document-form';
-import { purchaseLineDiscount } from '../../mappers/invoices/purchase-invoice-status';
+import { purchaseLineDiscount } from '../../mappers/purchase-invoice-status';
 
 import type { PurchaseDocumentFormValues } from '../../forms/documents/purchase-document-form';
 

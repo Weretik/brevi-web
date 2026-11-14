@@ -1,7 +1,7 @@
 import { Drawer } from '@mui/material';
 
-import { getNavigationPalette } from '../navigation-palette';
 import { AdminNavigationPanel } from './admin-navigation-panel';
+import { getNavigationPalette } from '../menu/routes/navigation-palette';
 
 import type { AdminNavigationGroup } from '../../layout/admin-shell-contract';
 

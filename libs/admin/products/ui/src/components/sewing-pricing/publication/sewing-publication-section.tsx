@@ -1,8 +1,8 @@
 import { Alert, Button, CircularProgress, Typography } from '@mui/material';
 
-import { SewingPriceTiersView } from '../sewing-price-tiers';
+import { SewingPriceTiersView } from '../tiers/sewing-price-tiers';
 
-import type { SewingPricingPanelProps } from '../sewing-pricing-panel-props';
+import type { SewingPricingPanelProps } from '../tiers/sewing-pricing-panel-props';
 
 export function SewingPublicationSection(
   props: Pick<

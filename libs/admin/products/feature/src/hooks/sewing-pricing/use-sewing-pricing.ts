@@ -4,7 +4,7 @@ import {
 } from '@admin/products/data-access';
 import { isAdminApiError } from '@admin/shared/api-client';
 
-import { pricingErrorMessage } from '../../model/pricing/pricing-error-message';
+import { pricingErrorMessage } from '../../model/pricing-error-message';
 
 /** The published Article price and the calculation behind it (read-only, CAT-012). */
 export function useSewingPricing(productId: number, articleId: number) {

@@ -2,10 +2,10 @@ import { Stack } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { DataGrid } from '@mui/x-data-grid';
 
-import { reportMono as mono } from './columns/finance-report-cell-columns';
-import { financeReportColumns } from './columns/finance-report-columns';
+import { reportMono as mono } from './finance-report-cell-columns';
+import { financeReportColumns } from './finance-report-columns';
 
-import type { FinanceReportGridRow as Row } from './columns/finance-report-cell-columns';
+import type { FinanceReportGridRow as Row } from './finance-report-cell-columns';
 import type { FinanceReport } from '@admin/accounting/model';
 
 interface Props {

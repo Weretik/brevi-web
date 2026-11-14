@@ -1,9 +1,9 @@
-import { customerDetailTag, changedCustomerTags } from '../../cache/customers/customer-cache';
+import { customerDetailTag, changedCustomerTags } from '../../cache/customer-cache';
 import { customerApiError } from '../../errors/customer-api-error';
-import { mapCustomerDetail } from '../../mappers/customers/customer-detail.mapper';
+import { mapCustomerDetail } from '../../mappers/customer-detail.mapper';
 
-import type { MergeCustomersIntent } from '../../models/customers/merge-customers-intent';
-import type { CustomerEndpointBuilder } from '../customer-endpoint-builder';
+import type { MergeCustomersIntent } from '../../models/merge-customers-intent';
+import type { CustomerEndpointBuilder } from '../base/customer-endpoint-builder';
 import type { CustomerDetail } from '@admin/clients/model';
 import type { operations } from '@admin/shared/contracts';
 

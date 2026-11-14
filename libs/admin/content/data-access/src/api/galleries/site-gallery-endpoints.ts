@@ -1,10 +1,10 @@
-import { siteGalleryApiError } from '../../errors/site-gallery-api-error';
+import { siteGalleryApiError } from '../../errors/site/site-gallery-api-error';
 import {
   mapSiteGallery,
   mapSiteGalleryTransfer,
 } from '../../mappers/galleries/site-gallery.mapper';
 
-import type { ContentEndpointBuilder } from '../content-endpoint-builder';
+import type { ContentEndpointBuilder } from '../base/content-endpoint-builder';
 import type {
   SiteGallery,
   SiteGalleryInput,

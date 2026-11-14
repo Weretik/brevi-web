@@ -10,9 +10,9 @@ import {
   mapBankStatementDetails,
   mapBankStatementLine,
   mapBankStatements,
-} from '../../mappers/accounting-statement.mapper';
+} from '../../mappers/imports/accounting-statement.mapper';
 
-import type { AccountingEndpointBuilder } from '../accounting-endpoint-builder';
+import type { AccountingEndpointBuilder } from '../base/accounting-endpoint-builder';
 import type {
   BankLineState,
   BankStatement,

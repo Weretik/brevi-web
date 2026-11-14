@@ -7,7 +7,7 @@ import {
   quoteSupplierFabrics,
 } from './quote-fabric-facts';
 
-import type { QuoteFabricFacts } from '../../entities/quote-catalog';
+import type { QuoteFabricFacts } from '../../entities/items/quote-catalog';
 import type { QuoteDraft, QuoteOptionDraft } from '../../forms/editor/quote-draft';
 
 const option = (patch: Partial<QuoteOptionDraft>): QuoteOptionDraft => ({

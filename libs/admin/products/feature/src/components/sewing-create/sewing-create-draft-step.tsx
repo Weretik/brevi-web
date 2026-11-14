@@ -1,8 +1,8 @@
 import { SewingCreateModelSummary } from './sewing-create-model-summary';
 import { SewingCreateReviewStep } from './sewing-create-review-step';
-import { SewingLabourTab } from '../sewing-model/sewing-labour-tab';
-import { SewingMaterialsTab } from '../sewing-model/sewing-materials-tab';
-import { SewingVariantsTab } from '../sewing-model/sewing-variants-tab';
+import { SewingLabourTab } from '../sewing-model/tabs/sewing-labour-tab';
+import { SewingMaterialsTab } from '../sewing-model/tabs/sewing-materials-tab';
+import { SewingVariantsTab } from '../sewing-model/tabs/sewing-variants-tab';
 
 import type { useSewingCreateDraft } from '../../hooks/sewing-create/use-sewing-create-draft';
 import type { useSewingCreateOverview } from '../../hooks/sewing-create/use-sewing-create-overview';

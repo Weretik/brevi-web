@@ -52,5 +52,5 @@
   `apps/admin-react/src/app/router/{legacy-menu,navigation-config}.ts`
 - `libs/admin/core/shell/src/components/top-bar/*`,
   `libs/admin/core/shell/src/navigation/{menu,sidebar}/*`,
-  `libs/admin/core/shell/src/navigation/navigation-palette.ts`,
+  `libs/admin/core/shell/src/navigation/menu/routes/navigation-palette.ts`,
   `libs/admin/core/shell/src/layout/admin-layout.tsx`

@@ -1,6 +1,6 @@
 import { Box, Stack, TextField } from '@mui/material';
 
-import { EmbroideryNumberField } from '../embroidery-number-field';
+import { EmbroideryNumberField } from '../fields/embroidery-number-field';
 
 import type { EmbroideryHoopDraft } from '@admin/embroidery/model';
 

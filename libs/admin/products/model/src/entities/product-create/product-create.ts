@@ -1,4 +1,4 @@
-import type { PpePriceTiers } from '../ppe-pricing/ppe-price-tiers';
+import type { PpePriceTiers } from '../ppe-pricing/prices/ppe-price-tiers';
 
 export type CatalogProductType = 'Sewing' | 'Ppe';
 

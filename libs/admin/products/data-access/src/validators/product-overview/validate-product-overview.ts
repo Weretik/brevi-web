@@ -1,5 +1,5 @@
+import { entries, number, record } from '../base/response-validation';
 import { pricingDate, pricingId, validPricingTiers } from '../pricing/pricing-values';
-import { entries, number, record } from '../response-validation';
 
 import type {
   ProductOverviewItemResponse,

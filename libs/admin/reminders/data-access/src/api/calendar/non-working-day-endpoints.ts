@@ -2,7 +2,7 @@ import { calendarChangeTags, nonWorkingDaysTag } from '../../cache/reminder-cach
 import { reminderApiError } from '../../errors/reminder-api-error';
 import { mapNonWorkingDay, mapNonWorkingDays } from '../../mappers/calendar/non-working-day.mapper';
 
-import type { RemindersEndpointBuilder } from '../reminders-endpoint-builder';
+import type { RemindersEndpointBuilder } from '../base/reminders-endpoint-builder';
 import type { NonWorkingDay } from '@admin/reminders/model';
 import type { components } from '@admin/shared/contracts';
 
