@@ -1,6 +1,7 @@
 [
   "crowded-folder: libs/admin/content/data-access/src/errors",
   "crowded-folder: libs/admin/products/model/src/entities/sewing-composition",
+  "crowded-folder: libs/admin/quotes/ui/src/components/settings/preview/pdf",
   "crowded-folder: libs/site/home/ui/src/lib/sections",
   "crowded-folder: libs/site/shared/ui/src/lib",
   "long-file: apps/admin-react/src/app/router/navigation/legacy-menu.ts",
@@ -45,7 +46,6 @@
   "long-file: libs/admin/production/data-access/src/mappers/people/payroll.mapper.ts",
   "long-file: libs/admin/production/feature/src/components/order-items/production-item-panel.tsx",
   "long-file: libs/admin/production/feature/src/components/orders/production-order-actions.tsx",
-  "long-file: libs/admin/production/feature/src/components/payroll/payroll-month-view.tsx",
   "long-file: libs/admin/production/feature/src/pages/archive/workshop-archive-page.tsx",
   "long-file: libs/admin/production/feature/src/pages/norms/fabric-norms-page.tsx",
   "long-file: libs/admin/production/feature/src/pages/orders/production-order-page.tsx",
@@ -85,7 +85,6 @@
   "long-file: libs/admin/quotes/ui/src/components/editor/item/quote-item-card.tsx",
   "long-file: libs/admin/quotes/ui/src/components/editor/item/quote-item-prices.tsx",
   "long-file: libs/admin/quotes/ui/src/components/introduction/quote-intro-slot-card.tsx",
-  "long-file: libs/admin/quotes/ui/src/components/settings/preview/quote-pdf-preview.tsx",
   "long-file: libs/admin/quotes/ui/src/components/settings/sections/quote-introduction-section.tsx",
   "long-file: libs/admin/quotes/ui/src/components/settings/sections/quote-letters-section.tsx",
   "long-file: libs/admin/quotes/ui/src/components/settings/sections/quote-pdf-section.tsx",
