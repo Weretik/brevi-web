@@ -14,7 +14,7 @@ libs/site/
 │   ├── data/size-chart.ts                      # charts and lookup functions
 │   ├── data/size-answers.ts                    # typed measures to the found sizes
 │   ├── i18n/sizes-dictionary.ts                # uk and ru text
-│   └── sections/                               # size-finder (client), size-chart-sheet (client), size-tables, measure-steps
+│   └── sections/                               # size-finder (client) with size-field and size-toggle-group, size-chart-sheet (client), size-tables, measure-steps
 └── sizes/seo/src/lib/sizes-metadata.ts
 ```
 

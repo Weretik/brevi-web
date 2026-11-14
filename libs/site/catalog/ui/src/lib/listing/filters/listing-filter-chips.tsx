@@ -1,52 +1,10 @@
 'use client';
 
 import { bandLabel } from './catalog-listing-options';
-import { ListingChoices } from './listing-choices';
-import { ListingFilterMenu } from './listing-filter-menu';
+import { ListingFilterChip } from './listing-filter-chip';
 
-import type { ListingOption, ListingOptions, ListingText } from './catalog-listing-options';
+import type { ListingOptions, ListingText } from './catalog-listing-options';
 import type { CatalogListingState } from '../use-catalog-listing';
-
-/** One filter chip of wider screens: its menu closes once a value is chosen. */
-function FilterChip<T extends string>({
-  label,
-  chosen,
-  options,
-  value,
-  onChange,
-  align,
-  title,
-}: {
-  label: string;
-  chosen: string | null;
-  options: readonly ListingOption<T>[];
-  value: T | null;
-  onChange: (value: T | null) => void;
-  align?: 'start' | 'end';
-  /** A heading above the choices in the menu. */
-  title?: string;
-}) {
-  return (
-    <div className="max-md:hidden">
-      <ListingFilterMenu label={label} chosen={chosen} align={align}>
-        {(close) => (
-          <>
-            {title ? <p className="text-sm font-bold">{title}</p> : null}
-            <ListingChoices
-              label={title ?? label}
-              options={options}
-              value={value}
-              onChange={(next) => {
-                onChange(next);
-                close();
-              }}
-            />
-          </>
-        )}
-      </ListingFilterMenu>
-    </div>
-  );
-}
 
 /** Wider screens: a chip per filter, each with its own menu, the count found and the order. */
 export function ListingFilterChips({
@@ -63,7 +21,7 @@ export function ListingFilterChips({
   return (
     <>
       {facets.bands.length > 0 ? (
-        <FilterChip
+        <ListingFilterChip
           label={text.price}
           title={text.priceTitle}
           chosen={chosenBand ? bandLabel(chosenBand, text) : null}
@@ -73,7 +31,7 @@ export function ListingFilterChips({
         />
       ) : null}
       {facets.fabrics.length > 0 ? (
-        <FilterChip
+        <ListingFilterChip
           label={text.fabric}
           chosen={choice.fabric}
           options={options.fabrics}
@@ -82,7 +40,7 @@ export function ListingFilterChips({
         />
       ) : null}
       {facets.types.length > 1 ? (
-        <FilterChip
+        <ListingFilterChip
           label={text.type}
           chosen={choice.type ? text.types[choice.type] : null}
           options={options.types}
@@ -104,7 +62,7 @@ export function ListingFilterChips({
           {text.found} {listing.found}
         </span>
       </span>
-      <FilterChip
+      <ListingFilterChip
         label={text.sort}
         chosen={choice.sort === 'default' ? null : text.sorts[choice.sort]}
         options={options.sorts}
