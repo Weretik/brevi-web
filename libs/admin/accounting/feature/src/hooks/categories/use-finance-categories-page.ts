@@ -17,6 +17,7 @@ import { useVersionedDeletion } from '../deletion/use-versioned-deletion';
 import type { FinanceCategoryEditorMode } from './use-finance-category-editor';
 import type { CategoryDirection, FinanceCategoryRow } from '@admin/accounting/model';
 
+/** «Категорії»: the categories of the open tab and direction with the search, the side panel, the message and deletion. */
 export function useFinanceCategoriesPage() {
   const query = useGetFinanceCategoriesQuery();
   const all = useMemo(() => query.data ?? [], [query.data]);

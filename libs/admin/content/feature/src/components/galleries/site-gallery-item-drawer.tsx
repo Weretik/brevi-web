@@ -1,22 +1,12 @@
-import {
-  applySiteGalleryItemForm,
-  newSiteGalleryItem,
-  siteGalleryItemFormOf,
-  siteGalleryLabels,
-  validateSiteGalleryItem,
-} from '@admin/content/model';
+import { siteGalleryLabels } from '@admin/content/model';
 import { SiteGalleryItemForm } from '@admin/content/ui';
 import { MediaPickerDrawer } from '@admin/media/feature';
 import { ReferenceEditorDrawer } from '@admin/references/ui';
 import { Alert, Stack } from '@mui/material';
-import { useState } from 'react';
 
-import type {
-  SiteGalleryItem,
-  SiteGalleryItemErrors,
-  SiteGalleryItemFormValues,
-  SiteGalleryKind,
-} from '@admin/content/model';
+import { useSiteGalleryItemForm } from '../../hooks/galleries/use-site-gallery-item-form';
+
+import type { SiteGalleryItem, SiteGalleryKind } from '@admin/content/model';
 
 interface Props {
   kind: SiteGalleryKind;
@@ -40,24 +30,9 @@ export function SiteGalleryItemDrawer({
   onClose,
   onSubmit,
 }: Props) {
-  const [photo, setPhoto] = useState(item);
-  const [values, setValues] = useState<SiteGalleryItemFormValues>(() =>
-    siteGalleryItemFormOf(item),
-  );
-  const [errors, setErrors] = useState<SiteGalleryItemErrors>({});
-  const [message, setMessage] = useState<string | null>(null);
-  const [picking, setPicking] = useState(false);
+  const { photo, values, setValues, errors, message, picking, setPicking, submit, replacePhoto } =
+    useSiteGalleryItemForm(kind, item, onSubmit);
   const label = siteGalleryLabels[kind].item;
-
-  async function submit() {
-    const found = validateSiteGalleryItem(kind, values);
-    setErrors(found);
-    if (Object.keys(found).length > 0) {
-      setMessage('Виправте позначені поля.');
-      return;
-    }
-    setMessage(await onSubmit(applySiteGalleryItemForm(photo, values)));
-  }
 
   return (
     <>
@@ -96,12 +71,7 @@ export function SiteGalleryItemDrawer({
         <MediaPickerDrawer
           alreadyAddedIds={takenIds}
           onClose={() => setPicking(false)}
-          onPick={(files) => {
-            setPicking(false);
-            const file = files[0];
-            if (file)
-              setPhoto({ ...newSiteGalleryItem(file), title: photo.title, note: photo.note });
-          }}
+          onPick={(files) => replacePhoto(files[0])}
         />
       )}
     </>
