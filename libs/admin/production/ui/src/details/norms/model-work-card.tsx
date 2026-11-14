@@ -1,34 +1,13 @@
-import {
-  compositionLineKindLabels,
-  compositionMaterialText,
-  compositionRest,
-  compositionUnitLabels,
-  fabricNormModelCaption,
-  fabricNormVariants,
-  forBatch,
-  formatCompositionQuantity,
-} from '@admin/production/model';
-import {
-  Alert,
-  Box,
-  Button,
-  CircularProgress,
-  InputAdornment,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { compositionRest, fabricNormVariants } from '@admin/production/model';
+import { Alert, Box, Button, CircularProgress } from '@mui/material';
 
+import { CompositionCard } from './composition-card';
 import { FabricNormVariantCard } from './fabric-norm-variant-card';
+import { ModelCompositionLayers } from './model-composition-layers';
+import { ModelCompositionRest } from './model-composition-rest';
+import { ModelWorkHeader } from './model-work-header';
 
-import type { CompositionUnit, FabricNormRow, ModelComposition } from '@admin/production/model';
-import type { ReactNode } from 'react';
+import type { FabricNormRow, ModelComposition } from '@admin/production/model';
 
 interface Props {
   row: FabricNormRow;
@@ -44,12 +23,6 @@ interface Props {
   /** null hides «Видалити норму». */
   onDelete: (() => void) | null;
 }
-
-const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' } as const;
-const head = { bgcolor: 'action.hover', fontWeight: 600 } as const;
-
-const quantity = (value: number, unit: CompositionUnit) =>
-  formatCompositionQuantity(value, compositionUnitLabels[unit]);
 
 /**
  * The work card of one model: fabric per item for one, two and three colours (each fabric on its
@@ -80,49 +53,15 @@ export function ModelWorkCard({
       aria-label={`${row.modelCode} ${name}`}
       sx={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}
     >
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-end',
-          gap: 2,
-          flexWrap: 'wrap',
-        }}
-      >
-        <Box sx={{ minWidth: 0 }}>
-          <Typography variant="caption" color="text.secondary" sx={mono}>
-            {fabricNormModelCaption(row)}
-            {row.modelName && !row.modelIsActive ? ' · вимкнена' : ''}
-          </Typography>
-          <Typography variant="h5" component="h2">
-            {name}
-          </Typography>
-        </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-          <TextField
-            label="Рахувати на"
-            size="small"
-            value={batchText}
-            onChange={(event) => onBatchChange(event.target.value)}
-            error={batchText.trim() !== '' && batchSize === null}
-            sx={{ width: 140 }}
-            slotProps={{
-              htmlInput: { inputMode: 'numeric', 'aria-label': 'Рахувати на кількість виробів' },
-              input: { endAdornment: <InputAdornment position="end">шт.</InputAdornment> },
-            }}
-          />
-          {onDelete && (
-            <Button variant="outlined" color="error" onClick={onDelete}>
-              Видалити норму
-            </Button>
-          )}
-          {onEdit && (
-            <Button variant="contained" onClick={onEdit}>
-              {row.norm ? 'Редагувати норму' : 'Задати норму'}
-            </Button>
-          )}
-        </Box>
-      </Box>
+      <ModelWorkHeader
+        row={row}
+        name={name}
+        batchText={batchText}
+        batchSize={batchSize}
+        onBatchChange={onBatchChange}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
 
       {row.problem && <Alert severity="error">{row.problem}</Alert>}
 
@@ -171,130 +110,23 @@ export function ModelWorkCard({
               )
             }
           >
-            {rest.length === 0 ? (
-              <Typography variant="body2" color="text.secondary" sx={{ px: 2, pb: 2 }}>
-                У «Товари» склад ще не задано.
-              </Typography>
-            ) : (
-              <Table size="small" aria-label={`Решта складу: ${name}`}>
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ ...head, width: 100 }}>Вид</TableCell>
-                    <TableCell sx={head}>Матеріал</TableCell>
-                    <TableCell sx={{ ...head, width: 100 }} align="right">
-                      На виріб
-                    </TableCell>
-                    {batchLabel && (
-                      <TableCell sx={{ ...head, width: 110 }} align="right">
-                        {batchLabel}
-                      </TableCell>
-                    )}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rest.map((line, index) => (
-                    <TableRow key={`${line.kind}-${line.code ?? ''}-${index}`}>
-                      <TableCell>{compositionLineKindLabels[line.kind]}</TableCell>
-                      <TableCell>
-                        {compositionMaterialText(line)}
-                        {line.article && (
-                          <Typography variant="caption" color="text.secondary" component="div">
-                            Артикул {line.article}
-                          </Typography>
-                        )}
-                      </TableCell>
-                      <TableCell align="right" sx={mono}>
-                        {quantity(line.quantity, line.unit)}
-                      </TableCell>
-                      {batchSize !== null && (
-                        <TableCell align="right" sx={{ ...mono, fontWeight: 600 }}>
-                          {quantity(forBatch(line.quantity, batchSize), line.unit)}
-                        </TableCell>
-                      )}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
+            <ModelCompositionRest
+              name={name}
+              rest={rest}
+              batchLabel={batchLabel}
+              batchSize={batchSize}
+            />
           </CompositionCard>
           <CompositionCard title="Підкладка, утеплювач, фліс" action={null}>
-            {composition.layers.length === 0 ? (
-              <Typography variant="body2" color="text.secondary" sx={{ px: 2, pb: 2 }}>
-                Немає: модель без підкладки та утеплення.
-              </Typography>
-            ) : (
-              <Table size="small" aria-label={`Підкладка і утеплювач: ${name}`}>
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={head}>Матеріал</TableCell>
-                    <TableCell sx={{ ...head, width: 110 }} align="right">
-                      На виріб
-                    </TableCell>
-                    {batchLabel && (
-                      <TableCell sx={{ ...head, width: 120 }} align="right">
-                        {batchLabel}
-                      </TableCell>
-                    )}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {composition.layers.map((layer, index) => (
-                    <TableRow key={`${layer.code ?? ''}-${index}`}>
-                      <TableCell>
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                          {layer.purpose}
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          {compositionMaterialText(layer)}
-                        </Typography>
-                      </TableCell>
-                      <TableCell align="right" sx={mono}>
-                        {quantity(layer.quantity, layer.unit)}
-                      </TableCell>
-                      {batchSize !== null && (
-                        <TableCell align="right" sx={{ ...mono, fontWeight: 600 }}>
-                          {quantity(forBatch(layer.quantity, batchSize), layer.unit)}
-                        </TableCell>
-                      )}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            )}
+            <ModelCompositionLayers
+              name={name}
+              layers={composition.layers}
+              batchLabel={batchLabel}
+              batchSize={batchSize}
+            />
           </CompositionCard>
         </Box>
       )}
     </Box>
-  );
-}
-
-function CompositionCard({
-  title,
-  action,
-  children,
-}: {
-  title: string;
-  action: ReactNode;
-  children: ReactNode;
-}) {
-  return (
-    <Paper variant="outlined" sx={{ overflow: 'hidden', minWidth: 0 }}>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          gap: 1,
-          px: 2,
-          py: 1.25,
-        }}
-      >
-        <Typography variant="h6" component="h3">
-          {title}
-        </Typography>
-        {action}
-      </Box>
-      <TableContainer>{children}</TableContainer>
-    </Paper>
   );
 }
