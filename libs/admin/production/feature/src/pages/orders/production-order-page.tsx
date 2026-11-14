@@ -1,7 +1,5 @@
-import { productionOrderOverview, productionStageLabels, todayIso } from '@admin/production/model';
+import { productionOrderOverview, todayIso } from '@admin/production/model';
 import {
-  ProductionCancelDialog,
-  ProductionConfirmDialog,
   ProductionItemsTable,
   ProductionOrderDueAlert,
   ProductionOrderFacts,
@@ -13,13 +11,12 @@ import { Alert, Box, CircularProgress, Stack } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { ProductionItemDrawer } from '../../components/order-items/production-item-drawer';
 import { ProductionItemPanel } from '../../components/order-items/production-item-panel';
 import { ProductionOrderActions } from '../../components/orders/production-order-actions';
-import { ProductionOrderHeaderDrawer } from '../../components/orders/production-order-header-drawer';
+import { ProductionOrderDialogs } from '../../components/orders/production-order-dialogs';
+import { ProductionOrderEditDrawers } from '../../components/orders/production-order-edit-drawers';
 import { ProductionOrderHistoryDrawer } from '../../components/orders/production-order-history-drawer';
 import { ProductionOrderWork } from '../../components/tracking/production-order-work';
-import { ProductionShipmentDrawer } from '../../components/tracking/production-shipment-drawer';
 import { useProductionOrderFiles } from '../../hooks/files/use-production-order-files';
 import { useProductionOrder } from '../../hooks/order-editor/use-production-order';
 import { useProductionOrderActions } from '../../hooks/order-editor/use-production-order-actions';
@@ -162,22 +159,13 @@ export function ProductionOrderPage() {
           onMessage={setMessage}
         />
       )}
-      <ProductionConfirmDialog
-        open={panel.pending !== null}
-        title="Відмітити етап?"
-        text={
-          panel.pending
-            ? `Позиція ${panel.pending.item.position} «${panel.pending.item.modelName}»: етап «${productionStageLabels[panel.pending.stage]}».`
-            : ''
-        }
-        confirmLabel="Відмітити"
-        busy={tracking.busy}
-        onClose={panel.cancelStage}
-        onConfirm={() => {
-          const pending = panel.pending;
-          panel.cancelStage();
-          if (pending) void tracking.toggle(pending.item, pending.stage);
-        }}
+      <ProductionOrderDialogs
+        order={order}
+        panel={panel}
+        tracking={tracking}
+        status={status}
+        files={files}
+        actions={actions}
       />
       {historyOpen && (
         <ProductionOrderHistoryDrawer
@@ -188,73 +176,7 @@ export function ProductionOrderPage() {
           onClose={() => setHistoryOpen(false)}
         />
       )}
-      {editing?.kind === 'header' && (
-        <ProductionOrderHeaderDrawer
-          number={order.number}
-          values={editing.values}
-          errors={editor.headerErrors}
-          message={editor.message}
-          saving={editor.saving}
-          onChange={editor.changeHeader}
-          onClose={editor.close}
-          onSubmit={() => void editor.save()}
-        />
-      )}
-      {editing?.kind === 'item' && (
-        <ProductionItemDrawer
-          item={editing.item}
-          values={editing.values}
-          errors={editor.itemErrors}
-          withRate={permissions.seesSewingRate}
-          message={editor.message}
-          saving={editor.saving}
-          onChange={editor.changeItem}
-          onClose={editor.close}
-          onSubmit={() => void editor.save()}
-        />
-      )}
-      {tracking.shipping && (
-        <ProductionShipmentDrawer
-          item={tracking.shipping.item}
-          values={tracking.shipping.values}
-          errors={tracking.errors}
-          message={tracking.message}
-          saving={tracking.saving}
-          onChange={tracking.changeShipping}
-          onClose={tracking.closeShipping}
-          onSubmit={() => void tracking.ship()}
-        />
-      )}
-      <ProductionCancelDialog
-        open={status.cancelling}
-        number={order.number}
-        reason={status.reason}
-        error={status.reasonError}
-        busy={status.busy}
-        onChange={status.changeReason}
-        onClose={status.closeCancel}
-        onConfirm={() => void status.confirmCancel()}
-      />
-      <ProductionConfirmDialog
-        open={files.deleting !== null}
-        title="Видалити файл?"
-        text={`Файл «${files.deleting?.name ?? ''}» зникне із завдання.`}
-        confirmLabel="Видалити"
-        danger
-        busy={files.removing}
-        onClose={files.cancelDelete}
-        onConfirm={() => void files.confirmDelete()}
-      />
-      <ProductionConfirmDialog
-        open={actions.confirmingDelete}
-        title="Видалити завдання?"
-        text={`Завдання № ${order.number} зникне зі списку. КП залишиться.`}
-        confirmLabel="Видалити"
-        danger
-        busy={actions.deleting}
-        onClose={actions.cancelDelete}
-        onConfirm={() => void actions.confirmDelete()}
-      />
+      <ProductionOrderEditDrawers order={order} editor={editor} tracking={tracking} />
       <ProductionOrderPrint order={order} />
     </Box>
   );
