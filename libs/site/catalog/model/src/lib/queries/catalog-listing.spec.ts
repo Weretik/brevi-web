@@ -7,9 +7,9 @@ import {
   readCatalogChoice,
   writeCatalogChoice,
 } from './catalog-listing';
-import { catalogCategoryFamily } from './catalog-tree';
+import { catalogCategoryFamily } from '../entities/catalog-tree';
 
-import type { CatalogProductType, CatalogTreeNode } from './catalog-tree';
+import type { CatalogProductType, CatalogTreeNode } from '../entities/catalog-tree';
 
 const item = (
   slug: string,

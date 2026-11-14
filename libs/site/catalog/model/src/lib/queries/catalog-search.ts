@@ -1,4 +1,4 @@
-import type { CatalogProductType } from './catalog-tree';
+import type { CatalogProductType } from '../entities/catalog-tree';
 
 /** A product as the search knows it: enough for a suggestion and its link. */
 export type CatalogSearchProduct = {

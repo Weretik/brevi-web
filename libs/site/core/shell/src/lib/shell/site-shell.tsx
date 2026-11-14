@@ -1,7 +1,7 @@
-import { SiteFooter } from './footer/site-footer';
-import { SiteHeader } from './header/site-header';
-import { getShellDictionary } from './i18n/shell-dictionary';
-import { MobileBar } from './mobile/mobile-bar';
+import { SiteFooter } from '../footer/site-footer';
+import { SiteHeader } from '../header/site-header';
+import { getShellDictionary } from '../i18n/shell-dictionary';
+import { MobileBar } from '../mobile/mobile-bar';
 
 import type { CatalogSection } from '@site/catalog/model';
 import type { Company } from '@site/core/config';

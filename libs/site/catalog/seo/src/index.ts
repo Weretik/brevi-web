@@ -3,11 +3,13 @@ export {
   buildCatalogCategoryMetadata,
   buildCatalogMetadata,
   buildCatalogSearchMetadata,
-} from './lib/catalog-metadata';
-export type { CatalogCategorySeoInput } from './lib/catalog-metadata';
+} from './lib/metadata/catalog-metadata';
+export type { CatalogCategorySeoInput } from './lib/metadata/catalog-metadata';
+export {
+  buildCatalogProductMetadata,
+  productDescription,
+} from './lib/metadata/catalog-product-metadata';
 export {
   buildCatalogItemListJsonLd,
   buildCatalogProductJsonLd,
-  buildCatalogProductMetadata,
-  productDescription,
-} from './lib/catalog-product-seo';
+} from './lib/json-ld/catalog-json-ld';

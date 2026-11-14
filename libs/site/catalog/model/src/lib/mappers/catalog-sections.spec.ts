@@ -1,7 +1,7 @@
 import { toCatalogSections } from './catalog-sections';
-import { findCatalogPath, flattenCatalogTree } from './catalog-tree';
+import { findCatalogPath, flattenCatalogTree } from '../entities/catalog-tree';
 
-import type { CatalogTreeNode } from './catalog-tree';
+import type { CatalogTreeNode } from '../entities/catalog-tree';
 
 const section = (slug: string): CatalogTreeNode => ({
   slug,

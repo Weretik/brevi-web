@@ -1,4 +1,4 @@
-import type { CatalogProductType } from './catalog-tree';
+import type { CatalogProductType } from '../entities/catalog-tree';
 
 /** Order of a listing: as staff arranged the category, or by the lowest price. */
 export type CatalogSort = 'default' | 'cheap' | 'expensive';

@@ -50,40 +50,46 @@ apps/site/src/app/sitemap.ts                            # categories and product
 libs/site/
 ├── shared/api-client/src/lib/     # siteApiGet: GET of the public BreviERP API
 ├── catalog/model/src/lib/
-│   ├── catalog-tree.ts            # tree type, path lookup
-│   ├── catalog-category.ts        # category, category page and product card types
-│   ├── catalog-product.ts         # product page, fabrics, price tiers
-│   ├── catalog-product-facts.ts   # short facts sorted into tags, rows, audience, notes
-│   ├── catalog-search.ts          # search index types, text normalizing, ranking
-│   ├── catalog-listing.ts         # price ranges, filters, order, choice in the address
-│   └── catalog-sections.ts        # sections for menus and the home page
+│   ├── entities/                  # catalog-tree (tree type, path lookup), catalog-category (category,
+│   │                              # category page and product card types), catalog-product (product page,
+│   │                              # fabrics, price tiers)
+│   ├── mappers/                   # catalog-product-facts (short facts sorted into tags, rows, audience,
+│   │                              # notes), catalog-inline (inline marks), catalog-sections (sections for
+│   │                              # menus and the home page)
+│   └── queries/                   # catalog-search (index types, text normalizing, ranking),
+│                                  # catalog-listing (price ranges, filters, order, choice in the address)
 ├── catalog/data-access/src/lib/
-│   ├── catalog-source.ts          # what pages call: tree, categories, products, related
-│   ├── catalog-loaders.ts         # cached reads of the API
 │   ├── catalog-cache.ts           # cache tag and lifetimes
+│   ├── loaders/                   # catalog-source (what pages call: tree, categories, products, related),
+│   │                              # catalog-loaders (cached reads of the API)
 │   └── mappers/                   # run-time check of answers, API to site types
 ├── catalog/ui/src/lib/
 │   ├── i18n/catalog-dictionary.ts # uk and ru text, price format
-│   └── sections/                  # section groups and icons, category tabs, product tile and grid,
-│                                  # listing with filters (client), search box (client), text, order,
-│                                  # product gallery and prices (client), order card, specs,
-│                                  # block links, folded text and phone price strip (client)
-├── catalog/seo/src/lib/           # catalog-metadata, catalog-product-seo
-└── catalog/feature/src/lib/       # catalog-root-page, catalog-category-page, catalog-product-page,
-                                   # catalog-search-page, catalog-search-index
+│   ├── category/                  # section groups and icons, category tabs and their scroller
+│   ├── listing/                   # listing with filters (client), product tile and grid
+│   ├── search/                    # search box (client)
+│   ├── product/                   # gallery and prices (client), order card, specs, block links,
+│   │                              # phone price strip (client)
+│   ├── text/                      # category text and folded text (client)
+│   └── order/                     # closing «order» block
+├── catalog/seo/src/lib/
+│   ├── metadata/                  # catalog-metadata, catalog-product-metadata
+│   └── json-ld/                   # catalog-json-ld: Product and ItemList
+└── catalog/feature/src/lib/       # one folder per page: root/, category/, product/,
+                                   # search/ (page and search index)
 ```
 
 ## Tests
 
 - `libs/site/shared/api-client/src/lib/site-api.spec.ts`
-- `libs/site/catalog/model/src/lib/catalog-sections.spec.ts`
-- `libs/site/catalog/model/src/lib/catalog-product-facts.spec.ts`
-- `libs/site/catalog/model/src/lib/catalog-search.spec.ts`
-- `libs/site/catalog/model/src/lib/catalog-listing.spec.ts`
-- `libs/site/catalog/data-access/src/lib/catalog-source.spec.ts`
+- `libs/site/catalog/model/src/lib/mappers/catalog-sections.spec.ts`
+- `libs/site/catalog/model/src/lib/mappers/catalog-product-facts.spec.ts`
+- `libs/site/catalog/model/src/lib/queries/catalog-search.spec.ts`
+- `libs/site/catalog/model/src/lib/queries/catalog-listing.spec.ts`
+- `libs/site/catalog/data-access/src/lib/loaders/catalog-source.spec.ts`
 - `libs/site/catalog/data-access/src/lib/mappers/public-catalog.mapper.spec.ts`
 - `libs/site/catalog/ui/src/lib/catalog-ui.spec.tsx`
-- `libs/site/catalog/seo/src/lib/catalog-metadata.spec.ts`
+- `libs/site/catalog/seo/src/lib/metadata/catalog-metadata.spec.ts`
 - `libs/site/catalog/seo/src/lib/catalog-product-seo.spec.ts`
 - `libs/site/catalog/feature/src/lib/catalog-pages.spec.tsx`
 
