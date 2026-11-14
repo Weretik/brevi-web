@@ -1,3 +1,4 @@
+export { RouteErrorBoundary } from './components/error-pages/route-error-boundary';
 export { AdminLayout } from './layout/admin-layout';
 export {
   AdminShellSessionProvider,

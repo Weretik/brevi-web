@@ -2,6 +2,7 @@ import { Box, CircularProgress, Container } from '@mui/material';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 
+import { RouteErrorBoundary } from '../components/error-pages/route-error-boundary';
 import { AdminTopBar } from '../components/top-bar/admin-top-bar';
 import {
   AdminNavigationDrawers,
@@ -78,9 +79,11 @@ export function AdminLayout({
         />
         <Box component="main" sx={{ minWidth: 0 }}>
           <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3, lg: 3.5 }, py: { xs: 2.5, lg: 3.5 } }}>
-            <Suspense fallback={<CircularProgress aria-label="Завантаження сторінки" />}>
-              <Outlet />
-            </Suspense>
+            <RouteErrorBoundary key={location.pathname}>
+              <Suspense fallback={<CircularProgress aria-label="Завантаження сторінки" />}>
+                <Outlet />
+              </Suspense>
+            </RouteErrorBoundary>
           </Container>
         </Box>
       </Box>
