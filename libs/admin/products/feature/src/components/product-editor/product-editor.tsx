@@ -1,5 +1,3 @@
-import { useCreateProductMutation, useReplaceProductMutation } from '@admin/products/data-access';
-import { changeProductType, emptyProductDraft, validateProductDraft } from '@admin/products/model';
 import {
   ProductCharacteristicFields,
   ProductBaseFields,
@@ -10,13 +8,12 @@ import {
   ProductTypeChangeDialog,
   ProductTypeFields,
 } from '@admin/products/ui';
-import { adminApiErrorMessage, isAdminApiError } from '@admin/shared/api-client';
 import { Alert, Box, Button, CircularProgress, Stack, TextField, Typography } from '@mui/material';
-import { useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { LegacySewingNormLockNotice } from './legacy-sewing-norm-lock-notice';
 import { ProductPhotoPicker } from './product-photo-picker';
+import { useProductForm } from '../../hooks/product-editor/use-product-form';
 import { useProductLookups } from '../../hooks/product-editor/use-product-lookups';
 
 import type { ProductDraft } from '@admin/products/model';
@@ -40,51 +37,14 @@ export function ProductEditor({
   legacyNormsError,
   onRetryLegacyNorms,
 }: Props) {
-  const navigate = useNavigate();
-  const [draft, setDraft] = useState<ProductDraft>(() => initial ?? emptyProductDraft());
-  const [newId, setNewId] = useState('');
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [message, setMessage] = useState<string | null>(null);
-  const [createProduct, createState] = useCreateProductMutation();
-  const [replaceProduct, replaceState] = useReplaceProductMutation();
-  const saving = createState.isLoading || replaceState.isLoading;
-  const savingRef = useRef(false);
-  const [pendingType, setPendingType] = useState<ProductDraft['type'] | null>(null);
+  const form = useProductForm({ initial, productId });
+  const { draft, setDraft, errors, message, saving } = form;
   const {
     lookups,
     error: lookupError,
     loading: lookupsLoading,
     reload: reloadLookups,
   } = useProductLookups();
-
-  async function save() {
-    if (savingRef.current) return;
-    const id = productId ?? Number(newId);
-    const nextErrors = validateProductDraft(
-      draft,
-      productId === undefined ? id : undefined,
-      lookups.references.filter((item) => item.unit === '%').map((item) => item.id),
-    );
-    setErrors(nextErrors);
-    if (Object.keys(nextErrors).length) {
-      setMessage('Перевірте позначені поля.');
-      return;
-    }
-    savingRef.current = true;
-    setMessage(null);
-    try {
-      const saved =
-        productId === undefined
-          ? await createProduct({ id, draft }).unwrap()
-          : await replaceProduct({ id, draft }).unwrap();
-      navigate(`/references/products/${saved.id}`, { state: { product: saved } });
-    } catch (cause) {
-      if (isAdminApiError(cause)) setErrors(cause.fieldErrors);
-      setMessage(adminApiErrorMessage(cause, 'Не вдалося зберегти товар.'));
-    } finally {
-      savingRef.current = false;
-    }
-  }
 
   return (
     <Box sx={{ p: { xs: 2, md: 3 }, maxWidth: 1200 }}>
@@ -156,7 +116,9 @@ export function ProductEditor({
           }}
           onSubmit={(event) => {
             event.preventDefault();
-            void save();
+            void form.save(
+              lookups.references.filter((item) => item.unit === '%').map((item) => item.id),
+            );
           }}
         >
           <ProductFormSection label="Основна інформація" fullWidth>
@@ -165,8 +127,8 @@ export function ProductEditor({
                 <TextField
                   label="ID товару"
                   type="number"
-                  value={newId}
-                  onChange={(event) => setNewId(event.target.value)}
+                  value={form.newId}
+                  onChange={(event) => form.setNewId(event.target.value)}
                   error={Boolean(errors['id'])}
                   helperText={errors['id']}
                   required
@@ -180,12 +142,12 @@ export function ProductEditor({
                 lookups={lookups}
                 onTypeChange={(type) => {
                   if (legacyNormsLocked && draft.type === 'Sewing' && type === 'Ppe') {
-                    setMessage(
+                    form.setMessage(
                       'Тип не змінено: спочатку перенесіть роботу зі старими нормами до розділу артикулів і складу.',
                     );
                     return;
                   }
-                  setPendingType(type === draft.type ? null : type);
+                  form.requestType(type);
                 }}
               />
             </Stack>
@@ -269,12 +231,9 @@ export function ProductEditor({
         </Box>
       )}
       <ProductTypeChangeDialog
-        open={pendingType !== null}
-        onCancel={() => setPendingType(null)}
-        onConfirm={() => {
-          if (pendingType) setDraft((current) => changeProductType(current, pendingType));
-          setPendingType(null);
-        }}
+        open={form.pendingType !== null}
+        onCancel={form.cancelType}
+        onConfirm={form.confirmType}
       />
     </Box>
   );
