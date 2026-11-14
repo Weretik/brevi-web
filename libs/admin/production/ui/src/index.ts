@@ -22,6 +22,8 @@ export {
 export { ProductionStageConveyor } from './components/orders/production-stage-conveyor';
 export { ProductionOrdersMoreMenu } from './tables/orders/toolbar/production-orders-more-menu';
 export type { ProductionOrdersImport } from './tables/orders/toolbar/production-orders-more-menu';
+export { ProductionOrdersSearchRow } from './tables/orders/toolbar/production-orders-search-row';
+export type { ProductionOrdersView } from './tables/orders/toolbar/production-orders-search-row';
 export { ProductionModelSummaryTable } from './tables/order-summary/production-model-summary-table';
 export { ModelSummarySortEditor } from './components/order-summary/model-summary-sort-editor';
 export { ProductionOrderHistory } from './details/orders/production-order-history';
