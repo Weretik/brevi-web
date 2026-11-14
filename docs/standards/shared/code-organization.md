@@ -45,6 +45,7 @@ A library that serves one page and has at most six production files may keep the
 ## Nesting and size
 
 - Create a role folder when the role exists, even for one file.
+- **The folder axiom, shared with the backend:** "A folder holds at most 6 code files. When it would hold more, split it by meaning into named subfolders of at least two files each. No empty folders, no wrapper folders (a folder with no files and a single subfolder), and no new one-file folders. Only generated code is exempt." The frontend reading follows.
 - **Axiom: a folder holds at most six production files.** At seven, split it into subfolders by meaning (a feature, use case, or page block such as `components/quote-editor/`, `hooks/sewing-pricing/`), each with two or more files where possible; never one folder per file. Co-located spec files and generated code (`generated/`) do not count.
 - **A folder holds either files or subfolders, never both.** When a folder gets its first subfolder, its remaining files move into subfolders too. Only entry files may stay next to folders: `index.ts`, `<domain>.routes.tsx`, and `testing.ts` at a library's `src/` root, and `cache-tags.ts` in a site `data-access` `src/lib/`. The app composition folder and file-based router folders (Next.js and Expo Router `src/app/`, shaped by URLs) are exempt.
 - **No wrapper folders:** a folder that holds only one subfolder and no files is merged with it (a role folder keeps the files of its single capability directly).
