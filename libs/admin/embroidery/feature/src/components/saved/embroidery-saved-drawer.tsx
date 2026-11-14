@@ -1,7 +1,4 @@
-import {
-  useDeleteEmbroideryCalculationMutation,
-  useGetEmbroideryCalculationQuery,
-} from '@admin/embroidery/data-access';
+import { useGetEmbroideryCalculationQuery } from '@admin/embroidery/data-access';
 import { embroiderySavedTitle } from '@admin/embroidery/model';
 import {
   EmbroideryBreakdownTable,
@@ -11,25 +8,15 @@ import {
 import { ReferenceEditorDrawer } from '@admin/references/ui';
 import { usePageRights } from '@admin/shared/ui';
 import PostAddOutlinedIcon from '@mui/icons-material/PostAddOutlined';
-import {
-  Alert,
-  Box,
-  Button,
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Snackbar,
-  Stack,
-} from '@mui/material';
+import { Alert, Box, Button, CircularProgress, Snackbar, Stack } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { EmbroideryAddToQuoteDrawer } from './embroidery-add-to-quote-drawer';
 import { EmbroideryMockupSection } from './embroidery-mockup-section';
+import { EmbroiderySavedDeleteDialog } from './embroidery-saved-delete-dialog';
 import { useEmbroideryCopy } from '../../hooks/calculation/use-embroidery-copy';
+import { useEmbroiderySavedDeletion } from '../../hooks/saved/use-embroidery-saved-deletion';
 
 import type { EmbroideryCalculationRequest } from '@admin/embroidery/model';
 
@@ -43,8 +30,7 @@ interface Props {
 /** A saved calculation as it was saved; «Повторити розрахунок» loads its form with the current rates. */
 export function EmbroiderySavedDrawer({ id, canDelete, onClose, onRepeat }: Props) {
   const query = useGetEmbroideryCalculationQuery(id);
-  const [remove, removing] = useDeleteEmbroideryCalculationMutation();
-  const [confirming, setConfirming] = useState(false);
+  const deletion = useEmbroiderySavedDeletion(id, onClose);
   const copier = useEmbroideryCopy();
   const navigate = useNavigate();
   const [adding, setAdding] = useState(false);
@@ -52,12 +38,6 @@ export function EmbroiderySavedDrawer({ id, canDelete, onClose, onRepeat }: Prop
   const canAddToQuote = usePageRights().can('create', 'quotes');
   const [addedTo, setAddedTo] = useState<{ id: number; number: string } | null>(null);
   const saved = query.data;
-
-  const confirmDelete = async () => {
-    const result = await remove(id);
-    setConfirming(false);
-    if (!('error' in result)) onClose();
-  };
 
   return (
     <ReferenceEditorDrawer
@@ -71,7 +51,7 @@ export function EmbroiderySavedDrawer({ id, canDelete, onClose, onRepeat }: Prop
       formId="embroidery-saved-form"
       paperWidth={520}
       readOnly
-      saving={removing.isLoading}
+      saving={deletion.deleting}
       editLabel={saved ? 'Повторити розрахунок' : null}
       editRight={null}
       onClose={onClose}
@@ -96,12 +76,7 @@ export function EmbroiderySavedDrawer({ id, canDelete, onClose, onRepeat }: Prop
         </Alert>
       ) : (
         <Stack sx={{ gap: 2 }}>
-          {removing.isError && (
-            <Alert severity="error">
-              {(removing.error as { message?: string } | undefined)?.message ??
-                'Не вдалося видалити розрахунок.'}
-            </Alert>
-          )}
+          {deletion.error && <Alert severity="error">{deletion.error}</Alert>}
           {canAddToQuote && saved.result.prices.length > 0 && (
             <Box>
               <Button
@@ -128,25 +103,19 @@ export function EmbroiderySavedDrawer({ id, canDelete, onClose, onRepeat }: Prop
           {saved.result.cost && <EmbroideryBreakdownTable cost={saved.result.cost} />}
           {canDelete && (
             <Box>
-              <Button color="error" onClick={() => setConfirming(true)}>
+              <Button color="error" onClick={deletion.ask}>
                 Видалити розрахунок
               </Button>
             </Box>
           )}
         </Stack>
       )}
-      <Dialog open={confirming} onClose={() => setConfirming(false)}>
-        <DialogTitle>Видалити {saved?.summary.number}?</DialogTitle>
-        <DialogContent>
-          <DialogContentText>Розрахунок зникне зі списку назавжди.</DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setConfirming(false)}>Скасувати</Button>
-          <Button color="error" variant="contained" onClick={() => void confirmDelete()}>
-            Видалити
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <EmbroiderySavedDeleteDialog
+        open={deletion.confirming}
+        number={saved?.summary.number}
+        onCancel={deletion.cancel}
+        onConfirm={() => void deletion.confirm()}
+      />
       {adding && saved && (
         <EmbroideryAddToQuoteDrawer
           summary={saved.summary}
