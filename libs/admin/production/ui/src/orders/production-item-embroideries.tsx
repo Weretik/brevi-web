@@ -4,7 +4,6 @@ import {
   embroideryMaterialsText,
 } from '@admin/production/model';
 import { Box, Link, Stack, Typography } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
 
 import type { ItemApplication } from '@admin/production/model';
 
@@ -59,7 +58,7 @@ export function ProductionItemEmbroideries({ applications, canOpenCalculation }:
               <Typography variant="subtitle2">
                 Вишивка:{' '}
                 {canOpenCalculation && embroidery ? (
-                  <Link component={RouterLink} to={embroideryCalculationHref(id)}>
+                  <Link href={embroideryCalculationHref(id)}>
                     {title}
                   </Link>
                 ) : (

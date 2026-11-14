@@ -24,7 +24,6 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
 
 import { FabricNormVariantCard } from './fabric-norm-variant-card';
 
@@ -166,7 +165,7 @@ export function ModelWorkCard({
             title={`Решта складу · ${rest.length}`}
             action={
               editHref && (
-                <Button component={RouterLink} to={editHref} size="small">
+                <Button href={editHref} size="small">
                   Склад у «Товари»
                 </Button>
               )

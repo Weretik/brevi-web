@@ -27,6 +27,7 @@ const card: TaskSummary = {
 const detail: TaskDetail = {
   ...card,
   description: null,
+  leadId: null,
   author: { userId: 1, name: 'Директор' },
   customerPublicId: null,
   steps: [],

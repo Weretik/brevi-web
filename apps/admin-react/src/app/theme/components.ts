@@ -1,3 +1,5 @@
+import { routerLinkComponents } from '@admin/shared/routing';
+
 import { motion } from './motion';
 import { monoFontFamily } from './typography';
 
@@ -66,6 +68,9 @@ export const components: Components<Theme> = {
       outlined: ({ theme }) => ({ borderColor: theme.palette.divider }),
     },
   },
+  // UI libraries pass href; the router-aware link keeps them free of router imports.
+  MuiButtonBase: routerLinkComponents.MuiButtonBase,
+  MuiLink: routerLinkComponents.MuiLink,
   MuiCard: { defaultProps: { variant: 'outlined' } },
   MuiChip: {
     styleOverrides: { root: { borderRadius: 6, fontWeight: 600 } },

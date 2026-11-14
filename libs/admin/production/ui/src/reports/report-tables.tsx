@@ -10,7 +10,6 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
 
 import type {
   ReportIssueRow,
@@ -90,7 +89,7 @@ const order = (id: number | null, number: number | null) =>
   id === null || number === null ? (
     '—'
   ) : (
-    <Link component={RouterLink} to={`/production/orders/${id}`}>
+    <Link href={`/production/orders/${id}`}>
       №{number}
     </Link>
   );

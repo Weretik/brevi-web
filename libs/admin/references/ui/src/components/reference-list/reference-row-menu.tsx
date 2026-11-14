@@ -3,8 +3,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import OpenInFullOutlinedIcon from '@mui/icons-material/OpenInFullOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import { Divider, ListItemIcon, Menu, MenuItem } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
+import { Divider, Link, ListItemIcon, Menu, MenuItem } from '@mui/material';
 
 import type { PageAction } from '@admin/shared/ui';
 
@@ -69,7 +68,14 @@ export function ReferenceRowMenu<Row extends MenuRow>({
         {viewLabel}
       </MenuItem>
       {row && openHref && (
-        <MenuItem component={RouterLink} to={openHref(row)} onClick={() => onClose(false)}>
+        <MenuItem
+          // MUI Link renders the router-aware link registered in the theme.
+          component={Link}
+          href={openHref(row)}
+          underline="none"
+          color="inherit"
+          onClick={() => onClose(false)}
+        >
           <ListItemIcon>
             <OpenInFullOutlinedIcon fontSize="small" />
           </ListItemIcon>

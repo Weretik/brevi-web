@@ -16,7 +16,6 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
 
 import type { ForecastRow } from '@admin/production/model';
 
@@ -80,7 +79,7 @@ export function SewingForecastTable({ rows, showMinutes, busy = false, onMove }:
                       </Tooltip>
                     )}
                     <Box>
-                      <Link component={RouterLink} to={`/production/orders/${row.orderId}`}>
+                      <Link href={`/production/orders/${row.orderId}`}>
                         № {row.orderNumber}
                       </Link>{' '}
                       · {row.clientName}

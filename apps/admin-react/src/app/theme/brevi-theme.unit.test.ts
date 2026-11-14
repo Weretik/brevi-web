@@ -1,4 +1,6 @@
+import { LinkBehavior } from '@admin/shared/routing';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+
 
 import { darkTheme, lightTheme } from './brevi-theme';
 import { readColorMode, saveColorMode } from './color-mode';
@@ -16,6 +18,13 @@ describe('Brevi theme', () => {
     expect(lightTheme.palette.navigation.background).toBe('#1e1e1e');
     expect(darkTheme.palette.navigation.background).toBe('#0f0f12');
     expect(darkTheme.palette.background.default).toBe('#09090b');
+  });
+
+  it('routes Material UI links and href buttons through the router in both schemes', () => {
+    for (const theme of [lightTheme, darkTheme]) {
+      expect(theme.components?.MuiLink?.defaultProps?.component).toBe(LinkBehavior);
+      expect(theme.components?.MuiButtonBase?.defaultProps?.LinkComponent).toBe(LinkBehavior);
+    }
   });
 
   it('makes native scrollbars follow the color scheme', () => {

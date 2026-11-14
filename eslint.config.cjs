@@ -86,6 +86,21 @@ module.exports = [
     },
   },
   {
+    files: ['libs/admin/*/ui/src/**/*.{ts,tsx}', 'libs/admin/shared/ui/src/**/*.{ts,tsx}'],
+    ignores: ['**/*.spec.{ts,tsx}', '**/*.test.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: ['react-router', 'react-router-dom', '@admin/shared/routing'].map((name) => ({
+            name,
+            message: 'Admin UI libraries do not import the router; pass href or a callback.',
+          })),
+        },
+      ],
+    },
+  },
+  {
     files: [
       '**/*.spec.{ts,tsx}',
       '**/*.test.{ts,tsx}',
