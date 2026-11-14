@@ -399,3 +399,4 @@ export type {
 } from './entities/reports/workshop-archive';
 export { parseWorkshopArchiveImportFile } from './validators/workshop-archive-import-file';
 export type { WorkshopPeopleAccess } from './entities/people/workshop-people-access';
+export { workLogOrderOptions } from './queries/work/work-log-orders';
