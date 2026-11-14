@@ -1,4 +1,4 @@
-import type { ProductDraft } from '../../forms/product-editor/product-draft.types';
+import type { ProductDraft } from '../../forms/product-editor/product-draft-values';
 
 export function validateProductDraft(
   draft: ProductDraft,

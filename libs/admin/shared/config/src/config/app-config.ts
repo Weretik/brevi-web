@@ -1,5 +1,5 @@
-import type { AppConfig } from './app-config.types';
-import type { AdminEnvironment } from '../env/admin-environment.types';
+import type { AppConfig } from './app-config-contract';
+import type { AdminEnvironment } from '../env/admin-environment-contract';
 
 const trimTrailingSlash = (value: string): string => value.replace(/\/$/, '');
 

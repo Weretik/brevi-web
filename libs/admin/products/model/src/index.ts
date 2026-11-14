@@ -3,7 +3,7 @@ export * from './entities/product-category/product-category';
 export * from './entities/product-detail/product-detail';
 export * from './entities/product-detail/product-content';
 export * from './forms/product-editor/product-draft';
-export * from './forms/product-editor/product-draft.types';
+export * from './forms/product-editor/product-draft-values';
 export * from './validators/product-editor/product-validation';
 export * from './entities/product-list/product';
 export * from './queries/product-list/product-query';

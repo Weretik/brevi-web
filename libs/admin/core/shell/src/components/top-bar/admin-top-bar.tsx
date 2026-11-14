@@ -9,7 +9,11 @@ import { topBarIconButtonSx } from './actions/top-bar-icon-button';
 import { TopBarSearch } from './actions/top-bar-search';
 import { AdminBreadcrumbs } from './admin-breadcrumbs';
 
-import type { AdminColorMode, AdminNavigationGroup, AdminShellUser } from '../../shell.types';
+import type {
+  AdminColorMode,
+  AdminNavigationGroup,
+  AdminShellUser,
+} from '../../layout/admin-shell-contract';
 import type { RefObject } from 'react';
 
 interface AdminTopBarProps {

@@ -81,7 +81,7 @@ boundary because a second Nx project is missing.
 `src/index.ts` in each library is only its public API. Do not place internal
 code beside it “temporarily” or accumulate it in a large file. The role-folder
 names for each layer, the nesting order, and the forbidden catch-all names are
-fixed in the [code organization rules](../../../standards/admin/admin-code-organization.md#role-folders);
+fixed in the [code organization rules](../../../standards/shared/code-organization.md#role-folders);
 use them when the corresponding role exists.
 
 This does not require creating every directory in advance. It requires keeping
@@ -119,7 +119,7 @@ libs/admin/products/
 
 A feature library groups pages, components, hooks, `model/`, and `state/` by
 role first and capability second, as shown in the
-[code organization rules](../../../standards/admin/admin-code-organization.md#nesting-and-size).
+[code organization rules](../../../standards/shared/code-organization.md#nesting-and-size).
 If a page becomes an independent business boundary, split it into a separate
 feature only through a separate architecture decision.
 

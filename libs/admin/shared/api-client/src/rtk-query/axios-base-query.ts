@@ -3,7 +3,7 @@ import { appConfig } from '@admin/shared/config';
 import { axiosClient } from '../client/axios-client';
 import { toApiError } from '../errors/api-error';
 
-import type { ApiError, ApiRequest } from '../contracts/api-client.types';
+import type { ApiError, ApiRequest } from '../contracts/api-client-contract';
 import type { BaseQueryFn } from '@reduxjs/toolkit/query';
 
 export const axiosBaseQuery: BaseQueryFn<string | ApiRequest, unknown, ApiError> = async (

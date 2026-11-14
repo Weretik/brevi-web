@@ -9,7 +9,7 @@ import {
 } from '../navigation/sidebar/admin-navigation-drawers';
 import { useNavigationCollapsed } from '../navigation/sidebar/use-navigation-collapsed';
 
-import type { AdminColorMode, AdminNavigationGroup, AdminShellUser } from '../shell.types';
+import type { AdminColorMode, AdminNavigationGroup, AdminShellUser } from './admin-shell-contract';
 
 interface AdminLayoutProps {
   navigation: readonly AdminNavigationGroup[];

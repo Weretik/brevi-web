@@ -6,8 +6,7 @@ import { SizeField } from './size-field';
 import { SizeToggleGroup } from './size-toggle-group';
 import { sizeFinderAnswers } from '../data/size-answers';
 
-import type { SizeKind } from '../data/size-answers';
-import type { Gender } from '../data/size-chart';
+import type { SizeFinderInput, SizeKind } from '../data/size-answers';
 import type { SizesDictionary } from '../i18n/sizes-dictionary';
 
 function Result({ label, value }: { label: string; value: string }) {
@@ -30,14 +29,18 @@ export function SizeFinder({
   dictionary: SizesDictionary['finder'];
   initialKind?: SizeKind;
 }) {
-  const [kind, setKind] = useState<SizeKind>(initialKind);
-  const [gender, setGender] = useState<Gender>('men');
-  const [chest, setChest] = useState('');
-  const [height, setHeight] = useState('');
-  const [foot, setFoot] = useState('');
+  const [input, setInput] = useState<SizeFinderInput>({
+    kind: initialKind,
+    gender: 'men',
+    chest: '',
+    height: '',
+    foot: '',
+  });
+  const change = (next: Partial<SizeFinderInput>) => setInput((value) => ({ ...value, ...next }));
+  const { kind, gender, chest, height, foot } = input;
   const { result } = dictionary;
 
-  const { outputs, outOfRange } = sizeFinderAnswers({ kind, gender, chest, height, foot }, result);
+  const { outputs, outOfRange } = sizeFinderAnswers(input, result);
 
   return (
     <div className="grid gap-5 rounded-2xl border border-border p-5 sm:p-6">
@@ -45,7 +48,7 @@ export function SizeFinder({
         <SizeToggleGroup
           label={dictionary.tabs.label}
           value={kind}
-          onChange={setKind}
+          onChange={(kind) => change({ kind })}
           options={[
             { value: 'clothing', label: dictionary.tabs.clothing },
             { value: 'shoes', label: dictionary.tabs.shoes },
@@ -55,7 +58,7 @@ export function SizeFinder({
           <SizeToggleGroup
             label={dictionary.gender.label}
             value={gender}
-            onChange={setGender}
+            onChange={(gender) => change({ gender })}
             options={[
               { value: 'men', label: dictionary.gender.men },
               { value: 'women', label: dictionary.gender.women },
@@ -67,11 +70,19 @@ export function SizeFinder({
       <div className="grid gap-4 sm:grid-cols-2">
         {kind === 'clothing' ? (
           <>
-            <SizeField label={dictionary.chest} value={chest} onChange={setChest} />
-            <SizeField label={dictionary.height} value={height} onChange={setHeight} />
+            <SizeField
+              label={dictionary.chest}
+              value={chest}
+              onChange={(chest) => change({ chest })}
+            />
+            <SizeField
+              label={dictionary.height}
+              value={height}
+              onChange={(height) => change({ height })}
+            />
           </>
         ) : (
-          <SizeField label={dictionary.foot} value={foot} onChange={setFoot} />
+          <SizeField label={dictionary.foot} value={foot} onChange={(foot) => change({ foot })} />
         )}
       </div>
 

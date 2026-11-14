@@ -29,6 +29,8 @@ jobs:
       - run: npm run contracts:check
       - run: npm run ci:test-scripts:fixtures
       - run: npm run ci:test-scripts
+      - run: npm run architecture:structure:fixtures
+      - run: npm run architecture:structure
       - run: npm run lint
       - run: npm run typecheck:tests:web
       - run: node tools/ci/run-affected.mjs test:web

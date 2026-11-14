@@ -9,7 +9,7 @@ import { AdminNavigationItemView } from './admin-navigation-item';
 import { matchesRoute } from './navigation-route';
 import { navigationRowSx } from './navigation-row';
 
-import type { AdminNavigationGroup as NavigationGroup } from '../../shell.types';
+import type { AdminNavigationGroup as NavigationGroup } from '../../layout/admin-shell-contract';
 
 interface AdminNavigationGroupProps {
   collapsed: boolean;

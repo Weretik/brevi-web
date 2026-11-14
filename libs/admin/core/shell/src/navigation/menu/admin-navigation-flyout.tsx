@@ -3,7 +3,7 @@ import { ClickAwayListener, List, Paper, Popper, Typography } from '@mui/materia
 import { AdminNavigationItemView } from './admin-navigation-item';
 import { matchesRoute } from './navigation-route';
 
-import type { AdminNavigationGroup } from '../../shell.types';
+import type { AdminNavigationGroup } from '../../layout/admin-shell-contract';
 
 interface AdminNavigationFlyoutProps {
   anchorElement: HTMLElement | null;

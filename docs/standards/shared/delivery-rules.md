@@ -56,7 +56,7 @@ If the user authorizes an entire feature, phase, or set of `SC-*` scenarios, the
 
 ## Full audit after the feature
 
-Implement a feature in stages (one scenario, task slice, or layer at a time) and put every new file where the [code organization rules](../admin/admin-code-organization.md) require it from the start. There is no separate structure check after each stage: a local check of changed files misses important problems (owner decision 2026-11-14). When the whole feature is implemented, run one full code audit of the feature against all architecture rules, not only the changed files: library and layer boundaries, data access through the contract, no dump folders, files, components and hooks split by responsibility, theme, locale, states, tests by level, and the feature card and catalog against the code. Fix the confirmed findings before reporting the feature complete.
+Implement a feature in stages (one scenario, task slice, or layer at a time) and put every new file where the [code organization rules](code-organization.md) require it from the start. There is no separate structure check after each stage: a local check of changed files misses important problems (owner decision 2026-11-14). When the whole feature is implemented, run one full code audit of the feature against all architecture rules, not only the changed files: library and layer boundaries, data access through the contract, no dump folders, files, components and hooks split by responsibility, theme, locale, states, tests by level, and the feature card and catalog against the code. Fix the confirmed findings before reporting the feature complete.
 
 ## Closing checklist
 
