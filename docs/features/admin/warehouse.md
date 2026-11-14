@@ -110,6 +110,6 @@ apps/admin-react/src/app/router/
 - `libs/admin/warehouse/model/src/queries/reports/booking-filters.test.ts`, `libs/admin/warehouse/model/src/queries/reports/hardware-filters.test.ts`, `libs/admin/warehouse/model/src/queries/reports/plan-fact-filters.test.ts`, `libs/admin/warehouse/model/src/queries/reports/report-tables.test.ts`, `libs/admin/warehouse/model/src/mappers/exports/hardware-exports.test.ts`
 - `libs/admin/warehouse/data-access/src/mappers/stock-reports.mapper.test.ts`
 - `libs/admin/warehouse/feature/src/pages/reports/report-pages.component.test.tsx`
-- `apps/admin-react/src/app/router/app-router.integration.test.tsx`, `apps/admin-react/src/app/router/navigation-config.unit.test.ts`
+- `apps/admin-react/src/app/router/app-router.integration.test.tsx`, `apps/admin-react/src/app/router/navigation/navigation-config.unit.test.ts`
 
 Focused run: `npx nx test admin-warehouse-model`, `admin-warehouse-data-access`, `admin-warehouse-ui`, `admin-warehouse-feature`.

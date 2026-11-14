@@ -104,6 +104,6 @@ libs/admin/core/auth/src/session/session-user.ts # WorkshopChief, canManageWorks
 - `libs/admin/production/ui/src/forecast/sewing-forecast-table.component.test.tsx`, `libs/admin/production/ui/src/timesheet/timesheet-day-table.component.test.tsx`, `libs/admin/production/ui/src/payroll/payroll-month-table.component.test.tsx`, `libs/admin/production/ui/src/reports/report-totals.component.test.tsx`
 - `libs/admin/production/feature/src/pages/staff/workshop-staff-page.component.test.tsx`, `libs/admin/production/feature/src/pages/people/workshop-people-page.component.test.tsx`, `libs/admin/production/feature/src/pages/norms/fabric-norms-page.component.test.tsx`, `libs/admin/production/feature/src/pages/archive/workshop-archive-page.component.test.tsx`
 - `libs/admin/production/feature/src/pages/orders/production-order-create-page.component.test.tsx`, `libs/admin/production/feature/src/pages/orders/production-order-page.component.test.tsx`
-- `apps/admin-react/src/app/router/navigation-config.unit.test.ts` (who sees the items)
+- `apps/admin-react/src/app/router/navigation/navigation-config.unit.test.ts` (who sees the items)
 
 Focused run: `npx nx run-many -t test -p admin-production-model admin-production-data-access admin-production-ui admin-production-feature`.

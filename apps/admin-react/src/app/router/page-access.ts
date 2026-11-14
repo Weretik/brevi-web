@@ -1,4 +1,4 @@
-import { legacyGroups } from './legacy-menu';
+import { legacyGroups } from './navigation/legacy-menu';
 
 /** Pages reached from inside another page, not from the menu. */
 const innerPages: readonly (readonly [string, string | readonly string[]])[] = [

@@ -22,8 +22,8 @@ import {
   tasksRoutes,
 } from './admin-route-definitions';
 import { AdminRouteLayout } from './admin-route-layout';
+import { NotFoundPage } from './not-found-page';
 import { RequirePageAccess } from './require-page-access';
-import { NotFoundPage } from '../pages/not-found-page';
 
 import type { StaffActor } from '@admin/users/model';
 

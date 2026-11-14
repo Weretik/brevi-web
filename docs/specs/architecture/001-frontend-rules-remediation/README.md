@@ -1,6 +1,6 @@
 # Frontend rules audit and remediation (2026-11-14)
 
-**Status:** in progress — stage 1 done (router out of admin UI).
+**Status:** in progress — stage 1 (router out of admin UI) and stage 2 (admin app folder) done.
 **Scope:** `libs/admin/**`, `apps/admin-react`, `libs/site/**`, `apps/site`. The Angular `apps/storefront` and `libs/storefront/**` are frozen (being replaced by `apps/site`) and only recorded as known deviations.
 **Owner request (2026-11-14):** full audit and fix of eight points: boundaries, architecture, feature documentation for AI and people, tests and TDD scenarios, tests before code, rules recorded in obsidian skills and in this repository, components with more than one responsibility split, no dump folders.
 **Shared rules:** the frontend rule text is kept identical with kedr-web; the obsidian template and skills own it (thread «Привести фронтенд Кедр к правилам»). This repository copies the sections verbatim and adds only its own known deviations.
@@ -45,7 +45,7 @@ The final audit re-measures the list; anything not split gets a recorded `keep` 
 
 ## Stages
 
-One PR per stage; a short structure check of the touched area after each stage and a final pass at the end. Tests come first: for a split, the existing behavior test is run green before the move, a missing one is written first; new behavior gets a failing test before code.
+One PR per stage; one full audit of all rules at the end (stage 7), as the delivery rules require since 2026-11-14. Tests come first: for a split, the existing behavior test is run green before the move, a missing one is written first; new behavior gets a failing test before code.
 
 | Stage | Content                                                                                                                                             | Points     |
 | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |

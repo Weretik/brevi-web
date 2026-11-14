@@ -54,7 +54,7 @@ libs/admin/dashboard/feature/src/
     ├── main-view.ts # main desk metrics, «Потребує уваги», managers
     ├── stock-shortages.ts # shortage lines from the warehouse reports
     └── numeric-text.ts # mono tabular figures
-apps/admin-react/src/app/router/use-dashboard-viewer.ts # canSee(page) and userId from the session
+apps/admin-react/src/app/slots/dashboard/use-dashboard-viewer.ts # canSee(page) and userId from the session
 ```
 
 ## Tests

@@ -162,4 +162,4 @@ apps/admin-react/src/app/router/{create-admin-router.tsx,legacy-menu.ts,admin-ro
 - `feature/src/pages/audit/finance-audit-page.component.test.tsx` — rows, the side panel with changed fields only, the kind filter; `model/src/entities/audit/finance-audit.unit.test.ts`;
 - `feature/src/components/counterparties/counterparty-finance.component.test.tsx` — the operations of one counterparty with the period on «Показати», zero totals and the empty label for a supplier, a reversed period refused; `model/src/queries/counterparties/finance-counterparty-filters.unit.test.ts`;
 - the feature tests pin `Date` to 2026-11-05 (`feature/src/test-setup.ts`), the day the API stub answers, so they do not depend on the day they run;
-- `apps/admin-react/src/app/router/navigation-config.unit.test.ts` — the group only for the director.
+- `apps/admin-react/src/app/router/navigation/navigation-config.unit.test.ts` — the group only for the director.

@@ -94,7 +94,7 @@ libs/admin/purchasing/
 libs/admin/references/feature/src/pages/counterparties/counterparties-page.tsx  # old ?tab=purchases link
 libs/admin/references/feature/src/components/suppliers/supplier-drawer.tsx      # passes the supplier tab to the card
 libs/admin/references/feature/src/references.routes.tsx                          # createReferencesRoutes
-apps/admin-react/src/app/router/use-can-see-purchase-invoices.ts                 # supplier tab role check
+apps/admin-react/src/app/slots/purchasing/use-can-see-purchase-invoices.ts                 # supplier tab role check
 apps/admin-react/src/app/router/create-admin-router.tsx, legacy-menu.ts          # route guard, menu item
 libs/admin/core/auth/src/session/session-user.ts                                 # canUsePurchaseInvoices
 ```
@@ -112,4 +112,4 @@ libs/admin/core/auth/src/session/session-user.ts                                
 - `data-access/src/mappers/invoices/purchase-invoice.mapper.unit.test.ts`, `model/src/mappers/invoices/describe-purchase-sync.unit.test.ts`;
 - `feature/src/components/payments/purchase-invoice-payments.component.test.tsx` — «Привʼязати оплату» with the version the user saw, the linked payment, a voided payment problem and a failed unlink; `data-access/src/mappers/invoices/purchase-payment.mapper.unit.test.ts`, `model/src/entities/invoices/purchase-payment.unit.test.ts`;
 - `references/feature/src/pages/counterparties/counterparties-tab.unit.test.ts` — «Контрагенти» tabs without the register;
-- `apps/admin-react/src/app/router/navigation-config.unit.test.ts` — the menu item in «Бухгалтерія», Director only.
+- `apps/admin-react/src/app/router/navigation/navigation-config.unit.test.ts` — the menu item in «Бухгалтерія», Director only.
