@@ -1,11 +1,11 @@
 import { Box } from '@mui/material';
 
-import { QuotePdfCta } from './pdf/quote-pdf-cta';
-import { QuotePdfFooter } from './pdf/quote-pdf-footer';
-import { QuotePdfHeader } from './pdf/quote-pdf-header';
-import { QuotePdfIntro } from './pdf/quote-pdf-intro';
-import { QuotePdfModel } from './pdf/quote-pdf-model';
 import { graphite } from './pdf/quote-pdf-palette';
+import { QuotePdfCta } from './pdf/sections/quote-pdf-cta';
+import { QuotePdfFooter } from './pdf/sections/quote-pdf-footer';
+import { QuotePdfHeader } from './pdf/sections/quote-pdf-header';
+import { QuotePdfIntro } from './pdf/sections/quote-pdf-intro';
+import { QuotePdfModel } from './pdf/sections/quote-pdf-model';
 import { previewHighlight } from './quote-preview-highlight';
 
 import type { QuoteSettingsDraft, QuoteSettingsPreviewSample } from '@admin/quotes/model';

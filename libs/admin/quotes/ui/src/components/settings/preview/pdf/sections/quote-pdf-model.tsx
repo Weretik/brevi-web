@@ -1,9 +1,9 @@
 import { Box, Stack } from '@mui/material';
 
-import { accentText, line, muted, tileBand, tileBody, fabrics } from './quote-pdf-palette';
-import { QuotePdfStandard } from './quote-pdf-standard';
+import { accentText, line, muted, tileBand, tileBody, fabrics } from '../quote-pdf-palette';
+import { QuotePdfStandard } from '../quote-pdf-standard';
 
-import type { PdfHighlight } from './quote-pdf-highlight';
+import type { PdfHighlight } from '../quote-pdf-highlight';
 import type { QuoteSettingsDraft, QuoteSettingsPreviewSample } from '@admin/quotes/model';
 
 /** The example model with its fabric variants and price tiles. */

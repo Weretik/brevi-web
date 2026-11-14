@@ -1,9 +1,9 @@
 import { Box, Stack } from '@mui/material';
 
-import { muted } from './quote-pdf-palette';
-import { QuotePdfStandard } from './quote-pdf-standard';
+import { muted } from '../quote-pdf-palette';
+import { QuotePdfStandard } from '../quote-pdf-standard';
 
-import type { PdfHighlight } from './quote-pdf-highlight';
+import type { PdfHighlight } from '../quote-pdf-highlight';
 import type { QuoteSettingsDraft, QuoteSettingsPreviewSample } from '@admin/quotes/model';
 
 /** The client, the introduction, the VAT notice and the contact line. */

@@ -15,8 +15,8 @@ The shared [frontend code organization rules](../shared/code-organization.md) ap
 
 `npm run architecture:structure` lists every entry in [the baseline](../../../tools/architecture/structure-baseline.json).
 
-| Path under `libs/site/`         | Deviation                      | Decision                                                                                                       |
-| ------------------------------- | ------------------------------ | -------------------------------------------------------------------------------------------------------------- |
-| `home/ui/src/lib/sections/` (8) | Eight or more production files | `keep`: one file per block of the home page, each a separate block; folders of one file each would add nothing |
-| `shared/ui/src/lib/` (8)        | Eight or more production files | `keep`: a flat component kit, one primitive per file with its spec, as shadcn generates it                     |
-| Files over the line limit       | Over 150 or 200 lines          | Reviewed one by one in stage 7 of the remediation                                                              |
+| Path under `libs/site/`                          | Deviation                      | Decision                                                                                                                                                                               |
+| ------------------------------------------------ | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `home/ui/src/lib/sections/` (8)                  | Eight or more production files | `keep`: one file per block of the home page, each a separate block; folders of one file each would add nothing                                                                         |
+| `shared/ui/src/lib/` (8)                         | Eight or more production files | `keep`: a flat component kit, one primitive per file with its spec, as shadcn generates it                                                                                             |
+| Six files over the line limit (see the baseline) | Over 150 or 200 lines          | `split when next changed`: cohesive (the catalog mapper of one API shape, the product page, footer, catalog menu, mobile bar, request form); a change that touches one splits it first |

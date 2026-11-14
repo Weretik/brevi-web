@@ -1,8 +1,8 @@
 import { Box, Stack } from '@mui/material';
 
-import { accentOnDark, graphite } from './quote-pdf-palette';
+import { accentOnDark, graphite } from '../quote-pdf-palette';
 
-import type { PdfHighlight } from './quote-pdf-highlight';
+import type { PdfHighlight } from '../quote-pdf-highlight';
 import type { QuoteSettingsPreviewSample } from '@admin/quotes/model';
 
 /** The manager contacts and the site in the dark page footer. */

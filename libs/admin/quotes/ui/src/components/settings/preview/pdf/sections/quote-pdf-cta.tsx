@@ -1,9 +1,9 @@
 import { Box } from '@mui/material';
 
-import { accentOnDark, graphite } from './quote-pdf-palette';
-import { QuoteMarkedText } from '../quote-marked-text';
+import { QuoteMarkedText } from '../../quote-marked-text';
+import { accentOnDark, graphite } from '../quote-pdf-palette';
 
-import type { PdfHighlight } from './quote-pdf-highlight';
+import type { PdfHighlight } from '../quote-pdf-highlight';
 import type { QuoteSettingsDraft, QuoteSettingsPreviewSample } from '@admin/quotes/model';
 
 /** The dark call-to-action block; it shows only when one of its texts is filled. */

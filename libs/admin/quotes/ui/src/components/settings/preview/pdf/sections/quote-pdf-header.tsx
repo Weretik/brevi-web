@@ -1,8 +1,8 @@
 import { Box, Stack, Typography } from '@mui/material';
 
-import { accent, accentText } from './quote-pdf-palette';
+import { accent, accentText } from '../quote-pdf-palette';
 
-import type { PdfHighlight } from './quote-pdf-highlight';
+import type { PdfHighlight } from '../quote-pdf-highlight';
 import type { QuoteSettingsDraft, QuoteSettingsPreviewSample } from '@admin/quotes/model';
 
 /** The logo or company name, the КП title and number, and the requisites line. */
