@@ -24,6 +24,7 @@ import { useMemo, useState } from 'react';
 
 import { FinanceAccountDrawer } from '../../components/accounts/finance-account-drawer';
 import { useAccountingSettings } from '../../hooks/accounts/use-accounting-settings';
+import { useVersionedDeletion } from '../../hooks/deletion/use-versioned-deletion';
 
 import type { FinanceAccountEditorMode } from '../../hooks/accounts/use-finance-account-editor';
 import type { FinanceAccount, FinanceAccountFilter } from '@admin/accounting/model';
@@ -50,28 +51,19 @@ export function FinanceAccountsPage() {
     mode: FinanceAccountEditorMode;
     account: FinanceAccount | null;
   } | null>(null);
-  const [pendingDelete, setPendingDelete] = useState<FinanceAccount | null>(null);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const [deleteAccount, deleteState] = useDeleteFinanceAccountMutation();
+  const deletion = useVersionedDeletion<FinanceAccount>(
+    deleteAccount,
+    { done: 'Рахунок видалено.', failed: 'Не вдалося видалити рахунок.' },
+    setActionMessage,
+  );
   const counts = countFinanceAccounts(rows);
   const filteredRows = useMemo(
     () => filterFinanceAccounts(rows, search, filter),
     [rows, search, filter],
   );
   const filterTotal = filter === 'archived' ? counts.archived : counts.active;
-
-  async function confirmDelete() {
-    if (!pendingDelete) return;
-    try {
-      await deleteAccount({ id: pendingDelete.id, version: pendingDelete.version }).unwrap();
-      setActionMessage('Рахунок видалено.');
-    } catch (failure) {
-      setActionMessage(
-        `Не вдалося видалити рахунок. ${adminApiErrorMessage(failure, 'Спробуйте ще раз.')}`,
-      );
-    }
-    setPendingDelete(null);
-  }
 
   return (
     <Box sx={{ minWidth: 0 }}>
@@ -135,7 +127,7 @@ export function FinanceAccountsPage() {
               setActionMessage(
                 `По рахунку «${account.name}» вже є рух коштів, тому його можна лише перенести в архів.`,
               );
-            else setPendingDelete(account);
+            else deletion.request(account);
           }}
         />
       </Paper>
@@ -155,12 +147,12 @@ export function FinanceAccountsPage() {
         />
       )}
       <FinanceDeleteDialog
-        open={Boolean(pendingDelete)}
+        open={Boolean(deletion.pending)}
         title="Видалити рахунок?"
-        text={`«${pendingDelete?.name ?? ''}» зникне зі списку, а в історії залишиться останній запис. Якщо рахунок лише не використовується, перенесіть його в архів.`}
+        text={`«${deletion.pending?.name ?? ''}» зникне зі списку, а в історії залишиться останній запис. Якщо рахунок лише не використовується, перенесіть його в архів.`}
         deleting={deleteState.isLoading}
-        onClose={() => setPendingDelete(null)}
-        onConfirm={() => void confirmDelete()}
+        onClose={deletion.cancel}
+        onConfirm={() => void deletion.confirm()}
       />
     </Box>
   );
