@@ -11,7 +11,6 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
 
 import { TaskStatePill } from '../components/status/task-state-pill';
 
@@ -108,7 +107,7 @@ export function TaskDetails({ task, busy, onStatus, onStep, assignees, onReassig
         {task.customerName && <Row label="Клієнт">{task.customerName}</Row>}
         {task.leadId && (
           <Row label="Лід">
-            <Link component={RouterLink} to={`/crm/leads?lead=${task.leadId}`}>
+            <Link href={`/crm/leads?lead=${task.leadId}`}>
               Відкрити в «Ліди › Мій день»
             </Link>
           </Row>

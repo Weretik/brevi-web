@@ -71,7 +71,7 @@ Do not create catch-all folders or files named `utils`, `helpers`, `common`, `mi
 
 - A page is an orchestrator; separate toolbars, tables, complex cells, and feature-only dialogs when they have independent responsibilities.
 - Reusable dialogs and forms belong in `ui` and receive values, errors, and callbacks through props.
-- `ui` and `shared/ui` never import the router. Links use `href` (or a path passed as a prop); the application registers one router-aware link component in the MUI theme (`MuiLink` `component` and `MuiButtonBase` `LinkComponent`). Navigation after an action is a callback from `feature`.
+- `ui` and `shared/ui` never import the router. Links use `href` (or a path passed as a prop); the application registers one router-aware link component in the MUI theme: `routerLinkComponents` from `@admin/shared/routing` (`MuiLink` `component` and `MuiButtonBase` `LinkComponent`). A `MenuItem` link uses `component={Link}` with `href`. Navigation after an action is a callback from `feature`. ESLint `no-restricted-imports` blocks `react-router`, `react-router-dom` and `@admin/shared/routing` in `libs/admin/*/ui` and `libs/admin/shared/ui` (tests excepted).
 - Do not change routes, guards, the global store, or theme without explicit feature scope.
 
 ## Known deviations

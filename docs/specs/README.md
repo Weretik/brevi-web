@@ -72,6 +72,7 @@ The Storefront currently has README files for its Nx feature libraries, but they
 - [Visual guidance for tables, menus, and forms](admin/table-visual-guidance.md)
 - [React Admin migration order](admin/react-migration-roadmap.md)
 - [Admin: restore layers and module boundaries](admin/architecture/001-admin-layers-and-boundaries/README.md)
+- [Frontend rules audit and remediation (2026-11-14)](architecture/001-frontend-rules-remediation/README.md) — admin and site, 7 stages; stage 1 done.
 - [Admin React: auth, permissions, and API foundation](admin/auth/001-auth-permissions-api-foundation/README.md) — history; its token session and TS-007 anonymous mode are replaced by 002.
 - [Admin React: cookie sign-in like Kedr](admin/auth/002-cookie-sign-in/README.md) — sign-in page, cookie session with CSRF, «Немає доступу», «Користувачі».
 - [Public site on Next.js: migration plan from brevi.com.ua](site/migration/README.md) — plan accepted 2026-10-30; each step gets its own SDD.

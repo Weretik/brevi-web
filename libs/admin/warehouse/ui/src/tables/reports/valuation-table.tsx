@@ -19,7 +19,6 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
 
 import { ExpandableRow, reportMono } from '../../components/reports/expandable-row';
 
@@ -128,7 +127,7 @@ export function ValuationTable({ report, fabrics, filtered }: Props) {
                                 : 'Немає ціни'
                             }
                           />{' '}
-                          <Link component={RouterLink} to={FABRICS_REFERENCE_PATH} variant="body2">
+                          <Link href={FABRICS_REFERENCE_PATH} variant="body2">
                             До «Тканини»
                           </Link>
                         </>

@@ -17,7 +17,6 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
 
 import { PayrollAdjustmentsTable, PayrollPaymentsTable } from './payroll-entries-tables';
 
@@ -49,7 +48,7 @@ function WorkTable({ title, rows }: { title: string; rows: readonly PayrollWorkR
               <TableRow key={row.workId}>
                 <TableCell sx={{ whiteSpace: 'nowrap' }}>{formatDay(row.workDate)}</TableCell>
                 <TableCell>
-                  <Link component={RouterLink} to={`/production/orders/${row.orderId}`}>
+                  <Link href={`/production/orders/${row.orderId}`}>
                     № {row.orderNumber}
                   </Link>{' '}
                   · {row.modelName}

@@ -163,7 +163,8 @@
       "@site/sizes/feature": ["./libs/site/sizes/feature/src/index.ts"],
       "@site/redirects/data-access": ["./libs/site/redirects/data-access/src/index.ts"],
       "@site/settings/data-access": ["./libs/site/settings/data-access/src/index.ts"],
-      "@site/settings/feature": ["./libs/site/settings/feature/src/index.ts"]
+      "@site/settings/feature": ["./libs/site/settings/feature/src/index.ts"],
+      "@admin/shared/routing": ["libs/admin/shared/routing/src/index.ts"]
     }
   }
 }

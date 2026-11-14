@@ -13,7 +13,6 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
 
 import type { ProductionWork } from '@admin/production/model';
 
@@ -79,7 +78,7 @@ export function ProductionWorkTable({
               <TableCell>{row.employeeName}</TableCell>
               {showItem && (
                 <TableCell>
-                  <Link component={RouterLink} to={`/production/orders/${row.orderId}`}>
+                  <Link href={`/production/orders/${row.orderId}`}>
                     № {row.orderNumber}
                   </Link>{' '}
                   · {row.modelName}

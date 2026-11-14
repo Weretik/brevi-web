@@ -4,7 +4,6 @@ import OpenInFullOutlinedIcon from '@mui/icons-material/OpenInFullOutlined';
 import { Box, IconButton, Tooltip } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { DataGrid } from '@mui/x-data-grid';
-import { Link as RouterLink } from 'react-router-dom';
 
 import { ReferenceGridFooter } from './reference-grid-footer';
 import { ReferenceRowMenu } from './reference-row-menu';
@@ -126,8 +125,7 @@ export function ReferenceDataGrid<Row extends ReferenceRow>({
             <Tooltip title="Відкрити повну картку">
               <IconButton
                 size="small"
-                component={RouterLink}
-                to={openHref(row)}
+                href={openHref(row)}
                 aria-label={`Відкрити повну картку: ${row.name}`}
                 tabIndex={tabIndex}
                 onClick={(event) => event.stopPropagation()}
