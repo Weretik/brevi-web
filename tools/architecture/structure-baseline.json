@@ -1,8 +1,4 @@
 [
-  "component-state: libs/admin/products/feature/src/components/sewing-card/sewing-product-card.tsx",
-  "component-state: libs/admin/quotes/feature/src/components/embroidery/quote-embroidery-drawer.tsx",
-  "component-state: libs/admin/references/feature/src/pages/pricing-parameters/pricing-parameters-content.tsx",
-  "component-state: libs/admin/references/feature/src/pages/product-sections/product-sections-page.tsx",
   "component-state: libs/admin/warehouse/feature/src/pages/reports/fabric-booking-page.tsx",
   "component-state: libs/admin/warehouse/feature/src/pages/reports/fabric-consumption-page.tsx",
   "component-state: libs/admin/warehouse/feature/src/pages/reports/fabric-plan-fact-page.tsx",
