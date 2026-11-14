@@ -1,4 +1,4 @@
-import { CATALOG_LIFE, FAILURE_LIFE } from './catalog-cache';
+import { CATALOG_LIFE, FAILURE_LIFE } from '../catalog-cache';
 import {
   getCatalogCategory,
   getCatalogCategoryAddresses,

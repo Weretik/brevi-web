@@ -32,7 +32,7 @@ libs/site/
 │   └── sections/                # home-hero, home-catalog, home-logo, home-process,
 │                                # home-production, home-industries, home-contacts, home-seo-text
 ├── home/seo/src/lib/            # home-metadata
-├── catalog/model/src/lib/catalog-sections.ts
+├── catalog/model/src/lib/mappers/catalog-sections.ts
 ├── shared/ui/src/lib/page-section.tsx   # block frame: stitch label, h2, action link
 └── core/i18n/src/lib/site-paths.ts
 ```
@@ -42,6 +42,6 @@ libs/site/
 - `libs/site/home/ui/src/lib/home-ui.spec.tsx`
 - `libs/site/home/feature/src/lib/home-page.spec.tsx`
 - `libs/site/home/seo/src/lib/home-seo.spec.ts`
-- `libs/site/catalog/model/src/lib/catalog-sections.spec.ts`
+- `libs/site/catalog/model/src/lib/mappers/catalog-sections.spec.ts`
 
 Run one project: `npx nx test site-home-ui`. All site libraries: `npm run test:site`.

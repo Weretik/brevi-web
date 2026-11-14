@@ -35,10 +35,10 @@ flowchart LR
 apps/site/src/app/[locale]/layout.tsx                   # verification tags, analytics scripts, sharing picture for the root
 apps/site/src/app/[locale]/**/page.tsx                  # generateMetadata → withSiteSharePicture
 libs/site/settings/data-access/src/lib/
-  site-settings-loader.ts                               # cached settings, tag `site-settings`, shape check
-  site-pages-loader.ts                                  # cached page texts, tag `site-pages`, shape check
-  page-text-metadata.ts                                 # withPageText: saved texts over the page's own
-  site-metadata.ts                                      # sitePageMetadata, withSiteSharePicture
+  loaders/site-settings-loader.ts                       # cached settings, tag `site-settings`, shape check
+  loaders/site-pages-loader.ts                          # cached page texts, tag `site-pages`, shape check
+  metadata/page-text-metadata.ts                        # withPageText: saved texts over the page's own
+  metadata/site-metadata.ts                             # sitePageMetadata, withSiteSharePicture
 libs/site/settings/feature/src/lib/
   site-page-text-section.tsx                            # SitePageTextSection: saved main text, questions, FAQPage
 libs/site/shared/ui/src/lib/faq-list.tsx                # FaqList: questions as <details>, also used by home and «Галузі»

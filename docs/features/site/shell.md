@@ -58,7 +58,7 @@ libs/site/
 │   ├── crawling/             # robots.txt and sitemap builders
 │   └── json-ld/              # JsonLd, Organization, WebSite, LocalBusiness, BreadcrumbList, FAQPage
 ├── core/shell/src/lib/
-│   ├── site-shell.tsx        # page frame
+│   ├── shell/site-shell.tsx  # page frame
 │   ├── header/               # site-header, catalog-menu, catalog-section-icon, header-search, show-when-stuck
 │   ├── mobile/mobile-bar.tsx # bottom bar with the catalog and menu sheets
 │   ├── footer/site-footer.tsx
@@ -71,7 +71,7 @@ libs/site/
 
 ## Tests
 
-- `libs/site/core/shell/src/lib/site-shell.spec.tsx`, `navigation/site-navigation.spec.ts`
+- `libs/site/core/shell/src/lib/shell/site-shell.spec.tsx`, `navigation/site-navigation.spec.ts`
 - `libs/site/core/seo/src/lib/**/*.spec.ts(x)`
 - `libs/site/core/i18n/src/lib/localized-path.spec.ts`, `libs/site/core/config/src/lib/site-config.spec.ts`
 - `libs/site/shared/ui/src/lib/*.spec.tsx`

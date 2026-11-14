@@ -1,16 +1,16 @@
 import { COMPANY } from '@site/core/config';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 
+import { CatalogCategoryTabs } from './category/catalog-category-tabs';
+import { CatalogSectionGroups } from './category/catalog-section-groups';
 import { formatCount, formatModelCount, getCatalogDictionary } from './i18n/catalog-dictionary';
-import { CatalogCategoryTabs } from './sections/catalog-category-tabs';
-import { CatalogListing } from './sections/catalog-listing';
-import { CatalogProductBuy } from './sections/catalog-product-buy';
-import { CatalogProductGallery } from './sections/catalog-product-gallery';
-import { CatalogProductGrid } from './sections/catalog-product-grid';
-import { CatalogProductSpecs } from './sections/catalog-product-specs';
-import { CatalogSearchBox } from './sections/catalog-search-box';
-import { CatalogSectionGroups } from './sections/catalog-section-groups';
-import { CatalogText } from './sections/catalog-text';
+import { CatalogListing } from './listing/catalog-listing';
+import { CatalogProductGrid } from './listing/catalog-product-grid';
+import { CatalogProductBuy } from './product/catalog-product-buy';
+import { CatalogProductGallery } from './product/catalog-product-gallery';
+import { CatalogProductSpecs } from './product/catalog-product-specs';
+import { CatalogSearchBox } from './search/catalog-search-box';
+import { CatalogText } from './text/catalog-text';
 
 import type { CatalogProductCard } from '@site/catalog/model';
 

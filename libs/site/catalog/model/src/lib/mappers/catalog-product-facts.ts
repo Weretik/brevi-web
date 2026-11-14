@@ -1,6 +1,6 @@
 import { plainCatalogText } from './catalog-inline';
 
-import type { CatalogTextBlock } from './catalog-category';
+import type { CatalogTextBlock } from '../entities/catalog-category';
 
 /** Short facts of a product sorted for the page: labels near the name, rows for the table, other lines. */
 export type CatalogProductFacts = {

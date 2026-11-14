@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { withPageText } from './page-text-metadata';
 import { mapSitePageTexts } from './site-pages-loader';
+import { withPageText } from '../metadata/page-text-metadata';
 
 describe('mapSitePageTexts', () => {
   it('keeps the texts by page key', () => {

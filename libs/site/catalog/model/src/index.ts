@@ -3,7 +3,7 @@ export type {
   CatalogCategoryPage,
   CatalogProductCard,
   CatalogTextBlock,
-} from './lib/catalog-category';
+} from './lib/entities/catalog-category';
 export type {
   CatalogFabric,
   CatalogPhoto,
@@ -12,12 +12,16 @@ export type {
   CatalogProductAddress,
   CatalogProductCategory,
   CatalogSpecGroup,
-} from './lib/catalog-product';
-export { parseCatalogInline, plainCatalogText } from './lib/catalog-inline';
-export type { CatalogInlineRun } from './lib/catalog-inline';
-export { toCatalogSections } from './lib/catalog-sections';
-export type { CatalogSection } from './lib/catalog-sections';
-export { catalogCategoryFamily, findCatalogPath, flattenCatalogTree } from './lib/catalog-tree';
+} from './lib/entities/catalog-product';
+export { parseCatalogInline, plainCatalogText } from './lib/mappers/catalog-inline';
+export type { CatalogInlineRun } from './lib/mappers/catalog-inline';
+export { toCatalogSections } from './lib/mappers/catalog-sections';
+export type { CatalogSection } from './lib/mappers/catalog-sections';
+export {
+  catalogCategoryFamily,
+  findCatalogPath,
+  flattenCatalogTree,
+} from './lib/entities/catalog-tree';
 export {
   CATALOG_SORTS,
   EMPTY_CATALOG_CHOICE,
@@ -27,24 +31,28 @@ export {
   countCatalogFilters,
   readCatalogChoice,
   writeCatalogChoice,
-} from './lib/catalog-listing';
+} from './lib/queries/catalog-listing';
 export type {
   CatalogListingChoice,
   CatalogListingOptions,
   CatalogPriceBand,
   CatalogSort,
-} from './lib/catalog-listing';
+} from './lib/queries/catalog-listing';
 export {
   catalogQueryWords,
   normalizeCatalogText,
   searchCatalogProducts,
   searchCatalogSections,
-} from './lib/catalog-search';
+} from './lib/queries/catalog-search';
 export type {
   CatalogSearchIndex,
   CatalogSearchProduct,
   CatalogSearchSection,
-} from './lib/catalog-search';
-export type { CatalogLocalized, CatalogProductType, CatalogTreeNode } from './lib/catalog-tree';
-export { splitCatalogProductFacts } from './lib/catalog-product-facts';
-export type { CatalogProductFacts } from './lib/catalog-product-facts';
+} from './lib/queries/catalog-search';
+export type {
+  CatalogLocalized,
+  CatalogProductType,
+  CatalogTreeNode,
+} from './lib/entities/catalog-tree';
+export { splitCatalogProductFacts } from './lib/mappers/catalog-product-facts';
+export type { CatalogProductFacts } from './lib/mappers/catalog-product-facts';

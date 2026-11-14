@@ -1,9 +1,8 @@
+import { buildCatalogItemListJsonLd, buildCatalogProductJsonLd } from './json-ld/catalog-json-ld';
 import {
-  buildCatalogItemListJsonLd,
-  buildCatalogProductJsonLd,
   buildCatalogProductMetadata,
   productDescription,
-} from './catalog-product-seo';
+} from './metadata/catalog-product-metadata';
 
 import type { CatalogProduct } from '@site/catalog/model';
 

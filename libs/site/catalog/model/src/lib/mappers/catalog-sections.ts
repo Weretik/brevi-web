@@ -1,4 +1,4 @@
-import type { CatalogLocalized, CatalogTreeNode } from './catalog-tree';
+import type { CatalogLocalized, CatalogTreeNode } from '../entities/catalog-tree';
 
 export type CatalogSection = {
   /** The category slug; also the key of the section icon. */

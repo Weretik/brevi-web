@@ -11,10 +11,13 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    env:
+      # Pull requests check only the projects their change affects; a push to master checks everything.
+      CI_SCOPE: ${{ github.event_name == 'push' && 'all' || '' }}
     steps:
       - uses: actions/checkout@v4
         with:
-          # Full history lets Nx compare with the base branch and test only affected Admin libraries.
+          # Full history lets Nx compare with the base branch and check only affected projects.
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
@@ -24,13 +27,15 @@ jobs:
       - uses: nrwl/nx-set-shas@v4
       - run: npm run docs:check
       - run: npm run contracts:check
+      - run: npm run ci:test-scripts:fixtures
+      - run: npm run ci:test-scripts
       - run: npm run lint
       - run: npm run typecheck:tests:web
-      - run: npm run test:web
-      - run: npm run check:admin-libs
+      - run: node tools/ci/run-affected.mjs test:web
+      - run: node tools/ci/run-affected.mjs check:admin-libs
       - run: npx nx build admin-react --configuration=production
       - run: npx nx build storefront --configuration=production
-      - run: npm run lint:site
+      - run: node tools/ci/run-affected.mjs lint:site
       - run: npx nx run site:typecheck
-      - run: npm run test:site
+      - run: node tools/ci/run-affected.mjs test:site
       - run: npx nx build site

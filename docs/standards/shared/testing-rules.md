@@ -51,7 +51,9 @@ The base React harness is already configured in `apps/admin-react`. For a new li
 - `*.integration.test.ts` or `*.integration.test.tsx` — state, data fetching, routing, and browser boundaries.
 - `*.spec.ts` in `apps/admin-react-e2e` — browser E2E journeys.
 
-Top-level commands: `npm run test:web` (the `admin-react` app only), `npm run check:admin-libs` (lint, typecheck, test typecheck and tests of the Admin libraries affected by the change, with everything that depends on them, by `nx affected` against `master`; CI runs it since 2026-11-14, before that library tests ran only locally and some fixtures went stale), `npm run check:admin-libs:all` (the same for every Admin library, for example after a tooling change), `npm run test:web:coverage`, `npm run test:web:e2e`, and `npm run typecheck:tests`. Individual empty test levels may pass through `--passWithNoTests`, but readiness requires at least one actual behavioral or infrastructure test.
+Top-level commands: `npm run test:web` (the `admin-react` app), `npm run check:admin-libs` (lint, typecheck, test typecheck and tests of every Admin library), `npm run test:site` and `npm run lint:site` (every `site-*` project), `npm run test:web:coverage`, `npm run test:web:e2e`, and `npm run typecheck:tests`. Individual empty test levels may pass through `--passWithNoTests`, but readiness requires at least one actual behavioral or infrastructure test.
+
+CI selection: the scripts select projects by pattern (`admin-*`, `site-*`), never by a hand-written list. `npm run ci:test-scripts` (`tools/ci/check-test-scripts.mjs`) fails when a project with a test target is not selected by `test:web`, `check:admin-libs` or `test:site`; it found `site-articles-data-access` missing from the old list on 2026-11-14. On a pull request CI runs these scripts through `node tools/ci/run-affected.mjs <script>`, which keeps only the projects `nx affected` reports against the base (from `nrwl/nx-set-shas`); a push to `master` (`CI_SCOPE=all`) runs everything. Locally the scripts run everything.
 
 ## Red → Green → Refactor → Regression
 

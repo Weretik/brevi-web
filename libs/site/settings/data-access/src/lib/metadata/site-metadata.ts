@@ -1,10 +1,10 @@
 import { withSharePicture } from '@site/core/seo';
 
 import { withPageText } from './page-text-metadata';
-import { loadSitePageTexts } from './site-pages-loader';
-import { loadSiteSettings } from './site-settings-loader';
+import { loadSitePageTexts } from '../loaders/site-pages-loader';
+import { loadSiteSettings } from '../loaders/site-settings-loader';
 
-import type { SiteLocaleKey } from './site-pages-loader';
+import type { SiteLocaleKey } from '../loaders/site-pages-loader';
 import type { Metadata } from 'next';
 
 /**

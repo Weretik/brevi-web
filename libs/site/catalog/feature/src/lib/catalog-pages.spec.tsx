@@ -8,10 +8,10 @@ import {
 } from '@site/catalog/data-access';
 import { render, screen, within } from '@testing-library/react';
 
-import { CatalogCategoryPage } from './catalog-category-page';
-import { CatalogProductPage } from './catalog-product-page';
-import { CatalogRootPage } from './catalog-root-page';
-import { CatalogSearchPage } from './catalog-search-page';
+import { CatalogCategoryPage } from './category/catalog-category-page';
+import { CatalogProductPage } from './product/catalog-product-page';
+import { CatalogRootPage } from './root/catalog-root-page';
+import { CatalogSearchPage } from './search/catalog-search-page';
 
 import type {
   CatalogCategoryPage as CatalogCategoryPageData,

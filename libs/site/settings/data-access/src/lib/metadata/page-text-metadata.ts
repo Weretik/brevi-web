@@ -1,4 +1,4 @@
-import type { SitePageText } from './site-pages-loader';
+import type { SitePageText } from '../loaders/site-pages-loader';
 import type { Metadata } from 'next';
 
 /**
