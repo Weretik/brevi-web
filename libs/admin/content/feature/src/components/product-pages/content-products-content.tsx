@@ -1,7 +1,4 @@
-import {
-  useGetSiteCategoriesQuery,
-  useSetContentProductVisibilityMutation,
-} from '@admin/content/data-access';
+import { useGetSiteCategoriesQuery } from '@admin/content/data-access';
 import {
   contentProductTypeLabel,
   contentProductTypes,
@@ -22,6 +19,7 @@ import { useState } from 'react';
 
 import { ContentProductDrawer } from './content-product-drawer';
 import { useContentProductList } from '../../hooks/product-pages/use-content-product-list';
+import { useContentProductVisibility } from '../../hooks/product-pages/use-content-product-visibility';
 import { useOldSiteImport } from '../../hooks/product-pages/use-old-site-import';
 
 import type { ContentProductRow, ContentProductsViewer } from '@admin/content/model';
@@ -39,34 +37,13 @@ const siteFilters = [
 export function ContentProductsContent({ viewer }: { viewer: ContentProductsViewer }) {
   const state = useContentProductList();
   const transfer = useOldSiteImport();
-  const [notice, setNotice] = useState<{ text: string; ok: boolean } | null>(null);
+  const visibility = useContentProductVisibility();
+  const { notice, setNotice } = visibility;
   const [opened, setOpened] = useState<ContentProductRow | null>(null);
-  const [savingId, setSavingId] = useState<number | null>(null);
-  const [setVisibility] = useSetContentProductVisibilityMutation();
   // Without the right to see «Розділи сайту» the list does not load and the filter is not offered.
   const categories = useGetSiteCategoriesQuery().currentData ?? null;
   const { list } = state;
   const page = list.currentData;
-
-  async function toggle(row: ContentProductRow, showOnSite: boolean) {
-    setSavingId(row.productId);
-    setNotice(null);
-    try {
-      const saved = await setVisibility({ productId: row.productId, showOnSite }).unwrap();
-      if (saved.showOnSite && !saved.onSite)
-        setNotice({
-          text: `«${row.name}» позначено для сайту, але товар вимкнено в «Товари», тому сайт його не покаже.`,
-          ok: false,
-        });
-    } catch (error) {
-      setNotice({
-        text: adminApiErrorMessage(error, `Не вдалося змінити показ товару «${row.name}».`),
-        ok: false,
-      });
-    } finally {
-      setSavingId(null);
-    }
-  }
 
   return (
     <Box sx={{ minWidth: 0 }}>
@@ -171,10 +148,10 @@ export function ContentProductsContent({ viewer }: { viewer: ContentProductsView
           narrowed={state.narrowed}
           unavailable={Boolean(list.error)}
           canEdit={viewer.canEdit}
-          savingId={savingId}
+          savingId={visibility.savingId}
           onPageChange={state.setPage}
           onOpen={setOpened}
-          onToggle={(row, showOnSite) => void toggle(row, showOnSite)}
+          onToggle={(row, showOnSite) => void visibility.toggle(row, showOnSite)}
         />
       </Paper>
       <OldSiteImportDialog
