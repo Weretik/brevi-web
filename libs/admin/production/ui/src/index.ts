@@ -70,3 +70,4 @@ export { WorkshopTabHeader } from './components/people/workshop-tab-header';
 export { PayrollMonthKpis } from './components/payroll/payroll-month-kpis';
 export { PeriodStepper } from './components/people/period-stepper';
 export { WorkLogFilters } from './components/work/work-log-filters';
+export { ReportPeriodBar } from './components/reports/report-period-bar';

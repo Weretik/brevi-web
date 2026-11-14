@@ -1,32 +1,19 @@
 import { useGetWorkshopReportQuery } from '@admin/production/data-access';
-import {
-  payrollMonthOf,
-  previousReportPeriod,
-  reportPeriodLabel,
-  reportPeriodProblem,
-  todayIso,
-} from '@admin/production/model';
+import { payrollMonthOf, reportPeriodLabel, todayIso } from '@admin/production/model';
 import {
   ReportMaterialsTable,
   ReportOutputTable,
+  ReportPeriodBar,
   ReportStaffTable,
   ReportStockTable,
   ReportTotals,
 } from '@admin/production/ui';
 import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
-import {
-  Alert,
-  Box,
-  Checkbox,
-  FormControlLabel,
-  Stack,
-  Tab,
-  Tabs,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Alert, Box, Tab, Tabs, Typography } from '@mui/material';
 import { useState } from 'react';
+
+import { useReportPeriod } from '../../hooks/reports/use-report-period';
 
 type View = 'overview' | 'output' | 'staff' | 'materials' | 'stock';
 
@@ -38,58 +25,14 @@ const views: { value: View; label: string }[] = [
   { value: 'stock', label: 'Залишки' },
 ];
 
-function MonthField({
-  label,
-  value,
-  max,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  max: string;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <TextField
-      label={label}
-      type="month"
-      size="small"
-      value={value}
-      onChange={(event) => onChange(event.target.value)}
-      slotProps={{ inputLabel: { shrink: true }, htmlInput: { max } }}
-      sx={{ width: 170 }}
-    />
-  );
-}
-
 /** «Швейний цех › Звіти цеху» (Admin): output, pay, fabric and stock of whole months, with a comparison. */
 export function WorkshopReportPage() {
   const current = payrollMonthOf(todayIso());
-  const [from, setFrom] = useState(current);
-  const [to, setTo] = useState(current);
-  const [compare, setCompare] = useState(false);
+  const period = useReportPeriod(current);
   const [view, setView] = useState<View>('overview');
-  const previous = previousReportPeriod(from, to);
-  const [compareFrom, setCompareFrom] = useState(previous?.from ?? current);
-  const [compareTo, setCompareTo] = useState(previous?.to ?? current);
-  const problem =
-    reportPeriodProblem(from, to, current) ??
-    (compare ? reportPeriodProblem(compareFrom, compareTo, current) : null);
-  const query = useGetWorkshopReportQuery(
-    compare ? { from, to, compareFrom, compareTo } : { from, to },
-    { skip: problem !== null },
-  );
+  const { problem } = period;
+  const query = useGetWorkshopReportQuery(period.query, { skip: problem !== null });
   const report = query.data?.current;
-
-  const setPeriod = (nextFrom: string, nextTo: string) => {
-    setFrom(nextFrom);
-    setTo(nextTo);
-    const before = previousReportPeriod(nextFrom, nextTo);
-    if (before) {
-      setCompareFrom(before.from);
-      setCompareTo(before.to);
-    }
-  };
 
   return (
     <Box sx={{ minWidth: 0 }}>
@@ -99,32 +42,19 @@ export function WorkshopReportPage() {
         subtitle="Випуск за цінами КП, нарахування, видана тканина й залишки за цілі місяці."
         actions={null}
       />
-      <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 1.5, alignItems: 'center', mb: 2 }}>
-        <MonthField
-          label="Від"
-          value={from}
-          max={current}
-          onChange={(value) => setPeriod(value, to)}
-        />
-        <MonthField
-          label="До"
-          value={to}
-          max={current}
-          onChange={(value) => setPeriod(from, value)}
-        />
-        <FormControlLabel
-          control={
-            <Checkbox checked={compare} onChange={(event) => setCompare(event.target.checked)} />
-          }
-          label="Порівняти з"
-        />
-        {compare && (
-          <>
-            <MonthField label="Від" value={compareFrom} max={current} onChange={setCompareFrom} />
-            <MonthField label="До" value={compareTo} max={current} onChange={setCompareTo} />
-          </>
-        )}
-      </Stack>
+      <ReportPeriodBar
+        current={current}
+        from={period.from}
+        to={period.to}
+        onFromChange={period.setFrom}
+        onToChange={period.setTo}
+        compare={period.compare}
+        onCompareChange={period.setCompare}
+        compareFrom={period.compareFrom}
+        compareTo={period.compareTo}
+        onCompareFromChange={period.setCompareFrom}
+        onCompareToChange={period.setCompareTo}
+      />
       {problem && (
         <Alert severity="warning" sx={{ mb: 2 }}>
           {problem}
