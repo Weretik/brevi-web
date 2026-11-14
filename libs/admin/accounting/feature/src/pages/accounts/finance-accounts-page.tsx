@@ -1,13 +1,4 @@
-import {
-  useDeleteFinanceAccountMutation,
-  useGetFinanceAccountsQuery,
-} from '@admin/accounting/data-access';
-import {
-  countFinanceAccounts,
-  filterFinanceAccounts,
-  formatLedgerDate,
-  nextFinanceSortOrder,
-} from '@admin/accounting/model';
+import { formatLedgerDate, nextFinanceSortOrder } from '@admin/accounting/model';
 import { FinanceAccountsGrid, FinanceDeleteDialog } from '@admin/accounting/ui';
 import {
   ReferenceFilterChip,
@@ -16,18 +7,14 @@ import {
   ReferencePageHeader,
   ReferenceSearchBar,
 } from '@admin/references/ui';
-import { adminApiErrorMessage } from '@admin/shared/api-client';
 import { usePageRights } from '@admin/shared/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import { Box, Button, Paper } from '@mui/material';
-import { useMemo, useState } from 'react';
 
 import { FinanceAccountDrawer } from '../../components/accounts/finance-account-drawer';
-import { useAccountingSettings } from '../../hooks/accounts/use-accounting-settings';
-import { useVersionedDeletion } from '../../hooks/deletion/use-versioned-deletion';
+import { useFinanceAccountsPage } from '../../hooks/accounts/use-finance-accounts-page';
 
-import type { FinanceAccountEditorMode } from '../../hooks/accounts/use-finance-account-editor';
-import type { FinanceAccount, FinanceAccountFilter } from '@admin/accounting/model';
+import type { FinanceAccountFilter } from '@admin/accounting/model';
 
 const filters: { value: FinanceAccountFilter; label: string }[] = [
   { value: 'active', label: 'Активні' },
@@ -38,46 +25,22 @@ const filters: { value: FinanceAccountFilter; label: string }[] = [
 /** «Бухгалтерія → Рахунки і каси» with counted balances (ACC-001). */
 export function FinanceAccountsPage() {
   const { canCreate } = usePageRights();
-  const query = useGetFinanceAccountsQuery();
-  const rows = useMemo(() => query.data ?? [], [query.data]);
-  const loading = query.isLoading || query.isFetching;
-  const error = query.error
-    ? adminApiErrorMessage(query.error, 'Не вдалося завантажити рахунки.')
-    : null;
-  const { cutoverDate, today } = useAccountingSettings();
-  const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState<FinanceAccountFilter>('active');
-  const [active, setActive] = useState<{
-    mode: FinanceAccountEditorMode;
-    account: FinanceAccount | null;
-  } | null>(null);
-  const [actionMessage, setActionMessage] = useState<string | null>(null);
-  const [deleteAccount, deleteState] = useDeleteFinanceAccountMutation();
-  const deletion = useVersionedDeletion<FinanceAccount>(
-    deleteAccount,
-    { done: 'Рахунок видалено.', failed: 'Не вдалося видалити рахунок.' },
-    setActionMessage,
-  );
-  const counts = countFinanceAccounts(rows);
-  const filteredRows = useMemo(
-    () => filterFinanceAccounts(rows, search, filter),
-    [rows, search, filter],
-  );
-  const filterTotal = filter === 'archived' ? counts.archived : counts.active;
+  const page = useFinanceAccountsPage();
+  const { counts, deletion, error, loading } = page;
 
   return (
     <Box sx={{ minWidth: 0 }}>
       <ReferencePageHeader
         overline="Бухгалтерія"
         title="Рахунки і каси"
-        subtitle={`Банківські рахунки, картки й каси. Поточний облік починається із залишку на ${formatLedgerDate(cutoverDate)}`}
+        subtitle={`Банківські рахунки, картки й каси. Поточний облік починається із залишку на ${formatLedgerDate(page.cutoverDate)}`}
         actions={
           canCreate ? (
             <Button
               variant="contained"
               startIcon={<AddOutlinedIcon />}
               disabled={loading || Boolean(error)}
-              onClick={() => setActive({ mode: 'create', account: null })}
+              onClick={() => page.open('create', null)}
             >
               Додати рахунок
             </Button>
@@ -87,15 +50,15 @@ export function FinanceAccountsPage() {
       <ReferenceListAlerts
         error={error}
         loading={loading}
-        onRetry={() => void query.refetch()}
-        actionMessage={actionMessage}
-        onCloseActionMessage={() => setActionMessage(null)}
+        onRetry={page.refetch}
+        actionMessage={page.message}
+        onCloseActionMessage={() => page.setMessage(null)}
       />
       <ReferenceSearchBar
         placeholder="Знайти рахунок за назвою, IBAN або приміткою"
         label="Пошук рахунків"
-        value={search}
-        onChange={setSearch}
+        value={page.search}
+        onChange={page.setSearch}
       />
       <ReferenceFilterRow
         filters={filters.map((item) => (
@@ -103,54 +66,44 @@ export function FinanceAccountsPage() {
             key={item.value}
             label={item.label}
             count={counts[item.value]}
-            selected={filter === item.value}
-            onClick={() => setFilter(item.value)}
+            selected={page.filter === item.value}
+            onClick={() => page.setFilter(item.value)}
           />
         ))}
-        count={filteredRows.length}
-        total={filter === 'unconfirmed' ? counts.unconfirmed : filterTotal}
+        count={page.rows.length}
+        total={page.total}
         countLabel="Кількість рахунків"
         selectedCount={0}
         onClearSelection={() => undefined}
       />
       <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
         <FinanceAccountsGrid
-          rows={filteredRows}
+          rows={page.rows}
           loading={loading}
-          searching={rows.length > 0}
+          searching={page.all.length > 0}
           unavailable={Boolean(error)}
-          onView={(account) => setActive({ mode: 'view', account })}
-          onEdit={(account) => setActive({ mode: 'edit', account })}
-          onDelete={(id) => {
-            const account = rows.find((row) => row.id === id) ?? null;
-            if (account?.balance?.hasHistory)
-              setActionMessage(
-                `По рахунку «${account.name}» вже є рух коштів, тому його можна лише перенести в архів.`,
-              );
-            else deletion.request(account);
-          }}
+          onView={(account) => page.open('view', account)}
+          onEdit={(account) => page.open('edit', account)}
+          onDelete={page.requestDelete}
         />
       </Paper>
-      {active && (
+      {page.active && (
         <FinanceAccountDrawer
-          key={`${active.mode}-${active.account?.id ?? 'new'}`}
-          mode={active.mode}
-          account={active.account}
-          cutoverDate={cutoverDate}
-          today={today}
-          newSortOrder={nextFinanceSortOrder(rows)}
-          onClose={() => setActive(null)}
-          onSaved={(message) => {
-            setActive(null);
-            setActionMessage(message);
-          }}
+          key={`${page.active.mode}-${page.active.account?.id ?? 'new'}`}
+          mode={page.active.mode}
+          account={page.active.account}
+          cutoverDate={page.cutoverDate}
+          today={page.today}
+          newSortOrder={nextFinanceSortOrder(page.all)}
+          onClose={page.close}
+          onSaved={page.saved}
         />
       )}
       <FinanceDeleteDialog
         open={Boolean(deletion.pending)}
         title="Видалити рахунок?"
         text={`«${deletion.pending?.name ?? ''}» зникне зі списку, а в історії залишиться останній запис. Якщо рахунок лише не використовується, перенесіть його в архів.`}
-        deleting={deleteState.isLoading}
+        deleting={page.deleting}
         onClose={deletion.cancel}
         onConfirm={() => void deletion.confirm()}
       />

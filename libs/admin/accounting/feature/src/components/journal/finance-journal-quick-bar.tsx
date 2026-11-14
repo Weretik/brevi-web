@@ -3,7 +3,9 @@ import { FinanceSegmentedButtons } from '@admin/accounting/ui';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 import { Box, Button, InputAdornment, Stack, TextField } from '@mui/material';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo } from 'react';
+
+import { useJournalSearchText } from '../../hooks/journal/use-journal-search-text';
 
 import type { useFinanceJournal } from '../../hooks/journal/use-finance-journal';
 import type {
@@ -38,8 +40,6 @@ const panelKeys: (keyof FinanceJournalFilter)[] = [
   'includeVoided',
 ];
 
-const searchDelayMs = 350;
-
 /**
  * Search, quick periods, the type and «Ще фільтри» in one place above a journal. Quick choices
  * apply at once; the panel applies on «Застосувати».
@@ -61,21 +61,8 @@ export function FinanceJournalQuickBar({
   const period: FinancePeriodKey =
     choices.find((choice) => choice.from === applied.from && choice.to === applied.to)?.key ??
     'custom';
-  const [text, setText] = useState(applied.search);
+  const { text, setText } = useJournalSearchText(applied.search, applyNow);
   const panelCount = panelKeys.filter((key) => applied[key] !== journal.defaults[key]).length;
-
-  // The latest applyNow, so a typed search applies against the current filters.
-  const apply = useRef(applyNow);
-  useEffect(() => {
-    apply.current = applyNow;
-  });
-
-  useEffect(() => setText(applied.search), [applied.search]);
-  useEffect(() => {
-    if (text.trim() === applied.search.trim()) return undefined;
-    const timer = setTimeout(() => apply.current({ search: text }), searchDelayMs);
-    return () => clearTimeout(timer);
-  }, [text, applied.search]);
 
   return (
     <Stack sx={{ gap: 1.5, mb: 2 }}>
