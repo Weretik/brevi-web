@@ -4,8 +4,7 @@ import {
 } from '@admin/accounting/data-access';
 import {
   financeOperationForms,
-  financePeriodCaption,
-  financePeriodChoices,
+  financeReviewReasons,
   formatFinanceCount,
   formatLedgerDate,
   previousDay,
@@ -21,7 +20,7 @@ import {
 import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
 import { Box, Button, Stack } from '@mui/material';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import {
   financeAccountsPath,
@@ -29,27 +28,15 @@ import {
   financeTransactionsPath,
 } from '../../accounting.routes';
 import { useAccountingSettings } from '../../hooks/accounts/use-accounting-settings';
-
-import type { FinancePeriod, FinancePeriodKey, LedgerScope } from '@admin/accounting/model';
+import { useFinanceOverviewPeriod } from '../../hooks/overview/use-finance-overview-period';
 
 /** «Бухгалтерія → Огляд»: what needs attention, totals of a period, balances and top expenses. */
 export function FinanceOverviewPage() {
   const { cutoverDate, today } = useAccountingSettings();
-  const [scope, setScope] = useState<LedgerScope>('Current');
-  const choices = useMemo(
-    () => financePeriodChoices(scope, cutoverDate, today),
-    [scope, cutoverDate, today],
-  );
-  const [key, setKey] = useState<FinancePeriodKey>('month');
-  const [custom, setCustom] = useState<FinancePeriod | null>(null);
-  const [draft, setDraft] = useState<FinancePeriod | null>(null);
-  const choice = choices.find((item) => item.key === key) ?? choices[0];
-  const period = key === 'custom' && custom ? custom : (choice ?? { from: today, to: today });
-  const caption =
-    key === 'custom' && custom ? financePeriodCaption(custom) : (choice?.caption ?? '');
-  const typed = draft ?? period;
+  const view = useFinanceOverviewPeriod(cutoverDate, today);
+  const { scope, archive, caption } = view;
 
-  const query = useGetFinanceOverviewQuery({ ...period, scope });
+  const query = useGetFinanceOverviewQuery({ ...view.period, scope });
   const accountsQuery = useGetFinanceAccountsQuery();
   const accounts = useMemo(
     () => (accountsQuery.data ?? []).filter((account) => account.active),
@@ -60,14 +47,6 @@ export function FinanceOverviewPage() {
     ? adminApiErrorMessage(query.error, 'Не вдалося завантажити огляд.')
     : null;
   const overview = query.data;
-  const archive = scope === 'LegacyArchive';
-
-  function switchScope() {
-    setScope(archive ? 'Current' : 'LegacyArchive');
-    setKey(archive ? 'month' : 'all');
-    setCustom(null);
-    setDraft(null);
-  }
 
   return (
     <Box sx={{ minWidth: 0 }}>
@@ -84,24 +63,25 @@ export function FinanceOverviewPage() {
             <FinanceSegmentedButtons
               label="Період"
               segments={[
-                ...choices.map((item) => ({ value: item.key, label: item.label })),
+                ...view.choices.map((item) => ({ value: item.key, label: item.label })),
                 { value: 'custom' as const, label: 'Свій період…' },
               ]}
-              value={key}
-              onChange={(next: FinancePeriodKey) => {
-                setKey(next);
-                setDraft(null);
-              }}
+              value={view.key}
+              onChange={view.choose}
             />
-            <Button variant="outlined" onClick={switchScope}>
+            <Button variant="outlined" onClick={view.switchScope}>
               {archive ? 'Поточний облік' : 'Домашня бухгалтерія'}
             </Button>
           </Stack>
         }
       />
       <Stack sx={{ gap: 2 }}>
-        {key === 'custom' && (
-          <FinancePeriodForm value={typed} onChange={setDraft} onApply={setCustom} />
+        {view.key === 'custom' && (
+          <FinancePeriodForm
+            value={view.typed}
+            onChange={view.setDraft}
+            onApply={view.applyCustom}
+          />
         )}
         <ReferenceListAlerts
           error={error}
@@ -114,8 +94,8 @@ export function FinanceOverviewPage() {
           <FinanceAttentionStrip actionLabel="Перевірити" href={financeReviewPath}>
             <b>{formatFinanceCount(overview.needsReviewCount, financeOperationForms)}</b> чекають
             перевірки
-            {reasons(overview.needsCategoryCount, overview.needsCounterpartyCount)}. У залишках вони
-            вже враховані.
+            {financeReviewReasons(overview.needsCategoryCount, overview.needsCounterpartyCount)}. У
+            залишках вони вже враховані.
           </FinanceAttentionStrip>
         )}
         {overview && (
@@ -152,15 +132,6 @@ export function FinanceOverviewPage() {
       </Stack>
     </Box>
   );
-}
-
-/** «: 2 без категорії, 1 з новим контрагентом» — only the reasons that are there. */
-function reasons(withoutCategory: number, newCounterparty: number): string {
-  const parts = [
-    withoutCategory ? `${withoutCategory} без категорії` : '',
-    newCounterparty ? `${newCounterparty} з новим контрагентом` : '',
-  ].filter(Boolean);
-  return parts.length ? `: ${parts.join(', ')}` : '';
 }
 
 export default FinanceOverviewPage;

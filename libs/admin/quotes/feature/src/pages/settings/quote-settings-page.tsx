@@ -19,7 +19,7 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { QuoteManagerDrawer } from '../../components/settings/quote-manager-drawer';
@@ -28,22 +28,13 @@ import { QuoteSettingsNotices } from '../../components/settings/quote-settings-n
 import { useGmailReturnNotice } from '../../hooks/sending/use-gmail-return-notice';
 import { useMailboxConnect } from '../../hooks/sending/use-mailbox-connect';
 import { useQuoteSettingsEditor } from '../../hooks/settings/use-quote-settings-editor';
+import { useQuoteSettingsPreview } from '../../hooks/settings/use-quote-settings-preview';
 import { useSettingsSections } from '../../hooks/settings/use-settings-sections';
-
-import type { QuoteLetterRef, QuotePreviewView } from '@admin/quotes/ui';
 
 const savedLabel = (name: string | null, at: string | null) =>
   name && at
     ? `Що бачить клієнт у PDF і листі. Змінив(-ла) ${name}, ${new Date(at).toLocaleString('uk-UA', { dateStyle: 'short', timeStyle: 'short' })}.`
     : 'Що бачить клієнт у PDF і листі. Ще не зберігали — показано тексти за замовчуванням.';
-
-/** The preview follows the field in focus: letter fields show the letter, the rest the PDF. */
-const viewOf = (path: string): QuotePreviewView | null =>
-  path.startsWith('email.') || path.startsWith('letter:')
-    ? 'letter'
-    : path.startsWith('company.') || path.startsWith('pdf.') || path.startsWith('staff:')
-      ? 'pdf'
-      : null;
 
 /** «Налаштування КП» (`/admin/quote-settings`): only Director and Admin open it. */
 export default function QuoteSettingsPage() {
@@ -56,21 +47,10 @@ export default function QuoteSettingsPage() {
   const mailbox = useMailboxConnect('/crm/quote-settings');
   const gmail = useGmailReturnNotice();
   const sections = useSettingsSections(Boolean(editor.draft));
-  const [focused, setFocused] = useState<string | null>(null);
-  const [view, setView] = useState<QuotePreviewView>('pdf');
-  const [openLetter, setOpenLetter] = useState<QuoteLetterRef | null>(null);
+  const previewState = useQuoteSettingsPreview();
+  const { form, focused, view, openLetter, setView, openLetterRow } = previewState;
   const [managerId, setManagerId] = useState<number | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
-  const form = useMemo(
-    () => ({
-      onFocusField: (path: string) => {
-        setFocused(path);
-        const next = viewOf(path);
-        if (next) setView(next);
-      },
-    }),
-    [],
-  );
   const { draft, saved, errors } = editor;
 
   if (editor.loading)
@@ -89,10 +69,6 @@ export default function QuoteSettingsPage() {
       </Alert>
     );
 
-  const openLetterRow = (letter: QuoteLetterRef | null) => {
-    setOpenLetter(letter);
-    if (letter) setView('letter');
-  };
   const save = async () => {
     if (await editor.save()) return;
     const first = quoteSettingsSections.find(
@@ -178,7 +154,7 @@ export default function QuoteSettingsPage() {
           onGoTo={sections.goTo}
           onDiscard={() => {
             editor.discard();
-            setFocused(null);
+            previewState.clearFocus();
           }}
           onSave={() => void save()}
         />

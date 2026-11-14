@@ -2,13 +2,6 @@ import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
 import { usePageRights } from '@admin/shared/ui';
 import { useGetFabricMovementsQuery, useGetFabricStockQuery } from '@admin/warehouse/data-access';
 import {
-  defaultFabricMovementQuery,
-  kyivToday,
-  movementFilterOf,
-  movementPeriodRange,
-  withMovementFilter,
-} from '@admin/warehouse/model';
-import {
   FabricMovementFilters,
   FabricMovementPager,
   FabricMovementsTable,
@@ -21,8 +14,7 @@ import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined';
 import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
 import RemoveOutlinedIcon from '@mui/icons-material/RemoveOutlined';
 import { Box, Button, Stack } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useState } from 'react';
 
 import { IssueToItemDrawer } from '../../components/item-issue/issue-to-item-drawer';
 import { FabricMovementDrawer } from '../../components/movements/fabric-movement-drawer';
@@ -31,15 +23,11 @@ import { FabricMovementHistoryDrawer } from '../../components/movements/fabric-m
 import { FabricIssueDrawer } from '../../components/operations/fabric-issue-drawer';
 import { FabricOpeningDrawer } from '../../components/operations/fabric-opening-drawer';
 import { FabricReceiptDrawer } from '../../components/operations/fabric-receipt-drawer';
-import { useDebouncedValue } from '../../hooks/debounce/use-debounced-value';
 import { useMovementCancel } from '../../hooks/movements/use-movement-cancel';
+import { useMovementFilters } from '../../hooks/movements/use-movement-filters';
 import { useMovementsExport } from '../../hooks/movements/use-movements-export';
 
-import type {
-  FabricMovementQuery,
-  FabricMovementRow,
-  MovementPeriod,
-} from '@admin/warehouse/model';
+import type { FabricMovementRow } from '@admin/warehouse/model';
 
 type Panel =
   | { kind: 'receipt' | 'issue' | 'item-issue' | 'opening' }
@@ -50,24 +38,10 @@ type Panel =
  * one search, the kind chips and the period. A row opens its side panel with the actions it allows.
  */
 export function FabricMovementsPage() {
-  const [params] = useSearchParams();
-  const [query, setQuery] = useState<FabricMovementQuery>(() => ({
-    ...defaultFabricMovementQuery,
-    kind: movementFilterOf(params.get('kind')),
-    search: params.get('search')?.trim() ?? '',
-  }));
-  const [search, setSearch] = useState(() => params.get('search') ?? '');
-  const [period, setPeriod] = useState<MovementPeriod>('all');
+  const filters = useMovementFilters();
+  const { query } = filters;
   const [panel, setPanel] = useState<Panel | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-  const typed = useDebouncedValue(search.trim());
-  useEffect(
-    () =>
-      setQuery((current) =>
-        current.search === typed ? current : withMovementFilter(current, { search: typed }),
-      ),
-    [typed],
-  );
   const movements = useGetFabricMovementsQuery(query);
   const stock = useGetFabricStockQuery();
   const saved = (text: string) => {
@@ -83,13 +57,6 @@ export function FabricMovementsPage() {
   // New operations need «Створення»; changing, cancelling or restoring a movement needs «Редагування».
   const canMove = canMoveStock && rights.canCreate;
   const canChange = canMoveStock && rights.canEdit;
-  const filtered = Boolean(query.search || query.from || query.to || query.kind !== 'All');
-  const choosePeriod = (value: MovementPeriod) => {
-    setPeriod(value);
-    if (value !== 'custom')
-      setQuery((current) => withMovementFilter(current, movementPeriodRange(value, kyivToday())));
-  };
-
   return (
     <Box sx={{ minWidth: 0 }}>
       <ReferencePageHeader
@@ -154,18 +121,18 @@ export function FabricMovementsPage() {
       />
       <FabricMovementFilters
         query={query}
-        search={search}
+        search={filters.search}
         counts={movements.data?.counts ?? null}
-        period={period}
-        onSearch={setSearch}
-        onChange={(change) => setQuery((current) => withMovementFilter(current, change))}
-        onPeriod={choosePeriod}
+        period={filters.period}
+        onSearch={filters.setSearch}
+        onChange={filters.change}
+        onPeriod={filters.choosePeriod}
       />
       {movements.data && (
         <>
           <FabricMovementsTable
             rows={movements.data.rows}
-            filtered={filtered}
+            filtered={filters.filtered}
             onOpen={(row) => setPanel({ kind: 'movement', row })}
           />
           <FabricMovementPager
@@ -174,7 +141,7 @@ export function FabricMovementsPage() {
             total={movements.data.total}
             shown={movements.data.rows.length}
             disabled={movements.isFetching}
-            onPage={(page) => setQuery((current) => ({ ...current, page }))}
+            onPage={filters.setPage}
           />
         </>
       )}
