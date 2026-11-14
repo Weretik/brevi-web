@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
 import { quoteDraftErrors } from './quote-draft-validation';
-import { catalogItemDraft, emptyQuoteDraft, oneOffItemDraft } from '../mappers/quote-draft-mapper';
+import { catalogItemDraft, emptyQuoteDraft, oneOffItemDraft } from '../mappers/editor/quote-draft-mapper';
 
 import type { QuoteCatalogProduct } from '../entities/quote-catalog';
-import type { QuoteDraft, QuoteItemDraft } from '../models/quote-draft';
+import type { QuoteDraft, QuoteItemDraft } from '../forms/editor/quote-draft';
 
 const ppe: QuoteCatalogProduct = {
   productId: 7,

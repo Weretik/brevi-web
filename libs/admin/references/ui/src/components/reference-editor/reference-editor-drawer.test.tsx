@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { ReferenceEditorDrawer } from './reference-editor-drawer';
+import { ReferenceEditorDrawer } from '../../panels/reference-editor/reference-editor-drawer';
 
 describe('ReferenceEditorDrawer', () => {
   it('exposes read-only content and switches to editing through its callback', () => {

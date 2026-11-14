@@ -1,5 +1,5 @@
 import type { ImportFileResult } from './production-import-file';
-import type { WorkshopArchiveImportRow } from '../entities/workshop-archive';
+import type { WorkshopArchiveImportRow } from '../entities/reports/workshop-archive';
 
 const isText = (value: unknown): value is string =>
   typeof value === 'string' && value.trim() !== '';

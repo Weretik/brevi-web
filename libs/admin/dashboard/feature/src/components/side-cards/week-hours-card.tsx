@@ -3,7 +3,7 @@ import { Link as RouterLink } from 'react-router-dom';
 
 import { numericTextSx } from '../../model/numeric-text';
 
-import type { WeekHours } from '../../model/dashboard-view';
+import type { WeekHours } from '../../model/desk-views/dashboard-view';
 
 interface WeekHoursCardProps {
   rows: readonly WeekHours[];

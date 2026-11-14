@@ -4,9 +4,9 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { Alert, Box, Button, CircularProgress, LinearProgress, Stack } from '@mui/material';
 import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 
-import { ProductionOrderCreateHeader } from '../../components/orders/production-order-create-header';
-import { ProductionOrderCreateLine } from '../../components/orders/production-order-create-line';
-import { useProductionOrderCreate } from '../../hooks/orders/use-production-order-create';
+import { ProductionOrderCreateHeader } from '../../components/order-create/production-order-create-header';
+import { ProductionOrderCreateLine } from '../../components/order-create/production-order-create-line';
+import { useProductionOrderCreate } from '../../hooks/order-editor/use-production-order-create';
 
 import type { ProductionOrderActor } from '@admin/production/model';
 

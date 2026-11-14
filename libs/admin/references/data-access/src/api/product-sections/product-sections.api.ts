@@ -1,8 +1,8 @@
 import { adminApi, toAdminApiError } from '@admin/shared/api-client';
 
+import { referenceErrorMessages } from '../../errors/reference-error-messages';
 import { mapProductSections } from '../../mappers/product-sections/product-sections.mapper';
 import { parseProductSectionsResponse } from '../../validators/product-sections/product-sections-response';
-import { referenceErrorMessages } from '../shared/reference-api.shared';
 
 import type {
   CreateProductSectionBody,

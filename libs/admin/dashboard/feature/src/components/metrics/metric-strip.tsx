@@ -2,7 +2,7 @@ import { Box, Paper, Typography } from '@mui/material';
 
 import { numericTextSx } from '../../model/numeric-text';
 
-import type { DashboardMetric } from '../../model/dashboard-view';
+import type { DashboardMetric } from '../../model/desk-views/dashboard-view';
 
 interface MetricStripProps {
   metrics: readonly DashboardMetric[];

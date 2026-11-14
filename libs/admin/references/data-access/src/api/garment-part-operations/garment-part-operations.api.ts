@@ -1,5 +1,7 @@
 import { adminApi, toAdminApiError } from '@admin/shared/api-client';
 
+import { productPricesTag } from '../../cache/product-prices-tag';
+import { referenceErrorMessages } from '../../errors/reference-error-messages';
 import {
   mapGarmentPartOperations,
   mapOperationLabourRates,
@@ -8,7 +10,6 @@ import {
   parseGarmentPartOperationsResponse,
   parseSewingSettingsResponse,
 } from '../../validators/garment-part-operations/garment-part-operations-response';
-import { referenceErrorMessages, productPricesTag } from '../shared/reference-api.shared';
 
 import type {
   CreateGarmentPartOperationBody,

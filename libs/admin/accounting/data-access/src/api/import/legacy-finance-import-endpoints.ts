@@ -5,8 +5,8 @@ import {
   financeMovementTags,
 } from '../../cache/accounting-tags';
 import { accountingApiError } from '../../errors/accounting-api-error';
-import { compressFinanceFile } from '../../files/compress-finance-file';
 import { mapLegacyFinanceImportReport } from '../../mappers/accounting-import.mapper';
+import { compressFinanceFile } from '../files/compress-finance-file';
 
 import type { AccountingEndpointBuilder } from '../accounting-endpoint-builder';
 import type { LegacyFinanceImportReport } from '@admin/accounting/model';

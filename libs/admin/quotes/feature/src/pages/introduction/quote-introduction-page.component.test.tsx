@@ -22,6 +22,7 @@ const product = (id: number, season = 'Літо'): QuoteCatalogProduct => ({
       sku: `S-${id}`,
       title: `Тканина ${id}`,
       fabricInfo: null,
+      fabricId: null,
       prices: { retail: null, wholesale: null, large: 1000 + id },
       problem: null,
     },

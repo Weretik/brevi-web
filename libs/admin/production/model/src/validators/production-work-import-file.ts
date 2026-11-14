@@ -1,5 +1,5 @@
 import type { ImportFileResult } from './production-import-file';
-import type { ProductionWorkImportFile } from '../entities/production-work';
+import type { ProductionWorkImportFile } from '../entities/work/production-work';
 
 /**
  * production-work.json from the old «Цех»: one object with the work records.

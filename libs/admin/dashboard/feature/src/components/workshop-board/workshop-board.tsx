@@ -4,7 +4,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { WorkshopOrderCard } from './workshop-order-card';
 import { numericTextSx } from '../../model/numeric-text';
 
-import type { WorkshopStage } from '../../model/dashboard-view';
+import type { WorkshopStage } from '../../model/desk-views/dashboard-view';
 
 interface WorkshopBoardProps {
   stages: readonly WorkshopStage[];

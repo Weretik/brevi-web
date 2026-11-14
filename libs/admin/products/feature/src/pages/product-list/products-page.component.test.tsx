@@ -48,6 +48,8 @@ const row = (
   currentSiteUrl: id === 1 ? 'https://brevi.com.ua/specodyag-litnij/kostyum-verde' : null,
   quoteDescription: 'Костюм із курткою та штанами.',
   updatedAtUtc: '2026-11-03T10:00:00Z',
+  mainPhotoUrl: null,
+  mainPhotoFullUrl: null,
   prices: null,
   pricesUpdatedAt: null,
   problems: [],

@@ -1,8 +1,9 @@
 import { adminApi, toAdminApiError } from '@admin/shared/api-client';
 
+import { productPricesTag } from '../../cache/product-prices-tag';
+import { referenceErrorMessages } from '../../errors/reference-error-messages';
 import { mapPpeMarkupRules } from '../../mappers/pricing-parameters/pricing-parameters.mapper';
 import { parsePpeMarkupRulesResponse } from '../../validators/pricing-parameters/pricing-parameters-response';
-import { referenceErrorMessages, productPricesTag } from '../shared/reference-api.shared';
 
 import type {
   CreatePpeMarkupRuleBody,

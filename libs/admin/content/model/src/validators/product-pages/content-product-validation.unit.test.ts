@@ -20,6 +20,7 @@ const empty = {
 const values = (changes: Partial<ContentProductFormValues> = {}): ContentProductFormValues => ({
   slug: 'kostyum-lider',
   showOnSite: true,
+  categoryIds: null,
   uk: empty,
   ru: empty,
   ...changes,

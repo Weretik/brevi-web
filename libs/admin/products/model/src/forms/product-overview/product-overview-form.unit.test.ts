@@ -16,6 +16,8 @@ const sewing: ProductOverview = {
   currentSiteUrl: 'https://brevi.com.ua/specodyag-litnij/kostyum-verde',
   quoteDescription: 'Костюм із курткою та штанами.',
   updatedAtUtc: '2026-11-03T10:00:00Z',
+  mainPhotoUrl: null,
+  mainPhotoFullUrl: null,
   prices: null,
   pricesUpdatedAt: null,
   problems: [],

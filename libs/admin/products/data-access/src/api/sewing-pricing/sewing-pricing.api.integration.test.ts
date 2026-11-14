@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { sewingCalculationsApi } from './calculations.api';
 import { publishedSewingProductsApi } from './products.api';
 import { sewingPublicationsApi } from './publications.api';
-import { sewingCalculationFixture } from '../../test-fixtures/sewing-pricing/sewing-calculation.fixture';
+import { sewingCalculationFixture } from '../../testing/sewing-pricing/sewing-calculation.fixture';
 
 const store = createAdminApiStore();
 afterEach(() => {

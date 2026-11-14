@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { mapPublishedSewingProducts } from './published-sewing-products.mapper';
 import { mapSewingCalculation } from './sewing-calculation.mapper';
-import { sewingCalculationFixture } from '../../test-fixtures/sewing-pricing/sewing-calculation.fixture';
+import { sewingCalculationFixture } from '../../testing/sewing-pricing/sewing-calculation.fixture';
 
 describe('Sewing pricing response boundary', () => {
   it('maps the retained server breakdown without recalculating it', () => {

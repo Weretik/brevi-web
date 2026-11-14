@@ -7,15 +7,15 @@ import { useGetQuotePeriodQuery } from '@admin/quotes/data-access';
 import { useGetFabricBookingQuery, useGetHardwareOrderQuery } from '@admin/warehouse/data-access';
 import { Stack } from '@mui/material';
 
-import { mainCurrency, monthSoFar } from '../../model/accounting-view';
-import { attentionList, mainMetrics, managerLines } from '../../model/main-view';
+import { mainCurrency, monthSoFar } from '../../model/desk-views/accounting-view';
+import { attentionList, mainMetrics, managerLines } from '../../model/desk-views/main-view';
 import { fabricShortages, hardwareToOrder } from '../../model/stock-shortages';
 import { DeskGrid } from '../desk-grid/desk-grid';
 import { DeskListCard } from '../desk-list/desk-list-card';
 import { MetricStrip } from '../metrics/metric-strip';
 
-import type { DashboardViewer } from '../../model/dashboard-view';
 import type { DeskList } from '../../model/desk-list';
+import type { DashboardViewer } from '../../model/desk-views/dashboard-view';
 
 interface MainDeskProps {
   viewer: DashboardViewer;

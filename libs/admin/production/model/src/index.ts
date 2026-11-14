@@ -2,8 +2,8 @@ export {
   WORKSHOP_EMPLOYEE_NAME_MAX_LENGTH,
   WORKSHOP_EMPLOYEE_POSITION_MAX_LENGTH,
   workshopPositions,
-} from './entities/workshop-employee';
-export type { WorkshopEmployee, WorkshopEmployeeDraft } from './entities/workshop-employee';
+} from './entities/people/workshop-employee';
+export type { WorkshopEmployee, WorkshopEmployeeDraft } from './entities/people/workshop-employee';
 export {
   FABRIC_NORM_DECIMALS,
   FABRIC_NORM_MAX_METERS,
@@ -11,58 +11,58 @@ export {
   fabricNormFieldShortLabels,
   fabricNormFields,
   fabricNormModelCaption,
-} from './entities/fabric-norm';
+} from './entities/norms/fabric-norm';
 export {
   compositionLineKindLabels,
   compositionLineKinds,
   compositionUnitLabels,
   compositionUnits,
-} from './entities/model-composition';
+} from './entities/norms/model-composition';
 export type {
   CompositionLineKind,
   CompositionUnit,
   ModelComposition,
   ModelCompositionLine,
   ModelLayer,
-} from './entities/model-composition';
+} from './entities/norms/model-composition';
 export {
   compositionMaterialText,
   formatCompositionQuantity,
-} from './queries/model-composition-filters';
+} from './queries/norms/model-composition-filters';
 export {
   BATCH_SIZE_MAX,
   compositionRest,
   fabricNormVariants,
   forBatch,
   parseBatchSize,
-} from './queries/model-work-card';
-export type { FabricNormPart, FabricNormVariant } from './queries/model-work-card';
-export type { FabricNormField, FabricNormRow, FabricNormValues } from './entities/fabric-norm';
+} from './queries/norms/model-work-card';
+export type { FabricNormPart, FabricNormVariant } from './queries/norms/model-work-card';
+export type { FabricNormField, FabricNormRow, FabricNormValues } from './entities/norms/fabric-norm';
 export type {
   FabricNormImportRow,
   ProductionImportAction,
   ProductionImportLine,
   ProductionImportResult,
   WorkshopStaffImportRow,
-} from './entities/production-import';
+} from './entities/orders/production-import';
 export {
   createWorkshopEmployeeDraft,
   validateWorkshopEmployee,
   workshopEmployeeBody,
-} from './forms/workshop-employee-form';
-export type { WorkshopEmployeeErrors, WorkshopEmployeeField } from './forms/workshop-employee-form';
+} from './forms/people/workshop-employee-form';
+export type { WorkshopEmployeeErrors, WorkshopEmployeeField } from './forms/people/workshop-employee-form';
 export {
   createFabricNormFormValues,
   fabricNormBody,
   fabricNormTotal,
   parseMeters,
   validateFabricNorm,
-} from './forms/fabric-norm-form';
-export type { FabricNormErrors, FabricNormFormValues } from './forms/fabric-norm-form';
-export { countWorkshopPositions, filterWorkshopStaff } from './queries/workshop-staff-filters';
-export type { WorkshopStaffStatus } from './queries/workshop-staff-filters';
-export { countFabricNorms, filterFabricNorms } from './queries/fabric-norm-filters';
-export type { FabricNormFilter } from './queries/fabric-norm-filters';
+} from './forms/norms/fabric-norm-form';
+export type { FabricNormErrors, FabricNormFormValues } from './forms/norms/fabric-norm-form';
+export { countWorkshopPositions, filterWorkshopStaff } from './queries/people/workshop-staff-filters';
+export type { WorkshopStaffStatus } from './queries/people/workshop-staff-filters';
+export { countFabricNorms, filterFabricNorms } from './queries/norms/fabric-norm-filters';
+export type { FabricNormFilter } from './queries/norms/fabric-norm-filters';
 export {
   formatDay,
   formatMeters,
@@ -87,7 +87,7 @@ export {
   itemApplicationKindLabels,
   productionOrderStatusLabels,
   reportPriceTierLabels,
-} from './entities/production-order';
+} from './entities/orders/production-order';
 export type {
   CreateProductionOrderBody,
   ItemApplication,
@@ -124,7 +124,7 @@ export type {
   ProductionQuoteSource,
   ReportPriceTier,
   UpdateProductionOrderBody,
-} from './entities/production-order';
+} from './entities/orders/production-order';
 export {
   createProductionItemFormValues,
   embroideryLinkLabel,
@@ -134,14 +134,14 @@ export {
   plannedFabricMeters,
   productionItemDetails,
   validateProductionItem,
-} from './forms/production-item-form';
+} from './forms/orders/production-item-form';
 export type {
   ItemApplicationFormValues,
   ItemEmbroideryLink,
   ProductionItemErrors,
   ProductionItemField,
   ProductionItemFormValues,
-} from './forms/production-item-form';
+} from './forms/orders/production-item-form';
 export {
   createOrderBody,
   createOrderFormValues,
@@ -151,29 +151,29 @@ export {
   updateOrderBody,
   validateCreateOrder,
   validateOrderHeader,
-} from './forms/production-order-form';
+} from './forms/orders/production-order-form';
 export type {
   CreateOrderErrors,
   CreateOrderFormValues,
   CreateOrderLine,
   ProductionOrderHeaderErrors,
   ProductionOrderHeaderValues,
-} from './forms/production-order-form';
-export { productionOrdersCsv } from './queries/production-orders-csv';
+} from './forms/orders/production-order-form';
+export { productionOrdersCsv } from './queries/orders/production-orders-csv';
 export {
   PRODUCTION_DUE_SOON_DAYS,
   dueState,
   orderModelsText,
   orderStageSpread,
   ordersWord,
-} from './queries/production-order-row';
-export type { DueState } from './queries/production-order-row';
-export { itemsWord, productionOrderOverview } from './queries/production-order-overview';
-export { itemStageSteps, nextItemStage } from './queries/production-item-steps';
+} from './queries/orders/production-order-row';
+export type { DueState } from './queries/orders/production-order-row';
+export { itemsWord, productionOrderOverview } from './queries/orders/production-order-overview';
+export { itemStageSteps, nextItemStage } from './queries/orders/production-item-steps';
 export type {
   ProductionDueItem,
   ProductionOrderOverview,
-} from './queries/production-order-overview';
+} from './queries/orders/production-order-overview';
 export {
   activeProductionOrderFilters,
   addModelSummarySortLevel,
@@ -182,12 +182,12 @@ export {
   modelSummarySortFields,
   moveModelSummarySortLevel,
   sortModelSummary,
-} from './queries/model-summary-sort';
+} from './queries/orders/model-summary-sort';
 export type {
   ModelSummarySortDirection,
   ModelSummarySortField,
   ModelSummarySortLevel,
-} from './queries/model-summary-sort';
+} from './queries/orders/model-summary-sort';
 export { parseProductionOrderImportFile } from './validators/production-order-import-file';
 export {
   PRODUCTION_FILE_MAX_BYTES,
@@ -198,7 +198,7 @@ export {
   productionStageLabels,
   productionStages,
   toggleStage,
-} from './entities/production-tracking';
+} from './entities/orders/production-tracking';
 export type {
   CreateProductionShipmentBody,
   ProductionFileKind,
@@ -212,36 +212,36 @@ export type {
   WorkshopSettings,
   WorkshopSettingsBody,
   WorkshopTelegramChat,
-} from './entities/production-tracking';
+} from './entities/orders/production-tracking';
 export {
   createShipmentFormValues,
   shipmentBody,
   validateCancelReason,
   validateShipment,
-} from './forms/production-shipment-form';
+} from './forms/orders/production-shipment-form';
 export type {
   ProductionShipmentErrors,
   ProductionShipmentFormValues,
-} from './forms/production-shipment-form';
+} from './forms/orders/production-shipment-form';
 export { parseProductionProgressImportFile } from './validators/production-progress-import-file';
 export { parseProductionReportPriceImportFile } from './validators/production-report-price-import-file';
 export {
   validateWorkshopSettings,
   workshopSettingsBody,
   workshopSettingsFormValues,
-} from './forms/workshop-settings-form';
+} from './forms/settings/workshop-settings-form';
 export type {
   WorkshopSettingsErrors,
   WorkshopSettingsFormValues,
-} from './forms/workshop-settings-form';
-export { validateStockReason } from './forms/stock-reason';
+} from './forms/settings/workshop-settings-form';
+export { validateStockReason } from './forms/orders/stock-reason';
 export {
   PRODUCTION_WORK_COMMENT_MAX_LENGTH,
   PRODUCTION_WORK_MAX_QUANTITY,
   PRODUCTION_WORK_REASON_MAX_LENGTH,
   productionWorkKindLabels,
   productionWorkKinds,
-} from './entities/production-work';
+} from './entities/work/production-work';
 export type {
   CreateProductionWorkBody,
   ProductionItemWorkCard,
@@ -253,7 +253,7 @@ export type {
   WorkItemChoice,
   WorkLog,
   WorkLogQuery,
-} from './entities/production-work';
+} from './entities/work/production-work';
 export {
   createProductionWorkValues,
   formatWorkMonth,
@@ -264,22 +264,22 @@ export {
   workLeft,
   workMonth,
   workTarget,
-} from './forms/production-work-form';
-export type { ProductionWorkErrors, ProductionWorkFormValues } from './forms/production-work-form';
+} from './forms/work/production-work-form';
+export type { ProductionWorkErrors, ProductionWorkFormValues } from './forms/work/production-work-form';
 export { parseProductionWorkImportFile } from './validators/production-work-import-file';
 export {
   forecastReasonLabels,
   forecastReasons,
   forecastStatuses,
-} from './entities/sewing-forecast';
+} from './entities/reports/sewing-forecast';
 export type {
   ForecastReason,
   ForecastRow,
   ForecastSettings,
   ForecastStatus,
   SewingForecast,
-} from './entities/sewing-forecast';
-export { TIMESHEET_MAX_MINUTES, TIMESHEET_STEP_MINUTES } from './entities/workshop-timesheet';
+} from './entities/reports/sewing-forecast';
+export { TIMESHEET_MAX_MINUTES, TIMESHEET_STEP_MINUTES } from './entities/people/workshop-timesheet';
 export type {
   SaveTimesheetDayBody,
   TimesheetChange,
@@ -289,7 +289,7 @@ export type {
   TimesheetMonthDay,
   TimesheetMonthEmployee,
   TimesheetRow,
-} from './entities/workshop-timesheet';
+} from './entities/people/workshop-timesheet';
 export {
   fillUnmarked,
   formatHours,
@@ -297,8 +297,8 @@ export {
   parseHours,
   shiftDay,
   timesheetDraftState,
-} from './forms/timesheet-form';
-export type { TimesheetDraft, TimesheetDraftState } from './forms/timesheet-form';
+} from './forms/people/timesheet-form';
+export type { TimesheetDraft, TimesheetDraftState } from './forms/people/timesheet-form';
 export {
   PAYROLL_COMMENT_MAX_LENGTH,
   PAYROLL_MAX_AMOUNT,
@@ -306,7 +306,7 @@ export {
   PAYROLL_REASON_MAX_LENGTH,
   payrollPaymentKindLabels,
   payrollPaymentKinds,
-} from './entities/payroll';
+} from './entities/people/payroll';
 export type {
   CreatePayrollAdjustmentBody,
   CreatePayrollPaymentBody,
@@ -324,7 +324,7 @@ export type {
   PayrollYear,
   PayrollYearMonth,
   PayrollYearRow,
-} from './entities/payroll';
+} from './entities/people/payroll';
 export {
   createPayrollAdjustmentValues,
   createPayrollPaymentValues,
@@ -337,16 +337,16 @@ export {
   validatePayrollAdjustment,
   validatePayrollPayment,
   validatePayrollReason,
-} from './forms/payroll-forms';
+} from './forms/people/payroll-forms';
 export type {
   PayrollAdjustmentErrors,
   PayrollAdjustmentFormValues,
   PayrollAdjustmentSign,
   PayrollPaymentErrors,
   PayrollPaymentFormValues,
-} from './forms/payroll-forms';
-export { payrollCsv } from './queries/payroll-csv';
-export { WORKSHOP_REPORT_MAX_MONTHS } from './entities/workshop-report';
+} from './forms/people/payroll-forms';
+export { payrollCsv } from './queries/people/payroll-csv';
+export { WORKSHOP_REPORT_MAX_MONTHS } from './entities/reports/workshop-report';
 export type {
   ReportIssueRow,
   ReportOutputRow,
@@ -360,20 +360,20 @@ export type {
   WorkshopReportPair,
   WorkshopReportQuery,
   WorkshopReportTotals,
-} from './entities/workshop-report';
+} from './entities/reports/workshop-report';
 export {
   previousReportPeriod,
   reportMonthCount,
   reportPeriodLabel,
   reportPeriodProblem,
-} from './forms/workshop-report-period';
-export { workshopArchiveKindLabels } from './entities/workshop-archive';
+} from './forms/reports/workshop-report-period';
+export { workshopArchiveKindLabels } from './entities/reports/workshop-archive';
 export type {
   WorkshopArchiveImportRow,
   WorkshopArchiveKind,
   WorkshopArchivePage,
   WorkshopArchiveQuery,
   WorkshopArchiveRow,
-} from './entities/workshop-archive';
+} from './entities/reports/workshop-archive';
 export { parseWorkshopArchiveImportFile } from './validators/workshop-archive-import-file';
-export type { WorkshopPeopleAccess } from './entities/workshop-people-access';
+export type { WorkshopPeopleAccess } from './entities/people/workshop-people-access';

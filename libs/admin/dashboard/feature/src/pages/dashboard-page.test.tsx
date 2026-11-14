@@ -41,6 +41,8 @@ const pair = (fabricName: string, color: string, toOrder: number, shortage: numb
   fabricCode: fabricName,
   fabricName,
   color,
+  supplier: null,
+  needBy: null,
   stock: 0,
   need: 0,
   reserved: 0,
@@ -61,6 +63,7 @@ const booking: BookingReport = {
   ],
   unknown: [],
   calculatedAt: '2026-11-11T10:00:00Z',
+  canReceive: false,
 };
 
 const hardware: HardwareReport = {
@@ -74,6 +77,7 @@ const hardware: HardwareReport = {
       note: null,
       unit: 'Piece',
       quantity: 120,
+      dueDate: null,
       orders: [],
     },
   ],

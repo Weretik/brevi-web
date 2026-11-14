@@ -1,5 +1,5 @@
+import type { Product } from '../../entities/product-list/product';
 import type { PublishedSewingProduct } from '../../entities/sewing-pricing/published-sewing-product';
-import type { Product } from '../../product-list/product';
 
 export function applyPublishedSewingPrice<T extends Product>(
   product: T,

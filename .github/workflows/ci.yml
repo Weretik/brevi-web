@@ -23,6 +23,7 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck:tests:web
       - run: npm run test:web
+      - run: npm run check:admin-libs
       - run: npx nx build admin-react --configuration=production
       - run: npx nx build storefront --configuration=production
       - run: npm run lint:site

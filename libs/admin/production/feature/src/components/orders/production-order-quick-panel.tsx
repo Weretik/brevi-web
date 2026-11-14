@@ -11,10 +11,10 @@ import { Alert, Box, LinearProgress } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { useProductionOrder } from '../../hooks/orders/use-production-order';
+import { useProductionOrder } from '../../hooks/order-editor/use-production-order';
 import { useProductionItemTracking } from '../../hooks/tracking/use-production-item-tracking';
 
-import type { PendingStage } from '../../hooks/orders/use-production-item-panel';
+import type { PendingStage } from '../../hooks/order-items/use-production-item-panel';
 import type { ProductionItem, ProductionOrder, ProductionStage } from '@admin/production/model';
 
 interface Props {

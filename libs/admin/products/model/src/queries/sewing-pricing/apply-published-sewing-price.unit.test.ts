@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import { applyPublishedSewingPrice } from './apply-published-sewing-price';
 
+import type { Product } from '../../entities/product-list/product';
 import type { PublishedSewingProduct } from '../../entities/sewing-pricing/published-sewing-product';
-import type { Product } from '../../product-list/product';
 
 const product: Product = {
   id: 42,

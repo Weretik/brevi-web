@@ -20,7 +20,7 @@ The owner asked (2026-11-04) for product photos that quotes (КП) show, the old
 - `libs/admin/products/model/src/{entities,validators,mappers}/product-photos/`, `ordering/move-photo.ts` — types, file reading, report sum, moving.
 - `libs/admin/products/feature/src/components/product-photos/` — tab «Фото» and the import panel; hooks in `hooks/product-photos/`.
 - `libs/admin/products/feature/src/hooks/product-overview/use-product-active-switch.ts` — the switch.
-- `libs/admin/products/ui/src/components/product-overview/product-overview-grid.tsx` (columns «Фото», «Активний»), `product-overview-section-chips.tsx` (chips), `sewing-card/sewing-card-header.tsx` (switch).
+- `libs/admin/products/ui/src/tables/product-overview/product-overview-grid.tsx` (columns «Фото», «Активний»), `product-overview-section-chips.tsx` (chips), `sewing-card/sewing-card-header.tsx` (switch).
 
 ## Tests
 

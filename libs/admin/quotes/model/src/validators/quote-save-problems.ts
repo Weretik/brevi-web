@@ -1,7 +1,7 @@
-import { quoteIntroSeasonLabels } from '../models/quote-intro-draft';
+import { quoteIntroSeasonLabels } from '../forms/introduction/quote-intro-draft';
 
-import type { QuoteDraft } from '../models/quote-draft';
-import type { QuoteIntroDraft } from '../models/quote-intro-draft';
+import type { QuoteDraft } from '../forms/editor/quote-draft';
+import type { QuoteIntroDraft } from '../forms/introduction/quote-intro-draft';
 
 /** One reason a КП cannot be saved; `target` is where the page scrolls to fix it. */
 export interface QuoteSaveProblem {

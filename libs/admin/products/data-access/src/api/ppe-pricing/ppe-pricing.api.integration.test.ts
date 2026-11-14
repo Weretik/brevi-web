@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ppeOfferVersionsApi } from './offers.api';
 import { ppeProductPricesApi } from './products.api';
-import { ppePricingFixture } from '../../test-fixtures/ppe-pricing/ppe-pricing.fixture';
+import { ppePricingFixture } from '../../testing/ppe-pricing/ppe-pricing.fixture';
 
 const store = createAdminApiStore();
 afterEach(() => {

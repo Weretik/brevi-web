@@ -1,7 +1,7 @@
 import type { CustomerContact } from '../entities/contacts/customer-contact';
 import type { CustomerDetail } from '../entities/customers/customer-detail';
-import type { ContactDraft } from '../models/contact-draft';
-import type { CustomerDraft } from '../models/customer-draft';
+import type { ContactDraft } from '../forms/contact-draft';
+import type { CustomerDraft } from '../forms/customer-draft';
 
 export function customerDraft(customer?: CustomerDetail): CustomerDraft {
   return {

@@ -3,7 +3,7 @@ import { Link as RouterLink } from 'react-router-dom';
 
 import { numericTextSx } from '../../model/numeric-text';
 
-import type { WorkshopOrder } from '../../model/dashboard-view';
+import type { WorkshopOrder } from '../../model/desk-views/dashboard-view';
 
 const visuallyHiddenSx = {
   border: 0,

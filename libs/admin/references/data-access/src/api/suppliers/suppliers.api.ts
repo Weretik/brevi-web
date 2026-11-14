@@ -1,9 +1,9 @@
 import { adminApi, toAdminApiError } from '@admin/shared/api-client';
 
+import { referenceErrorMessages } from '../../errors/reference-error-messages';
 import { mapSuppliers } from '../../mappers/suppliers/suppliers.mapper';
 import { parseSupplierKeepinSyncResponse } from '../../validators/suppliers/supplier-keepin-sync-response';
 import { parseSuppliersResponse } from '../../validators/suppliers/suppliers-response';
-import { referenceErrorMessages } from '../shared/reference-api.shared';
 
 import type { SupplierDraft, SupplierKeepinSyncResult } from '@admin/references/model';
 import type { operations } from '@admin/shared/contracts';

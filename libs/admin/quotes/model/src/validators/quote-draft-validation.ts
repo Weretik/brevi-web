@@ -1,12 +1,12 @@
-import { parseQuotePrice } from '../mappers/quote-price-text';
-import { quoteTiers } from '../models/quote-draft';
+import { quoteTiers } from '../forms/editor/quote-draft';
+import { parseQuotePrice } from '../mappers/editor/quote-price-text';
 
 import type {
   QuoteDraft,
   QuoteItemDraft,
   QuoteOptionDraft,
   QuotePriceDraft,
-} from '../models/quote-draft';
+} from '../forms/editor/quote-draft';
 
 export const quoteNameMaxLength = 200;
 export const quoteTextMaxLength = 4000;

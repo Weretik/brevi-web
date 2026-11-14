@@ -51,7 +51,7 @@ The base React harness is already configured in `apps/admin-react`. For a new li
 - `*.integration.test.ts` or `*.integration.test.tsx` — state, data fetching, routing, and browser boundaries.
 - `*.spec.ts` in `apps/admin-react-e2e` — browser E2E journeys.
 
-Top-level commands: `npm run test:web`, `npm run test:web:coverage`, `npm run test:web:e2e`, and `npm run typecheck:tests`. Individual empty test levels may pass through `--passWithNoTests`, but readiness requires at least one actual behavioral or infrastructure test.
+Top-level commands: `npm run test:web` (the `admin-react` app only), `npm run check:admin-libs` (lint, typecheck, test typecheck and tests of every Admin library; CI runs it since 2026-11-14, before that library tests ran only locally and some fixtures went stale), `npm run test:web:coverage`, `npm run test:web:e2e`, and `npm run typecheck:tests`. Individual empty test levels may pass through `--passWithNoTests`, but readiness requires at least one actual behavioral or infrastructure test.
 
 ## Red → Green → Refactor → Regression
 

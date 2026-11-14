@@ -1,6 +1,8 @@
 import { adminApi, toAdminApiError } from '@admin/shared/api-client';
 
 import { compressPriceFile } from './compress-price-file';
+import { productPricesTag } from '../../cache/product-prices-tag';
+import { referenceErrorMessages } from '../../errors/reference-error-messages';
 import {
   mapPriceImportResult,
   mapPriceSources,
@@ -9,7 +11,6 @@ import {
   parsePriceImportResponse,
   parsePriceSourcesResponse,
 } from '../../validators/price-import/price-import-response';
-import { productPricesTag, referenceErrorMessages } from '../shared/reference-api.shared';
 
 import type { UpdatePriceSourceBody } from '../../contracts/price-import/price-import-response';
 import type { PriceImportResult, PriceSourceList } from '@admin/references/model';

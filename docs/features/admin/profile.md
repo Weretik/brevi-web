@@ -59,7 +59,7 @@ libs/admin/users/
 
 - `libs/admin/users/model/src/validators/profile-rules.unit.test.ts`
 - `libs/admin/users/data-access/src/mappers/staff-profile.mapper.unit.test.ts`
-- `libs/admin/users/ui/src/profile/profile-details-card.component.test.tsx`
+- `libs/admin/users/ui/src/details/profile/profile-details-card.component.test.tsx`
 - `libs/admin/users/feature/src/errors/profile-error-message.unit.test.ts`
 - `libs/admin/shared/ui/src/data-display/user-avatar.component.test.tsx`
 - `libs/admin/core/shell/src/layout/admin-layout.component.test.tsx` (profile menu)
