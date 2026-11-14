@@ -3,27 +3,14 @@
 import { cn } from '@site/shared/ui';
 import { useState } from 'react';
 
-import {
-  findClothingSize,
-  findHeightGroup,
-  findShoeSize,
-  formatFoot,
-  range,
-} from '../data/size-chart';
+import { sizeFinderAnswers } from '../data/size-answers';
 
+import type { SizeKind } from '../data/size-answers';
 import type { Gender } from '../data/size-chart';
 import type { SizesDictionary } from '../i18n/sizes-dictionary';
 
-type Kind = 'clothing' | 'shoes';
-
 const FIELD =
   'h-11 w-full rounded-lg border border-border-strong bg-muted px-3 font-mono text-base outline-none focus-visible:ring-2 focus-visible:ring-ring';
-
-/** `"95,5"` and `"95.5"` both parse; an empty or non-positive field gives `null`. */
-function parseCm(value: string): number | null {
-  const number = Number(value.replace(',', '.'));
-  return value.trim() !== '' && Number.isFinite(number) && number > 0 ? number : null;
-}
 
 function ToggleGroup<T extends string>({
   label,
@@ -100,39 +87,16 @@ export function SizeFinder({
   initialKind = 'clothing',
 }: {
   dictionary: SizesDictionary['finder'];
-  initialKind?: Kind;
+  initialKind?: SizeKind;
 }) {
-  const [kind, setKind] = useState<Kind>(initialKind);
+  const [kind, setKind] = useState<SizeKind>(initialKind);
   const [gender, setGender] = useState<Gender>('men');
   const [chest, setChest] = useState('');
   const [height, setHeight] = useState('');
   const [foot, setFoot] = useState('');
   const { result } = dictionary;
 
-  const chestValue = parseCm(chest);
-  const heightValue = parseCm(height);
-  const footValue = parseCm(foot);
-
-  const outputs: { label: string; value: string }[] = [];
-  let outOfRange = false;
-  if (kind === 'clothing') {
-    if (chestValue !== null) {
-      const row = findClothingSize(gender, chestValue);
-      if (row) outputs.push({ label: result.size, value: row.size });
-      else outOfRange = true;
-    }
-    if (heightValue !== null) {
-      const row = findHeightGroup(gender, heightValue);
-      if (row)
-        outputs.push({ label: result.height, value: `${row.group} (${range(row.height)} см)` });
-      else outOfRange = true;
-    }
-  } else if (footValue !== null) {
-    const row = findShoeSize(footValue);
-    if (row)
-      outputs.push({ label: result.shoe, value: `${row.size} (${formatFoot(row.foot)} см)` });
-    else outOfRange = true;
-  }
+  const { outputs, outOfRange } = sizeFinderAnswers({ kind, gender, chest, height, foot }, result);
 
   return (
     <div className="grid gap-5 rounded-2xl border border-border p-5 sm:p-6">
