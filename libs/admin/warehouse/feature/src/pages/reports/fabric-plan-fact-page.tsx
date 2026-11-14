@@ -1,13 +1,10 @@
 import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
-import { useGetFabricPlanFactQuery } from '@admin/warehouse/data-access';
 import {
-  filterPlanFact,
   formatMeters,
   formatPerProduct,
   isPlanFactOverrun,
   kyivToday,
   movementPeriodRange,
-  planFactDeviation,
   planFactPeriods,
   planFactViewCounts,
   planFactViewLabels,
@@ -15,18 +12,11 @@ import {
 } from '@admin/warehouse/model';
 import { PeriodChip, PlanFactTable, ReportFilterBar, ReportStats } from '@admin/warehouse/ui';
 import { Alert, Box } from '@mui/material';
-import { useMemo, useState } from 'react';
 
 import { PlanFactModelDrawer } from '../../components/reports/plan-fact-model-drawer';
-import { useDebouncedValue } from '../../hooks/debounce/use-debounced-value';
+import { useFabricPlanFactReport } from '../../hooks/reports/use-fabric-plan-fact-report';
 
 import type { WarehouseTabProps } from '../tabs/warehouse-tab';
-import type {
-  MovementPeriod,
-  PlanFactFilter,
-  PlanFactModel,
-  PlanFactView,
-} from '@admin/warehouse/model';
 
 const percent = new Intl.NumberFormat('uk-UA', {
   maximumFractionDigits: 1,
@@ -38,21 +28,25 @@ const percent = new Intl.NumberFormat('uk-UA', {
  * products, the largest overspending first; red only above 5%. The period goes by the day of the last issue.
  */
 export function FabricPlanFactPage({ title, tabs }: WarehouseTabProps) {
-  const [period, setPeriod] = useState<MovementPeriod>('all');
-  const [filter, setFilter] = useState<PlanFactFilter>({ from: null, to: null });
-  const [search, setSearch] = useState('');
-  const debounced = useDebouncedValue(search, 200);
-  const [view, setView] = useState<PlanFactView>('all');
-  const [open, setOpen] = useState<PlanFactModel | null>(null);
-  const valid = !filter.from || !filter.to || filter.from <= filter.to;
-  const report = useGetFabricPlanFactQuery(filter, { skip: !valid });
-  const data = report.data;
-  const models = useMemo(
-    () => (data ? filterPlanFact(data.models, view, debounced) : []),
-    [data, view, debounced],
-  );
-  const total = data?.total;
-  const deviation = total ? planFactDeviation(total) : null;
+  const {
+    period,
+    setPeriod,
+    filter,
+    setFilter,
+    search,
+    setSearch,
+    debounced,
+    view,
+    setView,
+    open,
+    setOpen,
+    valid,
+    report,
+    data,
+    models,
+    total,
+    deviation,
+  } = useFabricPlanFactReport();
   return (
     <Box sx={{ minWidth: 0 }}>
       <ReferencePageHeader

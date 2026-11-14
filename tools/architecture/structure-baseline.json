@@ -1,8 +1,4 @@
 [
-  "component-state: libs/admin/warehouse/feature/src/pages/reports/fabric-booking-page.tsx",
-  "component-state: libs/admin/warehouse/feature/src/pages/reports/fabric-consumption-page.tsx",
-  "component-state: libs/admin/warehouse/feature/src/pages/reports/fabric-plan-fact-page.tsx",
-  "component-state: libs/admin/warehouse/feature/src/pages/stock/fabric-stock-page.tsx",
   "crowded-folder: libs/admin/content/data-access/src/errors",
   "crowded-folder: libs/admin/products/model/src/entities/sewing-composition",
   "crowded-folder: libs/site/home/ui/src/lib/sections",
@@ -110,7 +106,6 @@
   "long-file: libs/admin/warehouse/data-access/src/mappers/stock-reports.mapper.ts",
   "long-file: libs/admin/warehouse/feature/src/pages/movements/fabric-movements-page.tsx",
   "long-file: libs/admin/warehouse/feature/src/pages/reports/fabric-booking-page.tsx",
-  "long-file: libs/admin/warehouse/feature/src/pages/reports/fabric-plan-fact-page.tsx",
   "long-file: libs/admin/warehouse/feature/src/pages/stock/fabric-stock-page.tsx",
   "long-file: libs/admin/warehouse/model/src/entities/reports/stock-reports.ts",
   "long-file: libs/admin/warehouse/model/src/forms/item-issue/item-issue-form.ts",
