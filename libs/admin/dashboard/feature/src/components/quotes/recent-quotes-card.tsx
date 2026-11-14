@@ -15,7 +15,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { QuoteStatusPill } from './quote-status-pill';
 import { numericTextSx } from '../../model/numeric-text';
 
-import type { RecentQuote } from '../../model/dashboard-view';
+import type { RecentQuote } from '../../model/desk-views/dashboard-view';
 
 interface RecentQuotesCardProps {
   quotes: readonly RecentQuote[];

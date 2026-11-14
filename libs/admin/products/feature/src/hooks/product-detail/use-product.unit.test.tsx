@@ -5,6 +5,14 @@ import { useProduct } from './use-product';
 
 import type { ProductDetail } from '@admin/products/model';
 
+vi.mock('../pricing/use-product-prices', () => ({
+  useProductPrices: (products: readonly ProductDetail[]) => ({
+    products,
+    pricingError: null,
+    reloadPrices: vi.fn(),
+  }),
+}));
+
 const mocks = vi.hoisted(() => ({ useGetProductQuery: vi.fn() }));
 vi.mock('@admin/products/data-access', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@admin/products/data-access')>()),

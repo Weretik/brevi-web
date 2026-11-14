@@ -9,6 +9,8 @@ export default defineConfig({
   test: {
     name: 'admin-references-ui',
     environment: 'jsdom',
+    // MUI data grids render slowly in jsdom when several projects run in parallel.
+    testTimeout: 20_000,
     setupFiles: ['./src/test-setup.ts'],
     include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
   },

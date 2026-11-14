@@ -29,6 +29,8 @@ const product = (id: number, variants: ProductVariant[]): ProductOverview => ({
   currentSiteUrl: null,
   quoteDescription: null,
   updatedAtUtc: '2026-11-03T10:00:00Z',
+  mainPhotoUrl: null,
+  mainPhotoFullUrl: null,
   prices: null,
   pricesUpdatedAt: null,
   problems: [],

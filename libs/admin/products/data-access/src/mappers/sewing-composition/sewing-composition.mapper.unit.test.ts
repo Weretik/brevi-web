@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { mapSewingComposition } from './sewing-composition.mapper';
-import { compositionResponseFixture as composition } from '../../test-fixtures/sewing-composition/composition-response.fixture';
+import { compositionResponseFixture as composition } from '../../testing/sewing-composition/composition-response.fixture';
 
 describe('Sewing composition response mapping', () => {
   it('keeps shared materials, selected fabric and operation quantities distinct', () => {

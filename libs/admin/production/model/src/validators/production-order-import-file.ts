@@ -1,5 +1,8 @@
 import type { ImportFileResult } from './production-import-file';
-import type { ProductionOrderImportRow, ProductionOrderStatus } from '../entities/production-order';
+import type {
+  ProductionOrderImportRow,
+  ProductionOrderStatus,
+} from '../entities/orders/production-order';
 
 const statuses: readonly ProductionOrderStatus[] = ['New', 'Closed', 'Cancelled'];
 

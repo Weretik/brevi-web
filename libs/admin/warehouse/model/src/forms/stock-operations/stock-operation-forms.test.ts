@@ -27,10 +27,24 @@ const pair = (meters: number): FabricStockPair => ({
     fabricName: 'Грета',
     composition: null,
     density: null,
+    supplier: null,
     meters,
+    booked: 0,
+    free: meters,
     colors: [],
   },
-  color: { color: 'Синій', colorKey: 'синій', meters, version: 'abc', sources: [] },
+  color: {
+    color: 'Синій',
+    colorKey: 'синій',
+    meters,
+    version: 'abc',
+    sources: [],
+    booked: 0,
+    free: meters,
+    toOrder: 0,
+    lastMovement: null,
+    bookings: [],
+  },
 });
 
 describe('stock operation forms', () => {

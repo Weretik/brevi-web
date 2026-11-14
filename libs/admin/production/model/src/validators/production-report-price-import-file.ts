@@ -1,5 +1,5 @@
 import type { ImportFileResult } from './production-import-file';
-import type { ProductionReportPriceImportRow } from '../entities/production-tracking';
+import type { ProductionReportPriceImportRow } from '../entities/orders/production-tracking';
 
 const isText = (value: unknown): value is string =>
   typeof value === 'string' && value.trim() !== '';

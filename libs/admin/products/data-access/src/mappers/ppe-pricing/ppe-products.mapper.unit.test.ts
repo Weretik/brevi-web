@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { mapPpeProducts } from './ppe-products.mapper';
-import { ppePricingFixture } from '../../test-fixtures/ppe-pricing/ppe-pricing.fixture';
+import { ppePricingFixture } from '../../testing/ppe-pricing/ppe-pricing.fixture';
 
 describe('PPE response boundary', () => {
   it('maps exact server prices without exposing transport/approval actor fields', () => {

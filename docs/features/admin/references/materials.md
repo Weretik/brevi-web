@@ -69,7 +69,7 @@ libs/admin/references/
     └── fabric-colors/ # grid, form, details, delete dialog
 ```
 
-**Where to look:** [routes](../../../../libs/admin/references/feature/src/references.routes.tsx), [materials page](../../../../libs/admin/references/feature/src/pages/materials/materials-page.tsx), [fabrics tab](../../../../libs/admin/references/feature/src/pages/materials/fabrics-content.tsx), [accessories tab](../../../../libs/admin/references/feature/src/pages/materials/garment-accessories-content.tsx), [shared grid](../../../../libs/admin/references/ui/src/components/reference-list/reference-data-grid.tsx), [fabrics API](../../../../libs/admin/references/data-access/src/api/fabrics/fabrics.api.ts), [accessories API](../../../../libs/admin/references/data-access/src/api/garment-accessories/garment-accessories.api.ts).
+**Where to look:** [routes](../../../../libs/admin/references/feature/src/references.routes.tsx), [materials page](../../../../libs/admin/references/feature/src/pages/materials/materials-page.tsx), [fabrics tab](../../../../libs/admin/references/feature/src/pages/materials/fabrics-content.tsx), [accessories tab](../../../../libs/admin/references/feature/src/pages/materials/garment-accessories-content.tsx), [shared grid](../../../../libs/admin/references/ui/src/tables/reference-list/reference-data-grid.tsx), [fabrics API](../../../../libs/admin/references/data-access/src/api/fabrics/fabrics.api.ts), [accessories API](../../../../libs/admin/references/data-access/src/api/garment-accessories/garment-accessories.api.ts).
 
 ## Tests
 

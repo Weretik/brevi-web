@@ -1,7 +1,7 @@
 import { productOverviewLimits, productSeasons, sewingModelNameLimit } from '@admin/products/model';
 import { InputAdornment, CircularProgress, MenuItem, Stack, TextField } from '@mui/material';
 
-import type { ProductSectionOption } from '../../components/product-overview/product-overview-form';
+import type { ProductSectionOption } from '../product-overview/product-overview-form';
 import type {
   ProductSeason,
   SewingModelField,

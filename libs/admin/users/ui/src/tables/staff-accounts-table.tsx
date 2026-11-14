@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 
 import { StaffAccountActionsMenu } from './staff-account-actions-menu';
-import { StaffStatusPill } from '../status/staff-status-pill';
+import { StaffStatusPill } from '../components/staff/staff-status-pill';
 
 import type { StaffAccountAction } from './staff-account-actions-menu';
 import type { StaffAccount, StaffActor, StaffRoleOption } from '@admin/users/model';

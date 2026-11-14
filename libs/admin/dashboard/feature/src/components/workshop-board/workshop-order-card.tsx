@@ -3,7 +3,7 @@ import { Link as RouterLink } from 'react-router-dom';
 
 import { numericTextSx } from '../../model/numeric-text';
 
-import type { WorkshopOrder } from '../../model/dashboard-view';
+import type { WorkshopOrder } from '../../model/desk-views/dashboard-view';
 
 const visuallyHiddenSx = {
   border: 0,
@@ -20,7 +20,6 @@ interface WorkshopOrderCardProps {
 }
 
 export function WorkshopOrderCard({ order }: WorkshopOrderCardProps) {
-
   return (
     <Paper component="li" sx={{ listStyle: 'none', px: 1.5, py: 1.25 }} variant="outlined">
       <Box

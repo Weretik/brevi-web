@@ -11,9 +11,9 @@ export { QuoteRecipientCard, quoteRecipientAnchor } from './components/editor/qu
 export { QuoteStatusPill } from './components/editor/quote-status-pill';
 export { QuoteProblemsCard } from './components/editor/summary/quote-problems-card';
 export { QuoteSendActions } from './components/editor/summary/quote-send-actions';
-export { QuotePreviewDialog } from './components/preview/quote-preview-dialog';
+export { QuotePreviewDialog } from './dialogs/preview/quote-preview-dialog';
 export { QuoteSummaryCard } from './components/editor/summary/quote-summary-card';
-export { QuoteStartForm } from './components/start/quote-start-form';
+export { QuoteStartForm } from './forms/start/quote-start-form';
 export { QuoteMoreMenu } from './components/editor/quote-more-menu';
 export { QuoteHistoryList } from './components/history/quote-history-list';
 export { QuoteItemCard, quoteItemAnchor } from './components/editor/item/quote-item-card';

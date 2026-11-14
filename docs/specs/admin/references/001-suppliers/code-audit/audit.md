@@ -25,7 +25,7 @@
 - **Severity / status:** medium / verified.
 - **Походження:** додано під час поточного редизайну.
 - **Owner:** admin/references/ui.
-- **Свідчення:** `libs/admin/references/ui/src/components/suppliers/suppliers-grid.tsx:122` передає власний localeText із пакета ukUA. Спільна тема в `apps/admin-react/src/app/theme/brevi-theme.ts:31` окремо додає український `columnMenuAriaLabel`, якого немає в пакеті ukUA цієї версії.
+- **Свідчення:** `libs/admin/references/ui/src/tables/suppliers/suppliers-grid.tsx:122` передає власний localeText із пакета ukUA. Спільна тема в `apps/admin-react/src/app/theme/brevi-theme.ts:31` окремо додає український `columnMenuAriaLabel`, якого немає в пакеті ukUA цієї версії.
 - **Правило:** `mui-admin-ui/SKILL.md:20`, Admin UI Rules / Language and components — локаль має спільного власника, системні назви українською.
 - **Вплив:** MUI getThemeProps замінює localeText цілком, а не об'єднує його ключі. Data Grid потім додає англійські defaults, тому кнопка меню колонки втрачає назву `Меню стовпця Назва` й отримує `Назва column menu`. Подальші виправлення словника в темі також не діятимуть тут.
 - **Перевірка:** Node-відтворення з установленими `createTheme`, `getThemeProps` та ukUA: спільна тема повертає `Меню стовпця Назва`, а конфігурація таблиці має `columnMenuAriaLabel === undefined`. Код установленого Data Grid (`DataGrid/useDataGridProps.mjs`) підтверджує доповнення англійськими defaults; ukUA.mjs залишає цей ключ закоментованим.

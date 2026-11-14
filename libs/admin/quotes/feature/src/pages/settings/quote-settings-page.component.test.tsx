@@ -45,8 +45,8 @@ const settings: QuoteSettings = {
       recommended: 'Рекомендуємо',
       commentTitle: 'Коментар до пропозиції',
       clientTitle: 'Для',
-      showClient: true,
     },
+    showClient: true,
   },
   introduction: {
     logoText: null,

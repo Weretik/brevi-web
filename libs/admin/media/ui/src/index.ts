@@ -1,6 +1,6 @@
 export { MediaFolderTree } from './components/folder-tree/media-folder-tree';
 export type { MediaFolderAction } from './components/folder-tree/media-folder-menu';
-export { MediaFileGrid } from './components/gallery/media-file-grid';
+export { MediaFileGrid } from './tables/gallery/media-file-grid';
 export { MediaFilePreview } from './components/gallery/media-file-preview';
 export { MediaFileDetails } from './details/media-file-details';
 export { MediaConfirmDeleteDialog } from './dialogs/media-confirm-delete-dialog';

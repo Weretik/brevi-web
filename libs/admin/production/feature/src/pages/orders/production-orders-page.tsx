@@ -45,9 +45,9 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { ProductionImportDrawer } from '../../components/import/production-import-drawer';
 import { ProductionOrderQuickPanel } from '../../components/orders/production-order-quick-panel';
-import { useProductionModelSummary } from '../../hooks/orders/use-production-model-summary';
-import { useProductionOrders } from '../../hooks/orders/use-production-orders';
-import { useProductionOrdersExport } from '../../hooks/orders/use-production-orders-export';
+import { useProductionModelSummary } from '../../hooks/orders-list/use-production-model-summary';
+import { useProductionOrders } from '../../hooks/orders-list/use-production-orders';
+import { useProductionOrdersExport } from '../../hooks/orders-list/use-production-orders-export';
 
 import type { ProductionOrderActor } from '@admin/production/model';
 import type { ProductionOrdersImport } from '@admin/production/ui';

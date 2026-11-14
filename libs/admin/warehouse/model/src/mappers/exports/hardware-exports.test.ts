@@ -19,6 +19,7 @@ describe('hardwareWorkbook', () => {
             note: null,
             unit: 'Piece',
             quantity: 6,
+            dueDate: null,
             orders: [
               {
                 orderId: 1,
@@ -29,6 +30,7 @@ describe('hardwareWorkbook', () => {
                 norm: 2,
                 products: 3,
                 quantity: 6,
+                dueDate: null,
               },
             ],
           },

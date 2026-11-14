@@ -1,8 +1,8 @@
 import { draftPriceAmount, quoteDraftErrors } from './quote-draft-validation';
-import { quoteTiers } from '../models/quote-draft';
+import { quoteTiers } from '../forms/editor/quote-draft';
 
 import type { QuoteTier } from '../entities/quote';
-import type { QuoteDraft } from '../models/quote-draft';
+import type { QuoteDraft } from '../forms/editor/quote-draft';
 
 /** A problem that stops the КП from being sent, with the item it belongs to. */
 export interface QuoteDraftProblem {

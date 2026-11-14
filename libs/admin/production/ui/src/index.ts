@@ -1,69 +1,75 @@
-export { WorkshopStaffGrid } from './staff/workshop-staff-grid';
-export { WorkshopEmployeeForm } from './staff/workshop-employee-form';
-export { WorkshopEmployeeDetails } from './staff/workshop-employee-details';
-export { WorkshopStaffChips } from './staff/workshop-staff-chips';
-export { FabricNormModelList } from './norms/fabric-norm-model-list';
-export { FabricNormVariantCard } from './norms/fabric-norm-variant-card';
-export { ModelWorkCard } from './norms/model-work-card';
-export { FabricNormFilterChips } from './norms/fabric-norm-filter-chips';
-export { FabricNormForm } from './norms/fabric-norm-form';
-export { ProductionImportPreview } from './import/production-import-preview';
+export { WorkshopStaffGrid } from './tables/staff/workshop-staff-grid';
+export { WorkshopEmployeeForm } from './forms/staff/workshop-employee-form';
+export { WorkshopEmployeeDetails } from './details/staff/workshop-employee-details';
+export { WorkshopStaffChips } from './components/staff/workshop-staff-chips';
+export { FabricNormModelList } from './components/norms/fabric-norm-model-list';
+export { FabricNormVariantCard } from './details/norms/fabric-norm-variant-card';
+export { ModelWorkCard } from './details/norms/model-work-card';
+export { FabricNormFilterChips } from './components/norms/fabric-norm-filter-chips';
+export { FabricNormForm } from './forms/norms/fabric-norm-form';
+export { ProductionImportPreview } from './components/import/production-import-preview';
 export { ProductionConfirmDialog } from './dialogs/production-confirm-dialog';
-export { ProductionItemDetails } from './orders/production-item-details';
-export { ProductionItemsTable } from './orders/production-items-table';
-export { ProductionItemForm } from './orders/production-item-form';
-export type { EmbroideryPicker } from './orders/production-item-applications';
-export { ProductionOrderChips } from './orders/production-order-chips';
+export { ProductionItemDetails } from './details/order-items/production-item-details';
+export { ProductionItemsTable } from './tables/order-items/production-items-table';
+export { ProductionItemForm } from './forms/order-items/production-item-form';
+export type { EmbroideryPicker } from './forms/order-items/production-item-applications';
+export { ProductionOrderChips } from './components/orders/production-order-chips';
 export {
   ProductionOrderFilterChips,
   ProductionOrderFilterPanel,
   countProductionOrderFilters,
-} from './orders/production-order-filters';
-export { ProductionStageConveyor } from './orders/production-stage-conveyor';
-export { ProductionOrdersMoreMenu } from './orders/production-orders-more-menu';
-export type { ProductionOrdersImport } from './orders/production-orders-more-menu';
-export { ProductionModelSummaryTable } from './orders/production-model-summary-table';
-export { ModelSummarySortEditor } from './orders/model-summary-sort-editor';
-export { ProductionOrderHistory } from './orders/production-order-history';
-export { ProductionOrderFacts } from './orders/production-order-facts';
-export { ProductionOrderDueAlert } from './orders/production-order-due-alert';
-export { ProductionOrderPrint } from './orders/production-order-print';
-export { ProductionOrderStatusPill } from './orders/production-order-status';
-export { ProductionOrdersGrid } from './orders/production-orders-grid';
-export { ProductionQuoteSources } from './orders/production-quote-sources';
+} from './tables/orders/toolbar/production-order-filters';
+export { ProductionStageConveyor } from './components/orders/production-stage-conveyor';
+export { ProductionOrdersMoreMenu } from './tables/orders/toolbar/production-orders-more-menu';
+export type { ProductionOrdersImport } from './tables/orders/toolbar/production-orders-more-menu';
+export { ProductionModelSummaryTable } from './tables/order-summary/production-model-summary-table';
+export { ModelSummarySortEditor } from './components/order-summary/model-summary-sort-editor';
+export { ProductionOrderHistory } from './details/orders/production-order-history';
+export { ProductionOrderFacts } from './details/orders/production-order-facts';
+export { ProductionOrderDueAlert } from './feedback/production-order-due-alert';
+export { ProductionOrderPrint } from './details/orders/production-order-print';
+export { ProductionOrderStatusPill } from './components/orders/production-order-status';
+export { ProductionOrdersGrid } from './tables/orders/production-orders-grid';
+export { ProductionQuoteSources } from './details/orders/production-quote-sources';
 export { ProductionCancelDialog } from './dialogs/production-cancel-dialog';
-export { ProductionFiles } from './tracking/production-files';
-export { ProductionItemShipments } from './tracking/production-item-shipments';
-export { ProductionItemStages } from './tracking/production-item-stages';
-export { ProductionItemSteps } from './tracking/production-item-steps';
-export { ProductionOrderTelegram } from './tracking/production-order-telegram';
-export { ProductionShipmentForm } from './tracking/production-shipment-form';
-export { ProductionStagePill, productionStageTone } from './tracking/production-stage-pill';
-export { WorkshopSettingsForm } from './settings/workshop-settings-form';
+export { ProductionFiles } from './details/tracking/production-files';
+export { ProductionItemShipments } from './details/tracking/production-item-shipments';
+export { ProductionItemStages } from './details/tracking/production-item-stages';
+export { ProductionItemSteps } from './details/tracking/production-item-steps';
+export { ProductionOrderTelegram } from './details/tracking/production-order-telegram';
+export { ProductionShipmentForm } from './forms/tracking/production-shipment-form';
+export {
+  ProductionStagePill,
+  productionStageTone,
+} from './components/tracking/production-stage-pill';
+export { WorkshopSettingsForm } from './forms/settings/workshop-settings-form';
 export { ProductionReasonDialog } from './dialogs/production-reason-dialog';
-export { ProductionWorkTable } from './work/production-work-table';
-export { ProductionWorkForm } from './work/production-work-form';
-export { ProductionItemWorkPanel } from './work/production-item-work-panel';
-export { SewingForecastTable, forecastRowProblem } from './forecast/sewing-forecast-table';
-export { TimesheetDayTable } from './timesheet/timesheet-day-table';
-export { TimesheetMonthSummary } from './timesheet/timesheet-month-summary';
-export { TimesheetHistory } from './timesheet/timesheet-history';
-export { PayrollMonthTable } from './payroll/payroll-month-table';
-export { PayrollAdjustmentsTable, PayrollPaymentsTable } from './payroll/payroll-entries-tables';
-export { PayrollEmployeeDetails } from './payroll/payroll-employee-details';
-export { PayrollYearTable } from './payroll/payroll-year-table';
-export { PayrollSetupForm } from './payroll/payroll-setup-form';
-export type { PayrollPersonOption, PayrollSetupValues } from './payroll/payroll-setup-form';
-export { PayrollAdjustmentForm, PayrollPaymentForm } from './payroll/payroll-entry-forms';
-export { ReportTotals } from './reports/report-totals';
+export { ProductionWorkTable } from './tables/work/production-work-table';
+export { ProductionWorkForm } from './forms/work/production-work-form';
+export { ProductionItemWorkPanel } from './panels/work/production-item-work-panel';
+export { SewingForecastTable, forecastRowProblem } from './tables/forecast/sewing-forecast-table';
+export { TimesheetDayTable } from './tables/timesheet/timesheet-day-table';
+export { TimesheetMonthSummary } from './details/timesheet/timesheet-month-summary';
+export { TimesheetHistory } from './details/timesheet/timesheet-history';
+export { PayrollMonthTable } from './tables/payroll/payroll-month-table';
+export {
+  PayrollAdjustmentsTable,
+  PayrollPaymentsTable,
+} from './tables/payroll/payroll-entries-tables';
+export { PayrollEmployeeDetails } from './details/payroll/payroll-employee-details';
+export { PayrollYearTable } from './tables/payroll/payroll-year-table';
+export { PayrollSetupForm } from './forms/payroll/payroll-setup-form';
+export type { PayrollPersonOption, PayrollSetupValues } from './forms/payroll/payroll-setup-form';
+export { PayrollAdjustmentForm, PayrollPaymentForm } from './forms/payroll/payroll-entry-forms';
+export { ReportTotals } from './components/reports/report-totals';
 export {
   ReportMaterialsTable,
   ReportOutputTable,
   ReportStaffTable,
   ReportStockTable,
-} from './reports/report-tables';
-export { WorkshopArchiveDetails } from './archive/workshop-archive-details';
-export { WorkshopArchiveGrid } from './archive/workshop-archive-grid';
-export { WorkshopTabHeader } from './people/workshop-tab-header';
-export { PayrollMonthKpis } from './payroll/payroll-month-kpis';
-export { PeriodStepper } from './people/period-stepper';
+} from './tables/reports/report-tables';
+export { WorkshopArchiveDetails } from './details/archive/workshop-archive-details';
+export { WorkshopArchiveGrid } from './tables/archive/workshop-archive-grid';
+export { WorkshopTabHeader } from './components/people/workshop-tab-header';
+export { PayrollMonthKpis } from './components/payroll/payroll-month-kpis';
+export { PeriodStepper } from './components/people/period-stepper';

@@ -1,13 +1,13 @@
-import { unknownQuoteMarks } from '../mappers/quote-template-marks';
 import {
   quoteAdvantageCount,
   quoteMaxLetterVariants,
   quotePdfIntroCases,
   quotePdfIntroMarks,
   quoteTemplateMarks,
-} from '../models/quote-settings-draft';
+} from '../forms/settings/quote-settings-draft';
+import { unknownQuoteMarks } from '../mappers/introduction/quote-template-marks';
 
-import type { QuoteMark, QuoteSettingsDraft } from '../models/quote-settings-draft';
+import type { QuoteMark, QuoteSettingsDraft } from '../forms/settings/quote-settings-draft';
 
 export const quoteSettingsShortMax = 300;
 export const quoteSettingsTextMax = 4000;

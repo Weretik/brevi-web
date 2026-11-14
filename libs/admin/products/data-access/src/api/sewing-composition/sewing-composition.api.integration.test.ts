@@ -6,7 +6,7 @@ import { sewingCompositionApi } from './sewing-composition.api';
 import {
   compositionResponseFixture as composition,
   sharedMaterial,
-} from '../../test-fixtures/sewing-composition/composition-response.fixture';
+} from '../../testing/sewing-composition/composition-response.fixture';
 
 import type { SewingCompositionDraft } from '@admin/products/model';
 

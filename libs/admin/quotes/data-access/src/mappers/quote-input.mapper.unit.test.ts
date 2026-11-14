@@ -47,6 +47,7 @@ describe('toSaveQuoteInput', () => {
         sku: 'A-5',
         title: 'Саржа',
         fabricInfo: null,
+        fabricId: null,
         prices: { retail: 300, wholesale: 280, large: 250 },
         problem: null,
       },

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { quoteSettingsErrors } from './quote-settings-validation';
-import { quoteSettingsToDraft } from '../mappers/quote-settings-draft-mapper';
+import { quoteSettingsToDraft } from '../mappers/settings/quote-settings-draft-mapper';
 
 import type { QuoteSettings } from '../entities/quote-settings';
 

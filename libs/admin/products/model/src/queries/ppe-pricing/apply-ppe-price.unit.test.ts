@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { applyPpePrice } from './apply-ppe-price';
 
 import type { PpeProductPricing } from '../../entities/ppe-pricing/ppe-product-pricing';
-import type { Product } from '../../product-list/product';
+import type { Product } from '../../entities/product-list/product';
 
 const product: Product = {
   id: 42,

@@ -1,7 +1,7 @@
 export type * from './entities/quote';
-export { quoteEventLabels } from './models/quote-history';
+export { quoteEventLabels } from './entities/quote-history';
 export type * from './entities/quote-catalog';
-export type * from './models/quote-draft';
+export type * from './forms/editor/quote-draft';
 export {
   isFixedPriceKind,
   isSewingKind,
@@ -9,16 +9,16 @@ export {
   quoteItemSubtitles,
   quoteTierLabels,
   quoteTiers,
-} from './models/quote-draft';
+} from './forms/editor/quote-draft';
 export type * from './entities/quote-custom-sewing';
-export type * from './models/quote-custom-sewing-draft';
-export { quoteCustomLineKindLabels } from './models/quote-custom-sewing-draft';
-export { quoteModelChanges } from './mappers/quote-model-changes';
+export type * from './forms/editor/quote-custom-sewing-draft';
+export { quoteCustomLineKindLabels } from './forms/editor/quote-custom-sewing-draft';
+export { quoteModelChanges } from './mappers/editor/quote-model-changes';
 export type {
   QuoteModelChange,
   QuoteModelChangeGroup,
   QuoteModelChangeKind,
-} from './mappers/quote-model-changes';
+} from './mappers/editor/quote-model-changes';
 export {
   addCustomFabric,
   addCustomLine,
@@ -33,14 +33,14 @@ export {
   removeCustomFabric,
   removeCustomVariant,
   setCustomFabricMeters,
-} from './mappers/quote-custom-sewing-mapper';
+} from './mappers/editor/quote-custom-sewing-mapper';
 export {
   catalogItemDraft,
   emptyQuoteDraft,
   oneOffItemDraft,
   quoteToDraft,
   variantOptionDraft,
-} from './mappers/quote-draft-mapper';
+} from './mappers/editor/quote-draft-mapper';
 export {
   addQuoteOptions,
   moveQuoteItem,
@@ -51,17 +51,24 @@ export {
   setQuoteTierShown,
   updateQuoteItem,
   updateQuoteOption,
-} from './mappers/quote-draft-edits';
-export { formatQuotePrice, parseQuotePrice, priceInputText } from './mappers/quote-price-text';
+} from './mappers/editor/quote-draft-edits';
+export {
+  formatQuotePrice,
+  parseQuotePrice,
+  priceInputText,
+} from './mappers/editor/quote-price-text';
 export {
   quoteDraftFabricIds,
   quoteFabricFactsParts,
   quoteOptionFabrics,
   quoteSupplierFabrics,
-} from './mappers/quote-fabric-facts';
-export type { QuoteOptionFabricRef, QuoteSupplierFabric } from './mappers/quote-fabric-facts';
-export { quotePreviewWarnings } from './mappers/quote-preview-warnings';
-export type { QuotePreviewWarning } from './mappers/quote-preview-warnings';
+} from './mappers/editor/quote-fabric-facts';
+export type {
+  QuoteOptionFabricRef,
+  QuoteSupplierFabric,
+} from './mappers/editor/quote-fabric-facts';
+export { quotePreviewWarnings } from './mappers/preview/quote-preview-warnings';
+export type { QuotePreviewWarning } from './mappers/preview/quote-preview-warnings';
 export {
   draftPriceAmount,
   hasManualPrice,
@@ -72,7 +79,7 @@ export {
 } from './validators/quote-draft-validation';
 export type { QuoteDraftErrors } from './validators/quote-draft-validation';
 export type * from './entities/quote-settings';
-export type * from './models/quote-settings-draft';
+export type * from './forms/settings/quote-settings-draft';
 export {
   quoteAdvantageCount,
   quoteIntroMarks,
@@ -81,25 +88,25 @@ export {
   quotePdfIntroMarks,
   quoteTemplateMarkLabels,
   quoteTemplateMarks,
-} from './models/quote-settings-draft';
+} from './forms/settings/quote-settings-draft';
 export {
   quoteSettingsChangedSections,
   quoteSettingsErrorCounts,
   quoteSettingsSectionOf,
   quoteSettingsSections,
-} from './models/quote-settings-sections';
+} from './forms/settings/quote-settings-sections';
 export type {
   QuoteSettingsSection,
   QuoteSettingsSectionId,
-} from './models/quote-settings-sections';
-export { fillQuoteMarks, unknownQuoteMarks } from './mappers/quote-template-marks';
-export type { QuoteTemplatePart } from './mappers/quote-template-marks';
-export { quoteSettingsPreviewSample } from './mappers/quote-settings-preview';
-export type { QuoteSettingsPreviewSample } from './mappers/quote-settings-preview';
+} from './forms/settings/quote-settings-sections';
+export { fillQuoteMarks, unknownQuoteMarks } from './mappers/introduction/quote-template-marks';
+export type { QuoteTemplatePart } from './mappers/introduction/quote-template-marks';
+export { quoteSettingsPreviewSample } from './mappers/settings/quote-settings-preview';
+export type { QuoteSettingsPreviewSample } from './mappers/settings/quote-settings-preview';
 export {
   emptyLetterVariantDraft,
   quoteSettingsToDraft,
-} from './mappers/quote-settings-draft-mapper';
+} from './mappers/settings/quote-settings-draft-mapper';
 export {
   quoteSettingsErrors,
   quoteSettingsShortMax,
@@ -116,7 +123,7 @@ export {
   quoteSubjectMax,
 } from './validators/quote-send-validation';
 export type * from './entities/quote-introduction';
-export type * from './models/quote-intro-draft';
+export type * from './forms/introduction/quote-intro-draft';
 export {
   quoteIntroCatalogSeasons,
   quoteIntroEmailMax,
@@ -125,8 +132,8 @@ export {
   quoteIntroSeasonLabels,
   quoteIntroSeasons,
   quoteIntroTemplateNameMax,
-} from './models/quote-intro-draft';
-export type { QuoteIntroMainProducts } from './mappers/quote-intro-draft-mapper';
+} from './forms/introduction/quote-intro-draft';
+export type { QuoteIntroMainProducts } from './mappers/introduction/quote-intro-draft-mapper';
 export {
   applyIntroTemplate,
   chooseIntroFabric,
@@ -138,16 +145,16 @@ export {
   mainProductsOf,
   setIntroLayout,
   updateIntroSlot,
-} from './mappers/quote-intro-draft-mapper';
+} from './mappers/introduction/quote-intro-draft-mapper';
 export {
   quoteIntroErrors,
   quoteIntroPageErrors,
   quoteIntroTemplateNameError,
 } from './validators/quote-intro-validation';
 export type { QuoteIntroErrors } from './validators/quote-intro-validation';
-export { quoteEditorPath } from './models/quote-paths';
-export type * from './models/quote-start';
-export { quoteStartPaths, quoteStartPrefillOf, readQuoteStartPrefill } from './models/quote-start';
+export { quoteEditorPath } from './queries/quote-paths';
+export type * from './queries/quote-start';
+export { quoteStartPaths, quoteStartPrefillOf, readQuoteStartPrefill } from './queries/quote-start';
 export {
   quoteDraftProblems,
   quoteDraftSummary,

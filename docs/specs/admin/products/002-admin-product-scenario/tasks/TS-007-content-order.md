@@ -3,7 +3,7 @@
 - **ID задачі:** TS-007
 - **Охоплює:** SC-007
 - **Залежить від:** TS-003
-- **Точні шляхи:** `libs/admin/products/ui/src/product-editor/content/product-information-fields.tsx`, `libs/admin/products/ui/src/product-editor/content/product-characteristic-fields.tsx`, `libs/admin/products/model/src/ordering/product-order.ts` (цільовий за потреби), `libs/admin/products/model/src/ordering/product-order.test.ts` (цільовий)
+- **Точні шляхи:** `libs/admin/products/ui/src/forms/product-editor/content/product-information-fields.tsx`, `libs/admin/products/ui/src/forms/product-editor/content/product-characteristic-fields.tsx`, `libs/admin/products/model/src/mappers/ordering/product-order.ts` (цільовий за потреби), `libs/admin/products/model/src/mappers/ordering/product-order.unit.test.ts` (цільовий)
 - **Рівень тестування:** модульний + компонентний
 
 ## Робота

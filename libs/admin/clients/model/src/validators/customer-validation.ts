@@ -1,5 +1,5 @@
-import type { ContactDraft } from '../models/contact-draft';
-import type { CustomerDraft } from '../models/customer-draft';
+import type { ContactDraft } from '../forms/contact-draft';
+import type { CustomerDraft } from '../forms/customer-draft';
 
 export function customerErrors(draft: CustomerDraft): Record<string, string> {
   const errors: Record<string, string> = {};

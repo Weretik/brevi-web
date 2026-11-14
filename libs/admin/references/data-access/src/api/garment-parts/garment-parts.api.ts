@@ -1,7 +1,7 @@
 import { adminApi, toAdminApiError } from '@admin/shared/api-client';
 
+import { referenceErrorMessages } from '../../errors/reference-error-messages';
 import { mapGarmentParts } from '../../mappers/garment-parts/garment-parts.mapper';
-import { referenceErrorMessages } from '../shared/reference-api.shared';
 
 import type { operations } from '@admin/shared/contracts';
 

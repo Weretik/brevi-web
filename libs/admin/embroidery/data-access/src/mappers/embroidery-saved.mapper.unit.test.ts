@@ -37,7 +37,7 @@ const saved: Schemas['CrmEmbroiderySavedCalculation'] = {
     stitchesPerUnit: 10_000,
     hoopLabel: '18 см',
     incomplete: true,
-    prices: [{ name: 'Опт', unit: 81.54, total: 4077, repeatUnit: 69.64 }],
+    price: { name: 'Опт', unit: 81.54, total: 4077, repeatUnit: 69.64 },
     createdAt: '2026-11-04T19:52:00Z',
     createdByName: 'Олена',
     mockup: {
@@ -77,6 +77,7 @@ describe('embroidery saved mapper', () => {
     const body = toSaveEmbroideryCalculationInput({
       name: '   ',
       customerPublicId: null,
+      category: 'Категорія 1',
       calculation: { ...input, machineMinutes: null, expenseOverrides: {} },
     });
 

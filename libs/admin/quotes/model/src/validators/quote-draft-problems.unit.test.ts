@@ -1,11 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
 import { quoteDraftProblems, quoteDraftSummary, quoteTierVisibility } from './quote-draft-problems';
-import { setQuoteTier, setQuoteTierShown } from '../mappers/quote-draft-edits';
-import { catalogItemDraft, emptyQuoteDraft, oneOffItemDraft } from '../mappers/quote-draft-mapper';
+import { setQuoteTier, setQuoteTierShown } from '../mappers/editor/quote-draft-edits';
+import {
+  catalogItemDraft,
+  emptyQuoteDraft,
+  oneOffItemDraft,
+} from '../mappers/editor/quote-draft-mapper';
 
 import type { QuoteCatalogProduct } from '../entities/quote-catalog';
-import type { QuoteDraft, QuoteItemDraft } from '../models/quote-draft';
+import type { QuoteDraft, QuoteItemDraft } from '../forms/editor/quote-draft';
 
 const ppe: QuoteCatalogProduct = {
   productId: 7,

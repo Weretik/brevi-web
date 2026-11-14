@@ -1,7 +1,10 @@
 import { quoteNameMaxLength, quoteTextMaxLength } from './quote-draft-validation';
-import { quoteIntroEmailMax, quoteIntroTemplateNameMax } from '../models/quote-intro-draft';
+import {
+  quoteIntroEmailMax,
+  quoteIntroTemplateNameMax,
+} from '../forms/introduction/quote-intro-draft';
 
-import type { QuoteIntroDraft } from '../models/quote-intro-draft';
+import type { QuoteIntroDraft } from '../forms/introduction/quote-intro-draft';
 
 /** Errors by place: `internalName`, `recipientEmail`, `managerNote`, `pages`, `slot:<key>`. */
 export type QuoteIntroErrors = Readonly<Record<string, string>>;

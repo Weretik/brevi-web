@@ -4,11 +4,11 @@ import { adminApiErrorMessage } from '@admin/shared/api-client';
 import { Alert, Box, Button, Stack, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
-import { seoAreaPaths, seoFixList, seoMetrics } from '../../model/seo-view';
+import { seoAreaPaths, seoFixList, seoMetrics } from '../../model/desk-views/seo-view';
 import { DeskListCard } from '../desk-list/desk-list-card';
 import { MetricStrip } from '../metrics/metric-strip';
 
-import type { DashboardViewer } from '../../model/dashboard-view';
+import type { DashboardViewer } from '../../model/desk-views/dashboard-view';
 
 const seoOverviewPath = '/content/seo-overview';
 

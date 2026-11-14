@@ -26,7 +26,7 @@ import { useState } from 'react';
 
 import { QuoteFabricLine } from './quote-fabric-line';
 import { QuotePriceCell } from './quote-price-cell';
-import { QuoteRemoveLastFabricDialog } from './quote-remove-last-fabric-dialog';
+import { QuoteRemoveLastFabricDialog } from '../../../dialogs/editor/item/quote-remove-last-fabric-dialog';
 
 import type {
   QuoteFabricFacts,

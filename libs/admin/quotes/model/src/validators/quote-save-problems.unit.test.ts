@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { quoteDraftErrors } from './quote-draft-validation';
 import { quoteSaveProblems } from './quote-save-problems';
-import { emptyQuoteDraft, oneOffItemDraft } from '../mappers/quote-draft-mapper';
+import { emptyQuoteDraft, oneOffItemDraft } from '../mappers/editor/quote-draft-mapper';
 
 describe('quoteSaveProblems', () => {
   it('names the client and each item by its position', () => {

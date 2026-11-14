@@ -1,8 +1,9 @@
 import { adminApi, toAdminApiError } from '@admin/shared/api-client';
 
+import { productPricesTag } from '../../cache/product-prices-tag';
+import { referenceErrorMessages } from '../../errors/reference-error-messages';
 import { mapGarmentAccessories } from '../../mappers/garment-accessories/garment-accessories.mapper';
 import { parseGarmentAccessoriesResponse } from '../../validators/garment-accessories/garment-accessories-response';
-import { referenceErrorMessages, productPricesTag } from '../shared/reference-api.shared';
 
 import type {
   CreateGarmentAccessoryBody,

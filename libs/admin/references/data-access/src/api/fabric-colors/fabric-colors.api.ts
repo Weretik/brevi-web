@@ -1,8 +1,8 @@
 import { adminApi, toAdminApiError } from '@admin/shared/api-client';
 
+import { referenceErrorMessages } from '../../errors/reference-error-messages';
 import { mapFabricColors } from '../../mappers/fabric-colors/fabric-colors.mapper';
 import { parseFabricColorsResponse } from '../../validators/fabric-colors/fabric-colors-response';
-import { referenceErrorMessages } from '../shared/reference-api.shared';
 
 import type { FabricColorBody } from '../../contracts/fabric-colors/fabric-colors-response';
 import type { FabricColor } from '@admin/references/model';

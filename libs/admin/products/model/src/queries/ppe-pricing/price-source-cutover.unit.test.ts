@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { applyPpePrice } from './apply-ppe-price';
 
-import type { Product } from '../../product-list/product';
+import type { Product } from '../../entities/product-list/product';
 
 describe('TS-007 current price source', () => {
   it('does not reactivate an old amount when PPE is not enrolled', () => {

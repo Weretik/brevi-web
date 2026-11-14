@@ -1,6 +1,6 @@
 import { lazy } from 'react';
 
-import type { DashboardViewer } from './model/dashboard-view';
+import type { DashboardViewer } from './model/desk-views/dashboard-view';
 
 const DashboardPage = lazy(() => import('./pages/dashboard-page'));
 

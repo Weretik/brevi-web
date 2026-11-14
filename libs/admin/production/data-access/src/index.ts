@@ -4,14 +4,14 @@ export {
   useImportWorkshopStaffMutation,
   useSetWorkshopEmployeeActiveMutation,
   useUpdateWorkshopEmployeeMutation,
-} from './api/workshop-staff.api';
+} from './api/people/workshop-staff.api';
 export {
   useDeleteFabricNormMutation,
   useGetFabricNormsQuery,
   useGetModelCompositionsQuery,
   useImportFabricNormsMutation,
   useSaveFabricNormMutation,
-} from './api/fabric-norms.api';
+} from './api/norms/fabric-norms.api';
 export {
   useCopyProductionOrderMutation,
   useCreateProductionOrderMutation,
@@ -28,7 +28,7 @@ export {
   useImportProductionOrdersMutation,
   useLazyGetProductionOrdersQuery,
   useUpdateProductionOrderMutation,
-} from './api/production-orders.api';
+} from './api/orders/production-orders.api';
 export {
   useCancelProductionShipmentMutation,
   useChangeProductionOrderStatusMutation,
@@ -39,12 +39,12 @@ export {
   useSendProductionOrderTelegramMutation,
   useSetProductionItemStagesMutation,
   useUploadProductionOrderFileMutation,
-} from './api/production-tracking.api';
+} from './api/orders/production-tracking.api';
 export {
   useGetWorkshopSettingsQuery,
   useSendWorkshopTelegramTestMutation,
   useUpdateWorkshopSettingsMutation,
-} from './api/workshop-settings.api';
+} from './api/settings/workshop-settings.api';
 export {
   useCreateProductionWorkMutation,
   useGetProductionItemWorkQuery,
@@ -54,7 +54,7 @@ export {
   useImportProductionWorkMutation,
   useSaveSewingForecastQueueMutation,
   useVoidProductionWorkMutation,
-} from './api/production-work.api';
+} from './api/work/production-work.api';
 export {
   useClosePayrollMonthMutation,
   useCreatePayrollAdjustmentMutation,
@@ -70,12 +70,12 @@ export {
   useSetPayrollRolesMutation,
   useVoidPayrollAdjustmentMutation,
   useVoidPayrollPaymentMutation,
-} from './api/payroll.api';
+} from './api/people/payroll.api';
 export {
   useGetWorkshopDashboardQuery,
   useGetWorkshopReportQuery,
-} from './api/workshop-reports.api';
+} from './api/reports/workshop-reports.api';
 export {
   useGetWorkshopArchiveQuery,
   useImportWorkshopArchiveMutation,
-} from './api/workshop-archive.api';
+} from './api/reports/workshop-archive.api';

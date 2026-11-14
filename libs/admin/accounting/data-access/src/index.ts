@@ -48,5 +48,5 @@ export {
   useVoidFinanceTransactionMutation,
   useVoidFinanceTransferMutation,
 } from './api/accounting.api';
-export { fetchFinanceAttachmentContent } from './files/finance-attachment-content';
-export { fetchFinanceExport, fetchFinanceReportCsv } from './files/finance-report-files';
+export { fetchFinanceAttachmentContent } from './api/files/finance-attachment-content';
+export { fetchFinanceExport, fetchFinanceReportCsv } from './api/files/finance-report-files';

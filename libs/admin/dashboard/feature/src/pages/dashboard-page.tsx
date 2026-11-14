@@ -19,7 +19,7 @@ import { useChosenDesk } from '../hooks/use-chosen-desk';
 import { useOpenDesks } from '../hooks/use-open-desks';
 import { visibleDesks } from '../model/desks';
 
-import type { DashboardViewer } from '../model/dashboard-view';
+import type { DashboardViewer } from '../model/desk-views/dashboard-view';
 import type { DeskDefinition, DeskKey } from '../model/desks';
 
 /** yyyy-mm-dd of the person's own day. */

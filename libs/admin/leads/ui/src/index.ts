@@ -7,11 +7,15 @@ export { LeadCallHeader } from './components/call/lead-call-header';
 export { LeadCallForm } from './forms/lead-call-form';
 export { LeadCallResultFormFields } from './forms/lead-call-result-form-fields';
 export { LeadsTable } from './tables/leads-table';
-export { LeadStatsMetrics } from './stats/lead-stats-metrics';
-export { LeadStatsCard } from './stats/lead-stats-card';
-export { LeadIndustriesTable, LeadManagersTable, LeadResultsBars } from './stats/lead-stats-tables';
-export { LeadSyncCard } from './stats/lead-sync-card';
-export { LeadCallResultsList } from './references/lead-call-results-list';
-export { LeadCategoriesList } from './references/lead-categories-list';
+export { LeadStatsMetrics } from './components/stats/lead-stats-metrics';
+export { LeadStatsCard } from './components/stats/lead-stats-card';
+export {
+  LeadIndustriesTable,
+  LeadManagersTable,
+  LeadResultsBars,
+} from './tables/stats/lead-stats-tables';
+export { LeadSyncCard } from './components/stats/lead-sync-card';
+export { LeadCallResultsList } from './components/references/lead-call-results-list';
+export { LeadCategoriesList } from './components/references/lead-categories-list';
 export { SiteRequestStatusPill } from './components/status/site-request-status-pill';
 export { SiteRequestsTable } from './tables/site-requests-table';

@@ -11,12 +11,12 @@ import {
   monthSoFar,
   reviewList,
   topExpenses,
-} from '../../model/accounting-view';
+} from '../../model/desk-views/accounting-view';
 import { DeskGrid } from '../desk-grid/desk-grid';
 import { DeskListCard } from '../desk-list/desk-list-card';
 import { MetricStrip } from '../metrics/metric-strip';
 
-import type { DashboardViewer } from '../../model/dashboard-view';
+import type { DashboardViewer } from '../../model/desk-views/dashboard-view';
 
 interface AccountingDeskProps {
   viewer: DashboardViewer;
