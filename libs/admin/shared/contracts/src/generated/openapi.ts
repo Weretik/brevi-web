@@ -5493,6 +5493,74 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/scheduling/tasks': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description Every task in page order with its schedule, next run and last success and failure. */
+    get: operations['getScheduledTasks'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/scheduling/tasks/{key}/runs': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** @description The last 50 runs of a task, newest first. Runs are kept 90 days. */
+    get: operations['getScheduledTaskRuns'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/scheduling/tasks/{key}/schedule': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    /** @description Changes the schedule and the on/off switch. nextRunAt moves the next run once; without it the next run follows the schedule. */
+    put: operations['updateScheduledTaskSchedule'];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  '/api/scheduling/tasks/{key}/run': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** @description «Запустити зараз», also for a disabled task. The next tick, within a minute, starts it. */
+    post: operations['runScheduledTaskNow'];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/content/products': {
     parameters: {
       query?: never;
@@ -13521,6 +13589,67 @@ export interface components {
       chatId?: number;
       organizations?: string[] | null;
     };
+    ScheduleInput: {
+      /** @enum {string} */
+      kind: 'interval' | 'daily' | 'manual';
+      /** @description interval only */
+      everyMinutes?: number | null;
+      /** @description interval only; with toHour, the Kyiv hours the task runs in */
+      fromHour?: number | null;
+      toHour?: number | null;
+      /** @description daily only; Kyiv HH:mm */
+      times?: string[] | null;
+      /** @description daily only; ISO weekdays, 1 = Monday */
+      days?: number[] | null;
+    };
+    ScheduledTaskResponse: {
+      key: string;
+      name: string;
+      description: string;
+      /** @description false for the outbox, which runs every minute */
+      editable: boolean;
+      enabled: boolean;
+      schedule: components['schemas']['ScheduleInput'];
+      /** Format: date-time */
+      nextRunAt?: string | null;
+      isRunning: boolean;
+      /** Format: date-time */
+      runningSince?: string | null;
+      /** Format: date-time */
+      runRequestedAt?: string | null;
+      /** Format: date-time */
+      lastSuccessAt?: string | null;
+      lastSuccessSummary?: string | null;
+      /** Format: date-time */
+      lastFailureAt?: string | null;
+      lastFailureReason?: string | null;
+      /** @description the last result was a failure */
+      lastRunFailed: boolean;
+      /** @description an enabled task missed its time by more than 15 minutes */
+      overdue: boolean;
+    };
+    ScheduledTaskRunResponse: {
+      /** Format: uuid */
+      id: string;
+      /** @enum {string} */
+      trigger: 'schedule' | 'manual';
+      requestedBy?: string | null;
+      /** Format: date-time */
+      claimedAt: string;
+      /** Format: date-time */
+      startedAt?: string | null;
+      /** Format: date-time */
+      finishedAt?: string | null;
+      /** @enum {string} */
+      outcome: 'running' | 'succeeded' | 'failed';
+      message?: string | null;
+    };
+    ScheduledTaskScheduleInput: {
+      enabled: boolean;
+      schedule: components['schemas']['ScheduleInput'];
+      /** Format: date-time */
+      nextRunAt?: string | null;
+    };
     /** @description hasPage is false when nobody has made the page yet. onSite is true only when the mark is set and the Catalog product is active. The has… flags say what the site would miss. */
     ContentProductRow: {
       /** Format: int32 */
@@ -14721,6 +14850,7 @@ export interface components {
     TaskId: number;
     LeadId: number;
     FileId: string;
+    TaskKey: string;
     /** @description Catalog product id. */
     'components-parameters-ProductId': number;
     /** @description Site category id. */
@@ -31938,6 +32068,194 @@ export interface operations {
       };
       /** @description Admin role required (normal mode) */
       403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getScheduledTasks: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ScheduledTaskResponse'][];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No view right on background-tasks */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  getScheduledTaskRuns: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        key: components['parameters']['TaskKey'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ScheduledTaskRunResponse'][];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No view right on background-tasks */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unknown task */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  updateScheduledTaskSchedule: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        key: components['parameters']['TaskKey'];
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ScheduledTaskScheduleInput'];
+      };
+    };
+    responses: {
+      /** @description Saved */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ScheduledTaskResponse'];
+        };
+      };
+      /** @description Invalid schedule, or nextRunAt in the past */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No edit right on background-tasks */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unknown task */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The task runs every minute and its schedule does not change */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  runScheduledTaskNow: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        key: components['parameters']['TaskKey'];
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Requested */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['ScheduledTaskResponse'];
+        };
+      };
+      /** @description Not signed in */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description No create right on background-tasks */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Unknown task */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description «Задача вже виконується», «Запуск уже заплановано» or the task runs every minute */
+      409: {
         headers: {
           [name: string]: unknown;
         };
