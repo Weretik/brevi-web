@@ -4,7 +4,8 @@ import { Alert, Stack } from '@mui/material';
 import { useState } from 'react';
 
 import { ContentLanguageTabs } from '../product-pages/content-language-tabs';
-import { ContentBlocksPreview, ContentPreviewPart } from '../product-pages/content-text-preview';
+import { ContentBlocksPreview } from '../text-preview/content-blocks-preview';
+import { ContentPreviewPart } from '../text-preview/content-preview-part';
 
 import type { ContentLanguage, SiteCategory, SiteCategoryRow } from '@admin/content/model';
 
