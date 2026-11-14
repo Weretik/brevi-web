@@ -43,7 +43,7 @@ Not here (stage 4 of CNT-004): the site reading the articles. Until then the sit
 
 | Path                                                                                                                            | Role                                                           |
 | ------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| `libs/admin/shared/ui/src/inputs/rich-text-photo.tsx`                                                          | photo block of the visual editor with the «Опис фото» field    |
+| `libs/admin/shared/ui/src/inputs/rich-text-photo.tsx`                                                                           | photo block of the visual editor with the «Опис фото» field    |
 | `libs/admin/shared/ui/src/inputs/rich-text-editor/` (editor, toolbar, extensions)                                               | optional `onPickImages`: the «Фото» button and the photo block |
 | `libs/admin/content/model/src/entities/articles/article.ts`                                                                     | row, editor, blocks, viewer rights                             |
 | `libs/admin/content/model/src/forms/articles/article-form.ts`                                                                   | form values and the save body                                  |
@@ -66,7 +66,7 @@ Not here (stage 4 of CNT-004): the site reading the articles. Until then the sit
 | ------------------------ | ---------------------------------------------------------------------------------------- |
 | R-02, R-04, R-05         | `libs/admin/content/model/src/**/articles/*.unit.test.ts`                                |
 | contract shapes          | `libs/admin/content/data-access/src/mappers/articles/article.mapper.unit.test.ts`        |
-| R-05 editor              | `libs/admin/shared/ui/src/inputs/rich-text-editor.component.test.tsx`   |
+| R-05 editor              | `libs/admin/shared/ui/src/inputs/rich-text-editor.component.test.tsx`                    |
 | SC-01..SC-05, R-03, R-09 | `libs/admin/content/feature/src/components/articles/articles-content.component.test.tsx` |
 | menu and rights          | `apps/admin-react/src/app/router/navigation-config.unit.test.ts`                         |
 | R-10, SC-06              | `article-import-file.unit.test.ts`, `articles-content.component.test.tsx`                |

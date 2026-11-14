@@ -34,7 +34,7 @@ does not need an import window, so the Admin has no file upload.
 | SC-02 | Fabric create sends the sheet fields; a field error keeps the input   | `fabrics-page.component.test.tsx`                                        |
 | SC-03 | Accessory list and create with unit                                   | `garment-accessories-page.component.test.tsx`                            |
 | SC-04 | Responses with the new fields and units are validated before mapping  | `fabrics.mapper.unit.test.ts`, `garment-accessories.mapper.unit.test.ts` |
-| SC-05 | Old `?tab=fabrics` link opens the fabrics page; sidebar has both      | `apps/admin-react/src/app/router/routes/app-router.integration.test.tsx`        |
+| SC-05 | Old `?tab=fabrics` link opens the fabrics page; sidebar has both      | `apps/admin-react/src/app/router/routes/app-router.integration.test.tsx` |
 
 ## Data transfer
 
