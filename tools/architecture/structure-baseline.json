@@ -55,7 +55,6 @@
   "long-file: libs/admin/production/model/src/entities/orders/production-order.ts",
   "long-file: libs/admin/production/ui/src/components/order-summary/model-summary-sort-editor.tsx",
   "long-file: libs/admin/production/ui/src/details/norms/fabric-norm-variant-card.tsx",
-  "long-file: libs/admin/production/ui/src/details/norms/model-work-card.tsx",
   "long-file: libs/admin/production/ui/src/forms/order-items/production-item-applications.tsx",
   "long-file: libs/admin/production/ui/src/forms/order-items/production-item-form.tsx",
   "long-file: libs/admin/production/ui/src/forms/payroll/payroll-setup-form.tsx",
