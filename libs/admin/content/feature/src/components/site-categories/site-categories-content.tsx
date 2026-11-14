@@ -1,9 +1,5 @@
-import {
-  useGetSiteCategoriesQuery,
-  useReorderSiteCategoriesMutation,
-  useSetSiteCategoryVisibilityMutation,
-} from '@admin/content/data-access';
-import { filterSiteCategories, moveSiteCategory, siteCategoryName } from '@admin/content/model';
+import { useGetSiteCategoriesQuery } from '@admin/content/data-access';
+import { filterSiteCategories } from '@admin/content/model';
 import { OldSiteImportDialog, SiteCategoriesTable } from '@admin/content/ui';
 import { ReferenceListAlerts, ReferencePageHeader, ReferenceSearchBar } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
@@ -12,6 +8,7 @@ import { useMemo, useState } from 'react';
 
 import { SiteCategoryDrawer } from './site-category-drawer';
 import { useOldSiteCategoryImport } from '../../hooks/site-categories/use-old-site-category-import';
+import { useSiteCategoryRowActions } from '../../hooks/site-categories/use-site-category-row-actions';
 
 import type { SiteCategoryTarget } from '../../hooks/site-categories/use-site-category-editor';
 import type { SiteCategoriesViewer, SiteCategoryRow } from '@admin/content/model';
@@ -38,52 +35,12 @@ export function SiteCategoriesContent({ viewer }: { viewer: SiteCategoriesViewer
   const list = useGetSiteCategoriesQuery();
   const rows = list.currentData ?? noRows;
   const [term, setTerm] = useState('');
-  const [notice, setNotice] = useState<{ text: string; ok: boolean } | null>(null);
   const [opened, setOpened] = useState<SiteCategoryTarget | null>(null);
-  const [savingId, setSavingId] = useState<number | null>(null);
-  const [setVisibility] = useSetSiteCategoryVisibilityMutation();
-  const [reorder] = useReorderSiteCategoriesMutation();
+  const actions = useSiteCategoryRowActions(rows);
+  const { notice, setNotice } = actions;
   const transfer = useOldSiteCategoryImport();
   const shown = useMemo(() => filterSiteCategories(rows, term), [rows, term]);
   const narrowed = term.trim().length > 0;
-
-  async function run(row: SiteCategoryRow, action: () => Promise<void>, failure: string) {
-    setSavingId(row.id);
-    setNotice(null);
-    try {
-      await action();
-    } catch (error) {
-      setNotice({ text: adminApiErrorMessage(error, failure), ok: false });
-    } finally {
-      setSavingId(null);
-    }
-  }
-
-  const toggle = (row: SiteCategoryRow, showOnSite: boolean) =>
-    run(
-      row,
-      async () => {
-        const saved = await setVisibility({ id: row.id, showOnSite }).unwrap();
-        if (saved.showOnSite && !saved.onSite)
-          setNotice({
-            text: `«${siteCategoryName(row)}» позначено для сайту, але його розділ верхнього рівня приховано, тому сайт його не покаже.`,
-            ok: false,
-          });
-      },
-      `Не вдалося змінити показ розділу «${siteCategoryName(row)}».`,
-    );
-
-  const move = (row: SiteCategoryRow, step: -1 | 1) => {
-    const order = moveSiteCategory(rows, row.id, step);
-    if (!order) return;
-    void run(
-      row,
-      async () => {
-        await reorder(order).unwrap();
-      },
-      `Не вдалося змінити місце розділу «${siteCategoryName(row)}».`,
-    );
-  };
 
   return (
     <Box sx={{ minWidth: 0 }}>
@@ -135,10 +92,10 @@ export function SiteCategoriesContent({ viewer }: { viewer: SiteCategoriesViewer
           unavailable={Boolean(list.error)}
           canCreate={viewer.canCreate}
           canEdit={viewer.canEdit}
-          savingId={savingId}
+          savingId={actions.savingId}
           onOpen={(row) => setOpened({ id: row.id })}
-          onToggle={(row, showOnSite) => void toggle(row, showOnSite)}
-          onMove={move}
+          onToggle={(row, showOnSite) => void actions.toggle(row, showOnSite)}
+          onMove={(row, step) => void actions.move(row, step)}
           onAddChild={(row) => setOpened({ id: null, parentId: row.id })}
         />
       </Paper>
