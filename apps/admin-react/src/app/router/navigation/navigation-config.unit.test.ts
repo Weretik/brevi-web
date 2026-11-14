@@ -52,8 +52,8 @@ describe('legacy Admin navigation', () => {
       'Загальні звіти',
       'Адміністрування',
     ]);
-    expect(groups.map((group) => group.items.length)).toEqual([5, 6, 3, 4, 7, 1, 11, 3, 7]);
-    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(47);
+    expect(groups.map((group) => group.items.length)).toEqual([5, 6, 3, 4, 7, 1, 11, 3, 8]);
+    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(48);
     expect(groups[0].items.map((item) => item.id)).not.toContain('clients');
   });
   it('shows «Налаштування КП» only for the server Admin role', () => {
@@ -137,6 +137,7 @@ describe('legacy Admin navigation', () => {
       '/admin/tasks',
       '/admin/leads',
       '/admin/ai',
+      '/admin/background-tasks',
       '/admin/access',
       '/admin/quote-settings',
       '/production/settings',
@@ -150,6 +151,7 @@ describe('legacy Admin navigation', () => {
       { id: 'manager-tasks', label: 'Завдання менеджерам', to: '/admin/tasks' },
       { id: 'lead-stats', label: 'Статистика лідів', to: '/admin/leads' },
       { id: 'ai-settings', label: 'Налаштування ШІ', to: '/admin/ai' },
+      { id: 'background-tasks', label: 'Фонові задачі', to: '/admin/background-tasks' },
       { id: 'access-rights', label: 'Права доступу', to: '/admin/access' },
       { id: 'quote-settings', label: 'Налаштування КП', to: '/admin/quote-settings' },
       { id: 'workshop-settings', label: 'Налаштування цеху', to: '/production/settings' },
