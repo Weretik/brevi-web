@@ -14,6 +14,7 @@ import { productsRoutes } from '@admin/products/feature';
 import { createQuotesRoutes } from '@admin/quotes/feature';
 import { createReferencesRoutes } from '@admin/references/feature';
 import { remindersRoutes } from '@admin/reminders/feature';
+import { backgroundTasksRoutes } from '@admin/scheduling/feature';
 import { createTasksRoutes } from '@admin/tasks/feature';
 import { createWarehouseRoutes } from '@admin/warehouse/feature';
 
@@ -69,6 +70,7 @@ export const adminRouteDefinitions = [
     useSiteCertificatesViewer,
   }),
   ...createWarehouseRoutes({ useAccess: useWarehouseAccess }),
+  ...backgroundTasksRoutes,
 ];
 
 /** Task pages need a role check, so the router wraps them instead of listing them above. */

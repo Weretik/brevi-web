@@ -54,6 +54,7 @@ const defaults: Readonly<Record<string, Readonly<Record<string, readonly AccessA
     'content-company': VE,
     'content-works': VE,
     'content-certificates': VE,
+    'background-tasks': VCE,
   },
   Manager: {
     'desk-sales': V,

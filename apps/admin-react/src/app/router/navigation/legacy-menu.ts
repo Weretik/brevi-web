@@ -387,6 +387,12 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
       },
       { id: 'lead-stats', label: 'Статистика лідів', path: '/admin/leads', access: 'lead-stats' },
       { id: 'ai-settings', label: 'Налаштування ШІ', path: '/admin/ai', requiredRoles: admin },
+      {
+        id: 'background-tasks',
+        label: 'Фонові задачі',
+        path: '/admin/background-tasks',
+        access: 'background-tasks',
+      },
       { id: 'access-rights', label: 'Права доступу', path: '/admin/access', requiredRoles: admin },
       {
         id: 'quote-settings',
