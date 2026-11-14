@@ -12,6 +12,8 @@
     "watch": "nx build --watch --configuration development",
     "test": "nx test",
     "test:web": "nx run-many -t test --projects=admin-react",
+    "architecture:structure": "node tools/architecture/check-structure.mjs",
+    "architecture:structure:fixtures": "node --test tools/architecture/check-structure.spec.mjs",
     "ci:test-scripts": "node tools/ci/check-test-scripts.mjs",
     "ci:test-scripts:fixtures": "node --test tools/ci/test-scripts.spec.mjs",
     "test:web:unit": "nx test admin-react -- .unit.test. --passWithNoTests",

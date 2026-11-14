@@ -7,7 +7,7 @@ import { AdminHomeTile } from './admin-home-tile';
 import { AdminNavigationGroup } from './admin-navigation-group';
 import { getNavigationPalette } from '../navigation-palette';
 
-import type { AdminNavigationGroup as NavigationGroup } from '../../shell.types';
+import type { AdminNavigationGroup as NavigationGroup } from '../../layout/admin-shell-contract';
 
 interface AdminNavigationProps {
   ariaLabel: string;

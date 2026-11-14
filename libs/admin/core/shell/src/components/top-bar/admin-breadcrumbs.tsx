@@ -5,7 +5,7 @@ import { useLocation } from 'react-router-dom';
 import { homeLabel } from '../../navigation/menu/admin-home-tile';
 import { findCurrentEntry } from '../../navigation/menu/navigation-route';
 
-import type { AdminNavigationGroup } from '../../shell.types';
+import type { AdminNavigationGroup } from '../../layout/admin-shell-contract';
 
 interface AdminBreadcrumbsProps {
   navigation: readonly AdminNavigationGroup[];

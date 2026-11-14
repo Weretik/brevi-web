@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 import { getNavigationPalette } from '../navigation-palette';
 
-import type { AdminNavigationItem } from '../../shell.types';
+import type { AdminNavigationItem } from '../../layout/admin-shell-contract';
 
 interface AdminNavigationItemProps {
   item: AdminNavigationItem;

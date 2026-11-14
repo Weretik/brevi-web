@@ -45,10 +45,10 @@ configuration are kept separate:
 libs/admin/shared/config/src/
 ├── index.ts
 ├── env/
-│   ├── admin-environment.types.ts
+│   ├── admin-environment-contract.ts
 │   └── environment-reader.ts
 └── config/
-    ├── app-config.types.ts
+    ├── app-config-contract.ts
     └── app-config.ts
 ```
 

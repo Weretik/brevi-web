@@ -1,6 +1,6 @@
 import { normalizeOrder } from '../ordering/product-order';
 
-import type { ProductDraft } from '../../forms/product-editor/product-draft.types';
+import type { ProductDraft } from '../../forms/product-editor/product-draft-values';
 
 type Fabrics = Extract<ProductDraft, { type: 'Sewing' }>['fabrics'];
 

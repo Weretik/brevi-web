@@ -1,7 +1,7 @@
 import { removeOrdered } from '../ordering/product-order';
 
 import type { ProductMedia } from '../../entities/product-media/product-media';
-import type { ProductDraft } from '../../forms/product-editor/product-draft.types';
+import type { ProductDraft } from '../../forms/product-editor/product-draft-values';
 
 type Photos = ProductDraft['photos'];
 

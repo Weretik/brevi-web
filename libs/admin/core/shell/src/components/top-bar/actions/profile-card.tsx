@@ -1,7 +1,7 @@
 import { UserAvatar } from '@admin/shared/ui';
 import { Box, Stack, Typography } from '@mui/material';
 
-import type { AdminShellUser } from '../../../shell.types';
+import type { AdminShellUser } from '../../../layout/admin-shell-contract';
 
 /** Who is signed in: photo, name, email and role, at the top of the profile menu. */
 export function ProfileCard({ user }: { user: AdminShellUser }) {

@@ -1,7 +1,7 @@
 import { ordered } from '../../mappers/ordering/product-order';
 import { groupPrimaryFabrics } from '../../mappers/sewing-fabrics/product-fabrics';
 
-import type { ProductDraft } from './product-draft.types';
+import type { ProductDraft } from './product-draft-values';
 import type { ProductDetail } from '../../entities/product-detail/product-detail';
 
 export function emptyProductDraft(type: ProductDraft['type'] = 'Sewing'): ProductDraft {

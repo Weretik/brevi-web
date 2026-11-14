@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { ProfileCard } from './profile-card';
 import { useAdminShellLogout } from '../../../providers/admin-shell-session-provider';
 
-import type { AdminShellUser } from '../../../shell.types';
+import type { AdminShellUser } from '../../../layout/admin-shell-contract';
 
 interface ProfileMenuProps {
   user: AdminShellUser | null;

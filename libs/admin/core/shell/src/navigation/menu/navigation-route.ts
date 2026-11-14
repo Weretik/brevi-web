@@ -1,4 +1,4 @@
-import type { AdminNavigationGroup, AdminNavigationItem } from '../../shell.types';
+import type { AdminNavigationGroup, AdminNavigationItem } from '../../layout/admin-shell-contract';
 
 export function matchesRoute(pathname: string, to: string): boolean {
   return pathname === to || (to !== '/' && pathname.startsWith(`${to}/`));

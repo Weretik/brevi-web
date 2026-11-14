@@ -21,8 +21,8 @@ export type {
   ApiErrorNotifier,
   ApiRequest,
   AuthSessionAdapter,
-} from './contracts/api-client.types';
+} from './contracts/api-client-contract';
 export type {
   ApiError as AdminApiError,
   ApiErrorMessages as AdminApiErrorMessages,
-} from './contracts/api-client.types';
+} from './contracts/api-client-contract';

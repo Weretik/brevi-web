@@ -6,7 +6,7 @@ import { useState, type MouseEvent } from 'react';
 
 import { topBarIconButtonSx } from './top-bar-icon-button';
 
-import type { AdminColorMode } from '../../../shell.types';
+import type { AdminColorMode } from '../../../layout/admin-shell-contract';
 
 interface ColorSchemeMenuProps {
   mode: AdminColorMode;

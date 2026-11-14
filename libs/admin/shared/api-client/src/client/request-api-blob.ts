@@ -3,7 +3,7 @@ import { appConfig } from '@admin/shared/config';
 import { axiosClient } from './axios-client';
 import { toApiError } from '../errors/api-error';
 
-import type { ApiRequest } from '../contracts/api-client.types';
+import type { ApiRequest } from '../contracts/api-client-contract';
 
 /** Authenticated, uncached binary response; callers own its short-lived URL. */
 export async function requestApiBlob(request: ApiRequest, signal?: AbortSignal): Promise<Blob> {

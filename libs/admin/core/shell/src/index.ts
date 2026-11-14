@@ -8,7 +8,7 @@ export type {
   AdminNavigationGroup,
   AdminNavigationItem,
   AdminShellUser,
-} from './shell.types';
+} from './layout/admin-shell-contract';
 export type {
   AdminShellLogoutAction,
   AdminShellSessionProviderProps,

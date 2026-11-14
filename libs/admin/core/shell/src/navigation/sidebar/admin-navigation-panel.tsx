@@ -7,7 +7,7 @@ import { AdminNavigationLogo } from './admin-navigation-logo';
 import { AdminNavigation } from '../menu/admin-navigation';
 import { navigationRowSx } from '../menu/navigation-row';
 
-import type { AdminNavigationGroup } from '../../shell.types';
+import type { AdminNavigationGroup } from '../../layout/admin-shell-contract';
 
 interface AdminNavigationPanelProps {
   collapsed: boolean;

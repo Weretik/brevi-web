@@ -1,7 +1,7 @@
 import { createAppConfig } from './app-config';
 
-import type { AppConfig } from './app-config.types';
-import type { AdminEnvironment } from '../env/admin-environment.types';
+import type { AppConfig } from './app-config-contract';
+import type { AdminEnvironment } from '../env/admin-environment-contract';
 
 export let appConfig: AppConfig = createAppConfig({ production: false });
 
