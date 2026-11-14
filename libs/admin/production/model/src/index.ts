@@ -72,6 +72,12 @@ export {
 } from './queries/people/workshop-staff-filters';
 export type { WorkshopStaffStatus } from './queries/people/workshop-staff-filters';
 export { countFabricNorms, filterFabricNorms } from './queries/norms/fabric-norm-filters';
+export {
+  countProductionOrderFilters,
+  productionOrderFilterChipText,
+  productionOrderFilterLabels,
+  setProductionOrderFilters,
+} from './queries/orders/production-order-filters';
 export type { FabricNormFilter } from './queries/norms/fabric-norm-filters';
 export {
   formatDay,

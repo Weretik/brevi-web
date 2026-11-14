@@ -14,11 +14,8 @@ export { ProductionItemsTable } from './tables/order-items/production-items-tabl
 export { ProductionItemForm } from './forms/order-items/production-item-form';
 export type { EmbroideryPicker } from './forms/order-items/production-item-applications';
 export { ProductionOrderChips } from './components/orders/production-order-chips';
-export {
-  ProductionOrderFilterChips,
-  ProductionOrderFilterPanel,
-  countProductionOrderFilters,
-} from './tables/orders/toolbar/production-order-filters';
+export { ProductionOrderFilterChips } from './tables/orders/toolbar/filters/production-order-filter-chips';
+export { ProductionOrderFilterPanel } from './tables/orders/toolbar/filters/production-order-filter-panel';
 export { ProductionStageConveyor } from './components/orders/production-stage-conveyor';
 export { ProductionOrdersMoreMenu } from './tables/orders/toolbar/production-orders-more-menu';
 export type { ProductionOrdersImport } from './tables/orders/toolbar/production-orders-more-menu';

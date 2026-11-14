@@ -1,4 +1,4 @@
-import { ordersWord } from '@admin/production/model';
+import { countProductionOrderFilters, ordersWord } from '@admin/production/model';
 import {
   ProductionOrderChips,
   ProductionOrderFilterChips,
@@ -7,7 +7,6 @@ import {
   ProductionOrdersMoreMenu,
   ProductionOrdersSearchRow,
   ProductionStageConveyor,
-  countProductionOrderFilters,
 } from '@admin/production/ui';
 import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
 import { usePageRights } from '@admin/shared/ui';

@@ -1,10 +1,11 @@
-import { productionStageLabels } from '@admin/production/model';
+import {
+  countProductionOrderFilters,
+  productionOrderFilterLabels as fieldLabels,
+} from '@admin/production/model';
 import CloseIcon from '@mui/icons-material/Close';
 import {
-  Autocomplete,
   Box,
   Button,
-  Chip,
   Divider,
   Drawer,
   IconButton,
@@ -14,92 +15,16 @@ import {
   Typography,
 } from '@mui/material';
 
+import { CodeFilterPicker } from './code-filter-picker';
+import { TextFilterPicker } from './text-filter-picker';
+
 import type {
-  ProductionFilterOption,
   ProductionOrderFilterField,
   ProductionOrderFilterOptions,
   ProductionOrderFilterValues,
-  ProductionStage,
 } from '@admin/production/model';
 
-const fieldLabels: Record<ProductionOrderFilterField, string> = {
-  client: 'Замовник',
-  from: 'Період від',
-  to: 'Період до',
-  model: 'Модель',
-  fabric: 'Тканина',
-  color: 'Колір',
-  season: 'Сезон',
-};
-
-const formatDate = (value: string) => value.split('-').reverse().join('.');
-
-function optionLabel(list: ProductionFilterOption[] | undefined, code: string) {
-  const option = list?.find((x) => x.code === code);
-  return option && option.name !== option.code ? `${option.code} · ${option.name}` : code;
-}
-
-/** How many of the panel's filters are set: the seven fields and the manager. */
-export function countProductionOrderFilters(
-  values: ProductionOrderFilterValues,
-  manager: string | null,
-) {
-  return (
-    (Object.keys(fieldLabels) as ProductionOrderFilterField[]).filter((x) => values[x]).length +
-    (manager ? 1 : 0)
-  );
-}
-
-function TextPicker({
-  label,
-  value,
-  options,
-  onChange,
-}: {
-  label: string;
-  value: string | null;
-  options: string[];
-  onChange: (value: string | null) => void;
-}) {
-  return (
-    <Autocomplete
-      size="small"
-      options={options}
-      value={value}
-      onChange={(_event, next) => onChange(next)}
-      renderInput={(params) => <TextField {...params} label={label} />}
-      noOptionsText="Немає збігів"
-    />
-  );
-}
-
-function CodePicker({
-  label,
-  value,
-  options,
-  onChange,
-}: {
-  label: string;
-  value: string | null;
-  options: ProductionFilterOption[];
-  onChange: (value: string | null) => void;
-}) {
-  const selected = options.find((x) => x.code === value) ?? null;
-  return (
-    <Autocomplete
-      size="small"
-      options={options}
-      value={selected}
-      getOptionLabel={(option) => `${option.code} · ${option.name}`}
-      isOptionEqualToValue={(option, current) => option.code === current.code}
-      onChange={(_event, next) => onChange(next?.code ?? null)}
-      renderInput={(params) => <TextField {...params} label={label} />}
-      noOptionsText="Немає збігів"
-    />
-  );
-}
-
-interface PanelProps {
+interface Props {
   open: boolean;
   values: ProductionOrderFilterValues;
   options: ProductionOrderFilterOptions | null;
@@ -129,7 +54,7 @@ export function ProductionOrderFilterPanel({
   onManagerChange,
   onReset,
   onClose,
-}: PanelProps) {
+}: Props) {
   const periodWrong = values.from && values.to && values.to < values.from;
   const active = countProductionOrderFilters(values, manager);
   return (
@@ -164,7 +89,7 @@ export function ProductionOrderFilterPanel({
         </Stack>
         <Divider />
         <Stack sx={{ gap: 2, px: 3, py: 2.5, overflowY: 'auto', flex: 1 }}>
-          <TextPicker
+          <TextFilterPicker
             label={fieldLabels.client}
             value={values.client}
             options={options?.clients ?? []}
@@ -206,19 +131,19 @@ export function ProductionOrderFilterPanel({
               </MenuItem>
             ))}
           </TextField>
-          <CodePicker
+          <CodeFilterPicker
             label={fieldLabels.model}
             value={values.model}
             options={options?.models ?? []}
             onChange={(value) => onChange('model', value)}
           />
-          <CodePicker
+          <CodeFilterPicker
             label={fieldLabels.fabric}
             value={values.fabric}
             options={options?.fabrics ?? []}
             onChange={(value) => onChange('fabric', value)}
           />
-          <TextPicker
+          <TextFilterPicker
             label={fieldLabels.color}
             value={values.color}
             options={options?.colors ?? []}
@@ -252,57 +177,5 @@ export function ProductionOrderFilterPanel({
         </Stack>
       </Box>
     </Drawer>
-  );
-}
-
-interface ChipsProps {
-  values: ProductionOrderFilterValues;
-  options: ProductionOrderFilterOptions | null;
-  manager: string | null;
-  stage: ProductionStage | null;
-  onChange: (field: ProductionOrderFilterField, value: string | null) => void;
-  onManagerChange: (manager: string | null) => void;
-  onStageChange: (stage: ProductionStage | null) => void;
-}
-
-/** The set filters as chips next to the status chips; × removes one filter. */
-export function ProductionOrderFilterChips({
-  values,
-  options,
-  manager,
-  stage,
-  onChange,
-  onManagerChange,
-  onStageChange,
-}: ChipsProps) {
-  const set = (Object.keys(fieldLabels) as ProductionOrderFilterField[]).filter((x) => values[x]);
-  const chipText = (field: ProductionOrderFilterField, value: string) => {
-    if (field === 'from' || field === 'to') return `${fieldLabels[field]}: ${formatDate(value)}`;
-    if (field === 'model') return `Модель: ${optionLabel(options?.models, value)}`;
-    if (field === 'fabric') return `Тканина: ${optionLabel(options?.fabrics, value)}`;
-    return `${fieldLabels[field]}: ${value}`;
-  };
-  const sx = { height: 32, bgcolor: 'primary.light', color: 'primary.dark', fontWeight: 600 };
-  return (
-    <>
-      {stage && (
-        <Chip
-          sx={sx}
-          label={`Етап: ${productionStageLabels[stage]}`}
-          onDelete={() => onStageChange(null)}
-        />
-      )}
-      {set.map((field) => (
-        <Chip
-          key={field}
-          sx={sx}
-          label={chipText(field, values[field] ?? '')}
-          onDelete={() => onChange(field, null)}
-        />
-      ))}
-      {manager && (
-        <Chip sx={sx} label={`Менеджер: ${manager}`} onDelete={() => onManagerChange(null)} />
-      )}
-    </>
   );
 }
