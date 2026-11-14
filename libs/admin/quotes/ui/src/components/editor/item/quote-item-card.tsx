@@ -1,21 +1,9 @@
-import { quoteTextMaxLength } from '@admin/quotes/model';
-import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined';
-import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
-import {
-  Alert,
-  Box,
-  Button,
-  Card,
-  Collapse,
-  Link,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
-import { useState } from 'react';
+import { Alert, Button, Card, Stack } from '@mui/material';
 
+import { QuoteItemDescription } from './card/quote-item-description';
+import { QuoteItemFooter } from './card/quote-item-footer';
+import { QuoteItemTitle } from './card/quote-item-title';
 import { QuoteItemMenu } from './quote-item-menu';
 import { QuoteItemPhoto } from './quote-item-photo';
 import { QuoteItemPrices } from './quote-item-prices';
@@ -64,13 +52,6 @@ interface Props {
 /** The anchor the «Перед надсиланням» links scroll to. */
 export const quoteItemAnchor = (key: string) => `quote-item-${key}`;
 
-const kindLabel = (item: QuoteItemDraft) => {
-  if (item.kind === 'Sewing') return 'Модель';
-  if (item.kind === 'CustomSewing') return item.productId ? 'Змінена модель' : 'Новий виріб';
-  if (item.kind === 'Embroidery') return 'Вишивка';
-  return item.kind === 'Ppe' ? 'ЗІЗ' : 'Разовий ЗІЗ';
-};
-
 /** A compact КП item: header, the price table and the description, always open for editing. */
 export function QuoteItemCard({
   item,
@@ -95,13 +76,7 @@ export function QuoteItemCard({
 }: Props) {
   const oneOff = item.kind === 'OneOffPpe';
   const custom = item.kind === 'CustomSewing';
-  const ppe = item.kind === 'Ppe' || oneOff;
   const label = oneOff ? item.name || 'Разова позиція' : item.name;
-  const [supplier, setSupplier] = useState(false);
-  const meta =
-    item.kind === 'Embroidery'
-      ? (item.subtitle ?? '')
-      : [item.season, item.code].filter(Boolean).join(' · ');
   return (
     <Card
       variant="outlined"
@@ -111,66 +86,12 @@ export function QuoteItemCard({
     >
       <Stack direction="row" sx={{ gap: 2, alignItems: 'flex-start', p: 2, pb: 1.5 }}>
         <QuoteItemPhoto photoUrl={item.photoUrl} label={label} onChange={onChangePhoto} />
-        <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Stack direction="row" sx={{ gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              sx={{ fontFamily: 'var(--admin-font-mono)' }}
-            >
-              {String(position).padStart(2, '0')}
-            </Typography>
-            {oneOff ? (
-              <TextField
-                size="small"
-                required
-                label="Назва позиції"
-                value={item.name}
-                onChange={(event) => onChange({ name: event.target.value })}
-                slotProps={{ htmlInput: { maxLength: 200 } }}
-                sx={{ flex: '1 1 260px' }}
-              />
-            ) : (
-              <Typography variant="subtitle1" component="h3" sx={{ fontWeight: 700 }}>
-                {item.name}
-              </Typography>
-            )}
-            <Box
-              component="span"
-              sx={{
-                typography: 'caption',
-                fontWeight: 600,
-                px: 1,
-                py: 0.25,
-                borderRadius: 1,
-                border: 1,
-                borderColor: 'divider',
-                bgcolor: 'action.hover',
-              }}
-            >
-              {kindLabel(item)}
-            </Box>
-            {onShowChanges && item.kind === 'CustomSewing' && item.productId !== null && (
-              <Button
-                size="small"
-                startIcon={<HistoryOutlinedIcon />}
-                onClick={onShowChanges}
-                sx={{ py: 0, minHeight: 0 }}
-              >
-                Що змінено
-              </Button>
-            )}
-          </Stack>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25 }}>
-            {meta}
-            {meta && item.siteUrl ? ' · ' : ''}
-            {item.siteUrl && (
-              <Link href={item.siteUrl} target="_blank" rel="noreferrer" color="primary.dark">
-                на сайті <OpenInNewOutlinedIcon sx={{ fontSize: 13, verticalAlign: 'middle' }} />
-              </Link>
-            )}
-          </Typography>
-        </Box>
+        <QuoteItemTitle
+          item={item}
+          position={position}
+          onChange={onChange}
+          onShowChanges={onShowChanges}
+        />
         {(item.kind === 'Sewing' || custom) && (
           <Button
             variant="outlined"
@@ -206,60 +127,13 @@ export function QuoteItemCard({
         onOpenSupplier={onOpenSupplier}
       />
 
-      <Box sx={{ px: 2, pt: 1.5 }}>
-        <TextField
-          fullWidth
-          multiline
-          minRows={2}
-          size="small"
-          label="Опис позиції у КП"
-          placeholder="Короткий опис для клієнта: що це за виріб, для кого, переваги"
-          value={item.description}
-          onChange={(event) => onChange({ description: event.target.value })}
-          helperText={
-            oneOff || custom || item.kind === 'Embroidery'
-              ? 'Бачить клієнт у КП.'
-              : 'Підтягується з «Короткого опису для КП» у товарі. Зміна діє лише в цьому КП.'
-          }
-          slotProps={{ htmlInput: { maxLength: quoteTextMaxLength } }}
-        />
-      </Box>
-      <Stack direction="row" sx={{ gap: 1, alignItems: 'center', flexWrap: 'wrap', px: 1, py: 1 }}>
-        {item.kind === 'Sewing' && (
-          <Button startIcon={<AddOutlinedIcon />} onClick={onAddFabric}>
-            Тканина
-          </Button>
-        )}
-        {(item.kind === 'Sewing' || custom) && (
-          <Button onClick={onEditComposition} sx={{ display: { xs: 'inline-flex', sm: 'none' } }}>
-            Змінити склад
-          </Button>
-        )}
-        {ppe && (
-          <Button
-            onClick={() => setSupplier((open) => !open)}
-            aria-expanded={supplier}
-            sx={{ ml: 'auto' }}
-          >
-            {supplier ? 'Сховати посилання' : 'Посилання на постачальника'}
-          </Button>
-        )}
-      </Stack>
-      {ppe && (
-        <Collapse in={supplier} unmountOnExit>
-          <Box sx={{ px: 2, pb: 2 }}>
-            <TextField
-              fullWidth
-              size="small"
-              label="Посилання на постачальника"
-              value={item.supplierUrl}
-              onChange={(event) => onChange({ supplierUrl: event.target.value })}
-              helperText="Бачите лише ви."
-              slotProps={{ htmlInput: { maxLength: 1000 } }}
-            />
-          </Box>
-        </Collapse>
-      )}
+      <QuoteItemDescription item={item} onChange={onChange} />
+      <QuoteItemFooter
+        item={item}
+        onChange={onChange}
+        onAddFabric={onAddFabric}
+        onEditComposition={onEditComposition}
+      />
       {itemError && (
         <Alert severity="warning" sx={{ m: 2, mt: 0 }}>
           {itemError}
