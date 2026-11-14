@@ -21,3 +21,11 @@
 
 - Validate public runtime configuration at the application boundary.
 - Do not add secrets, tokens, PII, or request/response bodies to source, logs, or docs.
+
+## Validation and server errors
+
+- The server validates every request; it is the only source of truth. Frontend validation only helps the user (early hints, disabled «Зберегти») and never replaces or weakens a server check.
+- Keep form rules in `model/validators` or `data-access/validators` and mirror the server rule where cheap; when they disagree, the server wins and the form shows the server message.
+- The backend returns errors as ProblemDetails: `title`/`detail` for the whole request and `errors` with messages by field (`{ "name": ["Вкажіть назву."] }`). Messages are Ukrainian and do not repeat the field name, because the form shows them under the field.
+- Parse errors only through `@admin/shared/api-client` (`api-error.ts`): it maps `errors` keys to camelCase form fields (dropping a `Request.` prefix) and still reads the older Ardalis list during the backend's move to ProblemDetails. Do not parse response bodies in features or components.
+- Show a field message under its field and the rest in one alert; never show raw bodies, trace ids or English framework text.
