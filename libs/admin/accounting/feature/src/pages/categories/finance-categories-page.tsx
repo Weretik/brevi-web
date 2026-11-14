@@ -1,13 +1,6 @@
 import {
-  useDeleteFinanceCategoryMutation,
-  useGetFinanceCategoriesQuery,
-} from '@admin/accounting/data-access';
-import {
   categoryDirectionLabels,
   categoryDirections,
-  countFinanceCategories,
-  financeCategoryRows,
-  ledgerScopeOfTab,
   ledgerTabOfScope,
   nextFinanceSortOrder,
 } from '@admin/accounting/model';
@@ -19,60 +12,39 @@ import {
   ReferencePageHeader,
   ReferenceSearchBar,
 } from '@admin/references/ui';
-import { adminApiErrorMessage } from '@admin/shared/api-client';
 import { usePageRights } from '@admin/shared/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import { Box, Button, Paper } from '@mui/material';
-import { useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
 
 import { FinanceCategoryDrawer } from '../../components/categories/finance-category-drawer';
 import { LedgerScopeTabs } from '../../components/journal/ledger-scope-tabs';
-import { useAccountingSettings } from '../../hooks/accounts/use-accounting-settings';
-import { useVersionedDeletion } from '../../hooks/deletion/use-versioned-deletion';
-
-import type { FinanceCategoryEditorMode } from '../../hooks/categories/use-finance-category-editor';
-import type { CategoryDirection, FinanceCategoryRow } from '@admin/accounting/model';
+import { useFinanceCategoriesPage } from '../../hooks/categories/use-finance-categories-page';
 
 /** «Бухгалтерія → Категорії»: current books and «Домашня бухгалтерія» on tabs (`?tab=archive`). */
 export function FinanceCategoriesPage() {
   const { canCreate } = usePageRights();
-  const query = useGetFinanceCategoriesQuery();
-  const all = useMemo(() => query.data ?? [], [query.data]);
-  const loading = query.isLoading || query.isFetching;
-  const error = query.error
-    ? adminApiErrorMessage(query.error, 'Не вдалося завантажити категорії.')
-    : null;
-  const { cutoverDate } = useAccountingSettings();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const scope = ledgerScopeOfTab(searchParams.get('tab'));
-  const [direction, setDirection] = useState<CategoryDirection>('Expense');
-  const [search, setSearch] = useState('');
-  const [active, setActive] = useState<{
-    mode: FinanceCategoryEditorMode;
-    category: FinanceCategoryRow | null;
-    parentId: string | null;
-  } | null>(null);
-  const [actionMessage, setActionMessage] = useState<string | null>(null);
-  const [deleteCategory, deleteState] = useDeleteFinanceCategoryMutation();
-  const deletion = useVersionedDeletion<FinanceCategoryRow>(
-    deleteCategory,
-    {
-      done: 'Готово: невикористану категорію видалено, використану — вимкнено.',
-      failed: 'Не вдалося видалити категорію.',
-    },
+  const {
+    query,
+    all,
+    loading,
+    error,
+    cutoverDate,
+    setSearchParams,
+    scope,
+    direction,
+    setDirection,
+    search,
+    setSearch,
+    active,
+    setActive,
+    actionMessage,
     setActionMessage,
-  );
-  const counts = countFinanceCategories(all, scope);
-  const allRows = useMemo(
-    () => financeCategoryRows(all, scope, direction, ''),
-    [all, scope, direction],
-  );
-  const rows = useMemo(
-    () => (search.trim() ? financeCategoryRows(all, scope, direction, search) : allRows),
-    [all, allRows, scope, direction, search],
-  );
-
+    deleteState,
+    deletion,
+    counts,
+    allRows,
+    rows,
+  } = useFinanceCategoriesPage();
   return (
     <Box sx={{ minWidth: 0 }}>
       <ReferencePageHeader

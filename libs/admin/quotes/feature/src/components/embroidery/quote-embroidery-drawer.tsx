@@ -1,9 +1,8 @@
-import { useGetEmbroideryCalculationsQuery } from '@admin/embroidery/data-access';
 import { embroiderySavedTitle, formatEmbroideryUnitPrice } from '@admin/embroidery/model';
-import { useAddQuoteEmbroideryMutation } from '@admin/quotes/data-access';
 import { ReferenceEditorDrawer } from '@admin/references/ui';
 import { Alert, Autocomplete, Box, Stack, TextField, Typography } from '@mui/material';
-import { useDeferredValue, useState } from 'react';
+
+import { useQuoteEmbroideryPicker } from '../../hooks/embroidery/use-quote-embroidery-picker';
 
 import type { EmbroiderySavedSummary } from '@admin/embroidery/model';
 import type { Quote } from '@admin/quotes/model';
@@ -26,28 +25,17 @@ const details = (x: EmbroiderySavedSummary) =>
  * one row at the end, the same as «Додати в КП» on «Збережені».
  */
 export function QuoteEmbroideryDrawer({ ensureSaved, onClose, onAdded }: Props) {
-  const [search, setSearch] = useState('');
-  const [calculation, setCalculation] = useState<EmbroiderySavedSummary | null>(null);
-  const [tried, setTried] = useState(false);
-  const [saveFailed, setSaveFailed] = useState(false);
-  const deferred = useDeferredValue(search);
-  const list = useGetEmbroideryCalculationsQuery({ search: deferred, page: 1, pageSize: 25 });
-  const [add, adding] = useAddQuoteEmbroideryMutation();
-  const options = (list.data?.items ?? []).filter((x) => x.price !== null);
-
-  const submit = async () => {
-    setTried(true);
-    setSaveFailed(false);
-    if (!calculation) return;
-    const quote = await ensureSaved();
-    if (!quote) {
-      setSaveFailed(true);
-      return;
-    }
-    const result = await add({ id: quote.id, calculationId: calculation.id });
-    if ('data' in result && result.data) onAdded(result.data);
-  };
-
+  const {
+    setSearch,
+    calculation,
+    setCalculation,
+    tried,
+    saveFailed,
+    list,
+    adding,
+    options,
+    submit,
+  } = useQuoteEmbroideryPicker({ ensureSaved, onAdded });
   return (
     <ReferenceEditorDrawer
       titleId="quote-embroidery-title"

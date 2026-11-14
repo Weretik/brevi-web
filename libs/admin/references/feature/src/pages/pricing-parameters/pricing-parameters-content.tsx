@@ -1,5 +1,3 @@
-import { useDeletePricingParameterMutation } from '@admin/references/data-access';
-import { filterPricingParameters, listPricingParameterSections } from '@admin/references/model';
 import {
   PricingDeleteDialog,
   PricingParametersGrid,
@@ -13,20 +11,11 @@ import {
 import { usePageRights } from '@admin/shared/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import { Box, Button, Paper } from '@mui/material';
-import { useMemo, useState } from 'react';
 
 import { PricingParameterDrawer } from '../../components/pricing-parameters/pricing-parameter-drawer';
-import {
-  nextSortOrder,
-  usePricingParameters,
-} from '../../hooks/pricing-parameters/use-pricing-lists';
-import { useReferenceDeletion } from '../../hooks/reference-lists/use-reference-deletion';
+import { nextSortOrder } from '../../hooks/pricing-parameters/use-pricing-lists';
+import { usePricingParametersContent } from '../../hooks/pricing-parameters/use-pricing-parameters-content';
 
-import type {
-  PricingEditorMode,
-  PricingParameter,
-  PricingParameterSectionFilter,
-} from '@admin/references/model';
 import type { ReactNode } from 'react';
 
 interface Props {
@@ -38,22 +27,23 @@ const distinct = (values: string[]) => [...new Set(values)];
 
 export function PricingParametersContent({ tabs }: Props) {
   const { canCreate } = usePageRights();
-  const { rows, loading, error, reload } = usePricingParameters();
-  const [search, setSearch] = useState('');
-  const [section, setSection] = useState<PricingParameterSectionFilter>(null);
-  const [active, setActive] = useState<{
-    mode: PricingEditorMode;
-    parameter: PricingParameter | null;
-  } | null>(null);
-  const [actionMessage, setActionMessage] = useState<string | null>(null);
-  const [deleteParameter] = useDeletePricingParameterMutation();
-  const deletion = useReferenceDeletion((id) => deleteParameter(id).unwrap(), setActionMessage);
-  const sections = useMemo(() => listPricingParameterSections(rows), [rows]);
-  const filteredRows = useMemo(
-    () => filterPricingParameters(rows, search, section),
-    [rows, search, section],
-  );
-
+  const {
+    rows,
+    loading,
+    error,
+    reload,
+    search,
+    setSearch,
+    section,
+    setSection,
+    active,
+    setActive,
+    actionMessage,
+    setActionMessage,
+    deletion,
+    sections,
+    filteredRows,
+  } = usePricingParametersContent();
   return (
     <Box sx={{ minWidth: 0 }}>
       <ReferencePageHeader

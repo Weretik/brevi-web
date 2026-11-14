@@ -1,31 +1,18 @@
-import { useGetSiteGalleryQuery } from '@admin/content/data-access';
-import {
-  moveSiteGalleryItem,
-  newSiteGalleryItem,
-  siteGalleryLabels,
-  siteGalleryLimits,
-} from '@admin/content/model';
+import { moveSiteGalleryItem, newSiteGalleryItem } from '@admin/content/model';
 import { SiteGalleryDeleteDialog, SiteGalleryGrid } from '@admin/content/ui';
 import { MediaPickerDrawer } from '@admin/media/feature';
 import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
 import { Alert, Box, Button, Stack } from '@mui/material';
-import { useState } from 'react';
 
 import { SiteGalleryItemDrawer } from './site-gallery-item-drawer';
-import { useSiteGalleryActions } from '../../hooks/galleries/use-site-gallery-actions';
+import { useSiteGalleryContent } from '../../hooks/galleries/use-site-gallery-content';
 
-import type { SiteGalleryItem, SiteGalleryKind, SiteGalleryViewer } from '@admin/content/model';
+import type { SiteGalleryKind, SiteGalleryViewer } from '@admin/content/model';
 
 interface Props {
   kind: SiteGalleryKind;
   viewer: SiteGalleryViewer;
-}
-
-interface Editing {
-  /** Null for a new picture added at the end. */
-  index: number | null;
-  item: SiteGalleryItem;
 }
 
 /**
@@ -33,31 +20,29 @@ interface Editing {
  * whole list. Pictures the site still keeps as its own files move to «Фото» with «Перенести у бібліотеку фото».
  */
 export function SiteGalleryContent({ kind, viewer }: Props) {
-  const labels = siteGalleryLabels[kind];
-  const query = useGetSiteGalleryQuery(kind);
-  const gallery = query.currentData;
-  const actions = useSiteGalleryActions(kind);
-  const [editing, setEditing] = useState<Editing | null>(null);
-  const [adding, setAdding] = useState(false);
-  const [deleting, setDeleting] = useState<number | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const items = gallery?.items ?? [];
-  const takenIds = items.flatMap((x) => (x.photoId === null ? [] : [x.photoId]));
-  const full = items.length >= siteGalleryLimits[kind];
-  const busy = actions.saving || actions.transferring;
-
-  async function saveList(next: SiteGalleryItem[], done: string) {
-    if (!gallery) return 'Сторінка ще не завантажилась.';
-    const reason = await actions.saveItems(gallery, next);
-    setError(reason);
-    if (!reason) setNotice(done);
-    return reason;
-  }
-
-  const nameOf = (index: number) => items[index]?.title.uk || `${labels.item} ${index + 1}`;
-  const report = actions.report;
-
+  const {
+    labels,
+    query,
+    gallery,
+    actions,
+    editing,
+    setEditing,
+    adding,
+    setAdding,
+    deleting,
+    setDeleting,
+    notice,
+    setNotice,
+    error,
+    setError,
+    items,
+    takenIds,
+    full,
+    busy,
+    saveList,
+    nameOf,
+    report,
+  } = useSiteGalleryContent({ kind });
   return (
     <Box sx={{ minWidth: 0 }}>
       <ReferencePageHeader

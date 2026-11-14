@@ -16,12 +16,9 @@ import { QuoteIntroductionActions } from './quote-introduction-actions';
 import { QuoteDeleteDialog } from '../../components/editor/quote-delete-dialog';
 import { QuoteSaveFirstDialog } from '../../components/editor/quote-save-first-dialog';
 import { QuoteSaveProblemsDialog } from '../../components/editor/quote-save-problems-dialog';
-import { QuoteIntroModelPickerDrawer } from '../../components/introduction/quote-intro-model-picker-drawer';
-import { QuoteIntroTemplateSaveDrawer } from '../../components/introduction/quote-intro-template-save-drawer';
-import { QuoteIntroTemplatesDrawer } from '../../components/introduction/quote-intro-templates-drawer';
-import { QuoteHistoryDrawer } from '../../components/lifecycle/quote-history-drawer';
+import { QuoteIntroductionNotices } from '../../components/introduction/quote-introduction-notices';
+import { QuoteIntroductionPanels } from '../../components/introduction/quote-introduction-panels';
 import { QuotePreview } from '../../components/preview/quote-preview';
-import { QuoteSendDrawer } from '../../components/sending/quote-send-drawer';
 import { useQuoteSaveFirst } from '../../hooks/editor/use-quote-save-first';
 import { useQuoteIntroductionEditor } from '../../hooks/introduction/use-quote-introduction-editor';
 import { useQuoteDelete } from '../../hooks/lifecycle/use-quote-delete';
@@ -31,14 +28,9 @@ import { useQuotePreview } from '../../hooks/preview/use-quote-preview';
 import { useGmailReturnNotice } from '../../hooks/sending/use-gmail-return-notice';
 import { useQuoteStartPrefill } from '../../hooks/start/use-quote-start-prefill';
 
-import type { QuoteActor, QuoteIntroSeason, QuoteIntroSlotDraft } from '@admin/quotes/model';
-
-type Panel =
-  | { kind: 'pick'; season: QuoteIntroSeason; slot: QuoteIntroSlotDraft }
-  | { kind: 'templates' }
-  | { kind: 'save-template' }
-  | { kind: 'history' }
-  | { kind: 'send' };
+import type { QuoteIntroductionNotice } from '../../components/introduction/quote-introduction-notices';
+import type { QuoteIntroductionPanel } from '../../components/introduction/quote-introduction-panels';
+import type { QuoteActor } from '@admin/quotes/model';
 
 const recipientAnchor = 'quote-intro-recipient';
 const pagesAnchor = 'quote-intro-pages';
@@ -66,10 +58,8 @@ export default function QuoteIntroductionPage({ actor }: { actor: QuoteActor }) 
   const saveFirst = useQuoteSaveFirst({ quote, dirty: editor.dirty, save: editor.save });
   const removal = useQuoteDelete(() => navigate('/crm/quotes'));
   const gmail = useGmailReturnNotice();
-  const [panel, setPanel] = useState<Panel | null>(null);
-  const [notice, setNotice] = useState<{ severity: 'success' | 'warning'; text: string } | null>(
-    null,
-  );
+  const [panel, setPanel] = useState<QuoteIntroductionPanel | null>(null);
+  const [notice, setNotice] = useState<QuoteIntroductionNotice | null>(null);
   const lifecycle = useQuoteLifecycle(quote);
   const routeNotice = useRouteNotice();
 
@@ -90,11 +80,6 @@ export default function QuoteIntroductionPage({ actor }: { actor: QuoteActor }) 
       </Box>
     );
 
-  const usedProductIds = new Set(
-    draft.pages.flatMap((page) =>
-      page.slots.map((slot) => slot.productId).filter((x): x is number => x !== null),
-    ),
-  );
   const mainProblems = {
     Summer: setup.summer.problem ?? undefined,
     Winter: setup.winter.problem ?? undefined,
@@ -139,41 +124,14 @@ export default function QuoteIntroductionPage({ actor }: { actor: QuoteActor }) 
           </>
         }
       />
-      {lifecycle.error && (
-        <Alert severity="error" sx={{ mb: 2 }} onClose={lifecycle.clearError}>
-          {lifecycle.error}
-        </Alert>
-      )}
-      {routeNotice.notice && (
-        <Alert severity="success" sx={{ mb: 2 }} onClose={routeNotice.dismiss}>
-          {routeNotice.notice}
-        </Alert>
-      )}
-      {editor.saveError && (
-        <Alert
-          severity="error"
-          sx={{ mb: 2 }}
-          action={
-            editor.saveError.stale ? (
-              <Button color="inherit" onClick={() => void editor.reload()}>
-                Оновити
-              </Button>
-            ) : undefined
-          }
-        >
-          {editor.saveError.message}
-        </Alert>
-      )}
-      {gmail.notice && (
-        <Alert severity={gmail.notice.severity} sx={{ mb: 2 }} onClose={gmail.dismiss}>
-          {gmail.notice.text}
-        </Alert>
-      )}
-      {notice && (
-        <Alert severity={notice.severity} sx={{ mb: 2 }} onClose={() => setNotice(null)}>
-          {notice.text}
-        </Alert>
-      )}
+      <QuoteIntroductionNotices
+        lifecycle={lifecycle}
+        routeNotice={routeNotice}
+        editor={editor}
+        gmail={gmail}
+        notice={notice}
+        onCloseNotice={() => setNotice(null)}
+      />
       <Stack sx={{ gap: 2 }}>
         <QuoteIntroLayoutStep layout={draft.layout} onChange={editor.setLayout} />
         <Box id={recipientAnchor} sx={{ scrollMarginTop: 96 }}>
@@ -240,57 +198,15 @@ export default function QuoteIntroductionPage({ actor }: { actor: QuoteActor }) 
           onClose={editor.closeSaveProblems}
         />
       )}
-
-      {panel?.kind === 'pick' && (
-        <QuoteIntroModelPickerDrawer
-          season={panel.season}
-          usedProductIds={usedProductIds}
-          onClose={() => setPanel(null)}
-          onChoose={(product, variant) => {
-            editor.chooseModel(panel.slot, product, variant);
-            setPanel(null);
-          }}
-        />
-      )}
-      {panel?.kind === 'templates' && (
-        <QuoteIntroTemplatesDrawer
-          onClose={() => setPanel(null)}
-          onApply={async (template) => {
-            await editor.applyTemplate(template);
-            setPanel(null);
-            setNotice({ severity: 'success', text: `Застосовано шаблон «${template.name}».` });
-          }}
-        />
-      )}
-      {panel?.kind === 'save-template' && (
-        <QuoteIntroTemplateSaveDrawer
-          draft={draft}
-          onClose={() => setPanel(null)}
-          onSaved={(name) => {
-            setPanel(null);
-            setNotice({ severity: 'success', text: `Шаблон «${name}» збережено.` });
-          }}
-        />
-      )}
-      {panel?.kind === 'history' && quote && (
-        <QuoteHistoryDrawer
-          quoteId={quote.id}
-          number={quote.number}
-          onClose={() => setPanel(null)}
-        />
-      )}
-      {panel?.kind === 'send' && quote && (
-        <QuoteSendDrawer
-          quote={quote}
-          actor={actor}
-          onClose={() => setPanel(null)}
-          onSent={(next) => {
-            setPanel(null);
-            editor.applyServerQuote(next);
-            setNotice({ severity: 'success', text: `КП ${next.number} надіслано.` });
-          }}
-        />
-      )}
+      <QuoteIntroductionPanels
+        panel={panel}
+        actor={actor}
+        quote={quote}
+        draft={draft}
+        editor={editor}
+        onClose={() => setPanel(null)}
+        onNotice={setNotice}
+      />
       <QuoteDeleteDialog flow={removal} />
     </Box>
   );

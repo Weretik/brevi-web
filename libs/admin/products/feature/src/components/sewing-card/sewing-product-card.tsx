@@ -1,18 +1,11 @@
-import { isSewingCreateReady, sewingVariantRows } from '@admin/products/model';
+import { sewingVariantRows } from '@admin/products/model';
 import { SewingCardHeader } from '@admin/products/ui';
 import { Alert, Box, Stack, Tab, Tabs } from '@mui/material';
-import { useState } from 'react';
 
 import { SewingCardMetrics } from './sewing-card-metrics';
 import { SewingCardPricingTab } from './sewing-card-pricing-tab';
-import { useCanSeeCost } from '../../hooks/product-access/use-can-see-cost';
-import { useProductActiveSwitch } from '../../hooks/product-overview/use-product-active-switch';
-import {
-  sewingCardTabLabels,
-  sewingCardTabs,
-  useSewingCardTab,
-} from '../../hooks/sewing-card/use-sewing-card-tab';
-import { useSewingModelCard } from '../../hooks/sewing-model/use-sewing-model-card';
+import { sewingCardTabLabels, sewingCardTabs } from '../../hooks/sewing-card/use-sewing-card-tab';
+import { useSewingProductCard } from '../../hooks/sewing-card/use-sewing-product-card';
 import { ProductDeleteDialog } from '../product-deletion/product-delete-dialog';
 import { ProductOverviewDrawer } from '../product-overview/product-overview-drawer';
 import { ProductPhotosTab } from '../product-photos/product-photos-tab';
@@ -32,19 +25,26 @@ interface Props {
  * «Комплектація виробів» and «Трудовитрати виробів» in one place. Every change saves at once.
  */
 export function SewingProductCard({ product, onDeleted }: Props) {
-  const { card, model, writes, modelCode } = useSewingModelCard(product.id);
-  const { tab, setTab } = useSewingCardTab();
-  const [editing, setEditing] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [activeError, setActiveError] = useState<string | null>(null);
-  const activeSwitch = useProductActiveSwitch(setActiveError);
-  const [pricingArticleId, setPricingArticleId] = useState<number | null>(null);
-  const showCost = useCanSeeCost();
-  const launched =
-    card.row?.isActive !== false && (!card.summaryLoaded || isSewingCreateReady(card.articles));
-  const sectionName =
-    card.row?.sectionId == null ? null : (card.sectionNames.get(card.row.sectionId) ?? null);
-
+  const {
+    card,
+    model,
+    writes,
+    modelCode,
+    tab,
+    setTab,
+    editing,
+    setEditing,
+    deleting,
+    setDeleting,
+    activeError,
+    setActiveError,
+    activeSwitch,
+    pricingArticleId,
+    setPricingArticleId,
+    showCost,
+    launched,
+    sectionName,
+  } = useSewingProductCard({ product });
   return (
     <Stack sx={{ gap: 2 }}>
       <SewingCardHeader

@@ -65,6 +65,8 @@ const adminAppFolder = 'apps/admin-react/src/app/';
 const componentLineLimit = 150;
 const moduleLineLimit = 200;
 const crowdedFolderSize = 8;
+/** Static copy, generated code, and test helpers: long by nature, not by responsibility. */
+const isExemptFromLength = (path) => /\/(i18n|data|generated|testing)\//.test(path);
 const styleSheetStart = /^(export )?const \w+ = (createStyles|StyleSheet\.create)\(/m;
 
 const isCode = (path) => /\.(ts|tsx)$/.test(path) && !path.endsWith('.d.ts');
@@ -170,7 +172,7 @@ export function findStructureViolations({ files, read }) {
   for (const path of scoped.filter(isProduction)) {
     const text = read(path) ?? '';
     const limit = path.endsWith('.tsx') ? componentLineLimit : moduleLineLimit;
-    if (effectiveLength(text) > limit) add('long-file', path);
+    if (!isExemptFromLength(path) && effectiveLength(text) > limit) add('long-file', path);
     if (
       path.endsWith('.tsx') &&
       (count(text, /\buseState\b\s*[(<]/g) > 3 || count(text, /\buse(Layout)?Effect\(/g) > 1)

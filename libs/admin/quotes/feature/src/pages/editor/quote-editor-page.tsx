@@ -1,57 +1,32 @@
-import { oneOffItemDraft, quoteSupplierFabrics } from '@admin/quotes/model';
 import {
-  QuoteAddItems,
-  QuoteItemCard,
-  QuoteNotesCard,
   QuoteRecipientCard,
   QuoteSendActions,
   quoteItemAnchor,
   quoteRecipientAnchor,
 } from '@admin/quotes/ui';
-import {
-  Alert,
-  Box,
-  Button,
-  CircularProgress,
-  Stack,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material';
-import { useState } from 'react';
-import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Alert, Box, Button, CircularProgress, Stack } from '@mui/material';
+import { Navigate } from 'react-router-dom';
 
 import { QuoteEditorAside } from './quote-editor-aside';
 import { QuoteEditorHeader } from './quote-editor-header';
 import { QuoteEditorNotices } from './quote-editor-notices';
 import { QuoteEditorPanels } from './quote-editor-panels';
 import { QuoteDeleteDialog } from '../../components/editor/quote-delete-dialog';
+import { QuoteEditorItems, quoteAddItemsAnchor } from '../../components/editor/quote-editor-items';
 import { QuoteSaveFirstDialog } from '../../components/editor/quote-save-first-dialog';
 import { QuoteSaveProblemsDialog } from '../../components/editor/quote-save-problems-dialog';
 import { QuotePreview } from '../../components/preview/quote-preview';
-import { useClientSuggestions } from '../../hooks/clients/use-client-suggestions';
-import { useQuoteEditor } from '../../hooks/editor/use-quote-editor';
-import { useQuoteFabricFacts } from '../../hooks/editor/use-quote-fabric-facts';
-import { useQuoteSaveFirst } from '../../hooks/editor/use-quote-save-first';
-import { useQuoteDelete } from '../../hooks/lifecycle/use-quote-delete';
-import { useQuoteLifecycle } from '../../hooks/lifecycle/use-quote-lifecycle';
-import { useRouteNotice } from '../../hooks/lifecycle/use-route-notice';
-import { useQuotePreview } from '../../hooks/preview/use-quote-preview';
-import { useGmailReturnNotice } from '../../hooks/sending/use-gmail-return-notice';
-import { useQuoteStartPrefill } from '../../hooks/start/use-quote-start-prefill';
+import { useQuoteEditorPage } from '../../hooks/editor/use-quote-editor-page';
 
-import type { QuoteEditorPanel } from './quote-editor-panels';
 import type { QuoteSupplierCard, QuoteWorkshopCard } from './quote-supplier-card';
-import type { QuoteActor, QuoteFabricFacts } from '@admin/quotes/model';
-
-const addItemsAnchor = 'quote-add-items';
+import type { QuoteActor } from '@admin/quotes/model';
 
 const scrollTo = (target: string) => {
   const id =
     target === 'header'
       ? quoteRecipientAnchor
       : target === 'items'
-        ? addItemsAnchor
+        ? quoteAddItemsAnchor
         : quoteItemAnchor(target);
   document.getElementById(id)?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
 };
@@ -67,37 +42,26 @@ export default function QuoteEditorPage({
   /** «Цех» in the right column (client corrections item 9); the app supplies it from «Виробничі завдання». */
   workshopCard?: QuoteWorkshopCard;
 }) {
-  const params = useParams();
-  const id = params['quoteId'] ? Number(params['quoteId']) : null;
-  const navigate = useNavigate();
-  const [search] = useSearchParams();
-  const prefill = useQuoteStartPrefill();
-  const editor = useQuoteEditor(id, prefill);
-  const clients = useClientSuggestions();
-  const theme = useTheme();
-  const wide = useMediaQuery(theme.breakpoints.up('lg'));
-  // An old «КП з нуля» link opens a new КП with the «Новий виріб» panel.
-  const [panel, setPanel] = useState<QuoteEditorPanel | null>(() =>
-    id === null && search.get('custom') === '1' ? { kind: 'custom' } : null,
-  );
+  const {
+    navigate,
+    editor,
+    clients,
+    wide,
+    panel,
+    setPanel,
+    fabricFacts,
+    openSupplier,
+    preview,
+    saveFirst,
+    removal,
+    gmail,
+    sentNotice,
+    setSentNotice,
+    lifecycle,
+    routeNotice,
+    actions,
+  } = useQuoteEditorPage(supplierCard);
   const { quote, draft } = editor;
-  const fabricFacts = useQuoteFabricFacts(draft);
-  const openSupplierCard = supplierCard?.open;
-  const openSupplier = openSupplierCard
-    ? (facts: QuoteFabricFacts) =>
-        openSupplierCard({
-          id: facts.supplierId,
-          name: facts.supplierName ?? '',
-          fabrics: quoteSupplierFabrics(facts, fabricFacts),
-        })
-    : undefined;
-  const preview = useQuotePreview();
-  const saveFirst = useQuoteSaveFirst({ quote, dirty: editor.dirty, save: editor.save });
-  const removal = useQuoteDelete(() => navigate('/crm/quotes'));
-  const gmail = useGmailReturnNotice();
-  const [sentNotice, setSentNotice] = useState<string | null>(null);
-  const lifecycle = useQuoteLifecycle(quote);
-  const routeNotice = useRouteNotice();
 
   if (editor.loading)
     return (
@@ -116,28 +80,6 @@ export default function QuoteEditorPage({
     );
   if (quote?.kind === 'Introduction')
     return <Navigate to={`/crm/quote-introductions/${quote.id}`} replace />;
-
-  const actions = {
-    dirty: editor.dirty,
-    saving: editor.saving,
-    generating: preview.preparing,
-    // «Зберегти» saves and stays, «Зберегти і закрити» goes back to the list; «Скасувати» closes without saving.
-    onSave: () =>
-      void editor.save().then((saved) => {
-        if (saved) setSentNotice('КП збережено.');
-      }),
-    onSaveAndClose: () =>
-      void editor.save().then((saved) => {
-        if (saved) navigate('/crm/quotes', { state: { notice: 'КП збережено' } });
-      }),
-    onCancel: () => navigate('/crm/quotes'),
-    onPdf: () => saveFirst.run((saved) => void preview.open(saved)),
-    // The manager sees the PDF first and sends it from the preview (crm R-30).
-    onSend: () => {
-      setSentNotice(null);
-      saveFirst.run((saved) => void preview.open(saved));
-    },
-  };
 
   return (
     <Box sx={{ pb: wide ? 4 : 10 }}>
@@ -179,56 +121,11 @@ export default function QuoteEditorPage({
             onChange={editor.change}
             onClientSearch={clients.search}
           />
-          <Typography variant="h5" component="h2" sx={{ mt: 1 }}>
-            Позиції{' '}
-            <Box
-              component="span"
-              sx={{ fontFamily: 'var(--admin-font-mono)', color: 'text.secondary' }}
-            >
-              {draft.items.length}
-            </Box>
-          </Typography>
-          {draft.items.map((item, index) => (
-            <QuoteItemCard
-              key={item.key}
-              item={item}
-              position={index + 1}
-              isFirst={index === 0}
-              isLast={index === draft.items.length - 1}
-              itemError={editor.errors[`item:${item.key}`]}
-              optionErrors={editor.errors}
-              onChange={(patch) => editor.updateItem(item.key, patch)}
-              onTierChange={(optionKey, tier, patch) =>
-                editor.setTier(item.key, optionKey, tier, patch)
-              }
-              onOptionChange={(optionKey, change) =>
-                editor.updateOption(item.key, optionKey, change)
-              }
-              onRecommend={(optionKey) => editor.recommend(item.key, optionKey)}
-              onRemoveOption={(optionKey) => editor.removeOption(item.key, optionKey)}
-              onAddFabric={() => setPanel({ kind: 'fabric', itemKey: item.key })}
-              onEditComposition={() => setPanel({ kind: 'custom', itemKey: item.key })}
-              onChangePhoto={() => setPanel({ kind: 'photo', itemKey: item.key })}
-              onShowChanges={() => setPanel({ kind: 'changes', itemKey: item.key })}
-              onMove={(offset) => editor.moveItem(item.key, offset)}
-              onRemove={() => editor.removeItem(item.key)}
-              fabricFacts={fabricFacts}
-              onOpenSupplier={openSupplier}
-            />
-          ))}
-          <Box id={addItemsAnchor} sx={{ scrollMarginTop: 96 }}>
-            <QuoteAddItems
-              empty={draft.items.length === 0}
-              onAddProduct={() => setPanel({ kind: 'catalog' })}
-              onAddOneOff={() => editor.addItems([oneOffItemDraft()])}
-              onAddCustom={() => setPanel({ kind: 'custom' })}
-              onAddEmbroidery={() => setPanel({ kind: 'embroidery' })}
-            />
-          </Box>
-          <QuoteNotesCard
-            clientComment={draft.clientComment}
-            managerNote={draft.managerNote}
-            onChange={editor.change}
+          <QuoteEditorItems
+            editor={editor}
+            fabricFacts={fabricFacts}
+            onOpenSupplier={openSupplier}
+            onPanel={setPanel}
           />
         </Stack>
         <Box sx={{ position: { lg: 'sticky' }, top: { lg: 88 } }}>

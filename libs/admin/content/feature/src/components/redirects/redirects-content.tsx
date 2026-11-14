@@ -1,18 +1,14 @@
-import { useGetSiteRedirectsQuery } from '@admin/content/data-access';
-import { filterRedirects, redirectSourceLabel, siteRedirectSources } from '@admin/content/model';
+import { redirectSourceLabel, siteRedirectSources } from '@admin/content/model';
 import { OldSiteImportDialog, RedirectsTable } from '@admin/content/ui';
 import { ReferenceListAlerts, ReferencePageHeader, ReferenceSearchBar } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
 import { Alert, Box, Button, MenuItem, Paper, Stack, TextField } from '@mui/material';
-import { useMemo, useState } from 'react';
 
 import { RedirectDrawer } from './redirect-drawer';
-import {
-  redirectTransferReport,
-  useOldSiteRedirectImport,
-} from '../../hooks/redirects/use-old-site-redirect-import';
+import { redirectTransferReport } from '../../hooks/redirects/use-old-site-redirect-import';
+import { useRedirectsContent } from '../../hooks/redirects/use-redirects-content';
 
-import type { RedirectsViewer, SiteRedirect, SiteRedirectSource } from '@admin/content/model';
+import type { RedirectsViewer, SiteRedirectSource } from '@admin/content/model';
 import type { OldSiteImportCopy } from '@admin/content/ui';
 
 const transferCopy: OldSiteImportCopy = {
@@ -26,24 +22,25 @@ const transferCopy: OldSiteImportCopy = {
   notMatched: 'Не знайдено сторінку (додайте вручну)',
 };
 
-const noRows: SiteRedirect[] = [];
-
 /**
  * «Контент → Переадресації»: old addresses that lead to pages of the new site with a 301. Staff
  * transfer the old-site addresses, add and change redirects; an address change of a product,
  * category or article adds one by itself.
  */
 export function RedirectsContent({ viewer }: { viewer: RedirectsViewer }) {
-  const list = useGetSiteRedirectsQuery();
-  const rows = list.currentData ?? noRows;
-  const [term, setTerm] = useState('');
-  const [source, setSource] = useState<SiteRedirectSource | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
-  // `undefined` keeps the panel closed, null opens a new redirect.
-  const [opened, setOpened] = useState<SiteRedirect | null | undefined>(undefined);
-  const transfer = useOldSiteRedirectImport();
-  const shown = useMemo(() => filterRedirects(rows, term, source), [rows, term, source]);
-
+  const {
+    list,
+    term,
+    setTerm,
+    source,
+    setSource,
+    notice,
+    setNotice,
+    opened,
+    setOpened,
+    transfer,
+    shown,
+  } = useRedirectsContent();
   return (
     <Box sx={{ minWidth: 0 }}>
       <ReferencePageHeader

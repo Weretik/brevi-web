@@ -9,17 +9,13 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { useState } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 
-import { getLoginErrorMessage } from './login-error-message';
 import { LoginIntroPanel } from '../components/login/login-intro-panel';
 import { PasswordField } from '../components/login/password-field';
+import { useLoginForm } from '../hooks/login/use-login-form';
 import { readReturnPath } from '../routes/login-return-path';
-import { login } from '../session/auth-session';
 import { useAdminSession } from '../session/use-admin-session';
-
-import type { FormEvent } from 'react';
 
 const defaultReturnPath = '/';
 
@@ -31,31 +27,13 @@ const legalLinks = [
 export function LoginPage() {
   const session = useAdminSession();
   const location = useLocation();
-  const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const returnPath = readReturnPath(location.search, defaultReturnPath);
+  const { email, setEmail, password, setPassword, error, isSubmitting, handleSubmit } =
+    useLoginForm(returnPath);
 
   if (session.status === 'authenticated' && !isSubmitting) {
     return <Navigate replace to={returnPath} />;
   }
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setError(null);
-    setIsSubmitting(true);
-
-    try {
-      await login({ email: email.trim(), password });
-      navigate(returnPath, { replace: true });
-    } catch (loginError) {
-      setError(getLoginErrorMessage(loginError));
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   return (
     <Box sx={{ bgcolor: 'background.default', display: 'flex', minHeight: '100vh' }}>

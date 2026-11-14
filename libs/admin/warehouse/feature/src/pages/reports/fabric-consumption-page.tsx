@@ -1,49 +1,40 @@
 import { ReferenceListAlerts, ReferencePageHeader, ReferenceSearchBar } from '@admin/references/ui';
-import { useGetFabricConsumptionQuery } from '@admin/warehouse/data-access';
 import {
   consumptionPeriods,
-  filterConsumption,
   formatMeters,
   formatMoney,
-  kyivToday,
   movementPeriodRange,
 } from '@admin/warehouse/model';
 import { FabricConsumptionTable, PeriodChip, ReportStats } from '@admin/warehouse/ui';
 import { Alert, Box, Stack } from '@mui/material';
-import { useMemo, useState } from 'react';
 
-import { useDebouncedValue } from '../../hooks/debounce/use-debounced-value';
+import { useFabricConsumptionReport } from '../../hooks/reports/use-fabric-consumption-report';
 
 import type { WarehouseTabProps } from '../tabs/warehouse-tab';
-import type { ConsumptionSortKey, MovementPeriod } from '@admin/warehouse/model';
 
 /**
  * «Склад тканин › Звіти › Витрата за період» (WH-010): what came in, what went to tasks, one-off and corrections per
  * pair, «Цей місяць» by default; totals above, the table sorts.
  */
 export function FabricConsumptionPage({ title, tabs }: WarehouseTabProps) {
-  const today = kyivToday();
-  const [period, setPeriod] = useState<MovementPeriod>('month');
-  const [dates, setDates] = useState(() => movementPeriodRange('month', today));
-  const [search, setSearch] = useState('');
-  const debounced = useDebouncedValue(search, 200);
-  const [sort, setSort] = useState<{ key: ConsumptionSortKey; descending: boolean }>({
-    key: 'issuedToTasks',
-    descending: true,
-  });
-  const from = dates.from;
-  const to = dates.to;
-  const valid = Boolean(from && to && from <= to);
-  const report = useGetFabricConsumptionQuery(
-    { from: from ?? today, to: to ?? today },
-    { skip: !valid },
-  );
-  const data = valid ? report.data : undefined;
-  const rows = useMemo(
-    () => (data ? filterConsumption(data.rows, debounced, sort.key, sort.descending) : []),
-    [data, debounced, sort],
-  );
-  const seesValue = data?.issuedValue !== null && data?.issuedValue !== undefined;
+  const {
+    today,
+    period,
+    setPeriod,
+    setDates,
+    search,
+    setSearch,
+    debounced,
+    sort,
+    setSort,
+    from,
+    to,
+    valid,
+    report,
+    data,
+    rows,
+    seesValue,
+  } = useFabricConsumptionReport();
   return (
     <Box sx={{ minWidth: 0 }}>
       <ReferencePageHeader

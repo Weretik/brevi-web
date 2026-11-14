@@ -368,6 +368,13 @@ export type {
   PayrollPaymentFormValues,
 } from './forms/people/payroll-forms';
 export { payrollCsv } from './queries/people/payroll-csv';
+export {
+  payrollClosedBy,
+  payrollMissingRoles,
+  payrollMonthPeople,
+  payrollMonthPermissions,
+} from './queries/people/payroll-month-facts';
+export type { PayrollMonthRights } from './queries/people/payroll-month-facts';
 export { WORKSHOP_REPORT_MAX_MONTHS } from './entities/reports/workshop-report';
 export type {
   ReportIssueRow,

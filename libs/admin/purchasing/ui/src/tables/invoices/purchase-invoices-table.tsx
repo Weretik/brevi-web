@@ -1,16 +1,6 @@
-import {
-  formatPurchaseMessageAt,
-  formatPurchaseDocumentDate,
-  formatPurchaseMoney,
-  purchaseInvoicePageSizes,
-  purchaseInvoiceStatus,
-} from '@admin/purchasing/model';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import { purchaseInvoicePageSizes } from '@admin/purchasing/model';
 import {
   Box,
-  Collapse,
-  IconButton,
   LinearProgress,
   Stack,
   Table,
@@ -24,7 +14,8 @@ import {
 } from '@mui/material';
 import { Fragment, useState } from 'react';
 
-import { PurchaseStatusChip, PurchaseVatChip } from '../../components/status/purchase-status-chip';
+import { PurchaseInvoiceDetailsRow, purchaseInvoiceColumns } from './purchase-invoice-details-row';
+import { PurchaseInvoiceRow } from './purchase-invoice-row';
 
 import type { PurchaseInvoice, PurchaseInvoicePage } from '@admin/purchasing/model';
 import type { ReactNode } from 'react';
@@ -39,146 +30,6 @@ interface Props {
   onPageChange: (model: { page: number; pageSize: number }) => void;
   /** What a row shows when its arrow is open: positions, message, originals, buttons. */
   renderDetails: (invoice: PurchaseInvoice) => ReactNode;
-}
-
-const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' };
-const columns = 8;
-
-function InvoiceRow({
-  invoice,
-  open,
-  onToggle,
-  details,
-}: {
-  invoice: PurchaseInvoice;
-  open: boolean;
-  onToggle: () => void;
-  details: ReactNode;
-}) {
-  const { status } = purchaseInvoiceStatus(invoice);
-  const documents = invoice.links.flatMap((link) => (link.document ? [link.document] : []));
-  const first = documents[0];
-  const supplier = first?.supplierName ?? invoice.supplierName;
-  return (
-    <Fragment>
-      <TableRow
-        hover
-        onClick={onToggle}
-        sx={{
-          cursor: 'pointer',
-          '& > td': { borderBottom: open ? 0 : undefined },
-          bgcolor: open ? 'action.hover' : undefined,
-        }}
-      >
-        <TableCell padding="checkbox">
-          <IconButton
-            size="small"
-            aria-expanded={open}
-            aria-label={`${open ? 'Згорнути' : 'Розгорнути'} рахунок UID ${invoice.sourceUid}`}
-            onClick={(event) => {
-              event.stopPropagation();
-              onToggle();
-            }}
-          >
-            {open ? <KeyboardArrowDownIcon /> : <KeyboardArrowRightIcon />}
-          </IconButton>
-        </TableCell>
-        <TableCell>
-          <PurchaseStatusChip status={status} />
-        </TableCell>
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>
-          <Typography variant="body2" sx={mono}>
-            {formatPurchaseMessageAt(invoice.messageAt)}
-          </Typography>
-          <Typography variant="caption" color="text.secondary" sx={mono}>
-            UID {invoice.sourceUid}
-          </Typography>
-        </TableCell>
-        <TableCell sx={{ minWidth: 180, maxWidth: 260 }}>
-          <Typography
-            variant="body2"
-            noWrap
-            title={supplier ?? undefined}
-            color={supplier ? 'text.primary' : 'text.secondary'}
-          >
-            {supplier ?? '—'}
-          </Typography>
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            noWrap
-            component="div"
-            title={invoice.text}
-          >
-            {[invoice.chatName, invoice.fromUser].filter(Boolean).join(' · ') ||
-              invoice.text ||
-              '—'}
-          </Typography>
-        </TableCell>
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>
-          {first ? (
-            <>
-              <Typography variant="body2" sx={mono}>
-                № {first.documentNumber}
-                {documents.length > 1 && (
-                  <Typography component="span" variant="caption" color="text.secondary">
-                    {' '}
-                    +{documents.length - 1}
-                  </Typography>
-                )}
-              </Typography>
-              <Typography variant="caption" color="text.secondary" sx={mono}>
-                від {formatPurchaseDocumentDate(first.documentDate)}
-              </Typography>
-            </>
-          ) : (
-            <Typography variant="body2" color="text.secondary">
-              {invoice.links.length > 1 ? `Оригіналів: ${invoice.links.length}` : '—'}
-            </Typography>
-          )}
-        </TableCell>
-        <TableCell align="right" sx={{ ...mono, whiteSpace: 'nowrap' }}>
-          {first ? formatPurchaseMoney(first.totalPayable) : ''}
-        </TableCell>
-        <TableCell>{first && <PurchaseVatChip vat={first.vat} />}</TableCell>
-        <TableCell sx={{ whiteSpace: 'nowrap' }}>
-          {invoice.markedPaid && (
-            <Typography
-              variant="body2"
-              title={[invoice.markBy, invoice.markAt].filter(Boolean).join(' · ')}
-            >
-              Відмічено
-            </Typography>
-          )}
-        </TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell
-          colSpan={columns}
-          sx={{ p: 0, borderBottom: open ? 1 : 0, borderColor: 'divider' }}
-        >
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ bgcolor: 'action.hover' }}>
-              {/* Stays in view while the table scrolls sideways and keeps a readable width. */}
-              <Box
-                sx={{
-                  position: 'sticky',
-                  left: 0,
-                  maxWidth: 880,
-                  px: { xs: 1.5, sm: 2 },
-                  pb: 2,
-                  pt: 0.5,
-                  pl: { sm: 7 },
-                }}
-              >
-                {details}
-              </Box>
-            </Box>
-          </Collapse>
-        </TableCell>
-      </TableRow>
-    </Fragment>
-  );
 }
 
 /**
@@ -241,7 +92,7 @@ export function PurchaseInvoicesTable({
           <TableBody>
             {items.length === 0 && !loading ? (
               <TableRow>
-                <TableCell colSpan={columns}>
+                <TableCell colSpan={purchaseInvoiceColumns}>
                   <Stack sx={{ py: 4, alignItems: 'center' }}>
                     <Typography variant="body2" color="text.secondary">
                       {empty}
@@ -251,13 +102,16 @@ export function PurchaseInvoicesTable({
               </TableRow>
             ) : (
               items.map((invoice) => (
-                <InvoiceRow
-                  key={invoice.messageId}
-                  invoice={invoice}
-                  open={open.has(invoice.messageId)}
-                  onToggle={() => toggle(invoice.messageId)}
-                  details={open.has(invoice.messageId) ? renderDetails(invoice) : null}
-                />
+                <Fragment key={invoice.messageId}>
+                  <PurchaseInvoiceRow
+                    invoice={invoice}
+                    open={open.has(invoice.messageId)}
+                    onToggle={() => toggle(invoice.messageId)}
+                  />
+                  <PurchaseInvoiceDetailsRow open={open.has(invoice.messageId)}>
+                    {open.has(invoice.messageId) ? renderDetails(invoice) : null}
+                  </PurchaseInvoiceDetailsRow>
+                </Fragment>
               ))
             )}
           </TableBody>
