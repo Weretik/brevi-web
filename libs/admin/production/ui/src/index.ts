@@ -61,12 +61,10 @@ export { PayrollSetupForm } from './forms/payroll/payroll-setup-form';
 export type { PayrollPersonOption, PayrollSetupValues } from './forms/payroll/payroll-setup-form';
 export { PayrollAdjustmentForm, PayrollPaymentForm } from './forms/payroll/payroll-entry-forms';
 export { ReportTotals } from './components/reports/report-totals';
-export {
-  ReportMaterialsTable,
-  ReportOutputTable,
-  ReportStaffTable,
-  ReportStockTable,
-} from './tables/reports/report-tables';
+export { ReportMaterialsTable } from './tables/reports/report-materials-table';
+export { ReportOutputTable } from './tables/reports/report-output-table';
+export { ReportStaffTable } from './tables/reports/report-staff-table';
+export { ReportStockTable } from './tables/reports/report-stock-table';
 export { WorkshopArchiveDetails } from './details/archive/workshop-archive-details';
 export { WorkshopArchiveGrid } from './tables/archive/workshop-archive-grid';
 export { WorkshopTabHeader } from './components/people/workshop-tab-header';
