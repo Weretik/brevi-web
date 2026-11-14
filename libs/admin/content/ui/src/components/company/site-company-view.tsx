@@ -1,82 +1,12 @@
-import { scheduleText } from '@admin/content/model';
-import { Avatar, Box, Link, Stack, Typography } from '@mui/material';
+import { companyMapUrl, scheduleText } from '@admin/content/model';
+import { Box, Link, Stack, Typography } from '@mui/material';
 
+import { CompanyTextBoth } from './company-text-both';
+import { SiteCompanyManagerTile } from './site-company-manager-tile';
+import { mono } from './site-company-styles';
 import { SettingsCard, SettingsChangedLine, SettingsField } from '../settings-card/settings-card';
 
-import type { CompanyManager, CompanyText, SiteCompany } from '@admin/content/model';
-
-const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' } as const;
-
-function Both({ text }: { text: CompanyText }) {
-  return (
-    <>
-      {text.uk}
-      {text.ru !== text.uk && (
-        <Typography variant="caption" color="text.secondary" component="div">
-          рос.: {text.ru}
-        </Typography>
-      )}
-    </>
-  );
-}
-
-/** A picture of the library is shown; a picture that stays on the site itself is named. */
-export function managerPhotoSrc(url: string | null): string | undefined {
-  return url && /^https:\/\//.test(url) ? url : undefined;
-}
-
-/** What the map link of the site opens: a Google Maps search for the address. */
-export function companyMapUrl(mapQuery: string): string {
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}`;
-}
-
-function ManagerTile({ manager }: { manager: CompanyManager }) {
-  return (
-    <Stack
-      direction="row"
-      sx={{
-        gap: 1.5,
-        alignItems: 'flex-start',
-        p: 1.5,
-        border: 1,
-        borderColor: 'divider',
-        borderRadius: 1,
-        minWidth: 0,
-      }}
-    >
-      <Avatar
-        src={managerPhotoSrc(manager.photoUrl)}
-        alt={manager.name.uk}
-        sx={{ width: 56, height: 56 }}
-      >
-        {manager.name.uk.slice(0, 1)}
-      </Avatar>
-      <Stack sx={{ minWidth: 0, gap: 0.25 }}>
-        <Typography variant="subtitle2">{manager.name.uk}</Typography>
-        {manager.name.ru !== manager.name.uk && (
-          <Typography variant="caption" color="text.secondary">
-            рос.: {manager.name.ru}
-          </Typography>
-        )}
-        {manager.phones.map((phone) => (
-          <Typography key={phone} variant="body2" sx={mono}>
-            {phone}
-          </Typography>
-        ))}
-        {manager.email && (
-          <Typography variant="body2" color="text.secondary" sx={{ overflowWrap: 'anywhere' }}>
-            {manager.email}
-          </Typography>
-        )}
-        {manager.photoUrl && !managerPhotoSrc(manager.photoUrl) && (
-          <Typography variant="caption" color="text.secondary">
-            Фото з сайту; щоб змінити, оберіть нове з «Фото».
-          </Typography>
-        )}
-      </Stack>
-    </Stack>
-  );
-}
+import type { SiteCompany } from '@admin/content/model';
 
 /**
  * Read view of «Контакти та компанія»: cards side by side across the page width. Contacts, address and
@@ -115,10 +45,10 @@ export function SiteCompanyView({ company }: { company: SiteCompany }) {
         <SettingsCard title="Адреса">
           <Stack sx={{ gap: 2 }}>
             <SettingsField label="Місто">
-              <Both text={company.city} />
+              <CompanyTextBoth text={company.city} />
             </SettingsField>
             <SettingsField label="Вулиця">
-              <Both text={company.street} />
+              <CompanyTextBoth text={company.street} />
             </SettingsField>
             <SettingsField label="Пошук на мапі">
               <Link
@@ -166,7 +96,7 @@ export function SiteCompanyView({ company }: { company: SiteCompany }) {
             }}
           >
             {company.managers.map((manager, index) => (
-              <ManagerTile key={index} manager={manager} />
+              <SiteCompanyManagerTile key={index} manager={manager} />
             ))}
           </Box>
         )}
@@ -184,7 +114,7 @@ export function SiteCompanyView({ company }: { company: SiteCompany }) {
           }}
         >
           <SettingsField label="Отримувач">
-            <Both text={company.bankDetails.recipient} />
+            <CompanyTextBoth text={company.bankDetails.recipient} />
           </SettingsField>
           <SettingsField label="ЄДРПОУ">
             <Box component="span" sx={mono}>
@@ -197,7 +127,7 @@ export function SiteCompanyView({ company }: { company: SiteCompany }) {
             </Box>
           </SettingsField>
           <SettingsField label="Банк">
-            <Both text={company.bankDetails.bank} />
+            <CompanyTextBoth text={company.bankDetails.bank} />
           </SettingsField>
         </Box>
       </SettingsCard>

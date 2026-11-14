@@ -19,23 +19,16 @@ export { ItemFabricCard } from './panels/item-fabric/item-fabric-card';
 export { ItemIssueForm } from './forms/item-issue/item-issue-form';
 export { ItemIssuePreviewPanel } from './forms/item-issue/item-issue-preview';
 export { FabricIssueItemList } from './components/issue-items/fabric-issue-item-list';
-export {
-  PlanFactDeviation,
-  PlanFactItemDetails,
-  PlanFactTable,
-} from './tables/reports/plan-fact-table';
-export { BookingTable, BookingUnknownTable } from './tables/reports/booking-table';
-export {
-  FABRICS_REFERENCE_PATH,
-  ValuationShortageTable,
-  ValuationTable,
-} from './tables/reports/valuation-table';
-export {
-  HardwareIncompleteTable,
-  HardwareNeedShares,
-  HardwareNeedTable,
-  hardwareTasks,
-} from './tables/reports/hardware-table';
+export { PlanFactDeviation } from './tables/reports/plan-fact/plan-fact-deviation';
+export { PlanFactTable } from './tables/reports/plan-fact/plan-fact-table';
+export { PlanFactItemDetails } from './details/reports/plan-fact-item-details';
+export { BookingTable } from './tables/reports/booking/booking-table';
+export { BookingUnknownTable } from './tables/reports/booking/booking-unknown-table';
+export { FABRICS_REFERENCE_PATH, ValuationTable } from './tables/reports/valuation/valuation-table';
+export { ValuationShortageTable } from './tables/reports/valuation/valuation-shortage-table';
+export { HardwareIncompleteTable } from './tables/reports/hardware/hardware-incomplete-table';
+export { HardwareNeedTable } from './tables/reports/hardware/hardware-need-table';
+export { HardwareNeedShares } from './details/reports/hardware-need-shares';
 export { BookingPairDetails } from './panels/reports/booking-pair-details';
 export { ReportFilterBar } from './components/reports/report-filter-bar';
 export { PeriodChip } from './components/reports/period-chip';

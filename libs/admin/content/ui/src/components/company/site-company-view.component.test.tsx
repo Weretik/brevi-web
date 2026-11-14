@@ -1,7 +1,7 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { companyMapUrl, SiteCompanyView } from './site-company-view';
+import { SiteCompanyView } from './site-company-view';
 
 afterEach(cleanup);
 
@@ -50,11 +50,5 @@ describe('SiteCompanyView', () => {
     ).toBe('_blank');
     expect(screen.getAllByText('Без посилання: на сайті лише назва')).toHaveLength(2);
     expect(screen.getByText('050 000 00 00')).toBeTruthy();
-  });
-
-  it('opens the address in Google Maps', () => {
-    expect(companyMapUrl('Дніпро, Робоча 1')).toBe(
-      'https://www.google.com/maps/search/?api=1&query=%D0%94%D0%BD%D1%96%D0%BF%D1%80%D0%BE%2C%20%D0%A0%D0%BE%D0%B1%D0%BE%D1%87%D0%B0%201',
-    );
   });
 });

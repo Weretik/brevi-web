@@ -1,4 +1,4 @@
-import { emptyProductionOrderFilters } from '@admin/production/model';
+import { countProductionOrderFilters, emptyProductionOrderFilters } from '@admin/production/model';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -6,11 +6,8 @@ import { ProductionModelSummaryTable } from './production-model-summary-table';
 import { ModelSummarySortEditor } from '../../components/order-summary/model-summary-sort-editor';
 import { ProductionOrderChips } from '../../components/orders/production-order-chips';
 import { ProductionStageConveyor } from '../../components/orders/production-stage-conveyor';
-import {
-  ProductionOrderFilterChips,
-  ProductionOrderFilterPanel,
-  countProductionOrderFilters,
-} from '../orders/toolbar/production-order-filters';
+import { ProductionOrderFilterChips } from '../orders/toolbar/filters/production-order-filter-chips';
+import { ProductionOrderFilterPanel } from '../orders/toolbar/filters/production-order-filter-panel';
 
 import type { ModelSummarySortLevel, ProductionModelSummaryRow } from '@admin/production/model';
 

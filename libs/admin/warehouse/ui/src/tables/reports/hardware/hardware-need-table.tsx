@@ -1,4 +1,9 @@
-import { formatDay, formatQuantity, hardwareUnitLabel } from '@admin/warehouse/model';
+import {
+  formatDay,
+  formatQuantity,
+  hardwareTasks,
+  hardwareUnitLabel,
+} from '@admin/warehouse/model';
 import {
   Chip,
   Paper,
@@ -11,10 +16,9 @@ import {
   Typography,
 } from '@mui/material';
 
-import { reportMono } from '../../components/reports/expandable-row';
-import { OrderLink } from '../../components/reports/order-link';
+import { reportMono } from '../../../components/reports/expandable-row';
 
-import type { HardwareIncomplete, HardwareNeed } from '@admin/warehouse/model';
+import type { HardwareNeed } from '@admin/warehouse/model';
 import type { KeyboardEvent } from 'react';
 
 interface Props {
@@ -32,8 +36,6 @@ const activate = (event: KeyboardEvent, action: () => void) => {
 };
 
 /** Distinct tasks of a need. */
-export const hardwareTasks = (need: HardwareNeed) =>
-  new Set(need.orders.map((x) => x.orderId)).size;
 
 /**
  * «Що замовити › Фурнітура»: one row per accessory with its need and unit, the nearest due date and how many tasks
@@ -130,72 +132,6 @@ export function HardwareNeedTable({ needs, filtered, onOpen }: Props) {
               <TableCell align="right" sx={{ ...reportMono, fontWeight: 600 }}>
                 {formatQuantity(need.quantity)} {hardwareUnitLabel(need.unit)}
               </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  );
-}
-
-/** The breakdown of a need by task: norm × products. */
-export function HardwareNeedShares({ need }: { need: HardwareNeed }) {
-  const unit = hardwareUnitLabel(need.unit);
-  return (
-    <Table size="small" aria-label={`Розрахунок: ${need.name}`}>
-      <TableHead>
-        <TableRow>
-          <TableCell>Завдання</TableCell>
-          <TableCell>Модель</TableCell>
-          <TableCell align="right">Норма × виробів</TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {need.orders.map((share) => (
-          <TableRow key={share.itemId}>
-            <TableCell>
-              <OrderLink orderId={share.orderId} orderNumber={share.orderNumber} /> ·{' '}
-              {share.clientName}
-              {share.dueDate && (
-                <Typography variant="caption" color="text.secondary" component="div">
-                  до {formatDay(share.dueDate)}
-                </Typography>
-              )}
-            </TableCell>
-            <TableCell>{share.modelName}</TableCell>
-            <TableCell align="right" sx={reportMono}>
-              {formatQuantity(share.norm)} × {share.products} = {formatQuantity(share.quantity)}{' '}
-              {unit}
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  );
-}
-
-/** «Потреба неповна»: lines whose quantity is unknown, never zero. */
-export function HardwareIncompleteTable({ rows }: { rows: readonly HardwareIncomplete[] }) {
-  return (
-    <TableContainer component={Paper} variant="outlined">
-      <Table size="small" aria-label="Потреба неповна">
-        <TableHead>
-          <TableRow sx={{ bgcolor: 'action.hover' }}>
-            <TableCell>Замовлення / замовник</TableCell>
-            <TableCell>Модель</TableCell>
-            <TableCell>Рядок складу</TableCell>
-            <TableCell>Причина</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((row, index) => (
-            <TableRow key={`${row.itemId}|${row.code ?? ''}|${index}`}>
-              <TableCell>
-                <OrderLink orderId={row.orderId} orderNumber={row.orderNumber} /> · {row.clientName}
-              </TableCell>
-              <TableCell>{row.modelName}</TableCell>
-              <TableCell>{[row.code, row.name].filter(Boolean).join(' · ') || '—'}</TableCell>
-              <TableCell>{row.reason}</TableCell>
             </TableRow>
           ))}
         </TableBody>

@@ -236,6 +236,7 @@ export {
 export type { BookingView } from './queries/reports/booking-filters';
 export {
   filterHardware,
+  hardwareTasks,
   hardwareViewCounts,
   hardwareViewLabels,
   hardwareViews,

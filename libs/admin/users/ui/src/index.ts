@@ -13,5 +13,7 @@ export { ProfilePhotoCard } from './details/profile/profile-photo-card';
 export { StaffAccountsTable } from './tables/staff-accounts-table';
 export type { StaffAccountAction } from './tables/staff-account-actions-menu';
 export { AccessGroupCard } from './components/access-rights/access-group-card';
+export { AccessRightsHeader } from './components/access-rights/access-rights-header';
 export { AccessRoleTabs } from './components/access-rights/access-role-tabs';
+export { AccessRolePanel } from './details/access-rights/access-role-panel';
 export { NewRolePanel } from './panels/access/new-role-panel';

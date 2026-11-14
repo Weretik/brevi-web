@@ -1,62 +1,35 @@
+import { countProductionOrderFilters, ordersWord } from '@admin/production/model';
 import {
-  useImportProductionOrdersMutation,
-  useImportProductionProgressMutation,
-  useImportProductionReportPricesMutation,
-} from '@admin/production/data-access';
-import {
-  parseProductionOrderImportFile,
-  parseProductionProgressImportFile,
-  parseProductionReportPriceImportFile,
-  ordersWord,
-} from '@admin/production/model';
-import {
-  ModelSummarySortEditor,
-  ProductionModelSummaryTable,
   ProductionOrderChips,
   ProductionOrderFilterChips,
   ProductionOrderFilterPanel,
   ProductionOrdersGrid,
   ProductionOrdersMoreMenu,
+  ProductionOrdersSearchRow,
   ProductionStageConveyor,
-  countProductionOrderFilters,
 } from '@admin/production/ui';
-import { ReferenceListAlerts, ReferencePageHeader, ReferenceSearchBar } from '@admin/references/ui';
+import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
 import { usePageRights } from '@admin/shared/ui';
 import AddIcon from '@mui/icons-material/Add';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
-import TuneIcon from '@mui/icons-material/Tune';
-import {
-  Alert,
-  Badge,
-  Box,
-  Button,
-  Collapse,
-  LinearProgress,
-  Paper,
-  Stack,
-  ToggleButton,
-  ToggleButtonGroup,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-import { ProductionImportDrawer } from '../../components/import/production-import-drawer';
+import { ProductionOrdersImportDrawers } from '../../components/import/production-orders-import-drawers';
+import { ProductionModelSummaryView } from '../../components/orders/production-model-summary-view';
 import { ProductionOrderQuickPanel } from '../../components/orders/production-order-quick-panel';
+import { useOrderQuickParam } from '../../hooks/orders-list/use-order-quick-param';
 import { useProductionModelSummary } from '../../hooks/orders-list/use-production-model-summary';
 import { useProductionOrders } from '../../hooks/orders-list/use-production-orders';
 import { useProductionOrdersExport } from '../../hooks/orders-list/use-production-orders-export';
 
 import type { ProductionOrderActor } from '@admin/production/model';
-import type { ProductionOrdersImport } from '@admin/production/ui';
+import type { ProductionOrdersImport, ProductionOrdersView } from '@admin/production/ui';
 
 interface Props {
   useOrderActor: () => ProductionOrderActor;
 }
-
-type OrdersView = 'list' | 'summary';
 
 /**
  * «Швейний цех › Виробничі завдання»: what the workshop sews, made from КП. The stage «конвеєр» shows the open
@@ -70,31 +43,15 @@ export function ProductionOrdersPage({ useOrderActor }: Props) {
   const { canCreate } = usePageRights();
   const navigate = useNavigate();
   const list = useProductionOrders();
-  const [view, setView] = useState<OrdersView>('list');
+  const [view, setView] = useState<ProductionOrdersView>('list');
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [sortOpen, setSortOpen] = useState(false);
   const summary = useProductionModelSummary(list.query, view === 'summary');
   const [message, setMessage] = useState<string | null>(null);
   const [importing, setImporting] = useState<ProductionOrdersImport | null>(null);
   const exporter = useProductionOrdersExport(setMessage);
-  const [importOrders] = useImportProductionOrdersMutation();
-  const [importProgress] = useImportProductionProgressMutation();
-  const [importPrices] = useImportProductionReportPricesMutation();
+  const quick = useOrderQuickParam();
   const page = list.page;
-  const panelFilters = countProductionOrderFilters(list.filters, list.manager);
   const attention = page?.attention ?? { overdue: 0, dueSoon: 0 };
-  const [params, setParams] = useSearchParams();
-  const quickId = Number(params.get('order')) || null;
-  const setQuick = (id: number | null) =>
-    setParams(
-      (current) => {
-        const copy = new URLSearchParams(current);
-        if (id === null) copy.delete('order');
-        else copy.set('order', String(id));
-        return copy;
-      },
-      { replace: id === null },
-    );
 
   return (
     <Box sx={{ minWidth: 0 }}>
@@ -137,40 +94,14 @@ export function ProductionOrdersPage({ useOrderActor }: Props) {
         selected={list.stage}
         onSelect={list.setStage}
       />
-      <Stack
-        direction={{ xs: 'column', md: 'row' }}
-        sx={{ gap: 1, alignItems: { md: 'flex-start' }, '& > .MuiTextField-root': { mb: 0 } }}
-      >
-        <ReferenceSearchBar
-          placeholder="Номер завдання або КП, клієнт, модель"
-          label="Пошук завдань"
-          value={list.search}
-          onChange={list.setSearch}
-        />
-        <Stack direction="row" sx={{ gap: 1, flexShrink: 0 }}>
-          <Badge badgeContent={panelFilters} color="primary">
-            <Button
-              variant="outlined"
-              startIcon={<TuneIcon />}
-              aria-haspopup="dialog"
-              onClick={() => setFiltersOpen(true)}
-              sx={{ height: 48, bgcolor: 'background.paper' }}
-            >
-              Фільтри
-            </Button>
-          </Badge>
-          <ToggleButtonGroup
-            exclusive
-            value={view}
-            aria-label="Вигляд"
-            onChange={(_event, next: OrdersView | null) => next && setView(next)}
-            sx={{ height: 48, bgcolor: 'background.paper' }}
-          >
-            <ToggleButton value="list">Список</ToggleButton>
-            <ToggleButton value="summary">Зведення за моделями</ToggleButton>
-          </ToggleButtonGroup>
-        </Stack>
-      </Stack>
+      <ProductionOrdersSearchRow
+        search={list.search}
+        onSearchChange={list.setSearch}
+        filterCount={countProductionOrderFilters(list.filters, list.manager)}
+        onOpenFilters={() => setFiltersOpen(true)}
+        view={view}
+        onViewChange={setView}
+      />
       <Stack
         direction="row"
         sx={{ gap: 1, flexWrap: 'wrap', alignItems: 'center', my: 1.5 }}
@@ -213,54 +144,21 @@ export function ProductionOrdersPage({ useOrderActor }: Props) {
           today={list.today}
           paginationModel={list.pagination}
           onPaginationModelChange={list.setPagination}
-          onOpen={(row) => setQuick(row.id)}
+          onOpen={(row) => quick.open(row.id)}
           sort={list.sort}
           onSortChange={list.setSort}
         />
       ) : (
-        <Stack spacing={1.5}>
-          <Paper variant="outlined" sx={{ px: 2, py: 1 }}>
-            <Button
-              size="small"
-              aria-expanded={sortOpen}
-              endIcon={sortOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-              onClick={() => setSortOpen(!sortOpen)}
-            >
-              Сортування за пріоритетом ({summary.sort.length})
-            </Button>
-            <Collapse in={sortOpen} unmountOnExit>
-              <Box sx={{ pt: 1, pb: 1 }}>
-                <ModelSummarySortEditor levels={summary.sort} onChange={summary.setSort} />
-              </Box>
-            </Collapse>
-          </Paper>
-          {summary.error && (
-            <Alert
-              severity="error"
-              action={
-                <Button color="inherit" size="small" onClick={() => void summary.reload()}>
-                  Повторити
-                </Button>
-              }
-            >
-              {summary.error}
-            </Alert>
-          )}
-          {summary.loading && <LinearProgress aria-label="Завантаження зведення" />}
-          {!summary.loading && !summary.error && (
-            <ProductionModelSummaryTable
-              rows={summary.rows}
-              totalQuantity={summary.totalQuantity}
-              onView={(row) => {
-                list.setFilter('model', row.modelCode);
-                setView('list');
-              }}
-            />
-          )}
-        </Stack>
+        <ProductionModelSummaryView
+          summary={summary}
+          onView={(row) => {
+            list.setFilter('model', row.modelCode);
+            setView('list');
+          }}
+        />
       )}
-      {quickId !== null && (
-        <ProductionOrderQuickPanel orderId={quickId} onClose={() => setQuick(null)} />
+      {quick.orderId !== null && (
+        <ProductionOrderQuickPanel orderId={quick.orderId} onClose={quick.close} />
       )}
       <ProductionOrderFilterPanel
         open={filtersOpen}
@@ -274,39 +172,7 @@ export function ProductionOrdersPage({ useOrderActor }: Props) {
         onReset={list.resetFilters}
         onClose={() => setFiltersOpen(false)}
       />
-      {importing === 'progress' && (
-        <ProductionImportDrawer
-          title="Імпорт етапів"
-          description="Файл production-progress.json зі старого «Цеху»: етапи позицій, посилання на файли і відмітки Telegram. Спершу перевіримо, потім збережемо."
-          keyLabel="Завдання"
-          detailLabel="Що зміниться"
-          parse={parseProductionProgressImportFile}
-          send={(rows, dryRun) => importProgress({ rows, dryRun }).unwrap()}
-          onClose={() => setImporting(null)}
-        />
-      )}
-      {importing === 'prices' && (
-        <ProductionImportDrawer
-          title="Ціни КП"
-          description="Файл production-report-prices.json: ціни КП для завдань зі старого «Цеху», щоб «Звіти цеху» рахували вартість випуску. Ціну отримає лише позиція без ціни. Спершу перевіримо, потім збережемо."
-          keyLabel="Завдання"
-          detailLabel="Що зміниться"
-          parse={parseProductionReportPriceImportFile}
-          send={(rows, dryRun) => importPrices({ rows, dryRun }).unwrap()}
-          onClose={() => setImporting(null)}
-        />
-      )}
-      {importing === 'orders' && (
-        <ProductionImportDrawer
-          title="Імпорт завдань"
-          description="Файл production-orders.json зі старого «Цеху». Спершу перевіримо, потім збережемо."
-          keyLabel="Номер"
-          detailLabel="Клієнт"
-          parse={parseProductionOrderImportFile}
-          send={(rows, dryRun) => importOrders({ rows, dryRun }).unwrap()}
-          onClose={() => setImporting(null)}
-        />
-      )}
+      <ProductionOrdersImportDrawers kind={importing} onClose={() => setImporting(null)} />
     </Box>
   );
 }

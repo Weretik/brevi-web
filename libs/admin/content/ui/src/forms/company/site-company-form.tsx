@@ -1,4 +1,4 @@
-import { weekDayLabels } from '@admin/content/model';
+import { managerPhotoSrc, weekDayLabels } from '@admin/content/model';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
@@ -18,8 +18,6 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-
-import { managerPhotoSrc } from '../../components/company/site-company-view';
 
 import type {
   CompanyManagerFormValues,

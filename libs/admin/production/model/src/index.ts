@@ -72,6 +72,12 @@ export {
 } from './queries/people/workshop-staff-filters';
 export type { WorkshopStaffStatus } from './queries/people/workshop-staff-filters';
 export { countFabricNorms, filterFabricNorms } from './queries/norms/fabric-norm-filters';
+export {
+  countProductionOrderFilters,
+  productionOrderFilterChipText,
+  productionOrderFilterLabels,
+  setProductionOrderFilters,
+} from './queries/orders/production-order-filters';
 export type { FabricNormFilter } from './queries/norms/fabric-norm-filters';
 export {
   formatDay,
@@ -393,3 +399,4 @@ export type {
 } from './entities/reports/workshop-archive';
 export { parseWorkshopArchiveImportFile } from './validators/workshop-archive-import-file';
 export type { WorkshopPeopleAccess } from './entities/people/workshop-people-access';
+export { workLogOrderOptions } from './queries/work/work-log-orders';

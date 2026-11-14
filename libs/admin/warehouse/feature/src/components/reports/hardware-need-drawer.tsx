@@ -1,6 +1,6 @@
 import { ReferenceEditorDrawer } from '@admin/references/ui';
-import { formatQuantity, hardwareUnitLabel } from '@admin/warehouse/model';
-import { HardwareNeedShares, hardwareTasks } from '@admin/warehouse/ui';
+import { formatQuantity, hardwareUnitLabel, hardwareTasks } from '@admin/warehouse/model';
+import { HardwareNeedShares } from '@admin/warehouse/ui';
 import { Alert, Stack, Typography } from '@mui/material';
 
 import type { HardwareNeed } from '@admin/warehouse/model';

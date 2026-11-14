@@ -2,7 +2,7 @@ import { lazy } from 'react';
 
 import type { RouteObject } from 'react-router-dom';
 
-const AccessRightsPage = lazy(() => import('./pages/access-rights-page'));
+const AccessRightsPage = lazy(() => import('./pages/access-rights/access-rights-page'));
 
 export const accessPath = '/admin/access';
 
