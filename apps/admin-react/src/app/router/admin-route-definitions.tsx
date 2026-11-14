@@ -17,25 +17,25 @@ import { remindersRoutes } from '@admin/reminders/feature';
 import { createTasksRoutes } from '@admin/tasks/feature';
 import { createWarehouseRoutes } from '@admin/warehouse/feature';
 
-import { useArticlesViewer } from './use-articles-viewer';
-import { useCanSeeFinance } from './use-can-see-finance';
-import { useCanSeePurchaseInvoices } from './use-can-see-purchase-invoices';
-import { useContentProductsViewer } from './use-content-products-viewer';
-import { useDashboardViewer } from './use-dashboard-viewer';
-import { useEmbroideryViewer } from './use-embroidery-viewer';
-import { useLeadStatsViewer, useLeadViewer, useSiteRequestViewer } from './use-lead-viewer';
-import { useProductionOrderActor } from './use-production-order-actor';
-import { useQuoteActor } from './use-quote-actor';
-import { useQuoteSupplierCard } from './use-quote-supplier-card';
-import { useRedirectsViewer } from './use-redirects-viewer';
-import { useSeoSettingsViewer } from './use-seo-settings-viewer';
-import { useSiteCategoriesViewer } from './use-site-categories-viewer';
-import { useSiteCompanyViewer } from './use-site-company-viewer';
-import { useSiteCertificatesViewer, useSiteWorksViewer } from './use-site-gallery-viewers';
-import { useSitePagesViewer } from './use-site-pages-viewer';
-import { useTaskViewer } from './use-task-viewer';
-import { useWarehouseAccess } from './use-warehouse-access';
-import { useWorkshopPeopleAccess } from './use-workshop-people-access';
+import { useCanSeeFinance } from '../slots/accounting/use-can-see-finance';
+import { useSiteCategoriesViewer } from '../slots/content/site/use-site-categories-viewer';
+import { useSiteCompanyViewer } from '../slots/content/site/use-site-company-viewer';
+import { useSiteCertificatesViewer, useSiteWorksViewer } from '../slots/content/site/use-site-gallery-viewers';
+import { useSitePagesViewer } from '../slots/content/site/use-site-pages-viewer';
+import { useArticlesViewer } from '../slots/content/use-articles-viewer';
+import { useContentProductsViewer } from '../slots/content/use-content-products-viewer';
+import { useRedirectsViewer } from '../slots/content/use-redirects-viewer';
+import { useSeoSettingsViewer } from '../slots/content/use-seo-settings-viewer';
+import { useDashboardViewer } from '../slots/dashboard/use-dashboard-viewer';
+import { useEmbroideryViewer } from '../slots/embroidery/use-embroidery-viewer';
+import { useLeadStatsViewer, useLeadViewer, useSiteRequestViewer } from '../slots/leads/use-lead-viewer';
+import { useProductionOrderActor } from '../slots/production/use-production-order-actor';
+import { useWorkshopPeopleAccess } from '../slots/production/use-workshop-people-access';
+import { useCanSeePurchaseInvoices } from '../slots/purchasing/use-can-see-purchase-invoices';
+import { useQuoteActor } from '../slots/quotes/use-quote-actor';
+import { useQuoteSupplierCard } from '../slots/quotes/use-quote-supplier-card';
+import { useTaskViewer } from '../slots/tasks/use-task-viewer';
+import { useWarehouseAccess } from '../slots/warehouse/use-warehouse-access';
 
 export const adminRouteDefinitions = [
   ...createDashboardRoutes({ useViewer: useDashboardViewer }),

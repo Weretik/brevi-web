@@ -13,9 +13,9 @@ import {
   productionRoutes,
   tasksRoutes,
 } from './admin-route-definitions';
-import { createNavigation } from './navigation-config';
-import { useHomeHint } from './use-home-hint';
+import { createNavigation } from './navigation/navigation-config';
 import { useAdminColorMode } from '../providers/color-mode-provider';
+import { useHomeHint } from '../slots/tasks/use-home-hint';
 
 import type { SessionUser } from '@admin/core/auth';
 

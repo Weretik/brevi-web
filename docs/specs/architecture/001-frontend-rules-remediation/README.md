@@ -1,6 +1,6 @@
 # Frontend rules audit and remediation (2026-11-14)
 
-**Status:** in progress — stage 1 done (router out of admin UI).
+**Status:** in progress — stage 1 (router out of admin UI) and stage 2 (admin app folder) done.
 **Scope:** `libs/admin/**`, `apps/admin-react`, `libs/site/**`, `apps/site`. The Angular `apps/storefront` and `libs/storefront/**` are frozen (being replaced by `apps/site`) and only recorded as known deviations.
 **Owner request (2026-11-14):** full audit and fix of eight points: boundaries, architecture, feature documentation for AI and people, tests and TDD scenarios, tests before code, rules recorded in obsidian skills and in this repository, components with more than one responsibility split, no dump folders.
 **Shared rules:** the frontend rule text is kept identical with kedr-web; the obsidian template and skills own it (thread «Привести фронтенд Кедр к правилам»). This repository copies the sections verbatim and adds only its own known deviations.
@@ -45,14 +45,14 @@ The final audit re-measures the list; anything not split gets a recorded `keep` 
 
 ## Stages
 
-One PR per stage; a short structure check of the touched area after each stage and a final pass at the end. Tests come first: for a split, the existing behavior test is run green before the move, a missing one is written first; new behavior gets a failing test before code.
+One PR per stage; one full audit of all rules at the end (stage 7), as the delivery rules require since 2026-11-14. Tests come first: for a split, the existing behavior test is run green before the move, a missing one is written first; new behavior gets a failing test before code.
 
-| Stage | Content                                                                                                                                             | Points     |
-| ----- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
-| 1     | Router out of admin UI: `@admin/shared/routing` with `LinkBehavior` (copied from kedr-web), registered in the theme; lint rule; 11 files use `href` | 1, 2, 5    |
-| 2     | Admin app shell: split `app/router` into `routes/`, `navigation/`, `access/`                                                                        | 2, 8       |
-| 3     | Role folders in admin libraries (F4) and split/keep decisions for big folders (F5)                                                                  | 2, 8       |
-| 4     | Split admin components (split list, admin rows)                                                                                                     | 7          |
-| 5     | Site role folders and split site components (after the shared site rule lands)                                                                      | 2, 7, 8    |
-| 6     | Rules text from obsidian copied into `docs/standards`, testing rule «tests first», known deviations refreshed, missing pages in feature cards       | 3, 4, 5, 6 |
-| 7     | Final audit, this file closed                                                                                                                       | all        |
+| Stage | Content                                                                                                                                                                                                                                                      | Points     |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
+| 1     | Router out of admin UI: `@admin/shared/routing` with `LinkBehavior` (copied from kedr-web), registered in the theme; lint rule; 11 files use `href`                                                                                                          | 1, 2, 5    |
+| 2     | Admin app folder: route table stays in `router/` (menu in `router/navigation/`, 404 page beside the routes), the 20 session-to-domain hooks move to `slots/<domain>/`, `pages/` removed; owner rule «one full audit after the feature» in the delivery rules | 2, 6, 8    |
+| 3     | Role folders in admin libraries (F4) and split/keep decisions for big folders (F5)                                                                                                                                                                           | 2, 8       |
+| 4     | Split admin components (split list, admin rows)                                                                                                                                                                                                              | 7          |
+| 5     | Site role folders and split site components (after the shared site rule lands)                                                                                                                                                                               | 2, 7, 8    |
+| 6     | Rules text from obsidian copied into `docs/standards`, testing rule «tests first», known deviations refreshed, missing pages in feature cards                                                                                                                | 3, 4, 5, 6 |
+| 7     | Final audit, this file closed                                                                                                                                                                                                                                | all        |

@@ -9,7 +9,7 @@ Admin and the director only: «Адміністрування → Права д�
 ## How the rights are used
 
 - The session loads `GET /api/auth/session/access` together with `/session/me` (`core/auth/session-transport.ts`); `canAccess(user, page, action)` answers from it, and the director has `allowAll`.
-- The menu (`apps/admin-react/src/app/router/legacy-menu.ts`) names the page of every item (`access`); `navigation-config.ts` hides the items the user cannot see.
+- The menu (`apps/admin-react/src/app/router/navigation/legacy-menu.ts`) names the page of every item (`access`); `navigation-config.ts` hides the items the user cannot see.
 - `RequirePageAccess` (`router/require-page-access.tsx`) shows «Немає доступу» on a URL of a page the user cannot see; `page-access.ts` maps URLs to pages (the longest menu path, plus inner pages such as `/crm/clients`).
 - Buttons: deleting a КП follows «Видаляти» on «Комерційні пропозиції»; «Передати в цех» needs «Створювати» on «Виробничі завдання» and seeing КП; the home blocks follow «Комерційні пропозиції» and «Виробничі завдання».
 - «Користувачі», «Завдання менеджерам», «Налаштування ШІ» and this page stay Admin only. Business rules inside a page (a manager sees only their КП) still follow the built-in role; a role made here is treated like a manager there.

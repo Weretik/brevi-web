@@ -40,4 +40,4 @@ apps/admin-react/src/app/router/{create-admin-router.tsx,legacy-menu.ts}   # Adm
 
 - `feature/src/pages/ai-settings-page.component.test.tsx` — reason when it does not work, masked key, switch saved at once, limit with its own button, model check, side panel prices, reached limit, add/change/delete conditions, empty condition;
 - `data-access/src/mappers/ai-settings.mapper.unit.test.ts`, `model/src/validators/ai-settings-validation.unit.test.ts`, `model/src/forms/ai-prompt-rules.unit.test.ts`;
-- `apps/admin-react/src/app/router/navigation-config.unit.test.ts` — the menu item only for Admin.
+- `apps/admin-react/src/app/router/navigation/navigation-config.unit.test.ts` — the menu item only for Admin.

@@ -27,7 +27,7 @@ libs/admin/clients/
 ├── data-access/src/api/customers/customer-keepin-sync.ts                       # POST keepin-sync
 ├── data-access/src/mappers/customers/customer-keepin-sync.mapper.ts            # result mapping
 └── model/src/mappers/customers/describe-customer-keepin-sync.ts                # notice text
-apps/admin-react/src/app/router/legacy-menu.ts                                  # «Контрагенти» menu item
+apps/admin-react/src/app/router/navigation/legacy-menu.ts                                  # «Контрагенти» menu item
 ```
 
 ## Tests

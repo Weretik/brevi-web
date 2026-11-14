@@ -47,6 +47,6 @@ libs/admin/users/
 ## Tests
 
 - `libs/admin/users/**/src/**/*.test.ts(x)`
-- `apps/admin-react/src/app/router/navigation-config.unit.test.ts` (entry only for Admin)
+- `apps/admin-react/src/app/router/navigation/navigation-config.unit.test.ts` (entry only for Admin)
 
 Focused run: `npx nx run-many -t test -p admin-users-model,admin-users-data-access,admin-users-ui,admin-users-feature`.

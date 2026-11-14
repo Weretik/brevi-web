@@ -154,7 +154,7 @@ Use these for new pages. Prefer MUI components and the theme overrides; do not r
 5. Loading, empty, error, and forbidden states exist.
 6. Checked in light and dark themes, at phone, tablet, and desktop widths, with the sidebar expanded and collapsed.
 7. Adding and editing a list row uses the reference side panel, not a dialog or a page; creating a product-like object uses a full create page.
-8. New routes are added to `apps/admin-react/src/app/router/legacy-menu.ts` so they appear in the sidebar and breadcrumbs.
+8. New routes are added to `apps/admin-react/src/app/router/navigation/legacy-menu.ts` so they appear in the sidebar and breadcrumbs.
 
 ## Do and don't
 
