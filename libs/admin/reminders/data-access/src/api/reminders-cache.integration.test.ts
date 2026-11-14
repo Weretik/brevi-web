@@ -3,7 +3,7 @@ import { createServer } from 'node:http';
 import { createAdminApiStore } from '@admin/shared/api-client';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-import { remindersApi } from './reminders.api';
+import { remindersApi } from './base/reminders.api';
 import { taskResponse } from '../testing/reminder-fixtures';
 
 const runtime = vi.hoisted(() => ({ port: 0 }));

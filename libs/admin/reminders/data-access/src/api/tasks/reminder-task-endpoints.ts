@@ -12,7 +12,7 @@ import type {
   PreviewReminderDueDatesRequest,
   UpdateReminderTaskRequest,
 } from '../../models/reminder-requests';
-import type { RemindersEndpointBuilder } from '../reminders-endpoint-builder';
+import type { RemindersEndpointBuilder } from '../base/reminders-endpoint-builder';
 import type { DueDatePreview, ReminderTask, ReminderTaskInput } from '@admin/reminders/model';
 import type { operations } from '@admin/shared/contracts';
 

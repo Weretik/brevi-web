@@ -3,9 +3,9 @@ import { accountingApiError } from '../../errors/accounting-api-error';
 import {
   mapFinanceAttachment,
   mapFinanceAttachments,
-} from '../../mappers/accounting-attachment.mapper';
+} from '../../mappers/ledger/accounting-attachment.mapper';
 
-import type { AccountingEndpointBuilder } from '../accounting-endpoint-builder';
+import type { AccountingEndpointBuilder } from '../base/accounting-endpoint-builder';
 import type { FinanceAttachment } from '@admin/accounting/model';
 
 const ofTransaction = (id: string) =>

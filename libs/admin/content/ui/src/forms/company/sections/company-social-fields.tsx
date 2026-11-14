@@ -1,6 +1,6 @@
 import { TextField } from '@mui/material';
 
-import { CompanyFormTitle } from '../company-form-title';
+import { CompanyFormTitle } from '../form/company-form-title';
 
 import type { CompanyFormSectionProps } from './company-form-section';
 

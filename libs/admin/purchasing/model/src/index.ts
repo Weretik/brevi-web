@@ -1,27 +1,27 @@
-export { purchaseInvoiceStates } from './entities/invoices/purchase-invoice';
+export { purchaseInvoiceStates } from './entities/purchase-invoice';
 export type {
   PurchaseInvoice,
   PurchaseInvoiceLink,
   PurchaseInvoicePage,
   PurchaseInvoiceState,
-} from './entities/invoices/purchase-invoice';
-export type { PurchaseSyncResult, PurchaseSyncState } from './entities/invoices/purchase-sync';
+} from './entities/purchase-invoice';
+export type { PurchaseSyncResult, PurchaseSyncState } from './entities/purchase-sync';
 export {
   describePurchasePayment,
   formatPurchaseMinor,
   formatPurchasePaymentDate,
-} from './entities/invoices/purchase-payment';
+} from './entities/purchase-payment';
 export type {
   PurchaseInvoicePayment,
   PurchaseInvoicePayments,
   PurchasePaymentCandidate,
   PurchasePaymentInput,
-} from './entities/invoices/purchase-payment';
+} from './entities/purchase-payment';
 export {
   purchaseDocumentSources,
   purchaseDocumentVats,
   purchaseRecognitionResults,
-} from './entities/invoices/purchase-document';
+} from './entities/purchase-document';
 export type {
   PurchaseDocument,
   PurchaseDocumentItem,
@@ -33,7 +33,7 @@ export type {
   PurchaseRecognitionAttempt,
   PurchaseRecognitionBatch,
   PurchaseRecognitionResult,
-} from './entities/invoices/purchase-document';
+} from './entities/purchase-document';
 export {
   describePurchaseDocument,
   describePurchaseRecognitionBatch,
@@ -41,19 +41,19 @@ export {
   formatPurchaseMessageAt,
   formatPurchaseMoney,
   purchaseVatLabel,
-} from './mappers/invoices/describe-purchase-document';
+} from './mappers/describe-purchase-document';
 export {
   defaultPurchaseInvoicePageSize,
   purchaseInvoiceFilters,
   purchaseInvoicePageSizes,
 } from './queries/purchase-invoice-query';
 export type { PurchaseInvoiceFilter, PurchaseInvoiceQuery } from './queries/purchase-invoice-query';
-export { describePurchaseSync } from './mappers/invoices/describe-purchase-sync';
+export { describePurchaseSync } from './mappers/describe-purchase-sync';
 export type {
   PurchaseInvoiceReview,
   PurchaseReviewInput,
   PurchaseSupplierOption,
-} from './entities/invoices/purchase-review';
+} from './entities/purchase-review';
 export {
   purchaseReviewFormOf,
   purchaseReviewInputOf,
@@ -69,11 +69,11 @@ export {
   purchaseLineDiscount,
   purchaseLinkStatus,
   purchaseSheetIssues,
-} from './mappers/invoices/purchase-invoice-status';
+} from './mappers/purchase-invoice-status';
 export type {
   PurchaseInvoiceStatus,
   PurchaseStatusSummary,
-} from './mappers/invoices/purchase-invoice-status';
+} from './mappers/purchase-invoice-status';
 export {
   emptyPurchaseDocumentItem,
   purchaseDocumentFormOf,

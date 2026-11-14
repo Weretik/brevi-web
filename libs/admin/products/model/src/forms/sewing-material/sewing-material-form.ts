@@ -5,7 +5,7 @@ import type {
   SewingMaterialDraft,
   SewingMaterialKind,
   SewingMaterialUnit,
-} from '../../entities/sewing-composition';
+} from '../../entities/sewing-composition/composition/sewing-composition';
 
 /** Side panel «Матеріал» of the shared composition («Комплектація»). */
 export interface SewingMaterialFormValues {

@@ -2,7 +2,7 @@
 
 ## Перевірений контекст
 
-- Angular shell мав пункт «Товари» без маршруту. React `apps/admin-react/src/app/router/app-router.tsx` тепер реєструє список, створення, деталі й редагування.
+- Angular shell мав пункт «Товари» без маршруту. React `apps/admin-react/src/app/router/routes/app-router.tsx` тепер реєструє список, створення, деталі й редагування.
 - `docs/specs/admin/products/product-list-data-grid.md` — історичний blocked draft: `/api/admin/products` і припущення про `ProductsPage`/`libs/admin/products/*` не відповідали дереву до цієї feature.
 - Backend commit `7178113572c5c0da21ba9f28db5d94f96dc8e1b6` фіксує product CRUD, category lookup і media upload в агрегованому OpenAPI. Frontend snapshot і generated types походять із цього commit.
 - React shell, Vitest, Playwright, MUI Material і `@mui/x-data-grid` використовуються повторно. Product data-access і feature libs мають власні Nx lint/typecheck/test targets.

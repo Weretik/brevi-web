@@ -6,7 +6,7 @@ import {
 import { Box, Typography } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 
-import { ReminderChatActionsCell } from './cells/reminder-chat-actions-cell';
+import { ReminderChatActionsCell } from './reminder-chat-actions-cell';
 import { ReminderStatusPill } from '../../components/status/reminder-status-pill';
 
 import type { ReminderChat } from '@admin/reminders/model';

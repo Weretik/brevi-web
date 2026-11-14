@@ -10,9 +10,9 @@ import {
 } from './quote-intro-draft-mapper';
 import { quoteIntroErrors } from '../../validators/quote-intro-validation';
 
-import type { Quote } from '../../entities/quote';
-import type { QuoteCatalogProduct } from '../../entities/quote-catalog';
-import type { QuoteIntroductionSetup } from '../../entities/quote-introduction';
+import type { QuoteCatalogProduct } from '../../entities/items/quote-catalog';
+import type { Quote } from '../../entities/quote/quote';
+import type { QuoteIntroductionSetup } from '../../entities/settings/quote-introduction';
 
 const product = (id: number, season: string, large = 1000 + id): QuoteCatalogProduct => ({
   productId: id,

@@ -1,4 +1,4 @@
-import type { PpeMarkups } from '../../entities/ppe-pricing/ppe-markups';
+import type { PpeMarkups } from '../../entities/ppe-pricing/prices/ppe-markups';
 import type { PpeRuleMarkupDraft } from '../../forms/ppe-pricing/ppe-rule-markup-draft';
 
 export function parsePpeMarkupDraft(value: PpeRuleMarkupDraft): PpeMarkups | null {

@@ -2,7 +2,7 @@
 
 ## Existing context
 
-- Routes: `apps/admin-react/src/app/router/app-router.tsx`.
+- Routes: `apps/admin-react/src/app/router/routes/app-router.tsx`.
 - List: `libs/admin/products/feature/src/pages/product-list/products-page.tsx`;
   currently combines query state, columns, filters, Data Grid, and delete
   target, and has a “Дії” column.

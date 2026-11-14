@@ -1,11 +1,11 @@
-import { record } from '../response-validation';
+import { isSewingLineComment } from './is-sewing-line-comment';
+import { record } from '../base/response-validation';
 import {
   ensureSewingResponse,
   sewingResponseInteger,
   sewingResponseNullableId,
   sewingResponsePositive,
-} from '../sewing-response-values';
-import { isSewingLineComment } from './is-sewing-line-comment';
+} from '../base/sewing-response-values';
 
 import type { SewingMaterialDto } from '../../contracts/sewing-composition/sewing-material.dto';
 

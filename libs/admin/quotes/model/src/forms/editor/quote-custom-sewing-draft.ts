@@ -1,4 +1,4 @@
-import type { QuoteItemLineKind } from '../../entities/quote';
+import type { QuoteItemLineKind } from '../../entities/quote/quote';
 
 /** A fabric in the «Виріб з нуля» panel; `meters` is the typed text. */
 export interface QuoteCustomFabricDraft {

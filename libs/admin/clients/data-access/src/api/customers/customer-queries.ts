@@ -1,10 +1,10 @@
-import { customerListTag, customerDetailTag } from '../../cache/customers/customer-cache';
+import { customerListTag, customerDetailTag } from '../../cache/customer-cache';
 import { customerApiError } from '../../errors/customer-api-error';
-import { mapCustomerDetail } from '../../mappers/customers/customer-detail.mapper';
-import { mapCustomerPage } from '../../mappers/customers/customer-page.mapper';
+import { mapCustomerDetail } from '../../mappers/customer-detail.mapper';
+import { mapCustomerPage } from '../../mappers/customer-page.mapper';
 
-import type { CustomerListQuery } from '../../models/customers/customer-list-query';
-import type { CustomerEndpointBuilder } from '../customer-endpoint-builder';
+import type { CustomerListQuery } from '../../models/customer-list-query';
+import type { CustomerEndpointBuilder } from '../base/customer-endpoint-builder';
 import type { CustomerDetail, CustomerPage } from '@admin/clients/model';
 
 export function customerQueries(build: CustomerEndpointBuilder) {

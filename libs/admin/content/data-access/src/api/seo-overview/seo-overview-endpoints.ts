@@ -1,6 +1,6 @@
 import { mapSeoOverview } from '../../mappers/seo-overview/seo-overview.mapper';
 
-import type { ContentEndpointBuilder } from '../content-endpoint-builder';
+import type { ContentEndpointBuilder } from '../base/content-endpoint-builder';
 import type { SeoOverview } from '@admin/content/model';
 
 export function seoOverviewEndpoints(build: ContentEndpointBuilder) {

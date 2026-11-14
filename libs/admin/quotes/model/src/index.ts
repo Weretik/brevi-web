@@ -1,6 +1,6 @@
-export type * from './entities/quote';
-export { quoteEventLabels } from './entities/quote-history';
-export type * from './entities/quote-catalog';
+export type * from './entities/quote/quote';
+export { quoteEventLabels } from './entities/quote/quote-history';
+export type * from './entities/items/quote-catalog';
 export type * from './forms/editor/quote-draft';
 export {
   isFixedPriceKind,
@@ -10,7 +10,7 @@ export {
   quoteTierLabels,
   quoteTiers,
 } from './forms/editor/quote-draft';
-export type * from './entities/quote-custom-sewing';
+export type * from './entities/items/quote-custom-sewing';
 export type * from './forms/editor/quote-custom-sewing-draft';
 export { quoteCustomLineKindLabels } from './forms/editor/quote-custom-sewing-draft';
 export { quoteModelChanges } from './mappers/editor/quote-model-changes';
@@ -78,7 +78,7 @@ export {
   quoteTextMaxLength,
 } from './validators/quote-draft-validation';
 export type { QuoteDraftErrors } from './validators/quote-draft-validation';
-export type * from './entities/quote-settings';
+export type * from './entities/settings/quote-settings';
 export type * from './forms/settings/quote-settings-draft';
 export {
   quoteAdvantageCount,
@@ -114,7 +114,7 @@ export {
   quoteSettingsUrlMax,
 } from './validators/quote-settings-validation';
 export type { QuoteSettingsErrors } from './validators/quote-settings-validation';
-export type * from './entities/quote-send';
+export type * from './entities/quote/quote-send';
 export {
   parseQuoteRecipients,
   quoteLetterBodyMax,
@@ -122,7 +122,7 @@ export {
   quoteSendErrors,
   quoteSubjectMax,
 } from './validators/quote-send-validation';
-export type * from './entities/quote-introduction';
+export type * from './entities/settings/quote-introduction';
 export type * from './forms/introduction/quote-intro-draft';
 export {
   quoteIntroCatalogSeasons,

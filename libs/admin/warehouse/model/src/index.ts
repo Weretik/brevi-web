@@ -95,10 +95,7 @@ export type {
   FabricMovementEditErrors,
   FabricMovementEditValues,
 } from './forms/movement-edit/movement-edit-form';
-export {
-  parseStockMeters,
-  stockReasonError,
-} from './validators/stock-operations/stock-operation-rules';
+export { parseStockMeters, stockReasonError } from './validators/stock-operation-rules';
 export {
   findStockPair,
   searchFabricStock,

@@ -15,4 +15,4 @@ export {
   useSendReminderChatTestMutation,
   useUpdateReminderChatMutation,
   useUpdateReminderTaskMutation,
-} from './api/reminders.api';
+} from './api/base/reminders.api';

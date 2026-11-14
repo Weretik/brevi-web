@@ -1,4 +1,7 @@
-import type { QuoteIntroLayout, QuoteIntroSeason } from '../../entities/quote-introduction';
+import type {
+  QuoteIntroLayout,
+  QuoteIntroSeason,
+} from '../../entities/settings/quote-introduction';
 
 /** One model on a page: the main model (first) or one of the three chosen ones. */
 export interface QuoteIntroSlotDraft {

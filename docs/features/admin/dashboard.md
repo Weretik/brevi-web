@@ -60,4 +60,4 @@ apps/admin-react/src/app/slots/dashboard/use-dashboard-viewer.ts # canSee(page) 
 ## Tests
 
 - `libs/admin/dashboard/feature/src/pages/dashboard-page.test.tsx`
-- `apps/admin-react/src/app/router/app-router.integration.test.tsx` (manager desk on `/`, profile link)
+- `apps/admin-react/src/app/router/routes/app-router.integration.test.tsx` (manager desk on `/`, profile link)

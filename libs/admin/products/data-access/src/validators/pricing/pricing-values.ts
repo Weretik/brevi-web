@@ -1,4 +1,4 @@
-import { record } from '../response-validation';
+import { record } from '../base/response-validation';
 
 export const pricingRecord = record;
 export const pricingAmount = (value: unknown): value is number =>

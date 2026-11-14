@@ -17,10 +17,10 @@ import { SeoDesk } from '../components/desks/seo-desk';
 import { WorkshopDesk } from '../components/desks/workshop-desk';
 import { useChosenDesk } from '../hooks/use-chosen-desk';
 import { useOpenDesks } from '../hooks/use-open-desks';
-import { visibleDesks } from '../model/desks';
+import { visibleDesks } from '../model/desks/desks';
 
 import type { DashboardViewer } from '../model/desk-views/dashboard-view';
-import type { DeskDefinition, DeskKey } from '../model/desks';
+import type { DeskDefinition, DeskKey } from '../model/desks/desks';
 
 /** yyyy-mm-dd of the person's own day. */
 const today = () => {

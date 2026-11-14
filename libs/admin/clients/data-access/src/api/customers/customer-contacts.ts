@@ -1,9 +1,9 @@
-import { changedCustomerTags } from '../../cache/customers/customer-cache';
+import { changedCustomerTags } from '../../cache/customer-cache';
 import { customerApiError } from '../../errors/customer-api-error';
-import { mapCustomerDetail } from '../../mappers/customers/customer-detail.mapper';
+import { mapCustomerDetail } from '../../mappers/customer-detail.mapper';
 
-import type { SaveContactIntent } from '../../models/customers/save-contact-intent';
-import type { CustomerEndpointBuilder } from '../customer-endpoint-builder';
+import type { SaveContactIntent } from '../../models/save-contact-intent';
+import type { CustomerEndpointBuilder } from '../base/customer-endpoint-builder';
 import type { CustomerDetail } from '@admin/clients/model';
 import type { operations } from '@admin/shared/contracts';
 

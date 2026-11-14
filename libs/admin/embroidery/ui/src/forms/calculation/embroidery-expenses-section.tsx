@@ -5,8 +5,8 @@ import {
 } from '@admin/embroidery/model';
 import { Box, Checkbox, FormControlLabel, Stack, Typography } from '@mui/material';
 
-import { EmbroideryFormCard } from '../embroidery-form-card';
-import { EmbroideryNumberField } from '../embroidery-number-field';
+import { EmbroideryFormCard } from '../fields/embroidery-form-card';
+import { EmbroideryNumberField } from '../fields/embroidery-number-field';
 
 import type {
   EmbroideryCalculationErrors,

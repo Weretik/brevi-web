@@ -6,7 +6,7 @@ import {
   parseStockMeters,
   positiveMetersError,
   stockReasonError,
-} from '../../validators/stock-operations/stock-operation-rules';
+} from '../../validators/stock-operation-rules';
 
 import type {
   AdjustFabricStockBody,

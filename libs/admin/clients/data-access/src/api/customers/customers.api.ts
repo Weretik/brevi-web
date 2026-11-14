@@ -1,9 +1,9 @@
-import { customerBaseApi } from '../customer-base-api';
 import { customerContacts } from './customer-contacts';
 import { customerKeepinSync } from './customer-keepin-sync';
 import { customerMerge } from './customer-merge';
 import { customerMutations } from './customer-mutations';
 import { customerQueries } from './customer-queries';
+import { customerBaseApi } from '../base/customer-base-api';
 
 export const customersApi = customerBaseApi.injectEndpoints({
   endpoints: (build) => ({

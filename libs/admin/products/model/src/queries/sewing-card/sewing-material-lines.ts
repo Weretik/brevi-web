@@ -1,5 +1,8 @@
 import type { SewingCardMaterial } from '../../entities/sewing-card/sewing-article-summary';
-import type { SewingMaterialKind, SewingMaterialUnit } from '../../entities/sewing-composition';
+import type {
+  SewingMaterialKind,
+  SewingMaterialUnit,
+} from '../../entities/sewing-composition/composition/sewing-composition';
 
 /** One row of «Комплектація», as the sheet «Комплектація виробів». */
 export interface SewingMaterialLine {

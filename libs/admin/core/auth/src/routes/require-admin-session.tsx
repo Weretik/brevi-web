@@ -3,10 +3,10 @@ import { Navigate, useLocation } from 'react-router-dom';
 
 import { buildLoginPath } from './login-return-path';
 import { NoAccessPage } from '../pages/no-access-page';
-import { isStaff } from '../session/session-user';
-import { useAdminSession } from '../session/use-admin-session';
+import { isStaff } from '../session/store/session-user';
+import { useAdminSession } from '../session/store/use-admin-session';
 
-import type { SessionUser } from '../session/session-user';
+import type { SessionUser } from '../session/store/session-user';
 import type { ReactNode } from 'react';
 
 interface RequireAdminSessionProps {

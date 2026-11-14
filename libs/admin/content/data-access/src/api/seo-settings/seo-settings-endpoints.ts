@@ -1,7 +1,7 @@
-import { seoSettingsApiError } from '../../errors/seo-settings-api-error';
+import { seoSettingsApiError } from '../../errors/publishing/seo-settings-api-error';
 import { mapSeoSettings } from '../../mappers/seo-settings/seo-settings.mapper';
 
-import type { ContentEndpointBuilder } from '../content-endpoint-builder';
+import type { ContentEndpointBuilder } from '../base/content-endpoint-builder';
 import type { SeoSettings, SeoSettingsInput } from '@admin/content/model';
 import type { operations } from '@admin/shared/contracts';
 

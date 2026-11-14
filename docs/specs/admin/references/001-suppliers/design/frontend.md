@@ -4,7 +4,7 @@
 
 - Angular-джерело таблиці, діалогів і контекстних дій: `libs/admin/feature/references/src/lib/pages/supplier/` та `libs/admin/feature/references/src/lib/components/dialogs/`.
 - Старий transport: `libs/admin/data-access/src/lib/references/suppliers/suppliers.api.ts`; backend controller: `src/Modules/Reference/Reference.Api/Reference.Api/Controllers/` у BreviERP.
-- React route `/references/supplier` підключений через `apps/admin-react/src/app/router/app-router.tsx` і публічний export `libs/admin/references/feature/src/index.ts`. `apps/admin-react` має shell, Vitest, Playwright та lint/typecheck/build; нові `libs/admin/references/feature` і `data-access` мають власні Nx targets.
+- React route `/references/supplier` підключений через `apps/admin-react/src/app/router/routes/app-router.tsx` і публічний export `libs/admin/references/feature/src/index.ts`. `apps/admin-react` має shell, Vitest, Playwright та lint/typecheck/build; нові `libs/admin/references/feature` і `data-access` мають власні Nx targets.
 - Візуальна композиція: [приклад таблиці](../../../assets/visual-references/customers-search-list.png) і [приклад форми](../../../assets/visual-references/customer-create.png); це зразки структури, не полів чи бренду. Застосовувати Brevi MUI theme й безкоштовний `@mui/x-data-grid`, без PrimeNG у React.
 
 ## Межа сторінки й таблиці
@@ -17,14 +17,14 @@
 
 ## Відповідальності
 
-| Область       | Власник                                                                                                                                                                                                   |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Page/route    | `libs/admin/references/feature/src/pages/suppliers/suppliers-page.tsx` компонує одну таблицю й локальні діалоги; `apps/admin-react/src/app/router/app-router.tsx` підключає route через публічний export. |
-| Таблиця/форма | `libs/admin/references/feature/src/components/suppliers/` малює Data Grid, форму та підтвердження; компоненти не викликають data-access.                                                                  |
-| Стан і дії    | `libs/admin/references/feature/src/hooks/suppliers/` містить read lifecycle, збереження форми та підтверджене видалення з відновленням selection.                                                         |
-| Data-access   | `libs/admin/references/data-access/src/suppliers/` містить HTTP, generated operation types на межі, runtime-перевірку й mapping; повтор read після write виконує feature hook.                            |
-| Модель        | Типи застосунку та чисті правила без React/HTTP; окремий `model` лише коли потрібен спільний власник.                                                                                                     |
-| Меню          | Активувати пункт тільки разом із route згідно з SDD меню; не додавати другий пункт для вкладки.                                                                                                           |
+| Область       | Власник                                                                                                                                                                                                          |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Page/route    | `libs/admin/references/feature/src/pages/suppliers/suppliers-page.tsx` компонує одну таблицю й локальні діалоги; `apps/admin-react/src/app/router/routes/app-router.tsx` підключає route через публічний export. |
+| Таблиця/форма | `libs/admin/references/feature/src/components/suppliers/` малює Data Grid, форму та підтвердження; компоненти не викликають data-access.                                                                         |
+| Стан і дії    | `libs/admin/references/feature/src/hooks/suppliers/` містить read lifecycle, збереження форми та підтверджене видалення з відновленням selection.                                                                |
+| Data-access   | `libs/admin/references/data-access/src/suppliers/` містить HTTP, generated operation types на межі, runtime-перевірку й mapping; повтор read після write виконує feature hook.                                   |
+| Модель        | Типи застосунку та чисті правила без React/HTTP; окремий `model` лише коли потрібен спільний власник.                                                                                                            |
+| Меню          | Активувати пункт тільки разом із route згідно з SDD меню; не додавати другий пункт для вкладки.                                                                                                                  |
 
 Тестувати loading/empty/error, клавіатуру й фокус, успіх/помилку запису, підтвердження видалення там, де воно існує, а також прямий URL. Перевірити 320/768/1280 px, темну/світлу тему. Під час TS-001/TS-002 додати потрібні Nx targets для нових бібліотек і звірити їх через `npx nx show project <project> --json`; не вважати їх наявними.
 

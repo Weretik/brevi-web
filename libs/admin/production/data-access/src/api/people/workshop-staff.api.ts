@@ -4,7 +4,7 @@ import {
   mapWorkshopEmployee,
   mapWorkshopStaff,
 } from '../../mappers/people/workshop-employee.mapper';
-import { productionBaseApi } from '../production-base-api';
+import { productionBaseApi } from '../base/production-base-api';
 
 import type {
   ProductionImportResult,

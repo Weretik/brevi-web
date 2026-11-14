@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { mapProductDetail } from '../product-detail.mapper';
-import { mapProduct } from '../product.mapper';
+import { mapProductDetail } from '../product/product-detail.mapper';
+import { mapProduct } from '../product/product.mapper';
 
 const product = {
   id: 1,

@@ -1,10 +1,10 @@
-import { record } from '../response-validation';
+import { record } from '../base/response-validation';
 import {
   ensureSewingResponse,
   sewingResponseInteger,
   sewingResponseNullableId,
   sewingResponsePositive,
-} from '../sewing-response-values';
+} from '../base/sewing-response-values';
 
 import type { SewingArticleDto } from '../../contracts/sewing-articles/sewing-article.dto';
 

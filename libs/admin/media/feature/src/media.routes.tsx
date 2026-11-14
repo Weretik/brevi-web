@@ -1,7 +1,7 @@
 import { lazy } from 'react';
 import { Navigate } from 'react-router-dom';
 
-const MediaLibraryPage = lazy(() => import('./pages/library/media-library-page'));
+const MediaLibraryPage = lazy(() => import('./pages/media-library-page'));
 
 export const mediaRoutes = [
   { path: '/media', element: <MediaLibraryPage /> },

@@ -4,10 +4,10 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { LoginPage } from './login-page';
-import { setSessionState } from '../session/session-store';
-import { requestLogin } from '../session/session-transport';
+import { setSessionState } from '../session/store/session-store';
+import { requestLogin } from '../session/store/session-transport';
 
-vi.mock('../session/session-transport', () => ({
+vi.mock('../session/store/session-transport', () => ({
   requestLogin: vi.fn(),
   requestLogout: vi.fn(),
   requestCurrentUser: vi.fn(),

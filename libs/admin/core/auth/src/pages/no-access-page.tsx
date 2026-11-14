@@ -2,7 +2,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
-import { logout } from '../session/auth-session';
+import { logout } from '../session/store/auth-session';
 
 interface NoAccessPageProps {
   /** Full screen outside the admin layout, for an account that is not staff. */

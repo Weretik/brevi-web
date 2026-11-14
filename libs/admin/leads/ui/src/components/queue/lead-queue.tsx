@@ -2,7 +2,7 @@ import { formatLeadNext } from '@admin/leads/model';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import { Box, Button, LinearProgress, Paper, Typography } from '@mui/material';
 
-import { mono } from '../mono';
+import { mono } from '../status/mono';
 
 import type { LeadMyDay, LeadSummary } from '@admin/leads/model';
 

@@ -1,6 +1,6 @@
 import { Box, Paper, Typography } from '@mui/material';
 
-import { mono } from '../mono';
+import { mono } from '../status/mono';
 
 import type { LeadStats } from '@admin/leads/model';
 

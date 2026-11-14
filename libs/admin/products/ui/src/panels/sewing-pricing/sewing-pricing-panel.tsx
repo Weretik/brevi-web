@@ -2,9 +2,9 @@ import { Box, Paper, Stack, Typography } from '@mui/material';
 
 import { SewingCalculationSection } from '../../components/sewing-pricing/calculation/sewing-calculation-section';
 import { SewingPublicationSection } from '../../components/sewing-pricing/publication/sewing-publication-section';
-import { sewingPriceFormat } from '../../components/sewing-pricing/sewing-price-format';
+import { sewingPriceFormat } from '../../components/sewing-pricing/tiers/sewing-price-format';
 
-import type { SewingPricingPanelProps } from '../../components/sewing-pricing/sewing-pricing-panel-props';
+import type { SewingPricingPanelProps } from '../../components/sewing-pricing/tiers/sewing-pricing-panel-props';
 
 /**
  * The price of one fabric variant of the sewing card. Read-only: the backend publishes a new price automatically whenever its

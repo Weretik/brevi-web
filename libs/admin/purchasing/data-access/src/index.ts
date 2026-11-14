@@ -12,4 +12,4 @@ export {
   useGetPurchaseSyncStateQuery,
   useReviewPurchaseInvoiceMutation,
   useSyncPurchaseInvoicesMutation,
-} from './api/purchasing.api';
+} from './api/base/purchasing.api';

@@ -2,7 +2,7 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import { Box, IconButton, Paper, Tooltip } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 
-import { QuoteStatusPill } from '../components/editor/quote-status-pill';
+import { QuoteStatusPill } from '../components/editor/cards/quote-status-pill';
 
 import type { QuoteSummary } from '@admin/quotes/model';
 import type { GridColDef, GridPaginationModel } from '@mui/x-data-grid';

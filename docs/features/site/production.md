@@ -38,6 +38,6 @@ libs/site/
 - `libs/site/production/ui/src/lib/production-ui.spec.tsx`
 - `libs/site/production/feature/src/lib/production-page.spec.tsx`
 - `libs/site/production/seo/src/lib/production-seo.spec.ts`
-- `libs/site/shared/ui/src/lib/breadcrumbs.spec.tsx`, `page-section.spec.tsx`
+- `libs/site/shared/ui/src/lib/layout/breadcrumbs.spec.tsx`, `page-section.spec.tsx`
 
 Run one project: `npx nx test site-production-ui`. All site libraries: `npm run test:site`.

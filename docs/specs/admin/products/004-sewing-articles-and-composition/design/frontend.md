@@ -21,7 +21,7 @@ The current [Admin product feature](../../../../../features/admin/products/produ
 | `libs/admin/products/feature/src/components/`                                  | Planned focused component    | Article selection/editor and composition form orchestration.                |
 | `libs/admin/products/ui/src/`                                                  | Planned focused components   | Article list, scoped lines, validation and readiness display.               |
 | `libs/admin/products/model/src/`                                               | Planned model                | Article/composition draft and view types, validation and dirty-state rules. |
-| `libs/admin/products/data-access/src/api/products.api.ts`                      | Existing, change or split    | Add approved Article/composition operations and cache invalidation.         |
+| `libs/admin/products/data-access/src/api/base/products.api.ts`                 | Existing, change or split    | Add approved Article/composition operations and cache invalidation.         |
 | `libs/admin/products/data-access/src/mappers/`                                 | Existing plus planned mapper | Runtime-validated API result to application model.                          |
 | `libs/admin/shared/contracts/src/generated/openapi.ts`                         | Generated, never hand-edit   | Types from pinned backend OpenAPI snapshot.                                 |
 

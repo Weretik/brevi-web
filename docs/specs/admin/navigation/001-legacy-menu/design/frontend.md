@@ -3,7 +3,7 @@
 ## Наявний контекст
 
 - Джерело назв і порядку: `libs/admin/shell/src/lib/layout/sidebar/sidebar.ts`; чотири Angular-маршрути: `libs/admin/feature/references/src/lib/lib.routes.ts`.
-- React: `apps/admin-react/src/app/router/app-router.tsx` має тільки `/` та fallback; `libs/admin/core/shell/src/navigation/` малює плоский список, `components/admin-top-bar.tsx` — чинну шапку.
+- React: `apps/admin-react/src/app/router/routes/app-router.tsx` має тільки `/` та fallback; `libs/admin/core/shell/src/navigation/` малює плоский список, `components/admin-top-bar.tsx` — чинну шапку.
 - Інструменти: `admin-core-shell` і `admin-react` мають lint/typecheck/test; `admin-react` — build; `admin-react-e2e` — Playwright.
 - Візуальні референси від користувача: [бічна панель](../../../assets/visual-references/admin-sidebar.png), [вкладене меню](../../../assets/visual-references/products-submenu.png) і [верхня панель](../../../assets/visual-references/admin-top-bar.png). Це приклади композиції, а не джерело бренду, контенту чи функцій: залишаються кольори/логотип Brevi та українські підписи.
 

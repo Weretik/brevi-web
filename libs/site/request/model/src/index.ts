@@ -19,4 +19,4 @@ export {
   normalizeUkrainianPhone,
   validateRequest,
   validateRequestAttachment,
-} from './lib/validators/request-validators';
+} from './lib/request-validators';

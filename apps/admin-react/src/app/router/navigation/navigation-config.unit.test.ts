@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { adminRouteDefinitions } from '../admin-route-definitions';
 import { createNavigation } from './navigation-config';
 import { defaultAccess } from '../../../test/default-access';
+import { adminRouteDefinitions } from '../routes/admin-route-definitions';
 
 const as = (...roles: string[]) => ({ roles, access: defaultAccess(roles) });
 

@@ -1,8 +1,11 @@
 import { financeTransactionsTag, financeTransfersTag } from '../../cache/accounting-tags';
 import { accountingApiError } from '../../errors/accounting-api-error';
-import { mapFinanceAuditPage, mapFinanceReport } from '../../mappers/accounting-report.mapper';
+import {
+  mapFinanceAuditPage,
+  mapFinanceReport,
+} from '../../mappers/ledger/accounting-report.mapper';
 
-import type { AccountingEndpointBuilder } from '../accounting-endpoint-builder';
+import type { AccountingEndpointBuilder } from '../base/accounting-endpoint-builder';
 import type {
   AuditAction,
   AuditEntity,

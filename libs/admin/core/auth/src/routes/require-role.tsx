@@ -1,9 +1,9 @@
 import { Outlet } from 'react-router-dom';
 
 import { NoAccessPage } from '../pages/no-access-page';
-import { useAdminSession } from '../session/use-admin-session';
+import { useAdminSession } from '../session/store/use-admin-session';
 
-import type { SessionUser } from '../session/session-user';
+import type { SessionUser } from '../session/store/session-user';
 
 interface RequireRoleProps {
   allow: (user: SessionUser) => boolean;

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import type { DeskKey } from '../model/desks';
+import type { DeskKey } from '../model/desks/desks';
 
 const storageKey = 'brevi-admin:desks-open';
 

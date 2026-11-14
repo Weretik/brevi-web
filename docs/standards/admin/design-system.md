@@ -8,15 +8,15 @@ The character is a **work console for the office and the sewing shop**: light gr
 
 All tokens are code; this page describes them, the code is the source of truth.
 
-| File                                                         | Owns                                                                      |
-| ------------------------------------------------------------ | ------------------------------------------------------------------------- |
-| `apps/admin-react/src/app/theme/palette.ts`                  | `breviBrand`, light and dark palettes, including `palette.navigation`     |
-| `apps/admin-react/src/app/theme/typography.ts`               | IBM Plex Sans, `monoFontFamily`, the type scale                           |
-| `apps/admin-react/src/app/theme/motion.ts`                   | Durations and easing; mapped onto `theme.transitions` in `brevi-theme.ts` |
-| `apps/admin-react/src/app/theme/components.ts`               | MUI component overrides (radii, borders, states, reduced motion)          |
-| `apps/admin-react/src/app/theme/brevi-theme.ts`              | Assembles the theme, `shape.borderRadius: 8`, Ukrainian locales           |
-| `libs/admin/core/shell/src/navigation/navigation-palette.ts` | The `NavigationPalette` type and its MUI palette augmentation             |
-| `apps/admin-react/index.html`                                | Font loading (Google Fonts, Cyrillic) and `noindex`                       |
+| File                                                                     | Owns                                                                      |
+| ------------------------------------------------------------------------ | ------------------------------------------------------------------------- |
+| `apps/admin-react/src/app/theme/palette.ts`                              | `breviBrand`, light and dark palettes, including `palette.navigation`     |
+| `apps/admin-react/src/app/theme/typography.ts`                           | IBM Plex Sans, `monoFontFamily`, the type scale                           |
+| `apps/admin-react/src/app/theme/motion.ts`                               | Durations and easing; mapped onto `theme.transitions` in `brevi-theme.ts` |
+| `apps/admin-react/src/app/theme/components.ts`                           | MUI component overrides (radii, borders, states, reduced motion)          |
+| `apps/admin-react/src/app/theme/brevi-theme.ts`                          | Assembles the theme, `shape.borderRadius: 8`, Ukrainian locales           |
+| `libs/admin/core/shell/src/navigation/menu/routes/navigation-palette.ts` | The `NavigationPalette` type and its MUI palette augmentation             |
+| `apps/admin-react/index.html`                                            | Font loading (Google Fonts, Cyrillic) and `noindex`                       |
 
 Feature code uses theme paths (`primary.main`, `primary.dark`, `text.secondary`, `divider`, `background.paper`, `success.light`, `theme.transitions.create(...)`) and never hex values, font stacks, or durations. A new token goes into the theme first and onto this page second.
 

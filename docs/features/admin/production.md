@@ -94,7 +94,7 @@ libs/admin/production/
     components/payroll/           # month view (pulse: actions, totals, parameters, table or payments), roles and embroidery, payment / adjustment / worker side panels
     components/customers/         # client card tab «Завдання в цех» (`CustomerProductionOrders`, `customerId`)
 apps/admin-react/src/app/router/  # legacy-menu.ts items, create-admin-router.tsx guards, use-production-order-actor.ts
-libs/admin/core/auth/src/session/session-user.ts # WorkshopChief, canManageWorkshop
+libs/admin/core/auth/src/session/store/session-user.ts # WorkshopChief, canManageWorkshop
 ```
 
 ## Tests

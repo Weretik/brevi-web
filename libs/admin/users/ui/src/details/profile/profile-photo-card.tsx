@@ -4,7 +4,7 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import { Alert, Button, CircularProgress, Stack, Typography } from '@mui/material';
 
 import { ProfileSection } from './profile-section';
-import { AvatarPickerButton } from '../../components/avatar-picker-button';
+import { AvatarPickerButton } from '../../components/staff/avatar-picker-button';
 
 import type { StaffProfile } from '@admin/users/model';
 

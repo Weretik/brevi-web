@@ -6,7 +6,7 @@ import { PageRightsScope } from '@admin/shared/ui';
 import { Box, Tab, Tabs } from '@mui/material';
 import { lazy, Suspense, useState } from 'react';
 
-import { PayrollMonthView } from '../../components/payroll/payroll-month-view';
+import { PayrollMonthView } from '../../components/payroll/month/payroll-month-view';
 import { TimesheetDrawer } from '../../components/people/timesheet-drawer';
 import { usePayrollPeriod } from '../../hooks/payroll/use-payroll-period';
 import { useWorkshopPeopleTabs } from '../../hooks/people/use-workshop-people-tabs';

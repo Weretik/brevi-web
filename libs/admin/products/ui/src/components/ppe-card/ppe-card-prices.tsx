@@ -3,7 +3,7 @@ import { Paper, Stack, Typography } from '@mui/material';
 import { ppeMarkupPercent } from './ppe-markup-format';
 import { PpePriceRow, PpePriceTierRows } from './ppe-price-rows';
 import { SewingCardStatusPill } from '../sewing-card/sewing-card-status-pill';
-import { sewingPriceFormat } from '../sewing-pricing/sewing-price-format';
+import { sewingPriceFormat } from '../sewing-pricing/tiers/sewing-price-format';
 
 import type { PpePriceTiers } from '@admin/products/model';
 

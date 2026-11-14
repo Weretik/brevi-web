@@ -1,4 +1,4 @@
-import type { QuoteKind } from '../entities/quote';
+import type { QuoteKind } from '../entities/quote/quote';
 
 /** Where a saved КП is edited: «Товари та ціни» or «КП для знайомства». */
 export function quoteEditorPath(kind: QuoteKind, id: number): string {

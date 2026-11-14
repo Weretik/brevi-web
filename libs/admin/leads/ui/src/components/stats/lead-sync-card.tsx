@@ -2,7 +2,7 @@ import { formatLeadMoment } from '@admin/leads/model';
 import { Alert, Box, Typography } from '@mui/material';
 
 import { LeadStatsCard } from './lead-stats-card';
-import { mono } from '../mono';
+import { mono } from '../status/mono';
 
 import type { LeadSyncState } from '@admin/leads/model';
 import type { ReactNode } from 'react';

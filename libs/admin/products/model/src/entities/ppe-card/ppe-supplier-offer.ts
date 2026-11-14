@@ -1,4 +1,4 @@
-import type { PpePriceTiers } from '../ppe-pricing/ppe-price-tiers';
+import type { PpePriceTiers } from '../ppe-pricing/prices/ppe-price-tiers';
 
 /** PPE card (CAT-008): supplier fields of the sheet tab «ЗІЗ» and the live three prices. */
 export interface PpeSupplierOffer {

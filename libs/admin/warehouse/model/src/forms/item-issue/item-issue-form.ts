@@ -8,7 +8,7 @@ import {
   operationDateError,
   parseStockMeters,
   positiveMetersError,
-} from '../../validators/stock-operations/stock-operation-rules';
+} from '../../validators/stock-operation-rules';
 
 import type {
   CreateItemIssueBody,

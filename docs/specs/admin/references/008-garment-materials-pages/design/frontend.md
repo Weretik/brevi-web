@@ -2,7 +2,7 @@
 
 ## Наявний контекст
 
-- Route: `apps/admin-react/src/app/router/app-router.tsx` має лише
+- Route: `apps/admin-react/src/app/router/routes/app-router.tsx` має лише
   `/references/garment-accessory`.
 - Вкладки: `garment-accessories-page.tsx`; локальний numeric tab не відновлюється
   через URL. Content-компоненти володіють списком, selection, dialog state і delete.

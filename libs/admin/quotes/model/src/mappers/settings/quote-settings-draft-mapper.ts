@@ -1,4 +1,4 @@
-import type { QuoteSettings } from '../../entities/quote-settings';
+import type { QuoteSettings } from '../../entities/settings/quote-settings';
 import type {
   QuoteLetterVariantDraft,
   QuoteSettingsDraft,

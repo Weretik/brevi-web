@@ -5,7 +5,7 @@ import {
 } from '@admin/embroidery/model';
 import { Box, ButtonBase, Typography } from '@mui/material';
 
-import { EmbroideryFormCard } from '../embroidery-form-card';
+import { EmbroideryFormCard } from '../fields/embroidery-form-card';
 
 import type {
   EmbroideryCalculation,

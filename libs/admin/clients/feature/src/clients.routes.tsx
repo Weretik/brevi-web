@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom';
 
 import type { RouteObject } from 'react-router-dom';
 
-const CustomerDetailPage = lazy(() => import('./pages/customers/detail/customer-detail-page'));
+const CustomerDetailPage = lazy(() => import('./pages/detail/customer-detail-page'));
 
 export interface ClientsRouteOptions {
   /** Whether the signed-in user has the «Бухгалтерія» right: the client card gets «Фінанси». */

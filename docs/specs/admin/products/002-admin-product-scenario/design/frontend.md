@@ -2,7 +2,7 @@
 
 ## Наявний контекст
 
-- React shell і маршрути: `apps/admin-react/src/app/router/app-router.tsx`, `libs/admin/core/shell/`.
+- React shell і маршрути: `apps/admin-react/src/app/router/routes/app-router.tsx`, `libs/admin/core/shell/`.
 - Список, detail, editor і media orchestration: role-first каталоги з
   capability modules у `libs/admin/products/feature/src/`; presentation — відповідні modules у
   `libs/admin/products/ui/src/`; pure rules — `libs/admin/products/model/src/`;
@@ -20,7 +20,7 @@
 | Спільні правила подання | `libs/admin/products/model/src/ordering/`, `product-media/`, `product-editor/`; Markdown renderer — `libs/admin/products/ui/src/product-content/`.                                                     |
 | Стан і отримання даних  | Hooks згруповані за flow у `feature/src/hooks/product-list/`, `product-detail/`, `product-editor/` і `media-library/`; RTK Query володіє server state.                                                 |
 | React Web               | Pages і feature-only components розділені за роллю та capability; presentation у `ui/src/product-list/`, `product-detail/`, `product-editor/` і `media/`.                                              |
-| Навігація               | Поточні чотири маршрути в `apps/admin-react/src/app/router/app-router.tsx`; direct URL завжди робить GET, create/replace можуть відкрити detail з повної відповіді.                                    |
+| Навігація               | Поточні чотири маршрути в `apps/admin-react/src/app/router/routes/app-router.tsx`; direct URL завжди робить GET, create/replace можуть відкрити detail з повної відповіді.                             |
 | Браузерний адаптер      | `<input type=file>` у продуктовій photo-секції; upload через `product-lookups.api.ts`, перевірка `Ready` через media list, прев'ю тільки за готовим URL.                                               |
 | API                     | `libs/admin/products/data-access/src/products.api.ts`, `products.http.ts`, `product-lookups.api.ts`, `products.mapper.ts`; generated DTO лишаються тут, 409 body парситься без показу технічних даних. |
 | Тести                   | Чисті правила/model — unit; фото, порядок, попередження, стани — component; mapping/errors — data-access integration; create/edit/detail/delete — вибрані Playwright journeys.                         |

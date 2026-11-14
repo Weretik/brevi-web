@@ -3,7 +3,7 @@ import { Alert, Button, CircularProgress, Typography } from '@mui/material';
 import { SewingCalculationBreakdown } from './sewing-calculation-breakdown';
 import { SewingPricingBlockers } from './sewing-pricing-blockers';
 
-import type { SewingPricingPanelProps } from '../sewing-pricing-panel-props';
+import type { SewingPricingPanelProps } from '../tiers/sewing-pricing-panel-props';
 
 export function SewingCalculationSection(
   props: Pick<

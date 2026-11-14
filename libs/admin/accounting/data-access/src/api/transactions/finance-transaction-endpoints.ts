@@ -8,10 +8,10 @@ import { accountingApiError } from '../../errors/accounting-api-error';
 import {
   mapFinanceTransaction,
   mapFinanceTransactionPage,
-} from '../../mappers/accounting-movement.mapper';
-import { mapFinanceHistory } from '../../mappers/accounting.mapper';
+} from '../../mappers/ledger/accounting-movement.mapper';
+import { mapFinanceHistory } from '../../mappers/ledger/accounting.mapper';
 
-import type { AccountingEndpointBuilder } from '../accounting-endpoint-builder';
+import type { AccountingEndpointBuilder } from '../base/accounting-endpoint-builder';
 import type {
   FinanceHistoryEntry,
   FinanceTransaction,

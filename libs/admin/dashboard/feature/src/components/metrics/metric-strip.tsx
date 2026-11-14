@@ -1,6 +1,6 @@
 import { Box, Paper, Typography } from '@mui/material';
 
-import { numericTextSx } from '../../model/numeric-text';
+import { numericTextSx } from '../../model/desks/numeric-text';
 
 import type { DashboardMetric } from '../../model/desk-views/dashboard-view';
 

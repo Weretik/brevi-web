@@ -7,7 +7,7 @@ import {
   Typography,
 } from '@mui/material';
 
-import { ReminderOccurrenceHistory } from '../../details/occurrences/reminder-occurrence-history';
+import { ReminderOccurrenceHistory } from '../../details/reminder-occurrence-history';
 
 import type { ReminderOccurrence } from '@admin/reminders/model';
 

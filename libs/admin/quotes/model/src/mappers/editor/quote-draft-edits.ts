@@ -1,4 +1,4 @@
-import type { QuoteTier } from '../../entities/quote';
+import type { QuoteTier } from '../../entities/quote/quote';
 import type { QuoteDraft, QuoteItemDraft, QuoteOptionDraft } from '../../forms/editor/quote-draft';
 
 const mapItem = (

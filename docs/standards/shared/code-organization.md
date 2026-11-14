@@ -40,14 +40,17 @@ A public site library keeps the generator's `src/lib/` level. The library name a
 | `ui`          | One folder per page block or section (`hero/`, `listing/`, `contacts/`) · `i18n/` UI copy                                                                                                                                                           |
 | `feature`     | One folder per page (`category/`, `contacts/`) · `routing/` static params and route helpers · `sitemap/`                                                                                                                                            |
 
-A library that serves one page and has at most eight production files may keep them directly in `src/lib/`. Otherwise no production file sits directly in `src/lib/`.
+A library that serves one page and has at most six production files may keep them directly in `src/lib/`. Otherwise no production file sits directly in `src/lib/` (only `cache-tags.ts` of a `data-access` library may stay next to the folders).
 
 ## Nesting and size
 
 - Create a role folder when the role exists, even for one file.
-- Inside a role folder, add a capability subfolder (`components/quote-editor/`, `hooks/sewing-pricing/`) when it would hold two or more files or when the folder mixes independent flows. The order is always role first, then capability; never `src/<capability>/<role>/` or a capability folder directly under `src/`.
+- **The folder axiom, shared with the backend:** "A folder holds at most 6 code files. When it would hold more, split it by meaning into named subfolders of at least two files each. No empty folders, no wrapper folders (a folder with no files and a single subfolder), and no new one-file folders. Only generated code is exempt." The frontend reading follows.
+- **Axiom: a folder holds at most six production files.** At seven, split it into subfolders by meaning (a feature, use case, or page block such as `components/quote-editor/`, `hooks/sewing-pricing/`), each with two or more files where possible; never one folder per file. Co-located spec files and generated code (`generated/`) do not count.
+- **A folder holds either files or subfolders, never both.** When a folder gets its first subfolder, its remaining files move into subfolders too. Only entry files may stay next to folders: `index.ts`, `<domain>.routes.tsx`, and `testing.ts` at a library's `src/` root, and `cache-tags.ts` in a site `data-access` `src/lib/`. The app composition folder and file-based router folders (Next.js and Expo Router `src/app/`, shaped by URLs) are exempt.
+- **No wrapper folders:** a folder that holds only one subfolder and no files is merged with it (a role folder keeps the files of its single capability directly).
+- Inside a role folder, files stay flat up to six; the order is always role first, then capability; never `src/<capability>/<role>/` or a capability folder directly under `src/`.
 - A large component with its own subcomponents gets its own folder inside `components/`.
-- A role or capability folder with eight or more production files is a required signal to record a `split/keep` decision in the code audit.
 - Keep each test next to its production file at the same level.
 
 ```text
@@ -93,7 +96,7 @@ A page or screen composes: it reads route parameters, calls one controller hook,
 
 ## Application folder
 
-`apps/<app>/src/app/` is the composition root and holds only: `providers/`, `router/` (the route table, guards, and lazy imports of each domain's `<domain>.routes.tsx`; `router/navigation/` for the menu configuration), `theme/`, `store.ts`, `services/` (app-wide services such as error reporting), `notifications/`, and `slots/` (components and hooks the app injects into a feature to connect two domains, for example a customer picker for orders or the staff list for work tasks). Domain screens, forms, and data hooks live in libraries, not in the app. When `router/` reaches eight files, split the route table by area (`router/catalog.tsx`, `router/content.tsx`). A Next.js app keeps only thin route files under `src/app/`.
+`apps/<app>/src/app/` is the composition root and holds only: `providers/`, `router/` (the route table, guards, and lazy imports of each domain's `<domain>.routes.tsx`; `router/navigation/` for the menu configuration), `theme/`, `store.ts`, `services/` (app-wide services such as error reporting), `notifications/`, and `slots/` (components and hooks the app injects into a feature to connect two domains, for example a customer picker for orders or the staff list for work tasks). Domain screens, forms, and data hooks live in libraries, not in the app. When `router/` would hold more than six files, split the route table by area (`router/catalog.tsx`, `router/content.tsx`). A Next.js app keeps only thin route files under `src/app/`.
 
 ## Frozen applications
 
@@ -101,7 +104,7 @@ An application that is being replaced is frozen: it gets bug fixes only, no new 
 
 ## Structure check
 
-A script ([`tools/architecture/check-structure.mjs`](../../../tools/architecture/check-structure.mjs), with [its own tests](../../../tools/architecture/check-structure.spec.mjs); `npm run architecture:structure`) runs in CI next to the boundary check. It fails on a forbidden folder or file name, a folder outside the role list, a folder with eight or more production files, a production file directly in `src/lib/` of a site library with more than eight production files, a file over the line limit (static copy in `i18n/` or `data/`, generated code, and `testing/` helpers are not counted), a component with more than three `useState` or more than one `useEffect`, a library with production logic and no spec, and an application folder entry outside the composition list. Existing violations live in [the baseline](../../../tools/architecture/structure-baseline.json), which mirrors the known deviations table; a new violation fails the build, and fixing one removes its baseline line.
+A script ([`tools/architecture/check-structure.mjs`](../../../tools/architecture/check-structure.mjs), with [its own tests](../../../tools/architecture/check-structure.spec.mjs); `npm run architecture:structure`) runs in CI next to the boundary check. It fails on a forbidden folder or file name, a folder outside the role list, a folder with more than six production files (`crowded-folder`), a folder that mixes production files with subfolders (`mixed-folder`), a folder that holds only one subfolder (`wrapper-folder`), a file over the line limit (static copy in `i18n/` or `data/`, generated code, and `testing/` helpers are not counted), a component with more than three `useState` or more than one `useEffect`, a library with production logic and no spec, and an application folder entry outside the composition list. Existing violations live in [the baseline](../../../tools/architecture/structure-baseline.json), which mirrors the known deviations table; a new violation fails the build, and fixing one removes its baseline line.
 
 ## Forbidden names and where the code goes
 

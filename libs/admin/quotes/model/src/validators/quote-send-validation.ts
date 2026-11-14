@@ -1,4 +1,4 @@
-import type { QuoteSendForm } from '../entities/quote-send';
+import type { QuoteSendForm } from '../entities/quote/quote-send';
 
 export const quoteMaxRecipients = 10;
 export const quoteSubjectMax = 300;

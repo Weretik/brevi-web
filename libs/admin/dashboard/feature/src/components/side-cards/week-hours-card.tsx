@@ -1,7 +1,7 @@
 import { Box, Card, LinearProgress, Link, Stack, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
-import { numericTextSx } from '../../model/numeric-text';
+import { numericTextSx } from '../../model/desks/numeric-text';
 
 import type { WeekHours } from '../../model/desk-views/dashboard-view';
 

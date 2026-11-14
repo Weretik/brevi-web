@@ -75,7 +75,7 @@ libs/admin/references/
 
 - `libs/admin/references/data-access/src/mappers/<fabrics|garment-accessories>/*.unit.test.ts`, shared `libs/admin/references/data-access/src/api/integration/references.api.integration.test.ts`
 - `libs/admin/references/feature/src/pages/materials/*.component.test.tsx`, `libs/admin/references/model/src/queries/reference-lists/reference-supplier-filter.unit.test.ts`
-- `apps/admin-react/src/app/router/app-router.integration.test.tsx` (sidebar item and redirects)
+- `apps/admin-react/src/app/router/routes/app-router.integration.test.tsx` (sidebar item and redirects)
 - E2E (run only on request): `apps/admin-react-e2e/src/garment-accessories.spec.ts`
 
 Focused run: `npx nx test admin-references-data-access -- fabrics garment-accessories fabric-colors`; `npx nx test admin-references-feature -- materials`; `npx nx test admin-production-ui -- production-color-field`.

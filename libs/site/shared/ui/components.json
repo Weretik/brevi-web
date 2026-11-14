@@ -11,9 +11,9 @@
   },
   "iconLibrary": "lucide",
   "aliases": {
-    "components": "@site/shared/ui/lib",
-    "ui": "@site/shared/ui/lib",
-    "utils": "@site/shared/ui/lib/cn",
+    "components": "@site/shared/ui/lib/layout",
+    "ui": "@site/shared/ui/lib/primitives",
+    "utils": "@site/shared/ui/lib/primitives/cn",
     "lib": "@site/shared/ui/lib",
     "hooks": "@site/shared/ui/lib/hooks"
   }

@@ -8,9 +8,9 @@ import {
   mapFinanceCategories,
   mapFinanceCategory,
   mapFinanceHistory,
-} from '../../mappers/accounting.mapper';
+} from '../../mappers/ledger/accounting.mapper';
 
-import type { AccountingEndpointBuilder } from '../accounting-endpoint-builder';
+import type { AccountingEndpointBuilder } from '../base/accounting-endpoint-builder';
 import type {
   FinanceCategory,
   FinanceCategoryCreateBody,

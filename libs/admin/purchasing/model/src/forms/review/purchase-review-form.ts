@@ -1,5 +1,5 @@
-import type { PurchaseInvoice } from '../../entities/invoices/purchase-invoice';
-import type { PurchaseReviewInput } from '../../entities/invoices/purchase-review';
+import type { PurchaseInvoice } from '../../entities/purchase-invoice';
+import type { PurchaseReviewInput } from '../../entities/purchase-review';
 
 export const purchaseReviewNoteMaxLength = 1000;
 

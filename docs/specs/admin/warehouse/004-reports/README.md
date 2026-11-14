@@ -43,4 +43,4 @@ Only problems are coloured: to order, shortage, overspending, «Без ціни�
 - `libs/admin/warehouse/model/src/mappers/exports/hardware-exports.test.ts`
 - `libs/admin/warehouse/data-access/src/mappers/stock-reports.mapper.test.ts`
 - `libs/admin/warehouse/feature/src/pages/reports/report-pages.component.test.tsx`
-- `apps/admin-react/src/app/router/app-router.integration.test.tsx`: a Manager sees «План і факт» and «Бронь» but not «Фурнітура до замовлення».
+- `apps/admin-react/src/app/router/routes/app-router.integration.test.tsx`: a Manager sees «План і факт» and «Бронь» but not «Фурнітура до замовлення».

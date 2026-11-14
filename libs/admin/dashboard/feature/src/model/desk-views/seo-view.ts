@@ -1,9 +1,9 @@
 import { seoAreaLabels, seoProblemText } from '@admin/content/model';
 
-import { toDeskList } from '../desk-list';
+import { toDeskList } from '../desks/desk-list';
 
 import type { DashboardMetric } from './dashboard-view';
-import type { DeskList, DeskListRow } from '../desk-list';
+import type { DeskList, DeskListRow } from '../desks/desk-list';
 import type { SeoArea, SeoOverview } from '@admin/content/model';
 
 /** Admin pages of «Контент» where a page of the site is fixed. */

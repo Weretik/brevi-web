@@ -8,10 +8,10 @@ import {
   mapFinanceCounterparty,
   mapFinanceCounterpartyChoices,
   mapFinanceCounterpartyPage,
-} from '../../mappers/accounting-counterparty.mapper';
-import { mapFinanceHistory } from '../../mappers/accounting.mapper';
+} from '../../mappers/ledger/accounting-counterparty.mapper';
+import { mapFinanceHistory } from '../../mappers/ledger/accounting.mapper';
 
-import type { AccountingEndpointBuilder } from '../accounting-endpoint-builder';
+import type { AccountingEndpointBuilder } from '../base/accounting-endpoint-builder';
 import type {
   FinanceCounterparty,
   FinanceCounterpartyBody,

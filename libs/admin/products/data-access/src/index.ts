@@ -4,8 +4,8 @@ export {
   useGetProductQuery,
   useListProductsQuery,
   useReplaceProductMutation,
-} from './api/products.api';
-export { useListProductCategoriesQuery } from './api/product-lookups.api';
+} from './api/base/products.api';
+export { useListProductCategoriesQuery } from './api/base/product-lookups.api';
 export { useGetSewingAccessQuery } from './api/sewing-access/sewing-access.api';
 export {
   useListSewingArticlesQuery,
@@ -21,7 +21,7 @@ export {
   useLazyListProductMediaQuery,
   useListProductMediaQuery,
   useUploadProductMediaMutation,
-} from './api/product-media.api';
+} from './api/base/product-media.api';
 export { useGetSewingCalculationQuery } from './api/sewing-pricing/calculations.api';
 export { useGetPublishedSewingPriceQuery } from './api/sewing-pricing/publications.api';
 export { useGetPublishedSewingProductsQuery } from './api/sewing-pricing/products.api';

@@ -1,7 +1,7 @@
 import { formatLeadDate, leadLinkLabel } from '@admin/leads/model';
 import { Box, Link, Stack, Typography } from '@mui/material';
 
-import { mono } from '../mono';
+import { mono } from '../status/mono';
 
 import type { LeadDetail } from '@admin/leads/model';
 import type { ReactNode } from 'react';

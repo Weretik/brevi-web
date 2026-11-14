@@ -10,9 +10,9 @@ import {
   Typography,
 } from '@mui/material';
 
-import { companyFormGrid } from '../company-form-grid';
-import { CompanyFormTitle } from '../company-form-title';
-import { CompanyTwoLanguagesField } from '../company-two-languages-field';
+import { companyFormGrid } from '../form/company-form-grid';
+import { CompanyFormTitle } from '../form/company-form-title';
+import { CompanyTwoLanguagesField } from '../form/company-two-languages-field';
 
 import type { CompanyFormSectionProps } from './company-form-section';
 

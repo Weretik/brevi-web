@@ -1,9 +1,9 @@
 import { formatMinor } from '@admin/accounting/model';
 
-import { toDeskList } from '../desk-list';
+import { toDeskList } from '../desks/desk-list';
 
 import type { DashboardMetric } from './dashboard-view';
-import type { DeskList, DeskListRow } from '../desk-list';
+import type { DeskList, DeskListRow } from '../desks/desk-list';
 import type { FinanceOverview, FinanceOverviewCurrency } from '@admin/accounting/model';
 import type { SeoOverview } from '@admin/content/model';
 import type { LeadStats } from '@admin/leads/model';

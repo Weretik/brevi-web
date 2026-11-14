@@ -1,7 +1,7 @@
 import { quoteCustomLineKindLabels } from '../../forms/editor/quote-custom-sewing-draft';
 
-import type { QuoteItemLineKind } from '../../entities/quote';
-import type { QuoteModelComposition } from '../../entities/quote-custom-sewing';
+import type { QuoteModelComposition } from '../../entities/items/quote-custom-sewing';
+import type { QuoteItemLineKind } from '../../entities/quote/quote';
 import type { QuoteItemDraft } from '../../forms/editor/quote-draft';
 
 export type QuoteModelChangeKind = 'added' | 'removed' | 'changed';

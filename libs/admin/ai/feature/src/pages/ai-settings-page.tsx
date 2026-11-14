@@ -2,13 +2,13 @@ import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { Alert, Box, Button, CircularProgress, Paper, Stack, Typography } from '@mui/material';
 
-import { AiBaseInstruction } from '../components/ai-base-instruction';
-import { AiKeySection } from '../components/ai-key-section';
-import { AiModelsDrawer } from '../components/ai-models-drawer';
-import { AiModelsSection } from '../components/ai-models-section';
-import { AiRulesSection } from '../components/ai-rules-section';
-import { AiStatusStrip } from '../components/ai-status-strip';
-import { AiWorkSection } from '../components/ai-work-section';
+import { AiBaseInstruction } from '../components/settings/ai-base-instruction';
+import { AiKeySection } from '../components/settings/ai-key-section';
+import { AiModelsDrawer } from '../components/settings/ai-models-drawer';
+import { AiModelsSection } from '../components/settings/ai-models-section';
+import { AiRulesSection } from '../components/settings/ai-rules-section';
+import { AiStatusStrip } from '../components/status/ai-status-strip';
+import { AiWorkSection } from '../components/status/ai-work-section';
 import { useAiSettings } from '../hooks/use-ai-settings';
 
 import type { AiNotice } from '../hooks/use-ai-settings';

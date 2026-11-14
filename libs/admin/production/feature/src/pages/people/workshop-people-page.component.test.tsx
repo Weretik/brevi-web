@@ -20,7 +20,7 @@ vi.mock('@admin/production/data-access', () => ({
 }));
 vi.mock('../timesheet/timesheet-page', () => ({ default: () => <p>Сторінка годин</p> }));
 vi.mock('../staff/workshop-staff-page', () => ({ default: () => <p>Список працівників</p> }));
-vi.mock('../../components/payroll/payroll-month-view', () => ({
+vi.mock('../../components/payroll/month/payroll-month-view', () => ({
   PayrollMonthView: () => <p>Місяць цеху</p>,
 }));
 

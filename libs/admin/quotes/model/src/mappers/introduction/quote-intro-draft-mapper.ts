@@ -3,14 +3,14 @@ import {
   quoteIntroSeasons,
 } from '../../forms/introduction/quote-intro-draft';
 
-import type { Quote, QuoteItem } from '../../entities/quote';
-import type { QuoteCatalogProduct, QuoteCatalogVariant } from '../../entities/quote-catalog';
+import type { QuoteCatalogProduct, QuoteCatalogVariant } from '../../entities/items/quote-catalog';
+import type { Quote, QuoteItem } from '../../entities/quote/quote';
 import type {
   QuoteIntroductionSetup,
   QuoteIntroLayout,
   QuoteIntroSeason,
   QuoteIntroTemplate,
-} from '../../entities/quote-introduction';
+} from '../../entities/settings/quote-introduction';
 import type {
   QuoteIntroDraft,
   QuoteIntroPageDraft,

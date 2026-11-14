@@ -1,7 +1,7 @@
 import { Box, Typography } from '@mui/material';
 
-import { EmbroideryFormCard } from '../embroidery-form-card';
-import { EmbroideryNumberField } from '../embroidery-number-field';
+import { EmbroideryFormCard } from '../fields/embroidery-form-card';
+import { EmbroideryNumberField } from '../fields/embroidery-number-field';
 
 import type { EmbroiderySettingsDraft, EmbroiderySettingsErrors } from '@admin/embroidery/model';
 

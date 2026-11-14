@@ -2,7 +2,7 @@ import { adminApi, toAdminApiError } from '@admin/shared/api-client';
 
 import { mapProductPhotos } from '../../mappers/product-photos/product-photos.mapper';
 import { parseProductPhotoList } from '../../validators/product-photos/validate-product-photos';
-import { productErrorMessages } from '../product-api.shared';
+import { productErrorMessages } from '../base/product-api.shared';
 
 import type { SetProductPhotosBody } from '../../contracts/product-photos/product-photos.dto';
 import type { ProductCardPhoto } from '@admin/products/model';

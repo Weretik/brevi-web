@@ -1,4 +1,7 @@
-import type { SewingMaterialKind, SewingMaterialUnit } from '../../entities/sewing-composition';
+import type {
+  SewingMaterialKind,
+  SewingMaterialUnit,
+} from '../../entities/sewing-composition/composition/sewing-composition';
 
 export function materialUnitForKind(kind: SewingMaterialKind): SewingMaterialUnit {
   switch (kind) {

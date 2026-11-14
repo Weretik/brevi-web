@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { quoteSettingsErrors } from './quote-settings-validation';
 import { quoteSettingsToDraft } from '../mappers/settings/quote-settings-draft-mapper';
 
-import type { QuoteSettings } from '../entities/quote-settings';
+import type { QuoteSettings } from '../entities/settings/quote-settings';
 
 const settings: QuoteSettings = {
   version: 0,

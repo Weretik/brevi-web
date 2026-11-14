@@ -4,7 +4,7 @@ import { useGetFabricBookingQuery, useGetHardwareOrderQuery } from '@admin/wareh
 import { Alert, Stack, Typography } from '@mui/material';
 
 import { workshopMetrics, workshopStages, weekHours } from '../../model/desk-views/dashboard-view';
-import { fabricShortages, hardwareToOrder } from '../../model/stock-shortages';
+import { fabricShortages, hardwareToOrder } from '../../model/desks/stock-shortages';
 import { DeskGrid } from '../desk-grid/desk-grid';
 import { DeskListCard } from '../desk-list/desk-list-card';
 import { MetricStrip } from '../metrics/metric-strip';

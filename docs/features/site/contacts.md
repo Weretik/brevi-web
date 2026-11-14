@@ -39,6 +39,6 @@ libs/site/
 - `libs/site/contacts/ui/src/lib/contacts-ui.spec.tsx`
 - `libs/site/contacts/feature/src/lib/contacts-page.spec.tsx`
 - `libs/site/contacts/seo/src/lib/contacts-seo.spec.ts`
-- `libs/site/shared/ui/src/lib/page-header.spec.tsx`
+- `libs/site/shared/ui/src/lib/layout/page-header.spec.tsx`
 
 Run one project: `npx nx test site-contacts-ui`. All site libraries: `npm run test:site`.

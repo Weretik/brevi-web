@@ -1,12 +1,12 @@
 import { redirectsTag } from '../../cache/redirect-tags';
-import { redirectApiError } from '../../errors/redirect-api-error';
+import { redirectApiError } from '../../errors/publishing/redirect-api-error';
 import {
   mapRedirect,
   mapRedirectImportReport,
   mapRedirectList,
 } from '../../mappers/redirects/redirect.mapper';
 
-import type { ContentEndpointBuilder } from '../content-endpoint-builder';
+import type { ContentEndpointBuilder } from '../base/content-endpoint-builder';
 import type {
   OldSiteImportItems,
   RedirectImportReport,

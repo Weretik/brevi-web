@@ -2,10 +2,10 @@ import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrow
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import { Box, ListItemButton, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 
-import { getNavigationPalette } from '../navigation-palette';
 import { AdminNavigationLogo } from './admin-navigation-logo';
-import { AdminNavigation } from '../menu/admin-navigation';
-import { navigationRowSx } from '../menu/navigation-row';
+import { getNavigationPalette } from '../menu/routes/navigation-palette';
+import { navigationRowSx } from '../menu/routes/navigation-row';
+import { AdminNavigation } from '../menu/tree/admin-navigation';
 
 import type { AdminNavigationGroup } from '../../layout/admin-shell-contract';
 

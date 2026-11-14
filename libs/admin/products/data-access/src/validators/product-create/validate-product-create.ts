@@ -1,5 +1,5 @@
+import { record } from '../base/response-validation';
 import { ensurePricing, pricingId, validPricingTiers } from '../pricing/pricing-values';
-import { record } from '../response-validation';
 
 import type {
   CreatedCatalogProductDto,

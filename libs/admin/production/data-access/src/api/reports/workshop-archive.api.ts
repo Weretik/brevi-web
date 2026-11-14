@@ -3,7 +3,7 @@ import {
   mapWorkshopArchiveImportResult,
   mapWorkshopArchivePage,
 } from '../../mappers/reports/workshop-archive.mapper';
-import { productionBaseApi } from '../production-base-api';
+import { productionBaseApi } from '../base/production-base-api';
 
 import type {
   ProductionImportResult,

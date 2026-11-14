@@ -10,7 +10,7 @@ import {
 } from './sewing-create-progress';
 
 import type { SewingArticleSummaryRow } from '../../entities/sewing-card/sewing-article-summary';
-import type { SewingOperationDraft } from '../../entities/sewing-composition/sewing-operation-draft';
+import type { SewingOperationDraft } from '../../entities/sewing-composition/operations/sewing-operation-draft';
 
 function article(update: Partial<SewingArticleSummaryRow> = {}): SewingArticleSummaryRow {
   return {
