@@ -58,9 +58,7 @@ export function ProductionItemEmbroideries({ applications, canOpenCalculation }:
               <Typography variant="subtitle2">
                 Вишивка:{' '}
                 {canOpenCalculation && embroidery ? (
-                  <Link href={embroideryCalculationHref(id)}>
-                    {title}
-                  </Link>
+                  <Link href={embroideryCalculationHref(id)}>{title}</Link>
                 ) : (
                   title
                 )}

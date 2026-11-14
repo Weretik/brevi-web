@@ -20,7 +20,6 @@ interface WorkshopOrderCardProps {
 }
 
 export function WorkshopOrderCard({ order }: WorkshopOrderCardProps) {
-
   return (
     <Paper component="li" sx={{ listStyle: 'none', px: 1.5, py: 1.25 }} variant="outlined">
       <Box

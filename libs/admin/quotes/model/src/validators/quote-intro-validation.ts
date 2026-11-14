@@ -1,5 +1,8 @@
 import { quoteNameMaxLength, quoteTextMaxLength } from './quote-draft-validation';
-import { quoteIntroEmailMax, quoteIntroTemplateNameMax } from '../forms/introduction/quote-intro-draft';
+import {
+  quoteIntroEmailMax,
+  quoteIntroTemplateNameMax,
+} from '../forms/introduction/quote-intro-draft';
 
 import type { QuoteIntroDraft } from '../forms/introduction/quote-intro-draft';
 

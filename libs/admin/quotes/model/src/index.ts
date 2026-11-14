@@ -52,14 +52,21 @@ export {
   updateQuoteItem,
   updateQuoteOption,
 } from './mappers/editor/quote-draft-edits';
-export { formatQuotePrice, parseQuotePrice, priceInputText } from './mappers/editor/quote-price-text';
+export {
+  formatQuotePrice,
+  parseQuotePrice,
+  priceInputText,
+} from './mappers/editor/quote-price-text';
 export {
   quoteDraftFabricIds,
   quoteFabricFactsParts,
   quoteOptionFabrics,
   quoteSupplierFabrics,
 } from './mappers/editor/quote-fabric-facts';
-export type { QuoteOptionFabricRef, QuoteSupplierFabric } from './mappers/editor/quote-fabric-facts';
+export type {
+  QuoteOptionFabricRef,
+  QuoteSupplierFabric,
+} from './mappers/editor/quote-fabric-facts';
 export { quotePreviewWarnings } from './mappers/preview/quote-preview-warnings';
 export type { QuotePreviewWarning } from './mappers/preview/quote-preview-warnings';
 export {

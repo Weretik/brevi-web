@@ -18,7 +18,10 @@ import {
   Typography,
 } from '@mui/material';
 
-import { PayrollAdjustmentsTable, PayrollPaymentsTable } from '../../tables/payroll/payroll-entries-tables';
+import {
+  PayrollAdjustmentsTable,
+  PayrollPaymentsTable,
+} from '../../tables/payroll/payroll-entries-tables';
 
 import type { PayrollEmployee, PayrollWorkRow } from '@admin/production/model';
 
@@ -48,10 +51,8 @@ function WorkTable({ title, rows }: { title: string; rows: readonly PayrollWorkR
               <TableRow key={row.workId}>
                 <TableCell sx={{ whiteSpace: 'nowrap' }}>{formatDay(row.workDate)}</TableCell>
                 <TableCell>
-                  <Link href={`/production/orders/${row.orderId}`}>
-                    № {row.orderNumber}
-                  </Link>{' '}
-                  · {row.modelName}
+                  <Link href={`/production/orders/${row.orderId}`}>№ {row.orderNumber}</Link> ·{' '}
+                  {row.modelName}
                 </TableCell>
                 <TableCell>{productionWorkKindLabels[row.kind]}</TableCell>
                 <TableCell align="right" sx={mono}>

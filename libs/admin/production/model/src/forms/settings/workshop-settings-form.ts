@@ -1,4 +1,7 @@
-import type { WorkshopSettings, WorkshopSettingsBody } from '../../entities/orders/production-tracking';
+import type {
+  WorkshopSettings,
+  WorkshopSettingsBody,
+} from '../../entities/orders/production-tracking';
 
 export interface WorkshopSettingsFormValues {
   telegramEnabled: boolean;

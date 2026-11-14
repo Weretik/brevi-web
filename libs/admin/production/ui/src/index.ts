@@ -38,7 +38,10 @@ export { ProductionItemStages } from './details/tracking/production-item-stages'
 export { ProductionItemSteps } from './details/tracking/production-item-steps';
 export { ProductionOrderTelegram } from './details/tracking/production-order-telegram';
 export { ProductionShipmentForm } from './forms/tracking/production-shipment-form';
-export { ProductionStagePill, productionStageTone } from './components/tracking/production-stage-pill';
+export {
+  ProductionStagePill,
+  productionStageTone,
+} from './components/tracking/production-stage-pill';
 export { WorkshopSettingsForm } from './forms/settings/workshop-settings-form';
 export { ProductionReasonDialog } from './dialogs/production-reason-dialog';
 export { ProductionWorkTable } from './tables/work/production-work-table';
@@ -49,7 +52,10 @@ export { TimesheetDayTable } from './tables/timesheet/timesheet-day-table';
 export { TimesheetMonthSummary } from './details/timesheet/timesheet-month-summary';
 export { TimesheetHistory } from './details/timesheet/timesheet-history';
 export { PayrollMonthTable } from './tables/payroll/payroll-month-table';
-export { PayrollAdjustmentsTable, PayrollPaymentsTable } from './tables/payroll/payroll-entries-tables';
+export {
+  PayrollAdjustmentsTable,
+  PayrollPaymentsTable,
+} from './tables/payroll/payroll-entries-tables';
 export { PayrollEmployeeDetails } from './details/payroll/payroll-employee-details';
 export { PayrollYearTable } from './tables/payroll/payroll-year-table';
 export { PayrollSetupForm } from './forms/payroll/payroll-setup-form';

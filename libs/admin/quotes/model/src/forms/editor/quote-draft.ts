@@ -1,4 +1,9 @@
-import type { QuoteItemKind, QuoteItemLine, QuoteOptionFabric, QuoteTier } from '../../entities/quote';
+import type {
+  QuoteItemKind,
+  QuoteItemLine,
+  QuoteOptionFabric,
+  QuoteTier,
+} from '../../entities/quote';
 
 /** One editable price box; `manual` is the typed text, empty for the Catalog price. */
 export interface QuotePriceDraft {

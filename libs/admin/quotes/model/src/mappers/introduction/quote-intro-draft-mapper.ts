@@ -1,4 +1,7 @@
-import { quoteIntroModelsPerPage, quoteIntroSeasons } from '../../forms/introduction/quote-intro-draft';
+import {
+  quoteIntroModelsPerPage,
+  quoteIntroSeasons,
+} from '../../forms/introduction/quote-intro-draft';
 
 import type { Quote, QuoteItem } from '../../entities/quote';
 import type { QuoteCatalogProduct, QuoteCatalogVariant } from '../../entities/quote-catalog';

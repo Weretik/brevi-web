@@ -1,5 +1,8 @@
 import type { QuoteSettings } from '../../entities/quote-settings';
-import type { QuoteLetterVariantDraft, QuoteSettingsDraft } from '../../forms/settings/quote-settings-draft';
+import type {
+  QuoteLetterVariantDraft,
+  QuoteSettingsDraft,
+} from '../../forms/settings/quote-settings-draft';
 
 /** Replaces null with '' in every field of a flat section. */
 function texts<T extends object>(value: T): { [K in keyof T]: string } {

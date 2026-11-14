@@ -3,7 +3,10 @@ import {
   WORKSHOP_EMPLOYEE_POSITION_MAX_LENGTH,
 } from '../../entities/people/workshop-employee';
 
-import type { WorkshopEmployee, WorkshopEmployeeDraft } from '../../entities/people/workshop-employee';
+import type {
+  WorkshopEmployee,
+  WorkshopEmployeeDraft,
+} from '../../entities/people/workshop-employee';
 
 export type WorkshopEmployeeField = keyof WorkshopEmployeeDraft;
 export type WorkshopEmployeeErrors = Partial<Record<WorkshopEmployeeField, string>>;

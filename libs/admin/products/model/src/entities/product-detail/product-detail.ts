@@ -1,7 +1,4 @@
-import type {
-  ProductCharacteristicTable,
-  ProductInformationBlock,
-} from './product-content';
+import type { ProductCharacteristicTable, ProductInformationBlock } from './product-content';
 import type { Product } from '../product-list/product';
 import type { ProductPhoto } from '../product-media/product-media';
 

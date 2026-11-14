@@ -1,5 +1,8 @@
 import type { FabricNormRow } from '../../entities/norms/fabric-norm';
-import type { ModelComposition, ModelCompositionLine } from '../../entities/norms/model-composition';
+import type {
+  ModelComposition,
+  ModelCompositionLine,
+} from '../../entities/norms/model-composition';
 
 /** One fabric of a colour variant: «Основна», «Додаткова», «Додаткова 1», «Додаткова 2». */
 export interface FabricNormPart {

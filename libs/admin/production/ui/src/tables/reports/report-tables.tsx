@@ -86,13 +86,7 @@ function ReportTable<Row>({
 }
 
 const order = (id: number | null, number: number | null) =>
-  id === null || number === null ? (
-    '—'
-  ) : (
-    <Link href={`/production/orders/${id}`}>
-      №{number}
-    </Link>
-  );
+  id === null || number === null ? '—' : <Link href={`/production/orders/${id}`}>№{number}</Link>;
 
 /** «Випуск»: pieces sewn within the plan at the КП price. */
 export function ReportOutputTable({ rows }: { rows: ReportOutputRow[] }) {

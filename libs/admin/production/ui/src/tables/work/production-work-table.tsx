@@ -78,10 +78,8 @@ export function ProductionWorkTable({
               <TableCell>{row.employeeName}</TableCell>
               {showItem && (
                 <TableCell>
-                  <Link href={`/production/orders/${row.orderId}`}>
-                    № {row.orderNumber}
-                  </Link>{' '}
-                  · {row.modelName}
+                  <Link href={`/production/orders/${row.orderId}`}>№ {row.orderNumber}</Link> ·{' '}
+                  {row.modelName}
                   <Typography variant="caption" color="text.secondary" component="div">
                     {row.clientName}
                   </Typography>

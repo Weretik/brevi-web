@@ -79,10 +79,8 @@ export function SewingForecastTable({ rows, showMinutes, busy = false, onMove }:
                       </Tooltip>
                     )}
                     <Box>
-                      <Link href={`/production/orders/${row.orderId}`}>
-                        № {row.orderNumber}
-                      </Link>{' '}
-                      · {row.clientName}
+                      <Link href={`/production/orders/${row.orderId}`}>№ {row.orderNumber}</Link> ·{' '}
+                      {row.clientName}
                       {problem && (
                         <Typography variant="caption" color="error" component="div">
                           {problem}

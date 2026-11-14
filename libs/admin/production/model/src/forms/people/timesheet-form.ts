@@ -1,4 +1,7 @@
-import { TIMESHEET_MAX_MINUTES, TIMESHEET_STEP_MINUTES } from '../../entities/people/workshop-timesheet';
+import {
+  TIMESHEET_MAX_MINUTES,
+  TIMESHEET_STEP_MINUTES,
+} from '../../entities/people/workshop-timesheet';
 
 import type { TimesheetEntryBody, TimesheetRow } from '../../entities/people/workshop-timesheet';
 

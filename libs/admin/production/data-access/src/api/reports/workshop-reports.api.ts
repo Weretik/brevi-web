@@ -1,5 +1,8 @@
 import { reportErrors, toProductionApiError } from '../../errors/production-api-error';
-import { mapWorkshopDashboard, mapWorkshopReportPair } from '../../mappers/reports/workshop-report.mapper';
+import {
+  mapWorkshopDashboard,
+  mapWorkshopReportPair,
+} from '../../mappers/reports/workshop-report.mapper';
 import { productionBaseApi } from '../production-base-api';
 
 import type {

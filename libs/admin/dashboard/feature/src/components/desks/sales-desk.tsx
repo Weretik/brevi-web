@@ -8,7 +8,13 @@ import { Alert, Button, Stack, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
 import { recentQuotes } from '../../model/desk-views/dashboard-view';
-import { burningTasks, callQueue, lateCount, myOrders, salesMetrics } from '../../model/desk-views/sales-view';
+import {
+  burningTasks,
+  callQueue,
+  lateCount,
+  myOrders,
+  salesMetrics,
+} from '../../model/desk-views/sales-view';
 import { DeskGrid } from '../desk-grid/desk-grid';
 import { DeskListCard } from '../desk-list/desk-list-card';
 import { MetricStrip } from '../metrics/metric-strip';

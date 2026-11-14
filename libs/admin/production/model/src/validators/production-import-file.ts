@@ -1,6 +1,9 @@
 import { fabricNormFields } from '../entities/norms/fabric-norm';
 
-import type { FabricNormImportRow, WorkshopStaffImportRow } from '../entities/orders/production-import';
+import type {
+  FabricNormImportRow,
+  WorkshopStaffImportRow,
+} from '../entities/orders/production-import';
 
 /** Rows of a transfer file, or the reason it cannot be read. */
 export type ImportFileResult<Row> = { rows: Row[]; error: null } | { rows: []; error: string };
