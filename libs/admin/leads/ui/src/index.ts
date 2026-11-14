@@ -9,11 +9,9 @@ export { LeadCallResultFormFields } from './forms/lead-call-result-form-fields';
 export { LeadsTable } from './tables/leads-table';
 export { LeadStatsMetrics } from './components/stats/lead-stats-metrics';
 export { LeadStatsCard } from './components/stats/lead-stats-card';
-export {
-  LeadIndustriesTable,
-  LeadManagersTable,
-  LeadResultsBars,
-} from './tables/stats/lead-stats-tables';
+export { LeadIndustriesTable } from './tables/stats/lead-industries-table';
+export { LeadManagersTable } from './tables/stats/lead-managers-table';
+export { LeadResultsBars } from './tables/stats/lead-results-bars';
 export { LeadSyncCard } from './components/stats/lead-sync-card';
 export { LeadCallResultsList } from './components/references/lead-call-results-list';
 export { LeadCategoriesList } from './components/references/lead-categories-list';

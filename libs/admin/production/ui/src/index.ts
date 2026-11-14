@@ -51,15 +51,14 @@ export { TimesheetDayTable } from './tables/timesheet/timesheet-day-table';
 export { TimesheetMonthSummary } from './details/timesheet/timesheet-month-summary';
 export { TimesheetHistory } from './details/timesheet/timesheet-history';
 export { PayrollMonthTable } from './tables/payroll/payroll-month-table';
-export {
-  PayrollAdjustmentsTable,
-  PayrollPaymentsTable,
-} from './tables/payroll/payroll-entries-tables';
+export { PayrollAdjustmentsTable } from './tables/payroll/payroll-adjustments-table';
+export { PayrollPaymentsTable } from './tables/payroll/payroll-payments-table';
 export { PayrollEmployeeDetails } from './details/payroll/payroll-employee-details';
 export { PayrollYearTable } from './tables/payroll/payroll-year-table';
 export { PayrollSetupForm } from './forms/payroll/payroll-setup-form';
 export type { PayrollPersonOption, PayrollSetupValues } from './forms/payroll/payroll-setup-form';
-export { PayrollAdjustmentForm, PayrollPaymentForm } from './forms/payroll/payroll-entry-forms';
+export { PayrollAdjustmentForm } from './forms/payroll/payroll-adjustment-form';
+export { PayrollPaymentForm } from './forms/payroll/payroll-payment-form';
 export { ReportTotals } from './components/reports/report-totals';
 export { ReportMaterialsTable } from './tables/reports/report-materials-table';
 export { ReportOutputTable } from './tables/reports/report-output-table';

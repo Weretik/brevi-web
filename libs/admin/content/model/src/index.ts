@@ -278,3 +278,4 @@ export type {
   SiteGalleryItemErrors,
   SiteGalleryItemFormValues,
 } from './validators/galleries/site-gallery-validation';
+export { companyMapUrl, managerPhotoSrc } from './queries/company/company-links';

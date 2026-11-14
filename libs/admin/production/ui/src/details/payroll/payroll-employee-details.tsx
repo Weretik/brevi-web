@@ -18,10 +18,8 @@ import {
   Typography,
 } from '@mui/material';
 
-import {
-  PayrollAdjustmentsTable,
-  PayrollPaymentsTable,
-} from '../../tables/payroll/payroll-entries-tables';
+import { PayrollAdjustmentsTable } from '../../tables/payroll/payroll-adjustments-table';
+import { PayrollPaymentsTable } from '../../tables/payroll/payroll-payments-table';
 
 import type { PayrollEmployee, PayrollWorkRow } from '@admin/production/model';
 
