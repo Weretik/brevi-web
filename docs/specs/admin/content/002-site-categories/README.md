@@ -1,6 +1,6 @@
 # Admin: «Контент → Розділи» (categories of the site catalog)
 
-**Status:** implemented and locally verified 2026-11-11. **Backend:** BreviERP [CNT-003](https://github.com/Weretik/BreviERP/blob/7aa883d2b7ada5bcbb301100360a1b99478e4ea0/docs/sdd/specs/content/003-site-categories/README.md), stage 2 of its plan. **Contract:** [content-categories.openapi.yaml](../../../../contracts/openapi/backend/content/content-categories.openapi.yaml), operations `importOldSiteCategories`, `getSiteCategories`, `getSiteCategory`, `createSiteCategory`, `saveSiteCategory`, `setSiteCategoryVisibility`, `reorderSiteCategories`, `deleteSiteCategory`.
+**Status:** implemented and locally verified 2026-11-11. **Backend:** BreviERP [CNT-003](https://github.com/Weretik/BreviERP/blob/7aa883d2b7ada5bcbb301100360a1b99478e4ea0/docs/sdd/specs/content/003-site-categories/README.md), stage 2 of its plan. **Contract:** [content-categories.openapi.yaml](../../../../contracts/openapi/openapi.json), operations `importOldSiteCategories`, `getSiteCategories`, `getSiteCategory`, `createSiteCategory`, `saveSiteCategory`, `setSiteCategoryVisibility`, `reorderSiteCategories`, `deleteSiteCategory`.
 
 ## Goal
 

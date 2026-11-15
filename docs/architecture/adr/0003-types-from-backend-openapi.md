@@ -1,6 +1,6 @@
 # ADR-0003: API types are generated from a pinned snapshot of the backend OpenAPI
 
-**Status:** accepted
+**Status:** accepted; the source and the sync changed in [ADR-0004](0004-contract-follows-backend-and-typed-client.md)
 **Decision date:** 2026-11-15 (recorded from the current workflow)
 **Owners:** frontend, backend
 **Applications:** all clients of BreviERP

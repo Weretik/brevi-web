@@ -4,8 +4,8 @@ The current Angular Storefront is described separately in the
 [Storefront API boundary](storefront.md).
 
 - **Scope:** transport for `apps/admin-react`
-- **Status (checked 2026-10-16):** shared Axios transport, `baseApi`, and domain endpoints are implemented; check individual scenarios and target rules below against the code
-- **Related documents:** [Admin Axios transport ADR](../admin/adr/0001-admin-axios-transport.md), [Admin state and API](../admin/runtime/state-and-api.md)
+- **Status (checked 2026-11-15):** typed `openapi-fetch` client, `baseApi` and domain endpoints with `queryFn` are implemented
+- **Related documents:** [Admin openapi-fetch transport ADR](../admin/adr/0002-admin-openapi-fetch-transport.md), [Admin state and API](../admin/runtime/state-and-api.md)
 
 The [OpenAPI contract lifecycle](contract-workflow.md) applies to React Admin.
 Current entry points are `libs/admin/shared/api-client/src/index.ts`,
@@ -14,7 +14,7 @@ Current entry points are `libs/admin/shared/api-client/src/index.ts`,
 
 ## Purpose
 
-FE-007 compatible binary extension: public `requestApiBlob(ApiRequest, signal?)` reuses the same Axios instance, authentication refresh and error mapping for private downloads. Domain data-access validates MIME/size; feature owns the temporary URL. Binary responses stay outside RTK cache; JSON endpoints continue through the existing base query. [Decision and verification](../../specs/admin/clients/001-clients-quotes-custom-sewing/contracts/api-contract.md#p4-fe-007-handoff--2026-10-28).
+Private downloads use `apiRequest(apiClient.GET(path, { parseAs: 'blob', ... }))`: the same client, cookie, CSRF and error mapping. Domain data-access validates MIME/size; feature owns the temporary URL. Binary responses stay outside the RTK cache.
 
 Admin sends API requests through a shared transport, normalizes backend errors,
 and supports cancellation.
@@ -27,7 +27,7 @@ domain data-access ── baseApi.injectEndpoints
      │
      ▼
 shared/api-client
-  ApiRequest → axiosBaseQuery → Axios → backend
+  queryFn → apiCall(apiClient.GET/POST/…) → fetch → backend
                     │                │
                     └─ ApiError ◄────┘
                          │
@@ -43,25 +43,23 @@ not replace error state or report validation errors.
 
 | Layer                | Responsibility                                                                                                  |
 | -------------------- | --------------------------------------------------------------------------------------------------------------- |
-| `shared/api-client`  | Axios instance, interceptors, `axiosBaseQuery`, `baseApi`, API contracts, error normalization, runtime notifier |
-| Domain `data-access` | Generated DTOs at the boundary, runtime validation, mapper, and endpoints through `baseApi.injectEndpoints`     |
+| `shared/api-client`  | `openapi-fetch` client and middleware, `apiCall`/`apiRequest`, `baseApi`, error normalization, runtime notifier |
+| Domain `data-access` | Typed `apiClient` calls in `queryFn`, generated types at the boundary, mapper, endpoints via `injectEndpoints`  |
 | `feature`            | Generated RTK Query hooks, loading/error states, and manual `refetch`                                           |
 | `ui` / route         | Do not call HTTP or import transport                                                                            |
 
 Declare each domain endpoint exclusively through public
-`baseApi.injectEndpoints`. Do not create a separate Axios instance, deep-import
-from `api-client`, or duplicate RTK Query response/error state in a slice.
+`baseApi.injectEndpoints` with a `queryFn` that calls `apiCall`. Do not call
+`fetch` or Axios directly, deep-import from `api-client`, or duplicate RTK Query
+response/error state in a slice.
 
 ## Public transport contract
 
 ```ts
-interface ApiRequest {
-  url: string;
-  method?: AxiosRequestConfig['method'];
-  data?: AxiosRequestConfig['data'];
-  params?: AxiosRequestConfig['params'];
-  headers?: AxiosRequestConfig['headers'];
-}
+// apiCall(request, map?, mapError?) → { data } | { error: ApiError } for a queryFn
+apiCall(apiClient.GET('/api/crm/quotes/{id}', { params: { path: { id } }, signal }), mapQuote);
+// apiRequest(request, map?) → the mapped body, or throws ApiError
+await apiRequest(apiClient.POST('/api/auth/cookie/logout'));
 
 type ApiErrorCode =
   | 'Unknown'
@@ -82,16 +80,16 @@ interface ApiError {
 }
 ```
 
-`axiosBaseQuery` forwards RTK Query's `AbortSignal` to Axios and returns only
-`{ data }` or `{ error: ApiError }`. Axios exceptions do not escape to the
-feature.
+Every `queryFn` forwards RTK Query's `AbortSignal` to the request. `apiCall`
+returns only `{ data }` or `{ error: ApiError }`; a non-2xx response becomes
+`HttpError` and then `ApiError`, so no exception escapes to the feature.
 
 ## Backend errors
 
 | Backend response                | `ApiError`                                |
 | ------------------------------- | ----------------------------------------- |
 | No response                     | `Network`, `status: 0`                    |
-| `ECONNABORTED` / `ETIMEDOUT`    | `Timeout`                                 |
+| `TimeoutError` (`DOMException`) | `Timeout`                                 |
 | HTTP 401 / 403 / 404            | `Unauthorized` / `Forbidden` / `NotFound` |
 | HTTP 4xx with validation fields | `Validation` and `fieldErrors`            |
 | HTTP 5xx                        | `Server`                                  |
@@ -118,19 +116,19 @@ The backend may return an array with `Identifier` / `ErrorMessage` or
 
 ## Observability and security
 
-- A request interceptor may add a correlation ID and measure duration.
+- The logging middleware may measure duration.
 - Logs contain only method, sanitized URL without query/fragment, status, and duration.
 - Headers, request/response bodies, tokens, and personal data are not logged.
 - Logging is enabled only by the development opt-in flag `VITE_ENABLE_HTTP_LOGS`.
 
 ## Admin configuration
 
-| Aspect           | Admin                                                                     |
-| ---------------- | ------------------------------------------------------------------------- |
-| Base URL         | `@admin/shared/config`                                                    |
-| Authentication   | Bearer token, refresh, CSRF, and credentials through `AuthSessionAdapter` |
-| Runtime notifier | Configured during Admin bootstrap                                         |
-| Connectivity     | Browser/HTTP error handling                                               |
+| Aspect           | Admin                                                                      |
+| ---------------- | -------------------------------------------------------------------------- |
+| Base URL         | `@admin/shared/config`                                                     |
+| Authentication   | HttpOnly session cookie, CSRF middleware, 401 through `AuthSessionAdapter` |
+| Runtime notifier | Configured during Admin bootstrap                                          |
+| Connectivity     | Browser/HTTP error handling                                                |
 
 ## Verification
 

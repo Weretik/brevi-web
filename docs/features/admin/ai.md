@@ -1,6 +1,6 @@
 # Admin: Налаштування ШІ
 
-**Status:** implemented 2026-11-05 with stage 3 of «Рахунки на закупку». Backend decisions are in the BreviERP specification `docs/sdd/specs/ai/001-ai-settings`; the consumed contract is [backend/ai](../../contracts/openapi/backend/ai/ai-settings.openapi.yaml).
+**Status:** implemented 2026-11-05 with stage 3 of «Рахунки на закупку». Backend decisions are in the BreviERP specification `docs/sdd/specs/ai/001-ai-settings`; the consumed contract is [backend/ai](../../contracts/openapi/openapi.json).
 
 `/admin/ai` («Адміністрування → Налаштування ШІ») is visible to Admin only (backend policy `RequireAdminRole`). Layout chosen 2026-11-05 (variant A of the [UX review](https://claude.ai/artifact/4WYATYfV17vhvFy68BqYJ1)): a state strip on top, then cards that each save themselves next to their fields.
 

@@ -1,6 +1,6 @@
 # 018 — Product photos, old-site photo import and the active switch
 
-**Status:** implemented 2026-11-04. **Backend:** [CAT-018](../../../../contracts/openapi/backend/catalog/product-photos.openapi.yaml) (BreviERP `docs/sdd/specs/catalog/018-product-photos-and-old-site-import`).
+**Status:** implemented 2026-11-04. **Backend:** [CAT-018](../../../../contracts/openapi/openapi.json) (BreviERP `docs/sdd/specs/catalog/018-product-photos-and-old-site-import`).
 
 The owner asked (2026-11-04) for product photos that quotes (КП) show, the old-site photos and missing sewing models brought over, and a visible «Активний» state with a filter on the «Товари» page.
 

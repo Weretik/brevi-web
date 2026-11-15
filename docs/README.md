@@ -12,7 +12,7 @@ This is the index of versioned frontend documentation.
 - [Local startup and diagnostics](operations/README.md)
 - [Admin API integration](architecture/api/README.md)
 - [API contract lifecycle](architecture/api/contract-workflow.md)
-- [Backend OpenAPI snapshot](contracts/openapi/SOURCE.json)
+- [Backend OpenAPI snapshot](contracts/openapi/SOURCE.md)
 - [Stable engineering rules](standards/README.md)
 - [Feature specifications](specs/README.md)
 - [Idea: sign-in and access like Kedr](ideas/auth-like-kedr.md) (Russian; not an accepted decision)

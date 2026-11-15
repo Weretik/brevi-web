@@ -26,7 +26,7 @@ Compatible transport decision: additive shared `requestApiBlob(ApiRequest, signa
 
 ## P5 TS-009/010 handoff — 2026-10-29
 
-The current [provenance manifest](../../../../../contracts/openapi/SOURCE.json) pins backend `e5f563456efd1b29a67a36805c2b3775ce2f9d06`. The canonical sources under `docs/sdd/contracts/` and the frontend snapshot contain these seven operations. [Handoff evidence](../evidence/fe-en-002-p5-2026-10-29.md) records sync/generation/check results. FE-008 owns runtime mapping, errors, cache behavior and UI verification.
+The current [provenance manifest](../../../../../contracts/openapi/SOURCE.md) pins backend `e5f563456efd1b29a67a36805c2b3775ce2f9d06`. The canonical sources under `docs/sdd/contracts/` and the frontend snapshot contain these seven operations. [Handoff evidence](../evidence/fe-en-002-p5-2026-10-29.md) records sync/generation/check results. FE-008 owns runtime mapping, errors, cache behavior and UI verification.
 
 | operationId                      | Canonical source                   |
 | -------------------------------- | ---------------------------------- |
@@ -115,7 +115,7 @@ Backend реалізує й перевіряє schema/operation → надає �
 Repository: `https://github.com/Weretik/BreviERP.git`.
 Backend commit: `bb0a9a710892a7dd25acad99def291c53ccf6da9` (локальний, без push).
 Canonical source: `docs/sdd/contracts/crm/clients-quotes.openapi.yaml`, aggregate `docs/sdd/contracts/openapi.yaml`.
-Consumer: [versioned snapshot](../../../../../contracts/openapi/backend/crm/clients-quotes.openapi.yaml), `docs/contracts/openapi/SOURCE.json`, generated `@admin/shared/contracts`.
+Consumer: [versioned snapshot](../../../../../contracts/openapi/openapi.json), `docs/contracts/openapi/SOURCE.json`, generated `@admin/shared/contracts`.
 
 Синхронізацію виконано з чистого тимчасового локального checkout цього commit, оскільки в основному backend збережено сторонню давню правку індексу. Команди: `npm run contracts:sync -- <clean-checkout> <full-SHA>`, `npm run contracts:generate`, `npm run contracts:check`. Snapshot/generated provenance збігаються; generated файли не редагувалися вручну.
 
@@ -129,7 +129,7 @@ This is the historical P2 checkpoint; the current manifest and generated types u
 
 ## P3 contract handoff — 2026-10-28
 
-Canonical source for every new operation: backend `docs/sdd/contracts/crm/quote-drafts.openapi.yaml`, aggregate `docs/sdd/contracts/openapi.yaml`. Repository: `https://github.com/Weretik/BreviERP.git`. Current [provenance manifest](../../../../../contracts/openapi/SOURCE.json) pins the authorized local commit without push.
+Canonical source for every new operation: backend `docs/sdd/contracts/crm/quote-drafts.openapi.yaml`, aggregate `docs/sdd/contracts/openapi.yaml`. Repository: `https://github.com/Weretik/BreviERP.git`. Current [provenance manifest](../../../../../contracts/openapi/SOURCE.md) pins the authorized local commit without push.
 
 | operationId            | Backend immutable SHA                      |
 | ---------------------- | ------------------------------------------ |

@@ -1,6 +1,6 @@
 # API contract: «Контент → Товари»
 
-Source of truth: BreviERP `docs/sdd/contracts/content/content-products.openapi.yaml` at commit `f6c8fd16c237bbacc0fa5978d77b25f616eaf7d6`, synced into [the snapshot](../../../../../contracts/openapi/backend/content/content-products.openapi.yaml). Policy `access:content-products`.
+Source of truth: BreviERP `docs/sdd/contracts/content/content-products.openapi.yaml` at commit `f6c8fd16c237bbacc0fa5978d77b25f616eaf7d6`, synced into [the snapshot](../../../../../contracts/openapi/openapi.json). Policy `access:content-products`.
 
 | operationId                   | Use                              | Client decisions                                                                                                                                                        |
 | ----------------------------- | -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

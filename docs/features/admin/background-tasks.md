@@ -1,6 +1,6 @@
 # Admin: Фонові задачі
 
-**Status:** implemented 2026-11-14. Requirements are in [specification 001](../../specs/admin/scheduling/001-background-tasks/README.md); backend decisions are in the BreviERP specification for the Scheduling module; the consumed contract is [backend/scheduling](../../contracts/openapi/backend/scheduling/background-tasks.openapi.yaml).
+**Status:** implemented 2026-11-14. Requirements are in [specification 001](../../specs/admin/scheduling/001-background-tasks/README.md); backend decisions are in the BreviERP specification for the Scheduling module; the consumed contract is [backend/scheduling](../../contracts/openapi/openapi.json).
 
 `/admin/background-tasks` («Адміністрування → Фонові задачі») is page `background-tasks` of «Права доступу» (Admin by default: view, create = «Запустити зараз», edit = «Змінити розклад»). The list of tasks lives in the backend code: the page cannot add or delete a task, only change when it runs.
 

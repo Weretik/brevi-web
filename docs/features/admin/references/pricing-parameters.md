@@ -54,7 +54,7 @@ libs/admin/references/
     └── references.routes.tsx               # route + old URL redirect
 ```
 
-**Where to look:** [route](../../../../libs/admin/references/feature/src/references.routes.tsx), [page](../../../../libs/admin/references/feature/src/pages/pricing-parameters/pricing-parameters-page.tsx), [API](../../../../libs/admin/references/data-access/src/api/pricing-parameters/pricing-parameters.api.ts), [SDD](../../../specs/admin/references/015-pricing-parameters-sheet/README.md), [contract](../../../contracts/openapi/backend/reference/pricing-parameters.openapi.yaml).
+**Where to look:** [route](../../../../libs/admin/references/feature/src/references.routes.tsx), [page](../../../../libs/admin/references/feature/src/pages/pricing-parameters/pricing-parameters-page.tsx), [API](../../../../libs/admin/references/data-access/src/api/pricing-parameters/pricing-parameters.api.ts), [SDD](../../../specs/admin/references/015-pricing-parameters-sheet/README.md), [contract](../../../contracts/openapi/openapi.json).
 
 Products read the parameter list for the PPE product editor lookups
 (`admin-products-feature`, `use-product-lookups.ts`).
