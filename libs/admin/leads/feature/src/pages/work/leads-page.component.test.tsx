@@ -127,7 +127,9 @@ describe('«Ліди»', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Зберегти → наступний' }));
 
     await waitFor(() => expect(record).toHaveBeenCalledTimes(2));
-    const [first, second] = record.mock.calls.map(([call]) => (call as { requestId: string }).requestId);
+    const [first, second] = record.mock.calls.map(
+      ([call]) => (call as { requestId: string }).requestId,
+    );
     expect(second).toBe(first);
   });
 
