@@ -2,6 +2,7 @@
 
 This is the index of versioned frontend documentation.
 
+- [Workspace architecture decisions (ADR)](architecture/adr/README.md) — Nx workspace, admin SPA, OpenAPI types, and the list of key decisions the audit checks.
 - [Current frontend inventory](architecture/frontend-inventory.md)
 - [Technology stack and key libraries](architecture/technology-and-packages.md)
 - [Admin architecture](architecture/admin/README.md)
