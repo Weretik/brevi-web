@@ -7242,6 +7242,10 @@ export interface components {
             /** Format: uuid */
             requestId: string;
         };
+        CopyQuoteInput: {
+            /** Format: uuid */
+            requestId: null | string;
+        };
         /** @enum {unknown} */
         CounterpartyKind: "Financial" | "Client" | "Supplier";
         CreateCatalogProductRequest: {
@@ -7339,6 +7343,8 @@ export interface components {
             /** Format: double */
             amount: number;
             reason: string;
+            /** Format: uuid */
+            requestId?: null | string;
         };
         CreatePayrollPaymentInput: {
             /** Format: int32 */
@@ -7349,6 +7355,8 @@ export interface components {
             /** Format: double */
             amount: number;
             comment: null | string;
+            /** Format: uuid */
+            requestId?: null | string;
         };
         CreatePpeMarkupRuleRequest: {
             name: string;
@@ -7463,6 +7471,8 @@ export interface components {
             overPlan: boolean;
             reason: null | string;
             comment: null | string;
+            /** Format: uuid */
+            requestId?: null | string;
         };
         CreateProductRequest: {
             /** Format: int32 */
@@ -9025,6 +9035,8 @@ export interface components {
             oneoffName: null | string;
             description: null | string;
             comment: null | string;
+            /** Format: uuid */
+            requestId?: null | string;
         };
         FinanceTransactionPageResponse: {
             items: components["schemas"]["FinanceTransactionResponse"][];
@@ -9117,6 +9129,8 @@ export interface components {
             /** Format: int64 */
             amountMinor: number;
             note: null | string;
+            /** Format: uuid */
+            requestId?: null | string;
         };
         FinanceTransferPageResponse: {
             items: components["schemas"]["FinanceTransferResponse"][];
@@ -11810,6 +11824,8 @@ export interface components {
             comment?: null | string;
             locale?: null | string;
             attachment?: null | components["schemas"]["IFormFile"];
+            /** Format: uuid */
+            requestId?: null | string;
         };
         PublicSiteSettingsResponse: {
             googleAnalyticsId: null | string;
@@ -12640,6 +12656,8 @@ export interface components {
             nextContactAt: null | string;
             /** Format: int32 */
             version: number;
+            /** Format: uuid */
+            requestId?: null | string;
         };
         ReferenceImportResult: {
             applied: boolean;
@@ -12969,6 +12987,8 @@ export interface components {
             clientComment: null | string;
             managerNote: null | string;
             items: components["schemas"]["QuoteItemInput"][];
+            /** Format: uuid */
+            requestId?: null | string;
         };
         SaveQuoteIntroductionInput: {
             /** Format: int32 */
@@ -12985,6 +13005,8 @@ export interface components {
             pages: components["schemas"]["QuoteIntroPageInput"][];
             letterSubject?: null | string;
             letterBody?: null | string;
+            /** Format: uuid */
+            requestId?: null | string;
         };
         SaveQuoteSettingsInput: {
             /** Format: int32 */
@@ -13135,6 +13157,8 @@ export interface components {
             to: string;
             subject: string;
             body: string;
+            /** Format: uuid */
+            requestId?: null | string;
         };
         /** @enum {unknown} */
         SeoArea: "Product" | "Category" | "Article" | "Page";
@@ -22351,7 +22375,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": null | components["schemas"]["CopyQuoteInput"];
+            };
+        };
         responses: {
             /** @description Created */
             201: {
