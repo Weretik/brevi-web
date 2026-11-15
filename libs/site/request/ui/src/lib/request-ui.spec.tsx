@@ -77,4 +77,36 @@ describe('request blocks', () => {
     fireEvent.click(screen.getByRole('button', { name: dictionary.sent.again }));
     expect(await screen.findByRole('form')).toBeTruthy();
   });
+
+  it('sends the same form id again after a failure and a new one for the next request', async () => {
+    const ids: string[] = [];
+    let answer: RequestFormState = { status: 'unavailable', values };
+    render(
+      <RequestForm
+        company={COMPANY}
+        dictionary={dictionary}
+        action={async (_state, data) => {
+          ids.push(String(data.get('requestId')));
+          return answer;
+        }}
+        agreementHref="/uk/agreement"
+        catalogHref="/uk/catalog"
+      />,
+    );
+
+    fireEvent.submit(screen.getByRole('form'));
+    await screen.findByRole('alert');
+    answer = { status: 'sent', phone: '+380501234567' };
+    fireEvent.submit(screen.getByRole('form'));
+    await screen.findByRole('status');
+    fireEvent.click(screen.getByRole('button', { name: dictionary.sent.again }));
+    answer = { status: 'unavailable', values };
+    fireEvent.submit(await screen.findByRole('form'));
+    await screen.findByRole('alert');
+
+    expect(ids[0]).toMatch(/^[0-9a-f-]{36}$/);
+    expect(ids[1]).toBe(ids[0]);
+    expect(ids[2]).toMatch(/^[0-9a-f-]{36}$/);
+    expect(ids[2]).not.toBe(ids[0]);
+  });
 });

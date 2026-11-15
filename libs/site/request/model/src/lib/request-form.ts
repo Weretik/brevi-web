@@ -34,6 +34,12 @@ export const REQUEST_FORM_IDLE: RequestFormState = { status: 'idle' };
 /** Hidden field of the form: people never see or fill it, bots fill every field (LEAD-002). */
 export const REQUEST_TRAP_FIELD = 'website';
 
+/**
+ * Hidden field with one id per filled form: the same form sent twice (a double press, a retry after a lost answer)
+ * is one request for the managers.
+ */
+export const REQUEST_ID_FIELD = 'requestId';
+
 export const REQUEST_FIELD_LIMITS: Record<RequestTextField, number> = {
   phone: 32,
   workwear: 200,

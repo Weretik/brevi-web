@@ -9,7 +9,7 @@ import {
   quoteSaveProblems,
   quoteToDraft,
 } from '@admin/quotes/model';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useQuoteDraft } from './use-quote-draft';
@@ -27,6 +27,8 @@ export function useQuoteEditor(id: number | null, prefill: QuoteStartPrefill | n
   const navigate = useNavigate();
   const loaded = useGetQuoteQuery(id ?? 0, { skip: id === null });
   const [createQuote, creating] = useCreateQuoteMutation();
+  // One id per attempt to create: a repeated press returns the same КП instead of a second one.
+  const requestId = useRef(crypto.randomUUID());
   const [saveQuote, saving] = useSaveQuoteMutation();
   const [quote, setQuote] = useState<Quote | null>(null);
   const [showErrors, setShowErrors] = useState(false);
@@ -57,8 +59,9 @@ export function useQuoteEditor(id: number | null, prefill: QuoteStartPrefill | n
     try {
       const saved =
         quote === null
-          ? await createQuote(draft.draft).unwrap()
+          ? await createQuote({ draft: draft.draft, requestId: requestId.current }).unwrap()
           : await saveQuote({ id: quote.id, draft: draft.draft }).unwrap();
+      if (quote === null) requestId.current = crypto.randomUUID();
       setQuote(saved);
       reset(quoteToDraft(saved));
       setShowErrors(false);

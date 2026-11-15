@@ -1,6 +1,7 @@
 'use server';
 
 import {
+  REQUEST_ID_FIELD,
   REQUEST_TRAP_FIELD,
   cleanRequestValues,
   normalizeUkrainianPhone,
@@ -15,6 +16,8 @@ const text = (formData: FormData, field: string): string => {
   const value = formData.get(field);
   return typeof value === 'string' ? value : '';
 };
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
  * Server Action of the «Заявка» form (LEAD-002): cleans and checks the fields and the file, then posts them to
@@ -48,6 +51,9 @@ export async function submitRequest(
   if (values.quantity) body.set('quantity', values.quantity);
   if (values.comment) body.set('comment', values.comment);
   body.set('locale', locale);
+  // The same form sent again keeps its id, so BreviERP returns the request it already has.
+  const requestId = text(formData, REQUEST_ID_FIELD);
+  if (UUID.test(requestId)) body.set('requestId', requestId);
   if (attachment) body.set('attachment', attachment, attachment.name);
 
   const result = await siteApiPostForm('/api/public/site-requests', body);

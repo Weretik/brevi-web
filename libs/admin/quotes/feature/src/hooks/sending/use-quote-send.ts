@@ -1,6 +1,6 @@
 import { useGetQuoteSendDraftQuery, useSendQuoteMutation } from '@admin/quotes/data-access';
 import { quoteSendErrors } from '@admin/quotes/model';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import type { Quote, QuoteSendForm } from '@admin/quotes/model';
 
@@ -11,6 +11,8 @@ const messageOf = (error: unknown, fallback: string) =>
 export function useQuoteSend(quote: Quote, onSent: (quote: Quote) => void) {
   const draft = useGetQuoteSendDraftQuery(quote.id, { refetchOnMountOrArgChange: true });
   const [send, sending] = useSendQuoteMutation();
+  // One id per letter: a repeat after a lost answer sends nothing new.
+  const requestId = useRef(crypto.randomUUID());
   const [letterIndex, setLetterIndex] = useState(0);
   const [form, setForm] = useState<QuoteSendForm>({ to: '', subject: '', body: '' });
   const [showErrors, setShowErrors] = useState(false);
@@ -45,7 +47,14 @@ export function useQuoteSend(quote: Quote, onSent: (quote: Quote) => void) {
       setError(null);
       if (Object.keys(errors).length > 0) return;
       try {
-        onSent(await send({ id: quote.id, version: quote.version, form }).unwrap());
+        const sent = await send({
+          id: quote.id,
+          version: quote.version,
+          form,
+          requestId: requestId.current,
+        }).unwrap();
+        requestId.current = crypto.randomUUID();
+        onSent(sent);
       } catch (cause) {
         setError(messageOf(cause, 'Не вдалося надіслати КП.'));
       }

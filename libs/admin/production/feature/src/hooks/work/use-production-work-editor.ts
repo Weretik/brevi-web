@@ -11,6 +11,8 @@ import {
 import { adminApiErrorMessage } from '@admin/shared/api-client';
 import { useState } from 'react';
 
+import { useRequestId } from '../requests/use-request-id';
+
 import type {
   ProductionWorkErrors,
   ProductionWorkFormValues,
@@ -34,6 +36,7 @@ export function useProductionWorkEditor(
   const [errors, setErrors] = useState<ProductionWorkErrors>({});
   const [message, setMessage] = useState<string | null>(null);
   const [create, state] = useCreateProductionWorkMutation();
+  const requestId = useRequestId();
   const item =
     fixedItem ??
     choices.items.find((x) => workTarget(x.orderId, x.itemId) === values.target) ??
@@ -53,7 +56,11 @@ export function useProductionWorkEditor(
     if (Object.keys(validation).length || !target) return;
     setMessage(null);
     try {
-      const saved = await create({ ...target, body: productionWorkBody(values) }).unwrap();
+      const saved = await create({
+        ...target,
+        body: { ...productionWorkBody(values), requestId: requestId.current() },
+      }).unwrap();
+      requestId.renew();
       onSaved(
         `${saved.modelName}: пошито ${saved.sewn} з ${saved.quantity}, покроєно ${saved.cut}.`,
       );

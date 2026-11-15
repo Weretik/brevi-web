@@ -86,14 +86,15 @@ export const leadsApi = leadsBaseApi.injectEndpoints({
       transformErrorResponse: toLeadApiError,
       invalidatesTags: (_result, error, { id }) => changed(error, id),
     }),
+    /** `requestId` is one per attempt: a repeated press returns the lead without a second call. */
     recordLeadCall: build.mutation<
       LeadDetail,
-      { id: number; version: number; values: LeadCallFormValues }
+      { id: number; version: number; values: LeadCallFormValues; requestId: string }
     >({
-      query: ({ id, version, values }) => ({
+      query: ({ id, version, values, requestId }) => ({
         url: `/api/crm/leads/${id}/calls`,
         method: 'POST',
-        body: toRecordLeadCallInput(values, version),
+        body: { ...toRecordLeadCallInput(values, version), requestId },
       }),
       transformResponse: mapLeadDetail,
       transformErrorResponse: toLeadApiError,
