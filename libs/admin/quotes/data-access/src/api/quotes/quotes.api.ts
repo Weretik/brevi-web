@@ -57,8 +57,13 @@ export const quotesApi = quotesBaseApi.injectEndpoints({
       transformErrorResponse: errors,
       providesTags: (_result, _error, id) => [{ type: 'Quote', id }],
     }),
-    createQuote: build.mutation<Quote, QuoteDraft>({
-      query: (draft) => ({ url: '/api/crm/quotes', method: 'POST', body: toSaveQuoteInput(draft) }),
+    /** `requestId` is one per attempt: a repeated press returns the same КП. */
+    createQuote: build.mutation<Quote, { draft: QuoteDraft; requestId: string }>({
+      query: ({ draft, requestId }) => ({
+        url: '/api/crm/quotes',
+        method: 'POST',
+        body: { ...toSaveQuoteInput(draft), requestId },
+      }),
       transformResponse: mapQuote,
       transformErrorResponse: errors,
       invalidatesTags: (_result, error) => (error ? [] : list),
@@ -125,8 +130,13 @@ export const quotesApi = quotesBaseApi.injectEndpoints({
       invalidatesTags: (_result, error) =>
         error ? [] : [...list, { type: 'QuoteLegacyArchive', id: 'COUNT' }],
     }),
-    copyQuote: build.mutation<Quote, number>({
-      query: (id) => ({ url: `/api/crm/quotes/${id}/copy`, method: 'POST' }),
+    /** `requestId` is one per press: a repeat returns the same copy. */
+    copyQuote: build.mutation<Quote, { id: number; requestId: string }>({
+      query: ({ id, requestId }) => ({
+        url: `/api/crm/quotes/${id}/copy`,
+        method: 'POST',
+        body: { requestId },
+      }),
       transformResponse: mapQuote,
       transformErrorResponse: errors,
       invalidatesTags: (_result, error) => (error ? [] : list),

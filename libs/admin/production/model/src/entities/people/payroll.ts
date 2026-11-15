@@ -171,10 +171,14 @@ export interface CreatePayrollPaymentBody {
   kind: PayrollPaymentKind;
   amount: number;
   comment: string | null;
+  /** One per attempt: a repeated press returns the saved payment instead of a second one. */
+  requestId?: string;
 }
 
 export interface CreatePayrollAdjustmentBody {
   employeeId: number;
   amount: number;
   reason: string;
+  /** One per attempt: a repeated press returns the saved entry instead of a second one. */
+  requestId?: string;
 }

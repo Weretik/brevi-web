@@ -27,11 +27,21 @@ export const quoteSendApi = quotesBaseApi.injectEndpoints({
       transformErrorResponse: toQuoteSendApiError,
       keepUnusedDataFor: 0,
     }),
-    sendQuote: build.mutation<Quote, { id: number; version: number; form: QuoteSendForm }>({
-      query: ({ id, version, form }) => ({
+    /** `requestId` is one per press: a repeat returns the КП without a second letter. */
+    sendQuote: build.mutation<
+      Quote,
+      { id: number; version: number; form: QuoteSendForm; requestId: string }
+    >({
+      query: ({ id, version, form, requestId }) => ({
         url: `/api/crm/quotes/${id}/send`,
         method: 'POST',
-        body: { version, to: form.to.trim(), subject: form.subject.trim(), body: form.body.trim() },
+        body: {
+          version,
+          to: form.to.trim(),
+          subject: form.subject.trim(),
+          body: form.body.trim(),
+          requestId,
+        },
       }),
       transformResponse: mapQuote,
       transformErrorResponse: toQuoteSendApiError,

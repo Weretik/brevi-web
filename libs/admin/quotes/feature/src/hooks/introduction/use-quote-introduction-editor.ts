@@ -18,7 +18,7 @@ import {
   setIntroLayout,
   updateIntroSlot,
 } from '@admin/quotes/model';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useIntroProducts } from './use-intro-products';
@@ -53,6 +53,8 @@ export function useQuoteIntroductionEditor(
   const setup = useGetQuoteIntroductionSetupQuery();
   const loaded = useGetQuoteQuery(id ?? 0, { skip: id === null });
   const [createIntroduction, creating] = useCreateQuoteIntroductionMutation();
+  // One id per attempt to create: a repeated press returns the same КП instead of a second one.
+  const requestId = useRef(crypto.randomUUID());
   const [saveIntroduction, saving] = useSaveQuoteIntroductionMutation();
   const [loadProducts] = useLazyGetQuoteCatalogProductsQuery();
   const [quote, setQuote] = useState<Quote | null>(null);
@@ -99,8 +101,9 @@ export function useQuoteIntroductionEditor(
     try {
       const saved =
         quote === null
-          ? await createIntroduction(draft).unwrap()
+          ? await createIntroduction({ draft, requestId: requestId.current }).unwrap()
           : await saveIntroduction({ id: quote.id, draft }).unwrap();
+      if (quote === null) requestId.current = crypto.randomUUID();
       start(introToDraft(saved), saved);
       if (id === null) navigate(`/crm/quote-introductions/${saved.id}`, { replace: true });
       return saved;

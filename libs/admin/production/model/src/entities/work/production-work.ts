@@ -98,6 +98,8 @@ export interface CreateProductionWorkBody {
   overPlan: boolean;
   reason: string | null;
   comment: string | null;
+  /** One per attempt: a repeated press returns the item card without a second entry. */
+  requestId?: string;
 }
 
 export interface ProductionWorkImportFile {

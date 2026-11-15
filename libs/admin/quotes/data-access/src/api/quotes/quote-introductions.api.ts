@@ -45,11 +45,12 @@ export const quoteIntroductionsApi = quotesBaseApi.injectEndpoints({
         value.map(mapQuoteCatalogProduct),
       transformErrorResponse: lookupErrors,
     }),
-    createQuoteIntroduction: build.mutation<Quote, QuoteIntroDraft>({
-      query: (draft) => ({
+    /** `requestId` is one per attempt: a repeated press returns the same КП. */
+    createQuoteIntroduction: build.mutation<Quote, { draft: QuoteIntroDraft; requestId: string }>({
+      query: ({ draft, requestId }) => ({
         url: '/api/crm/quote-introductions',
         method: 'POST',
-        body: toSaveQuoteIntroductionInput(draft),
+        body: { ...toSaveQuoteIntroductionInput(draft), requestId },
       }),
       transformResponse: mapQuote,
       transformErrorResponse: errors,

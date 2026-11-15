@@ -204,7 +204,11 @@ describe('КП для знайомства', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Зберегти і закрити' }));
     await waitFor(() => expect(api.create).toHaveBeenCalledTimes(1));
-    const draft = api.create.mock.calls[0][0] as QuoteIntroDraft;
+    const { draft, requestId } = api.create.mock.calls[0][0] as {
+      draft: QuoteIntroDraft;
+      requestId: string;
+    };
+    expect(requestId).toMatch(/^[0-9a-f-]{36}$/);
     expect(draft.layout).toBe('Summer');
     expect([draft.letterSubject, draft.letterBody]).toEqual(['Своя тема', null]);
     expect(draft.pages[0].slots.map((slot) => [slot.productId, slot.articleId])).toEqual([

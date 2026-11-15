@@ -55,6 +55,23 @@ describe('submitRequest', () => {
     expect(body.get('comment')).toBeNull();
     expect(body.get('locale')).toBe('ru');
     expect((body.get('attachment') as File).name).toBe('brief.pdf');
+    expect(body.get('requestId')).toBeNull();
+  });
+
+  it('passes the id of the filled form, so the same form sent twice is one request', async () => {
+    post.mockResolvedValue({ kind: 'ok', data: { id: 5 } });
+    const requestId = '5f0c6a8e-2d43-4f1b-9a57-0c1d2e3f4a5b';
+    const data = form({ phone: '050 123 45 67' });
+    data.set('requestId', requestId);
+    const forged = form({ phone: '050 123 45 67' });
+    forged.set('requestId', 'not-an-id');
+
+    await submitRequest('uk', REQUEST_FORM_IDLE, data);
+    await submitRequest('uk', REQUEST_FORM_IDLE, forged);
+
+    const [[, sent], [, refused]] = post.mock.calls as [string, FormData][];
+    expect(sent.get('requestId')).toBe(requestId);
+    expect(refused.get('requestId')).toBeNull();
   });
 
   it('asks to call when the API does not take the request', async () => {

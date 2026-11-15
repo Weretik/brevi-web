@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -111,8 +111,26 @@ describe('«Ліди»', () => {
       id: 1,
       version: 3,
       values: { resultId: 9, nextContactAt: '', comment: '' },
+      requestId: expect.any(String),
     });
     expect(await screen.findByText('Збережено: L&S Distributions')).toBeVisible();
+  });
+
+  it('repeats a failed save with the same request id', async () => {
+    record
+      .mockReturnValueOnce({ unwrap: () => Promise.reject(new Error('Мережа')) })
+      .mockReturnValue({ unwrap: () => Promise.resolve(detail) });
+    renderPage();
+    fireEvent.click(screen.getByRole('button', { name: /Відмова/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'Зберегти → наступний' }));
+    await waitFor(() => expect(record).toHaveBeenCalledTimes(1));
+    fireEvent.click(await screen.findByRole('button', { name: 'Зберегти → наступний' }));
+
+    await waitFor(() => expect(record).toHaveBeenCalledTimes(2));
+    const [first, second] = record.mock.calls.map(
+      ([call]) => (call as { requestId: string }).requestId,
+    );
+    expect(second).toBe(first);
   });
 
   it('shows free leads first in «Усі ліди» for a manager', () => {

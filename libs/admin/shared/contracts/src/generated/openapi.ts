@@ -2680,7 +2680,7 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** @description «Копіювати»: a new draft with the next number, the same header, introduction and items with their saved prices. The actor becomes its author and responsible. */
+    /** @description «Копіювати»: a new draft with the next number, the same header, introduction and items with their saved prices. The actor becomes its author and responsible. A repeat with the same `requestId` returns the same copy. */
     post: operations['copyCrmQuote'];
     delete?: never;
     options?: never;
@@ -6692,6 +6692,11 @@ export interface components {
       comment?: string | null;
       /** @description Picked from the list; cannot go together with oneoffName */
       counterparty?: components['schemas']['FinanceCounterpartyLinkInput'] | null;
+      /**
+       * Format: uuid
+       * @description Made when the form opens; a repeat with the same id returns the saved row and adds nothing
+       */
+      requestId?: string | null;
     };
     FinanceTransactionUpdateInput: {
       /** Format: date */
@@ -6763,6 +6768,11 @@ export interface components {
       /** Format: int64 */
       amountMinor: number;
       note?: string | null;
+      /**
+       * Format: uuid
+       * @description Made when the form opens; a repeat with the same id returns the saved row and adds nothing
+       */
+      requestId?: string | null;
     };
     FinanceTransferUpdateInput: {
       /** Format: date */
@@ -9330,6 +9340,11 @@ export interface components {
       clientComment?: string | null;
       managerNote?: string | null;
       items: components['schemas']['CrmQuoteItemInput'][];
+      /**
+       * Format: uuid
+       * @description Create only: new for every form; a repeat with the same id returns the same КП.
+       */
+      requestId?: string | null;
     };
     CrmQuotePrice: {
       /** @description What the client sees. */
@@ -9514,6 +9529,11 @@ export interface components {
       subject: string;
       /** @description Plain text. */
       body: string;
+      /**
+       * Format: uuid
+       * @description New for every press; a repeat with the same id returns the КП without a second letter.
+       */
+      requestId?: string | null;
     };
     CrmQuoteEvent: {
       /** Format: int64 */
@@ -9543,6 +9563,13 @@ export interface components {
       deleted: number;
       /** @description Kept by a production order; back in the list. */
       returned: number;
+    };
+    CrmCopyQuoteInput: {
+      /**
+       * Format: uuid
+       * @description New for every press.
+       */
+      requestId?: string | null;
     };
     CrmImportPerson: {
       /** @description Found among Brevi staff by e-mail. */
@@ -9887,6 +9914,11 @@ export interface components {
       letterBody?: string | null;
       /** @description One page per season of the layout, summer first; a model only once. */
       pages: components['schemas']['CrmQuoteIntroPageInput'][];
+      /**
+       * Format: uuid
+       * @description Create only: new for every form; a repeat with the same id returns the same КП.
+       */
+      requestId?: string | null;
     };
     CrmQuoteIntroTemplateModel: {
       productId: number;
@@ -10546,6 +10578,11 @@ export interface components {
        * @description Up to 10 MB; pdf, doc, docx, xls, xlsx, zip, rar, 7z, jpg, jpeg, png, cdr, ai, eps, psd.
        */
       attachment?: string;
+      /**
+       * Format: uuid
+       * @description New for every filled form; the same form sent again returns the same request.
+       */
+      requestId?: string;
     };
     CrmSiteRequestReceived: {
       /** Format: int64 */
@@ -10689,6 +10726,11 @@ export interface components {
       /** Format: date-time */
       nextContactAt?: string | null;
       version: number;
+      /**
+       * Format: uuid
+       * @description New for every form; a repeat with the same id returns the lead without a second call.
+       */
+      requestId?: string | null;
     };
     CrmLeadManagerStats: {
       manager: components['schemas']['CrmLeadPerson'];
@@ -12579,6 +12621,11 @@ export interface components {
         | 'Інше'
         | null;
       comment: string | null;
+      /**
+       * Format: uuid
+       * @description New for every form; a repeat with the same id returns the item card without new work.
+       */
+      requestId?: string | null;
     };
     VoidProductionWorkInput: {
       reason: string;
@@ -13026,6 +13073,11 @@ export interface components {
       kind: 'Advance' | 'Card' | 'Cash' | 'Other';
       amount: number;
       comment: string | null;
+      /**
+       * Format: uuid
+       * @description Made when the form opens; a repeat with the same id adds nothing and returns the month.
+       */
+      requestId?: string | null;
     };
     VoidPayrollEntryInput: {
       reason: string;
@@ -13035,6 +13087,11 @@ export interface components {
       /** @description Not zero; negative for a deduction. */
       amount: number;
       reason: string;
+      /**
+       * Format: uuid
+       * @description Made when the form opens; a repeat with the same id adds nothing and returns the month.
+       */
+      requestId?: string | null;
     };
     SetPayrollIssuedInput: {
       employeeId: number;
@@ -23777,7 +23834,11 @@ export interface operations {
       };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['CrmCopyQuoteInput'];
+      };
+    };
     responses: {
       /** @description The new КП. */
       201: {

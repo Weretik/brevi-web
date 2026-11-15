@@ -304,7 +304,7 @@ describe('КП editor', () => {
     fireEvent.click(screen.getByRole('menuitem', { name: /Копіювати/ }));
 
     expect(await screen.findByText('Створено КП 2-11-2026 — копію КП 1-11-2026.')).toBeVisible();
-    expect(api.copy).toHaveBeenCalledWith(4);
+    expect(api.copy).toHaveBeenCalledWith({ id: 4, requestId: expect.any(String) });
   });
 
   it('shows the client as the title, with the number and the status', async () => {
@@ -563,6 +563,7 @@ describe('КП editor', () => {
       id: 4,
       version: 4,
       form: { to: 'client@agro.ua', subject: 'КП № 1-11-2026', body: 'Добрий день' },
+      requestId: expect.any(String),
     });
   });
 
