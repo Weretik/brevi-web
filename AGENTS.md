@@ -22,6 +22,10 @@ Identify the application from the request and current code. If choosing between 
 
 The axiom shared with the backend: "A folder holds at most 6 code files. When it would hold more, split it by meaning into named subfolders of at least two files each. No empty folders, no wrapper folders (a folder with no files and a single subfolder), and no new one-file folders. Only generated code is exempt." For the frontend: every folder in `apps/` and `libs/` (except the frozen Angular storefront) holds at most six production files (tests beside them and `index.ts` do not count; generated code is exempt). The seventh file splits the folder into subfolders by meaning, never one folder per file. A folder holds either files or subfolders, not both, and a folder that only wraps one subfolder is merged with it. `npm run architecture:structure` enforces this in CI; details in [code organization](docs/standards/shared/code-organization.md#nesting-and-size).
 
+## Repeated submits
+
+Every mutation has a pending lock. A mutation whose BreviERP operation takes a `requestId` (money, stock `operationId`, orders, КП and e-mails, lead calls, site requests) makes one id per attempt, reuses it on retry and renews it after a success or a change of the data ([idempotency rules](docs/standards/shared/idempotency-rules.md)).
+
 ## Context search order
 
 1. [Feature map](docs/features/README.md) → feature card → files from its "Code structure" and "Tests" sections.
