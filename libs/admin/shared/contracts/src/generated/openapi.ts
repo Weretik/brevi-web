@@ -6692,6 +6692,11 @@ export interface components {
       comment?: string | null;
       /** @description Picked from the list; cannot go together with oneoffName */
       counterparty?: components['schemas']['FinanceCounterpartyLinkInput'] | null;
+      /**
+       * Format: uuid
+       * @description Made when the form opens; a repeat with the same id returns the saved row and adds nothing
+       */
+      requestId?: string | null;
     };
     FinanceTransactionUpdateInput: {
       /** Format: date */
@@ -6763,6 +6768,11 @@ export interface components {
       /** Format: int64 */
       amountMinor: number;
       note?: string | null;
+      /**
+       * Format: uuid
+       * @description Made when the form opens; a repeat with the same id returns the saved row and adds nothing
+       */
+      requestId?: string | null;
     };
     FinanceTransferUpdateInput: {
       /** Format: date */
@@ -13026,6 +13036,11 @@ export interface components {
       kind: 'Advance' | 'Card' | 'Cash' | 'Other';
       amount: number;
       comment: string | null;
+      /**
+       * Format: uuid
+       * @description Made when the form opens; a repeat with the same id adds nothing and returns the month.
+       */
+      requestId?: string | null;
     };
     VoidPayrollEntryInput: {
       reason: string;
@@ -13035,6 +13050,11 @@ export interface components {
       /** @description Not zero; negative for a deduction. */
       amount: number;
       reason: string;
+      /**
+       * Format: uuid
+       * @description Made when the form opens; a repeat with the same id adds nothing and returns the month.
+       */
+      requestId?: string | null;
     };
     SetPayrollIssuedInput: {
       employeeId: number;

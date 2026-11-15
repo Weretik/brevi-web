@@ -39,7 +39,7 @@ export function financeTransferEndpoints(build: AccountingEndpointBuilder) {
     }),
     createFinanceTransfer: build.mutation<
       FinanceTransfer,
-      FinanceTransferBody & { scope: LedgerScope }
+      FinanceTransferBody & { scope: LedgerScope; requestId: string }
     >({
       query: (body) => ({ url: transfers, method: 'POST', body }),
       transformResponse: mapFinanceTransfer,

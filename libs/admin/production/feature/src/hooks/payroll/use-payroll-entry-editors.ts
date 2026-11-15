@@ -14,6 +14,8 @@ import {
 import { adminApiErrorMessage } from '@admin/shared/api-client';
 import { useState } from 'react';
 
+import { useRequestId } from '../requests/use-request-id';
+
 import type {
   PayrollAdjustmentErrors,
   PayrollAdjustmentFormValues,
@@ -28,6 +30,7 @@ export function usePayrollPaymentEditor(month: string, onSaved: (message: string
   const [errors, setErrors] = useState<PayrollPaymentErrors>({});
   const [message, setMessage] = useState<string | null>(null);
   const [create, state] = useCreatePayrollPaymentMutation();
+  const requestId = useRequestId();
 
   async function save() {
     if (state.isLoading) return;
@@ -36,7 +39,11 @@ export function usePayrollPaymentEditor(month: string, onSaved: (message: string
     if (Object.keys(validation).length) return;
     setMessage(null);
     try {
-      await create({ month, body: payrollPaymentBody(values) }).unwrap();
+      await create({
+        month,
+        body: { ...payrollPaymentBody(values), requestId: requestId.current() },
+      }).unwrap();
+      requestId.renew();
       onSaved('Виплату додано.');
     } catch (error) {
       setMessage(adminApiErrorMessage(error, 'Не вдалося додати виплату.'));
@@ -63,6 +70,7 @@ export function usePayrollAdjustmentEditor(month: string, onSaved: (message: str
   const [errors, setErrors] = useState<PayrollAdjustmentErrors>({});
   const [message, setMessage] = useState<string | null>(null);
   const [create, state] = useCreatePayrollAdjustmentMutation();
+  const requestId = useRequestId();
 
   async function save() {
     if (state.isLoading) return;
@@ -71,7 +79,11 @@ export function usePayrollAdjustmentEditor(month: string, onSaved: (message: str
     if (Object.keys(validation).length) return;
     setMessage(null);
     try {
-      await create({ month, body: payrollAdjustmentBody(values) }).unwrap();
+      await create({
+        month,
+        body: { ...payrollAdjustmentBody(values), requestId: requestId.current() },
+      }).unwrap();
+      requestId.renew();
       onSaved(values.sign === 'deduction' ? 'Утримання додано.' : 'Нарахування додано.');
     } catch (error) {
       setMessage(adminApiErrorMessage(error, 'Не вдалося зберегти запис.'));
