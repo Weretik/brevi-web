@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import { tasksBaseApi } from './tasks-base-api';
 import { toTaskApiError } from '../errors/task-api-error';
 import { toSaveTaskInput } from '../mappers/task-input.mapper';
@@ -29,111 +31,146 @@ const changed = (error: unknown, id?: number) =>
 export const tasksApi = tasksBaseApi.injectEndpoints({
   endpoints: (build) => ({
     listTasks: build.query<TaskPage, TaskListQuery>({
-      query: (query) => ({
-        url: '/api/crm/tasks',
-        params: {
-          search: query.search.trim() || undefined,
-          filter: query.filter,
-          assigneeUserId: query.assigneeUserId ?? undefined,
-          page: query.page,
-          pageSize: query.pageSize,
-        },
-      }),
-      transformResponse: mapTaskPage,
-      transformErrorResponse: toTaskApiError,
+      queryFn: (query, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/crm/tasks', {
+            params: {
+              query: {
+                search: query.search.trim() || undefined,
+                filter: query.filter,
+                assigneeUserId: query.assigneeUserId ?? undefined,
+                page: query.page,
+                pageSize: query.pageSize,
+              },
+            },
+            signal,
+          }),
+          mapTaskPage,
+          toTaskApiError,
+        ),
       providesTags: list,
     }),
     getTaskBoard: build.query<
       readonly TaskSummary[],
       { assigneeUserId: number | null; period: TaskBoardPeriod }
     >({
-      query: ({ assigneeUserId, period }) => ({
-        url: '/api/crm/tasks/board',
-        params: { assigneeUserId: assigneeUserId ?? undefined, period },
-      }),
-      transformResponse: mapTaskBoard,
-      transformErrorResponse: toTaskApiError,
+      queryFn: ({ assigneeUserId, period }, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/crm/tasks/board', {
+            params: { query: { assigneeUserId: assigneeUserId ?? undefined, period } },
+            signal,
+          }),
+          mapTaskBoard,
+          toTaskApiError,
+        ),
       providesTags: list,
     }),
     getTaskOverview: build.query<TaskOverview, { assigneeUserId: number | null }>({
-      query: ({ assigneeUserId }) => ({
-        url: '/api/crm/tasks/overview',
-        params: { assigneeUserId: assigneeUserId ?? undefined },
-      }),
-      transformResponse: mapTaskOverview,
-      transformErrorResponse: toTaskApiError,
+      queryFn: ({ assigneeUserId }, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/crm/tasks/overview', {
+            params: { query: { assigneeUserId: assigneeUserId ?? undefined } },
+            signal,
+          }),
+          mapTaskOverview,
+          toTaskApiError,
+        ),
       providesTags: list,
     }),
     getTaskAssignees: build.query<readonly TaskAssignee[], void>({
-      query: () => '/api/crm/tasks/assignees',
-      transformResponse: mapTaskAssignees,
-      transformErrorResponse: toTaskApiError,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/crm/tasks/assignees', { signal }),
+          mapTaskAssignees,
+          toTaskApiError,
+        ),
     }),
     getTask: build.query<TaskDetail, number>({
-      query: (id) => `/api/crm/tasks/${id}`,
-      transformResponse: mapTaskDetail,
-      transformErrorResponse: toTaskApiError,
+      queryFn: (id, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/crm/tasks/{id}', { params: { path: { id: id } }, signal }),
+          mapTaskDetail,
+          toTaskApiError,
+        ),
       providesTags: (_result, _error, id) => [{ type: 'ManagerTask', id }],
     }),
     createTask: build.mutation<TaskDetail, TaskFormValues>({
-      query: (values) => ({ url: '/api/crm/tasks', method: 'POST', body: toSaveTaskInput(values) }),
-      transformResponse: mapTaskDetail,
-      transformErrorResponse: toTaskApiError,
+      queryFn: (values, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/crm/tasks', { body: toSaveTaskInput(values), signal }),
+          mapTaskDetail,
+          toTaskApiError,
+        ),
       invalidatesTags: (_result, error) => changed(error),
     }),
     editTask: build.mutation<TaskDetail, { id: number; values: TaskFormValues }>({
-      query: ({ id, values }) => ({
-        url: `/api/crm/tasks/${id}`,
-        method: 'PUT',
-        body: toSaveTaskInput(values),
-      }),
-      transformResponse: mapTaskDetail,
-      transformErrorResponse: toTaskApiError,
+      queryFn: ({ id, values }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/crm/tasks/{id}', {
+            params: { path: { id: id } },
+            body: toSaveTaskInput(values),
+            signal,
+          }),
+          mapTaskDetail,
+          toTaskApiError,
+        ),
       invalidatesTags: (_result, error, { id }) => changed(error, id),
     }),
     changeTaskStatus: build.mutation<
       TaskDetail,
       { id: number; version: number; status: 'New' | 'InProgress' | 'Done' }
     >({
-      query: ({ id, version, status }) => ({
-        url: `/api/crm/tasks/${id}/status`,
-        method: 'PUT',
-        body: { version, status },
-      }),
-      transformResponse: mapTaskDetail,
-      transformErrorResponse: toTaskApiError,
+      queryFn: ({ id, version, status }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/crm/tasks/{id}/status', {
+            params: { path: { id: id } },
+            body: { version, status },
+            signal,
+          }),
+          mapTaskDetail,
+          toTaskApiError,
+        ),
       invalidatesTags: (_result, error, { id }) => changed(error, id),
     }),
     setTaskUrgent: build.mutation<TaskDetail, { id: number; version: number; isUrgent: boolean }>({
-      query: ({ id, version, isUrgent }) => ({
-        url: `/api/crm/tasks/${id}/urgent`,
-        method: 'PUT',
-        body: { version, isUrgent },
-      }),
-      transformResponse: mapTaskDetail,
-      transformErrorResponse: toTaskApiError,
+      queryFn: ({ id, version, isUrgent }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/crm/tasks/{id}/urgent', {
+            params: { path: { id: id } },
+            body: { version, isUrgent },
+            signal,
+          }),
+          mapTaskDetail,
+          toTaskApiError,
+        ),
       invalidatesTags: (_result, error, { id }) => changed(error, id),
     }),
     markTaskStep: build.mutation<
       TaskDetail,
       { id: number; stepId: number; version: number; isDone: boolean }
     >({
-      query: ({ id, stepId, version, isDone }) => ({
-        url: `/api/crm/tasks/${id}/steps/${stepId}`,
-        method: 'PUT',
-        body: { version, isDone },
-      }),
-      transformResponse: mapTaskDetail,
-      transformErrorResponse: toTaskApiError,
+      queryFn: ({ id, stepId, version, isDone }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/crm/tasks/{id}/steps/{stepId}', {
+            params: { path: { id: id, stepId: stepId } },
+            body: { version, isDone },
+            signal,
+          }),
+          mapTaskDetail,
+          toTaskApiError,
+        ),
       invalidatesTags: (_result, error, { id }) => changed(error, id),
     }),
     deleteTask: build.mutation<void, { id: number; version: number }>({
-      query: ({ id, version }) => ({
-        url: `/api/crm/tasks/${id}`,
-        method: 'DELETE',
-        params: { version },
-      }),
-      transformErrorResponse: toTaskApiError,
+      queryFn: ({ id, version }, { signal }) =>
+        apiCall(
+          apiClient.DELETE('/api/crm/tasks/{id}', {
+            params: { path: { id: id }, query: { version } },
+            signal,
+          }),
+          undefined,
+          toTaskApiError,
+        ),
       invalidatesTags: (_result, error) => changed(error),
     }),
   }),

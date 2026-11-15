@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import { seoSettingsApiError } from '../../errors/publishing/seo-settings-api-error';
 import { mapSeoSettings } from '../../mappers/seo-settings/seo-settings.mapper';
 
@@ -12,19 +14,21 @@ const tag = { type: 'SiteSeoSettings' as const, id: 'ONE' };
 export function seoSettingsEndpoints(build: ContentEndpointBuilder) {
   return {
     getSiteSeoSettings: build.query<SeoSettings, void>({
-      query: () => ({ url: '/api/content/seo-settings' }),
-      transformResponse: mapSeoSettings,
-      transformErrorResponse: seoSettingsApiError,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/content/seo-settings', { signal }),
+          mapSeoSettings,
+          seoSettingsApiError,
+        ),
       providesTags: [tag],
     }),
     saveSiteSeoSettings: build.mutation<SeoSettings, SeoSettingsInput>({
-      query: (input) => ({
-        url: '/api/content/seo-settings',
-        method: 'PUT',
-        body: input satisfies SaveBody,
-      }),
-      transformResponse: mapSeoSettings,
-      transformErrorResponse: seoSettingsApiError,
+      queryFn: (input, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/content/seo-settings', { body: input satisfies SaveBody, signal }),
+          mapSeoSettings,
+          seoSettingsApiError,
+        ),
       // A stale revision means someone else saved: reload either way.
       invalidatesTags: [tag],
     }),

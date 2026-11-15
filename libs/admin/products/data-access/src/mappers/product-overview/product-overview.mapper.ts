@@ -6,6 +6,8 @@ import type {
   ProductOverview,
   ProductOverviewListQuery,
   ProductOverviewPage,
+  ProductOverviewType,
+  ProductSeason,
   SewingPriceTiers,
 } from '@admin/products/model';
 
@@ -19,11 +21,11 @@ const tiers = (value: Tiers): SewingPriceTiers | null =>
 export function mapProductOverviewItem(row: ProductOverviewItemResponse): ProductOverview {
   return {
     id: row.id,
-    type: row.type,
+    type: row.type as ProductOverviewType,
     code: row.code ?? null,
     name: row.name,
     sectionId: row.sectionId ?? null,
-    season: row.season ?? null,
+    season: (row.season ?? null) as ProductSeason | null,
     isActive: row.isActive,
     currentSiteUrl: row.currentSiteUrl ?? null,
     quoteDescription: row.quoteDescription ?? null,
@@ -63,16 +65,17 @@ export function mapProductOverviewPage(value: ProductOverviewPageResponse): Prod
 }
 
 /** Query string of `getProductOverview`; empty values are left out. */
-export function productOverviewSearchParams(query: ProductOverviewListQuery): string {
-  const params = new URLSearchParams({ type: query.type });
+export function productOverviewQueryParams(query: ProductOverviewListQuery) {
   const search = query.search.trim();
-  if (search) params.set('search', search);
-  if (query.section !== null) params.set('section', String(query.section));
-  if (query.withoutPrice) params.set('withoutPrice', 'true');
-  if (query.active !== null) params.set('active', String(query.active));
-  if (query.sort !== 'code') params.set('sort', query.sort);
-  if (query.direction !== 'asc') params.set('direction', query.direction);
-  params.set('page', String(query.page));
-  params.set('pageSize', String(query.pageSize));
-  return params.toString();
+  return {
+    type: query.type,
+    ...(search ? { search } : {}),
+    ...(query.section !== null ? { section: String(query.section) } : {}),
+    ...(query.withoutPrice ? { withoutPrice: true } : {}),
+    ...(query.active !== null ? { active: query.active } : {}),
+    ...(query.sort !== 'code' ? { sort: query.sort } : {}),
+    ...(query.direction !== 'asc' ? { direction: query.direction } : {}),
+    page: query.page,
+    pageSize: query.pageSize,
+  };
 }

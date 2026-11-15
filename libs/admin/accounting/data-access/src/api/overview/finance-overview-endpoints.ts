@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import { financeOverviewTag } from '../../cache/accounting-tags';
 import { accountingApiError } from '../../errors/accounting-api-error';
 import { mapFinanceOverview } from '../../mappers/ledger/accounting-movement.mapper';
@@ -12,12 +14,15 @@ export function financeOverviewEndpoints(build: AccountingEndpointBuilder) {
       FinanceOverview,
       { from: string; to: string; scope: LedgerScope | null }
     >({
-      query: ({ from, to, scope }) => ({
-        url: '/api/accounting/overview',
-        params: scope ? { from, to, scope } : { from, to },
-      }),
-      transformResponse: mapFinanceOverview,
-      transformErrorResponse: accountingApiError,
+      queryFn: ({ from, to, scope }, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/accounting/overview', {
+            params: { query: scope ? { from, to, scope } : { from, to } },
+            signal,
+          }),
+          mapFinanceOverview,
+          accountingApiError,
+        ),
       providesTags: [financeOverviewTag],
     }),
   };

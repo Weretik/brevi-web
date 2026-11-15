@@ -1,8 +1,10 @@
-import { requestApiBlob } from '@admin/shared/api-client';
+import { apiClient, apiRequest } from '@admin/shared/api-client';
 
 /** The PDF built on the server from the saved КП. */
 export function fetchQuotePdf(id: number): Promise<Blob> {
-  return requestApiBlob({ url: `/api/crm/quotes/${id}/pdf` });
+  return apiRequest(
+    apiClient.GET('/api/crm/quotes/{id}/pdf', { params: { path: { id } }, parseAs: 'blob' }),
+  );
 }
 
 /** Saves a КП PDF as «КП <number>.pdf». */

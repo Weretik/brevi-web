@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import { redirectsTag } from '../../cache/redirect-tags';
 import { redirectApiError } from '../../errors/publishing/redirect-api-error';
 import {
@@ -22,25 +24,37 @@ type ImportBody =
 export function redirectEndpoints(build: ContentEndpointBuilder) {
   return {
     getSiteRedirects: build.query<SiteRedirect[], void>({
-      query: () => ({ url: '/api/content/redirects' }),
-      transformResponse: mapRedirectList,
-      transformErrorResponse: redirectApiError,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/content/redirects', { signal }),
+          mapRedirectList,
+          redirectApiError,
+        ),
       providesTags: [redirectsTag],
     }),
     /** Adds a redirect when `id` is null, otherwise changes it. */
     saveSiteRedirect: build.mutation<SiteRedirect, SiteRedirectInput>({
-      query: ({ id, ...input }) => ({
-        url: id === null ? '/api/content/redirects' : `/api/content/redirects/${id}`,
-        method: id === null ? 'POST' : 'PUT',
-        body: input satisfies SaveBody,
-      }),
-      transformResponse: mapRedirect,
-      transformErrorResponse: redirectApiError,
+      queryFn: ({ id, ...input }, { signal }) =>
+        apiCall(
+          id === null
+            ? apiClient.POST('/api/content/redirects', { body: input satisfies SaveBody, signal })
+            : apiClient.PUT('/api/content/redirects/{id}', {
+                params: { path: { id } },
+                body: input satisfies SaveBody,
+                signal,
+              }),
+          mapRedirect,
+          redirectApiError,
+        ),
       invalidatesTags: [redirectsTag],
     }),
     deleteSiteRedirect: build.mutation<void, number>({
-      query: (id) => ({ url: `/api/content/redirects/${id}`, method: 'DELETE' }),
-      transformErrorResponse: redirectApiError,
+      queryFn: (id, { signal }) =>
+        apiCall(
+          apiClient.DELETE('/api/content/redirects/{id}', { params: { path: { id: id } }, signal }),
+          undefined,
+          redirectApiError,
+        ),
       invalidatesTags: [redirectsTag],
     }),
     /** Transfer of the old-site addresses: a check (`dryRun`) or the transfer. */
@@ -48,14 +62,15 @@ export function redirectEndpoints(build: ContentEndpointBuilder) {
       RedirectImportReport,
       { items: OldSiteImportItems; dryRun: boolean; overwrite: boolean }
     >({
-      query: ({ items, dryRun, overwrite }) => ({
-        url: '/api/content/redirects/old-site-import',
-        method: 'POST',
-        // The file is passed as it is; the server checks every address.
-        body: { items: items as unknown as ImportBody['items'], dryRun, overwrite },
-      }),
-      transformResponse: mapRedirectImportReport,
-      transformErrorResponse: redirectApiError,
+      queryFn: ({ items, dryRun, overwrite }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/content/redirects/old-site-import', {
+            body: { items: items as unknown as ImportBody['items'], dryRun, overwrite },
+            signal,
+          }),
+          mapRedirectImportReport,
+          redirectApiError,
+        ),
       invalidatesTags: (report) => (report && !report.dryRun ? [redirectsTag] : []),
     }),
   };

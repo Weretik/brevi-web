@@ -1,4 +1,4 @@
-import { adminApi, toAdminApiError } from '@admin/shared/api-client';
+import { adminApi, apiCall, apiClient, toAdminApiError } from '@admin/shared/api-client';
 
 import {
   mapCreatedCatalogProduct,
@@ -26,31 +26,41 @@ const createError = (response: Parameters<typeof toAdminApiError>[0]) =>
 export const productCreateApi = adminApi.injectEndpoints({
   endpoints: (build) => ({
     createCatalogProduct: build.mutation<CreatedCatalogProduct, CreateCatalogProductInput>({
-      query: (input) => ({
-        url: '/api/v1/products/overview',
-        method: 'POST',
-        body: toCreateCatalogProductBody(input),
-      }),
-      transformResponse: (value) => mapCreatedCatalogProduct(value),
-      transformErrorResponse: createError,
+      queryFn: (input, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/v1/products/overview', {
+            body: toCreateCatalogProductBody(input),
+            signal,
+          }),
+          (value) => mapCreatedCatalogProduct(value),
+          createError,
+        ),
       invalidatesTags: (_result, error) => (error ? [] : [{ type: 'Product', id: 'LIST' }]),
     }),
     getProductCodeCheck: build.query<ProductCodeCheck, { type: CatalogProductType; code?: string }>(
       {
-        query: ({ type, code }) => ({
-          url: '/api/v1/products/overview/code-check',
-          params: code ? { type, code } : { type },
-        }),
-        transformResponse: (value) => mapProductCodeCheck(value),
-        transformErrorResponse: createError,
+        queryFn: ({ type, code }, { signal }) =>
+          apiCall(
+            apiClient.GET('/api/v1/products/overview/code-check', {
+              params: { query: code ? { type, code } : { type } },
+              signal,
+            }),
+            (value) => mapProductCodeCheck(value),
+            createError,
+          ),
         keepUnusedDataFor: 0,
       },
     ),
     previewPpePrices: build.query<PpePricePreview, { ruleCode: string; supplierPrice: number }>({
-      query: (params) => ({ url: '/api/v1/pricing/ppe/rules/preview', params }),
-      transformResponse: (value) => mapPpePricePreview(value),
-      transformErrorResponse: (response) =>
-        toAdminApiError(response, { fallback: 'Не вдалося порахувати ціни. Спробуйте ще раз.' }),
+      queryFn: (params, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/v1/pricing/ppe/rules/preview', { params: { query: params }, signal }),
+          (value) => mapPpePricePreview(value),
+          (response) =>
+            toAdminApiError(response, {
+              fallback: 'Не вдалося порахувати ціни. Спробуйте ще раз.',
+            }),
+        ),
     }),
   }),
 });

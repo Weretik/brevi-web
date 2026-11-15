@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import { siteCategoriesTag, siteCategoryTag } from '../../cache/site-category-tags';
 import { siteCategoryApiError } from '../../errors/site/site-category-api-error';
 import { mapSiteCategoryImportReport } from '../../mappers/product-pages/old-site-import.mapper';
@@ -29,26 +31,37 @@ type OrderBody = operations['reorderSiteCategories']['requestBody']['content']['
 export function siteCategoryEndpoints(build: ContentEndpointBuilder) {
   return {
     getSiteCategories: build.query<SiteCategoryRow[], void>({
-      query: () => ({ url: '/api/content/categories' }),
-      transformResponse: mapSiteCategoryList,
-      transformErrorResponse: siteCategoryApiError,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/content/categories', { signal }),
+          mapSiteCategoryList,
+          siteCategoryApiError,
+        ),
       providesTags: [siteCategoriesTag],
     }),
     getSiteCategory: build.query<SiteCategory, number>({
-      query: (id) => ({ url: `/api/content/categories/${id}` }),
-      transformResponse: mapSiteCategory,
-      transformErrorResponse: siteCategoryApiError,
+      queryFn: (id, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/content/categories/{id}', { params: { path: { id: id } }, signal }),
+          mapSiteCategory,
+          siteCategoryApiError,
+        ),
       providesTags: (_result, _error, id) => [siteCategoryTag(id)],
     }),
     /** Creates a category when `id` is null, otherwise replaces it as a whole. */
     saveSiteCategory: build.mutation<SiteCategory, SiteCategoryInput>({
-      query: ({ id, ...input }) => ({
-        url: id === null ? '/api/content/categories' : `/api/content/categories/${id}`,
-        method: id === null ? 'POST' : 'PUT',
-        body: input satisfies SaveBody,
-      }),
-      transformResponse: mapSiteCategory,
-      transformErrorResponse: siteCategoryApiError,
+      queryFn: ({ id, ...input }, { signal }) =>
+        apiCall(
+          id === null
+            ? apiClient.POST('/api/content/categories', { body: input satisfies SaveBody, signal })
+            : apiClient.PUT('/api/content/categories/{id}', {
+                params: { path: { id } },
+                body: input satisfies SaveBody,
+                signal,
+              }),
+          mapSiteCategory,
+          siteCategoryApiError,
+        ),
       // A stale revision means someone else saved: reload either way.
       invalidatesTags: (_result, _error, { id }) =>
         id === null ? [siteCategoriesTag] : [siteCategoriesTag, siteCategoryTag(id)],
@@ -57,27 +70,40 @@ export function siteCategoryEndpoints(build: ContentEndpointBuilder) {
       SiteCategoryVisibility,
       { id: number; showOnSite: boolean }
     >({
-      query: ({ id, showOnSite }) => ({
-        url: `/api/content/categories/${id}/visibility`,
-        method: 'PATCH',
-        body: { showOnSite } satisfies VisibilityBody,
-      }),
-      transformResponse: mapSiteCategoryVisibility,
-      transformErrorResponse: siteCategoryApiError,
+      queryFn: ({ id, showOnSite }, { signal }) =>
+        apiCall(
+          apiClient.PATCH('/api/content/categories/{id}/visibility', {
+            params: { path: { id: id } },
+            body: { showOnSite } satisfies VisibilityBody,
+            signal,
+          }),
+          mapSiteCategoryVisibility,
+          siteCategoryApiError,
+        ),
       invalidatesTags: (_result, _error, { id }) => [siteCategoriesTag, siteCategoryTag(id)],
     }),
     reorderSiteCategories: build.mutation<void, { parentId: number | null; ids: number[] }>({
-      query: (order) => ({
-        url: '/api/content/categories/order',
-        method: 'PUT',
-        body: order satisfies OrderBody,
-      }),
-      transformErrorResponse: siteCategoryApiError,
+      queryFn: (order, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/content/categories/order', {
+            body: order satisfies OrderBody,
+            signal,
+          }),
+          undefined,
+          siteCategoryApiError,
+        ),
       invalidatesTags: [siteCategoriesTag],
     }),
     deleteSiteCategory: build.mutation<void, number>({
-      query: (id) => ({ url: `/api/content/categories/${id}`, method: 'DELETE' }),
-      transformErrorResponse: siteCategoryApiError,
+      queryFn: (id, { signal }) =>
+        apiCall(
+          apiClient.DELETE('/api/content/categories/{id}', {
+            params: { path: { id: id } },
+            signal,
+          }),
+          undefined,
+          siteCategoryApiError,
+        ),
       invalidatesTags: (_result, _error, id) => [siteCategoriesTag, siteCategoryTag(id)],
     }),
     /** One-time transfer of the old-site category tree: a check (`dryRun`) or the transfer itself. */
@@ -85,14 +111,15 @@ export function siteCategoryEndpoints(build: ContentEndpointBuilder) {
       SiteCategoryImportReport,
       OldSiteImportOptions & { items: OldSiteImportItems; dryRun: boolean }
     >({
-      query: ({ items, dryRun, showOnSite, overwrite }) => ({
-        url: '/api/content/categories/old-site-import',
-        method: 'POST',
-        // The file is passed as it is; the server checks every category.
-        body: { items: items as unknown as ImportBody['items'], dryRun, showOnSite, overwrite },
-      }),
-      transformResponse: mapSiteCategoryImportReport,
-      transformErrorResponse: siteCategoryApiError,
+      queryFn: ({ items, dryRun, showOnSite, overwrite }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/content/categories/old-site-import', {
+            body: { items: items as unknown as ImportBody['items'], dryRun, showOnSite, overwrite },
+            signal,
+          }),
+          mapSiteCategoryImportReport,
+          siteCategoryApiError,
+        ),
       // A transfer changes the tree and the categories of products.
       invalidatesTags: (report) =>
         report && !report.dryRun ? ['SiteCategory', 'ContentProduct'] : [],

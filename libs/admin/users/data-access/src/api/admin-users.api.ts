@@ -1,4 +1,4 @@
-import { adminApi } from '@admin/shared/api-client';
+import { adminApi, apiCall, apiClient } from '@admin/shared/api-client';
 
 import {
   mapStaffAccount,
@@ -19,76 +19,92 @@ import type {
 type CreateStaffAccountBody = components['schemas']['CreateStaffAccountRequest'];
 type UpdateStaffDetailsBody = components['schemas']['UpdateStaffDetailsRequest'];
 
-const root = '/api/admin/users';
-const accessRoot = '/api/admin/access';
-const userUrl = (userId: number, action: string) => `${root}/${userId}/${action}`;
-
 export const adminUsersApi = adminApi.injectEndpoints({
   endpoints: (build) => ({
     getStaffAccounts: build.query<StaffAccount[], void>({
-      query: () => ({ url: root, method: 'GET' }),
-      transformResponse: mapStaffAccounts,
+      queryFn: (_arg, { signal }) =>
+        apiCall(apiClient.GET('/api/admin/users', { signal }), mapStaffAccounts),
       providesTags: ['StaffAccount'],
     }),
     /** Assignable roles with their titles; «Права доступу» invalidates 'AccessRights' on change. */
     getStaffRoleOptions: build.query<StaffRoleOption[], void>({
-      query: () => ({ url: accessRoot, method: 'GET' }),
-      transformResponse: mapStaffRoleOptions,
+      queryFn: (_arg, { signal }) =>
+        apiCall(apiClient.GET('/api/admin/access', { signal }), mapStaffRoleOptions),
       providesTags: ['AccessRights'],
     }),
     createStaffAccount: build.mutation<StaffAccount, CreateStaffAccountInput>({
-      query: (input) => ({
-        url: root,
-        method: 'POST',
-        body: {
-          email: input.email.trim(),
-          fullName: input.fullName.trim(),
-          role: input.role,
-          password: input.password,
-          phoneNumber: toPhoneBody(input.phoneNumber),
-        } satisfies CreateStaffAccountBody,
-      }),
-      transformResponse: mapStaffAccount,
+      queryFn: (input, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/admin/users', {
+            body: {
+              email: input.email.trim(),
+              fullName: input.fullName.trim(),
+              role: input.role,
+              password: input.password,
+              phoneNumber: toPhoneBody(input.phoneNumber),
+            } satisfies CreateStaffAccountBody,
+            signal,
+          }),
+          mapStaffAccount,
+        ),
       invalidatesTags: ['StaffAccount'],
     }),
     updateStaffDetails: build.mutation<void, { userId: number; details: StaffDetailsInput }>({
-      query: ({ userId, details }) => ({
-        url: userUrl(userId, 'details'),
-        method: 'PUT',
-        body: {
-          fullName: details.fullName.trim(),
-          email: details.email.trim(),
-          phoneNumber: toPhoneBody(details.phoneNumber),
-        } satisfies UpdateStaffDetailsBody,
-      }),
+      queryFn: ({ userId, details }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/admin/users/{userId}/details', {
+            params: { path: { userId: userId } },
+            body: {
+              fullName: details.fullName.trim(),
+              email: details.email.trim(),
+              phoneNumber: toPhoneBody(details.phoneNumber),
+            } satisfies UpdateStaffDetailsBody,
+            signal,
+          }),
+        ),
       // The signed-in admin may edit their own row, which their profile also shows.
       invalidatesTags: ['StaffAccount', 'StaffProfile'],
     }),
     changeStaffRole: build.mutation<void, { userId: number; role: StaffRole }>({
-      query: ({ userId, role }) => ({
-        url: userUrl(userId, 'role'),
-        method: 'PUT',
-        body: { role },
-      }),
+      queryFn: ({ userId, role }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/admin/users/{userId}/role', {
+            params: { path: { userId: userId } },
+            body: { role },
+            signal,
+          }),
+        ),
       invalidatesTags: ['StaffAccount'],
     }),
     setStaffBlocked: build.mutation<void, { userId: number; blocked: boolean }>({
-      query: ({ userId, blocked }) => ({
-        url: userUrl(userId, 'blocked'),
-        method: 'PUT',
-        body: { blocked },
-      }),
+      queryFn: ({ userId, blocked }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/admin/users/{userId}/blocked', {
+            params: { path: { userId: userId } },
+            body: { blocked },
+            signal,
+          }),
+        ),
       invalidatesTags: ['StaffAccount'],
     }),
     setStaffPassword: build.mutation<void, { userId: number; password: string }>({
-      query: ({ userId, password }) => ({
-        url: userUrl(userId, 'password'),
-        method: 'PUT',
-        body: { password },
-      }),
+      queryFn: ({ userId, password }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/admin/users/{userId}/password', {
+            params: { path: { userId: userId } },
+            body: { password },
+            signal,
+          }),
+        ),
     }),
     deleteStaffAccount: build.mutation<void, number>({
-      query: (userId) => ({ url: `${root}/${userId}`, method: 'DELETE' }),
+      queryFn: (userId, { signal }) =>
+        apiCall(
+          apiClient.DELETE('/api/admin/users/{userId}', {
+            params: { path: { userId: userId } },
+            signal,
+          }),
+        ),
       invalidatesTags: ['StaffAccount'],
     }),
   }),

@@ -1,3 +1,5 @@
+import { apiCall, apiClient, formDataBody } from '@admin/shared/api-client';
+
 import {
   bankStatementsTag,
   bankStatementTag,
@@ -21,16 +23,16 @@ import type {
   BankStatementLineBody,
 } from '@admin/accounting/model';
 
-const statements = '/api/accounting/statements';
-const one = (id: string) => `${statements}/${encodeURIComponent(id)}`;
-
 export function bankStatementEndpoints(build: AccountingEndpointBuilder) {
   return {
     /** «Історія виписок»: the last 100 uploads of every account. */
     getBankStatements: build.query<BankStatement[], void>({
-      query: () => statements,
-      transformResponse: mapBankStatements,
-      transformErrorResponse: accountingApiError,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/accounting/statements', { signal }),
+          mapBankStatements,
+          accountingApiError,
+        ),
       providesTags: [bankStatementsTag],
     }),
     /** A statement with one page of its lines; `state` filters the lines. */
@@ -38,45 +40,59 @@ export function bankStatementEndpoints(build: AccountingEndpointBuilder) {
       BankStatementDetails,
       { id: string; state: BankLineState | null; page: number }
     >({
-      query: ({ id, state, page }) => ({
-        url: one(id),
-        params: state ? { state, page } : { page },
-      }),
-      transformResponse: mapBankStatementDetails,
-      transformErrorResponse: accountingApiError,
+      queryFn: ({ id, state, page }, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/accounting/statements/{id}', {
+            params: { path: { id: id }, query: state ? { state, page } : { page } },
+            signal,
+          }),
+          mapBankStatementDetails,
+          accountingApiError,
+        ),
       providesTags: (_, __, { id }) => [bankStatementTag(id)],
     }),
     /** «Завантажити виписку»: reads the file into a preview; nothing reaches the books yet. */
     uploadBankStatement: build.mutation<BankStatement, { accountId: string; file: File }>({
-      query: ({ accountId, file }) => {
-        const body = new FormData();
-        body.append('accountId', accountId);
-        body.append('file', file, file.name);
-        return { url: statements, method: 'POST', body };
-      },
-      transformResponse: mapBankStatement,
-      transformErrorResponse: accountingApiError,
+      queryFn: ({ accountId, file }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/accounting/statements', {
+            ...formDataBody({ accountId, file }),
+            signal,
+          }),
+          mapBankStatement,
+          accountingApiError,
+        ),
       invalidatesTags: (_, error) => (error ? [] : [bankStatementsTag]),
     }),
     updateBankStatementLine: build.mutation<
       BankStatementLine,
       { statementId: string; lineId: string; body: BankStatementLineBody }
     >({
-      query: ({ statementId, lineId, body }) => ({
-        url: `${one(statementId)}/lines/${encodeURIComponent(lineId)}`,
-        method: 'PUT',
-        body,
-      }),
-      transformResponse: mapBankStatementLine,
-      transformErrorResponse: accountingApiError,
+      queryFn: ({ statementId, lineId, body }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/accounting/statements/{id}/lines/{lineId}', {
+            params: { path: { id: statementId, lineId: lineId } },
+            body: body,
+            signal,
+          }),
+          mapBankStatementLine,
+          accountingApiError,
+        ),
       invalidatesTags: (_, error, { statementId }) =>
         error ? [] : [bankStatementTag(statementId)],
     }),
     /** «Провести виписку»: operations, transfers and new finance counterparties in one save. */
     bookBankStatement: build.mutation<BankStatement, { id: string; version: number }>({
-      query: ({ id, version }) => ({ url: `${one(id)}/book`, method: 'POST', body: { version } }),
-      transformResponse: mapBankStatement,
-      transformErrorResponse: accountingApiError,
+      queryFn: ({ id, version }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/accounting/statements/{id}/book', {
+            params: { path: { id: id } },
+            body: { version },
+            signal,
+          }),
+          mapBankStatement,
+          accountingApiError,
+        ),
       invalidatesTags: (_, error, { id }) =>
         error
           ? [bankStatementTag(id)]
@@ -89,13 +105,16 @@ export function bankStatementEndpoints(build: AccountingEndpointBuilder) {
     }),
     /** «Відкотити виписку»: cancels what the statement booked; it becomes a preview again. */
     rollbackBankStatement: build.mutation<BankStatement, { id: string; version: number }>({
-      query: ({ id, version }) => ({
-        url: `${one(id)}/rollback`,
-        method: 'POST',
-        body: { version },
-      }),
-      transformResponse: mapBankStatement,
-      transformErrorResponse: accountingApiError,
+      queryFn: ({ id, version }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/accounting/statements/{id}/rollback', {
+            params: { path: { id: id } },
+            body: { version },
+            signal,
+          }),
+          mapBankStatement,
+          accountingApiError,
+        ),
       invalidatesTags: (_, error, { id }) =>
         error
           ? [bankStatementTag(id)]

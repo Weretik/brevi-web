@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import { sitePageApiError } from '../../errors/site/site-page-api-error';
 import { mapSitePage, mapSitePages } from '../../mappers/site-pages/site-page.mapper';
 
@@ -12,19 +14,25 @@ const tag = { type: 'SitePages' as const, id: 'LIST' };
 export function sitePageEndpoints(build: ContentEndpointBuilder) {
   return {
     getSitePages: build.query<SitePage[], void>({
-      query: () => ({ url: '/api/content/site-pages' }),
-      transformResponse: mapSitePages,
-      transformErrorResponse: sitePageApiError,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/content/site-pages', { signal }),
+          mapSitePages,
+          sitePageApiError,
+        ),
       providesTags: [tag],
     }),
     saveSitePage: build.mutation<SitePage, SitePageInput>({
-      query: ({ key, revision, texts }) => ({
-        url: `/api/content/site-pages/${encodeURIComponent(key)}`,
-        method: 'PUT',
-        body: { revision, uk: texts.uk, ru: texts.ru } satisfies SaveBody,
-      }),
-      transformResponse: mapSitePage,
-      transformErrorResponse: sitePageApiError,
+      queryFn: ({ key, revision, texts }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/content/site-pages/{key}', {
+            params: { path: { key: key } },
+            body: { revision, uk: texts.uk, ru: texts.ru } satisfies SaveBody,
+            signal,
+          }),
+          mapSitePage,
+          sitePageApiError,
+        ),
       // A stale revision means someone else saved: reload either way.
       invalidatesTags: [tag],
     }),

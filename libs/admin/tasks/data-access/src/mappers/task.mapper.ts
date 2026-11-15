@@ -3,20 +3,23 @@ import type {
   TaskAssignee,
   TaskDetail,
   TaskEvent,
+  TaskEventKind,
+  TaskLane,
   TaskLoad,
   TaskOverview,
   TaskPage,
+  TaskStatus,
   TaskSummary,
 } from '@admin/tasks/model';
 
 type Schemas = components['schemas'];
 
-export const mapTaskSummary = (value: Schemas['CrmTaskSummary']): TaskSummary => ({
+export const mapTaskSummary = (value: Schemas['TaskSummaryResponse']): TaskSummary => ({
   id: value.id,
   number: value.number,
   title: value.title,
-  status: value.status,
-  lane: value.lane,
+  status: value.status as TaskStatus,
+  lane: value.lane as TaskLane,
   isUrgent: value.isUrgent,
   isOverdue: value.isOverdue,
   dueAt: value.dueAt,
@@ -30,22 +33,22 @@ export const mapTaskSummary = (value: Schemas['CrmTaskSummary']): TaskSummary =>
   createdAt: value.createdAt,
 });
 
-export const mapTaskPage = (value: Schemas['CrmTaskPage']): TaskPage => ({
+export const mapTaskPage = (value: Schemas['TaskPageResponse']): TaskPage => ({
   items: value.items.map(mapTaskSummary),
   total: value.total,
 });
 
-export const mapTaskBoard = (value: Schemas['CrmTaskBoard']): readonly TaskSummary[] =>
+export const mapTaskBoard = (value: Schemas['TaskBoardResponse']): readonly TaskSummary[] =>
   value.items.map(mapTaskSummary);
 
-const event = (value: Schemas['CrmTaskEvent']): TaskEvent => ({
-  kind: value.kind,
+const event = (value: Schemas['TaskEventResponse']): TaskEvent => ({
+  kind: value.kind as TaskEventKind,
   by: { userId: value.by.userId, name: value.by.name },
   at: value.at,
   details: value.details ?? null,
 });
 
-export const mapTaskDetail = (value: Schemas['CrmTask']): TaskDetail => ({
+export const mapTaskDetail = (value: Schemas['TaskDetailResponse']): TaskDetail => ({
   ...mapTaskSummary({
     ...value,
     stepsTotal: value.steps.length,
@@ -62,9 +65,9 @@ export const mapTaskDetail = (value: Schemas['CrmTask']): TaskDetail => ({
   createdAt: value.createdAt,
 });
 
-const load = (value: Schemas['CrmTaskLoad']): TaskLoad => ({ ...value });
+const load = (value: Schemas['TaskLoadResponse']): TaskLoad => ({ ...value });
 
-export const mapTaskOverview = (value: Schemas['CrmTaskOverview']): TaskOverview => ({
+export const mapTaskOverview = (value: Schemas['TaskOverviewResponse']): TaskOverview => ({
   open: value.open,
   overdue: value.overdue,
   urgent: value.urgent,
@@ -76,5 +79,7 @@ export const mapTaskOverview = (value: Schemas['CrmTaskOverview']): TaskOverview
   load: value.load.map(load),
 });
 
-export const mapTaskAssignees = (value: Schemas['CrmTaskAssignee'][]): readonly TaskAssignee[] =>
+export const mapTaskAssignees = (
+  value: Schemas['TaskAssigneeResponse'][],
+): readonly TaskAssignee[] =>
   value.map((x) => ({ userId: x.userId, name: x.name, email: x.email ?? null }));

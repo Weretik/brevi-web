@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import { toQuoteApiError } from '../../errors/quote-api-error';
 import { mapQuoteSettings, toSaveQuoteSettingsInput } from '../../mappers/quote-settings.mapper';
 import { quotesBaseApi } from '../base/quotes-base-api';
@@ -17,19 +19,20 @@ const errors = (response: unknown) => toQuoteApiError(response, settingsErrors);
 export const quoteSettingsApi = quotesBaseApi.injectEndpoints({
   endpoints: (build) => ({
     getQuoteSettings: build.query<QuoteSettings, void>({
-      query: () => '/api/crm/quote-settings',
-      transformResponse: mapQuoteSettings,
-      transformErrorResponse: errors,
+      queryFn: (_arg, { signal }) =>
+        apiCall(apiClient.GET('/api/crm/quote-settings', { signal }), mapQuoteSettings, errors),
       providesTags: tag,
     }),
     saveQuoteSettings: build.mutation<QuoteSettings, QuoteSettingsDraft>({
-      query: (draft) => ({
-        url: '/api/crm/quote-settings',
-        method: 'PUT',
-        body: toSaveQuoteSettingsInput(draft),
-      }),
-      transformResponse: mapQuoteSettings,
-      transformErrorResponse: errors,
+      queryFn: (draft, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/crm/quote-settings', {
+            body: toSaveQuoteSettingsInput(draft),
+            signal,
+          }),
+          mapQuoteSettings,
+          errors,
+        ),
       async onQueryStarted(_draft, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;

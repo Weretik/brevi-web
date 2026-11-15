@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import { siteGalleryApiError } from '../../errors/site/site-gallery-api-error';
 import {
   mapSiteGallery,
@@ -21,26 +23,39 @@ const tag = (kind: SiteGalleryKind) => ({ type: 'SiteGallery' as const, id: kind
 export function siteGalleryEndpoints(build: ContentEndpointBuilder) {
   return {
     getSiteGallery: build.query<SiteGallery, SiteGalleryKind>({
-      query: (kind) => ({ url: `/api/content/${kind}` }),
-      transformResponse: mapSiteGallery,
-      transformErrorResponse: siteGalleryApiError,
+      queryFn: (kind, { signal }) =>
+        apiCall(
+          kind === 'works'
+            ? apiClient.GET('/api/content/works', { signal })
+            : apiClient.GET('/api/content/certificates', { signal }),
+          mapSiteGallery,
+          siteGalleryApiError,
+        ),
       providesTags: (_result, _error, kind) => [tag(kind)],
     }),
     saveSiteGallery: build.mutation<SiteGallery, SiteGalleryInput>({
-      query: ({ kind, revision, items }) => ({
-        url: `/api/content/${kind}`,
-        method: 'PUT',
-        body: { revision, items } satisfies SaveBody,
-      }),
-      transformResponse: mapSiteGallery,
-      transformErrorResponse: siteGalleryApiError,
+      queryFn: ({ kind, revision, items }, { signal }) => {
+        const body = { revision, items } satisfies SaveBody;
+        return apiCall(
+          kind === 'works'
+            ? apiClient.PUT('/api/content/works', { body, signal })
+            : apiClient.PUT('/api/content/certificates', { body, signal }),
+          mapSiteGallery,
+          siteGalleryApiError,
+        );
+      },
       // A stale revision means someone else saved: reload either way.
       invalidatesTags: (_result, _error, input) => [tag(input.kind)],
     }),
     transferSiteGallery: build.mutation<SiteGalleryTransfer, SiteGalleryKind>({
-      query: (kind) => ({ url: `/api/content/${kind}/transfer`, method: 'POST' }),
-      transformResponse: mapSiteGalleryTransfer,
-      transformErrorResponse: siteGalleryApiError,
+      queryFn: (kind, { signal }) =>
+        apiCall(
+          kind === 'works'
+            ? apiClient.POST('/api/content/works/transfer', { signal })
+            : apiClient.POST('/api/content/certificates/transfer', { signal }),
+          mapSiteGalleryTransfer,
+          siteGalleryApiError,
+        ),
       invalidatesTags: (_result, _error, kind) => [tag(kind)],
     }),
   };

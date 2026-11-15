@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import { warehouseBaseApi } from './warehouse-base-api';
 import { warehouseApiError } from '../errors/warehouse-api-error';
 import {
@@ -25,30 +27,42 @@ const filterParams = (filter: PlanFactFilter) =>
 export const stockReportsApi = warehouseBaseApi.injectEndpoints({
   endpoints: (build) => ({
     getFabricPlanFact: build.query<PlanFactReport, PlanFactFilter>({
-      query: (filter) => ({
-        url: '/api/warehouse/reports/plan-fact',
-        params: filterParams(filter),
-      }),
-      transformResponse: mapPlanFact,
-      transformErrorResponse: warehouseApiError,
+      queryFn: (filter, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/warehouse/reports/plan-fact', {
+            params: { query: filterParams(filter) },
+            signal,
+          }),
+          mapPlanFact,
+          warehouseApiError,
+        ),
       providesTags: reportTags,
     }),
     getFabricBooking: build.query<BookingReport, void>({
-      query: () => '/api/warehouse/reports/booking',
-      transformResponse: mapBooking,
-      transformErrorResponse: warehouseApiError,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/warehouse/reports/booking', { signal }),
+          mapBooking,
+          warehouseApiError,
+        ),
       providesTags: reportTags,
     }),
     getFabricValuation: build.query<ValuationReport, void>({
-      query: () => '/api/warehouse/reports/valuation',
-      transformResponse: mapValuation,
-      transformErrorResponse: warehouseApiError,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/warehouse/reports/valuation', { signal }),
+          mapValuation,
+          warehouseApiError,
+        ),
       providesTags: reportTags,
     }),
     getHardwareOrder: build.query<HardwareReport, void>({
-      query: () => '/api/warehouse/reports/hardware',
-      transformResponse: mapHardware,
-      transformErrorResponse: warehouseApiError,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/warehouse/reports/hardware', { signal }),
+          mapHardware,
+          warehouseApiError,
+        ),
       providesTags: [{ type: 'ProductionOrder' as const }],
     }),
   }),

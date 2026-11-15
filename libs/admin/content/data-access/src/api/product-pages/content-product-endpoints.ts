@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import { contentProductTag, contentProductsTag } from '../../cache/content-product-tags';
 import { contentApiError } from '../../errors/site/content-api-error';
 import {
@@ -30,35 +32,49 @@ type ImportBody =
 export function contentProductEndpoints(build: ContentEndpointBuilder) {
   return {
     getContentProducts: build.query<ContentProductPage, ContentProductQuery>({
-      query: ({ page, pageSize, search, type, site, category }) => ({
-        url: '/api/content/products',
-        params: {
-          page,
-          pageSize,
-          search: search || undefined,
-          type: type ?? undefined,
-          onSite: site === 'all' ? undefined : site === 'onSite',
-          categoryId: category ?? undefined,
-        },
-      }),
-      transformResponse: mapContentProductPage,
-      transformErrorResponse: contentApiError,
+      queryFn: ({ page, pageSize, search, type, site, category }, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/content/products', {
+            params: {
+              query: {
+                page,
+                pageSize,
+                search: search || undefined,
+                type: type ?? undefined,
+                onSite: site === 'all' ? undefined : site === 'onSite',
+                categoryId: category ?? undefined,
+              },
+            },
+            signal,
+          }),
+          mapContentProductPage,
+          contentApiError,
+        ),
       providesTags: [contentProductsTag],
     }),
     getContentProduct: build.query<ContentProduct, number>({
-      query: (productId) => ({ url: `/api/content/products/${productId}` }),
-      transformResponse: mapContentProduct,
-      transformErrorResponse: contentApiError,
+      queryFn: (productId, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/content/products/{productId}', {
+            params: { path: { productId: productId } },
+            signal,
+          }),
+          mapContentProduct,
+          contentApiError,
+        ),
       providesTags: (_result, _error, productId) => [contentProductTag(productId)],
     }),
     saveContentProduct: build.mutation<ContentProduct, ContentProductInput>({
-      query: ({ productId, ...input }) => ({
-        url: `/api/content/products/${productId}`,
-        method: 'PUT',
-        body: input satisfies SaveBody,
-      }),
-      transformResponse: mapContentProduct,
-      transformErrorResponse: contentApiError,
+      queryFn: ({ productId, ...input }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/content/products/{productId}', {
+            params: { path: { productId: productId } },
+            body: input satisfies SaveBody,
+            signal,
+          }),
+          mapContentProduct,
+          contentApiError,
+        ),
       // A stale revision means someone else saved: reload either way. Categories count their products.
       invalidatesTags: (_result, _error, { productId }) => [
         contentProductsTag,
@@ -70,21 +86,31 @@ export function contentProductEndpoints(build: ContentEndpointBuilder) {
       ContentProductVisibility,
       { productId: number; showOnSite: boolean }
     >({
-      query: ({ productId, showOnSite }) => ({
-        url: `/api/content/products/${productId}/visibility`,
-        method: 'PATCH',
-        body: { showOnSite } satisfies VisibilityBody,
-      }),
-      transformResponse: mapContentProductVisibility,
-      transformErrorResponse: contentApiError,
+      queryFn: ({ productId, showOnSite }, { signal }) =>
+        apiCall(
+          apiClient.PATCH('/api/content/products/{productId}/visibility', {
+            params: { path: { productId: productId } },
+            body: { showOnSite } satisfies VisibilityBody,
+            signal,
+          }),
+          mapContentProductVisibility,
+          contentApiError,
+        ),
       invalidatesTags: (_result, _error, { productId }) => [
         contentProductsTag,
         contentProductTag(productId),
       ],
     }),
     deleteContentProduct: build.mutation<void, number>({
-      query: (productId) => ({ url: `/api/content/products/${productId}`, method: 'DELETE' }),
-      transformErrorResponse: contentApiError,
+      queryFn: (productId, { signal }) =>
+        apiCall(
+          apiClient.DELETE('/api/content/products/{productId}', {
+            params: { path: { productId: productId } },
+            signal,
+          }),
+          undefined,
+          contentApiError,
+        ),
       invalidatesTags: (_result, _error, productId) => [
         contentProductsTag,
         contentProductTag(productId),
@@ -95,14 +121,15 @@ export function contentProductEndpoints(build: ContentEndpointBuilder) {
       OldSiteImportReport,
       OldSiteImportOptions & { items: OldSiteImportItems; dryRun: boolean }
     >({
-      query: ({ items, dryRun, showOnSite, overwrite }) => ({
-        url: '/api/content/products/old-site-import',
-        method: 'POST',
-        // The file is passed as it is; the server checks every page.
-        body: { items: items as unknown as ImportBody['items'], dryRun, showOnSite, overwrite },
-      }),
-      transformResponse: mapOldSiteImportReport,
-      transformErrorResponse: contentApiError,
+      queryFn: ({ items, dryRun, showOnSite, overwrite }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/content/products/old-site-import', {
+            body: { items: items as unknown as ImportBody['items'], dryRun, showOnSite, overwrite },
+            signal,
+          }),
+          mapOldSiteImportReport,
+          contentApiError,
+        ),
       // A transfer changes many pages: reload the list and every opened page.
       invalidatesTags: (report) => (report && !report.dryRun ? ['ContentProduct'] : []),
     }),

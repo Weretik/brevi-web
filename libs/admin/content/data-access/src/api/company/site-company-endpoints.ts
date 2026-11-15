@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import { siteCompanyApiError } from '../../errors/site/site-company-api-error';
 import { mapSiteCompany } from '../../mappers/company/site-company.mapper';
 
@@ -12,19 +14,21 @@ const tag = { type: 'SiteCompany' as const, id: 'ONE' };
 export function siteCompanyEndpoints(build: ContentEndpointBuilder) {
   return {
     getSiteCompany: build.query<SiteCompany, void>({
-      query: () => ({ url: '/api/content/company' }),
-      transformResponse: mapSiteCompany,
-      transformErrorResponse: siteCompanyApiError,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/content/company', { signal }),
+          mapSiteCompany,
+          siteCompanyApiError,
+        ),
       providesTags: [tag],
     }),
     saveSiteCompany: build.mutation<SiteCompany, SiteCompanyInput>({
-      query: (input) => ({
-        url: '/api/content/company',
-        method: 'PUT',
-        body: input satisfies SaveBody,
-      }),
-      transformResponse: mapSiteCompany,
-      transformErrorResponse: siteCompanyApiError,
+      queryFn: (input, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/content/company', { body: input satisfies SaveBody, signal }),
+          mapSiteCompany,
+          siteCompanyApiError,
+        ),
       // A stale revision means someone else saved: reload either way.
       invalidatesTags: [tag],
     }),

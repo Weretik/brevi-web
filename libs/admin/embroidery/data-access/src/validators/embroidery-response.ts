@@ -15,12 +15,14 @@ function check(value: unknown, arrays: readonly string[], numbers: readonly stri
 }
 
 /** The shape checks the page relies on before mapping; the generated types do not check at run time. */
-export function ensureEmbroideryForm(value: unknown): Schemas['CrmEmbroideryForm'] {
+export function ensureEmbroideryForm(value: unknown): Schemas['EmbroideryFormResponse'] {
   check(value, ['hoops', 'expenses', 'markupNames'], []);
-  return value as Schemas['CrmEmbroideryForm'];
+  return value as Schemas['EmbroideryFormResponse'];
 }
 
-export function ensureEmbroideryCalculation(value: unknown): Schemas['CrmEmbroideryCalculation'] {
+export function ensureEmbroideryCalculation(
+  value: unknown,
+): Schemas['EmbroideryCalculationResponse'] {
   check(
     value,
     ['missing', 'prices'],
@@ -33,10 +35,10 @@ export function ensureEmbroideryCalculation(value: unknown): Schemas['CrmEmbroid
     )
   )
     throw invalid();
-  return value as Schemas['CrmEmbroideryCalculation'];
+  return value as Schemas['EmbroideryCalculationResponse'];
 }
 
-export function ensureEmbroiderySettings(value: unknown): Schemas['CrmEmbroiderySettings'] {
+export function ensureEmbroiderySettings(value: unknown): Schemas['EmbroiderySettingsResponse'] {
   check(value, ['markups', 'hoops', 'expenses'], ['version', 'fabricIncreasePercent']);
   const settings = value as Record<string, unknown>;
   if (
@@ -45,10 +47,10 @@ export function ensureEmbroiderySettings(value: unknown): Schemas['CrmEmbroidery
     !isRecord(settings['fabric'])
   )
     throw invalid();
-  return value as Schemas['CrmEmbroiderySettings'];
+  return value as Schemas['EmbroiderySettingsResponse'];
 }
 
-export function ensureEmbroiderySavedPage(value: unknown): Schemas['CrmEmbroiderySavedPage'] {
+export function ensureEmbroiderySavedPage(value: unknown): Schemas['EmbroiderySavedPageResponse'] {
   check(value, ['items'], ['page', 'pageSize', 'total']);
   const items = (value as { items: unknown[] }).items;
   if (
@@ -60,13 +62,13 @@ export function ensureEmbroiderySavedPage(value: unknown): Schemas['CrmEmbroider
     )
   )
     throw invalid();
-  return value as Schemas['CrmEmbroiderySavedPage'];
+  return value as Schemas['EmbroiderySavedPageResponse'];
 }
 
 export function ensureEmbroiderySavedCalculation(
   value: unknown,
-): Schemas['CrmEmbroiderySavedCalculation'] {
+): Schemas['EmbroiderySavedCalculationResponse'] {
   if (!isRecord(value) || !isRecord(value['summary']) || !isRecord(value['input'])) throw invalid();
   ensureEmbroideryCalculation(value['result']);
-  return value as Schemas['CrmEmbroiderySavedCalculation'];
+  return value as Schemas['EmbroiderySavedCalculationResponse'];
 }

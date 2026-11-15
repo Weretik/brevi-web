@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import { fabricNormErrors, toProductionApiError } from '../../errors/production-api-error';
 import { mapFabricNormRow, mapFabricNormRows } from '../../mappers/norms/fabric-norm.mapper';
 import { mapModelCompositions } from '../../mappers/norms/model-composition.mapper';
@@ -23,47 +25,62 @@ const errors = (response: unknown) => toProductionApiError(response, fabricNormE
 export const fabricNormsApi = productionBaseApi.injectEndpoints({
   endpoints: (build) => ({
     getFabricNorms: build.query<FabricNormRow[], void>({
-      query: () => '/api/production/fabric-norms',
-      transformResponse: mapFabricNormRows,
-      transformErrorResponse: errors,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/production/fabric-norms', { signal }),
+          mapFabricNormRows,
+          errors,
+        ),
       providesTags: normList,
     }),
     /** Read from «Товари»; changes there show after a reload of the tab. */
     getModelCompositions: build.query<ModelComposition[], void>({
-      query: () => '/api/production/fabric-norms/compositions',
-      transformResponse: mapModelCompositions,
-      transformErrorResponse: errors,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/production/fabric-norms/compositions', { signal }),
+          mapModelCompositions,
+          errors,
+        ),
     }),
     saveFabricNorm: build.mutation<FabricNormRow, { modelCode: string; norm: FabricNormValues }>({
-      query: ({ modelCode, norm }) => ({
-        url: `/api/production/fabric-norms/${encodeURIComponent(modelCode)}`,
-        method: 'PUT',
-        body: toInput(norm),
-      }),
-      transformResponse: mapFabricNormRow,
-      transformErrorResponse: errors,
+      queryFn: ({ modelCode, norm }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/production/fabric-norms/{modelCode}', {
+            params: { path: { modelCode: modelCode } },
+            body: toInput(norm),
+            signal,
+          }),
+          mapFabricNormRow,
+          errors,
+        ),
       invalidatesTags: (_result, error) => (error ? [] : normList),
     }),
     deleteFabricNorm: build.mutation<void, string>({
-      query: (modelCode) => ({
-        url: `/api/production/fabric-norms/${encodeURIComponent(modelCode)}`,
-        method: 'DELETE',
-      }),
-      transformErrorResponse: errors,
+      queryFn: (modelCode, { signal }) =>
+        apiCall(
+          apiClient.DELETE('/api/production/fabric-norms/{modelCode}', {
+            params: { path: { modelCode: modelCode } },
+            signal,
+          }),
+          undefined,
+          errors,
+        ),
       invalidatesTags: (_result, error) => (error ? [] : normList),
     }),
     importFabricNorms: build.mutation<
       ProductionImportResult,
       { rows: FabricNormImportRow[]; dryRun: boolean }
     >({
-      query: ({ rows, dryRun }) => ({
-        url: '/api/production/fabric-norms/import',
-        method: 'POST',
-        params: { dryRun },
-        body: rows.map((row) => ({ modelCode: row.modelCode, norm: toInput(row.norm) })),
-      }),
-      transformResponse: mapFabricNormImportResult,
-      transformErrorResponse: errors,
+      queryFn: ({ rows, dryRun }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/production/fabric-norms/import', {
+            params: { query: { dryRun } },
+            body: rows.map((row) => ({ modelCode: row.modelCode, norm: toInput(row.norm) })),
+            signal,
+          }),
+          mapFabricNormImportResult,
+          errors,
+        ),
       invalidatesTags: (result, error) =>
         error || !result || result.dryRun || result.errors > 0 ? [] : normList,
     }),

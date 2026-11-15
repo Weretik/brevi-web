@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import { mapSiteRequestPage } from './site-request.mapper';
 
+type PageResponse = Parameters<typeof mapSiteRequestPage>[0];
+
 describe('mapSiteRequestPage', () => {
   it('turns missing optional fields into null', () => {
     const page = mapSiteRequestPage({
@@ -19,7 +21,7 @@ describe('mapSiteRequestPage', () => {
       page: 1,
       pageSize: 50,
       counts: { new: 1, inWork: 0, mine: 0, closed: 0 },
-    });
+    } as PageResponse);
 
     expect(page.items[0]).toMatchObject({
       id: 5,

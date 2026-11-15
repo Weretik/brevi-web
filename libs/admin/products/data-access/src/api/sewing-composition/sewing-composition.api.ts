@@ -1,4 +1,4 @@
-import { adminApi } from '@admin/shared/api-client';
+import { adminApi, apiCall, apiClient } from '@admin/shared/api-client';
 
 import { sewingCompositionTag } from './sewing-composition.cache';
 import { sewingCompositionError } from './sewing-composition.errors';
@@ -11,20 +11,28 @@ import type { SewingCompositionDraft, SewingCompositionView } from '@admin/produ
 export const sewingCompositionApi = adminApi.injectEndpoints({
   endpoints: (build) => ({
     getSewingComposition: build.query<SewingCompositionView, SewingCompositionQuery>({
-      query: ({ productId, articleId }) =>
-        `/api/v1/products/${productId}/composition${articleId === null ? '' : `?articleId=${articleId}`}`,
-      transformResponse: mapSewingComposition,
-      transformErrorResponse: sewingCompositionError,
+      queryFn: ({ productId, articleId }, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/v1/products/{productId}/composition', {
+            params: { path: { productId }, query: articleId === null ? {} : { articleId } },
+            signal,
+          }),
+          mapSewingComposition,
+          sewingCompositionError,
+        ),
       providesTags: (_result, _error, { productId }) => [sewingCompositionTag(productId)],
     }),
     replaceSewingComposition: build.mutation<SewingCompositionView, SewingCompositionDraft>({
-      query: (draft) => ({
-        url: `/api/v1/products/${draft.productId}/composition`,
-        method: 'PUT',
-        body: mapReplaceSewingCompositionRequest(draft),
-      }),
-      transformResponse: mapSewingComposition,
-      transformErrorResponse: sewingCompositionError,
+      queryFn: (draft, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/v1/products/{productId}/composition', {
+            params: { path: { productId: draft.productId } },
+            body: mapReplaceSewingCompositionRequest(draft),
+            signal,
+          }),
+          mapSewingComposition,
+          sewingCompositionError,
+        ),
       invalidatesTags: (_result, error, { productId }) =>
         error
           ? []

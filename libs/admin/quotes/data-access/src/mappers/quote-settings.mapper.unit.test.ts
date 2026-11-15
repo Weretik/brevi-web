@@ -5,7 +5,10 @@ import { mapQuoteSettings, toSaveQuoteSettingsInput } from './quote-settings.map
 
 import type { components } from '@admin/shared/contracts';
 
-const response: components['schemas']['CrmQuoteSettings'] = {
+type Settings = components['schemas']['QuoteSettingsResponse'];
+
+// A sparse body on purpose: the mapper must still fill every missing field.
+const response = {
   version: 3,
   company: { name: 'ПП «Бреві»', edrpou: '35521636', site: 'https://brevi.com.ua/' },
   email: { subject: 'КП № {quoteNumber}', body: 'Добрий день' },
@@ -13,7 +16,7 @@ const response: components['schemas']['CrmQuoteSettings'] = {
   introduction: { advantages: [{ title: 'Своє виробництво' }] },
   letterVariants: [{ name: 'Короткий', subject: 'КП', body: 'Текст' }],
   staffContacts: [{ userId: 7, accountName: 'Оля', name: 'Ольга', phone: '+380 50 000 00 00' }],
-};
+} as Settings;
 
 describe('quote settings mapper', () => {
   it('fills missing fields with null', () => {
@@ -31,7 +34,7 @@ describe('quote settings mapper', () => {
       mapQuoteSettings({
         ...response,
         pdf: { title: 'КП', intros: { sewing: 'Моделі' }, labels: { recommended: 'Радимо' } },
-      }),
+      } as Settings),
     );
     expect(draft.pdf.intros.sewing).toBe('Моделі');
     draft.pdf.labels.recommended = ' ';
@@ -45,7 +48,10 @@ describe('quote settings mapper', () => {
   it('shows the client block «Для» unless the settings turned it off', () => {
     expect(mapQuoteSettings(response).pdf.showClient).toBe(true);
     const draft = quoteSettingsToDraft(
-      mapQuoteSettings({ ...response, pdf: { title: 'КП', labels: { showClient: false } } }),
+      mapQuoteSettings({
+        ...response,
+        pdf: { title: 'КП', labels: { showClient: false } },
+      } as Settings),
     );
     expect(draft.pdf.showClient).toBe(false);
     draft.pdf.labels.clientTitle = 'Замовник';

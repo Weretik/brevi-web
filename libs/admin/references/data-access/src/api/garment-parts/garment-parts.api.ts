@@ -1,4 +1,4 @@
-import { adminApi, toAdminApiError } from '@admin/shared/api-client';
+import { adminApi, apiCall, apiClient, toAdminApiError } from '@admin/shared/api-client';
 
 import { referenceErrorMessages } from '../../errors/reference-error-messages';
 import { mapGarmentParts } from '../../mappers/garment-parts/garment-parts.mapper';
@@ -11,22 +11,37 @@ type UpdatePartBody = operations['updateGarmentPart']['requestBody']['content'][
 export const garmentPartsApi = adminApi.injectEndpoints({
   endpoints: (build) => ({
     listGarmentParts: build.query<ReturnType<typeof mapGarmentParts>, void>({
-      query: () => '/api/reference/garment-parts',
-      transformResponse: mapGarmentParts,
-      transformErrorResponse: (error) => toAdminApiError(error, referenceErrorMessages),
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/reference/garment-parts', { signal }),
+          mapGarmentParts,
+          (error) => toAdminApiError(error, referenceErrorMessages),
+        ),
       providesTags: (result) => [
         { type: 'GarmentPart', id: 'LIST' },
         ...(result?.map(({ id }) => ({ type: 'GarmentPart' as const, id })) ?? []),
       ],
     }),
     createGarmentPart: build.mutation<void, CreatePartBody>({
-      query: (body) => ({ url: '/api/reference/garment-parts', method: 'POST', body }),
-      transformErrorResponse: (error) => toAdminApiError(error, referenceErrorMessages),
+      queryFn: (body, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/reference/garment-parts', { body: body, signal }),
+          () => undefined,
+          (error) => toAdminApiError(error, referenceErrorMessages),
+        ),
       invalidatesTags: (_result, error) => (error ? [] : [{ type: 'GarmentPart', id: 'LIST' }]),
     }),
     updateGarmentPart: build.mutation<void, { id: number; body: UpdatePartBody }>({
-      query: ({ id, body }) => ({ url: `/api/reference/garment-parts/${id}`, method: 'PUT', body }),
-      transformErrorResponse: (error) => toAdminApiError(error, referenceErrorMessages),
+      queryFn: ({ id, body }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/reference/garment-parts/{id}', {
+            params: { path: { id: id } },
+            body: body,
+            signal,
+          }),
+          undefined,
+          (error) => toAdminApiError(error, referenceErrorMessages),
+        ),
       invalidatesTags: (_result, error, { id }) =>
         error
           ? []
@@ -36,8 +51,15 @@ export const garmentPartsApi = adminApi.injectEndpoints({
             ],
     }),
     deleteGarmentPart: build.mutation<void, number>({
-      query: (id) => ({ url: `/api/reference/garment-parts/${id}`, method: 'DELETE' }),
-      transformErrorResponse: (error) => toAdminApiError(error, referenceErrorMessages),
+      queryFn: (id, { signal }) =>
+        apiCall(
+          apiClient.DELETE('/api/reference/garment-parts/{id}', {
+            params: { path: { id: id } },
+            signal,
+          }),
+          undefined,
+          (error) => toAdminApiError(error, referenceErrorMessages),
+        ),
       invalidatesTags: (_result, error, id) =>
         error
           ? []

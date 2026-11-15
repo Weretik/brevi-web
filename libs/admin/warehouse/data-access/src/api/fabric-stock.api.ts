@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import { warehouseBaseApi } from './warehouse-base-api';
 import { warehouseApiError } from '../errors/warehouse-api-error';
 import {
@@ -72,129 +74,167 @@ const movementParams = (query: FabricMovementQuery) => ({
 export const fabricStockApi = warehouseBaseApi.injectEndpoints({
   endpoints: (build) => ({
     getFabricStock: build.query<FabricStockList, void>({
-      query: () => '/api/warehouse/fabric-stock',
-      transformResponse: mapFabricStockList,
-      transformErrorResponse: warehouseApiError,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/warehouse/fabric-stock', { signal }),
+          mapFabricStockList,
+          warehouseApiError,
+        ),
       providesTags: [{ type: 'FabricStock', id: 'LIST' }],
     }),
     getFabricStockChoices: build.query<FabricStockChoices, void>({
-      query: () => '/api/warehouse/fabric-stock/choices',
-      transformResponse: mapFabricStockChoices,
-      transformErrorResponse: warehouseApiError,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/warehouse/fabric-stock/choices', { signal }),
+          mapFabricStockChoices,
+          warehouseApiError,
+        ),
     }),
     getFabricMovements: build.query<FabricMovementPage, FabricMovementQuery>({
-      query: (query) => ({
-        url: '/api/warehouse/fabric-stock/movements',
-        params: movementParams(query),
-      }),
-      transformResponse: mapFabricMovementPage,
-      transformErrorResponse: warehouseApiError,
+      queryFn: (query, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/warehouse/fabric-stock/movements', {
+            params: { query: movementParams(query) },
+            signal,
+          }),
+          mapFabricMovementPage,
+          warehouseApiError,
+        ),
       providesTags: [{ type: 'FabricMovement', id: 'LIST' }],
     }),
     openFabricStock: build.mutation<FabricStockOperationResult, OpenFabricStockBody>({
-      query: (body) => ({
-        url: '/api/warehouse/fabric-stock/openings',
-        method: 'POST',
-        body: openingInput(body),
-      }),
-      transformResponse: mapFabricStockOperation,
-      transformErrorResponse: warehouseApiError,
+      queryFn: (body, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/warehouse/fabric-stock/openings', {
+            body: openingInput(body),
+            signal,
+          }),
+          mapFabricStockOperation,
+          warehouseApiError,
+        ),
       invalidatesTags: stockChanged,
     }),
     receiveFabric: build.mutation<FabricStockOperationResult, ReceiveFabricBody>({
-      query: (body) => ({
-        url: '/api/warehouse/fabric-stock/receipts',
-        method: 'POST',
-        body: receiptInput(body),
-      }),
-      transformResponse: mapFabricStockOperation,
-      transformErrorResponse: warehouseApiError,
+      queryFn: (body, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/warehouse/fabric-stock/receipts', {
+            body: receiptInput(body),
+            signal,
+          }),
+          mapFabricStockOperation,
+          warehouseApiError,
+        ),
       invalidatesTags: stockChanged,
     }),
     issueFabric: build.mutation<FabricStockOperationResult, IssueFabricBody>({
-      query: (body) => ({
-        url: '/api/warehouse/fabric-stock/issues',
-        method: 'POST',
-        body: issueInput(body),
-      }),
-      transformResponse: mapFabricStockOperation,
-      transformErrorResponse: warehouseApiError,
+      queryFn: (body, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/warehouse/fabric-stock/issues', { body: issueInput(body), signal }),
+          mapFabricStockOperation,
+          warehouseApiError,
+        ),
       invalidatesTags: stockChanged,
     }),
     adjustFabricStock: build.mutation<FabricStockOperationResult, AdjustFabricStockBody>({
-      query: (body) => ({
-        url: '/api/warehouse/fabric-stock/adjustments',
-        method: 'POST',
-        body: adjustmentInput(body),
-      }),
-      transformResponse: mapFabricStockOperation,
-      transformErrorResponse: warehouseApiError,
+      queryFn: (body, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/warehouse/fabric-stock/adjustments', {
+            body: adjustmentInput(body),
+            signal,
+          }),
+          mapFabricStockOperation,
+          warehouseApiError,
+        ),
       invalidatesTags: stockChanged,
     }),
     reverseFabricMovement: build.mutation<
       FabricStockOperationResult,
       { movementId: number; reason: string }
     >({
-      query: ({ movementId, reason }) => ({
-        url: `/api/warehouse/fabric-stock/movements/${movementId}/reverse`,
-        method: 'POST',
-        body: { reason } satisfies Schemas['ReverseFabricMovementInput'],
-      }),
-      transformResponse: mapFabricStockOperation,
-      transformErrorResponse: warehouseApiError,
+      queryFn: ({ movementId, reason }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/warehouse/fabric-stock/movements/{movementId}/reverse', {
+            params: { path: { movementId: movementId } },
+            body: { reason } satisfies Schemas['ReverseFabricMovementInput'],
+            signal,
+          }),
+          mapFabricStockOperation,
+          warehouseApiError,
+        ),
       invalidatesTags: stockChanged,
     }),
     editFabricMovement: build.mutation<
       FabricStockOperationResult,
       { movementId: number; body: EditFabricMovementBody }
     >({
-      query: ({ movementId, body }) => ({
-        url: `/api/warehouse/fabric-stock/movements/${movementId}`,
-        method: 'PUT',
-        body: editInput(body),
-      }),
-      transformResponse: mapFabricStockOperation,
-      transformErrorResponse: warehouseApiError,
+      queryFn: ({ movementId, body }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/warehouse/fabric-stock/movements/{movementId}', {
+            params: { path: { movementId: movementId } },
+            body: editInput(body),
+            signal,
+          }),
+          mapFabricStockOperation,
+          warehouseApiError,
+        ),
       invalidatesTags: movementRevised,
     }),
     voidFabricMovement: build.mutation<
       FabricStockOperationResult,
       { movementId: number; body: VoidFabricMovementBody }
     >({
-      query: ({ movementId, body }) => ({
-        url: `/api/warehouse/fabric-stock/movements/${movementId}/void`,
-        method: 'POST',
-        body: voidInput(body),
-      }),
-      transformResponse: mapFabricStockOperation,
-      transformErrorResponse: warehouseApiError,
+      queryFn: ({ movementId, body }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/warehouse/fabric-stock/movements/{movementId}/void', {
+            params: { path: { movementId: movementId } },
+            body: voidInput(body),
+            signal,
+          }),
+          mapFabricStockOperation,
+          warehouseApiError,
+        ),
       invalidatesTags: movementRevised,
     }),
     restoreFabricMovement: build.mutation<
       FabricStockOperationResult,
       { movementId: number; body: RestoreFabricMovementBody }
     >({
-      query: ({ movementId, body }) => ({
-        url: `/api/warehouse/fabric-stock/movements/${movementId}/restore`,
-        method: 'POST',
-        body: restoreInput(body),
-      }),
-      transformResponse: mapFabricStockOperation,
-      transformErrorResponse: warehouseApiError,
+      queryFn: ({ movementId, body }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/warehouse/fabric-stock/movements/{movementId}/restore', {
+            params: { path: { movementId: movementId } },
+            body: restoreInput(body),
+            signal,
+          }),
+          mapFabricStockOperation,
+          warehouseApiError,
+        ),
       invalidatesTags: movementRevised,
     }),
     getFabricMovementHistory: build.query<FabricMovementHistory, number>({
-      query: (movementId) => `/api/warehouse/fabric-stock/movements/${movementId}/revisions`,
-      transformResponse: mapFabricMovementHistory,
-      transformErrorResponse: warehouseApiError,
+      queryFn: (movementId, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/warehouse/fabric-stock/movements/{movementId}/revisions', {
+            params: { path: { movementId: movementId } },
+            signal,
+          }),
+          mapFabricMovementHistory,
+          warehouseApiError,
+        ),
       providesTags: (_result, _error, movementId) => [
         { type: 'FabricMovement', id: `HISTORY-${movementId}` },
       ],
     }),
     getFabricConsumption: build.query<FabricConsumption, { from: string; to: string }>({
-      query: (params) => ({ url: '/api/warehouse/fabric-stock/consumption', params }),
-      transformResponse: mapFabricConsumption,
-      transformErrorResponse: warehouseApiError,
+      queryFn: (params, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/warehouse/fabric-stock/consumption', {
+            params: { query: params },
+            signal,
+          }),
+          mapFabricConsumption,
+          warehouseApiError,
+        ),
       providesTags: [{ type: 'FabricMovement', id: 'CONSUMPTION' }],
     }),
   }),

@@ -1,6 +1,11 @@
 import { validateSewingCompositionResponse } from '../../validators/sewing-composition/validate-sewing-composition-response';
 
-import type { SewingCompositionView } from '@admin/products/model';
+import type {
+  SewingCompositionView,
+  SewingMaterialKind,
+  SewingMaterialScope,
+  SewingMaterialUnit,
+} from '@admin/products/model';
 
 export function mapSewingComposition(value: unknown): SewingCompositionView {
   const dto = validateSewingCompositionResponse(value);
@@ -9,7 +14,13 @@ export function mapSewingComposition(value: unknown): SewingCompositionView {
     articleId: dto.articleId,
     modelCode: dto.modelCode,
     version: dto.version,
-    materials: dto.materials.map((line) => ({ ...line, comment: line.comment ?? '' })),
+    materials: dto.materials.map((line) => ({
+      ...line,
+      scope: line.scope as SewingMaterialScope,
+      kind: line.kind as SewingMaterialKind,
+      unit: line.unit as SewingMaterialUnit,
+      comment: line.comment ?? '',
+    })),
     operations: dto.operations.map((line) => ({ ...line, comment: line.comment ?? '' })),
     blockers: [...dto.blockers],
   };

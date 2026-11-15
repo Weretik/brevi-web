@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { mapProductOverviewPage, productOverviewSearchParams } from './product-overview.mapper';
+import { mapProductOverviewPage, productOverviewQueryParams } from './product-overview.mapper';
 import {
   parseProductOverviewItem,
   parseProductOverviewPage,
@@ -62,7 +62,7 @@ describe('product overview response', () => {
 
   it('sends only the set filters', () => {
     expect(
-      productOverviewSearchParams({
+      productOverviewQueryParams({
         type: 'Sewing',
         search: '  602 ',
         section: 'none',
@@ -73,11 +73,19 @@ describe('product overview response', () => {
         page: 2,
         pageSize: 25,
       }),
-    ).toBe(
-      'type=Sewing&search=602&section=none&withoutPrice=true&active=false&sort=price&direction=desc&page=2&pageSize=25',
-    );
+    ).toEqual({
+      type: 'Sewing',
+      search: '602',
+      section: 'none',
+      withoutPrice: true,
+      active: false,
+      sort: 'price',
+      direction: 'desc',
+      page: 2,
+      pageSize: 25,
+    });
     expect(
-      productOverviewSearchParams({
+      productOverviewQueryParams({
         type: 'Ppe',
         search: '',
         section: null,
@@ -88,6 +96,6 @@ describe('product overview response', () => {
         page: 1,
         pageSize: 10,
       }),
-    ).toBe('type=Ppe&page=1&pageSize=10');
+    ).toEqual({ type: 'Ppe', page: 1, pageSize: 10 });
   });
 });

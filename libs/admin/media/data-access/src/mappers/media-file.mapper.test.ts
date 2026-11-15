@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { mapMediaFileDetail, mapMediaFilePage } from './media-file.mapper';
 import { mapMediaFolders } from './media-folder.mapper';
-import { serializeMediaFileQuery } from '../api/media-files.api';
+import { mediaFileQueryParams } from '../api/media-files.api';
 
 const file = {
   id: 41,
@@ -49,22 +49,22 @@ describe('media mappers', () => {
 
   it('sends the folder filter only with a folder', () => {
     expect(
-      serializeMediaFileQuery({
+      mediaFileQueryParams({
         folderId: null,
         includeSubfolders: true,
         search: '  сумка ',
         page: 2,
         pageSize: 48,
       }),
-    ).toBe('search=%D1%81%D1%83%D0%BC%D0%BA%D0%B0&page=2&pageSize=48');
+    ).toEqual({ search: 'сумка', page: 2, pageSize: 48 });
     expect(
-      serializeMediaFileQuery({
+      mediaFileQueryParams({
         folderId: 3,
         includeSubfolders: false,
         search: '',
         page: 1,
         pageSize: 48,
       }),
-    ).toBe('folderId=3&includeSubfolders=false&page=1&pageSize=48');
+    ).toEqual({ folderId: 3, includeSubfolders: false, page: 1, pageSize: 48 });
   });
 });

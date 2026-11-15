@@ -1,7 +1,12 @@
 import { ensurePricing } from '../../validators/pricing/pricing-values';
 import { validateSewingArticleSummary } from '../../validators/sewing-pricing/validate-sewing-article-summary';
 
-import type { SewingArticleSummary, SewingCostKind } from '@admin/products/model';
+import type {
+  SewingArticleSummary,
+  SewingCostKind,
+  SewingMaterialKind,
+  SewingMaterialUnit,
+} from '@admin/products/model';
 
 const costKinds: SewingCostKind[] = [
   'materials',
@@ -55,7 +60,12 @@ export function mapSewingArticleSummary(value: unknown, productId: number): Sewi
           }
         : null,
     })),
-    materials: dto.materials.map((line) => ({ ...line, comment: line.comment ?? '' })),
+    materials: dto.materials.map((line) => ({
+      ...line,
+      kind: line.kind as SewingMaterialKind,
+      unit: line.unit as SewingMaterialUnit,
+      comment: line.comment ?? '',
+    })),
     operations: dto.operations.map((line) => ({ ...line, comment: line.comment ?? '' })),
   };
 }

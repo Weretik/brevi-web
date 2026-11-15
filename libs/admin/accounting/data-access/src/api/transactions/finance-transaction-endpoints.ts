@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import {
   financeCounterpartiesTag,
   financeHistoryTag,
@@ -21,9 +23,6 @@ import type {
   LedgerScope,
 } from '@admin/accounting/model';
 
-const transactions = '/api/accounting/transactions';
-const one = (id: string) => `${transactions}/${encodeURIComponent(id)}`;
-
 /** A saved operation changes balances, the overview, the journal and its own history. */
 const changed = (_: unknown, error: unknown, { id }: { id: string }) =>
   error ? [] : [...financeMovementTags, financeCounterpartiesTag, financeHistoryTag(id)];
@@ -35,18 +34,24 @@ export function financeTransactionEndpoints(build: AccountingEndpointBuilder) {
       FinanceTransactionPage,
       Record<string, string | number | boolean>
     >({
-      query: (params) => ({ url: transactions, params }),
-      transformResponse: mapFinanceTransactionPage,
-      transformErrorResponse: accountingApiError,
+      queryFn: (params, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/accounting/transactions', { params: { query: params }, signal }),
+          mapFinanceTransactionPage,
+          accountingApiError,
+        ),
       providesTags: [financeTransactionsTag],
     }),
     createFinanceTransaction: build.mutation<
       FinanceTransaction,
       FinanceTransactionBody & { scope: LedgerScope; requestId: string }
     >({
-      query: (body) => ({ url: transactions, method: 'POST', body }),
-      transformResponse: mapFinanceTransaction,
-      transformErrorResponse: accountingApiError,
+      queryFn: (body, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/accounting/transactions', { body: body, signal }),
+          mapFinanceTransaction,
+          accountingApiError,
+        ),
       invalidatesTags: (_, error) =>
         error ? [] : [...financeMovementTags, financeCounterpartiesTag],
     }),
@@ -54,15 +59,29 @@ export function financeTransactionEndpoints(build: AccountingEndpointBuilder) {
       FinanceTransaction,
       { id: string; body: FinanceTransactionBody & { version: number } }
     >({
-      query: ({ id, body }) => ({ url: one(id), method: 'PUT', body }),
-      transformResponse: mapFinanceTransaction,
-      transformErrorResponse: accountingApiError,
+      queryFn: ({ id, body }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/accounting/transactions/{id}', {
+            params: { path: { id: id } },
+            body: body,
+            signal,
+          }),
+          mapFinanceTransaction,
+          accountingApiError,
+        ),
       invalidatesTags: changed,
     }),
     voidFinanceTransaction: build.mutation<FinanceTransaction, { id: string; version: number }>({
-      query: ({ id, version }) => ({ url: `${one(id)}/void`, method: 'POST', body: { version } }),
-      transformResponse: mapFinanceTransaction,
-      transformErrorResponse: accountingApiError,
+      queryFn: ({ id, version }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/accounting/transactions/{id}/void', {
+            params: { path: { id: id } },
+            body: { version },
+            signal,
+          }),
+          mapFinanceTransaction,
+          accountingApiError,
+        ),
       invalidatesTags: changed,
     }),
     /** «Перевірити»: the category and who the operation is with. */
@@ -70,26 +89,42 @@ export function financeTransactionEndpoints(build: AccountingEndpointBuilder) {
       FinanceTransaction,
       { id: string; body: FinanceTransactionReviewBody }
     >({
-      query: ({ id, body }) => ({ url: `${one(id)}/review`, method: 'PUT', body }),
-      transformResponse: mapFinanceTransaction,
-      transformErrorResponse: accountingApiError,
+      queryFn: ({ id, body }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/accounting/transactions/{id}/review', {
+            params: { path: { id: id } },
+            body: body,
+            signal,
+          }),
+          mapFinanceTransaction,
+          accountingApiError,
+        ),
       invalidatesTags: changed,
     }),
     /** «Зробити постійним»: the one-off name becomes a finance counterparty. */
     promoteFinanceOneoff: build.mutation<FinanceTransaction, { id: string; version: number }>({
-      query: ({ id, version }) => ({
-        url: `${one(id)}/promote-oneoff`,
-        method: 'POST',
-        body: { version },
-      }),
-      transformResponse: mapFinanceTransaction,
-      transformErrorResponse: accountingApiError,
+      queryFn: ({ id, version }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/accounting/transactions/{id}/promote-oneoff', {
+            params: { path: { id: id } },
+            body: { version },
+            signal,
+          }),
+          mapFinanceTransaction,
+          accountingApiError,
+        ),
       invalidatesTags: changed,
     }),
     getFinanceTransactionHistory: build.query<FinanceHistoryEntry[], string>({
-      query: (id) => ({ url: `${one(id)}/history` }),
-      transformResponse: mapFinanceHistory,
-      transformErrorResponse: accountingApiError,
+      queryFn: (id, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/accounting/transactions/{id}/history', {
+            params: { path: { id: id } },
+            signal,
+          }),
+          mapFinanceHistory,
+          accountingApiError,
+        ),
       providesTags: (_, __, id) => [financeHistoryTag(id)],
     }),
   };

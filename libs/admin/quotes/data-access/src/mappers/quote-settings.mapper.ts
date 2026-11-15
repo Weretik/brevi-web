@@ -78,7 +78,7 @@ function texts<T extends object>(value: T): { [K in keyof T]: string | null } {
   ) as { [K in keyof T]: string | null };
 }
 
-export function mapQuoteSettings(value: Schemas['CrmQuoteSettings']): QuoteSettings {
+export function mapQuoteSettings(value: Schemas['QuoteSettingsResponse']): QuoteSettings {
   return {
     version: value.version,
     updatedByName: value.updatedByName ?? null,
@@ -114,7 +114,7 @@ export function mapQuoteSettings(value: Schemas['CrmQuoteSettings']): QuoteSetti
 
 export function toSaveQuoteSettingsInput(
   draft: QuoteSettingsDraft,
-): Schemas['CrmSaveQuoteSettingsInput'] {
+): Schemas['SaveQuoteSettingsInput'] {
   const { advantages, ...introduction } = draft.introduction;
   const { intros, labels, showClient, ...pdf } = draft.pdf;
   return {

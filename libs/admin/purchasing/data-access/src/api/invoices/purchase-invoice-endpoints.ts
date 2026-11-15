@@ -1,14 +1,11 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import {
   purchaseInvoicesTag,
   purchaseSuppliersTag,
   purchaseSyncStateTag,
 } from '../../cache/purchase-invoice-tags';
 import { purchaseApiError } from '../../errors/purchase-api-error';
-import {
-  mapPurchaseDocumentSave,
-  mapPurchaseRecognition,
-  mapPurchaseRecognitionBatch,
-} from '../../mappers/purchase-document.mapper';
 import { mapPurchaseInvoicePage } from '../../mappers/purchase-invoice.mapper';
 import {
   mapPurchaseInvoicePayments,
@@ -22,16 +19,12 @@ import { mapPurchaseSyncResult, mapPurchaseSyncState } from '../../mappers/purch
 
 import type { PurchasingEndpointBuilder } from '../base/purchasing-endpoint-builder';
 import type {
-  PurchaseDocumentSave,
-  PurchaseDocumentUpload,
   PurchaseInvoicePage,
   PurchaseInvoicePayments,
   PurchaseInvoiceQuery,
   PurchasePaymentCandidate,
   PurchasePaymentInput,
   PurchaseInvoiceReview,
-  PurchaseRecognition,
-  PurchaseRecognitionBatch,
   PurchaseReviewInput,
   PurchaseSupplierOption,
   PurchaseSyncResult,
@@ -41,51 +34,71 @@ import type {
 export function purchaseInvoiceEndpoints(build: PurchasingEndpointBuilder) {
   return {
     getPurchaseInvoices: build.query<PurchaseInvoicePage, PurchaseInvoiceQuery>({
-      query: ({ page, pageSize, search, filter, supplierId, documentFrom, documentTo, vat }) => ({
-        url: '/api/purchasing/invoices',
-        params: {
-          page,
-          pageSize,
-          search: search || undefined,
-          filter: filter === 'All' ? undefined : filter,
-          supplierId,
-          documentFrom: documentFrom || undefined,
-          documentTo: documentTo || undefined,
-          vat,
-        },
-      }),
-      transformResponse: mapPurchaseInvoicePage,
-      transformErrorResponse: purchaseApiError,
+      queryFn: (
+        { page, pageSize, search, filter, supplierId, documentFrom, documentTo, vat },
+        { signal },
+      ) =>
+        apiCall(
+          apiClient.GET('/api/purchasing/invoices', {
+            params: {
+              query: {
+                page,
+                pageSize,
+                search: search || undefined,
+                filter: filter === 'All' ? undefined : filter,
+                supplierId,
+                documentFrom: documentFrom || undefined,
+                documentTo: documentTo || undefined,
+                vat,
+              },
+            },
+            signal,
+          }),
+          mapPurchaseInvoicePage,
+          purchaseApiError,
+        ),
       providesTags: [purchaseInvoicesTag],
     }),
     getPurchaseSyncState: build.query<PurchaseSyncState, void>({
-      query: () => ({ url: '/api/purchasing/invoices/sync-state' }),
-      transformResponse: mapPurchaseSyncState,
-      transformErrorResponse: purchaseApiError,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/purchasing/invoices/sync-state', { signal }),
+          mapPurchaseSyncState,
+          purchaseApiError,
+        ),
       providesTags: [purchaseSyncStateTag],
     }),
     syncPurchaseInvoices: build.mutation<PurchaseSyncResult, void>({
-      query: () => ({ url: '/api/purchasing/invoices/sync', method: 'POST' }),
-      transformResponse: mapPurchaseSyncResult,
-      transformErrorResponse: purchaseApiError,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/purchasing/invoices/sync', { signal }),
+          mapPurchaseSyncResult,
+          purchaseApiError,
+        ),
       // A failed sync records its reason, so the state is refreshed either way.
       invalidatesTags: (_, error) =>
         error ? [purchaseSyncStateTag] : [purchaseInvoicesTag, purchaseSyncStateTag],
     }),
     getPurchaseSuppliers: build.query<PurchaseSupplierOption[], void>({
-      query: () => ({ url: '/api/purchasing/invoices/suppliers' }),
-      transformResponse: mapPurchaseSupplierOptions,
-      transformErrorResponse: purchaseApiError,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/purchasing/invoices/suppliers', { signal }),
+          mapPurchaseSupplierOptions,
+          purchaseApiError,
+        ),
       providesTags: [purchaseSuppliersTag],
     }),
     reviewPurchaseInvoice: build.mutation<PurchaseInvoiceReview, PurchaseReviewInput>({
-      query: ({ messageId, ...body }) => ({
-        url: `/api/purchasing/invoices/${encodeURIComponent(messageId)}/review`,
-        method: 'PUT',
-        body,
-      }),
-      transformResponse: mapPurchaseInvoiceReview,
-      transformErrorResponse: purchaseApiError,
+      queryFn: ({ messageId, ...body }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/purchasing/invoices/{messageId}/review', {
+            params: { path: { messageId: messageId } },
+            body: body,
+            signal,
+          }),
+          mapPurchaseInvoiceReview,
+          purchaseApiError,
+        ),
       // A stale version means someone else saved: reload the list either way.
       invalidatesTags: [purchaseInvoicesTag],
     }),
@@ -94,71 +107,46 @@ export function purchaseInvoiceEndpoints(build: PurchasingEndpointBuilder) {
       PurchasePaymentCandidate[],
       { messageId: string; search: string }
     >({
-      query: ({ messageId, search }) => ({
-        url: `/api/purchasing/invoices/${encodeURIComponent(messageId)}/payments/candidates`,
-        params: search.trim() ? { search: search.trim() } : undefined,
-      }),
-      transformResponse: mapPurchasePaymentCandidates,
-      transformErrorResponse: purchaseApiError,
+      queryFn: ({ messageId, search }, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/purchasing/invoices/{messageId}/payments/candidates', {
+            params: {
+              path: { messageId: messageId },
+              query: search.trim() ? { search: search.trim() } : undefined,
+            },
+            signal,
+          }),
+          mapPurchasePaymentCandidates,
+          purchaseApiError,
+        ),
       providesTags: [purchaseInvoicesTag],
     }),
     linkPurchasePayment: build.mutation<PurchaseInvoicePayments, PurchasePaymentInput>({
-      query: ({ messageId, ...body }) => ({
-        url: `/api/purchasing/invoices/${encodeURIComponent(messageId)}/payments`,
-        method: 'POST',
-        body,
-      }),
-      transformResponse: mapPurchaseInvoicePayments,
-      transformErrorResponse: purchaseApiError,
+      queryFn: ({ messageId, ...body }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/purchasing/invoices/{messageId}/payments', {
+            params: { path: { messageId: messageId } },
+            body: body,
+            signal,
+          }),
+          mapPurchaseInvoicePayments,
+          purchaseApiError,
+        ),
       // A stale version means someone else saved: reload the list either way.
       invalidatesTags: [purchaseInvoicesTag],
     }),
     unlinkPurchasePayment: build.mutation<PurchaseInvoicePayments, PurchasePaymentInput>({
-      query: ({ messageId, ...body }) => ({
-        url: `/api/purchasing/invoices/${encodeURIComponent(messageId)}/payments/unlink`,
-        method: 'POST',
-        body,
-      }),
-      transformResponse: mapPurchaseInvoicePayments,
-      transformErrorResponse: purchaseApiError,
+      queryFn: ({ messageId, ...body }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/purchasing/invoices/{messageId}/payments/unlink', {
+            params: { path: { messageId: messageId } },
+            body: body,
+            signal,
+          }),
+          mapPurchaseInvoicePayments,
+          purchaseApiError,
+        ),
       invalidatesTags: [purchaseInvoicesTag],
-    }),
-    recognizePurchaseFile: build.mutation<PurchaseRecognition, string>({
-      query: (fileId) => ({
-        url: `/api/purchasing/invoices/files/${encodeURIComponent(fileId)}/recognize`,
-        method: 'POST',
-      }),
-      transformResponse: mapPurchaseRecognition,
-      transformErrorResponse: purchaseApiError,
-      invalidatesTags: (_, error) => (error ? [] : [purchaseInvoicesTag]),
-    }),
-    /** One batch; the feature repeats it. The list reloads after every batch that read a file. */
-    recognizeNewPurchaseFiles: build.mutation<PurchaseRecognitionBatch, void>({
-      query: () => ({ url: '/api/purchasing/invoices/recognize-new', method: 'POST' }),
-      transformResponse: mapPurchaseRecognitionBatch,
-      transformErrorResponse: purchaseApiError,
-      invalidatesTags: (result) =>
-        result && result.recognized + result.needsReview + result.failed + result.skipped > 0
-          ? [purchaseInvoicesTag]
-          : [],
-    }),
-    savePurchaseDocument: build.mutation<PurchaseDocumentSave, PurchaseDocumentUpload>({
-      query: ({ fileId, document, replace }) => ({
-        url: `/api/purchasing/invoices/files/${encodeURIComponent(fileId)}/document`,
-        method: 'PUT',
-        body: { document, replace },
-      }),
-      transformResponse: mapPurchaseDocumentSave,
-      transformErrorResponse: purchaseApiError,
-      invalidatesTags: (_, error) => (error ? [] : [purchaseInvoicesTag]),
-    }),
-    /** The JSON as the server gives it, to be saved as a file and edited by hand. */
-    getPurchaseDocumentTemplate: build.query<unknown, string>({
-      query: (fileId) => ({
-        url: `/api/purchasing/invoices/files/${encodeURIComponent(fileId)}/document-template`,
-      }),
-      transformErrorResponse: purchaseApiError,
-      keepUnusedDataFor: 0,
     }),
   };
 }

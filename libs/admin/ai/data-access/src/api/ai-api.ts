@@ -1,4 +1,4 @@
-import { adminApi } from '@admin/shared/api-client';
+import { adminApi, apiCall, apiClient } from '@admin/shared/api-client';
 
 import { aiApiError } from '../errors/ai-api-error';
 import { mapAiSettings, mapAiTestResult } from '../mappers/ai-settings.mapper';
@@ -13,43 +13,53 @@ const aiBaseApi = adminApi.enhanceEndpoints({ addTagTypes: ['AiSettings'] });
 export const aiApi = aiBaseApi.injectEndpoints({
   endpoints: (build) => ({
     getAiSettings: build.query<AiSettings, void>({
-      query: () => ({ url: '/api/ai/settings' }),
-      transformResponse: mapAiSettings,
-      transformErrorResponse: aiApiError,
+      queryFn: (_arg, { signal }) =>
+        apiCall(apiClient.GET('/api/ai/settings', { signal }), mapAiSettings, aiApiError),
       providesTags: [aiSettingsTag],
     }),
     updateAiSettings: build.mutation<AiSettings, AiSettingsInput>({
-      query: (body) => ({ url: '/api/ai/settings', method: 'PUT', body }),
-      transformResponse: mapAiSettings,
-      transformErrorResponse: aiApiError,
+      queryFn: (body, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/ai/settings', { body: body, signal }),
+          mapAiSettings,
+          aiApiError,
+        ),
       invalidatesTags: [aiSettingsTag],
     }),
     setAiKey: build.mutation<AiSettings, string>({
-      query: (apiKey) => ({ url: '/api/ai/settings/key', method: 'PUT', body: { apiKey } }),
-      transformResponse: mapAiSettings,
-      transformErrorResponse: aiApiError,
+      queryFn: (apiKey, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/ai/settings/key', { body: { apiKey }, signal }),
+          mapAiSettings,
+          aiApiError,
+        ),
       invalidatesTags: [aiSettingsTag],
     }),
     removeAiKey: build.mutation<AiSettings, void>({
-      query: () => ({ url: '/api/ai/settings/key', method: 'DELETE' }),
-      transformResponse: mapAiSettings,
-      transformErrorResponse: aiApiError,
+      queryFn: (_arg, { signal }) =>
+        apiCall(apiClient.DELETE('/api/ai/settings/key', { signal }), mapAiSettings, aiApiError),
       invalidatesTags: [aiSettingsTag],
     }),
     updateAiPrompt: build.mutation<AiSettings, { key: string; text: string }>({
-      query: ({ key, text }) => ({
-        url: `/api/ai/settings/prompts/${encodeURIComponent(key)}`,
-        method: 'PUT',
-        body: { text },
-      }),
-      transformResponse: mapAiSettings,
-      transformErrorResponse: aiApiError,
+      queryFn: ({ key, text }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/ai/settings/prompts/{key}', {
+            params: { path: { key: key } },
+            body: { text },
+            signal,
+          }),
+          mapAiSettings,
+          aiApiError,
+        ),
       invalidatesTags: [aiSettingsTag],
     }),
     testAiConnection: build.mutation<AiTestResult, AiModelTier>({
-      query: (tier) => ({ url: '/api/ai/settings/test', method: 'POST', body: { tier } }),
-      transformResponse: mapAiTestResult,
-      transformErrorResponse: aiApiError,
+      queryFn: (tier, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/ai/settings/test', { body: { tier }, signal }),
+          mapAiTestResult,
+          aiApiError,
+        ),
       // The test is counted in this month's use.
       invalidatesTags: [aiSettingsTag],
     }),

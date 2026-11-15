@@ -1,4 +1,5 @@
 import { adminApi, configureApiClient, createAdminApiStore } from '@admin/shared/api-client';
+import { stubApiFetch } from '@admin/shared/api-client/testing';
 import { configureAppConfig } from '@admin/shared/config';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -21,7 +22,7 @@ describe('Sewing access from the current session', () => {
         headers: { 'Content-Type': 'application/json' },
       }),
     );
-    vi.stubGlobal('fetch', fetcher);
+    stubApiFetch(fetcher);
     expect(
       await store.dispatch(sewingAccessApi.endpoints.getSewingAccess.initiate()).unwrap(),
     ).toEqual({ canRead: true, canManage: false, canManagePhotos: false, canSeeCost: false });

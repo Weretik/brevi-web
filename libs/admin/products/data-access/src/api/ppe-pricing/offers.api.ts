@@ -1,4 +1,4 @@
-import { adminApi } from '@admin/shared/api-client';
+import { adminApi, apiCall, apiClient } from '@admin/shared/api-client';
 
 import { ppePricingError } from './ppe-pricing-errors';
 import { mapPpeOffer } from '../../mappers/ppe-pricing/ppe-offer.mapper';
@@ -18,13 +18,16 @@ export const ppeOfferVersionsApi = adminApi.injectEndpoints({
         values: PpeOfferValues;
       }
     >({
-      query: ({ productId, ...body }) => ({
-        url: `/api/v1/pricing/ppe/products/${productId}/offer/versions`,
-        method: 'POST',
-        body: body satisfies Body,
-      }),
-      transformResponse: (value, _meta, args) => mapPpeOffer(value, args.productId),
-      transformErrorResponse: ppePricingError,
+      queryFn: ({ productId, ...body }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/v1/pricing/ppe/products/{productId}/offer/versions', {
+            params: { path: { productId } },
+            body: body satisfies Body,
+            signal,
+          }),
+          (value) => mapPpeOffer(value, productId),
+          ppePricingError,
+        ),
       invalidatesTags: (_result, error, args) =>
         error
           ? []

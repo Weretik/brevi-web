@@ -1,4 +1,4 @@
-import { adminApi } from '@admin/shared/api-client';
+import { adminApi, apiCall, apiClient } from '@admin/shared/api-client';
 
 import { mapSewingArticles } from '../../mappers/sewing-articles/sewing-article-list.mapper';
 import { mapSewingArticle } from '../../mappers/sewing-articles/sewing-article.mapper';
@@ -27,37 +27,53 @@ const changed = (productId: number) => [
 export const sewingArticlesApi = adminApi.injectEndpoints({
   endpoints: (build) => ({
     listSewingArticles: build.query<SewingArticleList, number>({
-      query: (id) => `/api/v1/products/${id}/articles`,
-      transformResponse: mapSewingArticles,
-      transformErrorResponse: sewingCompositionError,
+      queryFn: (id, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/v1/products/{productId}/articles', {
+            params: { path: { productId: id } },
+            signal,
+          }),
+          mapSewingArticles,
+          sewingCompositionError,
+        ),
       providesTags: (_result, _error, id) => [sewingCompositionTag(id)],
     }),
     createSewingArticle: build.mutation<SewingArticle, CreateSewingArticleArguments>({
-      query: ({ productId, input }) => ({
-        url: `/api/v1/products/${productId}/articles`,
-        method: 'POST',
-        body: mapCreateSewingArticleRequest(input),
-      }),
-      transformResponse: mapSewingArticle,
-      transformErrorResponse: sewingCompositionError,
+      queryFn: ({ productId, input }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/v1/products/{productId}/articles', {
+            params: { path: { productId: productId } },
+            body: mapCreateSewingArticleRequest(input),
+            signal,
+          }),
+          mapSewingArticle,
+          sewingCompositionError,
+        ),
       invalidatesTags: (_result, error, { productId }) => (error ? [] : changed(productId)),
     }),
     updateSewingArticle: build.mutation<SewingArticle, UpdateSewingArticleArguments>({
-      query: ({ productId, articleId, input }) => ({
-        url: `/api/v1/products/${productId}/articles/${articleId}`,
-        method: 'PUT',
-        body: mapUpdateSewingArticleRequest(input),
-      }),
-      transformResponse: mapSewingArticle,
-      transformErrorResponse: sewingCompositionError,
+      queryFn: ({ productId, articleId, input }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/v1/products/{productId}/articles/{articleId}', {
+            params: { path: { productId: productId, articleId: articleId } },
+            body: mapUpdateSewingArticleRequest(input),
+            signal,
+          }),
+          mapSewingArticle,
+          sewingCompositionError,
+        ),
       invalidatesTags: (_result, error, { productId }) => (error ? [] : changed(productId)),
     }),
     deleteSewingArticle: build.mutation<void, DeleteSewingArticleArguments>({
-      query: ({ productId, articleId, expectedVersion }) => ({
-        url: `/api/v1/products/${productId}/articles/${articleId}?expectedVersion=${expectedVersion}`,
-        method: 'DELETE',
-      }),
-      transformErrorResponse: sewingCompositionError,
+      queryFn: ({ productId, articleId, expectedVersion }, { signal }) =>
+        apiCall(
+          apiClient.DELETE('/api/v1/products/{productId}/articles/{articleId}', {
+            params: { path: { productId, articleId }, query: { expectedVersion } },
+            signal,
+          }),
+          undefined,
+          sewingCompositionError,
+        ),
       invalidatesTags: (_result, error, { productId }) => (error ? [] : changed(productId)),
     }),
   }),

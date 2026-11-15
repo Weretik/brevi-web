@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import { warehouseBaseApi } from './warehouse-base-api';
 import { warehouseApiError } from '../errors/warehouse-api-error';
 import { mapStockTransferResult } from '../mappers/stock-transfer.mapper';
@@ -20,14 +22,16 @@ const transferInput = (input: StockTransferInput) =>
 export const stockTransferApi = warehouseBaseApi.injectEndpoints({
   endpoints: (build) => ({
     transferFabricStock: build.mutation<StockTransferResult, StockTransferArgs>({
-      query: ({ input, dryRun, confirmReplace }) => ({
-        url: '/api/warehouse/fabric-stock/transfer',
-        method: 'POST',
-        params: { dryRun, confirmReplace },
-        body: transferInput(input),
-      }),
-      transformResponse: mapStockTransferResult,
-      transformErrorResponse: warehouseApiError,
+      queryFn: ({ input, dryRun, confirmReplace }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/warehouse/fabric-stock/transfer', {
+            params: { query: { dryRun, confirmReplace } },
+            body: transferInput(input),
+            signal,
+          }),
+          mapStockTransferResult,
+          warehouseApiError,
+        ),
       /** An applied transfer replaces the whole stock, its movements and the items' fabric. */
       invalidatesTags: (result) =>
         result?.applied ? ['FabricStock', 'FabricMovement', 'ItemFabric', 'ProductionOrder'] : [],

@@ -4,7 +4,7 @@ import type { components } from '@admin/shared/contracts';
 import type { TaskFormValues } from '@admin/tasks/model';
 
 /** The side panel as the server takes it; call only after `validateTaskForm` passed. */
-export function toSaveTaskInput(values: TaskFormValues): components['schemas']['CrmSaveTaskInput'] {
+export function toSaveTaskInput(values: TaskFormValues): components['schemas']['SaveTaskInput'] {
   const dueAt = dueAtFromForm(values);
   if (dueAt === null || values.assigneeUserId === null)
     throw new Error('Форма завдання не заповнена.');

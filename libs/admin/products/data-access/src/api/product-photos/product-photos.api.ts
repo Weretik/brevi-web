@@ -1,4 +1,4 @@
-import { adminApi, toAdminApiError } from '@admin/shared/api-client';
+import { adminApi, apiCall, apiClient, toAdminApiError } from '@admin/shared/api-client';
 
 import { mapProductPhotos } from '../../mappers/product-photos/product-photos.mapper';
 import { parseProductPhotoList } from '../../validators/product-photos/validate-product-photos';
@@ -14,18 +14,28 @@ const photosTag = (id: number) => ({ type: tag, id: `photos-${id}` });
 export const productPhotosApi = adminApi.injectEndpoints({
   endpoints: (build) => ({
     getProductPhotos: build.query<ProductCardPhoto[], number>({
-      query: (id) => `/api/v1/products/${id}/photos`,
-      transformResponse: (value: unknown) => mapProductPhotos(parseProductPhotoList(value)),
-      transformErrorResponse: (error) => toAdminApiError(error, productErrorMessages),
+      queryFn: (id, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/v1/products/{id}/photos', { params: { path: { id: id } }, signal }),
+          (value: unknown) => mapProductPhotos(parseProductPhotoList(value)),
+          (error) => toAdminApiError(error, productErrorMessages),
+        ),
       providesTags: (_result, _error, id) => [photosTag(id)],
     }),
     setProductPhotos: build.mutation<
       ProductCardPhoto[],
       { id: number; body: SetProductPhotosBody }
     >({
-      query: ({ id, body }) => ({ url: `/api/v1/products/${id}/photos`, method: 'PUT', body }),
-      transformResponse: (value: unknown) => mapProductPhotos(parseProductPhotoList(value)),
-      transformErrorResponse: (error) => toAdminApiError(error, productErrorMessages),
+      queryFn: ({ id, body }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/v1/products/{id}/photos', {
+            params: { path: { id: id } },
+            body: body,
+            signal,
+          }),
+          (value: unknown) => mapProductPhotos(parseProductPhotoList(value)),
+          (error) => toAdminApiError(error, productErrorMessages),
+        ),
       async onQueryStarted({ id }, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;

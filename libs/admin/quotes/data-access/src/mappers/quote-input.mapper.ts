@@ -7,12 +7,12 @@ type Schemas = components['schemas'];
 
 const text = (value: string): string | null => (value.trim() ? value.trim() : null);
 
-const priceInput = (price: QuotePriceDraft, sewing: boolean): Schemas['CrmQuotePriceInput'] => {
+const priceInput = (price: QuotePriceDraft, sewing: boolean): Schemas['QuotePriceInput'] => {
   const manual = sewing || !price.manual.trim() ? null : parseQuotePrice(price.manual);
   return { shown: price.shown, manual: manual !== null && manual !== price.source ? manual : null };
 };
 
-const optionInput = (option: QuoteOptionDraft, sewing: boolean): Schemas['CrmQuoteOptionInput'] => {
+const optionInput = (option: QuoteOptionDraft, sewing: boolean): Schemas['QuoteOptionInput'] => {
   const [retail, wholesale, large] = quoteTiers.map((tier) =>
     priceInput(option.prices[tier], sewing),
   );
@@ -32,7 +32,7 @@ const optionInput = (option: QuoteOptionDraft, sewing: boolean): Schemas['CrmQuo
 };
 
 /** The whole editor content; Catalog prices are never sent (the server keeps or takes them). */
-export function toSaveQuoteInput(draft: QuoteDraft): Schemas['CrmSaveQuoteInput'] {
+export function toSaveQuoteInput(draft: QuoteDraft): Schemas['SaveQuoteInput'] {
   return {
     version: draft.version,
     internalName: draft.internalName.trim(),

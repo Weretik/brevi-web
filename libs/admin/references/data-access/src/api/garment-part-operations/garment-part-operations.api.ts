@@ -1,4 +1,4 @@
-import { adminApi, toAdminApiError } from '@admin/shared/api-client';
+import { adminApi, apiCall, apiClient, toAdminApiError } from '@admin/shared/api-client';
 
 import { productPricesTag } from '../../cache/product-prices-tag';
 import { referenceErrorMessages } from '../../errors/reference-error-messages';
@@ -20,24 +20,32 @@ import type { GarmentPartOperation, OperationLabourRates } from '@admin/referenc
 export const garmentPartOperationsApi = adminApi.injectEndpoints({
   endpoints: (build) => ({
     listGarmentPartOperations: build.query<GarmentPartOperation[], void>({
-      query: () => '/api/reference/garment-part-operations',
-      transformResponse: (value: unknown) =>
-        mapGarmentPartOperations(parseGarmentPartOperationsResponse(value)),
-      transformErrorResponse: (error) => toAdminApiError(error, referenceErrorMessages),
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/reference/garment-part-operations', { signal }),
+          (value: unknown) => mapGarmentPartOperations(parseGarmentPartOperationsResponse(value)),
+          (error) => toAdminApiError(error, referenceErrorMessages),
+        ),
       providesTags: (result) => [
         { type: 'GarmentPartOperation', id: 'LIST' },
         ...(result?.map(({ id }) => ({ type: 'GarmentPartOperation' as const, id })) ?? []),
       ],
     }),
     getOperationLabourRates: build.query<OperationLabourRates, void>({
-      query: () => '/api/v1/pricing/sewing/settings',
-      transformResponse: (value: unknown) =>
-        mapOperationLabourRates(parseSewingSettingsResponse(value)),
-      transformErrorResponse: (error) => toAdminApiError(error, referenceErrorMessages),
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/v1/pricing/sewing/settings', { signal }),
+          (value: unknown) => mapOperationLabourRates(parseSewingSettingsResponse(value)),
+          (error) => toAdminApiError(error, referenceErrorMessages),
+        ),
     }),
     createGarmentPartOperation: build.mutation<void, CreateGarmentPartOperationBody>({
-      query: (body) => ({ url: '/api/reference/garment-part-operations', method: 'POST', body }),
-      transformErrorResponse: (error) => toAdminApiError(error, referenceErrorMessages),
+      queryFn: (body, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/reference/garment-part-operations', { body: body, signal }),
+          () => undefined,
+          (error) => toAdminApiError(error, referenceErrorMessages),
+        ),
       invalidatesTags: (_result, error) =>
         error
           ? []
@@ -51,12 +59,16 @@ export const garmentPartOperationsApi = adminApi.injectEndpoints({
       void,
       { id: number; body: UpdateGarmentPartOperationBody }
     >({
-      query: ({ id, body }) => ({
-        url: `/api/reference/garment-part-operations/${id}`,
-        method: 'PUT',
-        body,
-      }),
-      transformErrorResponse: (error) => toAdminApiError(error, referenceErrorMessages),
+      queryFn: ({ id, body }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/reference/garment-part-operations/{id}', {
+            params: { path: { id: id } },
+            body: body,
+            signal,
+          }),
+          undefined,
+          (error) => toAdminApiError(error, referenceErrorMessages),
+        ),
       invalidatesTags: (_result, error, { id }) =>
         error
           ? []
@@ -67,8 +79,15 @@ export const garmentPartOperationsApi = adminApi.injectEndpoints({
             ],
     }),
     deleteGarmentPartOperation: build.mutation<void, number>({
-      query: (id) => ({ url: `/api/reference/garment-part-operations/${id}`, method: 'DELETE' }),
-      transformErrorResponse: (error) => toAdminApiError(error, referenceErrorMessages),
+      queryFn: (id, { signal }) =>
+        apiCall(
+          apiClient.DELETE('/api/reference/garment-part-operations/{id}', {
+            params: { path: { id: id } },
+            signal,
+          }),
+          undefined,
+          (error) => toAdminApiError(error, referenceErrorMessages),
+        ),
       invalidatesTags: (_result, error, id) =>
         error
           ? []

@@ -1,6 +1,9 @@
 import { mapEmbroideryCalculation, toCalculateEmbroideryInput } from './embroidery.mapper';
 
 import type {
+  EmbroideryMaterialMode,
+  EmbroideryMode,
+  EmbroideryProgram,
   EmbroiderySavedCalculation,
   EmbroiderySavedPage,
   EmbroiderySavedSummary,
@@ -10,13 +13,13 @@ import type { components } from '@admin/shared/contracts';
 
 type Schemas = components['schemas'];
 
-const mapSummary = (value: Schemas['CrmEmbroiderySavedSummary']): EmbroiderySavedSummary => ({
+const mapSummary = (value: Schemas['EmbroiderySavedSummaryResponse']): EmbroiderySavedSummary => ({
   id: value.id,
   number: value.number,
   name: value.name,
   customerPublicId: value.customerPublicId ?? null,
   customerName: value.customerName ?? null,
-  mode: value.mode,
+  mode: value.mode as EmbroideryMode,
   quantity: value.quantity,
   stitchesPerUnit: value.stitchesPerUnit,
   hoopLabel: value.hoopLabel,
@@ -35,7 +38,7 @@ const mapSummary = (value: Schemas['CrmEmbroiderySavedSummary']): EmbroiderySave
 });
 
 export const mapEmbroiderySavedPage = (
-  value: Schemas['CrmEmbroiderySavedPage'],
+  value: Schemas['EmbroiderySavedPageResponse'],
 ): EmbroiderySavedPage => ({
   items: value.items.map(mapSummary),
   page: value.page,
@@ -44,11 +47,14 @@ export const mapEmbroiderySavedPage = (
 });
 
 export const mapEmbroiderySavedCalculation = (
-  value: Schemas['CrmEmbroiderySavedCalculation'],
+  value: Schemas['EmbroiderySavedCalculationResponse'],
 ): EmbroiderySavedCalculation => ({
   summary: mapSummary(value.summary),
   input: {
     ...value.input,
+    mode: value.input.mode as EmbroideryMode,
+    program: value.input.program as EmbroideryProgram,
+    materialMode: value.input.materialMode as EmbroideryMaterialMode,
     machineMinutes: value.input.machineMinutes ?? null,
     expenseOverrides: { ...(value.input.expenseOverrides ?? {}) },
   },
@@ -64,7 +70,7 @@ export const mapEmbroiderySavedCalculation = (
 
 export const toSaveEmbroideryCalculationInput = (
   request: EmbroiderySaveRequest,
-): Schemas['CrmSaveEmbroideryCalculationInput'] => ({
+): Schemas['SaveEmbroideryCalculationInput'] => ({
   name: request.name.trim() || null,
   customerPublicId: request.customerPublicId,
   calculation: toCalculateEmbroideryInput(request.calculation),
