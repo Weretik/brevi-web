@@ -1,6 +1,6 @@
 # Workspace architecture decisions
 
-Decisions that cover the whole frontend workspace. Decisions of one app live next to it: [Admin ADRs](../admin/adr/README.md), [Site ADRs](../site/adr/0001-nextjs-public-site.md). The backend and the whole system (C4 diagrams with these apps as containers) are in [BreviERP](https://github.com/Weretik/BreviERP/blob/main/docs/sdd/architecture/c4/README.md).
+Decisions that cover the whole frontend workspace. Decisions of one app live next to it: [Admin ADRs](../admin/adr/README.md), [Site ADRs](../site/adr/0001-nextjs-public-site.md). The backend and the whole system (C4 diagrams with these apps as containers) are in [BreviERP](https://github.com/Weretik/BreviERP/blob/master/docs/sdd/architecture/c4/README.md).
 
 | ADR                                                | Decision                                                              | Status   |
 | -------------------------------------------------- | --------------------------------------------------------------------- | -------- |
