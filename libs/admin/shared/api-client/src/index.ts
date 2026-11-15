@@ -1,5 +1,8 @@
 export { adminApi, baseApi } from './rtk-query/base-api';
-export { requestApiBlob } from './client/request-api-blob';
+export { apiClient } from './client/api-client';
+export { apiCall, apiRequest } from './client/api-call';
+export type { ApiCallResult, ApiErrorMapper } from './client/api-call';
+export { formDataBody } from './client/form-data-body';
 export { csrfHeaderName, readCsrfToken } from './csrf/csrf-token';
 export {
   AdminApiProvider,
@@ -10,6 +13,7 @@ export {
   adminApiErrorMessage,
   isAdminApiError,
   toAdminApiError,
+  HttpError,
   toApiError,
 } from './errors/api-error';
 export { configureApiClient, configureApiErrorNotifier } from './runtime/api-client-runtime';
@@ -19,7 +23,6 @@ export type {
   ApiErrorCode,
   ApiErrorMessages,
   ApiErrorNotifier,
-  ApiRequest,
   AuthSessionAdapter,
 } from './contracts/api-client-contract';
 export type {

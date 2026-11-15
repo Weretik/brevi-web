@@ -1,15 +1,12 @@
-import { AxiosError } from 'axios';
 import { describe, expect, it } from 'vitest';
 
-import { toAdminApiError, toApiError } from './api-error';
+import { HttpError, toAdminApiError, toApiError } from './api-error';
 
 describe('API error normalization', () => {
-  it('normalizes an Axios validation response without exposing the raw response', () => {
-    const error = new AxiosError('Bad request');
-    error.response = {
-      data: [{ identifier: 'Request.Name', errorMessage: 'Назва обов’язкова.' }],
-      status: 400,
-    } as typeof error.response;
+  it('normalizes a validation response without exposing the raw response', () => {
+    const error = new HttpError(400, [
+      { identifier: 'Request.Name', errorMessage: 'Назва обов’язкова.' },
+    ]);
 
     expect(toAdminApiError(error, { badRequest: 'Перевірте введені дані.' })).toEqual({
       code: 'Validation',
@@ -21,11 +18,11 @@ describe('API error normalization', () => {
   });
 
   it('normalizes problem details and keeps only safe public fields', () => {
-    const error = new AxiosError('Server response');
-    error.response = {
-      data: { detail: 'Invalid request', errors: { Email: ['Invalid'] }, traceId: 'trace-1' },
-      status: 422,
-    } as typeof error.response;
+    const error = new HttpError(422, {
+      detail: 'Invalid request',
+      errors: { Email: ['Invalid'] },
+      traceId: 'trace-1',
+    });
 
     expect(toApiError(error)).toEqual({
       code: 'Validation',
@@ -37,11 +34,9 @@ describe('API error normalization', () => {
   });
 
   it('keeps a bounded backend conflict message for existing feature UX', () => {
-    const error = new AxiosError('Conflict');
-    error.response = {
-      data: [{ errorMessage: 'Запис використовується в іншій сутності.' }],
-      status: 409,
-    } as typeof error.response;
+    const error = new HttpError(409, [
+      { errorMessage: 'Запис використовується в іншій сутності.' },
+    ]);
 
     expect(toAdminApiError(error, { conflict: 'Не вдалося видалити запис.' })).toMatchObject({
       code: 'Conflict',
@@ -51,16 +46,20 @@ describe('API error normalization', () => {
   });
 
   it('reads a backend { errors: [text] } body such as a 503 from an external system', () => {
-    const error = new AxiosError('Request failed with status code 503');
-    error.response = {
-      data: { errors: ['Google не дає доступу до таблиці.'] },
-      status: 503,
-    } as typeof error.response;
+    const error = new HttpError(503, { errors: ['Google не дає доступу до таблиці.'] });
 
     expect(toApiError(error)).toMatchObject({
       code: 'Server',
       message: 'Google не дає доступу до таблиці.',
       status: 503,
     });
+  });
+});
+
+describe('transport failures', () => {
+  it('maps a failed connection, a timeout and an unknown value', () => {
+    expect(toApiError(new TypeError('Failed to fetch'))).toMatchObject({ code: 'Network' });
+    expect(toApiError(new DOMException('late', 'TimeoutError'))).toMatchObject({ code: 'Timeout' });
+    expect(toApiError('boom')).toMatchObject({ code: 'Unknown', status: 0 });
   });
 });

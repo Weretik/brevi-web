@@ -1,5 +1,3 @@
-import axios from 'axios';
-
 import type { ApiError, ApiErrorCode, ApiErrorMessages } from '../contracts/api-client-contract';
 
 type ProblemDetails = {
@@ -8,6 +6,18 @@ type ProblemDetails = {
   title?: string;
   traceId?: string;
 };
+
+/** A response outside 2xx: its status, its parsed body, and the status text. */
+export class HttpError extends Error {
+  constructor(
+    readonly status: number,
+    readonly body: unknown,
+    statusText = '',
+  ) {
+    super(statusText || `Request failed with status ${status}`);
+    this.name = 'HttpError';
+  }
+}
 
 const fallbackMessage = 'Не вдалося виконати запит. Спробуйте ще раз.';
 
@@ -103,10 +113,10 @@ export function isApiError(value: unknown): value is ApiError {
 
 export function toApiError(error: unknown): ApiError {
   if (isApiError(error)) return error;
-  if (!axios.isAxiosError(error)) {
-    return { code: 'Unknown', fieldErrors: {}, message: fallbackMessage, status: 0 };
-  }
-  if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
+  if (
+    error instanceof DOMException &&
+    (error.name === 'TimeoutError' || error.name === 'AbortError')
+  ) {
     return {
       code: 'Timeout',
       fieldErrors: {},
@@ -114,16 +124,14 @@ export function toApiError(error: unknown): ApiError {
       status: 0,
     };
   }
-  if (!error.response) {
-    return {
-      code: 'Network',
-      fieldErrors: {},
-      message: error.message || fallbackMessage,
-      status: 0,
-    };
+  if (error instanceof TypeError) {
+    return { code: 'Network', fieldErrors: {}, message: fallbackMessage, status: 0 };
+  }
+  if (!(error instanceof HttpError)) {
+    return { code: 'Unknown', fieldErrors: {}, message: fallbackMessage, status: 0 };
   }
 
-  const { data, status } = error.response;
+  const { body: data, status } = error;
   const problemDetails = toProblemDetails(data);
   const fieldErrors = {
     ...firstProblemErrors(problemDetails),
@@ -148,9 +156,7 @@ export function toAdminApiError(error: unknown, messages: ApiErrorMessages = {})
   } else if (normalized.status === 404) {
     message = messages.notFound ?? message;
   } else if (normalized.status === 409) {
-    const backendMessage = axios.isAxiosError(error)
-      ? responseMessage(error.response?.data)
-      : undefined;
+    const backendMessage = error instanceof HttpError ? responseMessage(error.body) : undefined;
     message = backendMessage ?? messages.conflict ?? message;
   } else if (normalized.status === 400) {
     message = messages.badRequest ?? 'Перевірте введені дані.';
