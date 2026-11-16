@@ -1,0 +1,139 @@
+name: E2E
+
+# Full-stack browser checks: the Admin and the site against a real BreviERP API and an empty test database
+# (apps/stack-e2e). Nothing here reaches production, Telegram, Gmail, KeepinCRM, or the media CDN.
+on:
+  pull_request:
+    paths:
+      - 'apps/admin-react/**'
+      - 'apps/site/**'
+      - 'apps/stack-e2e/**'
+      - 'libs/admin/**'
+      - 'libs/site/**'
+      - 'docs/contracts/openapi/**'
+      - 'package-lock.json'
+      - '.github/workflows/e2e.yml'
+  schedule:
+    # Every night at 01:30 UTC against the latest BreviERP master, so a backend change that breaks the frontends
+    # shows up the next morning even when no frontend pull request is open.
+    - cron: '30 1 * * *'
+  workflow_dispatch:
+    inputs:
+      backend-ref:
+        description: BreviERP branch, tag, or commit to test against
+        default: master
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  # A throwaway database that lives only inside this job.
+  DB_CONNECTION: Host=localhost;Port=5432;Database=brevi_e2e;Username=postgres;Password=postgres
+  E2E_ADMIN_EMAIL: admin@e2e.test
+  E2E_ADMIN_PASSWORD: E2e-Admin-Pass1!
+  BREVI_API_URL: http://localhost:5082
+
+jobs:
+  stack:
+    name: admin and site against the API
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: brevi_e2e
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: Weretik/BreviERP
+          ref: ${{ inputs.backend-ref || 'master' }}
+          path: backend
+      # Outside the workspace, so Nx does not read the backend's files as part of this monorepo.
+      - name: Move BreviERP out of the workspace
+        run: |
+          mv backend "$RUNNER_TEMP/BreviERP"
+          echo "BACKEND_DIR=$RUNNER_TEMP/BreviERP" >> "$GITHUB_ENV"
+          echo "E2E_OUT=$RUNNER_TEMP/brevi-e2e" >> "$GITHUB_ENV"
+
+      # Backend: build the API and Host.Seed from source, the same projects the deploy images use.
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: ${{ runner.temp }}/BreviERP/global.json
+      - name: Build BreviERP
+        working-directory: ${{ env.BACKEND_DIR }}
+        run: |
+          dotnet publish src/Bootstrapper/Host.Seed/Host.Seed.csproj -c Release -o "$E2E_OUT/seed"
+          dotnet publish src/Bootstrapper/Host.Api/Host.Api.csproj -c Release -o "$E2E_OUT/api"
+      - name: Migrate and seed the test database, create the administrator
+        working-directory: ${{ env.E2E_OUT }}/seed
+        env:
+          ConnectionStrings__Default: ${{ env.DB_CONNECTION }}
+          ADMIN_DEFAULT_PASSWORD: ${{ env.E2E_ADMIN_PASSWORD }}
+          Identity__AdminUser__Email: ${{ env.E2E_ADMIN_EMAIL }}
+        run: dotnet Host.Seed.dll
+      - name: Start the API
+        working-directory: ${{ env.E2E_OUT }}/api
+        env:
+          ConnectionStrings__Default: ${{ env.DB_CONNECTION }}
+          ASPNETCORE_URLS: ${{ env.BREVI_API_URL }}
+          # Local HTTP: the CSRF cookie belongs to localhost, not to brevi.com.ua.
+          Identity__SessionCookies__CsrfCookieDomain: ''
+          # Media storage must be configured to sign in; the tests upload nothing, so it points nowhere.
+          AdmToolsStorage__Host: media.e2e.invalid
+          AdmToolsStorage__Login: e2e
+          AdmToolsStorage__Password: e2e
+          AdmToolsStorage__PublicBaseUrl: https://media.e2e.invalid
+        run: |
+          nohup dotnet Host.Api.dll > "$E2E_OUT/api.log" 2>&1 &
+          for attempt in $(seq 60); do
+            curl -sf "$BREVI_API_URL/health" && exit 0
+            sleep 1
+          done
+          cat "$E2E_OUT/api.log"
+          exit 1
+
+      # Frontend: the Admin runs from the Vite dev server, the site from a production build.
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Build the site
+        env:
+          SITE_URL: http://localhost:3001
+        run: npx nx build site --skip-nx-cache
+      - name: Read Playwright version
+        id: playwright
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+      - if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+      - run: npm run test:stack:e2e
+
+      # On a failure: the HTML report with screenshots, videos and traces of the failed tests, and the API log.
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-report
+          path: |
+            playwright-report/stack-e2e/
+            test-results/stack-e2e/
+            ${{ env.E2E_OUT }}/api.log
+          retention-days: 14

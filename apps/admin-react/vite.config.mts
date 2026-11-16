@@ -17,11 +17,13 @@ export default defineConfig(({ mode }) => {
     'src/environments',
     mode === 'production' ? 'environment.prod.ts' : 'environment.ts',
   );
+  // The full-stack e2e checks point the proxy at a local HTTP API (apps/stack-e2e).
+  const apiTarget = process.env['ADMIN_API_PROXY_TARGET'] || environment.api.baseUrl;
   const apiProxy = {
     '/api': {
-      target: environment.api.baseUrl,
+      target: apiTarget,
       changeOrigin: true,
-      secure: !environment.api.baseUrl.startsWith('https://localhost:'),
+      secure: !apiTarget.startsWith('https://localhost:'),
     },
   };
 
