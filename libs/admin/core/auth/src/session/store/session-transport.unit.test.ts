@@ -1,16 +1,9 @@
+import { stubApiFetch, type StubHandler } from '@admin/shared/api-client/testing';
 import { configureAppConfig } from '@admin/shared/config';
-import axios from 'axios';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { requestCurrentUser, requestLogin, requestLogout } from './session-transport';
 
-vi.mock('axios', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('axios')>();
-  return { ...actual, default: { ...actual.default, get: vi.fn(), post: vi.fn() } };
-});
-
-const post = vi.mocked(axios.post);
-const get = vi.mocked(axios.get);
 const meResponse = {
   userId: '1',
   email: 'admin@brevi.com.ua',
@@ -23,17 +16,21 @@ const accessResponse = {
   grants: { quotes: ['view', 'create', 'edit'] },
 };
 
+const answer = (path: string) =>
+  path === '/api/auth/session/access' ? { json: () => accessResponse } : { json: () => meResponse };
+
 describe('cookie session transport', () => {
   beforeEach(() => {
     configureAppConfig({ production: true, api: { baseUrl: 'http://localhost' } });
-    post.mockReset();
-    get.mockReset();
     document.cookie = 'brevi.csrf=; Max-Age=0; Path=/';
   });
 
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   it('signs in with the cookie endpoint and maps the user', async () => {
-    post.mockResolvedValue({ data: meResponse });
-    get.mockResolvedValue({ data: accessResponse });
+    const fetch = stubApiFetch(vi.fn(answer));
 
     await expect(
       requestLogin({ email: 'admin@brevi.com.ua', password: 'secret-pass' }),
@@ -45,54 +42,34 @@ describe('cookie session transport', () => {
       avatarUrl: null,
       access: accessResponse,
     });
-    expect(post).toHaveBeenCalledWith(
-      'http://localhost/api/auth/cookie/login',
-      { email: 'admin@brevi.com.ua', password: 'secret-pass' },
-      { withCredentials: true },
-    );
-    expect(get).toHaveBeenCalledWith('http://localhost/api/auth/session/access', {
-      withCredentials: true,
-    });
-  });
-
-  it('keeps the path relative in development, where Vite proxies /api', async () => {
-    configureAppConfig({ production: false, api: { baseUrl: 'https://localhost:7142' } });
-    post.mockResolvedValue({ data: meResponse });
-    get.mockResolvedValue({ data: accessResponse });
-
-    await requestLogin({ email: 'admin@brevi.com.ua', password: 'secret-pass' });
-
-    expect(post).toHaveBeenCalledWith(
+    expect(fetch).toHaveBeenCalledWith(
       '/api/auth/cookie/login',
-      { email: 'admin@brevi.com.ua', password: 'secret-pass' },
-      { withCredentials: true },
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ email: 'admin@brevi.com.ua', password: 'secret-pass' }),
+      }),
     );
-    expect(get).toHaveBeenCalledWith('/api/auth/session/access', { withCredentials: true });
+    expect(fetch).toHaveBeenCalledWith(
+      '/api/auth/session/access',
+      expect.objectContaining({ method: 'GET' }),
+    );
   });
 
   it('signs out with the CSRF cookie value and no bearer token', async () => {
     document.cookie = 'brevi.csrf=csrf%20value; Path=/';
-    post.mockResolvedValue({ data: undefined });
+    const fetch = stubApiFetch(vi.fn<StubHandler>(() => ({ status: 204 })));
 
     await requestLogout();
 
-    expect(post).toHaveBeenCalledWith(
-      'http://localhost/api/auth/cookie/logout',
-      {},
-      { headers: { 'X-CSRF-Token': 'csrf value' }, withCredentials: true },
-    );
+    const [path, init] = fetch.mock.calls[0] ?? [];
+    expect(path).toBe('/api/auth/cookie/logout');
+    expect(init?.method).toBe('POST');
+    expect(init?.headers.get('X-CSRF-Token')).toBe('csrf value');
+    expect(init?.headers.get('Authorization')).toBeNull();
   });
 
   it('returns null for the current user without a session', async () => {
-    get.mockRejectedValue(
-      new axios.AxiosError('Unauthorized', '401', undefined, undefined, {
-        status: 401,
-        data: {},
-        statusText: '',
-        headers: {},
-        config: { headers: new axios.AxiosHeaders() },
-      }),
-    );
+    stubApiFetch(() => ({ status: 401, json: () => ({}) }));
 
     await expect(requestCurrentUser()).resolves.toBeNull();
   });

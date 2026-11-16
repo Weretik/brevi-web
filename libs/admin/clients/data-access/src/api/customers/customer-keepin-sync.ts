@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import { customerListTag } from '../../cache/customer-cache';
 import { customerApiError } from '../../errors/customer-api-error';
 import { mapCustomerKeepinSyncResult } from '../../mappers/customer-keepin-sync.mapper';
@@ -14,13 +16,15 @@ export function customerKeepinSync(build: CustomerEndpointBuilder) {
   return {
     /** «Оновити з KeepinCRM»: the daily refresh, applied, never deleting. */
     syncCustomersFromKeepinCrm: build.mutation<CustomerKeepinSyncResult, void>({
-      query: () => ({
-        url: '/api/crm/customers/keepin-sync',
-        method: 'POST',
-        body: { dryRun: false, removeUnlinked: false } satisfies Body,
-      }),
-      transformResponse: mapCustomerKeepinSyncResult,
-      transformErrorResponse: customerApiError,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/crm/customers/keepin-sync', {
+            body: { dryRun: false, removeUnlinked: false } satisfies Body,
+            signal,
+          }),
+          mapCustomerKeepinSyncResult,
+          customerApiError,
+        ),
       invalidatesTags: (_, error) => (error ? [] : [customerListTag]),
     }),
   };

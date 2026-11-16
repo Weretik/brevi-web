@@ -27,7 +27,7 @@ const request: EmbroideryCalculationRequest = {
   expenseOverrides: {},
 };
 
-const managerCalculation: Schemas['CrmEmbroideryCalculation'] = {
+const managerCalculation: Schemas['EmbroideryCalculationResponse'] = {
   error: null,
   missing: [],
   hoopings: 50,

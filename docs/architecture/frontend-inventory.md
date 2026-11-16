@@ -29,7 +29,7 @@ are in root `package.json` and `package-lock.json`.
 - Package manager: `npm@11.6.2`, lock file `package-lock.json`.
 - Root scripts include `test:web` and its unit, component, integration, coverage, and E2E variants, plus `typecheck:tests`, `docs:check`, `docs:format:check`, and `storefront:start`, alongside existing build, lint, and formatting commands.
 - Nx defines targets per project; inspect `npx nx show project <project> --json` before planning a task.
-- `contracts:sync`, `contracts:generate`, and `contracts:check` support the OpenAPI snapshot and generated API types for React Admin.
+- `contracts:sync`, `contracts:generate`, `contracts:check` and `contracts:drift` keep the copy of the BreviERP generated OpenAPI and its types for React Admin in step with the backend ([contract workflow](api/contract-workflow.md)).
 
 ## Test tooling and existing tests
 

@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import { quoteErrors, quoteLookupErrors, toQuoteApiError } from '../../errors/quote-api-error';
 import {
   mapQuoteIntroductionSetup,
@@ -35,59 +37,84 @@ const templateErrors = (response: unknown) =>
 export const quoteIntroductionsApi = quotesBaseApi.injectEndpoints({
   endpoints: (build) => ({
     getQuoteIntroductionSetup: build.query<QuoteIntroductionSetup, void>({
-      query: () => '/api/crm/quote-lookups/introduction',
-      transformResponse: mapQuoteIntroductionSetup,
-      transformErrorResponse: lookupErrors,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/crm/quote-lookups/introduction', { signal }),
+          mapQuoteIntroductionSetup,
+          lookupErrors,
+        ),
     }),
     getQuoteCatalogProducts: build.query<QuoteCatalogProduct[], readonly number[]>({
-      query: (ids) => ({ url: '/api/crm/quote-lookups/products', params: { ids: [...ids] } }),
-      transformResponse: (value: Schemas['CrmQuoteCatalogProduct'][]) =>
-        value.map(mapQuoteCatalogProduct),
-      transformErrorResponse: lookupErrors,
+      queryFn: (ids, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/crm/quote-lookups/products', {
+            params: { query: { ids: [...ids] } },
+            signal,
+          }),
+          (value: Schemas['QuoteCatalogProductResponse'][]) => value.map(mapQuoteCatalogProduct),
+          lookupErrors,
+        ),
     }),
     /** `requestId` is one per attempt: a repeated press returns the same КП. */
     createQuoteIntroduction: build.mutation<Quote, { draft: QuoteIntroDraft; requestId: string }>({
-      query: ({ draft, requestId }) => ({
-        url: '/api/crm/quote-introductions',
-        method: 'POST',
-        body: { ...toSaveQuoteIntroductionInput(draft), requestId },
-      }),
-      transformResponse: mapQuote,
-      transformErrorResponse: errors,
+      queryFn: ({ draft, requestId }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/crm/quote-introductions', {
+            body: { ...toSaveQuoteIntroductionInput(draft), requestId },
+            signal,
+          }),
+          mapQuote,
+          errors,
+        ),
       invalidatesTags: (_result, error) => (error ? [] : list),
     }),
     saveQuoteIntroduction: build.mutation<Quote, { id: number; draft: QuoteIntroDraft }>({
-      query: ({ id, draft }) => ({
-        url: `/api/crm/quote-introductions/${id}`,
-        method: 'PUT',
-        body: toSaveQuoteIntroductionInput(draft),
-      }),
-      transformResponse: mapQuote,
-      transformErrorResponse: errors,
+      queryFn: ({ id, draft }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/crm/quote-introductions/{id}', {
+            params: { path: { id: id } },
+            body: toSaveQuoteIntroductionInput(draft),
+            signal,
+          }),
+          mapQuote,
+          errors,
+        ),
       invalidatesTags: (_result, error, { id }) => (error ? [] : [...list, { type: 'Quote', id }]),
     }),
     getQuoteIntroTemplates: build.query<QuoteIntroTemplate[], void>({
-      query: () => '/api/crm/quote-intro-templates',
-      transformResponse: mapQuoteIntroTemplates,
-      transformErrorResponse: lookupErrors,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/crm/quote-intro-templates', { signal }),
+          mapQuoteIntroTemplates,
+          lookupErrors,
+        ),
       providesTags: templates,
     }),
     createQuoteIntroTemplate: build.mutation<
       QuoteIntroTemplate,
       { name: string; draft: QuoteIntroDraft }
     >({
-      query: ({ name, draft }) => ({
-        url: '/api/crm/quote-intro-templates',
-        method: 'POST',
-        body: toCreateQuoteIntroTemplateInput(name, draft),
-      }),
-      transformResponse: mapQuoteIntroTemplate,
-      transformErrorResponse: templateErrors,
+      queryFn: ({ name, draft }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/crm/quote-intro-templates', {
+            body: toCreateQuoteIntroTemplateInput(name, draft),
+            signal,
+          }),
+          mapQuoteIntroTemplate,
+          templateErrors,
+        ),
       invalidatesTags: (_result, error) => (error ? [] : templates),
     }),
     deleteQuoteIntroTemplate: build.mutation<void, number>({
-      query: (id) => ({ url: `/api/crm/quote-intro-templates/${id}`, method: 'DELETE' }),
-      transformErrorResponse: templateErrors,
+      queryFn: (id, { signal }) =>
+        apiCall(
+          apiClient.DELETE('/api/crm/quote-intro-templates/{id}', {
+            params: { path: { id: id } },
+            signal,
+          }),
+          undefined,
+          templateErrors,
+        ),
       invalidatesTags: (_result, error) => (error ? [] : templates),
     }),
   }),

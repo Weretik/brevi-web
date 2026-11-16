@@ -1,9 +1,9 @@
-import { adminApi, toAdminApiError } from '@admin/shared/api-client';
+import { adminApi, apiCall, apiClient, toAdminApiError } from '@admin/shared/api-client';
 
 import {
   mapProductOverviewItem,
   mapProductOverviewPage,
-  productOverviewSearchParams,
+  productOverviewQueryParams,
 } from '../../mappers/product-overview/product-overview.mapper';
 import {
   parseProductOverviewItem,
@@ -27,25 +27,40 @@ const tag = 'Product' as const;
 export const productOverviewApi = adminApi.injectEndpoints({
   endpoints: (build) => ({
     listProductOverview: build.query<ProductOverviewPage, ProductOverviewListQuery>({
-      query: (query) => `/api/v1/products/overview?${productOverviewSearchParams(query)}`,
-      transformResponse: (value: unknown) =>
-        mapProductOverviewPage(parseProductOverviewPage(value)),
-      transformErrorResponse: (error) => toAdminApiError(error, productErrorMessages),
+      queryFn: (query, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/v1/products/overview', {
+            params: { query: productOverviewQueryParams(query) },
+            signal,
+          }),
+          (value: unknown) => mapProductOverviewPage(parseProductOverviewPage(value)),
+          (error) => toAdminApiError(error, productErrorMessages),
+        ),
       providesTags: (result) => [
         { type: tag, id: 'LIST' },
         ...(result?.items.map(({ id }) => ({ type: tag, id })) ?? []),
       ],
     }),
     getProductOverviewItem: build.query<ProductOverview, number>({
-      query: (id) => `/api/v1/products/${id}/overview`,
-      transformResponse: (value: unknown) =>
-        mapProductOverviewItem(parseProductOverviewItem(value)),
-      transformErrorResponse: (error) => toAdminApiError(error, productErrorMessages),
+      queryFn: (id, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/v1/products/{id}/overview', { params: { path: { id: id } }, signal }),
+          (value: unknown) => mapProductOverviewItem(parseProductOverviewItem(value)),
+          (error) => toAdminApiError(error, productErrorMessages),
+        ),
       providesTags: (_result, _error, id) => [{ type: tag, id }],
     }),
     updateProductOverview: build.mutation<void, { id: number; body: UpdateProductOverviewBody }>({
-      query: ({ id, body }) => ({ url: `/api/v1/products/${id}/overview`, method: 'PUT', body }),
-      transformErrorResponse: (error) => toAdminApiError(error, productErrorMessages),
+      queryFn: ({ id, body }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/v1/products/{id}/overview', {
+            params: { path: { id: id } },
+            body: body,
+            signal,
+          }),
+          undefined,
+          (error) => toAdminApiError(error, productErrorMessages),
+        ),
       invalidatesTags: (_result, error, { id }) =>
         error
           ? []

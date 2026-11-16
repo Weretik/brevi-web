@@ -1,4 +1,4 @@
-import { adminApi, toAdminApiError } from '@admin/shared/api-client';
+import { adminApi, apiCall, apiClient, toAdminApiError } from '@admin/shared/api-client';
 
 import { productPricesTag } from '../../cache/product-prices-tag';
 import { referenceErrorMessages } from '../../errors/reference-error-messages';
@@ -16,34 +16,51 @@ const tag = 'PricingParameter' as const;
 export const pricingParametersApi = adminApi.injectEndpoints({
   endpoints: (build) => ({
     listPricingParameters: build.query<PricingParameter[], void>({
-      query: () => '/api/reference/pricing-parameters',
-      transformResponse: (value: unknown) =>
-        mapPricingParameters(parsePricingParametersResponse(value)),
-      transformErrorResponse: (error) => toAdminApiError(error, referenceErrorMessages),
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/reference/pricing-parameters', { signal }),
+          (value: unknown) => mapPricingParameters(parsePricingParametersResponse(value)),
+          (error) => toAdminApiError(error, referenceErrorMessages),
+        ),
       providesTags: (result) => [
         { type: tag, id: 'LIST' },
         ...(result?.map(({ id }) => ({ type: tag, id })) ?? []),
       ],
     }),
     createPricingParameter: build.mutation<number, CreatePricingParameterBody>({
-      query: (body) => ({ url: '/api/reference/pricing-parameters', method: 'POST', body }),
-      transformErrorResponse: (error) => toAdminApiError(error, referenceErrorMessages),
+      queryFn: (body, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/reference/pricing-parameters', { body: body, signal }),
+          undefined,
+          (error) => toAdminApiError(error, referenceErrorMessages),
+        ),
       invalidatesTags: (_result, error) =>
         error ? [] : [productPricesTag, { type: tag, id: 'LIST' }],
     }),
     updatePricingParameter: build.mutation<void, { id: number; body: UpdatePricingParameterBody }>({
-      query: ({ id, body }) => ({
-        url: `/api/reference/pricing-parameters/${id}`,
-        method: 'PUT',
-        body,
-      }),
-      transformErrorResponse: (error) => toAdminApiError(error, referenceErrorMessages),
+      queryFn: ({ id, body }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/reference/pricing-parameters/{id}', {
+            params: { path: { id: id } },
+            body: body,
+            signal,
+          }),
+          undefined,
+          (error) => toAdminApiError(error, referenceErrorMessages),
+        ),
       invalidatesTags: (_result, error, { id }) =>
         error ? [] : [productPricesTag, { type: tag, id }, { type: tag, id: 'LIST' }],
     }),
     deletePricingParameter: build.mutation<void, number>({
-      query: (id) => ({ url: `/api/reference/pricing-parameters/${id}`, method: 'DELETE' }),
-      transformErrorResponse: (error) => toAdminApiError(error, referenceErrorMessages),
+      queryFn: (id, { signal }) =>
+        apiCall(
+          apiClient.DELETE('/api/reference/pricing-parameters/{id}', {
+            params: { path: { id: id } },
+            signal,
+          }),
+          undefined,
+          (error) => toAdminApiError(error, referenceErrorMessages),
+        ),
       invalidatesTags: (_result, error, id) =>
         error ? [] : [productPricesTag, { type: tag, id }, { type: tag, id: 'LIST' }],
     }),

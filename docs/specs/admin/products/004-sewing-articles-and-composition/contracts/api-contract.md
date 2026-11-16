@@ -1,6 +1,6 @@
 # API contract dependency
 
-**Status:** synchronized and generated, 2026-10-25. The canonical backend repository is `https://github.com/Weretik/BreviERP.git`, pinned at `cafa6c231a114c94dd8e095fa4f6dfc6b2aa60a1`. The canonical source is `docs/sdd/contracts/catalog/sewing-composition.openapi.yaml`; its local [snapshot](../../../../../contracts/openapi/backend/catalog/sewing-composition.openapi.yaml) and [provenance](../../../../../contracts/openapi/SOURCE.json) are generated through the project workflow.
+**Status:** synchronized and generated, 2026-10-25. The canonical backend repository is `https://github.com/Weretik/BreviERP.git`, pinned at `cafa6c231a114c94dd8e095fa4f6dfc6b2aa60a1`. The canonical source is `docs/sdd/contracts/catalog/sewing-composition.openapi.yaml`; its local [snapshot](../../../../../contracts/openapi/openapi.json) and [provenance](../../../../../contracts/openapi/SOURCE.md) are generated through the project workflow.
 
 | operationId                       | Canonical backend source                                     | Pinned revision                            |
 | --------------------------------- | ------------------------------------------------------------ | ------------------------------------------ |

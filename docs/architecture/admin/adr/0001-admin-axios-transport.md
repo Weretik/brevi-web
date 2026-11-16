@@ -1,6 +1,6 @@
 # ADR-0001: Axios Transport for Admin RTK Query
 
-**Status:** Accepted\
+**Status:** Superseded by [ADR-0002](0002-admin-openapi-fetch-transport.md)\
 **Date:** 2026-07-22
 
 ## Context

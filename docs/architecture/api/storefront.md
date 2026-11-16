@@ -45,7 +45,7 @@ the appropriate Storefront `data-access` boundary, and keep the feature
 responsible for visible loading/empty/error states. Check existing
 interceptors, runtime validation, SSR behavior, auth/CSRF, cache, and
 cancellation for that specific operation; do not mechanically apply React
-Admin RTK Query/Axios rules.
+Admin RTK Query/openapi-fetch rules.
 
 After implementation, update this page with a table of
 `operationId → consumer → mapper/model → cache/error behavior → test`, naming

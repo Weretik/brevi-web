@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import { reportErrors, toProductionApiError } from '../../errors/production-api-error';
 import {
   mapWorkshopDashboard,
@@ -17,15 +19,21 @@ const errors = (response: unknown) => toProductionApiError(response, reportError
 export const workshopReportsApi = productionBaseApi.injectEndpoints({
   endpoints: (build) => ({
     getWorkshopReport: build.query<WorkshopReportPair, WorkshopReportQuery>({
-      query: (params) => ({ url: '/api/production/reports', params }),
-      transformResponse: mapWorkshopReportPair,
-      transformErrorResponse: errors,
+      queryFn: (params, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/production/reports', { params: { query: params }, signal }),
+          mapWorkshopReportPair,
+          errors,
+        ),
       providesTags: ['Payroll', 'ProductionWork', 'FabricStock', 'ProductionOrder'],
     }),
     getWorkshopDashboard: build.query<WorkshopDashboard, void>({
-      query: () => ({ url: '/api/production/dashboard' }),
-      transformResponse: mapWorkshopDashboard,
-      transformErrorResponse: errors,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/production/dashboard', { signal }),
+          mapWorkshopDashboard,
+          errors,
+        ),
       providesTags: ['ProductionOrder', 'ProductionWork', 'Timesheet'],
     }),
   }),

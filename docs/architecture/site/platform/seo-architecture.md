@@ -116,7 +116,7 @@ A versioned file in `apps/site` (format decided in step 9). It maps every old `b
 
 ## Backend requirements (BreviERP)
 
-For full SEO, BreviERP needs the following. Record each item in the matching backend SDD and the [contracts](../../../contracts/openapi/SOURCE.json).
+For full SEO, BreviERP needs the following. Record each item in the matching backend SDD and the [contracts](../../../contracts/openapi/SOURCE.md).
 
 1. A public catalog read API: a category tree (three levels) with `uk` and `ru` names, slugs, H1, title, description, and SEO text. Products with a slug, the parent category, a model or SKU, description, characteristics, fabrics, sizes, colors, photos, availability, and `updatedAt`.
 2. Public price tiers 1–9, 10–39, and 40+ per product (and per fabric if the price depends on it), VAT included, plus logo surcharges for the calculator.

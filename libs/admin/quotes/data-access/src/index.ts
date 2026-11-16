@@ -3,17 +3,19 @@ export {
   useCopyQuoteMutation,
   useCreateQuoteMutation,
   useDeleteQuoteMutation,
-  useGetQuoteHistoryQuery,
-  useGetQuoteLegacyArchiveQuery,
   useGetQuotePeriodQuery,
   useGetQuoteQuery,
   useLazyGetQuoteQuery,
   useListQuotesQuery,
-  usePurgeQuoteLegacyArchiveMutation,
   useRepriceQuoteMutation,
   useSaveQuoteMutation,
   useSetQuoteResponsibleMutation,
 } from './api/quotes/quotes.api';
+export {
+  useGetQuoteHistoryQuery,
+  useGetQuoteLegacyArchiveQuery,
+  usePurgeQuoteLegacyArchiveMutation,
+} from './api/quotes/quote-history.api';
 export {
   useCalculateQuoteCustomSewingMutation,
   useGetQuoteFabricFactsQuery,

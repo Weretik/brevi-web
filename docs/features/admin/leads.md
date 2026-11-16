@@ -1,6 +1,6 @@
 # Leads: «Ліди», «Статистика лідів» and «Заявки з сайту»
 
-**State:** implemented 2026-11-08, Admin React. Backend rules R-* and scenarios SC-* in BreviERP `docs/sdd/specs/crm/006-leads/README.md` (LEAD-001); contract [`crm/leads.openapi.yaml`](../../contracts/openapi/backend/crm/leads.openapi.yaml). Look: [«Цех»](../../standards/admin/design-system.md), concept C «Мій день» chosen by the owner on 2026-11-08.
+**State:** implemented 2026-11-08, Admin React. Backend rules R-* and scenarios SC-* in BreviERP `docs/sdd/specs/crm/006-leads/README.md` (LEAD-001); contract [`crm/leads.openapi.yaml`](../../contracts/openapi/openapi.json). Look: [«Цех»](../../standards/admin/design-system.md), concept C «Мій день» chosen by the owner on 2026-11-08.
 
 An AI fills the Google Sheet «Лиды Brevi». BreviERP reads it every weekday morning (the 09:00 sync job) and on «Синхронізувати зараз»; managers take leads, call them and record results here instead of the sheet.
 
@@ -17,7 +17,7 @@ An AI fills the Google Sheet «Лиды Brevi». BreviERP reads it every weekday
 - «Усі ліди»: search, chips «Вільні / Мої / Усі» with counts (a manager starts on «Вільні»), the server-paged table and the side panel (`ReferenceEditorDrawer`) with «Взяти собі», «Дзвонити зараз» for own leads and «Повернути у вільні» for the owner or Admin (R-04).
 - `leads` edit = take and record calls; without it the page is read-only.
 - «Зведення» (`lead-stats` view): period chips, metric strip, managers table, call results, industries × categories and the last sync; only a failed sync shows as a problem. «Синхронізувати зараз» needs `lead-stats` create (Director and Admin by default).
-- «Заявки з сайту» (BreviERP LEAD-002, contract [`crm/site-requests.openapi.yaml`](../../contracts/openapi/backend/crm/site-requests.openapi.yaml)): what visitors sent from the site form «Заявка». Chips «Нові та в роботі / Мої / Закриті / Усі» with counts, the server-paged table (time, phone, what and how many, a file mark, manager, state; only a failed Telegram send is marked), and the side panel with the phone link, the file, a note and «Беру», «Готово», «Не заявка», «Повернути в нові». Anyone with `site-requests` edit takes a free request; the owner or Admin closes or frees a taken one (R-05). The bot posts each request to the groups ticked «Надсилати сюди заявки з сайту» in «Нагадування › Чати Telegram».
+- «Заявки з сайту» (BreviERP LEAD-002, contract [`crm/site-requests.openapi.yaml`](../../contracts/openapi/openapi.json)): what visitors sent from the site form «Заявка». Chips «Нові та в роботі / Мої / Закриті / Усі» with counts, the server-paged table (time, phone, what and how many, a file mark, manager, state; only a failed Telegram send is marked), and the side panel with the phone link, the file, a note and «Беру», «Готово», «Не заявка», «Повернути в нові». Anyone with `site-requests` edit takes a free request; the owner or Admin closes or frees a taken one (R-05). The bot posts each request to the groups ticked «Надсилати сюди заявки з сайту» in «Нагадування › Чати Telegram».
 - «Довідники» (`lead-stats` edit): call results (name, what it does, retry days, order, shown to managers) and category descriptions, edited in the side panel.
 
 ## Structure diagram

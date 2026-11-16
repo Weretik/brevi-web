@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import { financeTransactionsTag, financeTransfersTag } from '../../cache/accounting-tags';
 import { accountingApiError } from '../../errors/accounting-api-error';
 import {
@@ -17,9 +19,12 @@ export function financeReportEndpoints(build: AccountingEndpointBuilder) {
   return {
     /** «Звіти»; `params` come from `financeReportParams`. A movement change rebuilds it. */
     getFinanceReport: build.query<FinanceReport, Record<string, string>>({
-      query: (params) => ({ url: '/api/accounting/reports', params }),
-      transformResponse: mapFinanceReport,
-      transformErrorResponse: accountingApiError,
+      queryFn: (params, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/accounting/reports', { params: { query: params }, signal }),
+          mapFinanceReport,
+          accountingApiError,
+        ),
       providesTags: [financeTransactionsTag, financeTransfersTag],
     }),
     /** «Журнал змін» of all records, newest first. */
@@ -27,16 +32,21 @@ export function financeReportEndpoints(build: AccountingEndpointBuilder) {
       FinanceAuditPage,
       { entity: AuditEntity | null; action: AuditAction | null; page: number }
     >({
-      query: ({ entity, action, page }) => ({
-        url: '/api/accounting/audit',
-        params: {
-          page,
-          ...(entity ? { entity } : {}),
-          ...(action ? { action } : {}),
-        },
-      }),
-      transformResponse: mapFinanceAuditPage,
-      transformErrorResponse: accountingApiError,
+      queryFn: ({ entity, action, page }, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/accounting/audit', {
+            params: {
+              query: {
+                page,
+                ...(entity ? { entity } : {}),
+                ...(action ? { action } : {}),
+              },
+            },
+            signal,
+          }),
+          mapFinanceAuditPage,
+          accountingApiError,
+        ),
     }),
   };
 }

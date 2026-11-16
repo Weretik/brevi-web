@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import { productionOrderErrors, toProductionApiError } from '../../errors/production-api-error';
 import { mapOrderImportResult } from '../../mappers/orders/production-import.mapper';
 import {
@@ -80,116 +82,163 @@ function listParams(query: ProductionOrderListQuery) {
 export const productionOrdersApi = productionBaseApi.injectEndpoints({
   endpoints: (build) => ({
     getProductionOrders: build.query<ProductionOrderPage, ProductionOrderListQuery>({
-      query: (query) => ({ url: '/api/production/orders', params: listParams(query) }),
-      transformResponse: mapProductionOrderPage,
-      transformErrorResponse: errors,
+      queryFn: (query, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/production/orders', { params: { query: listParams(query) }, signal }),
+          mapProductionOrderPage,
+          errors,
+        ),
       providesTags: [list],
     }),
     getProductionModelSummary: build.query<ProductionModelSummary, ProductionOrderListQuery>({
-      query: (query) => ({
-        url: '/api/production/orders/model-summary',
-        params: filterParams(query),
-      }),
-      transformResponse: mapProductionModelSummary,
-      transformErrorResponse: errors,
+      queryFn: (query, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/production/orders/model-summary', {
+            params: { query: filterParams(query) },
+            signal,
+          }),
+          mapProductionModelSummary,
+          errors,
+        ),
       providesTags: [list],
     }),
     getProductionOrderFilterOptions: build.query<ProductionOrderFilterOptions, void>({
-      query: () => '/api/production/orders/filter-options',
-      transformResponse: mapProductionOrderFilterOptions,
-      transformErrorResponse: errors,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/production/orders/filter-options', { signal }),
+          mapProductionOrderFilterOptions,
+          errors,
+        ),
       providesTags: [list],
     }),
     getProductionOrder: build.query<ProductionOrder, number>({
-      query: (id) => `/api/production/orders/${id}`,
-      transformResponse: mapProductionOrder,
-      transformErrorResponse: errors,
+      queryFn: (id, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/production/orders/{id}', { params: { path: { id: id } }, signal }),
+          mapProductionOrder,
+          errors,
+        ),
       providesTags: (_result, _error, id) => [one(id)],
     }),
     getProductionOrderHistory: build.query<ProductionOrderChange[], number>({
-      query: (id) => `/api/production/orders/${id}/history`,
-      transformResponse: mapProductionOrderHistory,
-      transformErrorResponse: errors,
+      queryFn: (id, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/production/orders/{id}/history', {
+            params: { path: { id: id } },
+            signal,
+          }),
+          mapProductionOrderHistory,
+          errors,
+        ),
       providesTags: (_result, _error, id) => [one(id)],
     }),
     getProductionQuoteSources: build.query<ProductionQuoteSource[], string>({
-      query: (search) => ({
-        url: '/api/production/orders/quote-sources',
-        params: search.trim() ? { search: search.trim() } : {},
-      }),
-      transformResponse: mapProductionQuoteSources,
-      transformErrorResponse: errors,
+      queryFn: (search, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/production/orders/quote-sources', {
+            params: { query: search.trim() ? { search: search.trim() } : {} },
+            signal,
+          }),
+          mapProductionQuoteSources,
+          errors,
+        ),
       providesTags: [list],
     }),
     getProductionEmbroideries: build.query<ProductionEmbroideryChoice[], string>({
-      query: (search) => ({
-        url: '/api/production/orders/embroideries',
-        params: search.trim() ? { search: search.trim() } : {},
-      }),
-      transformResponse: mapProductionEmbroideryChoices,
-      transformErrorResponse: errors,
+      queryFn: (search, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/production/orders/embroideries', {
+            params: { query: search.trim() ? { search: search.trim() } : {} },
+            signal,
+          }),
+          mapProductionEmbroideryChoices,
+          errors,
+        ),
     }),
     /** Colours of «Кольори» for the item form. */
     getProductionColors: build.query<string[], void>({
-      query: () => '/api/production/orders/colors',
-      transformResponse: productionColors,
-      transformErrorResponse: errors,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/production/orders/colors', { signal }),
+          productionColors,
+          errors,
+        ),
     }),
     getProductionQuoteDraft: build.query<ProductionQuoteDraft, number>({
-      query: (quoteId) => `/api/production/orders/quote-sources/${quoteId}`,
-      transformResponse: mapProductionQuoteDraft,
-      transformErrorResponse: errors,
+      queryFn: (quoteId, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/production/orders/quote-sources/{quoteId}', {
+            params: { path: { quoteId: quoteId } },
+            signal,
+          }),
+          mapProductionQuoteDraft,
+          errors,
+        ),
     }),
     createProductionOrder: build.mutation<ProductionOrder, CreateProductionOrderBody>({
-      query: (body) => ({ url: '/api/production/orders', method: 'POST', body: createInput(body) }),
-      transformResponse: mapProductionOrder,
-      transformErrorResponse: errors,
+      queryFn: (body, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/production/orders', { body: createInput(body), signal }),
+          mapProductionOrder,
+          errors,
+        ),
       invalidatesTags: (_result, error) => (error ? [] : [list]),
     }),
     updateProductionOrder: build.mutation<
       ProductionOrder,
       { id: number; body: UpdateProductionOrderBody }
     >({
-      query: ({ id, body }) => ({
-        url: `/api/production/orders/${id}`,
-        method: 'PUT',
-        body: updateInput(body),
-      }),
-      transformResponse: mapProductionOrder,
-      transformErrorResponse: errors,
+      queryFn: ({ id, body }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/production/orders/{id}', {
+            params: { path: { id: id } },
+            body: updateInput(body),
+            signal,
+          }),
+          mapProductionOrder,
+          errors,
+        ),
       invalidatesTags: (_result, error, { id }) => (error ? [] : [list, one(id)]),
     }),
     copyProductionOrder: build.mutation<ProductionOrder, { id: number; requestId: string }>({
-      query: ({ id, requestId }) => ({
-        url: `/api/production/orders/${id}/copy`,
-        method: 'POST',
-        body: { requestId },
-      }),
-      transformResponse: mapProductionOrder,
-      transformErrorResponse: errors,
+      queryFn: ({ id, requestId }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/production/orders/{id}/copy', {
+            params: { path: { id: id } },
+            body: { requestId },
+            signal,
+          }),
+          mapProductionOrder,
+          errors,
+        ),
       invalidatesTags: (_result, error) => (error ? [] : [list]),
     }),
     deleteProductionOrder: build.mutation<void, { id: number; version: number }>({
-      query: ({ id, version }) => ({
-        url: `/api/production/orders/${id}`,
-        method: 'DELETE',
-        params: { version },
-      }),
-      transformErrorResponse: errors,
+      queryFn: ({ id, version }, { signal }) =>
+        apiCall(
+          apiClient.DELETE('/api/production/orders/{id}', {
+            params: { path: { id: id }, query: { version } },
+            signal,
+          }),
+          undefined,
+          errors,
+        ),
       invalidatesTags: (_result, error, { id }) => (error ? [] : [list, one(id)]),
     }),
     importProductionOrders: build.mutation<
       ProductionImportResult,
       { rows: ProductionOrderImportRow[]; dryRun: boolean }
     >({
-      query: ({ rows, dryRun }) => ({
-        url: '/api/production/orders/import',
-        method: 'POST',
-        params: { dryRun },
-        body: importInput(rows),
-      }),
-      transformResponse: mapOrderImportResult,
-      transformErrorResponse: errors,
+      queryFn: ({ rows, dryRun }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/production/orders/import', {
+            params: { query: { dryRun } },
+            body: importInput(rows),
+            signal,
+          }),
+          mapOrderImportResult,
+          errors,
+        ),
       invalidatesTags: (result, error) =>
         error || !result || result.dryRun || result.errors > 0 ? [] : [list],
     }),

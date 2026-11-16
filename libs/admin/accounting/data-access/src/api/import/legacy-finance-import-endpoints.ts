@@ -1,3 +1,5 @@
+import { apiCall, apiClient, formDataBody } from '@admin/shared/api-client';
+
 import {
   financeAccountsTag,
   financeCategoriesTag,
@@ -16,21 +18,17 @@ export function legacyFinanceImportEndpoints(build: AccountingEndpointBuilder) {
     /** «Перенесення архіву»: a check (`dryRun`) or the move of the old Calculator «Фінанси». */
     importLegacyFinance: build.mutation<LegacyFinanceImportReport, { file: File; dryRun: boolean }>(
       {
-        queryFn: async ({ file, dryRun }, _api, _extra, baseQuery) => {
-          const body = new FormData();
-          body.append('file', await compressFinanceFile(file), file.name);
-          const result = await baseQuery({
-            url: '/api/accounting/legacy-import',
-            method: 'POST',
-            params: { dryRun },
-            body,
-          });
-          if (result.error) return { error: accountingApiError(result.error) };
-          try {
-            return { data: mapLegacyFinanceImportReport(result.data) };
-          } catch (error) {
-            return { error: accountingApiError(error) };
-          }
+        queryFn: async ({ file, dryRun }, { signal }) => {
+          const compressed = new File([await compressFinanceFile(file)], file.name);
+          return apiCall(
+            apiClient.POST('/api/accounting/legacy-import', {
+              params: { query: { dryRun } },
+              ...formDataBody({ file: compressed }),
+              signal,
+            }),
+            mapLegacyFinanceImportReport,
+            accountingApiError,
+          );
         },
         /** A move fills every list of «Бухгалтерія». */
         invalidatesTags: (report) =>

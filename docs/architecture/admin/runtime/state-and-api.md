@@ -4,7 +4,7 @@
 
 - Server state is implemented with RTK Query and belongs in `data-access`.
 - The planned root Redux store belongs in `apps/admin-react/src/app/store.ts`; this file is not present in the current bootstrap.
-- The shared API is in `@admin/shared/api-client`; transport details are defined in [ADR-0001](../adr/0001-admin-axios-transport.md).
+- The shared API is in `@admin/shared/api-client`; transport details are defined in [ADR-0002](../adr/0002-admin-openapi-fetch-transport.md).
 - `admin/core/auth` provides `AuthSessionAdapter` to the API client; the API client does not store tokens or know the session refresh endpoint.
 - Each domain declares endpoints in its own `data-access` library through `baseApi.injectEndpoints`.
 - A feature uses only exported typed hooks and does not access `baseApi` directly.
@@ -20,19 +20,21 @@ are grouped by role:
 ```text
 libs/admin/shared/api-client/src/
 ├── index.ts
-├── client/        # Axios instance creation
-├── contracts/     # ApiRequest, ApiError, auth contracts
-├── errors/        # transport/API error normalization and tests
-├── interceptors/  # auth header, refresh/retry, logging, and installer
-├── rtk-query/     # baseApi and Axios base query
-└── runtime/       # runtime configuration: session adapter, error notifier
+├── client/        # openapi-fetch client, apiCall/apiRequest, formDataBody
+├── contracts/     # ApiError, auth contracts
+├── csrf/          # CSRF token cookie
+├── errors/        # HttpError and API error normalization
+├── middleware/    # CSRF header, development logging, 401 handling
+├── rtk-query/     # baseApi (fakeBaseQuery) and its provider
+├── runtime/       # runtime configuration: session adapter, error notifier
+└── testing/       # stubApiFetch for tests (@admin/shared/api-client/testing)
 ```
 
-- A module does not combine the Axios client, interceptor, RTK Query base query, transport contract, and error mapper.
-- An interceptor does not own global application state; the session adapter and error notifier belong in `runtime` and are configured through the public API.
-- Domain `data-access` libraries declare endpoints only through `baseApi.injectEndpoints`; they do not create their own Axios instance or import internal `api-client` modules.
+- A module does not combine the client, middleware, RTK Query base API, transport contract, and error mapper.
+- Middleware does not own global application state; the session adapter and error notifier belong in `runtime` and are configured through the public API.
+- Domain `data-access` libraries declare endpoints only through `baseApi.injectEndpoints`; each endpoint is a `queryFn` calling `apiCall(apiClient.<METHOD>(...), mapper)`; they do not call `fetch` directly or import internal `api-client` modules.
 - Change public transport layer exports only through a separate compatible decision.
-- A change to transport behavior includes relevant error mapping or interceptor behavior tests and verification with `npx nx build admin-react`.
+- A change to transport behavior includes relevant error mapping or middleware behavior tests and verification with `npx nx build admin-react`.
 
 ## Target structure of `@admin/shared/config`
 

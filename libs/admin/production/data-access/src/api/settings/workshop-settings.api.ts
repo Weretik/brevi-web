@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import { toProductionApiError } from '../../errors/production-api-error';
 import { mapWorkshopSettings } from '../../mappers/orders/production-tracking.mapper';
 import { productionBaseApi } from '../base/production-base-api';
@@ -24,25 +26,27 @@ const tag = { type: 'WorkshopSettings' as const, id: 'ONE' };
 export const workshopSettingsApi = productionBaseApi.injectEndpoints({
   endpoints: (build) => ({
     getWorkshopSettings: build.query<WorkshopSettings, void>({
-      query: () => '/api/production/settings',
-      transformResponse: mapWorkshopSettings,
-      transformErrorResponse: errors,
+      queryFn: (_arg, { signal }) =>
+        apiCall(apiClient.GET('/api/production/settings', { signal }), mapWorkshopSettings, errors),
       providesTags: [tag],
     }),
     updateWorkshopSettings: build.mutation<WorkshopSettings, WorkshopSettingsBody>({
-      query: (body) => ({
-        url: '/api/production/settings',
-        method: 'PUT',
-        body: settingsInput(body),
-      }),
-      transformResponse: mapWorkshopSettings,
-      transformErrorResponse: errors,
+      queryFn: (body, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/production/settings', { body: settingsInput(body), signal }),
+          mapWorkshopSettings,
+          errors,
+        ),
       // The order cards say whether «Надіслати в цех» can work.
       invalidatesTags: (_result, error) => (error ? [] : [tag, { type: 'ProductionOrder' }]),
     }),
     sendWorkshopTelegramTest: build.mutation<void, void>({
-      query: () => ({ url: '/api/production/settings/telegram-test', method: 'POST' }),
-      transformErrorResponse: errors,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/production/settings/telegram-test', { signal }),
+          undefined,
+          errors,
+        ),
     }),
   }),
 });

@@ -26,6 +26,7 @@ jobs:
       - run: npm ci
       - uses: nrwl/nx-set-shas@v4
       - run: npm run docs:check
+      - run: npm run contracts:fixtures
       - run: npm run contracts:check
       - run: npm run ci:test-scripts:fixtures
       - run: npm run ci:test-scripts
@@ -41,3 +42,5 @@ jobs:
       - run: npx nx run site:typecheck
       - run: node tools/ci/run-affected.mjs test:site
       - run: npx nx build site
+      # The snapshot must equal the contract on the BreviERP default branch; `npm run contracts:sync` refreshes it.
+      - run: npm run contracts:drift

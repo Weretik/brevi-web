@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import {
   financeCounterpartiesTag,
   financeCounterpartyTags,
@@ -20,22 +22,8 @@ import type {
   FinanceHistoryEntry,
 } from '@admin/accounting/model';
 
-const counterparties = '/api/accounting/counterparties';
-const one = (id: string) => `${counterparties}/${encodeURIComponent(id)}`;
-
 const changed = (_: unknown, error: unknown, { id }: { id: string }) =>
   error ? [] : [...financeCounterpartyTags, financeHistoryTag(id)];
-
-const action = (path: 'verify' | 'archive' | 'restore') => ({
-  query: ({ id, version }: { id: string; version: number }) => ({
-    url: `${one(id)}/${path}`,
-    method: 'POST',
-    body: { version },
-  }),
-  transformResponse: mapFinanceCounterparty,
-  transformErrorResponse: accountingApiError,
-  invalidatesTags: changed,
-});
 
 export function financeCounterpartyEndpoints(build: AccountingEndpointBuilder) {
   return {
@@ -44,67 +32,132 @@ export function financeCounterpartyEndpoints(build: AccountingEndpointBuilder) {
       FinanceCounterpartyPage,
       Record<string, string | number | boolean>
     >({
-      query: (params) => ({ url: counterparties, params }),
-      transformResponse: mapFinanceCounterpartyPage,
-      transformErrorResponse: accountingApiError,
+      queryFn: (params, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/accounting/counterparties', { params: { query: params }, signal }),
+          mapFinanceCounterpartyPage,
+          accountingApiError,
+        ),
       providesTags: [financeCounterpartiesTag],
     }),
     /** The counterparty field of an operation: active ones of the three kinds. */
     getFinanceCounterpartyChoices: build.query<FinanceCounterpartyChoice[], string>({
-      query: (search) => ({
-        url: `${counterparties}/choices`,
-        params: search.trim() ? { search: search.trim() } : {},
-      }),
-      transformResponse: mapFinanceCounterpartyChoices,
-      transformErrorResponse: accountingApiError,
+      queryFn: (search, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/accounting/counterparties/choices', {
+            params: { query: search.trim() ? { search: search.trim() } : {} },
+            signal,
+          }),
+          mapFinanceCounterpartyChoices,
+          accountingApiError,
+        ),
       providesTags: [financeCounterpartiesTag],
     }),
     createFinanceCounterparty: build.mutation<
       FinanceCounterparty,
       FinanceCounterpartyBody & { verified: boolean }
     >({
-      query: (body) => ({ url: counterparties, method: 'POST', body }),
-      transformResponse: mapFinanceCounterparty,
-      transformErrorResponse: accountingApiError,
+      queryFn: (body, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/accounting/counterparties', { body: body, signal }),
+          mapFinanceCounterparty,
+          accountingApiError,
+        ),
       invalidatesTags: (_, error) => (error ? [] : [financeCounterpartiesTag]),
     }),
     updateFinanceCounterparty: build.mutation<
       FinanceCounterparty,
       { id: string; body: FinanceCounterpartyBody & { version: number } }
     >({
-      query: ({ id, body }) => ({ url: one(id), method: 'PUT', body }),
-      transformResponse: mapFinanceCounterparty,
-      transformErrorResponse: accountingApiError,
+      queryFn: ({ id, body }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/accounting/counterparties/{id}', {
+            params: { path: { id: id } },
+            body: body,
+            signal,
+          }),
+          mapFinanceCounterparty,
+          accountingApiError,
+        ),
       invalidatesTags: changed,
     }),
     verifyFinanceCounterparty: build.mutation<FinanceCounterparty, { id: string; version: number }>(
-      action('verify'),
+      {
+        queryFn: ({ id, version }, { signal }) =>
+          apiCall(
+            apiClient.POST('/api/accounting/counterparties/{id}/verify', {
+              params: { path: { id } },
+              body: { version },
+              signal,
+            }),
+            mapFinanceCounterparty,
+            accountingApiError,
+          ),
+        invalidatesTags: changed,
+      },
     ),
     archiveFinanceCounterparty: build.mutation<
       FinanceCounterparty,
       { id: string; version: number }
-    >(action('archive')),
+    >({
+      queryFn: ({ id, version }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/accounting/counterparties/{id}/archive', {
+            params: { path: { id } },
+            body: { version },
+            signal,
+          }),
+          mapFinanceCounterparty,
+          accountingApiError,
+        ),
+      invalidatesTags: changed,
+    }),
     restoreFinanceCounterparty: build.mutation<
       FinanceCounterparty,
       { id: string; version: number }
-    >(action('restore')),
+    >({
+      queryFn: ({ id, version }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/accounting/counterparties/{id}/restore', {
+            params: { path: { id } },
+            body: { version },
+            signal,
+          }),
+          mapFinanceCounterparty,
+          accountingApiError,
+        ),
+      invalidatesTags: changed,
+    }),
     /** Moves every operation of `id` to `targetId` and archives `id`; returns the target. */
     mergeFinanceCounterparty: build.mutation<
       FinanceCounterparty,
       { id: string; version: number; targetId: string; targetVersion: number }
     >({
-      query: ({ id, ...body }) => ({ url: `${one(id)}/merge`, method: 'POST', body }),
-      transformResponse: mapFinanceCounterparty,
-      transformErrorResponse: accountingApiError,
+      queryFn: ({ id, ...body }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/accounting/counterparties/{id}/merge', {
+            params: { path: { id: id } },
+            body: body,
+            signal,
+          }),
+          mapFinanceCounterparty,
+          accountingApiError,
+        ),
       invalidatesTags: (_, error, { id, targetId }) =>
         error
           ? []
           : [...financeCounterpartyTags, financeHistoryTag(id), financeHistoryTag(targetId)],
     }),
     getFinanceCounterpartyHistory: build.query<FinanceHistoryEntry[], string>({
-      query: (id) => ({ url: `${one(id)}/history` }),
-      transformResponse: mapFinanceHistory,
-      transformErrorResponse: accountingApiError,
+      queryFn: (id, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/accounting/counterparties/{id}/history', {
+            params: { path: { id: id } },
+            signal,
+          }),
+          mapFinanceHistory,
+          accountingApiError,
+        ),
       providesTags: (_, __, id) => [financeHistoryTag(id)],
     }),
   };

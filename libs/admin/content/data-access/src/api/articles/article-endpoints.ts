@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import { articleTag, articlesTag } from '../../cache/article-tags';
 import { articleApiError } from '../../errors/publishing/article-api-error';
 import {
@@ -27,26 +29,37 @@ type ImportBody = operations['importOldSiteArticles']['requestBody']['content'][
 export function articleEndpoints(build: ContentEndpointBuilder) {
   return {
     getContentArticles: build.query<ArticleRow[], void>({
-      query: () => ({ url: '/api/content/articles' }),
-      transformResponse: mapArticleList,
-      transformErrorResponse: articleApiError,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/content/articles', { signal }),
+          mapArticleList,
+          articleApiError,
+        ),
       providesTags: [articlesTag],
     }),
     getContentArticle: build.query<Article, number>({
-      query: (id) => ({ url: `/api/content/articles/${id}` }),
-      transformResponse: mapArticle,
-      transformErrorResponse: articleApiError,
+      queryFn: (id, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/content/articles/{id}', { params: { path: { id: id } }, signal }),
+          mapArticle,
+          articleApiError,
+        ),
       providesTags: (_result, _error, id) => [articleTag(id)],
     }),
     /** Creates an article when `id` is null, otherwise replaces it as a whole. */
     saveContentArticle: build.mutation<Article, ArticleInput>({
-      query: ({ id, ...input }) => ({
-        url: id === null ? '/api/content/articles' : `/api/content/articles/${id}`,
-        method: id === null ? 'POST' : 'PUT',
-        body: input satisfies SaveBody,
-      }),
-      transformResponse: mapArticle,
-      transformErrorResponse: articleApiError,
+      queryFn: ({ id, ...input }, { signal }) =>
+        apiCall(
+          id === null
+            ? apiClient.POST('/api/content/articles', { body: input satisfies SaveBody, signal })
+            : apiClient.PUT('/api/content/articles/{id}', {
+                params: { path: { id } },
+                body: input satisfies SaveBody,
+                signal,
+              }),
+          mapArticle,
+          articleApiError,
+        ),
       // A stale revision means someone else saved: reload either way.
       invalidatesTags: (_result, _error, { id }) =>
         id === null ? [articlesTag] : [articlesTag, articleTag(id)],
@@ -55,18 +68,25 @@ export function articleEndpoints(build: ContentEndpointBuilder) {
       ArticleVisibility,
       { id: number; showOnSite: boolean }
     >({
-      query: ({ id, showOnSite }) => ({
-        url: `/api/content/articles/${id}/visibility`,
-        method: 'PATCH',
-        body: { showOnSite } satisfies VisibilityBody,
-      }),
-      transformResponse: mapArticleVisibility,
-      transformErrorResponse: articleApiError,
+      queryFn: ({ id, showOnSite }, { signal }) =>
+        apiCall(
+          apiClient.PATCH('/api/content/articles/{id}/visibility', {
+            params: { path: { id: id } },
+            body: { showOnSite } satisfies VisibilityBody,
+            signal,
+          }),
+          mapArticleVisibility,
+          articleApiError,
+        ),
       invalidatesTags: (_result, _error, { id }) => [articlesTag, articleTag(id)],
     }),
     deleteContentArticle: build.mutation<void, number>({
-      query: (id) => ({ url: `/api/content/articles/${id}`, method: 'DELETE' }),
-      transformErrorResponse: articleApiError,
+      queryFn: (id, { signal }) =>
+        apiCall(
+          apiClient.DELETE('/api/content/articles/{id}', { params: { path: { id: id } }, signal }),
+          undefined,
+          articleApiError,
+        ),
       invalidatesTags: (_result, _error, id) => [articlesTag, articleTag(id)],
     }),
     /** One-time transfer of old-site articles: a check (`dryRun`) or the transfer of one part of the file. */
@@ -74,14 +94,15 @@ export function articleEndpoints(build: ContentEndpointBuilder) {
       ArticleImportReport,
       OldSiteImportOptions & { items: OldSiteImportItems; dryRun: boolean }
     >({
-      query: ({ items, dryRun, showOnSite, overwrite }) => ({
-        url: '/api/content/articles/old-site-import',
-        method: 'POST',
-        // The file is passed as it is; the server checks every article.
-        body: { items: items as unknown as ImportBody['items'], dryRun, showOnSite, overwrite },
-      }),
-      transformResponse: mapArticleImportReport,
-      transformErrorResponse: articleApiError,
+      queryFn: ({ items, dryRun, showOnSite, overwrite }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/content/articles/old-site-import', {
+            body: { items: items as unknown as ImportBody['items'], dryRun, showOnSite, overwrite },
+            signal,
+          }),
+          mapArticleImportReport,
+          articleApiError,
+        ),
       invalidatesTags: (report) => (report && !report.dryRun ? ['ContentArticle'] : []),
     }),
   };

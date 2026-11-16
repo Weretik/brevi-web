@@ -1,4 +1,4 @@
-import { adminApi } from '@admin/shared/api-client';
+import { adminApi, apiCall, apiClient } from '@admin/shared/api-client';
 
 import { ppePricingError } from './ppe-pricing-errors';
 import { mapPpeRule } from '../../mappers/ppe-pricing/ppe-rule.mapper';
@@ -10,22 +10,27 @@ type Body = operations['createPpeRuleVersion']['requestBody']['content']['applic
 export const ppeRuleVersionsApi = adminApi.injectEndpoints({
   endpoints: (build) => ({
     getPpePricingRule: build.query<PpeRuleVersion, string>({
-      query: (code) => `/api/v1/pricing/ppe/rules?${new URLSearchParams({ code })}`,
-      transformResponse: (value, _meta, code) => mapPpeRule(value, code),
-      transformErrorResponse: ppePricingError,
+      queryFn: (code, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/v1/pricing/ppe/rules', { params: { query: { code } }, signal }),
+          (value) => mapPpeRule(value, code),
+          ppePricingError,
+        ),
       providesTags: [{ type: 'Product', id: 'LIST' }],
     }),
     createPpeRuleVersion: build.mutation<
       PpeRuleVersion,
       { expectedVersionId: string | null; requestId: string; values: PpeRuleValues }
     >({
-      query: (body) => ({
-        url: '/api/v1/pricing/ppe/rules/versions',
-        method: 'POST',
-        body: body satisfies Body,
-      }),
-      transformResponse: (value, _meta, args) => mapPpeRule(value, args.values.code),
-      transformErrorResponse: ppePricingError,
+      queryFn: (body, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/v1/pricing/ppe/rules/versions', {
+            body: body satisfies Body,
+            signal,
+          }),
+          (value) => mapPpeRule(value, body.values.code),
+          ppePricingError,
+        ),
       invalidatesTags: (_result, error) => (error ? [] : [{ type: 'Product', id: 'LIST' }]),
     }),
   }),

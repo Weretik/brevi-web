@@ -10,7 +10,7 @@ import type { components } from '@admin/shared/contracts';
 
 type Schemas = components['schemas'];
 
-const input: Schemas['CrmCalculateEmbroideryInput'] = {
+const input: Schemas['CalculateEmbroideryInput'] = {
   mode: 'Garment',
   quantity: 50,
   stitchesPerUnit: 10_000,
@@ -25,7 +25,7 @@ const input: Schemas['CrmCalculateEmbroideryInput'] = {
   expenseOverrides: null,
 };
 
-const saved: Schemas['CrmEmbroiderySavedCalculation'] = {
+const saved: Schemas['EmbroiderySavedCalculationResponse'] = {
   summary: {
     id: 42,
     number: 'ВШ-0042',
@@ -78,7 +78,14 @@ describe('embroidery saved mapper', () => {
       name: '   ',
       customerPublicId: null,
       category: 'Категорія 1',
-      calculation: { ...input, machineMinutes: null, expenseOverrides: {} },
+      calculation: {
+        ...input,
+        mode: 'Garment',
+        program: 'New',
+        materialMode: 'UsedBlanks',
+        machineMinutes: null,
+        expenseOverrides: {},
+      },
     });
 
     expect(body.name).toBeNull();

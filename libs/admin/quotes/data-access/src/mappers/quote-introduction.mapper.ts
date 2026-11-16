@@ -3,21 +3,23 @@ import { mapQuoteCatalogProduct } from './quote.mapper';
 import type {
   QuoteIntroDraft,
   QuoteIntroductionSetup,
+  QuoteIntroLayout,
   QuoteIntroMainModel,
+  QuoteIntroSeason,
   QuoteIntroTemplate,
 } from '@admin/quotes/model';
 import type { components } from '@admin/shared/contracts';
 
 type Schemas = components['schemas'];
 
-const mainModel = (value: Schemas['CrmQuoteIntroMainModel']): QuoteIntroMainModel => ({
+const mainModel = (value: Schemas['QuoteIntroMainModelResponse']): QuoteIntroMainModel => ({
   code: value.code,
   product: value.product ? mapQuoteCatalogProduct(value.product) : null,
   problem: value.problem ?? null,
 });
 
 export const mapQuoteIntroductionSetup = (
-  value: Schemas['CrmQuoteIntroductionSetup'],
+  value: Schemas['QuoteIntroductionSetupResponse'],
 ): QuoteIntroductionSetup => ({
   summer: mainModel(value.summer),
   winter: mainModel(value.winter),
@@ -25,17 +27,17 @@ export const mapQuoteIntroductionSetup = (
 });
 
 export const mapQuoteIntroTemplates = (
-  value: Schemas['CrmQuoteIntroTemplate'][],
+  value: Schemas['QuoteIntroTemplateResponse'][],
 ): QuoteIntroTemplate[] => value.map(mapQuoteIntroTemplate);
 
 export const mapQuoteIntroTemplate = (
-  value: Schemas['CrmQuoteIntroTemplate'],
+  value: Schemas['QuoteIntroTemplateResponse'],
 ): QuoteIntroTemplate => ({
   id: value.id,
   name: value.name,
-  layout: value.layout,
+  layout: value.layout as QuoteIntroLayout,
   letterName: value.letterName ?? null,
-  pages: value.pages,
+  pages: value.pages.map((page) => ({ ...page, season: page.season as QuoteIntroSeason })),
   author: value.author,
   createdAt: value.createdAt,
   canDelete: value.canDelete,
@@ -43,7 +45,7 @@ export const mapQuoteIntroTemplate = (
 
 const text = (value: string): string | null => value.trim() || null;
 
-const pages = (draft: QuoteIntroDraft): Schemas['CrmQuoteIntroPageInput'][] =>
+const pages = (draft: QuoteIntroDraft): Schemas['QuoteIntroPageInput'][] =>
   draft.pages.map((page) => ({
     season: page.season,
     models: page.slots.map((slot) => ({
@@ -56,7 +58,7 @@ const pages = (draft: QuoteIntroDraft): Schemas['CrmQuoteIntroPageInput'][] =>
 /** Prices are never sent: the server takes them from the Catalog or keeps the saved ones. */
 export function toSaveQuoteIntroductionInput(
   draft: QuoteIntroDraft,
-): Schemas['CrmSaveQuoteIntroductionInput'] {
+): Schemas['SaveQuoteIntroductionInput'] {
   return {
     version: draft.version,
     internalName: draft.internalName.trim(),
@@ -76,7 +78,7 @@ export function toSaveQuoteIntroductionInput(
 export function toCreateQuoteIntroTemplateInput(
   name: string,
   draft: QuoteIntroDraft,
-): Schemas['CrmCreateQuoteIntroTemplateInput'] {
+): Schemas['CreateQuoteIntroTemplateInput'] {
   return {
     name: name.trim(),
     layout: draft.layout,

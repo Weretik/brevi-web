@@ -1,4 +1,4 @@
-import { adminApi } from '@admin/shared/api-client';
+import { adminApi, apiCall, apiClient } from '@admin/shared/api-client';
 
 import { sewingPricingError } from './pricing-errors';
 import { mapSewingPublication } from '../../mappers/sewing-pricing/sewing-publication.mapper';
@@ -11,10 +11,15 @@ type Scope = operations['getPublishedSewingPrice']['parameters']['path'];
 export const sewingPublicationsApi = adminApi.injectEndpoints({
   endpoints: (build) => ({
     getPublishedSewingPrice: build.query<SewingPublication, Scope>({
-      query: ({ productId, articleId }) =>
-        `/api/v1/products/${productId}/articles/${articleId}/pricing/published`,
-      transformResponse: (value, _meta, scope) => mapSewingPublication(value, scope),
-      transformErrorResponse: sewingPricingError,
+      queryFn: (scope, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/v1/products/{productId}/articles/{articleId}/pricing/published', {
+            params: { path: scope },
+            signal,
+          }),
+          (value) => mapSewingPublication(value, scope),
+          sewingPricingError,
+        ),
       providesTags: (_result, _error, { productId }) => [{ type: 'Product', id: productId }],
     }),
   }),

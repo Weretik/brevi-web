@@ -1,5 +1,5 @@
 import type { GarmentAccessoriesResponse } from '../../contracts/garment-accessories/garment-accessories-response';
-import type { GarmentAccessory } from '@admin/references/model';
+import type { GarmentAccessory, GarmentAccessoryUnit } from '@admin/references/model';
 
 export function mapGarmentAccessories(value: GarmentAccessoriesResponse): GarmentAccessory[] {
   return value.map((row) => ({
@@ -8,7 +8,7 @@ export function mapGarmentAccessories(value: GarmentAccessoriesResponse): Garmen
     name: row.name,
     supplierName: row.supplierName,
     price: row.price,
-    unit: row.unit,
+    unit: row.unit as GarmentAccessoryUnit,
     priceUpdatedAt: row.priceUpdatedAt,
     isActive: row.isActive,
     comment: row.comment,

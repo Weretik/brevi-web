@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import { embroideryBaseApi } from './embroidery-base-api';
 import { toEmbroideryApiError } from '../errors/embroidery-api-error';
 import {
@@ -46,89 +48,120 @@ export interface EmbroiderySavedListArgs {
 export const embroideryApi = embroideryBaseApi.injectEndpoints({
   endpoints: (build) => ({
     getEmbroideryForm: build.query<EmbroideryFormSetup, void>({
-      query: () => '/api/crm/embroidery/form',
-      transformResponse: (value: unknown) => mapEmbroideryForm(ensureEmbroideryForm(value)),
-      transformErrorResponse: toEmbroideryApiError,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/crm/embroidery/form', { signal }),
+          (value: unknown) => mapEmbroideryForm(ensureEmbroideryForm(value)),
+          toEmbroideryApiError,
+        ),
       providesTags: settingsTag,
     }),
     /** A POST that changes nothing: a query, so the same inputs come from the cache. */
     calculateEmbroidery: build.query<EmbroideryCalculation, EmbroideryCalculationRequest>({
-      query: (request) => ({
-        url: '/api/crm/embroidery/calculate',
-        method: 'POST',
-        body: toCalculateEmbroideryInput(request),
-      }),
-      transformResponse: (value: unknown) =>
-        mapEmbroideryCalculation(ensureEmbroideryCalculation(value)),
-      transformErrorResponse: toEmbroideryApiError,
+      queryFn: (request, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/crm/embroidery/calculate', {
+            body: toCalculateEmbroideryInput(request),
+            signal,
+          }),
+          (value: unknown) => mapEmbroideryCalculation(ensureEmbroideryCalculation(value)),
+          toEmbroideryApiError,
+        ),
       providesTags: settingsTag,
       keepUnusedDataFor: 30,
     }),
     getEmbroiderySettings: build.query<EmbroiderySettings, void>({
-      query: () => '/api/crm/embroidery/settings',
-      transformResponse: (value: unknown) => mapEmbroiderySettings(ensureEmbroiderySettings(value)),
-      transformErrorResponse: toEmbroideryApiError,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/crm/embroidery/settings', { signal }),
+          (value: unknown) => mapEmbroiderySettings(ensureEmbroiderySettings(value)),
+          toEmbroideryApiError,
+        ),
       providesTags: settingsTag,
     }),
     saveEmbroiderySettings: build.mutation<
       EmbroiderySettings,
       { version: number; settings: EmbroiderySettingsContent }
     >({
-      query: ({ version, settings }) => ({
-        url: '/api/crm/embroidery/settings',
-        method: 'PUT',
-        body: toSaveEmbroiderySettingsInput(version, settings),
-      }),
-      transformResponse: (value: unknown) => mapEmbroiderySettings(ensureEmbroiderySettings(value)),
-      transformErrorResponse: toEmbroideryApiError,
+      queryFn: ({ version, settings }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/crm/embroidery/settings', {
+            body: toSaveEmbroiderySettingsInput(version, settings),
+            signal,
+          }),
+          (value: unknown) => mapEmbroiderySettings(ensureEmbroiderySettings(value)),
+          toEmbroideryApiError,
+        ),
       invalidatesTags: (_result, error) => (error ? [] : settingsTag),
     }),
     getEmbroideryCalculations: build.query<EmbroiderySavedPage, EmbroiderySavedListArgs>({
-      query: ({ search, page, pageSize }) => ({
-        url: '/api/crm/embroidery/calculations',
-        params: { ...(search.trim() ? { search: search.trim() } : {}), page, pageSize },
-      }),
-      transformResponse: (value: unknown) =>
-        mapEmbroiderySavedPage(ensureEmbroiderySavedPage(value)),
-      transformErrorResponse: toEmbroideryApiError,
+      queryFn: ({ search, page, pageSize }, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/crm/embroidery/calculations', {
+            params: {
+              query: { ...(search.trim() ? { search: search.trim() } : {}), page, pageSize },
+            },
+            signal,
+          }),
+          (value: unknown) => mapEmbroiderySavedPage(ensureEmbroiderySavedPage(value)),
+          toEmbroideryApiError,
+        ),
       providesTags: [savedListTag],
     }),
     getEmbroideryCalculation: build.query<EmbroiderySavedCalculation, number>({
-      query: (id) => `/api/crm/embroidery/calculations/${id}`,
-      transformResponse: (value: unknown) =>
-        mapEmbroiderySavedCalculation(ensureEmbroiderySavedCalculation(value)),
-      transformErrorResponse: toEmbroideryApiError,
+      queryFn: (id, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/crm/embroidery/calculations/{id}', {
+            params: { path: { id: id } },
+            signal,
+          }),
+          (value: unknown) =>
+            mapEmbroiderySavedCalculation(ensureEmbroiderySavedCalculation(value)),
+          toEmbroideryApiError,
+        ),
       providesTags: (_result, _error, id) => [{ type: 'EmbroideryCalculations', id }],
     }),
     saveEmbroideryCalculation: build.mutation<EmbroiderySavedCalculation, EmbroiderySaveRequest>({
-      query: (request) => ({
-        url: '/api/crm/embroidery/calculations',
-        method: 'POST',
-        body: toSaveEmbroideryCalculationInput(request),
-      }),
-      transformResponse: (value: unknown) =>
-        mapEmbroiderySavedCalculation(ensureEmbroiderySavedCalculation(value)),
-      transformErrorResponse: toEmbroideryApiError,
+      queryFn: (request, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/crm/embroidery/calculations', {
+            body: toSaveEmbroideryCalculationInput(request),
+            signal,
+          }),
+          (value: unknown) =>
+            mapEmbroiderySavedCalculation(ensureEmbroiderySavedCalculation(value)),
+          toEmbroideryApiError,
+        ),
       invalidatesTags: (_result, error) => (error ? [] : [savedListTag]),
     }),
     setEmbroideryMockup: build.mutation<
       EmbroiderySavedCalculation,
       { id: number; mediaFileId: number | null }
     >({
-      query: ({ id, mediaFileId }) => ({
-        url: `/api/crm/embroidery/calculations/${id}/mockup`,
-        method: 'PUT',
-        body: { mediaFileId } satisfies Schemas['CrmSetEmbroideryMockupInput'],
-      }),
-      transformResponse: (value: unknown) =>
-        mapEmbroiderySavedCalculation(ensureEmbroiderySavedCalculation(value)),
-      transformErrorResponse: toEmbroideryApiError,
+      queryFn: ({ id, mediaFileId }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/crm/embroidery/calculations/{id}/mockup', {
+            params: { path: { id: id } },
+            body: { mediaFileId } satisfies Schemas['SetEmbroideryMockupInput'],
+            signal,
+          }),
+          (value: unknown) =>
+            mapEmbroiderySavedCalculation(ensureEmbroiderySavedCalculation(value)),
+          toEmbroideryApiError,
+        ),
       invalidatesTags: (_result, error, { id }) =>
         error ? [] : [savedListTag, { type: 'EmbroideryCalculations', id }],
     }),
     deleteEmbroideryCalculation: build.mutation<void, number>({
-      query: (id) => ({ url: `/api/crm/embroidery/calculations/${id}`, method: 'DELETE' }),
-      transformErrorResponse: toEmbroideryApiError,
+      queryFn: (id, { signal }) =>
+        apiCall(
+          apiClient.DELETE('/api/crm/embroidery/calculations/{id}', {
+            params: { path: { id: id } },
+            signal,
+          }),
+          undefined,
+          toEmbroideryApiError,
+        ),
       invalidatesTags: (_result, error, id) =>
         error ? [] : [savedListTag, { type: 'EmbroideryCalculations', id }],
     }),

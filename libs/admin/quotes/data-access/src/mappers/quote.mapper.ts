@@ -4,8 +4,13 @@ import type {
   QuoteCatalogProduct,
   QuoteCustomSewingPrice,
   QuoteEvent,
+  QuoteEventKind,
   QuoteFabricFacts,
   QuoteItem,
+  QuoteIntroLayout,
+  QuoteItemKind,
+  QuoteItemLineKind,
+  QuoteKind,
   QuoteModelComposition,
   QuoteOption,
   QuotePage,
@@ -14,20 +19,21 @@ import type {
   QuoteProductPhoto,
   QuoteRepriceReport,
   QuoteStaff,
+  QuoteStatus,
   QuoteTierPrices,
 } from '@admin/quotes/model';
 import type { components } from '@admin/shared/contracts';
 
 type Schemas = components['schemas'];
 
-const price = (value: Schemas['CrmQuotePrice']): QuotePrice => ({
+const price = (value: Schemas['QuotePriceResponse']): QuotePrice => ({
   amount: value.amount ?? null,
   source: value.source ?? null,
   isManual: value.isManual,
   shown: value.shown,
 });
 
-const option = (value: Schemas['CrmQuoteOption']): QuoteOption => ({
+const option = (value: Schemas['QuoteOptionResponse']): QuoteOption => ({
   id: value.id,
   articleId: value.articleId ?? null,
   fabricId: value.fabricId ?? null,
@@ -51,9 +57,9 @@ const option = (value: Schemas['CrmQuoteOption']): QuoteOption => ({
   })),
 });
 
-const item = (value: Schemas['CrmQuoteItem']): QuoteItem => ({
+const item = (value: Schemas['QuoteItemResponse']): QuoteItem => ({
   id: value.id,
-  kind: value.kind,
+  kind: value.kind as QuoteItemKind,
   productId: value.productId ?? null,
   code: value.code ?? null,
   name: value.name,
@@ -65,7 +71,7 @@ const item = (value: Schemas['CrmQuoteItem']): QuoteItem => ({
   supplierUrl: value.supplierUrl ?? null,
   options: value.options.map(option),
   lines: value.lines.map((line) => ({
-    kind: line.kind,
+    kind: line.kind as QuoteItemLineKind,
     referenceId: line.referenceId,
     name: line.name,
     unit: line.unit,
@@ -75,11 +81,11 @@ const item = (value: Schemas['CrmQuoteItem']): QuoteItem => ({
   })),
 });
 
-export const mapQuote = (value: Schemas['CrmQuote']): Quote => ({
+export const mapQuote = (value: Schemas['QuoteResponse']): Quote => ({
   id: value.id,
   number: value.number,
-  kind: value.kind,
-  status: value.status,
+  kind: value.kind as QuoteKind,
+  status: value.status as QuoteStatus,
   internalName: value.internalName,
   customerId: value.customerId ?? null,
   recipientName: value.recipientName ?? null,
@@ -95,7 +101,7 @@ export const mapQuote = (value: Schemas['CrmQuote']): Quote => ({
   items: value.items.map(item),
   introduction: value.introduction
     ? {
-        layout: value.introduction.layout,
+        layout: value.introduction.layout as QuoteIntroLayout,
         recipientEmail: value.introduction.recipientEmail ?? null,
         letterName: value.introduction.letterName ?? null,
         letterSubject: value.introduction.letterSubject ?? null,
@@ -104,15 +110,15 @@ export const mapQuote = (value: Schemas['CrmQuote']): Quote => ({
     : null,
 });
 
-export const mapQuoteEvent = (value: Schemas['CrmQuoteEvent']): QuoteEvent => ({
+export const mapQuoteEvent = (value: Schemas['QuoteEventResponse']): QuoteEvent => ({
   id: value.id,
-  kind: value.kind,
+  kind: value.kind as QuoteEventKind,
   at: value.at,
   actor: value.actor,
   details: value.details ?? null,
 });
 
-export const mapQuotePeriod = (value: Schemas['CrmQuotePeriod']): QuotePeriod => ({
+export const mapQuotePeriod = (value: Schemas['QuotePeriodResponse']): QuotePeriod => ({
   from: value.from,
   to: value.to,
   created: value.created,
@@ -120,12 +126,12 @@ export const mapQuotePeriod = (value: Schemas['CrmQuotePeriod']): QuotePeriod =>
   managers: value.managers.map((x) => ({ manager: x.manager, created: x.created, sent: x.sent })),
 });
 
-export const mapQuotePage = (value: Schemas['CrmQuotePage']): QuotePage => ({
+export const mapQuotePage = (value: Schemas['QuotePageResponse']): QuotePage => ({
   items: value.items.map((row) => ({
     id: row.id,
     number: row.number,
-    kind: row.kind,
-    status: row.status,
+    kind: row.kind as QuoteKind,
+    status: row.status as QuoteStatus,
     internalName: row.internalName,
     companyName: row.companyName ?? null,
     responsible: row.responsible,
@@ -140,7 +146,7 @@ export const mapQuotePage = (value: Schemas['CrmQuotePage']): QuotePage => ({
 });
 
 const tierPrices = (
-  value: Schemas['CrmQuoteTierPrices'] | null | undefined,
+  value: Schemas['QuoteTierPricesResponse'] | null | undefined,
 ): QuoteTierPrices | null =>
   value
     ? {
@@ -151,10 +157,10 @@ const tierPrices = (
     : null;
 
 export const mapQuoteCatalogProduct = (
-  value: Schemas['CrmQuoteCatalogProduct'],
+  value: Schemas['QuoteCatalogProductResponse'],
 ): QuoteCatalogProduct => ({
   productId: value.productId,
-  kind: value.kind,
+  kind: value.kind as 'Sewing' | 'Ppe',
   code: value.code ?? null,
   name: value.name,
   season: value.season ?? null,
@@ -173,7 +179,9 @@ export const mapQuoteCatalogProduct = (
   })),
 });
 
-export const mapQuoteCatalogPage = (value: Schemas['CrmQuoteCatalogPage']): QuoteCatalogPage => ({
+export const mapQuoteCatalogPage = (
+  value: Schemas['QuoteCatalogPageResponse'],
+): QuoteCatalogPage => ({
   items: value.items.map(mapQuoteCatalogProduct),
   page: value.page,
   pageSize: value.pageSize,
@@ -181,7 +189,7 @@ export const mapQuoteCatalogPage = (value: Schemas['CrmQuoteCatalogPage']): Quot
 });
 
 export const mapQuoteRepriceReport = (
-  value: Schemas['CrmQuoteRepriceReport'],
+  value: Schemas['QuoteRepriceReport'],
 ): QuoteRepriceReport => ({
   applied: value.applied,
   version: value.version,
@@ -195,7 +203,7 @@ export const mapQuoteRepriceReport = (
   unavailable: value.unavailable,
 });
 
-export const mapQuoteStaff = (value: Schemas['CrmQuoteStaff'][]): QuoteStaff[] =>
+export const mapQuoteStaff = (value: Schemas['QuoteStaffResponse'][]): QuoteStaff[] =>
   value.map((member) => ({
     userId: member.userId,
     name: member.name,
@@ -203,10 +211,10 @@ export const mapQuoteStaff = (value: Schemas['CrmQuoteStaff'][]): QuoteStaff[] =
   }));
 
 export const mapQuoteCustomSewingPrice = (
-  value: Schemas['CrmQuoteCustomSewingPrice'],
+  value: Schemas['QuoteCustomSewingPriceResponse'],
 ): QuoteCustomSewingPrice => ({
   lines: value.lines.map((line) => ({
-    kind: line.kind,
+    kind: line.kind as QuoteItemLineKind,
     referenceId: line.referenceId,
     name: line.name ?? null,
     unit: line.unit ?? null,
@@ -238,7 +246,7 @@ export const mapQuoteCustomSewingPrice = (
 });
 
 export const mapQuoteModelComposition = (
-  value: Schemas['CrmQuoteModelComposition'],
+  value: Schemas['QuoteModelCompositionResponse'],
 ): QuoteModelComposition => ({
   productId: value.productId,
   fabrics: value.fabrics.map((fabric) => ({
@@ -249,7 +257,7 @@ export const mapQuoteModelComposition = (
     isActive: fabric.isActive,
   })),
   lines: value.lines.map((line) => ({
-    kind: line.kind,
+    kind: line.kind as QuoteItemLineKind,
     referenceId: line.referenceId,
     costCode: line.costCode ?? null,
     name: line.name ?? null,
@@ -274,7 +282,9 @@ export const mapQuoteProductPhotos = (value: Schemas['ProductPhotoList']): Quote
       : [],
   );
 
-export const mapQuoteFabricFacts = (value: Schemas['CrmQuoteFabricFacts'][]): QuoteFabricFacts[] =>
+export const mapQuoteFabricFacts = (
+  value: Schemas['QuoteFabricFactsResponse'][],
+): QuoteFabricFacts[] =>
   value.map((fabric) => ({
     fabricId: fabric.fabricId,
     name: fabric.name,

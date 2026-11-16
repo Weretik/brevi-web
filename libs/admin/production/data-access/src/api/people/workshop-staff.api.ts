@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import { toProductionApiError, workshopStaffErrors } from '../../errors/production-api-error';
 import { mapStaffImportResult } from '../../mappers/orders/production-import.mapper';
 import {
@@ -28,52 +30,69 @@ export const workshopStaffApi = productionBaseApi.injectEndpoints({
   endpoints: (build) => ({
     getWorkshopStaff: build.query<WorkshopEmployee[], void>({
       // Archived workers come too: the page switches between «Працюють» and «Архів» without a request.
-      query: () => ({ url: '/api/production/staff', params: { includeArchived: true } }),
-      transformResponse: mapWorkshopStaff,
-      transformErrorResponse: errors,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/production/staff', {
+            params: { query: { includeArchived: true } },
+            signal,
+          }),
+          mapWorkshopStaff,
+          errors,
+        ),
       providesTags: staffList,
     }),
     createWorkshopEmployee: build.mutation<WorkshopEmployee, WorkshopEmployeeDraft>({
-      query: (draft) => ({ url: '/api/production/staff', method: 'POST', body: toInput(draft) }),
-      transformResponse: mapWorkshopEmployee,
-      transformErrorResponse: errors,
+      queryFn: (draft, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/production/staff', { body: toInput(draft), signal }),
+          mapWorkshopEmployee,
+          errors,
+        ),
       invalidatesTags: (_result, error) => (error ? [] : staffList),
     }),
     updateWorkshopEmployee: build.mutation<
       WorkshopEmployee,
       { id: number; draft: WorkshopEmployeeDraft }
     >({
-      query: ({ id, draft }) => ({
-        url: `/api/production/staff/${id}`,
-        method: 'PUT',
-        body: toInput(draft),
-      }),
-      transformResponse: mapWorkshopEmployee,
-      transformErrorResponse: errors,
+      queryFn: ({ id, draft }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/production/staff/{id}', {
+            params: { path: { id: id } },
+            body: toInput(draft),
+            signal,
+          }),
+          mapWorkshopEmployee,
+          errors,
+        ),
       invalidatesTags: (_result, error) => (error ? [] : staffList),
     }),
     setWorkshopEmployeeActive: build.mutation<WorkshopEmployee, { id: number; isActive: boolean }>({
-      query: ({ id, isActive }) => ({
-        url: `/api/production/staff/${id}/active`,
-        method: 'PUT',
-        body: { isActive },
-      }),
-      transformResponse: mapWorkshopEmployee,
-      transformErrorResponse: errors,
+      queryFn: ({ id, isActive }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/production/staff/{id}/active', {
+            params: { path: { id: id } },
+            body: { isActive },
+            signal,
+          }),
+          mapWorkshopEmployee,
+          errors,
+        ),
       invalidatesTags: (_result, error) => (error ? [] : staffList),
     }),
     importWorkshopStaff: build.mutation<
       ProductionImportResult,
       { rows: WorkshopStaffImportRow[]; dryRun: boolean }
     >({
-      query: ({ rows, dryRun }) => ({
-        url: '/api/production/staff/import',
-        method: 'POST',
-        params: { dryRun },
-        body: rows.map(toInput),
-      }),
-      transformResponse: mapStaffImportResult,
-      transformErrorResponse: errors,
+      queryFn: ({ rows, dryRun }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/production/staff/import', {
+            params: { query: { dryRun } },
+            body: rows.map(toInput),
+            signal,
+          }),
+          mapStaffImportResult,
+          errors,
+        ),
       invalidatesTags: (result, error) => (error || result?.dryRun ? [] : staffList),
     }),
   }),

@@ -1,4 +1,4 @@
-import { adminApi } from '@admin/shared/api-client';
+import { adminApi, apiCall, apiClient } from '@admin/shared/api-client';
 
 import { mapSessionRoles } from './session-roles';
 
@@ -6,11 +6,8 @@ import { mapSessionRoles } from './session-roles';
 export const sessionRolesApi = adminApi.injectEndpoints({
   endpoints: (build) => ({
     getAdminSessionRoles: build.query<readonly string[], void>({
-      async queryFn(_arg, _api, _extra, baseQuery) {
-        const response = await baseQuery('/api/auth/session/me');
-        if (response.error) return { error: response.error };
-        return { data: mapSessionRoles(response.data) };
-      },
+      queryFn: (_arg, { signal }) =>
+        apiCall(apiClient.GET('/api/auth/session/me', { signal }), mapSessionRoles),
     }),
   }),
 });

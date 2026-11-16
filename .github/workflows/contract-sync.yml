@@ -1,0 +1,73 @@
+name: Sync backend API contract
+
+# Every weekday morning (and on demand) the snapshot is refreshed from the BreviERP default branch. When it
+# changed, one pull request `chore/sync-backend-contract` is opened or updated with the new snapshot and types.
+on:
+  schedule:
+    - cron: '0 5 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: contract-sync
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      BRANCH: chore/sync-backend-contract
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run contracts:sync
+      - name: Check whether the snapshot changed
+        id: diff
+        run: |
+          if git diff --quiet -- docs/contracts/openapi libs/admin/shared/contracts/src/generated; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "The snapshot already matches the backend."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+      # A pull request opened with the workflow token does not start CI, so the typecheck runs here and its result
+      # goes into the pull request text.
+      - name: Typecheck against the new contract
+        id: typecheck
+        if: steps.diff.outputs.changed == 'true'
+        continue-on-error: true
+        run: npx nx run-many -t typecheck
+      - name: Open or update the sync pull request
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TYPECHECK: ${{ steps.typecheck.outcome }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch -C "$BRANCH"
+          git add docs/contracts/openapi libs/admin/shared/contracts/src/generated
+          git commit -m 'Sync the BreviERP API contract'
+          git push --force origin "$BRANCH"
+          if [ "$TYPECHECK" = 'success' ]; then
+            result='Typecheck passed: the frontend compiles against the new contract.'
+          else
+            result='Typecheck FAILED: fix the places it lists on this branch before merging.'
+          fi
+          body="$(printf '%s\n\n%s\n\n%s\n' \
+            'The BreviERP OpenAPI contract changed on its default branch. This refreshes `docs/contracts/openapi` and the generated types.' \
+            "$result Details: $RUN_URL" \
+            'CI does not start on a pull request opened by this workflow; close and reopen it, or push a commit, to run CI.')"
+          number="$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number')"
+          if [ -z "$number" ]; then
+            gh pr create --head "$BRANCH" --base master --title 'Sync the BreviERP API contract' --body "$body"
+          else
+            gh pr edit "$number" --body "$body"
+          fi

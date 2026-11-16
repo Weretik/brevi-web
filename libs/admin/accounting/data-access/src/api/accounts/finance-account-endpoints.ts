@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import {
   financeAccountsTag,
   financeHistoryTag,
@@ -21,9 +23,6 @@ import type {
   FinanceHistoryEntry,
 } from '@admin/accounting/model';
 
-const accounts = '/api/accounting/accounts';
-const one = (id: string) => `${accounts}/${encodeURIComponent(id)}`;
-
 /**
  * Every change returns the account; the list, its history, the overview and the journals (they show
  * account names) are fetched again.
@@ -34,63 +33,105 @@ const changed = (_: unknown, error: unknown, { id }: { id: string }) =>
 export function financeAccountEndpoints(build: AccountingEndpointBuilder) {
   return {
     getAccountingSettings: build.query<AccountingSettings, void>({
-      query: () => ({ url: '/api/accounting/settings' }),
-      transformResponse: mapAccountingSettings,
-      transformErrorResponse: accountingApiError,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/accounting/settings', { signal }),
+          mapAccountingSettings,
+          accountingApiError,
+        ),
     }),
     /** All accounts, archived ones too: the page filters them with chips. */
     getFinanceAccounts: build.query<FinanceAccount[], void>({
-      query: () => ({ url: accounts, params: { includeArchived: true } }),
-      transformResponse: mapFinanceAccounts,
-      transformErrorResponse: accountingApiError,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/accounting/accounts', {
+            params: { query: { includeArchived: true } },
+            signal,
+          }),
+          mapFinanceAccounts,
+          accountingApiError,
+        ),
       providesTags: [financeAccountsTag],
     }),
     createFinanceAccount: build.mutation<FinanceAccount, FinanceAccountBody>({
-      query: (body) => ({ url: accounts, method: 'POST', body }),
-      transformResponse: mapFinanceAccount,
-      transformErrorResponse: accountingApiError,
+      queryFn: (body, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/accounting/accounts', { body: body, signal }),
+          mapFinanceAccount,
+          accountingApiError,
+        ),
       invalidatesTags: (_, error) => (error ? [] : [financeAccountsTag, financeOverviewTag]),
     }),
     updateFinanceAccount: build.mutation<
       FinanceAccount,
       { id: string; body: FinanceAccountBody & { version: number } }
     >({
-      query: ({ id, body }) => ({ url: one(id), method: 'PUT', body }),
-      transformResponse: mapFinanceAccount,
-      transformErrorResponse: accountingApiError,
+      queryFn: ({ id, body }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/accounting/accounts/{id}', {
+            params: { path: { id: id } },
+            body: body,
+            signal,
+          }),
+          mapFinanceAccount,
+          accountingApiError,
+        ),
       invalidatesTags: changed,
     }),
     setFinanceAccountCutover: build.mutation<
       FinanceAccount,
       { id: string; body: FinanceAccountCutoverBody }
     >({
-      query: ({ id, body }) => ({ url: `${one(id)}/cutover`, method: 'PUT', body }),
-      transformResponse: mapFinanceAccount,
-      transformErrorResponse: accountingApiError,
+      queryFn: ({ id, body }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/accounting/accounts/{id}/cutover', {
+            params: { path: { id: id } },
+            body: body,
+            signal,
+          }),
+          mapFinanceAccount,
+          accountingApiError,
+        ),
       invalidatesTags: changed,
     }),
     setFinanceAccountActive: build.mutation<
       FinanceAccount,
       { id: string; active: boolean; version: number }
     >({
-      query: ({ id, active, version }) => ({
-        url: `${one(id)}/${active ? 'restore' : 'archive'}`,
-        method: 'POST',
-        body: { version },
-      }),
-      transformResponse: mapFinanceAccount,
-      transformErrorResponse: accountingApiError,
+      queryFn: ({ id, active, version }, { signal }) => {
+        const init = { params: { path: { id } }, body: { version }, signal };
+        return apiCall(
+          active
+            ? apiClient.POST('/api/accounting/accounts/{id}/restore', init)
+            : apiClient.POST('/api/accounting/accounts/{id}/archive', init),
+          mapFinanceAccount,
+          accountingApiError,
+        );
+      },
       invalidatesTags: changed,
     }),
     deleteFinanceAccount: build.mutation<void, { id: string; version: number }>({
-      query: ({ id, version }) => ({ url: one(id), method: 'DELETE', params: { version } }),
-      transformErrorResponse: accountingApiError,
+      queryFn: ({ id, version }, { signal }) =>
+        apiCall(
+          apiClient.DELETE('/api/accounting/accounts/{id}', {
+            params: { path: { id: id }, query: { version } },
+            signal,
+          }),
+          undefined,
+          accountingApiError,
+        ),
       invalidatesTags: (_, error) => (error ? [] : [financeAccountsTag]),
     }),
     getFinanceAccountHistory: build.query<FinanceHistoryEntry[], string>({
-      query: (id) => ({ url: `${one(id)}/history` }),
-      transformResponse: mapFinanceHistory,
-      transformErrorResponse: accountingApiError,
+      queryFn: (id, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/accounting/accounts/{id}/history', {
+            params: { path: { id: id } },
+            signal,
+          }),
+          mapFinanceHistory,
+          accountingApiError,
+        ),
       providesTags: (_, __, id) => [financeHistoryTag(id)],
     }),
   };

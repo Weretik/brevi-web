@@ -1,63 +1,69 @@
 # API Contract Lifecycle
 
-These rules apply to every frontend feature that calls a backend API, whether
-it uses Angular or React. The source of truth is OpenAPI in the backend
-repository. The frontend keeps a reproducible snapshot of a specific backend
-commit; Markdown documents consumer decisions and does not copy request or
-response schemas.
+These rules apply to every frontend feature that calls the BreviERP API. The
+source of truth is the backend code: BreviERP generates
+`docs/sdd/contracts/openapi.json` from it on every build, and its CI fails when
+the committed file differs from the code. This repository keeps a copy of that
+file and never edits it ([ADR-0004](../adr/0004-contract-follows-backend-and-typed-client.md)).
 
-## Workflow
+## Where things are
 
-1. Before implementation, find the operation in the backend OpenAPI. In the
-   feature's `contracts/api-contract.md`, record the exact `operationId`, path
-   to canonical OpenAPI, backend repository, and full commit SHA or immutable
-   release tag. Record a separate row for each operation. If the operation is
-   missing or the contract is not agreed, create a backend blocker; method and
-   URL alone do not replace `operationId`.
-2. Sync OpenAPI from a clean checkout at the pinned commit and preserve the
-   snapshot provenance in the frontend: repository, commit, source path, date,
-   and sync command. Do not edit snapshot YAML by hand; change the contract in
-   the backend and sync again.
-3. Generate TypeScript request and response types from the snapshot. Do not
-   edit generated files by hand or duplicate equivalent DTOs in `contracts`
-   or `data-access`. Use operation-specific types in transport/data-access;
-   keep local types only for application models and client rules missing from
-   OpenAPI.
-4. Validate the network response at runtime before converting the DTO. Static
-   type generation is not runtime validation. The mapper at the `data-access`
-   boundary returns an application model; `feature`, `ui`, and domain models
-   do not import generated DTOs.
-5. Document client decisions in the feature contract: request mapping,
-   response mapping, errors, pagination, caching/invalidation, retries,
-   cancellation, and constraints. Refer to `operationId` and OpenAPI instead
-   of rewriting schema fields in Markdown.
-6. Run snapshot, generation, relevant typecheck, mapper and error tests, lint,
-   and build checks. A backend contract change and its frontend consumer must
-   pass these checks against the same pinned version.
+| What                     | Where                                                                                        |
+| ------------------------ | -------------------------------------------------------------------------------------------- |
+| Snapshot of the contract | `docs/contracts/openapi/openapi.json` (copy, never edited by hand)                           |
+| Its source commit        | `docs/contracts/openapi/SOURCE.md`                                                           |
+| Generated types          | `libs/admin/shared/contracts/src/generated/openapi.ts` (`paths`, `components`, `operations`) |
+| Typed client             | `apiClient`, `apiCall`, `apiRequest` in `@admin/shared/api-client`                           |
+| Sync tools               | `tools/contracts/`                                                                           |
 
-## Tooling status in this repository
+## Commands
 
-As of 2026-10-01, the repository has a versioned OpenAPI snapshot, provenance
-manifest, generated types in `libs/admin/shared/contracts`, and the
-`contracts:sync`, `contracts:generate`, and `contracts:check` commands. React
-data-access imports generated operation types through the public alias
-`@admin/shared/contracts`.
+| Command                                    | What it does                                                                                 |
+| ------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| `npm run contracts:sync`                   | Downloads `openapi.json` from BreviERP `master`, writes `SOURCE.md`, regenerates the types   |
+| `npm run contracts:sync -- --ref <branch>` | The same from a backend branch that is not merged yet                                        |
+| `npm run contracts:sync -- --file <path>`  | The same from a local backend checkout                                                       |
+| `npm run contracts:check`                  | Regenerates the types and fails if they differ from the committed ones                       |
+| `npm run contracts:drift`                  | Fails when the snapshot differs from BreviERP `master` and lists the added and removed paths |
 
-Verification sequence for an API feature:
+CI runs `contracts:fixtures`, `contracts:check` and `contracts:drift`. The
+workflow `contract-sync.yml` runs every weekday at 07:00 Kyiv time and on
+demand; when the backend contract changed, it opens or updates the pull request
+`chore/sync-backend-contract` and writes whether the typecheck passed. GitHub
+does not start CI for a pull request opened by a workflow: push an empty change
+or re-run the checks by hand.
 
-```powershell
-npm run contracts:sync -- <backend-checkout> <backend-commit>
-npm run contracts:generate
-npm run contracts:check
-npx nx lint <changed-project>
-npx nx typecheck <changed-project>
-npx nx test <changed-project>
-npx nx build <app>
-```
+## Workflow for a feature
 
-The first three lines are current npm scripts; `contracts:sync` requires a
-backend checkout and immutable revision. Run `typecheck` and `test` only when
-the Nx targets exist, as verified by
-`npx nx show project <project> --json`; React test types can be checked with
-`npm run typecheck:tests`. If a target is missing, create an `EN-*` task or
-record the gap and the available `tsc --noEmit --project <tsconfig>` check.
+1. Change or add the endpoint in BreviERP first: `WithName` (operation id),
+   `WithSummary`, `Produces<T>` for every response with a body, and
+   `ProducesProblem`. Build `Host.Api` to regenerate `openapi.json` and commit it.
+2. Here, run `npm run contracts:sync -- --ref <backend-branch>` and commit the
+   snapshot with the frontend change. After the backend merges, sync again
+   from `master` (or merge the daily sync pull request).
+3. In domain `data-access`, call the API only through the typed client:
+
+   ```ts
+   getQuote: build.query<Quote, number>({
+     queryFn: (id, { signal }) =>
+       apiCall(
+         apiClient.GET('/api/crm/quotes/{id}', { params: { path: { id } }, signal }),
+         mapQuote,
+         quoteApiError,
+       ),
+   }),
+   ```
+
+   Never raw `fetch` or Axios. Use `apiRequest` outside RTK Query (it throws
+   the `ApiError`), `formDataBody` for uploads and `parseAs: 'blob'` for files.
+
+4. The mapper at the `data-access` boundary takes the generated type and
+   returns the application model; `feature`, `ui` and models do not import
+   generated types. Codes the backend sends as plain strings are narrowed to
+   the model union in the mapper only.
+5. Test mappers and error handling; component tests stub the network with
+   `stubApiFetch` from `@admin/shared/api-client/testing`.
+6. Before handoff: `npm run contracts:check`, then `typecheck`, `lint` and the
+   focused tests of the changed projects.
+
+Merge order: the backend pull request merges first, then the frontend one.

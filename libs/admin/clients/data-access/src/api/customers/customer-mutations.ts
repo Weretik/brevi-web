@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import { customerListTag, changedCustomerTags } from '../../cache/customer-cache';
 import { customerApiError } from '../../errors/customer-api-error';
 import { customerBody } from '../../mappers/customer-body';
@@ -12,31 +14,36 @@ import type { operations } from '@admin/shared/contracts';
 export function customerMutations(build: CustomerEndpointBuilder) {
   return {
     createCustomer: build.mutation<CustomerDetail, CreateCustomerIntent>({
-      query: ({ draft, requestId }) => ({
-        url: '/api/crm/customers',
-        method: 'POST',
-        body: {
-          requestId,
-          input: customerBody(draft),
-        } satisfies operations['createCrmCustomer']['requestBody']['content']['application/json'],
-      }),
-      transformResponse: mapCustomerDetail,
-      transformErrorResponse: customerApiError,
+      queryFn: ({ draft, requestId }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/crm/customers', {
+            body: {
+              requestId,
+              input: customerBody(draft),
+            } satisfies operations['createCrmCustomer']['requestBody']['content']['application/json'],
+            signal,
+          }),
+          mapCustomerDetail,
+          customerApiError,
+        ),
       invalidatesTags: (_, error) => (error ? [] : [customerListTag]),
     }),
     reviseCustomer: build.mutation<CustomerDetail, ReviseCustomerIntent>({
-      query: ({ customerId, revision, draft, requestId }) => ({
-        url: `/api/crm/customers/${customerId}`,
-        method: 'PUT',
-        body: {
-          requestId,
-          expectedRevision: revision,
-          input: customerBody(draft),
-          active: draft.active,
-        } satisfies operations['reviseCrmCustomer']['requestBody']['content']['application/json'],
-      }),
-      transformResponse: mapCustomerDetail,
-      transformErrorResponse: customerApiError,
+      queryFn: ({ customerId, revision, draft, requestId }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/crm/customers/{customerId}', {
+            params: { path: { customerId: customerId } },
+            body: {
+              requestId,
+              expectedRevision: revision,
+              input: customerBody(draft),
+              active: draft.active,
+            } satisfies operations['reviseCrmCustomer']['requestBody']['content']['application/json'],
+            signal,
+          }),
+          mapCustomerDetail,
+          customerApiError,
+        ),
       invalidatesTags: (_, error, { customerId }) => (error ? [] : changedCustomerTags(customerId)),
     }),
   };

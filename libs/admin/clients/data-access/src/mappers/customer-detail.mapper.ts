@@ -9,9 +9,7 @@ import {
 } from '../validators/customer-response';
 
 import type { CustomerChannel, CustomerDetail } from '@admin/clients/model';
-import type { operations } from '@admin/shared/contracts';
 
-type DetailResponse = operations['getCrmCustomer']['responses'][200]['content']['application/json'];
 export function mapCustomerDetail(value: unknown): CustomerDetail {
   const row = record(value);
   const customer = mapCustomerSummary(row);
@@ -44,17 +42,5 @@ export function mapCustomerDetail(value: unknown): CustomerDetail {
       };
     }),
   };
-  // Generated wire type stays at this boundary; application models remain independent.
-  const compatible: DetailResponse = {
-    ...mapped,
-    contacts: mapped.contacts.map((c) => ({ ...c, channels: [...c.channels] })),
-    externalIdentities: [...mapped.externalIdentities],
-  };
-  return {
-    ...compatible,
-    keepinCrmId: mapped.keepinCrmId,
-    contactName: mapped.contactName,
-    phones: mapped.phones,
-    keepinSyncedAt: mapped.keepinSyncedAt,
-  };
+  return mapped;
 }

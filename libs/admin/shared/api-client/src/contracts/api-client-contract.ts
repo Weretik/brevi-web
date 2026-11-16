@@ -1,14 +1,3 @@
-import type { AxiosRequestConfig } from 'axios';
-
-export interface ApiRequest {
-  readonly url: string;
-  readonly method?: AxiosRequestConfig['method'];
-  readonly body?: AxiosRequestConfig['data'];
-  readonly data?: AxiosRequestConfig['data'];
-  readonly params?: AxiosRequestConfig['params'];
-  readonly headers?: AxiosRequestConfig['headers'];
-}
-
 export type ApiErrorCode =
   | 'Unknown'
   | 'Network'

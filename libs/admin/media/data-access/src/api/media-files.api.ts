@@ -1,3 +1,5 @@
+import { apiCall, apiClient, formDataBody } from '@admin/shared/api-client';
+
 import { mediaBaseApi } from './media-base-api';
 import { mediaFileErrors, toMediaApiError } from '../errors/media-api-error';
 import { mapMediaFile, mapMediaFileDetail, mapMediaFilePage } from '../mappers/media-file.mapper';
@@ -19,17 +21,17 @@ export interface UploadMediaFileRequest {
   folderId: number | null;
 }
 
-export function serializeMediaFileQuery(query: MediaFileQuery): string {
-  const params = new URLSearchParams();
-  if (query.folderId !== null) {
-    params.set('folderId', String(query.folderId));
-    params.set('includeSubfolders', String(query.includeSubfolders));
-  }
+/** The folder filter goes only with a folder, and an empty search is not sent. */
+export function mediaFileQueryParams(query: MediaFileQuery) {
   const search = query.search.trim();
-  if (search) params.set('search', search);
-  params.set('page', String(query.page));
-  params.set('pageSize', String(query.pageSize));
-  return params.toString();
+  return {
+    ...(query.folderId !== null
+      ? { folderId: query.folderId, includeSubfolders: query.includeSubfolders }
+      : {}),
+    ...(search ? { search } : {}),
+    page: query.page,
+    pageSize: query.pageSize,
+  };
 }
 
 const toInput = (draft: MediaFileDraft): MediaFileInput => ({
@@ -47,55 +49,72 @@ const afterChange = [
 export const mediaFilesApi = mediaBaseApi.injectEndpoints({
   endpoints: (build) => ({
     searchMediaFiles: build.query<MediaFilePage, MediaFileQuery>({
-      query: (query) => `/api/media/files?${serializeMediaFileQuery(query)}`,
-      transformResponse: mapMediaFilePage,
-      transformErrorResponse: (response) => toMediaApiError(response, mediaFileErrors),
+      queryFn: (query, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/media/files', {
+            params: { query: mediaFileQueryParams(query) },
+            signal,
+          }),
+          mapMediaFilePage,
+          (response) => toMediaApiError(response, mediaFileErrors),
+        ),
       providesTags: (result) => [
         { type: 'MediaFile', id: 'LIST' },
         ...(result?.items.map(({ id }) => ({ type: 'MediaFile' as const, id })) ?? []),
       ],
     }),
     getMediaFile: build.query<MediaFileDetail, number>({
-      query: (id) => `/api/media/files/${id}`,
-      transformResponse: mapMediaFileDetail,
-      transformErrorResponse: (response) => toMediaApiError(response, mediaFileErrors),
+      queryFn: (id, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/media/files/{id}', { params: { path: { id: id } }, signal }),
+          mapMediaFileDetail,
+          (response) => toMediaApiError(response, mediaFileErrors),
+        ),
       providesTags: (_result, _error, id) => [{ type: 'MediaFile', id }],
     }),
     uploadMediaFile: build.mutation<MediaFile, UploadMediaFileRequest>({
-      query: ({ file, folderId }) => {
-        const body = new FormData();
-        body.set('file', file);
-        if (folderId !== null) body.set('folderId', String(folderId));
-        return { url: '/api/media/files', method: 'POST', body };
-      },
-      transformResponse: mapMediaFile,
-      transformErrorResponse: (response) => toMediaApiError(response, mediaFileErrors),
+      queryFn: ({ file, folderId }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/media/files', { ...formDataBody({ file, folderId }), signal }),
+          mapMediaFile,
+          (response) => toMediaApiError(response, mediaFileErrors),
+        ),
       invalidatesTags: (_result, error) => (error ? [] : afterChange),
     }),
     updateMediaFile: build.mutation<MediaFile, { id: number; draft: MediaFileDraft }>({
-      query: ({ id, draft }) => ({
-        url: `/api/media/files/${id}`,
-        method: 'PUT',
-        body: toInput(draft),
-      }),
-      transformResponse: mapMediaFile,
-      transformErrorResponse: (response) => toMediaApiError(response, mediaFileErrors),
+      queryFn: ({ id, draft }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/media/files/{id}', {
+            params: { path: { id: id } },
+            body: toInput(draft),
+            signal,
+          }),
+          mapMediaFile,
+          (response) => toMediaApiError(response, mediaFileErrors),
+        ),
       invalidatesTags: (_result, error, { id }) =>
         error ? [] : [...afterChange, { type: 'MediaFile', id }],
     }),
     moveMediaFiles: build.mutation<void, { fileIds: number[]; folderId: number | null }>({
-      query: ({ fileIds, folderId }) => ({
-        url: '/api/media/files/move',
-        method: 'POST',
-        body: { fileIds, folderId } satisfies MoveMediaFilesInput,
-      }),
-      transformErrorResponse: (response) => toMediaApiError(response, mediaFileErrors),
+      queryFn: ({ fileIds, folderId }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/media/files/move', {
+            body: { fileIds, folderId } satisfies MoveMediaFilesInput,
+            signal,
+          }),
+          undefined,
+          (response) => toMediaApiError(response, mediaFileErrors),
+        ),
       invalidatesTags: (_result, error, { fileIds }) =>
         error ? [] : [...afterChange, ...fileIds.map((id) => ({ type: 'MediaFile' as const, id }))],
     }),
     deleteMediaFile: build.mutation<void, number>({
-      query: (id) => ({ url: `/api/media/files/${id}`, method: 'DELETE' }),
-      transformErrorResponse: (response) => toMediaApiError(response, mediaFileErrors),
+      queryFn: (id, { signal }) =>
+        apiCall(
+          apiClient.DELETE('/api/media/files/{id}', { params: { path: { id: id } }, signal }),
+          undefined,
+          (response) => toMediaApiError(response, mediaFileErrors),
+        ),
       invalidatesTags: (_result, error, id) =>
         error ? [] : [...afterChange, { type: 'MediaFile', id }],
     }),

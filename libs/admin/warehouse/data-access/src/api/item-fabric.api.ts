@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import { warehouseBaseApi } from './warehouse-base-api';
 import { warehouseApiError } from '../errors/warehouse-api-error';
 import { mapFabricIssueItems, mapItemFabric } from '../mappers/item-fabric.mapper';
@@ -27,11 +29,6 @@ interface ItemRef {
   itemId: number;
 }
 
-const cardUrl = ({ orderId, itemId, scope }: ItemRef & { scope: ItemFabricScope }) =>
-  scope === 'orders'
-    ? `/api/warehouse/orders/${orderId}/items/${itemId}/fabric`
-    : `/api/warehouse/fabric-stock/issue-items/${orderId}/${itemId}`;
-
 /** An issue or a plan change moves the stock, the card and the order's «Історія змін». */
 const itemChanged = (_result: unknown, error: unknown, { orderId }: { orderId: number }) =>
   error
@@ -46,51 +43,75 @@ const itemChanged = (_result: unknown, error: unknown, { orderId }: { orderId: n
 export const itemFabricApi = warehouseBaseApi.injectEndpoints({
   endpoints: (build) => ({
     getFabricIssueItems: build.query<FabricIssueItems, string>({
-      query: (search) => ({
-        url: '/api/warehouse/fabric-stock/issue-items',
-        params: search.trim() ? { search: search.trim() } : {},
-      }),
-      transformResponse: mapFabricIssueItems,
-      transformErrorResponse: warehouseApiError,
+      queryFn: (search, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/warehouse/fabric-stock/issue-items', {
+            params: { query: search.trim() ? { search: search.trim() } : {} },
+            signal,
+          }),
+          mapFabricIssueItems,
+          warehouseApiError,
+        ),
       providesTags: [{ type: 'ItemFabric', id: 'SEARCH' }],
     }),
     getItemFabric: build.query<ItemFabric, ItemRef & { scope: ItemFabricScope }>({
-      query: cardUrl,
-      transformResponse: mapItemFabric,
-      transformErrorResponse: warehouseApiError,
+      queryFn: ({ orderId, itemId, scope }, { signal }) => {
+        return apiCall(
+          scope === 'orders'
+            ? apiClient.GET('/api/warehouse/orders/{id}/items/{itemId}/fabric', {
+                params: { path: { id: orderId, itemId } },
+                signal,
+              })
+            : apiClient.GET('/api/warehouse/fabric-stock/issue-items/{orderId}/{itemId}', {
+                params: { path: { orderId, itemId } },
+                signal,
+              }),
+          mapItemFabric,
+          warehouseApiError,
+        );
+      },
       providesTags: (_result, _error, { itemId }) => [{ type: 'ItemFabric', id: itemId }],
     }),
     issueFabricToItem: build.mutation<ItemFabric, ItemRef & { body: CreateItemIssueBody }>({
-      query: ({ orderId, itemId, body }) => ({
-        url: `/api/warehouse/fabric-stock/issue-items/${orderId}/${itemId}/issues`,
-        method: 'POST',
-        body: issueInput(body),
-      }),
-      transformResponse: mapItemFabric,
-      transformErrorResponse: warehouseApiError,
+      queryFn: ({ orderId, itemId, body }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/warehouse/fabric-stock/issue-items/{orderId}/{itemId}/issues', {
+            params: { path: { orderId: orderId, itemId: itemId } },
+            body: issueInput(body),
+            signal,
+          }),
+          mapItemFabric,
+          warehouseApiError,
+        ),
       invalidatesTags: itemChanged,
     }),
     refreshItemFabricPlan: build.mutation<ItemFabric, ItemRef & { body: RefreshItemPlanBody }>({
-      query: ({ orderId, itemId, body }) => ({
-        url: `/api/warehouse/fabric-stock/issue-items/${orderId}/${itemId}/plan`,
-        method: 'POST',
-        body: refreshInput(body),
-      }),
-      transformResponse: mapItemFabric,
-      transformErrorResponse: warehouseApiError,
+      queryFn: ({ orderId, itemId, body }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/warehouse/fabric-stock/issue-items/{orderId}/{itemId}/plan', {
+            params: { path: { orderId: orderId, itemId: itemId } },
+            body: refreshInput(body),
+            signal,
+          }),
+          mapItemFabric,
+          warehouseApiError,
+        ),
       invalidatesTags: itemChanged,
     }),
     reverseFabricIssue: build.mutation<
       ItemFabric,
       { orderId: number; issueId: number; orderVersion: number; reason: string }
     >({
-      query: ({ orderId, issueId, orderVersion, reason }) => ({
-        url: `/api/warehouse/orders/${orderId}/fabric-issues/${issueId}/reverse`,
-        method: 'POST',
-        body: { orderVersion, reason } satisfies Schemas['ReverseFabricIssueInput'],
-      }),
-      transformResponse: mapItemFabric,
-      transformErrorResponse: warehouseApiError,
+      queryFn: ({ orderId, issueId, orderVersion, reason }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/warehouse/orders/{id}/fabric-issues/{issueId}/reverse', {
+            params: { path: { id: orderId, issueId: issueId } },
+            body: { orderVersion, reason } satisfies Schemas['ReverseFabricIssueInput'],
+            signal,
+          }),
+          mapItemFabric,
+          warehouseApiError,
+        ),
       invalidatesTags: itemChanged,
     }),
   }),

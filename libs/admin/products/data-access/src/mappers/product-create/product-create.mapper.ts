@@ -6,6 +6,7 @@ import {
 
 import type { CreateCatalogProductBody } from '../../contracts/product-create/product-create.dto';
 import type {
+  CatalogProductType,
   CreateCatalogProductInput,
   CreatedCatalogProduct,
   PpePricePreview,
@@ -18,7 +19,12 @@ export const toCreateCatalogProductBody = (
 
 export function mapCreatedCatalogProduct(value: unknown): CreatedCatalogProduct {
   const dto = validateCreatedCatalogProduct(value);
-  return { id: dto.id, type: dto.type, code: dto.code, priceSaved: dto.priceSaved };
+  return {
+    id: dto.id,
+    type: dto.type as CatalogProductType,
+    code: dto.code,
+    priceSaved: dto.priceSaved,
+  };
 }
 
 export function mapProductCodeCheck(value: unknown): ProductCodeCheck {

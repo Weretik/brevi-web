@@ -1,4 +1,4 @@
-import { adminApi } from '@admin/shared/api-client';
+import { adminApi, apiCall, apiClient } from '@admin/shared/api-client';
 
 import {
   mapAccessRights,
@@ -12,9 +12,6 @@ import type { AccessGrants, AccessRights, AccessRole } from '@admin/users/model'
 
 type CreateRoleBody = components['schemas']['CreateRoleRequest'];
 
-const root = '/api/admin/access';
-const roleUrl = (role: string) => `${root}/roles/${encodeURIComponent(role)}`;
-
 export interface SaveRoleAccessInput {
   role: string;
   version: number;
@@ -25,17 +22,20 @@ export interface SaveRoleAccessInput {
 export const accessRightsApi = adminApi.injectEndpoints({
   endpoints: (build) => ({
     getAccessRights: build.query<AccessRights, void>({
-      query: () => ({ url: root, method: 'GET' }),
-      transformResponse: mapAccessRights,
+      queryFn: (_arg, { signal }) =>
+        apiCall(apiClient.GET('/api/admin/access', { signal }), mapAccessRights),
       providesTags: ['AccessRights'],
     }),
     saveRoleAccess: build.mutation<AccessRole, SaveRoleAccessInput>({
-      query: ({ role, version, grants }) => ({
-        url: roleUrl(role),
-        method: 'PUT',
-        body: toSaveRoleAccessBody(version, grants),
-      }),
-      transformResponse: mapAccessRole,
+      queryFn: ({ role, version, grants }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/admin/access/roles/{role}', {
+            params: { path: { role: role } },
+            body: toSaveRoleAccessBody(version, grants),
+            signal,
+          }),
+          mapAccessRole,
+        ),
       // Put the saved role into the cache at once, so the tab does not flash the old grants.
       async onQueryStarted(_input, { dispatch, queryFulfilled }) {
         try {
@@ -53,16 +53,24 @@ export const accessRightsApi = adminApi.injectEndpoints({
       invalidatesTags: ['AccessRights'],
     }),
     createRole: build.mutation<{ name: string; title: string }, string>({
-      query: (title) => ({
-        url: `${root}/roles`,
-        method: 'POST',
-        body: { title: title.trim() } satisfies CreateRoleBody,
-      }),
-      transformResponse: mapCreatedRole,
+      queryFn: (title, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/admin/access/roles', {
+            body: { title: title.trim() } satisfies CreateRoleBody,
+            signal,
+          }),
+          mapCreatedRole,
+        ),
       invalidatesTags: ['AccessRights'],
     }),
     deleteRole: build.mutation<void, string>({
-      query: (role) => ({ url: roleUrl(role), method: 'DELETE' }),
+      queryFn: (role, { signal }) =>
+        apiCall(
+          apiClient.DELETE('/api/admin/access/roles/{role}', {
+            params: { path: { role: role } },
+            signal,
+          }),
+        ),
       invalidatesTags: ['AccessRights'],
     }),
   }),

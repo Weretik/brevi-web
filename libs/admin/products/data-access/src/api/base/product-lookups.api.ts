@@ -1,4 +1,4 @@
-import { adminApi, toAdminApiError } from '@admin/shared/api-client';
+import { adminApi, apiCall, apiClient, toAdminApiError } from '@admin/shared/api-client';
 
 import { productErrorMessages } from './product-api.shared';
 import { mapProductCategories } from '../../mappers/product/product-categories.mapper';
@@ -6,9 +6,12 @@ import { mapProductCategories } from '../../mappers/product/product-categories.m
 export const productLookupsApi = adminApi.injectEndpoints({
   endpoints: (build) => ({
     listProductCategories: build.query<ReturnType<typeof mapProductCategories>, void>({
-      query: () => '/api/reference/product-categories/admin',
-      transformResponse: mapProductCategories,
-      transformErrorResponse: (response) => toAdminApiError(response, productErrorMessages),
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/reference/product-categories/admin', { signal }),
+          mapProductCategories,
+          (response) => toAdminApiError(response, productErrorMessages),
+        ),
       providesTags: [{ type: 'ProductCategory', id: 'LIST' }],
     }),
   }),

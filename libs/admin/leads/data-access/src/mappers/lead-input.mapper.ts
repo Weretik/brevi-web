@@ -7,7 +7,7 @@ type Schemas = components['schemas'];
 export function toRecordLeadCallInput(
   values: LeadCallFormValues,
   version: number,
-): Schemas['CrmRecordLeadCallInput'] {
+): Schemas['RecordLeadCallInput'] {
   const comment = values.comment.trim();
   return {
     resultId: values.resultId ?? 0,
@@ -19,7 +19,7 @@ export function toRecordLeadCallInput(
 
 export const toSaveLeadCallResultInput = (
   values: LeadCallResultFormValues,
-): Schemas['CrmSaveLeadCallResultInput'] => ({
+): Schemas['SaveLeadCallResultInput'] => ({
   name: values.name.trim(),
   outcome: values.outcome,
   retryDays: values.outcome === 'Retry' ? Number(values.retryDays) || 1 : null,

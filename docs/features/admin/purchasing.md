@@ -1,6 +1,6 @@
 # Admin: Рахунки на закупку
 
-**Status:** stage 1 (register), stage 2 (supplier link and note) and stage 3 (invoice recognition) implemented 2026-11-05; payment links («Оплата», accounting stage 9) 2026-11-08. Backend decisions and later stages are in the BreviERP specification `docs/sdd/specs/purchasing/001-purchase-invoices`; the consumed contract is [backend/purchasing](../../contracts/openapi/backend/purchasing/purchase-invoices.openapi.yaml).
+**Status:** stage 1 (register), stage 2 (supplier link and note) and stage 3 (invoice recognition) implemented 2026-11-05; payment links («Оплата», accounting stage 9) 2026-11-08. Backend decisions and later stages are in the BreviERP specification `docs/sdd/specs/purchasing/001-purchase-invoices`; the consumed contract is [backend/purchasing](../../contracts/openapi/openapi.json).
 
 `/accounting/purchase-invoices` («Бухгалтерія → Рахунки на закупку», its own menu item since client corrections item 10, 2026-11-08) shows the purchase invoices that staff post to Telegram and the Google sheet «финансы» collects. Only the Director sees it, and the supplier card tab with the supplier's invoices; the backend allows the same role (policy `CanUsePurchaseInvoices`). The old link `/references/counterparties?tab=purchases` takes the Director to the new page with the same filters.
 

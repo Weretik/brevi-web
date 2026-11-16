@@ -7,10 +7,11 @@ export const productErrorMessages = {
   fallback: 'Не вдалося виконати запит. Спробуйте ще раз.',
 };
 
-export function serializeProductQuery(query: ProductQuery): string {
-  const params = new URLSearchParams();
-  for (const [name, value] of Object.entries(query)) {
-    if (value !== undefined && value !== null && value !== '') params.set(name, String(value));
-  }
-  return params.toString();
+/** The filled filters of the product list; an empty search is not sent. */
+export function productQueryParams(query: ProductQuery): ProductQuery {
+  return Object.fromEntries(
+    Object.entries(query).filter(
+      ([, value]) => value !== undefined && value !== null && value !== '',
+    ),
+  );
 }

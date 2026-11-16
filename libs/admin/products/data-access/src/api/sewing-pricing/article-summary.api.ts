@@ -1,4 +1,4 @@
-import { adminApi } from '@admin/shared/api-client';
+import { adminApi, apiCall, apiClient } from '@admin/shared/api-client';
 
 import { sewingPricingError } from './pricing-errors';
 import { mapSewingArticleSummary } from '../../mappers/sewing-pricing/sewing-article-summary.mapper';
@@ -10,9 +10,15 @@ import type { SewingArticleSummary } from '@admin/products/model';
 export const sewingArticleSummaryApi = adminApi.injectEndpoints({
   endpoints: (build) => ({
     getSewingArticleSummary: build.query<SewingArticleSummary, number>({
-      query: (productId) => `/api/v1/products/${productId}/articles/pricing-summary`,
-      transformResponse: (value, _meta, productId) => mapSewingArticleSummary(value, productId),
-      transformErrorResponse: sewingPricingError,
+      queryFn: (productId, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/v1/products/{productId}/articles/pricing-summary', {
+            params: { path: { productId } },
+            signal,
+          }),
+          (value) => mapSewingArticleSummary(value, productId),
+          sewingPricingError,
+        ),
       providesTags: (_result, _error, productId) => [
         { type: 'Product', id: productId },
         sewingCompositionTag(productId),

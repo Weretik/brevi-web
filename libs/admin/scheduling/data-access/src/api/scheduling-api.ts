@@ -1,4 +1,4 @@
-import { adminApi } from '@admin/shared/api-client';
+import { adminApi, apiCall, apiClient } from '@admin/shared/api-client';
 
 import { schedulingApiError } from './scheduling-api-error';
 import {
@@ -20,37 +20,56 @@ const schedulingBaseApi = adminApi.enhanceEndpoints({
   addTagTypes: ['ScheduledTask', 'ScheduledTaskRun'],
 });
 
-const taskUrl = (key: string, rest: string) =>
-  `/api/scheduling/tasks/${encodeURIComponent(key)}/${rest}`;
-
 /** «Фонові задачі»: the list, the history of one task, the schedule and «Запустити зараз». */
 export const schedulingApi = schedulingBaseApi.injectEndpoints({
   endpoints: (build) => ({
     getScheduledTasks: build.query<ScheduledTask[], void>({
-      query: () => ({ url: '/api/scheduling/tasks' }),
-      transformResponse: mapScheduledTasks,
-      transformErrorResponse: schedulingApiError,
+      queryFn: (_arg, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/scheduling/tasks', { signal }),
+          mapScheduledTasks,
+          schedulingApiError,
+        ),
       providesTags: [tasksTag],
     }),
     getScheduledTaskRuns: build.query<ScheduledTaskRun[], string>({
-      query: (key) => ({ url: taskUrl(key, 'runs') }),
-      transformResponse: mapScheduledTaskRuns,
-      transformErrorResponse: schedulingApiError,
+      queryFn: (key, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/scheduling/tasks/{key}/runs', {
+            params: { path: { key: key } },
+            signal,
+          }),
+          mapScheduledTaskRuns,
+          schedulingApiError,
+        ),
       providesTags: (_result, _error, key) => [runsTag(key)],
     }),
     updateScheduledTaskSchedule: build.mutation<
       ScheduledTask,
       { key: string; input: ScheduledTaskScheduleInput }
     >({
-      query: ({ key, input }) => ({ url: taskUrl(key, 'schedule'), method: 'PUT', body: input }),
-      transformResponse: mapScheduledTask,
-      transformErrorResponse: schedulingApiError,
+      queryFn: ({ key, input }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/scheduling/tasks/{key}/schedule', {
+            params: { path: { key: key } },
+            body: input,
+            signal,
+          }),
+          mapScheduledTask,
+          schedulingApiError,
+        ),
       invalidatesTags: [tasksTag],
     }),
     runScheduledTaskNow: build.mutation<ScheduledTask, string>({
-      query: (key) => ({ url: taskUrl(key, 'run'), method: 'POST' }),
-      transformResponse: mapScheduledTask,
-      transformErrorResponse: schedulingApiError,
+      queryFn: (key, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/scheduling/tasks/{key}/run', {
+            params: { path: { key: key } },
+            signal,
+          }),
+          mapScheduledTask,
+          schedulingApiError,
+        ),
       invalidatesTags: (_result, _error, key) => [tasksTag, runsTag(key)],
     }),
   }),

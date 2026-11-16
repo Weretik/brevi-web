@@ -1,3 +1,5 @@
+import { apiCall, apiClient } from '@admin/shared/api-client';
+
 import { archiveErrors, toProductionApiError } from '../../errors/production-api-error';
 import {
   mapWorkshopArchiveImportResult,
@@ -24,33 +26,40 @@ const importInput = (rows: WorkshopArchiveImportRow[]): Schemas['WorkshopArchive
 export const workshopArchiveApi = productionBaseApi.injectEndpoints({
   endpoints: (build) => ({
     getWorkshopArchive: build.query<WorkshopArchivePage, WorkshopArchiveQuery>({
-      query: ({ kind, search, from, to, page, pageSize }) => ({
-        url: '/api/production/archive',
-        params: {
-          kind,
-          ...(search?.trim() ? { search: search.trim() } : {}),
-          ...(from ? { from } : {}),
-          ...(to ? { to } : {}),
-          page,
-          pageSize,
-        },
-      }),
-      transformResponse: mapWorkshopArchivePage,
-      transformErrorResponse: errors,
+      queryFn: ({ kind, search, from, to, page, pageSize }, { signal }) =>
+        apiCall(
+          apiClient.GET('/api/production/archive', {
+            params: {
+              query: {
+                kind,
+                ...(search?.trim() ? { search: search.trim() } : {}),
+                ...(from ? { from } : {}),
+                ...(to ? { to } : {}),
+                page,
+                pageSize,
+              },
+            },
+            signal,
+          }),
+          mapWorkshopArchivePage,
+          errors,
+        ),
       providesTags: ['WorkshopArchive'],
     }),
     importWorkshopArchive: build.mutation<
       ProductionImportResult,
       { rows: WorkshopArchiveImportRow[]; dryRun: boolean }
     >({
-      query: ({ rows, dryRun }) => ({
-        url: '/api/production/archive/import',
-        method: 'POST',
-        params: { dryRun },
-        body: importInput(rows),
-      }),
-      transformResponse: mapWorkshopArchiveImportResult,
-      transformErrorResponse: errors,
+      queryFn: ({ rows, dryRun }, { signal }) =>
+        apiCall(
+          apiClient.POST('/api/production/archive/import', {
+            params: { query: { dryRun } },
+            body: importInput(rows),
+            signal,
+          }),
+          mapWorkshopArchiveImportResult,
+          errors,
+        ),
       invalidatesTags: (result, error) =>
         error || !result || result.dryRun || result.errors > 0 ? [] : ['WorkshopArchive'],
     }),

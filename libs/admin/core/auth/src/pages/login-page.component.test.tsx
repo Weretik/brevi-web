@@ -1,5 +1,5 @@
+import { HttpError } from '@admin/shared/api-client';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { AxiosError, AxiosHeaders } from 'axios';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -76,16 +76,7 @@ describe('LoginPage', () => {
   });
 
   it('explains wrong credentials', async () => {
-    const response = {
-      status: 401,
-      data: {},
-      statusText: '',
-      headers: {},
-      config: { headers: new AxiosHeaders() },
-    };
-    loginMock.mockRejectedValue(
-      new AxiosError('Unauthorized', '401', undefined, undefined, response),
-    );
+    loginMock.mockRejectedValue(new HttpError(401, {}));
     renderLogin();
     fillAndSubmit();
 

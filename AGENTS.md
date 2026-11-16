@@ -14,7 +14,7 @@ Brevi Web holds the Brevi Admin (React, staff manage the catalogue, reference da
 - [Implemented feature map](docs/features/README.md) — separate Admin and Storefront descriptions with routes, boundaries, and code.
 - Admin look and page patterns: [design system «Цех»](docs/standards/admin/design-system.md); every new Admin feature follows it.
 - [Standards index](docs/standards/README.md) — stable rules for code, UI, API, testing, security, and delivery.
-- [Backend OpenAPI snapshot](docs/contracts/openapi/SOURCE.json) — synchronized backend contract and its source commit; see the [contract workflow](docs/architecture/api/contract-workflow.md).
+- [Backend OpenAPI snapshot](docs/contracts/openapi/SOURCE.md) — synchronized backend contract and its source commit; see the [contract workflow](docs/architecture/api/contract-workflow.md).
 
 Identify the application from the request and current code. If choosing between React and Angular affects the result and cannot be determined from context, clarify it before creating files.
 
@@ -37,14 +37,14 @@ For a new or substantially changed feature, update the [feature map](docs/featur
 
 ## Commands
 
-| Purpose                         | Command                                                               | Cost |
-| ------------------------------- | --------------------------------------------------------------------- | ---- |
-| Focused tests of one Nx project | `npx nx test <project> -- <file-path-filter>`                         | fast |
-| Lint or typecheck one project   | `npx nx lint <project>`, `npx nx typecheck <project>`                 | fast |
-| Site tests, lint, typecheck     | `npm run test:site`, `npm run lint:site`, `npx nx run site:typecheck` | fast |
-| Documentation links             | `npm run docs:check`                                                  | fast |
-| Backend contract snapshot       | `npm run contracts:check`                                             | fast |
-| List projects and targets       | `npx nx show projects`, `npx nx show project <project> --json`        | fast |
+| Purpose                         | Command                                                                                                                   | Cost |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ---- |
+| Focused tests of one Nx project | `npx nx test <project> -- <file-path-filter>`                                                                             | fast |
+| Lint or typecheck one project   | `npx nx lint <project>`, `npx nx typecheck <project>`                                                                     | fast |
+| Site tests, lint, typecheck     | `npm run test:site`, `npm run lint:site`, `npx nx run site:typecheck`                                                     | fast |
+| Documentation links             | `npm run docs:check`                                                                                                      | fast |
+| Backend contract                | `npm run contracts:sync` (from BreviERP `master`; `--ref <branch>`), `npm run contracts:check`, `npm run contracts:drift` | fast |
+| List projects and targets       | `npx nx show projects`, `npx nx show project <project> --json`                                                            | fast |
 
 Do not run `run-many`, full `npm run test:web`, coverage, production builds, or E2E (`admin-react-e2e`) unless the user asks; CI runs them. A small fix that restores documented behavior needs no SDD, file-role map, or audit: fix it, run the focused test, and describe the change briefly.
 
@@ -61,6 +61,8 @@ Do not run `run-many`, full `npm run test:web`, coverage, production builds, or 
 | HTTP and API contracts                                        | `$frontend-api-contract-sync`                            | [Contract workflow](docs/architecture/api/contract-workflow.md)                                                     |
 | Verify changes / hand off for review                          | `$frontend-change-verification` / `$frontend-pr-handoff` | [Testing rules](docs/standards/shared/testing-rules.md)                                                             |
 | Differences between code and documentation                    | `$frontend-docs-sync`                                    | [Documentation index](docs/README.md)                                                                               |
+
+**API contract:** BreviERP generates its OpenAPI from code; `docs/contracts/openapi/openapi.json` is a copy of it from the backend `master`, never edited here. `npm run contracts:sync` refreshes it and the types in `@admin/shared/contracts`; CI (`contracts:drift`) fails while it lags the backend, and a daily workflow opens the sync pull request. Admin calls the API only through the typed `openapi-fetch` client: `queryFn: (arg, { signal }) => apiCall(apiClient.GET('/api/...', { params, signal }), mapper)` in domain `data-access`, never raw `fetch` or Axios ([contract workflow](docs/architecture/api/contract-workflow.md), [ADR-0004](docs/architecture/adr/0004-contract-follows-backend-and-typed-client.md)).
 
 ## Process priority
 
