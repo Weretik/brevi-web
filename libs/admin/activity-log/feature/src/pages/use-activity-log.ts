@@ -8,7 +8,7 @@ import {
   activityQueryToParams,
 } from '@admin/activity-log/model';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import type { ActivityEntry, ActivityQuery } from '@admin/activity-log/model';
@@ -22,6 +22,9 @@ const noOptions = { actors: [], subjectTypes: [], actions: [] };
 export function useActivityLog() {
   const [params, setParams] = useSearchParams();
   const query = useMemo(() => activityQueryFromParams(params), [params]);
+  // The router's updater sees the params of its own render; the pause reads the latest ones here.
+  const latest = useRef(query);
+  latest.current = query;
   const [search, setSearch] = useState(query.search ?? '');
   const [openId, setOpenId] = useState<string | null>(null);
   const entries = useGetActivityEntriesQuery(query);
@@ -34,7 +37,14 @@ export function useActivityLog() {
   useEffect(() => {
     const next = search.trim() || undefined;
     if (next === query.search) return;
-    const timer = setTimeout(() => apply({ search: next }), activitySearchDelayMs);
+    // Use the request as it is when the pause ends, so a filter chosen meanwhile is kept.
+    const timer = setTimeout(
+      () =>
+        setParams(activityQueryToParams({ ...latest.current, page: 1, search: next }), {
+          replace: true,
+        }),
+      activitySearchDelayMs,
+    );
     return () => clearTimeout(timer);
     // Only a typed change starts the pause; the query follows the URL.
   }, [search]);

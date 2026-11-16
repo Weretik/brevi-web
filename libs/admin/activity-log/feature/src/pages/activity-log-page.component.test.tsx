@@ -125,6 +125,16 @@ describe('ActivityLogPage', () => {
     });
   });
 
+  it('keeps a filter chosen during the search pause (SC-03)', async () => {
+    renderPage();
+
+    await userEvent.type(screen.getByRole('textbox', { name: 'Пошук у журналі' }), 'Мрія');
+    await choose(/^Дія/, 'Змінено');
+
+    await waitFor(() => expect(lastQuery().search).toBe('Мрія'));
+    expect(lastQuery().action).toBe('Changed');
+  });
+
   it('opens an entry with every change and a link to the КП (SC-04)', async () => {
     fixture.items = [quoteChanged];
     renderPage();

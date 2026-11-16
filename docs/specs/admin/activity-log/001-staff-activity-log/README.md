@@ -61,10 +61,11 @@ Out of scope: editing or deleting entries, exports, and instant updates. An entr
 - **TS-03** feature: page component tests (SC-01 to SC-05).
 - **TS-04** app: menu, route, `defaultAccess` (SC-06).
 - **TS-05** contract sync, feature card, catalog row, spec index.
+- **TS-06** full feature audit: [code-audit/audit.md](code-audit/audit.md) (AF-01 fixed).
 
-**Evidence (2026-11-16):** TS-01 to TS-05 are done.
+**Evidence (2026-11-16):** TS-01 to TS-06 are done.
 
-- `npx nx test` passes for `admin-activity-log-model` (5), `admin-activity-log-data-access` (3), `admin-activity-log-feature` (5) and `admin-react` (35).
+- `npx nx test` passes for `admin-activity-log-model` (5), `admin-activity-log-data-access` (3), `admin-activity-log-feature` (6) and `admin-react` (35).
 - lint, typecheck and typecheck-tests pass for the four projects.
 - `architecture:structure`, `contracts:drift` and `docs:check` pass.
 - Feature card: [activity-log](../../../../features/admin/activity-log.md).
