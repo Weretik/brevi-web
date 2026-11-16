@@ -4,6 +4,46 @@
  */
 
 export interface paths {
+    "/api/activity-log/entries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A page of «Журнал дій», newest first
+         * @description Who created, changed or deleted what and when (ACT-001). Filters combine: person, role, object type, action, Kyiv period (from/to days, inclusive) and words of the object title.
+         */
+        get: operations["getActivityEntries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/activity-log/filters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The choices of the «Журнал дій» filters
+         * @description People and object types found in the journal, and every action.
+         */
+        get: operations["getActivityFilters"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/ai/settings": {
         parameters: {
             query?: never;
@@ -6684,6 +6724,51 @@ export interface components {
             timeZone: string;
             /** Format: date */
             today: string;
+        };
+        ActivityActorDto: {
+            /** Format: int32 */
+            id: number;
+            name: string;
+        };
+        ActivityChangeDto: {
+            field: string;
+            from: null | string;
+            to: null | string;
+        };
+        ActivityEntriesPageDto: {
+            items: components["schemas"]["ActivityEntryDto"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            total: number;
+        };
+        ActivityEntryDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            occurredAt: string;
+            /** Format: int32 */
+            actorId: number;
+            actorName: string;
+            actorRoles: string[];
+            action: string;
+            subjectType: string;
+            subjectTypeTitle: string;
+            subjectId: string;
+            subjectTitle: string;
+            summary: null | string;
+            changes: components["schemas"]["ActivityChangeDto"][];
+        };
+        ActivityFiltersDto: {
+            actors: components["schemas"]["ActivityActorDto"][];
+            subjectTypes: components["schemas"]["ActivitySubjectTypeDto"][];
+            actions: string[];
+        };
+        ActivitySubjectTypeDto: {
+            key: string;
+            title: string;
         };
         AdditionalReferenceAdminDetail: {
             /** Format: int32 */
@@ -14807,6 +14892,56 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    getActivityEntries: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+                actorId?: number;
+                role?: string;
+                subjectType?: string;
+                action?: string;
+                from?: string;
+                to?: string;
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActivityEntriesPageDto"];
+                };
+            };
+        };
+    };
+    getActivityFilters: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActivityFiltersDto"];
+                };
+            };
+        };
+    };
     getAiSettings: {
         parameters: {
             query?: never;

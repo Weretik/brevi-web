@@ -47,6 +47,7 @@ The Storefront currently has README files for its Nx feature libraries, but they
 - [Admin React: «Кольори» tab and colours picked from the list in the workshop](admin/references/019-fabric-colors/README.md) — implemented 2026-11-11.
 - [Admin React: Telegram reminders](admin/reminders/001-telegram-reminders/README.md) — implemented and locally verified 2026-11-01.
 - [Admin React: «Фонові задачі»](admin/scheduling/001-background-tasks/README.md) — implemented 2026-11-14 (backend BreviERP SCH-001).
+- [Admin React: «Журнал дій»](admin/activity-log/001-staff-activity-log/README.md) — implemented 2026-11-16 (backend BreviERP ACT-001).
 - [Admin React: «Швейний цех» stage 1](admin/production/001-workshop-references/README.md) — implemented 2026-11-04.
 - [Admin React: «Швейний цех» stage 2, «Виробничі завдання»](admin/production/002-production-orders/README.md) — implemented 2026-11-04.
 - [Admin React: «Швейний цех» stage 3, stages, shipments, files, Telegram](admin/production/003-order-tracking/README.md) — implemented 2026-11-04.

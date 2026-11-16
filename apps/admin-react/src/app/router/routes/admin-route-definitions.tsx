@@ -1,3 +1,4 @@
+import { activityLogRoutes } from '@admin/activity-log/feature';
 import { createClientsRoutes } from '@admin/clients/feature';
 import { createContentRoutes } from '@admin/content/feature';
 import { createDashboardRoutes } from '@admin/dashboard/feature';
@@ -71,6 +72,7 @@ export const adminRouteDefinitions = [
   }),
   ...createWarehouseRoutes({ useAccess: useWarehouseAccess }),
   ...backgroundTasksRoutes,
+  ...activityLogRoutes,
 ];
 
 /** Task pages need a role check, so the router wraps them instead of listing them above. */
