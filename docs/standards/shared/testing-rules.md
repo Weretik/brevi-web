@@ -40,6 +40,7 @@ For example, one filtering scenario may have a unit test for parameter normaliza
 - React component tests use Vitest and React Testing Library after a project target and one `test-setup` are created. Global setup contains only DOM matchers/polyfills; feature fixtures and mocks stay local.
 - App-level integration tests verify provider composition, routing, and browser adapters only when risk crosses a library boundary.
 - Browser E2E uses a separate `admin-react-e2e` Nx project and covers a few critical journeys. Add E2E only for a separate journey risk.
+- Full-stack E2E uses `stack-e2e`: the Admin and the site against a real BreviERP API with a seeded test database, run by the [`e2e.yml` workflow](../../../.github/workflows/e2e.yml) ([SDD](../../specs/architecture/002-full-stack-e2e/README.md)); locally `npm run test:stack:e2e` after starting the API ([how](../../specs/architecture/002-full-stack-e2e/README.md#run-locally)).
 - Coverage is collected in CI after a stable test set exists. Thresholds are introduced by a separate decision based on a baseline, not an arbitrary number.
 
 The base React harness is already configured in `apps/admin-react`. For a new library, check its Nx target/configuration and add the first behavioral test in the relevant `TS-*`. Existing harness smoke coverage checks only test infrastructure and is not evidence for a business scenario.
