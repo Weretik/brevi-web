@@ -10,5 +10,8 @@
         ]
       }
     ]
+  },
+  "enabledPlugins": {
+    "dotnet-backend@weretik-dev": false
   }
 }
