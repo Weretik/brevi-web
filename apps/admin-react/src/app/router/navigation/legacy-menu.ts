@@ -393,6 +393,12 @@ export const legacyGroups: readonly LegacyNavigationGroup[] = [
         path: '/admin/background-tasks',
         access: 'background-tasks',
       },
+      {
+        id: 'activity-log',
+        label: 'Журнал дій',
+        path: '/admin/activity-log',
+        access: 'activity-log',
+      },
       { id: 'access-rights', label: 'Права доступу', path: '/admin/access', requiredRoles: admin },
       {
         id: 'quote-settings',

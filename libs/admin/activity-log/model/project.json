@@ -1,0 +1,31 @@
+{
+  "name": "admin-activity-log-model",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/admin/activity-log/model/src",
+  "projectType": "library",
+  "tags": ["scope:admin", "domain:activity-log", "type:model"],
+  "targets": {
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": { "command": "eslint .", "cwd": "libs/admin/activity-log/model" }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit -p tsconfig.lib.json",
+        "cwd": "libs/admin/activity-log/model"
+      }
+    },
+    "typecheck-tests": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit -p tsconfig.spec.json",
+        "cwd": "libs/admin/activity-log/model"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": { "command": "vitest run", "cwd": "libs/admin/activity-log/model" }
+    }
+  }
+}
