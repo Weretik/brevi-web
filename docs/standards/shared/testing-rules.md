@@ -99,7 +99,6 @@ npm run format:check -- <paths>
 
 Run only targets listed by `npx nx show project <project> --json`. For an API feature, also verify synchronization/generation/checking under the [contract workflow](../../architecture/api/contract-workflow.md), runtime mapping, and errors. The `contracts:sync`, `contracts:generate`, and `contracts:check` scripts are defined in root `package.json`; run applicable commands and record actual results. If a required contract prerequisite is absent, record a specific `EN-*` rather than marking the check complete.
 
-
 ## Agent hooks
 
 The guard hook `.claude/hooks/guard.mjs` (it blocks secret files, force pushes, pushes to the default branch, production migrations and recursive deletes outside build output) has its own tests in `.claude/hooks/guard.test.mjs`. CI runs them with `node --test .claude/hooks/guard.test.mjs`; a change to the hook changes its tests in the same pull request.
