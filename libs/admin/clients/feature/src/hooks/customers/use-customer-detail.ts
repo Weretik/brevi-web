@@ -1,10 +1,10 @@
 import { useGetCustomerQuery, useReviseCustomerMutation } from '@admin/clients/data-access';
+import { useRequestId } from '@admin/shared/api-client';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { customerError } from '../../errors/customer-error';
 import { useClientDirtyGuard } from '../navigation/use-client-dirty-guard';
-import { useCustomerRequest } from '../requests/use-customer-request';
 
 import type { CustomerContact, CustomerDraft } from '@admin/clients/model';
 
@@ -24,7 +24,7 @@ export function useCustomerDetail() {
   const [merge, setMerge] = useState(false);
   const [saved, setSaved] = useState(false);
   const navigate = useNavigate();
-  const requestId = useCustomerRequest();
+  const requestId = useRequestId();
   const { blocker } = useClientDirtyGuard(dirty || contactDirty || mergeDirty);
   async function refresh() {
     setReloadConfirm(false);
@@ -43,7 +43,7 @@ export function useCustomerDetail() {
     setError(null);
     setSaved(false);
     try {
-      await revise({ ...intent, requestId: requestId(intent) }).unwrap();
+      await revise({ ...intent, requestId: requestId.forPayload(intent) }).unwrap();
       setDirty(false);
       setSaved(true);
     } catch (error) {

@@ -1,6 +1,7 @@
 import { useCopyQuoteMutation } from '@admin/quotes/data-access';
 import { quoteEditorPath } from '@admin/quotes/model';
-import { useRef, useState } from 'react';
+import { useRequestId } from '@admin/shared/api-client';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import type { Quote } from '@admin/quotes/model';
@@ -13,7 +14,7 @@ export function useQuoteLifecycle(quote: Quote | null) {
   const navigate = useNavigate();
   const [copyQuote, copying] = useCopyQuoteMutation();
   // One id per press: a repeat after a lost answer returns the same copy instead of a second one.
-  const requestId = useRef(crypto.randomUUID());
+  const requestId = useRequestId();
   const [error, setError] = useState<string | null>(null);
 
   return {
@@ -24,8 +25,11 @@ export function useQuoteLifecycle(quote: Quote | null) {
       if (!quote) return;
       setError(null);
       try {
-        const copy = await copyQuote({ id: quote.id, requestId: requestId.current }).unwrap();
-        requestId.current = crypto.randomUUID();
+        const copy = await copyQuote({
+          id: quote.id,
+          requestId: requestId.forPayload(quote.id),
+        }).unwrap();
+        requestId.renew();
         navigate(quoteEditorPath(copy.kind, copy.id), {
           state: { notice: `Створено КП ${copy.number} — копію КП ${quote.number}.` },
         });

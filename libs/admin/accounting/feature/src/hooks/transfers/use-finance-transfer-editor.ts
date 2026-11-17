@@ -8,8 +8,8 @@ import {
   financeTransferBody,
   validateFinanceTransfer,
 } from '@admin/accounting/model';
-import { adminApiErrorMessage, isAdminApiError } from '@admin/shared/api-client';
-import { useRef, useState } from 'react';
+import { adminApiErrorMessage, isAdminApiError, useRequestId } from '@admin/shared/api-client';
+import { useState } from 'react';
 
 import type { FinanceMovementEditorMode } from '../transactions/use-finance-transaction-editor';
 import type {
@@ -45,7 +45,7 @@ export function useFinanceTransferEditor(options: Options) {
   const [message, setMessage] = useState<string | null>(null);
   const [create, createState] = useCreateFinanceTransferMutation();
   // One id per new transfer: a repeated press returns the saved one instead of a duplicate.
-  const requestId = useRef(crypto.randomUUID());
+  const requestId = useRequestId();
   const [update, updateState] = useUpdateFinanceTransferMutation();
   const history = useGetFinanceTransferHistoryQuery(transfer?.id ?? '', {
     skip: !transfer || mode !== 'view',
@@ -77,8 +77,12 @@ export function useFinanceTransferEditor(options: Options) {
       if (transfer)
         await update({ id: transfer.id, body: { ...body, version: transfer.version } }).unwrap();
       else {
-        await create({ ...body, scope, requestId: requestId.current }).unwrap();
-        requestId.current = crypto.randomUUID();
+        await create({
+          ...body,
+          scope,
+          requestId: requestId.forPayload({ ...body, scope }),
+        }).unwrap();
+        requestId.renew();
       }
       onSaved(transfer ? 'Переказ збережено.' : 'Переказ додано.');
     } catch (error) {

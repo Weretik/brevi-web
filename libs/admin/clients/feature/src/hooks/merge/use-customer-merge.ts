@@ -3,10 +3,10 @@ import {
   useListCustomersQuery,
   useMergeCustomersMutation,
 } from '@admin/clients/data-access';
+import { useRequestId } from '@admin/shared/api-client';
 import { useEffect, useState } from 'react';
 
 import { customerError } from '../../errors/customer-error';
-import { useCustomerRequest } from '../requests/use-customer-request';
 
 import type { CustomerDetail } from '@admin/clients/model';
 
@@ -27,7 +27,7 @@ export function useCustomerMerge({
   const list = useListCustomersQuery({ page: 1, pageSize: 25, search }, { skip: !search });
   const victim = useGetCustomerQuery(victimId, { skip: !victimId });
   const [merge, state] = useMergeCustomersMutation();
-  const requestId = useCustomerRequest();
+  const requestId = useRequestId();
   useEffect(() => {
     onDirty(!!reason || !!victimId);
     return () => onDirty(false);
@@ -42,7 +42,7 @@ export function useCustomerMerge({
       reason,
     };
     try {
-      await merge({ ...intent, requestId: requestId(intent) }).unwrap();
+      await merge({ ...intent, requestId: requestId.forPayload(intent) }).unwrap();
       onClose();
     } catch (error) {
       setError(customerError(error));

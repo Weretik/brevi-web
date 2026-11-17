@@ -1,4 +1,4 @@
-import { adminApiErrorMessage } from '@admin/shared/api-client';
+import { adminApiErrorMessage, useRequestId } from '@admin/shared/api-client';
 import {
   useReverseFabricMovementMutation,
   useVoidFabricMovementMutation,
@@ -19,14 +19,14 @@ export const movementCancelModes = (row: FabricMovementRow): MovementCancelMode[
 
 /**
  * «Відмінити операцію…»: pick the way, give a reason, confirm. The void operation id is kept across failed tries
- * so a lost answer is replayed instead of voiding twice.
+ * with the same reason, so a lost answer is replayed instead of voiding twice.
  */
 export function useMovementCancel(onDone: (message: string) => void) {
   const [voidMovement] = useVoidFabricMovementMutation();
   const [reverse] = useReverseFabricMovementMutation();
   const [pending, setPending] = useState<FabricMovementRow | null>(null);
   const [mode, setMode] = useState<MovementCancelMode>('void');
-  const [operationId, setOperationId] = useState('');
+  const operationId = useRequestId();
   const [reason, setReason] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -41,7 +41,11 @@ export function useMovementCancel(onDone: (message: string) => void) {
       if (mode === 'void') {
         const result = await voidMovement({
           movementId: pending.id,
-          body: { operationId, expectedRevision: pending.revision, reason: reason.trim() },
+          body: {
+            operationId: operationId.forPayload({ movementId: pending.id, reason: reason.trim() }),
+            expectedRevision: pending.revision,
+            reason: reason.trim(),
+          },
         }).unwrap();
         onDone(operationMessage(result, 'Операцію прибрано з обліку. Залишок оновлено.'));
       } else {
@@ -68,7 +72,7 @@ export function useMovementCancel(onDone: (message: string) => void) {
       if (modes.length === 0) return;
       setPending(row);
       setMode(modes[0] ?? 'void');
-      setOperationId(crypto.randomUUID());
+      operationId.renew();
       setReason('');
       setError(null);
     },

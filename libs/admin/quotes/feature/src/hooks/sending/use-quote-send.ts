@@ -1,6 +1,7 @@
 import { useGetQuoteSendDraftQuery, useSendQuoteMutation } from '@admin/quotes/data-access';
 import { quoteSendErrors } from '@admin/quotes/model';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useRequestId } from '@admin/shared/api-client';
+import { useEffect, useMemo, useState } from 'react';
 
 import type { Quote, QuoteSendForm } from '@admin/quotes/model';
 
@@ -12,7 +13,7 @@ export function useQuoteSend(quote: Quote, onSent: (quote: Quote) => void) {
   const draft = useGetQuoteSendDraftQuery(quote.id, { refetchOnMountOrArgChange: true });
   const [send, sending] = useSendQuoteMutation();
   // One id per letter: a repeat after a lost answer sends nothing new.
-  const requestId = useRef(crypto.randomUUID());
+  const requestId = useRequestId();
   const [letterIndex, setLetterIndex] = useState(0);
   const [form, setForm] = useState<QuoteSendForm>({ to: '', subject: '', body: '' });
   const [showErrors, setShowErrors] = useState(false);
@@ -51,9 +52,9 @@ export function useQuoteSend(quote: Quote, onSent: (quote: Quote) => void) {
           id: quote.id,
           version: quote.version,
           form,
-          requestId: requestId.current,
+          requestId: requestId.forPayload({ id: quote.id, form }),
         }).unwrap();
-        requestId.current = crypto.randomUUID();
+        requestId.renew();
         onSent(sent);
       } catch (cause) {
         setError(messageOf(cause, 'Не вдалося надіслати КП.'));

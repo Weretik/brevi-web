@@ -2,10 +2,8 @@ import {
   useCopyProductionOrderMutation,
   useDeleteProductionOrderMutation,
 } from '@admin/production/data-access';
-import { adminApiErrorMessage } from '@admin/shared/api-client';
+import { adminApiErrorMessage, useRequestId } from '@admin/shared/api-client';
 import { useState } from 'react';
-
-import { useRequestId } from '../requests/use-request-id';
 
 import type { ProductionOrder } from '@admin/production/model';
 
@@ -25,7 +23,10 @@ export function useProductionOrderActions(order: ProductionOrder | null, callbac
   async function copy() {
     if (!order) return;
     try {
-      const copy = await copyOrder({ id: order.id, requestId: copyRequest.current() }).unwrap();
+      const copy = await copyOrder({
+        id: order.id,
+        requestId: copyRequest.forPayload(order.id),
+      }).unwrap();
       copyRequest.renew();
       callbacks.onCopied(copy);
     } catch (error) {
