@@ -15,7 +15,7 @@ export const {
   useGetPurchasePaymentCandidatesQuery,
   useLinkPurchasePaymentMutation,
   useUnlinkPurchasePaymentMutation,
-  useRecognizeNewPurchaseFilesMutation,
+  useStartNewPurchaseFilesRecognitionMutation,
   useRecognizePurchaseFileMutation,
   useSavePurchaseDocumentMutation,
   useGetPurchaseSuppliersQuery,

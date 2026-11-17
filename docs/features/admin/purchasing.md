@@ -6,7 +6,7 @@
 
 The page has:
 
-- a header with «Розпізнати всі нові» and «Оновити зараз» (the same sheet sync as the daily `brevierp-sync` step) and the time of the last successful sync. «Розпізнати всі нові» repeats `POST recognize-new` (5 never-tried originals per call, newest first) with progress «Розпізнано N з M», until none remain, the server gives a stop reason (AI off, monthly limit, already running) or «Зупинити» is pressed; the list reloads after each batch;
+- a header with «Розпізнати всі нові» and «Оновити зараз» (the same sheet sync as the daily `brevierp-sync` step) and the time of the last successful sync. «Розпізнати всі нові» calls `POST recognize-new` once: BreviERP starts the «Фонові задачі» task `purchase-recognition`, which reads the never-tried originals in the background, so no AI call runs inside the page's request. The notice says how many originals wait and that the summary is on «Фонові задачі»; «Нових оригіналів … немає» when nothing waits; a running or waiting task comes back as the server's 409 reason. The one-file «Розпізнати» stays in the request; BreviERP stops it after 85 s with «ШІ не встиг…»;
 - a warning with the reason when the last sync failed (sheet not shared, header changed, a UID moved);
 - search by text, chat, author or exact UID, and the chips «Усі / Помилки і перевірка / Без постачальника / Не розпізнані» with server counts;
 - «Дата рахунку з … по …» and «Усі / З ПДВ / Без ПДВ» over the checked facts (URL `from`, `to`, `vat`; invoices not recognized yet drop out while set) and «Скинути дату і ПДВ»;
@@ -88,7 +88,7 @@ libs/admin/purchasing/
     ├── components/documents/purchase-link-draft.tsx                # last AI answer of a failed original
     ├── hooks/documents/use-purchase-document-editor.ts             # template → form → save with replace
     ├── hooks/documents/use-purchase-file-actions.ts                # one original: recognize
-    ├── hooks/documents/use-purchase-recognition-batch.ts           # «Розпізнати всі нові» loop and «Зупинити»
+    ├── hooks/documents/use-purchase-recognition-start.ts           # «Розпізнати всі нові»: start the background task
     ├── hooks/review/use-purchase-review-editor.ts                  # form state, save with version
     └── hooks/invoices/use-purchase-invoice-{list,sync}.ts          # URL state, counts, sync
 libs/admin/references/feature/src/pages/counterparties/counterparties-page.tsx  # old ?tab=purchases link

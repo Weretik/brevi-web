@@ -1,4 +1,4 @@
-import type { PurchaseDocument, PurchaseRecognitionBatch } from '../entities/purchase-document';
+import type { PurchaseDocument, PurchaseRecognitionStart } from '../entities/purchase-document';
 
 /** 2026-10-21 → 21.10.2026. */
 export function formatPurchaseDocumentDate(value: string): string {
@@ -43,16 +43,10 @@ export function describePurchaseDocument(document: PurchaseDocument): string {
 export const purchaseVatLabel = (document: PurchaseDocument): string =>
   document.vat === 'WithVat' ? 'З ПДВ' : 'Без ПДВ';
 
-/** Progress line of «Розпізнати всі нові». */
-export function describePurchaseRecognitionBatch(
-  done: PurchaseRecognitionBatch,
-  total: number,
-): string {
-  const processed = done.recognized + done.needsReview + done.failed + done.skipped;
-  const parts = [`Розпізнано ${done.recognized} з ${total}`];
-  if (done.needsReview > 0) parts.push(`потребують перевірки ${done.needsReview}`);
-  if (done.failed > 0) parts.push(`не вдалося ${done.failed}`);
-  if (done.skipped > 0) parts.push(`не PDF ${done.skipped}`);
-  if (processed > 0) parts.push(`витрачено ${done.costUsd.toFixed(4)} $`);
-  return parts.join(', ') + '.';
+/** What «Розпізнати всі нові» tells the accountant: the work runs in «Фонові задачі», not in the page. */
+export function describePurchaseRecognitionStart(start: PurchaseRecognitionStart): string {
+  return start.started
+    ? `Розпізнавання нових оригіналів (${start.waiting}) запущено у фоні: почнеться протягом хвилини. ` +
+        'Документи з’являтимуться в списку, підсумок — на сторінці «Фонові задачі».'
+    : 'Нових оригіналів для розпізнавання немає.';
 }
