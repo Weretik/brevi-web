@@ -13,6 +13,7 @@
     "test": "nx test",
     "test:web": "nx run-many -t test --projects=admin-react",
     "architecture:structure": "node tools/architecture/check-structure.mjs",
+    "security:audit": "node tools/security/check-npm-audit.mjs",
     "architecture:structure:fixtures": "node --test tools/architecture/check-structure.spec.mjs",
     "ci:test-scripts": "node tools/ci/check-test-scripts.mjs",
     "ci:test-scripts:fixtures": "node --test tools/ci/test-scripts.spec.mjs",
@@ -188,6 +189,9 @@
     "undici": "^7.18.2",
     "openapi-typescript": {
       "typescript": "$typescript"
+    },
+    "@node-minify/core": {
+      "glob": "^10.5.0"
     }
   },
   "nx": {}
