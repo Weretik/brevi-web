@@ -11,8 +11,8 @@ import {
   nextFinanceTransactionFormValues,
   validateFinanceTransaction,
 } from '@admin/accounting/model';
-import { adminApiErrorMessage, isAdminApiError } from '@admin/shared/api-client';
-import { useRef, useState } from 'react';
+import { adminApiErrorMessage, isAdminApiError, useRequestId } from '@admin/shared/api-client';
+import { useState } from 'react';
 
 import type {
   CategoryDirection,
@@ -60,7 +60,7 @@ export function useFinanceTransactionEditor(options: Options) {
   const [addNext, setAddNext] = useState(false);
   const [create, createState] = useCreateFinanceTransactionMutation();
   // One id per new operation: a repeated press returns the saved one instead of a duplicate.
-  const requestId = useRef(crypto.randomUUID());
+  const requestId = useRequestId();
   const [update, updateState] = useUpdateFinanceTransactionMutation();
   const history = useGetFinanceTransactionHistoryQuery(transaction?.id ?? '', {
     skip: !transaction || mode !== 'view',
@@ -110,8 +110,12 @@ export function useFinanceTransactionEditor(options: Options) {
             id: transaction.id,
             body: { ...body, version: transaction.version },
           }).unwrap()
-        : await create({ ...body, scope, requestId: requestId.current }).unwrap();
-      if (!transaction) requestId.current = crypto.randomUUID();
+        : await create({
+            ...body,
+            scope,
+            requestId: requestId.forPayload({ ...body, scope }),
+          }).unwrap();
+      if (!transaction) requestId.renew();
       if (!transaction && addNext) {
         setValues(nextFinanceTransactionFormValues(values));
         setNotice(

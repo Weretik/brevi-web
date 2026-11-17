@@ -66,6 +66,5 @@ libs/admin/references/
 - `libs/admin/references/feature/src/pages/operations/*.component.test.tsx`
 - `libs/admin/references/data-access/src/mappers/<garment-parts|garment-part-operations>/*.unit.test.ts`
 - `libs/admin/references/model/src/{validators,mappers}/garment-part-operations/*.unit.test.ts`
-- E2E (run only on request): `apps/admin-react-e2e/src/garment-parts.spec.ts`, `apps/admin-react-e2e/src/garment-part-operations.spec.ts`
 
 Focused run: `npx nx test admin-references-feature -- operations`; `npx nx test admin-references-data-access -- garment-part`; `npx nx test admin-references-model -- garment-part-operations`.

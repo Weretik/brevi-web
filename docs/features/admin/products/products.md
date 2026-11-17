@@ -73,6 +73,5 @@ libs/admin/products/
 - `libs/admin/products/model/src/queries/ppe-card/`; `libs/admin/products/data-access/src/mappers/ppe-card/`
 - «Новий ЗІЗ»: `libs/admin/products/model/src/{forms,validators,queries}/ppe-create/`; `libs/admin/products/feature/src/pages/ppe-create/`
 - «Нова модель»: `libs/admin/products/model/src/{validators,queries}/sewing-create/`; `libs/admin/products/feature/src/pages/product-create/`
-- E2E (run only on request): `apps/admin-react-e2e/src/products.spec.ts`
 
 Focused run: `npx nx test admin-products-model -- product-overview`; `npx nx test admin-products-feature -- product-list product-detail product-editor sewing-card ppe-card`; `npx nx test admin-products-data-access -- products.api`; `npx nx test admin-products-model -- product-editor ordering product-fabrics`; `npx nx test admin-products-ui -- product-detail product-editor product-content`; `npx nx test admin-products-model -- ppe-card`.

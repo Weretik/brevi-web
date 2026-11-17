@@ -1,9 +1,9 @@
 import { useSaveCustomerContactMutation } from '@admin/clients/data-access';
 import { contactDraft, contactErrors } from '@admin/clients/model';
+import { useRequestId } from '@admin/shared/api-client';
 import { useEffect, useState } from 'react';
 
 import { customerError } from '../../errors/customer-error';
-import { useCustomerRequest } from '../requests/use-customer-request';
 
 import type { CustomerDetail, CustomerContact } from '@admin/clients/model';
 
@@ -24,7 +24,7 @@ export function useCustomerContactEditor({
   const [discard, setDiscard] = useState(false);
   const [refreshAfterDiscard, setRefreshAfterDiscard] = useState(false);
   const [save, state] = useSaveCustomerContactMutation();
-  const requestId = useCustomerRequest();
+  const requestId = useRequestId();
   const dirty = JSON.stringify(draft) !== JSON.stringify(contactDraft(contact));
   useEffect(() => {
     onDirty(dirty);
@@ -47,7 +47,7 @@ export function useCustomerContactEditor({
       draft,
     };
     try {
-      await save({ ...intent, requestId: requestId(intent) }).unwrap();
+      await save({ ...intent, requestId: requestId.forPayload(intent) }).unwrap();
       onClose();
     } catch (error) {
       setError(customerError(error));

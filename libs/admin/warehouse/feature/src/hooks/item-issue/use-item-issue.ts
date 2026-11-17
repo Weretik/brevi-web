@@ -1,4 +1,4 @@
-import { adminApiErrorMessage } from '@admin/shared/api-client';
+import { adminApiErrorMessage, useRequestId } from '@admin/shared/api-client';
 import { useIssueFabricToItemMutation } from '@admin/warehouse/data-access';
 import {
   createItemIssueValues,
@@ -17,12 +17,10 @@ import type {
   ItemIssueFormValues,
 } from '@admin/warehouse/model';
 
-const newOperationId = () => crypto.randomUUID();
-
 /**
  * «Видача» by actual cutting in two steps: the form, then a check of plan and fact and the pairs
- * before and after; «Записати» sends one package. The operation id lives as long as the form, so a
- * lost answer is replayed by the server instead of moving the stock twice.
+ * before and after; «Записати» sends one package. The operation id is kept while the values stay the
+ * same, so a lost answer is replayed by the server instead of moving the stock twice.
  */
 export function useItemIssue(
   card: ItemFabric,
@@ -33,7 +31,7 @@ export function useItemIssue(
   const [errors, setErrors] = useState<ItemIssueErrors>({ line: {} });
   const [checking, setChecking] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const [operationId] = useState(newOperationId);
+  const operationId = useRequestId();
   const [issue, state] = useIssueFabricToItemMutation();
 
   function change(next: ItemIssueFormValues) {
@@ -49,7 +47,7 @@ export function useItemIssue(
 
   async function save() {
     if (state.isLoading) return;
-    const body = itemIssueBody(values, card, fabrics, operationId);
+    const body = itemIssueBody(values, card, fabrics, operationId.forPayload(values));
     if (!body) {
       setChecking(false);
       return;

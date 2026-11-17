@@ -11,10 +11,8 @@ import {
   validatePayrollAdjustment,
   validatePayrollPayment,
 } from '@admin/production/model';
-import { adminApiErrorMessage } from '@admin/shared/api-client';
+import { adminApiErrorMessage, useRequestId } from '@admin/shared/api-client';
 import { useState } from 'react';
-
-import { useRequestId } from '../requests/use-request-id';
 
 import type {
   PayrollAdjustmentErrors,
@@ -41,7 +39,7 @@ export function usePayrollPaymentEditor(month: string, onSaved: (message: string
     try {
       await create({
         month,
-        body: { ...payrollPaymentBody(values), requestId: requestId.current() },
+        body: { ...payrollPaymentBody(values), requestId: requestId.forPayload({ month, values }) },
       }).unwrap();
       requestId.renew();
       onSaved('Виплату додано.');
@@ -81,7 +79,10 @@ export function usePayrollAdjustmentEditor(month: string, onSaved: (message: str
     try {
       await create({
         month,
-        body: { ...payrollAdjustmentBody(values), requestId: requestId.current() },
+        body: {
+          ...payrollAdjustmentBody(values),
+          requestId: requestId.forPayload({ month, values }),
+        },
       }).unwrap();
       requestId.renew();
       onSaved(values.sign === 'deduction' ? 'Утримання додано.' : 'Нарахування додано.');

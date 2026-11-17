@@ -10,11 +10,10 @@ import {
   todayIso,
   validateCreateOrder,
 } from '@admin/production/model';
-import { adminApiErrorMessage } from '@admin/shared/api-client';
+import { adminApiErrorMessage, useRequestId } from '@admin/shared/api-client';
 import { useState } from 'react';
 
 import { useDebouncedValue } from '../requests/use-debounced-value';
-import { useRequestId } from '../requests/use-request-id';
 
 import type {
   CreateOrderErrors,
@@ -76,7 +75,7 @@ export function useProductionOrderCreate(
     setMessage(null);
     try {
       const order = await create(
-        createOrderBody(loadedDraft, values, requestId.current()),
+        createOrderBody(loadedDraft, values, requestId.forPayload({ quoteId, values })),
       ).unwrap();
       requestId.renew();
       onCreated(order);

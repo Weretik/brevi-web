@@ -65,6 +65,5 @@ Products read the parameter list for the PPE product editor lookups
 - `libs/admin/references/data-access/src/mappers/pricing-parameters/*.unit.test.ts`
 - `libs/admin/references/feature/src/pages/pricing-parameters/*.component.test.tsx`
 - `apps/admin-react/src/app/router/routes/app-router.integration.test.tsx` (menu and old URL)
-- E2E (run only on request): `apps/admin-react-e2e/src/pricing-parameters.spec.ts`
 
 Focused run: `npx nx test admin-references-model -- pricing-parameters`; `npx nx test admin-references-data-access -- pricing-parameters`; `npx nx test admin-references-feature -- pricing-parameters`.

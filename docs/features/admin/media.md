@@ -65,6 +65,5 @@ libs/admin/media/
 - `libs/admin/media/feature/src/hooks/library/use-media-toasts.unit.test.ts`
 - `libs/admin/media/feature/src/components/picker/media-picker-drawer.component.test.tsx` (ticks, already added, folder + search, upload → ticked)
 - `libs/admin/products/data-access/src/products.api.integration.test.ts` (product editor paging and upload)
-- E2E (run only on request): `apps/admin-react-e2e/src/media.spec.ts`; product photos through the picker in `apps/admin-react-e2e/src/products.spec.ts`
 
 Focused run: `npx nx run-many -t test -p admin-media-model admin-media-data-access admin-media-ui admin-media-feature`.

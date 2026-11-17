@@ -3,6 +3,8 @@ export { apiClient } from './client/api-client';
 export { apiCall, apiRequest } from './client/api-call';
 export type { ApiCallResult, ApiErrorMapper } from './client/api-call';
 export { formDataBody } from './client/form-data-body';
+export { createRequestIdKeeper, useRequestId } from './client/request-id';
+export type { RequestIdKeeper } from './client/request-id';
 export { csrfHeaderName, readCsrfToken } from './csrf/csrf-token';
 export {
   AdminApiProvider,

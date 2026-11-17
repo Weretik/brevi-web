@@ -1,9 +1,9 @@
 import { useCreateCustomerMutation } from '@admin/clients/data-access';
 import { customerDraft, customerErrors } from '@admin/clients/model';
+import { useRequestId } from '@admin/shared/api-client';
 import { useState } from 'react';
 
 import { customerError } from '../../errors/customer-error';
-import { useCustomerRequest } from '../requests/use-customer-request';
 
 import type { CustomerDetail, CustomerDraft } from '@admin/clients/model';
 
@@ -14,7 +14,7 @@ export function useCustomerCreate(onCreated: (customer: CustomerDetail) => void)
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [duplicates, setDuplicates] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const requestId = useCustomerRequest();
+  const requestId = useRequestId();
 
   async function save() {
     const found = customerErrors(draft);
@@ -22,7 +22,7 @@ export function useCustomerCreate(onCreated: (customer: CustomerDetail) => void)
     if (Object.keys(found).length) return;
     setError(null);
     try {
-      onCreated(await create({ draft, requestId: requestId(draft) }).unwrap());
+      onCreated(await create({ draft, requestId: requestId.forPayload(draft) }).unwrap());
     } catch (failure) {
       setError(customerError(failure));
     }

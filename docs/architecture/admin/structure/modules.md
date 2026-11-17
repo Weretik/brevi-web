@@ -8,7 +8,7 @@ in [domains.md](domains.md).
 
 | Area         | Existing Nx projects                                   | Responsibility                                    |
 | ------------ | ------------------------------------------------------ | ------------------------------------------------- |
-| Application  | `apps/admin-react`, `apps/admin-react-e2e`             | React Admin composition and browser checks        |
+| Application  | `apps/admin-react`                                     | React Admin composition and browser checks        |
 | Core         | `libs/admin/core/{auth,shell}`                         | Session and application shell                     |
 | Products     | `libs/admin/products/{model,data-access,ui,feature}`   | Product model, API, presentation, and scenarios   |
 | References   | `libs/admin/references/{model,data-access,ui,feature}` | Admin reference data                              |

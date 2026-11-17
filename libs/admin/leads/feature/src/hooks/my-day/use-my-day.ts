@@ -5,8 +5,8 @@ import {
   useRecordLeadCallMutation,
 } from '@admin/leads/data-access';
 import { emptyLeadCallForm, validateLeadCallForm } from '@admin/leads/model';
-import { adminApiErrorMessage } from '@admin/shared/api-client';
-import { useRef, useState } from 'react';
+import { adminApiErrorMessage, useRequestId } from '@admin/shared/api-client';
+import { useState } from 'react';
 
 import type { LeadCallFormValues, LeadSummary } from '@admin/leads/model';
 
@@ -42,7 +42,7 @@ export function useMyDay(notify: (message: string) => void, focusId: number | nu
   const [form, setForm] = useState<FormState>(blank(null));
   const [record, recording] = useRecordLeadCallMutation();
   // One id per attempt on one lead: a repeated press records the call once.
-  const request = useRef<{ leadId: number; id: string } | null>(null);
+  const requestId = useRequestId();
 
   const queue = day.data?.queue ?? [];
   const currentId = selectedId ?? queue.find((x) => !called.has(x.id))?.id ?? queue[0]?.id ?? null;
@@ -60,15 +60,13 @@ export function useMyDay(notify: (message: string) => void, focusId: number | nu
       return;
     }
     try {
-      if (request.current?.leadId !== detail.id)
-        request.current = { leadId: detail.id, id: crypto.randomUUID() };
       await record({
         id: detail.id,
         version: detail.version,
         values: current.values,
-        requestId: request.current.id,
+        requestId: requestId.forPayload({ leadId: detail.id, values: current.values }),
       }).unwrap();
-      request.current = null;
+      requestId.renew();
       const done = new Set(called).add(detail.id);
       setCalled(done);
       setSelectedId(nextAfter(queue, detail.id, done));

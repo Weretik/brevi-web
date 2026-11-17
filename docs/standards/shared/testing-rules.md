@@ -39,7 +39,7 @@ For example, one filtering scenario may have a unit test for parameter normaliza
 - State/data-fetching tests assemble the minimum real store/provider graph and replace only the external transport boundary. Do not create a global mock backend or new mocking library without a separate `EN-*`.
 - React component tests use Vitest and React Testing Library after a project target and one `test-setup` are created. Global setup contains only DOM matchers/polyfills; feature fixtures and mocks stay local.
 - App-level integration tests verify provider composition, routing, and browser adapters only when risk crosses a library boundary.
-- Browser E2E uses a separate `admin-react-e2e` Nx project and covers a few critical journeys. Add E2E only for a separate journey risk.
+- Browser E2E covers a few critical journeys against the real API only; there are no browser tests with a mocked API (they were removed on 2026-11-17 because they passed while the real API was broken). Add E2E only for a separate journey risk.
 - Full-stack E2E uses `stack-e2e`: the Admin and the site against a real BreviERP API with a seeded test database, run by the [`e2e.yml` workflow](../../../.github/workflows/e2e.yml) ([SDD](../../specs/architecture/002-full-stack-e2e/README.md)); locally `npm run test:stack:e2e` after starting the API ([how](../../specs/architecture/002-full-stack-e2e/README.md#run-locally)).
 - Coverage is collected in CI after a stable test set exists. Thresholds are introduced by a separate decision based on a baseline, not an arbitrary number.
 
@@ -50,9 +50,9 @@ The base React harness is already configured in `apps/admin-react`. For a new li
 - `*.unit.test.ts` or `*.unit.test.tsx` — pure functions and validation.
 - `*.component.test.tsx` — React UI and user interactions.
 - `*.integration.test.ts` or `*.integration.test.tsx` — state, data fetching, routing, and browser boundaries.
-- `*.spec.ts` in `apps/admin-react-e2e` — browser E2E journeys.
+- `*.spec.ts` in `apps/stack-e2e` — browser E2E journeys.
 
-Top-level commands: `npm run test:web` (the `admin-react` app), `npm run check:admin-libs` (lint, typecheck, test typecheck and tests of every Admin library), `npm run test:site` and `npm run lint:site` (every `site-*` project), `npm run test:web:coverage`, `npm run test:web:e2e`, and `npm run typecheck:tests`. Individual empty test levels may pass through `--passWithNoTests`, but readiness requires at least one actual behavioral or infrastructure test.
+Top-level commands: `npm run test:web` (the `admin-react` app), `npm run check:admin-libs` (lint, typecheck, test typecheck and tests of every Admin library), `npm run test:site` and `npm run lint:site` (every `site-*` project), `npm run test:web:coverage`, `npm run test:stack:e2e`, and `npm run typecheck:tests`. Individual empty test levels may pass through `--passWithNoTests`, but readiness requires at least one actual behavioral or infrastructure test.
 
 CI selection: the scripts select projects by pattern (`admin-*`, `site-*`), never by a hand-written list. `npm run ci:test-scripts` (`tools/ci/check-test-scripts.mjs`) fails when a project with a test target is not selected by `test:web`, `check:admin-libs` or `test:site`; it found `site-articles-data-access` missing from the old list on 2026-11-14. On a pull request CI runs these scripts through `node tools/ci/run-affected.mjs <script>`, which keeps only the projects `nx affected` reports against the base (from `nrwl/nx-set-shas`); a push to `master` (`CI_SCOPE=all`) runs everything. Locally the scripts run everything.
 

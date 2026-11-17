@@ -1,1 +1,8 @@
-[]
+[
+  {
+    "advisory": "GHSA-fc5q-39xc-vjpf",
+    "package": "picomatch",
+    "reason": "ReDoS through single-branch repeated extglobs; reached only through dev and build tooling (Nx, Vite, Jest globbing) on trusted input. No patched picomatch release exists (4.0.7 is the latest). Allowed by the owner on 2026-11-17.",
+    "review": "Remove once a patched picomatch is released and the lockfile is updated."
+  }
+]

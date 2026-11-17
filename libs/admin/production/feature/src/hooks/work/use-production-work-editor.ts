@@ -8,10 +8,8 @@ import {
   workLeft,
   workTarget,
 } from '@admin/production/model';
-import { adminApiErrorMessage } from '@admin/shared/api-client';
+import { adminApiErrorMessage, useRequestId } from '@admin/shared/api-client';
 import { useState } from 'react';
-
-import { useRequestId } from '../requests/use-request-id';
 
 import type {
   ProductionWorkErrors,
@@ -58,7 +56,7 @@ export function useProductionWorkEditor(
     try {
       const saved = await create({
         ...target,
-        body: { ...productionWorkBody(values), requestId: requestId.current() },
+        body: { ...productionWorkBody(values), requestId: requestId.forPayload(values) },
       }).unwrap();
       requestId.renew();
       onSaved(
