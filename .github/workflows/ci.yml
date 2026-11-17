@@ -27,6 +27,7 @@ jobs:
       - uses: nrwl/nx-set-shas@v4
       - run: npm run security:audit
       - run: npm run docs:check
+      - run: node --test .claude/hooks/guard.test.mjs
       - run: npm run contracts:fixtures
       - run: npm run contracts:check
       - run: npm run ci:test-scripts:fixtures
