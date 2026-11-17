@@ -61,14 +61,10 @@ export interface PurchaseRecognition {
 }
 
 /** One batch of «Розпізнати всі нові». */
-export interface PurchaseRecognitionBatch {
-  recognized: number;
-  needsReview: number;
-  failed: number;
-  skipped: number;
-  remaining: number;
-  costUsd: number;
-  stopReason: string | null;
+/** «Розпізнати всі нові»: how many new originals wait, and whether the background task was started. */
+export interface PurchaseRecognitionStart {
+  waiting: number;
+  started: boolean;
 }
 
 export interface PurchaseDocumentSave {

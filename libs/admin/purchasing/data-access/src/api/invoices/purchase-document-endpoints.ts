@@ -5,7 +5,7 @@ import { purchaseApiError } from '../../errors/purchase-api-error';
 import {
   mapPurchaseDocumentSave,
   mapPurchaseRecognition,
-  mapPurchaseRecognitionBatch,
+  mapPurchaseRecognitionStart,
 } from '../../mappers/purchase-document.mapper';
 
 import type { PurchasingEndpointBuilder } from '../base/purchasing-endpoint-builder';
@@ -13,7 +13,7 @@ import type {
   PurchaseDocumentSave,
   PurchaseDocumentUpload,
   PurchaseRecognition,
-  PurchaseRecognitionBatch,
+  PurchaseRecognitionStart,
 } from '@admin/purchasing/model';
 
 export function purchaseDocumentEndpoints(build: PurchasingEndpointBuilder) {
@@ -31,17 +31,14 @@ export function purchaseDocumentEndpoints(build: PurchasingEndpointBuilder) {
       invalidatesTags: (_, error) => (error ? [] : [purchaseInvoicesTag]),
     }),
     /** One batch; the feature repeats it. The list reloads after every batch that read a file. */
-    recognizeNewPurchaseFiles: build.mutation<PurchaseRecognitionBatch, void>({
+    // Only starts the «Фонові задачі» task: the register changes later, as the task reads the files.
+    startNewPurchaseFilesRecognition: build.mutation<PurchaseRecognitionStart, void>({
       queryFn: (_arg, { signal }) =>
         apiCall(
           apiClient.POST('/api/purchasing/invoices/recognize-new', { signal }),
-          mapPurchaseRecognitionBatch,
+          mapPurchaseRecognitionStart,
           purchaseApiError,
         ),
-      invalidatesTags: (result) =>
-        result && result.recognized + result.needsReview + result.failed + result.skipped > 0
-          ? [purchaseInvoicesTag]
-          : [],
     }),
     savePurchaseDocument: build.mutation<PurchaseDocumentSave, PurchaseDocumentUpload>({
       queryFn: ({ fileId, document, replace }, { signal }) =>

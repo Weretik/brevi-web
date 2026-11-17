@@ -313,10 +313,10 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * One batch (5 files) of «Розпізнати всі нові»: active safe links never tried before, newest messages first
-         * @description One batch (5 files) of «Розпізнати всі нові»: active safe links never tried before, newest messages first. Repeat while remaining is above 0 and stopReason is null. Failed files are not retried here; use recognizePurchaseFile.
+         * Start the background recognition of new purchase originals
+         * @description «Розпізнати всі нові»: counts the active safe originals never tried before and, when there are any, asks «Фонові задачі» to start the «Розпізнавання оригіналів закупки» task; the next scheduler tick, within a minute, runs it in the tasks job. started is false when nothing waits. 409 when the task already runs or waits to start. The result shows on the «Фонові задачі» page and the recognised documents in the list.
          */
-        post: operations["recognizeNewPurchaseFiles"];
+        post: operations["startNewPurchaseFilesRecognition"];
         delete?: never;
         options?: never;
         head?: never;
@@ -12101,21 +12101,6 @@ export interface components {
             /** Format: date-time */
             at: string;
         };
-        PurchaseRecognitionBatchResponse: {
-            /** Format: int32 */
-            recognized: number;
-            /** Format: int32 */
-            needsReview: number;
-            /** Format: int32 */
-            failed: number;
-            /** Format: int32 */
-            skipped: number;
-            /** Format: int32 */
-            remaining: number;
-            /** Format: double */
-            costUsd: number;
-            stopReason: null | string;
-        };
         PurchaseRecognitionResponse: {
             fileId: string;
             result: components["schemas"]["PurchaseRecognitionResult"];
@@ -12126,6 +12111,11 @@ export interface components {
         };
         /** @enum {unknown} */
         PurchaseRecognitionResult: "Recognized" | "NeedsReview" | "Failed" | "Skipped";
+        PurchaseRecognitionStartResponse: {
+            /** Format: int32 */
+            waiting: number;
+            started: boolean;
+        };
         PurchaseSupplierOption: {
             /** Format: int32 */
             id: number;
@@ -15298,7 +15288,7 @@ export interface operations {
             };
         };
     };
-    recognizeNewPurchaseFiles: {
+    startNewPurchaseFilesRecognition: {
         parameters: {
             query?: never;
             header?: never;
@@ -15313,7 +15303,16 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PurchaseRecognitionBatchResponse"];
+                    "application/json": components["schemas"]["PurchaseRecognitionStartResponse"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
         };

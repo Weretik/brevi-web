@@ -15,7 +15,7 @@ import { useState } from 'react';
 
 import { PurchaseInvoiceRowDetails } from './purchase-invoice-row-details';
 import { usePurchaseFileActions } from '../../hooks/documents/use-purchase-file-actions';
-import { usePurchaseRecognitionBatch } from '../../hooks/documents/use-purchase-recognition-batch';
+import { usePurchaseRecognitionStart } from '../../hooks/documents/use-purchase-recognition-start';
 import { usePurchaseInvoiceList } from '../../hooks/invoices/use-purchase-invoice-list';
 import { usePurchaseInvoiceSync } from '../../hooks/invoices/use-purchase-invoice-sync';
 import { PurchaseDocumentEditor } from '../documents/purchase-document-editor';
@@ -29,8 +29,8 @@ const formatTime = (value: string) =>
 
 /**
  * «Бухгалтерія → Рахунки на закупку»: messages of the Google sheet «финансы», refreshed daily
- * and by «Оновити зараз». «Розпізнати всі нові» reads new originals by AI in batches; only
- * problems are marked.
+ * and by «Оновити зараз». «Розпізнати всі нові» starts the background task that reads new
+ * originals by AI; only problems are marked.
  */
 export function PurchaseInvoicesContent() {
   const state = usePurchaseInvoiceList();
@@ -39,7 +39,7 @@ export function PurchaseInvoicesContent() {
   const { sync, syncing, syncState } = usePurchaseInvoiceSync((text, ok) =>
     setNotice({ text, ok }),
   );
-  const batch = usePurchaseRecognitionBatch((text, ok) => setNotice({ text, ok }));
+  const recognition = usePurchaseRecognitionStart((text, ok) => setNotice({ text, ok }));
   const files = usePurchaseFileActions();
   // Updating, recognising and reviewing change the register: «Редагування» on «Рахунки на закупку».
   const { canEdit } = usePageRights();
@@ -72,24 +72,18 @@ export function PurchaseInvoicesContent() {
         actions={
           canEdit ? (
             <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap' }}>
-              {batch.running ? (
-                <Button variant="outlined" color="warning" onClick={batch.stop}>
-                  Зупинити
-                </Button>
-              ) : (
-                <Button
-                  variant="outlined"
-                  startIcon={<AutoAwesomeOutlinedIcon />}
-                  disabled={syncing}
-                  onClick={() => void batch.start()}
-                >
-                  Розпізнати всі нові
-                </Button>
-              )}
+              <Button
+                variant="outlined"
+                startIcon={<AutoAwesomeOutlinedIcon />}
+                disabled={syncing || recognition.starting}
+                onClick={() => void recognition.start()}
+              >
+                Розпізнати всі нові
+              </Button>
               <Button
                 variant="outlined"
                 startIcon={<SyncOutlinedIcon />}
-                disabled={syncing || batch.running}
+                disabled={syncing}
                 onClick={() => void sync()}
               >
                 {syncing ? 'Оновлення…' : 'Оновити зараз'}
@@ -98,11 +92,6 @@ export function PurchaseInvoicesContent() {
           ) : null
         }
       />
-      {batch.running && (
-        <Alert severity="info" sx={{ mb: 2 }}>
-          {batch.progress ?? 'Розпізнавання оригіналів…'}
-        </Alert>
-      )}
       {notice && (
         <Alert
           severity={notice.ok ? 'success' : 'error'}

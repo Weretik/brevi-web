@@ -31,12 +31,12 @@ export type {
   PurchaseDocumentVat,
   PurchaseRecognition,
   PurchaseRecognitionAttempt,
-  PurchaseRecognitionBatch,
+  PurchaseRecognitionStart,
   PurchaseRecognitionResult,
 } from './entities/purchase-document';
 export {
   describePurchaseDocument,
-  describePurchaseRecognitionBatch,
+  describePurchaseRecognitionStart,
   formatPurchaseDocumentDate,
   formatPurchaseMessageAt,
   formatPurchaseMoney,

@@ -22,7 +22,7 @@ import type {
   PurchaseDocumentSave,
   PurchaseRecognition,
   PurchaseRecognitionAttempt,
-  PurchaseRecognitionBatch,
+  PurchaseRecognitionStart,
 } from '@admin/purchasing/model';
 
 function mapItem(value: unknown): PurchaseDocumentItem {
@@ -83,16 +83,11 @@ export function mapPurchaseRecognition(value: unknown): PurchaseRecognition {
   };
 }
 
-export function mapPurchaseRecognitionBatch(value: unknown): PurchaseRecognitionBatch {
-  const row = record(value, 'пакет розпізнавання');
+export function mapPurchaseRecognitionStart(value: unknown): PurchaseRecognitionStart {
+  const row = record(value, 'запуск розпізнавання');
   return {
-    recognized: integer(row['recognized'], 'розпізнано'),
-    needsReview: integer(row['needsReview'], 'потребують перевірки'),
-    failed: integer(row['failed'], 'не вдалося'),
-    skipped: integer(row['skipped'], 'пропущено'),
-    remaining: integer(row['remaining'], 'залишилось'),
-    costUsd: amount(row['costUsd'], 'вартість'),
-    stopReason: nullableText(row['stopReason'], 'причина зупинки'),
+    waiting: integer(row['waiting'], 'нових оригіналів'),
+    started: flag(row['started'], 'запущено'),
   };
 }
 

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   describePurchaseDocument,
-  describePurchaseRecognitionBatch,
+  describePurchaseRecognitionStart,
   formatPurchaseMessageAt,
   formatPurchaseMoney,
 } from './describe-purchase-document';
@@ -27,20 +27,13 @@ describe('purchase document text', () => {
     expect(formatPurchaseMoney('8000')).toBe('8 000,00 грн');
   });
 
-  it('describes the batch progress with problems only when there are any', () => {
-    expect(
-      describePurchaseRecognitionBatch(
-        {
-          recognized: 4,
-          needsReview: 1,
-          failed: 0,
-          skipped: 0,
-          remaining: 0,
-          costUsd: 0.0123,
-          stopReason: null,
-        },
-        700,
-      ),
-    ).toBe('Розпізнано 4 з 700, потребують перевірки 1, витрачено 0.0123 $.');
+  it('says that the recognition runs in the background, or that nothing waits', () => {
+    expect(describePurchaseRecognitionStart({ waiting: 7, started: true })).toBe(
+      'Розпізнавання нових оригіналів (7) запущено у фоні: почнеться протягом хвилини. ' +
+        'Документи з’являтимуться в списку, підсумок — на сторінці «Фонові задачі».',
+    );
+    expect(describePurchaseRecognitionStart({ waiting: 0, started: false })).toBe(
+      'Нових оригіналів для розпізнавання немає.',
+    );
   });
 });

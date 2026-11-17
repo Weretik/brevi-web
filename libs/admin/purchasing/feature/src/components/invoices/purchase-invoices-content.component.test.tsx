@@ -103,7 +103,7 @@ vi.mock('@admin/purchasing/data-access', () => ({
   }),
   useReviewPurchaseInvoiceMutation: () => [fixture.review, { isLoading: false }],
   useRecognizePurchaseFileMutation: () => [fixture.recognize, { isLoading: false }],
-  useRecognizeNewPurchaseFilesMutation: () => [fixture.recognizeNew, { isLoading: false }],
+  useStartNewPurchaseFilesRecognitionMutation: () => [fixture.recognizeNew, { isLoading: false }],
   useSavePurchaseDocumentMutation: () => [fixture.save, { isLoading: false }],
   useGetPurchasePaymentCandidatesQuery: () => ({ data: [], isFetching: false, error: undefined }),
   useLinkPurchasePaymentMutation: () => [vi.fn(), { isLoading: false }],
@@ -115,18 +115,8 @@ vi.mock('@admin/purchasing/data-access', () => ({
   }),
 }));
 
-const batch = (values: Record<string, unknown>) => ({
-  unwrap: () =>
-    Promise.resolve({
-      recognized: 0,
-      needsReview: 0,
-      failed: 0,
-      skipped: 0,
-      remaining: 0,
-      costUsd: 0,
-      stopReason: null,
-      ...values,
-    }),
+const started = (waiting: number) => ({
+  unwrap: () => Promise.resolve({ waiting, started: waiting > 0 }),
 });
 
 afterEach(() => {
@@ -310,32 +300,45 @@ describe('«Бухгалтерія → Рахунки на закупку»', ()
     expect(router.state.location.search).toContain('filter=NotRecognized');
   });
 
-  it('recognizes all new originals in batches and shows the total', async () => {
+  it('starts the background recognition of new originals once and says where the result is', async () => {
     const user = userEvent.setup();
-    fixture.recognizeNew
-      .mockReturnValueOnce(batch({ recognized: 4, needsReview: 1, remaining: 3, costUsd: 0.002 }))
-      .mockReturnValueOnce(batch({ recognized: 3, remaining: 0, costUsd: 0.001 }));
+    fixture.recognizeNew.mockReturnValueOnce(started(8));
     renderContent();
 
     await user.click(screen.getByRole('button', { name: 'Розпізнати всі нові' }));
 
     expect(
-      await screen.findByText('Розпізнано 7 з 8, потребують перевірки 1, витрачено 0.0030 $.'),
+      await screen.findByText(/^Розпізнавання нових оригіналів \(8\) запущено у фоні/),
     ).toBeVisible();
-    expect(fixture.recognizeNew).toHaveBeenCalledTimes(2);
+    expect(fixture.recognizeNew).toHaveBeenCalledTimes(1);
   });
 
-  it('stops the batch with the server reason', async () => {
+  it('says when no new original waits', async () => {
     const user = userEvent.setup();
-    fixture.recognizeNew.mockReturnValueOnce(
-      batch({ remaining: 9, stopReason: 'ШІ вимкнено в «Налаштування ШІ».' }),
-    );
+    fixture.recognizeNew.mockReturnValueOnce(started(0));
     renderContent();
 
     await user.click(screen.getByRole('button', { name: 'Розпізнати всі нові' }));
 
-    expect(await screen.findByText(/^ШІ вимкнено в «Налаштування ШІ»\./)).toBeVisible();
-    expect(fixture.recognizeNew).toHaveBeenCalledTimes(1);
+    expect(await screen.findByText('Нових оригіналів для розпізнавання немає.')).toBeVisible();
+  });
+
+  it('shows the server reason when the recognition already runs', async () => {
+    const user = userEvent.setup();
+    fixture.recognizeNew.mockReturnValueOnce({
+      unwrap: () =>
+        Promise.reject({
+          code: 'Conflict',
+          status: 409,
+          message: 'Розпізнавання вже запущено.',
+          fieldErrors: {},
+        }),
+    });
+    renderContent();
+
+    await user.click(screen.getByRole('button', { name: 'Розпізнати всі нові' }));
+
+    expect(await screen.findByText('Розпізнавання вже запущено.')).toBeVisible();
   });
 
   it('recognizes one original from the open row and shows the problems', async () => {

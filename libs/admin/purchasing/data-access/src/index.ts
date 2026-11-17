@@ -5,7 +5,7 @@ export {
   useGetPurchasePaymentCandidatesQuery,
   useLinkPurchasePaymentMutation,
   useUnlinkPurchasePaymentMutation,
-  useRecognizeNewPurchaseFilesMutation,
+  useStartNewPurchaseFilesRecognitionMutation,
   useRecognizePurchaseFileMutation,
   useSavePurchaseDocumentMutation,
   useGetPurchaseSuppliersQuery,
