@@ -80,7 +80,6 @@ libs/admin/shared/
 - `libs/admin/core/auth/src/**/*.test.ts(x)` (session, transport, return path, guard, login page)
 - `libs/admin/shared/api-client/src/interceptors/auth-interceptors.integration.test.ts`
 - `apps/admin-react/src/app/**/*.test.ts(x)` (router, providers, navigation, theme)
-- E2E (run only on request): `apps/admin-react-e2e/src/admin-react.shell.spec.ts`
 
 Focused run: `npx nx test admin-core-shell`; `npx nx test admin-core-auth`; `npx nx test admin-react -- src/app`.
 

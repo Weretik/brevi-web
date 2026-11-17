@@ -20,7 +20,7 @@ Read the current composition and constraints in [Storefront runtime](storefront/
 | Routing                 | `@angular/router`                                                       | `react-router-dom`                                                       |
 | State and HTTP          | `HttpClient` (no feature consumer yet)                                  | `@reduxjs/toolkit` (RTK Query), `react-redux`, `openapi-fetch`           |
 | Localization            | `@jsverse/transloco`                                                    | —                                                                        |
-| Tests                   | no test target                                                          | Vitest, React Testing Library, Playwright (`admin-react-e2e`)            |
+| Tests                   | no test target                                                          | Vitest, React Testing Library, Playwright (`stack-e2e`)                  |
 
 Workspace tooling: Nx, Vite, ESLint, Prettier, TypeScript, and `openapi-typescript` for contract types.
 

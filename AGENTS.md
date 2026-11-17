@@ -46,7 +46,7 @@ For a new or substantially changed feature, update the [feature map](docs/featur
 | Backend contract                | `npm run contracts:sync` (from BreviERP `master`; `--ref <branch>`), `npm run contracts:check`, `npm run contracts:drift` | fast |
 | List projects and targets       | `npx nx show projects`, `npx nx show project <project> --json`                                                            | fast |
 
-Do not run `run-many`, full `npm run test:web`, coverage, production builds, or E2E (`admin-react-e2e`) unless the user asks; CI runs them. A small fix that restores documented behavior needs no SDD, file-role map, or audit: fix it, run the focused test, and describe the change briefly.
+Do not run `run-many`, full `npm run test:web`, coverage, production builds, or E2E (`stack-e2e`) unless the user asks; CI runs them. A small fix that restores documented behavior needs no SDD, file-role map, or audit: fix it, run the focused test, and describe the change briefly.
 
 ## Task routing
 

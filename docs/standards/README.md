@@ -12,7 +12,7 @@ instead of copying them into task files.
 
 ## Workflow
 
-- [Testing rules](shared/testing-rules.md) — general risk-based level selection; React/Vitest/RTK Query and `admin-react-e2e` sections apply to Admin. Check Storefront targets in Nx and the [inventory](../architecture/frontend-inventory.md).
+- [Testing rules](shared/testing-rules.md) — general risk-based level selection; React/Vitest/RTK Query and `stack-e2e` sections apply to Admin. Check Storefront targets in Nx and the [inventory](../architecture/frontend-inventory.md).
 - [Delivery rules](shared/delivery-rules.md) — readiness, traceability, and feature completion.
 - [Idempotency rules](shared/idempotency-rules.md) — one `requestId` per submit attempt, reused on retry and renewed after success or a change; pending lock on every mutation; no automatic retry of non-idempotent mutations.
 - [Repository file rules](shared/repository-conventions.md) — change scope and UTF-8.

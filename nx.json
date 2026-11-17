@@ -132,7 +132,6 @@
       },
       "include": [
         "apps/admin-react/**/*",
-        "apps/admin-react-e2e/**/*",
         "apps/storefront/**/*",
         "apps/site/**/*",
         "libs/site/**/*",

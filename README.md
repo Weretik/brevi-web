@@ -100,7 +100,7 @@ CI runs lint, type checks, all unit and component tests, contract and docs check
 ```text
 apps/
   admin-react/      admin SPA
-  admin-react-e2e/  Playwright tests
+  stack-e2e/        Playwright full-stack tests (Admin and site against a real API)
   site/             Next.js public site
   storefront/       legacy Angular storefront (to be removed)
 libs/
