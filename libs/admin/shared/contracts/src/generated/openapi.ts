@@ -10697,6 +10697,11 @@ export interface components {
         };
         /** @enum {unknown} */
         PpePriceImportStatus: "Changed" | "Unchanged" | "ManualPrice" | "Inactive" | "NotInFile" | "Invalid";
+        PpePricePreview: {
+            prices: null | components["schemas"]["PpePriceTiers"];
+            blockers: components["schemas"]["PpePricingBlocker"][];
+            isCalculated: boolean;
+        };
         /** @enum {unknown} */
         PpePriceSourceMethod: "Website" | "GoogleSheets" | "SupplierCabinet" | "File";
         PpePriceSourcesResponse: {
@@ -23149,7 +23154,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PpePriceCalculation"];
+                    "application/json": components["schemas"]["PpePricePreview"];
                 };
             };
         };
