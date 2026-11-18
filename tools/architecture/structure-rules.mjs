@@ -194,13 +194,14 @@ export function findStructureViolations({ files, read }) {
     }
   }
 
-  // Libraries with production code and no test.
+  // Libraries with hand-written production code and no test; generated code is exempt.
   for (const project of scoped.filter(
     (path) => path.startsWith('libs/') && baseOf(path) === 'project.json',
   )) {
     const root = dirOf(project);
     const inside = scoped.filter((path) => path.startsWith(`${root}/src/`));
-    if (inside.some(isProduction) && !inside.some(isSpec)) add('missing-tests', root);
+    if (inside.some((path) => isProduction(path) && !isGenerated(path)) && !inside.some(isSpec))
+      add('missing-tests', root);
   }
 
   // Admin application folder holds composition only.

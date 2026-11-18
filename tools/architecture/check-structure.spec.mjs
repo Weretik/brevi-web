@@ -219,6 +219,17 @@ test('flags a library with production code and no test', () => {
   );
 });
 
+test('does not ask generated code for tests', () => {
+  assert.deepEqual(
+    check({
+      'libs/admin/shared/contracts/project.json': '{}',
+      'libs/admin/shared/contracts/src/index.ts': '',
+      'libs/admin/shared/contracts/src/generated/openapi.ts': '',
+    }),
+    [],
+  );
+});
+
 test('allows only composition folders in the Admin application folder', () => {
   assert.deepEqual(
     check({
