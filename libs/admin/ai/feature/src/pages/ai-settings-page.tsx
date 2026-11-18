@@ -1,51 +1,18 @@
 import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import { Alert, Box, Button, CircularProgress, Paper, Stack, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Stack, Typography } from '@mui/material';
 
-import { AiBaseInstruction } from '../components/settings/ai-base-instruction';
+import { AiPromptCards } from '../components/prompts/ai-prompt-cards';
 import { AiKeySection } from '../components/settings/ai-key-section';
 import { AiModelsDrawer } from '../components/settings/ai-models-drawer';
 import { AiModelsSection } from '../components/settings/ai-models-section';
-import { AiRulesSection } from '../components/settings/ai-rules-section';
+import { Card } from '../components/settings/ai-settings-card';
 import { AiStatusStrip } from '../components/status/ai-status-strip';
 import { AiWorkSection } from '../components/status/ai-work-section';
 import { useAiSettings } from '../hooks/use-ai-settings';
 
-import type { AiNotice } from '../hooks/use-ai-settings';
-import type { ReactNode } from 'react';
-
 const formatTime = (value: string) =>
   new Date(value).toLocaleString('uk-UA', { dateStyle: 'short', timeStyle: 'short' });
-
-function Card({
-  title,
-  action,
-  notice,
-  children,
-}: {
-  title: string;
-  action?: ReactNode;
-  notice?: AiNotice;
-  children: ReactNode;
-}) {
-  return (
-    <Paper component="section" variant="outlined" sx={{ p: 2, minWidth: 0 }} aria-label={title}>
-      <Stack sx={{ gap: 1.5 }}>
-        <Stack
-          direction="row"
-          sx={{ justifyContent: 'space-between', alignItems: 'center', gap: 1 }}
-        >
-          <Typography variant="h6" component="h2">
-            {title}
-          </Typography>
-          {action}
-        </Stack>
-        {children}
-        {notice && <Alert severity={notice.ok ? 'success' : 'error'}>{notice.text}</Alert>}
-      </Stack>
-    </Paper>
-  );
-}
 
 /**
  * «Адміністрування › Налаштування ШІ»: the state strip answers «does the AI work now?»; below,
@@ -133,20 +100,7 @@ export function AiSettingsPage() {
                 />
               </Card>
             </Stack>
-            <Stack sx={{ gap: 2, minWidth: 0 }}>
-              {settings.prompts.map((prompt) => (
-                <Card key={prompt.key} title={prompt.title} notice={page.notices.prompt}>
-                  <Stack sx={{ gap: 2 }}>
-                    <AiBaseInstruction text={prompt.baseText} />
-                    <AiRulesSection
-                      rules={page.rulesOf(prompt.key)}
-                      disabled={page.busy}
-                      onSave={(rules, done) => page.saveRules(prompt.key, rules, done)}
-                    />
-                  </Stack>
-                </Card>
-              ))}
-            </Stack>
+            <AiPromptCards settings={settings} page={page} />
           </Box>
           {settings.updatedAt && (
             <Typography variant="caption" color="text.secondary">

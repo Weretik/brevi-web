@@ -1,22 +1,16 @@
 import { useGetEmbroideryCalculationQuery } from '@admin/embroidery/data-access';
 import { embroiderySavedTitle } from '@admin/embroidery/model';
-import {
-  EmbroideryBreakdownTable,
-  EmbroideryPriceCards,
-  EmbroiderySavedSummaryView,
-} from '@admin/embroidery/ui';
 import { ReferenceEditorDrawer } from '@admin/references/ui';
 import { usePageRights } from '@admin/shared/ui';
-import PostAddOutlinedIcon from '@mui/icons-material/PostAddOutlined';
-import { Alert, Box, Button, CircularProgress, Snackbar, Stack } from '@mui/material';
+import { Alert, Box, Button, CircularProgress, Snackbar } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { EmbroideryAddToQuoteDrawer } from './embroidery-add-to-quote-drawer';
-import { EmbroideryMockupSection } from './embroidery-mockup-section';
 import { EmbroiderySavedDeleteDialog } from './embroidery-saved-delete-dialog';
-import { useEmbroideryCopy } from '../../hooks/calculation/use-embroidery-copy';
-import { useEmbroiderySavedDeletion } from '../../hooks/saved/use-embroidery-saved-deletion';
+import { EmbroiderySavedDetails } from './embroidery-saved-details';
+import { useEmbroideryCopy } from '../../../hooks/calculation/use-embroidery-copy';
+import { useEmbroiderySavedDeletion } from '../../../hooks/saved/use-embroidery-saved-deletion';
+import { EmbroideryAddToQuoteDrawer } from '../list/embroidery-add-to-quote-drawer';
 
 import type { EmbroideryCalculationRequest } from '@admin/embroidery/model';
 
@@ -75,40 +69,15 @@ export function EmbroiderySavedDrawer({ id, canDelete, onClose, onRepeat }: Prop
             'Не вдалося відкрити розрахунок.'}
         </Alert>
       ) : (
-        <Stack sx={{ gap: 2 }}>
-          {deletion.error && <Alert severity="error">{deletion.error}</Alert>}
-          {canAddToQuote && saved.result.prices.length > 0 && (
-            <Box>
-              <Button
-                variant="outlined"
-                startIcon={<PostAddOutlinedIcon />}
-                onClick={() => setAdding(true)}
-              >
-                Додати в КП
-              </Button>
-            </Box>
-          )}
-          <EmbroideryPriceCards
-            prices={saved.result.prices}
-            quantity={saved.input.quantity}
-            error={saved.result.error}
-            missing={saved.result.missing}
-            missingAction={null}
-            waiting={false}
-            fetching={false}
-            onCopy={(price) => void copier.copy(saved.result.prices, price, saved.input.quantity)}
-          />
-          <EmbroiderySavedSummaryView saved={saved} />
-          <EmbroideryMockupSection summary={saved.summary} />
-          {saved.result.cost && <EmbroideryBreakdownTable cost={saved.result.cost} />}
-          {canDelete && (
-            <Box>
-              <Button color="error" onClick={deletion.ask}>
-                Видалити розрахунок
-              </Button>
-            </Box>
-          )}
-        </Stack>
+        <EmbroiderySavedDetails
+          saved={saved}
+          deleteError={deletion.error}
+          canAddToQuote={canAddToQuote}
+          canDelete={canDelete}
+          onAdd={() => setAdding(true)}
+          onCopy={(price) => void copier.copy(saved.result.prices, price, saved.input.quantity)}
+          onDelete={deletion.ask}
+        />
       )}
       <EmbroiderySavedDeleteDialog
         open={deletion.confirming}

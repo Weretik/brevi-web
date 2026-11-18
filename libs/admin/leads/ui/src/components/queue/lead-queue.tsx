@@ -1,10 +1,10 @@
-import { formatLeadNext } from '@admin/leads/model';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import { Box, Button, LinearProgress, Paper, Typography } from '@mui/material';
 
+import { LeadQueueItem as Item } from './lead-queue-item';
 import { mono } from '../status/mono';
 
-import type { LeadMyDay, LeadSummary } from '@admin/leads/model';
+import type { LeadMyDay } from '@admin/leads/model';
 
 interface Props {
   day: LeadMyDay;
@@ -13,64 +13,6 @@ interface Props {
   onSelect: (id: number) => void;
   /** Opens «Усі ліди» on the free leads. */
   onFindMore: () => void;
-}
-
-function hint(lead: LeadSummary): string {
-  if (lead.lastResultName) return `${lead.lastResultName} · ${lead.callCount}-й дзвінок`;
-  return lead.category ? `Новий · категорія ${lead.category}` : 'Новий';
-}
-
-function Item({
-  lead,
-  now,
-  current,
-  onSelect,
-}: {
-  lead: LeadSummary;
-  now: Date;
-  current: boolean;
-  onSelect: (id: number) => void;
-}) {
-  return (
-    <Box
-      component="button"
-      type="button"
-      aria-current={current || undefined}
-      onClick={() => onSelect(lead.id)}
-      sx={{
-        all: 'unset',
-        boxSizing: 'border-box',
-        width: '100%',
-        cursor: 'pointer',
-        display: 'grid',
-        gridTemplateColumns: '92px minmax(0, 1fr)',
-        gap: 1.25,
-        px: 1.75,
-        py: 1.25,
-        borderBottom: 1,
-        borderColor: 'divider',
-        bgcolor: current ? 'primary.light' : 'transparent',
-        boxShadow: current ? (theme) => `inset 3px 0 0 ${theme.palette.primary.main}` : 'none',
-        '&:hover': { bgcolor: current ? 'primary.light' : 'action.hover' },
-        '&:focus-visible': { outline: 2, outlineColor: 'primary.main', outlineOffset: -2 },
-      }}
-    >
-      <Typography
-        variant="body2"
-        sx={{ ...mono, color: lead.isOverdue ? 'error.main' : 'text.primary', fontSize: 12 }}
-      >
-        {lead.nextContactAt ? formatLeadNext(lead.nextContactAt, now) : '—'}
-      </Typography>
-      <Box sx={{ minWidth: 0 }}>
-        <Typography variant="body2" sx={{ fontWeight: 700 }} noWrap>
-          {lead.company}
-        </Typography>
-        <Typography variant="caption" color="text.secondary" noWrap component="p">
-          {hint(lead)}
-        </Typography>
-      </Box>
-    </Box>
-  );
 }
 
 /** «Мій день» aside: progress of the day, today's queue, then what is planned later. */

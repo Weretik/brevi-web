@@ -1,17 +1,9 @@
 import { UserAvatar, usePageRights } from '@admin/shared/ui';
-import { describeTaskEvent, formatTaskDue, formatTaskMoment } from '@admin/tasks/model';
-import {
-  Box,
-  Button,
-  Checkbox,
-  Divider,
-  Link,
-  MenuItem,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { formatTaskDue, formatTaskMoment } from '@admin/tasks/model';
+import { Box, Button, Divider, Link, MenuItem, Stack, TextField, Typography } from '@mui/material';
 
+import { TaskHistory } from './task-history';
+import { taskMono as mono, TaskStepsChecklist } from './task-steps-checklist';
 import { TaskStatePill } from '../components/status/task-state-pill';
 
 import type { TaskAssignee, TaskDetail } from '@admin/tasks/model';
@@ -25,8 +17,6 @@ interface Props {
   assignees?: readonly TaskAssignee[];
   onReassign?: (assigneeUserId: number) => void;
 }
-
-const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' };
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -107,9 +97,7 @@ export function TaskDetails({ task, busy, onStatus, onStep, assignees, onReassig
         {task.customerName && <Row label="Клієнт">{task.customerName}</Row>}
         {task.leadId && (
           <Row label="Лід">
-            <Link href={`/crm/leads?lead=${task.leadId}`}>
-              Відкрити в «Ліди › Мій день»
-            </Link>
+            <Link href={`/crm/leads?lead=${task.leadId}`}>Відкрити в «Ліди › Мій день»</Link>
           </Row>
         )}
         <Row label="Поставив">
@@ -127,51 +115,11 @@ export function TaskDetails({ task, busy, onStatus, onStep, assignees, onReassig
       )}
 
       {task.steps.length > 0 && (
-        <Box>
-          <Typography variant="subtitle2" component="h3" color="text.secondary" sx={{ mb: 0.5 }}>
-            Кроки{' '}
-            <Box component="span" sx={mono}>
-              {task.stepsDone}/{task.stepsTotal}
-            </Box>
-          </Typography>
-          {task.steps.map((step) => (
-            <Stack key={step.id} direction="row" sx={{ alignItems: 'center' }}>
-              <Checkbox
-                checked={step.isDone}
-                disabled={busy || !canEdit}
-                onChange={(event) => onStep(step.id, event.target.checked)}
-                slotProps={{ input: { 'aria-label': step.text } }}
-              />
-              <Typography
-                variant="body2"
-                sx={{
-                  textDecoration: step.isDone ? 'line-through' : 'none',
-                  color: step.isDone ? 'text.secondary' : 'text.primary',
-                }}
-              >
-                {step.text}
-              </Typography>
-            </Stack>
-          ))}
-        </Box>
+        <TaskStepsChecklist task={task} disabled={busy || !canEdit} onStep={onStep} />
       )}
 
       <Divider />
-      <Box>
-        <Typography variant="subtitle2" component="h3" color="text.secondary" sx={{ mb: 1 }}>
-          Історія змін
-        </Typography>
-        <Stack component="ol" sx={{ gap: 0.75, m: 0, p: 0, listStyle: 'none' }}>
-          {task.history.map((event, index) => (
-            <Box component="li" key={`${event.at}-${index}`} sx={{ typography: 'caption' }}>
-              <Box component="span" sx={{ ...mono, color: 'text.secondary' }}>
-                {formatTaskMoment(event.at)}
-              </Box>{' '}
-              · {event.by.name}: {describeTaskEvent(event)}
-            </Box>
-          ))}
-        </Stack>
-      </Box>
+      <TaskHistory history={task.history} />
     </Stack>
   );
 }

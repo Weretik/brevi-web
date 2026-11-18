@@ -1,9 +1,10 @@
 import { aiRuleOf, validateAiRule } from '@admin/ai/model';
 import AddIcon from '@mui/icons-material/Add';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import { Box, Button, IconButton, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import { Box, Button, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
+
+import { AiRuleEditor } from './ai-rule-editor';
+import { AiRuleView, ruleNumber as mono } from './ai-rule-view';
 
 interface Props {
   rules: readonly string[];
@@ -13,8 +14,6 @@ interface Props {
 }
 
 type Editing = { index: number | 'new'; draft: string; error?: string } | null;
-
-const mono = { fontFamily: 'var(--admin-font-mono)', color: 'text.secondary' } as const;
 
 /**
  * Conditions as a list: «+ Додати умову» opens a field in place, each condition can be changed
@@ -54,36 +53,15 @@ export function AiRulesSection({ rules, disabled, onSave }: Props) {
 
   const editor = (index: number | 'new') =>
     editing && editing.index === index ? (
-      <Stack
-        component="form"
-        sx={{ gap: 1, flex: 1, minWidth: 0 }}
-        onSubmit={(event) => {
-          event.preventDefault();
-          void submit();
-        }}
-      >
-        <TextField
-          autoFocus
-          size="small"
-          label={index === 'new' ? 'Нова умова' : `Умова ${index + 1}`}
-          placeholder="Наприклад: «Номер рахунку пиши без №»"
-          value={editing.draft}
-          error={Boolean(editing.error)}
-          helperText={editing.error}
-          disabled={disabled}
-          onChange={(event) =>
-            setEditing({ ...editing, draft: event.target.value, error: undefined })
-          }
-        />
-        <Stack direction="row" sx={{ gap: 1 }}>
-          <Button type="submit" variant="contained" size="small" disabled={disabled}>
-            Зберегти
-          </Button>
-          <Button size="small" disabled={disabled} onClick={() => setEditing(null)}>
-            Скасувати
-          </Button>
-        </Stack>
-      </Stack>
+      <AiRuleEditor
+        label={index === 'new' ? 'Нова умова' : `Умова ${index + 1}`}
+        value={editing.draft}
+        error={editing.error}
+        disabled={disabled}
+        onChange={(draft) => setEditing({ ...editing, draft, error: undefined })}
+        onSubmit={() => void submit()}
+        onCancel={() => setEditing(null)}
+      />
     ) : null;
 
   return (
@@ -116,64 +94,19 @@ export function AiRulesSection({ rules, disabled, onSave }: Props) {
               <Typography variant="body2" sx={{ ...mono, pt: 0.5, minWidth: 20 }}>
                 {index + 1}
               </Typography>
-              {editor(index) ??
-                (deleting === index ? (
-                  <Stack
-                    direction={{ xs: 'column', sm: 'row' }}
-                    sx={{ gap: 1, flex: 1, alignItems: { sm: 'center' } }}
-                  >
-                    <Typography variant="body2" color="error.main" sx={{ flex: 1, minWidth: 0 }}>
-                      Видалити умову «{rule}»?
-                    </Typography>
-                    <Stack direction="row" sx={{ gap: 1 }}>
-                      <Button
-                        size="small"
-                        color="error"
-                        variant="outlined"
-                        disabled={disabled}
-                        onClick={() => void remove(index)}
-                      >
-                        Видалити
-                      </Button>
-                      <Button size="small" disabled={disabled} onClick={() => setDeleting(null)}>
-                        Ні
-                      </Button>
-                    </Stack>
-                  </Stack>
-                ) : (
-                  <>
-                    <Typography
-                      variant="body2"
-                      sx={{ flex: 1, minWidth: 0, pt: 0.5, wordBreak: 'break-word' }}
-                    >
-                      {rule}
-                    </Typography>
-                    <Tooltip title="Змінити">
-                      <span>
-                        <IconButton
-                          size="small"
-                          aria-label={`Змінити умову ${index + 1}`}
-                          disabled={busy}
-                          onClick={() => setEditing({ index, draft: rule })}
-                        >
-                          <EditOutlinedIcon fontSize="small" />
-                        </IconButton>
-                      </span>
-                    </Tooltip>
-                    <Tooltip title="Видалити">
-                      <span>
-                        <IconButton
-                          size="small"
-                          aria-label={`Видалити умову ${index + 1}`}
-                          disabled={busy}
-                          onClick={() => setDeleting(index)}
-                        >
-                          <DeleteOutlineIcon fontSize="small" />
-                        </IconButton>
-                      </span>
-                    </Tooltip>
-                  </>
-                ))}
+              {editor(index) ?? (
+                <AiRuleView
+                  rule={rule}
+                  index={index}
+                  asking={deleting === index}
+                  busy={busy}
+                  disabled={disabled}
+                  onEdit={() => setEditing({ index, draft: rule })}
+                  onAsk={() => setDeleting(index)}
+                  onCancel={() => setDeleting(null)}
+                  onDelete={() => void remove(index)}
+                />
+              )}
             </Box>
           ))}
           {editing?.index === 'new' && (

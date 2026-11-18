@@ -15,7 +15,7 @@ import {
 import { useDeferredValue, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { EmbroiderySavedDrawer } from './embroidery-saved-drawer';
+import { EmbroiderySavedDrawer } from '../details/embroidery-saved-drawer';
 
 import type { EmbroideryCalculationRequest } from '@admin/embroidery/model';
 

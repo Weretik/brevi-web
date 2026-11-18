@@ -4,7 +4,7 @@ import { ReferenceEditorDrawer } from '@admin/references/ui';
 import { Alert, Stack } from '@mui/material';
 import { useState } from 'react';
 
-import { useEmbroideryCustomers } from '../../hooks/saved/use-embroidery-customers';
+import { useEmbroideryCustomers } from '../../../hooks/saved/use-embroidery-customers';
 
 import type {
   EmbroideryCalculationRequest,
