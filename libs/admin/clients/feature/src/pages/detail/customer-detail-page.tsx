@@ -1,15 +1,11 @@
 import { CounterpartyFinance } from '@admin/accounting/feature';
-import { CustomerContacts } from '@admin/clients/ui';
 import { CustomerProductionOrders } from '@admin/production/feature';
 import { CustomerQuotes } from '@admin/quotes/feature';
 import { Alert, Box, Button, CircularProgress, Stack, Typography } from '@mui/material';
 
 import { ConfirmClientRefresh } from '../../components/changes/confirm-client-refresh';
 import { UnsavedClientDialog } from '../../components/changes/unsaved-client-dialog';
-import { CustomerContactDialog } from '../../components/contacts/customer-contact-dialog';
-import { CustomerForm } from '../../components/customers/customer-form';
-import { DuplicateCandidates } from '../../components/customers/duplicate-candidates';
-import { CustomerMergeDialog } from '../../components/merge/customer-merge-dialog';
+import { CustomerCardTab } from '../../components/customers/customer-card-tab';
 import { CustomerTabs } from '../../components/tabs/customer-tabs';
 import { customerError } from '../../errors/customer-error';
 import { useCustomerDetail } from '../../hooks/customers/use-customer-detail';
@@ -21,32 +17,9 @@ interface Props {
 }
 
 export default function CustomerDetailPage({ canSeeFinance = false }: Props) {
-  const {
-    customerId,
-    query,
-    customer,
-    dirty,
-    setDirty,
-    setContactDirty,
-    setMergeDirty,
-    epoch,
-    reloadConfirm,
-    setReloadConfirm,
-    error,
-    duplicates,
-    setDuplicates,
-    contact,
-    setContact,
-    merge,
-    setMerge,
-    saved,
-    setSaved,
-    navigate,
-    blocker,
-    refresh,
-    save,
-    pending,
-  } = useCustomerDetail();
+  const detail = useCustomerDetail();
+  const { customerId, query, customer, dirty, reloadConfirm, setReloadConfirm } = detail;
+  const { navigate, blocker, refresh } = detail;
   const { tab, setTab } = useCustomerTab(canSeeFinance);
   const numericId = Number(customerId);
   return (
@@ -84,80 +57,7 @@ export default function CustomerDetailPage({ canSeeFinance = false }: Props) {
           </>
         )}
         {!query.error && customer && tab === 'card' && (
-          <>
-            {saved && (
-              <Alert severity="success" onClose={() => setSaved(false)}>
-                Клієнта збережено.
-              </Alert>
-            )}
-            <Button
-              disabled={pending || !!contact || merge}
-              onClick={() => {
-                if (dirty) setReloadConfirm(true);
-                else void refresh();
-              }}
-            >
-              Оновити дані із сервера
-            </Button>
-            {dirty && (
-              <Alert severity="info">
-                Спочатку збережіть зміни клієнта, щоб редагувати контакти або об’єднати записи.
-              </Alert>
-            )}
-            <CustomerForm
-              key={`${customerId}:${customer.revision}:${epoch}`}
-              customer={customer}
-              pending={pending}
-              error={error}
-              onSave={(draft) => void save(draft)}
-              onDirty={setDirty}
-              onCheckDuplicates={(draft) =>
-                setDuplicates(draft.taxIdentity.trim() || draft.displayName.trim())
-              }
-            />
-            {duplicates && <DuplicateCandidates term={duplicates} currentId={customerId} />}
-            {!!customer.externalIdentities.length && (
-              <Alert severity="info">
-                Зовнішні зв’язки:{' '}
-                {customer.externalIdentities
-                  .map((x) => `${x.source}/${x.type}: ${x.externalId}`)
-                  .join('; ')}
-              </Alert>
-            )}
-            <CustomerContacts
-              contacts={customer.contacts}
-              canEdit={customer.canEdit && !dirty && !pending}
-              onEdit={(value) => setContact({ value })}
-            />
-            {customer.canMerge && (
-              <Button color="warning" disabled={dirty || pending} onClick={() => setMerge(true)}>
-                Об’єднати з перевіреним дублем
-              </Button>
-            )}
-            {contact && (
-              <CustomerContactDialog
-                customer={customer}
-                contact={contact.value}
-                onDirty={setContactDirty}
-                onClose={() => setContact(null)}
-                onRefresh={() => {
-                  setContact(null);
-                  void refresh();
-                }}
-              />
-            )}
-            {merge && (
-              <CustomerMergeDialog
-                customer={customer}
-                onDirty={setMergeDirty}
-                onClose={() => setMerge(false)}
-                onRefresh={() => {
-                  setMerge(false);
-                  void refresh();
-                }}
-              />
-            )}
-          </>
+          <CustomerCardTab detail={detail} customer={customer} />
         )}
         <ConfirmClientRefresh
           open={reloadConfirm}

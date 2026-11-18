@@ -1,19 +1,13 @@
 import { PurchaseInvoiceNarrowing, PurchaseInvoicesTable } from '@admin/purchasing/ui';
-import {
-  ReferenceFilterChip,
-  ReferenceFilterRow,
-  ReferenceListAlerts,
-  ReferencePageHeader,
-  ReferenceSearchBar,
-} from '@admin/references/ui';
+import { ReferenceListAlerts, ReferenceSearchBar } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
 import { usePageRights } from '@admin/shared/ui';
-import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined';
-import SyncOutlinedIcon from '@mui/icons-material/SyncOutlined';
-import { Alert, Box, Button, Paper, Stack } from '@mui/material';
+import { Alert, Box, Paper } from '@mui/material';
 import { useState } from 'react';
 
+import { PurchaseInvoiceFilters } from './purchase-invoice-filters';
 import { PurchaseInvoiceRowDetails } from './purchase-invoice-row-details';
+import { formatTime, PurchaseInvoicesHeader } from './purchase-invoices-header';
 import { usePurchaseFileActions } from '../../hooks/documents/use-purchase-file-actions';
 import { usePurchaseRecognitionStart } from '../../hooks/documents/use-purchase-recognition-start';
 import { usePurchaseInvoiceList } from '../../hooks/invoices/use-purchase-invoice-list';
@@ -23,9 +17,6 @@ import { PurchaseFileActions } from '../documents/purchase-file-actions';
 import { PurchaseInvoiceDrawer } from '../review/purchase-invoice-drawer';
 
 import type { PurchaseInvoice, PurchaseInvoiceLink } from '@admin/purchasing/model';
-
-const formatTime = (value: string) =>
-  new Date(value).toLocaleString('uk-UA', { dateStyle: 'short', timeStyle: 'short' });
 
 /**
  * «Бухгалтерія → Рахунки на закупку»: messages of the Google sheet «финансы», refreshed daily
@@ -55,42 +46,12 @@ export function PurchaseInvoicesContent() {
 
   return (
     <Box sx={{ minWidth: 0 }}>
-      <ReferencePageHeader
-        title="Рахунки на закупку"
-        subtitle={
-          lastSuccess ? (
-            <>
-              Повідомлення з Google-таблиці «финансы» оновлюються щодня. Останнє оновлення:{' '}
-              <Box component="span" sx={{ fontFamily: 'var(--admin-font-mono)' }}>
-                {formatTime(lastSuccess)}
-              </Box>
-            </>
-          ) : (
-            'Повідомлення з Google-таблиці «финансы». Реєстр ще не оновлювався.'
-          )
-        }
-        actions={
-          canEdit ? (
-            <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap' }}>
-              <Button
-                variant="outlined"
-                startIcon={<AutoAwesomeOutlinedIcon />}
-                disabled={syncing || recognition.starting}
-                onClick={() => void recognition.start()}
-              >
-                Розпізнати всі нові
-              </Button>
-              <Button
-                variant="outlined"
-                startIcon={<SyncOutlinedIcon />}
-                disabled={syncing}
-                onClick={() => void sync()}
-              >
-                {syncing ? 'Оновлення…' : 'Оновити зараз'}
-              </Button>
-            </Stack>
-          ) : null
-        }
+      <PurchaseInvoicesHeader
+        lastSuccess={lastSuccess}
+        canEdit={canEdit}
+        syncing={syncing}
+        recognition={recognition}
+        onSync={() => void sync()}
       />
       {notice && (
         <Alert
@@ -129,41 +90,7 @@ export function PurchaseInvoicesContent() {
         vat={state.vat}
         onChange={state.setNarrowing}
       />
-      <ReferenceFilterRow
-        filters={
-          <>
-            <ReferenceFilterChip
-              label="Усі"
-              count={state.counts.All}
-              selected={state.filter === 'All'}
-              onClick={() => state.setFilter('All')}
-            />
-            <ReferenceFilterChip
-              label="Помилки і перевірка"
-              count={state.counts.NeedsReview}
-              selected={state.filter === 'NeedsReview'}
-              onClick={() => state.setFilter('NeedsReview')}
-            />
-            <ReferenceFilterChip
-              label="Без постачальника"
-              count={state.counts.WithoutSupplier}
-              selected={state.filter === 'WithoutSupplier'}
-              onClick={() => state.setFilter('WithoutSupplier')}
-            />
-            <ReferenceFilterChip
-              label="Не розпізнані"
-              count={state.counts.NotRecognized}
-              selected={state.filter === 'NotRecognized'}
-              onClick={() => state.setFilter('NotRecognized')}
-            />
-          </>
-        }
-        count={page?.total ?? 0}
-        total={state.counts[state.filter]}
-        countLabel="Кількість рахунків"
-        selectedCount={0}
-        onClearSelection={() => undefined}
-      />
+      <PurchaseInvoiceFilters state={state} total={page?.total ?? 0} />
       <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
         <PurchaseInvoicesTable
           page={page}

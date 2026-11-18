@@ -1,25 +1,11 @@
 import { useGetAccessRightsQuery } from '@admin/users/data-access';
 import { groupAccessAreas, normalizeAccessGrants } from '@admin/users/model';
-import {
-  AccessRightsHeader,
-  AccessRolePanel,
-  AccessRoleTabs,
-  ConfirmActionDialog,
-  NewRolePanel,
-} from '@admin/users/ui';
-import {
-  Alert,
-  Box,
-  Button,
-  Card,
-  CircularProgress,
-  Snackbar,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { AccessRightsHeader, AccessRolePanel, AccessRoleTabs, NewRolePanel } from '@admin/users/ui';
+import { Alert, Box, Button, Card, Stack, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 
-import { isForbiddenError } from '../errors/access-error-message';
+import { AccessRightsDialogs } from '../components/access-rights-dialogs';
+import { AccessRightsUnavailable } from '../components/access-rights-unavailable';
 import { useAccessRightsActions } from '../hooks/use-access-rights-actions';
 import { useAccessRoleDraft } from '../hooks/use-access-role-draft';
 
@@ -91,22 +77,11 @@ export default function AccessRightsPage({ onAccessChanged }: AccessRightsPagePr
     return (
       <Stack component="section" spacing={3}>
         {header}
-        {rightsQuery.isError ? (
-          isForbiddenError(rightsQuery.error) ? (
-            <Alert severity="warning">Лише адміністратор може керувати правами доступу.</Alert>
-          ) : (
-            <Alert
-              action={<Button onClick={() => void rightsQuery.refetch()}>Повторити</Button>}
-              severity="error"
-            >
-              Не вдалося завантажити права доступу.
-            </Alert>
-          )
-        ) : (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-            <CircularProgress aria-label="Завантаження прав доступу" />
-          </Box>
-        )}
+        <AccessRightsUnavailable
+          isError={rightsQuery.isError}
+          error={rightsQuery.error}
+          onRetry={() => void rightsQuery.refetch()}
+        />
       </Stack>
     );
   }
@@ -161,37 +136,15 @@ export default function AccessRightsPage({ onAccessChanged }: AccessRightsPagePr
         open={isCreateOpen}
         submitting={actions.creating}
       />
-      <ConfirmActionDialog
-        confirmLabel="Видалити роль"
-        description={`Роль «${deleteTarget?.title ?? ''}» буде видалено разом з її правами. Цю дію не можна скасувати.`}
-        destructive
-        error={actions.deleteError}
-        onCancel={() => setDeleteTarget(null)}
-        onConfirm={() => void handleDelete()}
-        open={deleteTarget !== null}
-        submitting={actions.deleting}
-        title="Видалити роль?"
+      <AccessRightsDialogs
+        actions={actions}
+        role={role}
+        deleteTarget={deleteTarget}
+        onCancelDelete={() => setDeleteTarget(null)}
+        onDelete={() => void handleDelete()}
+        successMessage={successMessage}
+        onCloseSuccess={() => setSuccessMessage(null)}
       />
-      <ConfirmActionDialog
-        confirmLabel="Перейти без збереження"
-        description="На цій вкладці є незбережені зміни. Якщо перейти до іншої ролі, вони зникнуть."
-        destructive
-        error={null}
-        onCancel={role.cancelPendingTab}
-        onConfirm={role.confirmPendingTab}
-        open={role.pendingTab !== null}
-        submitting={false}
-        title="Незбережені зміни"
-      />
-      <Snackbar
-        autoHideDuration={4000}
-        onClose={() => setSuccessMessage(null)}
-        open={successMessage !== null}
-      >
-        <Alert onClose={() => setSuccessMessage(null)} severity="success" variant="filled">
-          {successMessage}
-        </Alert>
-      </Snackbar>
     </Stack>
   );
 }

@@ -40,7 +40,8 @@ apps/admin-react/
     ├── router/
     │   ├── app-router.tsx # router provider
     │   ├── create-admin-router.tsx # /login, session guard, Admin-only users route
-    │   ├── legacy-menu.ts # groups, icons, sections
+    │   ├── legacy-menu.ts # menu types and order of the groups
+    │   ├── legacy-menu-{work,office,data,admin}.ts # groups, icons and items by section
     │   └── navigation-config.ts # navigation
     ├── theme/ # palette, typography, motion, components
     └── app.tsx # composition
