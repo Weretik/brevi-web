@@ -1,15 +1,8 @@
-import {
-  contentProductPageSizes,
-  contentProductProblems,
-  contentProductTypeLabel,
-  siteCategoryPath,
-} from '@admin/content/model';
-import ImageNotSupportedOutlinedIcon from '@mui/icons-material/ImageNotSupportedOutlined';
+import { contentProductPageSizes } from '@admin/content/model';
 import {
   Box,
   LinearProgress,
   Stack,
-  Switch,
   Table,
   TableBody,
   TableCell,
@@ -19,6 +12,8 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
+
+import { ContentProductTableRow } from './content-product-table-row';
 
 import type { ContentProductPage, ContentProductRow, SiteCategoryRow } from '@admin/content/model';
 
@@ -39,37 +34,7 @@ interface Props {
   onToggle: (row: ContentProductRow, showOnSite: boolean) => void;
 }
 
-const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' };
 const columns = 6;
-const formatDate = (value: string) =>
-  new Date(value).toLocaleString('uk-UA', { dateStyle: 'short', timeStyle: 'short' });
-
-function Photo({ url }: { url: string | null }) {
-  const frame = {
-    width: 44,
-    height: 44,
-    borderRadius: 1,
-    border: 1,
-    borderColor: 'divider',
-    bgcolor: 'background.paper',
-  };
-  return url ? (
-    <Box component="img" src={url} alt="" loading="lazy" sx={{ ...frame, objectFit: 'contain' }} />
-  ) : (
-    <Box sx={{ ...frame, display: 'grid', placeItems: 'center', color: 'text.disabled' }}>
-      <ImageNotSupportedOutlinedIcon fontSize="small" />
-    </Box>
-  );
-}
-
-/** The site categories of a row, or null when it is in none or they cannot be named. */
-function siteCategories(row: ContentProductRow, categories: readonly SiteCategoryRow[] | null) {
-  if (!categories || row.categoryIds.length === 0) return null;
-  const names = categories
-    .filter((category) => row.categoryIds.includes(category.id))
-    .map((category) => siteCategoryPath(category, categories));
-  return names.length > 0 ? names.join(', ') : null;
-}
 
 /**
  * «Контент → Товари»: every product of «Товари» with the «На сайті» switch and what its page still
@@ -133,75 +98,17 @@ export function ContentProductsTable({
                 </TableCell>
               </TableRow>
             ) : (
-              items.map((row) => {
-                const problems = contentProductProblems(row);
-                const inSite = siteCategories(row, categories);
-                return (
-                  <TableRow
-                    key={row.productId}
-                    hover
-                    onClick={() => onOpen(row)}
-                    sx={{ cursor: 'pointer' }}
-                  >
-                    <TableCell>
-                      <Photo url={row.mainPhotoUrl} />
-                    </TableCell>
-                    <TableCell sx={{ minWidth: 220, maxWidth: 360 }}>
-                      <Typography variant="body2" noWrap title={row.name}>
-                        {row.name}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={mono}
-                        noWrap
-                        component="div"
-                      >
-                        {[row.code, row.slug ? `/product/${row.slug}` : null]
-                          .filter(Boolean)
-                          .join(' · ') || '—'}
-                      </Typography>
-                    </TableCell>
-                    <TableCell sx={{ whiteSpace: 'nowrap' }}>
-                      <Typography variant="body2">{row.sectionName ?? '—'}</Typography>
-                      <Typography variant="caption" color="text.secondary">
-                        {contentProductTypeLabel(row.type)}
-                      </Typography>
-                      {inSite && (
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{ display: 'block' }}
-                        >
-                          Сайт: {inSite}
-                        </Typography>
-                      )}
-                    </TableCell>
-                    <TableCell sx={{ maxWidth: 320 }}>
-                      {problems.length > 0 && (
-                        <Typography variant="body2" sx={{ color: 'warning.dark' }}>
-                          {problems.join(' · ')}
-                        </Typography>
-                      )}
-                    </TableCell>
-                    <TableCell sx={{ whiteSpace: 'nowrap' }}>
-                      <Typography variant="body2" color="text.secondary" sx={mono}>
-                        {row.updatedAtUtc ? formatDate(row.updatedAtUtc) : '—'}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="center" onClick={(event) => event.stopPropagation()}>
-                      <Switch
-                        checked={row.showOnSite}
-                        disabled={!canEdit || savingId === row.productId}
-                        onChange={(event) => onToggle(row, event.target.checked)}
-                        slotProps={{
-                          input: { 'aria-label': `Показувати на сайті: ${row.name}` },
-                        }}
-                      />
-                    </TableCell>
-                  </TableRow>
-                );
-              })
+              items.map((row) => (
+                <ContentProductTableRow
+                  key={row.productId}
+                  row={row}
+                  categories={categories}
+                  canEdit={canEdit}
+                  saving={savingId === row.productId}
+                  onOpen={onOpen}
+                  onToggle={onToggle}
+                />
+              ))
             )}
           </TableBody>
         </Table>

@@ -1,11 +1,13 @@
 import { moveSiteGalleryItem, newSiteGalleryItem } from '@admin/content/model';
 import { SiteGalleryDeleteDialog, SiteGalleryGrid } from '@admin/content/ui';
 import { MediaPickerDrawer } from '@admin/media/feature';
-import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
+import { ReferenceListAlerts } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
-import { Alert, Box, Button, Stack } from '@mui/material';
+import { Box } from '@mui/material';
 
+import { SiteGalleryHeader } from './site-gallery-header';
 import { SiteGalleryItemDrawer } from './site-gallery-item-drawer';
+import { SiteGalleryNotices } from './site-gallery-notices';
 import { useSiteGalleryContent } from '../../hooks/galleries/use-site-gallery-content';
 
 import type { SiteGalleryKind, SiteGalleryViewer } from '@admin/content/model';
@@ -45,48 +47,24 @@ export function SiteGalleryContent({ kind, viewer }: Props) {
   } = useSiteGalleryContent({ kind });
   return (
     <Box sx={{ minWidth: 0 }}>
-      <ReferencePageHeader
-        title={labels.title}
-        subtitle={labels.subtitle}
-        actions={
-          viewer.canEdit && gallery ? (
-            <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap' }}>
-              {gallery.legacyCount > 0 && (
-                <Button variant="outlined" disabled={busy} onClick={() => void actions.transfer()}>
-                  {actions.transferring
-                    ? 'Переносимо…'
-                    : `Перенести у бібліотеку фото (${gallery.legacyCount})`}
-                </Button>
-              )}
-              <Button variant="contained" disabled={busy || full} onClick={() => setAdding(true)}>
-                {kind === 'certificates' ? 'Додати документ' : 'Додати фото'}
-              </Button>
-            </Stack>
-          ) : null
-        }
+      <SiteGalleryHeader
+        kind={kind}
+        labels={labels}
+        canEdit={viewer.canEdit}
+        gallery={gallery}
+        actions={actions}
+        busy={busy}
+        full={full}
+        onAdd={() => setAdding(true)}
       />
-      {notice && (
-        <Alert severity="success" onClose={() => setNotice(null)} sx={{ mb: 2 }}>
-          {notice}
-        </Alert>
-      )}
-      {error && (
-        <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      )}
-      {report && (
-        <Alert
-          severity={report.problems.length > 0 ? 'warning' : 'info'}
-          onClose={actions.transferring ? undefined : actions.clearReport}
-          sx={{ mb: 2 }}
-        >
-          Перенесено в «Фото»: {report.moved}.{report.left > 0 ? ` Лишилось: ${report.left}.` : ''}
-          {report.problems.map((problem) => (
-            <Box key={problem}>{problem}</Box>
-          ))}
-        </Alert>
-      )}
+      <SiteGalleryNotices
+        notice={notice}
+        onCloseNotice={() => setNotice(null)}
+        error={error}
+        onCloseError={() => setError(null)}
+        report={report}
+        onCloseReport={actions.transferring ? undefined : actions.clearReport}
+      />
       <ReferenceListAlerts
         error={
           query.error ? adminApiErrorMessage(query.error, 'Не вдалося завантажити сторінку.') : null
