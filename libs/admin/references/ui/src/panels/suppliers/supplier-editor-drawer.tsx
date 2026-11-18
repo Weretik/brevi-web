@@ -1,7 +1,7 @@
-import { keepinCrmOwnedSupplierFields, supplierLinkHref } from '@admin/references/model';
-import { Alert, FormControlLabel, Link, Stack, Switch, Tab, Tabs, TextField } from '@mui/material';
+import { Tab, Tabs } from '@mui/material';
 import { useState } from 'react';
 
+import { SupplierCardFields } from './supplier-card-fields';
 import { ReferenceEditorDrawer } from '../reference-editor/reference-editor-drawer';
 
 import type {
@@ -10,7 +10,7 @@ import type {
   SupplierField,
   SupplierFieldErrors,
 } from '@admin/references/model';
-import type { KeyboardEvent, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 interface Props {
   mode: SupplierDialogMode;
@@ -47,43 +47,18 @@ export function SupplierEditorDrawer({
   onEnableEditing,
   onClose,
 }: Props) {
-  function submitOnEnter(event: KeyboardEvent) {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      onSave();
-    }
-  }
-
   const readOnly = mode === 'view';
   const [tab, setTab] = useState<SupplierCardTab>('card');
   const withTabs = readOnly && (invoices !== undefined || finance !== undefined);
   const showInvoices = withTabs && tab === 'invoices' && invoices !== undefined;
   const showFinance = withTabs && tab === 'finance' && finance !== undefined;
   const showOther = showInvoices || showFinance;
-  const linkHref = supplierLinkHref(draft.link);
   const title =
     mode === 'create'
       ? 'Новий постачальник'
       : readOnly
         ? 'Перегляд постачальника'
         : 'Редагування постачальника';
-  const fields: {
-    field: Exclude<SupplierField, 'id' | 'isActive'>;
-    label: string;
-    multiline?: boolean;
-  }[] = [
-    { field: 'name', label: 'Назва' },
-    { field: 'purchaseCategories', label: 'Що закуповуємо' },
-    { field: 'phoneNumber', label: 'Телефон' },
-    { field: 'email', label: 'Email' },
-    { field: 'contactPerson', label: 'Контактна особа' },
-    { field: 'link', label: 'Сайт' },
-    { field: 'notes', label: 'Нотатки', multiline: true },
-  ];
-  const keepinOwned = (field: SupplierField) =>
-    Boolean(keepinCrmId) &&
-    (keepinCrmOwnedSupplierFields as readonly SupplierField[]).includes(field);
-
   return (
     <ReferenceEditorDrawer
       titleId="supplier-drawer-title"
@@ -115,55 +90,16 @@ export function SupplierEditorDrawer({
       )}
       {showInvoices && invoices}
       {showFinance && finance}
-      <Stack sx={{ gap: 2, display: showOther ? 'none' : undefined }}>
-        {message && <Alert severity="error">{message}</Alert>}
-        {keepinCrmId && (
-          <Alert severity="info">
-            Картка оновлюється з KeepinCRM (ID {keepinCrmId}). У Brevi змінюються лише
-            «Використовувати в проєкті» та нотатки.
-          </Alert>
-        )}
-        <TextField
-          label="ID"
-          type="number"
-          value={draft.id}
-          onChange={(event) => onChange('id', event.target.value)}
-          onKeyDown={submitOnEnter}
-          disabled={mode !== 'create'}
-          error={Boolean(errors.id)}
-          helperText={errors.id}
-          slotProps={{ htmlInput: { min: 1, step: 1 } }}
-        />
-        {fields.map(({ field, label, multiline }) => (
-          <TextField
-            key={field}
-            label={label}
-            value={draft[field]}
-            onChange={(event) => onChange(field, event.target.value)}
-            onKeyDown={multiline ? undefined : submitOnEnter}
-            disabled={readOnly || keepinOwned(field)}
-            error={Boolean(errors[field])}
-            helperText={errors[field]}
-            multiline={multiline}
-            minRows={multiline ? 3 : undefined}
-          />
-        ))}
-        <FormControlLabel
-          control={
-            <Switch
-              checked={draft.isActive}
-              onChange={(event) => onChange('isActive', event.target.checked)}
-              disabled={readOnly}
-            />
-          }
-          label="Використовувати в проєкті"
-        />
-        {readOnly && linkHref && (
-          <Link href={linkHref} target="_blank" rel="noopener noreferrer">
-            {draft.link}
-          </Link>
-        )}
-      </Stack>
+      <SupplierCardFields
+        mode={mode}
+        draft={draft}
+        errors={errors}
+        message={message}
+        keepinCrmId={keepinCrmId}
+        hidden={showOther}
+        onChange={onChange}
+        onSave={onSave}
+      />
     </ReferenceEditorDrawer>
   );
 }

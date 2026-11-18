@@ -6,18 +6,16 @@ import {
 } from '@admin/products/ui';
 import { useReferenceDeletion } from '@admin/references/feature';
 import {
-  ReferenceBulkDeleteButton,
   ReferenceFilterRow,
   ReferenceListAlerts,
   ReferencePageHeader,
   ReferenceSearchBar,
 } from '@admin/references/ui';
 import { usePageRights } from '@admin/shared/ui';
-import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
-import { Box, Button, Paper } from '@mui/material';
+import { Box, Paper } from '@mui/material';
 import { useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
 
+import { ProductOverviewActions } from '../../components/product-overview/product-overview-actions';
 import { ProductOverviewDrawer } from '../../components/product-overview/product-overview-drawer';
 import { useProductActiveSwitch } from '../../hooks/product-overview/use-product-active-switch';
 import { useProductOverview } from '../../hooks/product-overview/use-product-overview';
@@ -34,7 +32,6 @@ interface Props {
 /** One «Товари» tab: sewing models (sheet «Товари») or PPE (sheet «ЗІЗ»). */
 export function ProductOverviewContent({ type, tabs }: Props) {
   const rights = usePageRights();
-  const { canCreate } = rights;
   const list = useProductOverview(type);
   const { sections, sectionNames, loading, error, reload } = list;
   const [active, setActive] = useState<{
@@ -58,23 +55,12 @@ export function ProductOverviewContent({ type, tabs }: Props) {
         title="Товари"
         subtitle="Швейна продукція — одна модель в рядку, ЗІЗ — один артикул сайту. Головне фото товару показується тут і в КП"
         actions={
-          <>
-            <ReferenceBulkDeleteButton
-              selectedCount={deletion.selectedIds.length}
-              disabled={deletion.deleting || loading}
-              onDelete={() => deletion.requestDelete(deletion.selectedIds)}
-            />
-            {canCreate && (
-              <Button
-                variant="contained"
-                startIcon={<AddOutlinedIcon />}
-                component={RouterLink}
-                to={sewing ? '/references/products/new/sewing' : '/references/products/new/ppe'}
-              >
-                {sewing ? 'Додати модель' : 'Додати ЗІЗ'}
-              </Button>
-            )}
-          </>
+          <ProductOverviewActions
+            sewing={sewing}
+            selectedCount={deletion.selectedIds.length}
+            deleteDisabled={deletion.deleting || loading}
+            onDelete={() => deletion.requestDelete(deletion.selectedIds)}
+          />
         }
       />
       {tabs}
