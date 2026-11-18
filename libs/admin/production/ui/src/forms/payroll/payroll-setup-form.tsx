@@ -1,13 +1,12 @@
 import { formatShare } from '@admin/production/model';
-import { Autocomplete, Button, Paper, Stack, TextField, Typography } from '@mui/material';
+import { Button, Paper, Stack, TextField, Typography } from '@mui/material';
 
+import { PersonPicker } from './payroll-person-picker';
+
+import type { PayrollPersonOption } from './payroll-person-picker';
 import type { PayrollMonth, PayrollPerson } from '@admin/production/model';
 
-export interface PayrollPersonOption {
-  employeeId: number;
-  name: string;
-  position: string;
-}
+export type { PayrollPersonOption } from './payroll-person-picker';
 
 export interface PayrollSetupValues {
   masterId: number | null;
@@ -30,36 +29,6 @@ interface Props {
 
 const found = (person: PayrollPerson | null) =>
   person && !person.isAssigned ? `Знайдено за посадою: ${person.name}` : undefined;
-
-function PersonPicker({
-  label,
-  people,
-  value,
-  helper,
-  disabled,
-  onChange,
-}: {
-  label: string;
-  people: readonly PayrollPersonOption[];
-  value: number | null;
-  helper?: string;
-  disabled: boolean;
-  onChange: (id: number | null) => void;
-}) {
-  return (
-    <Autocomplete
-      size="small"
-      sx={{ minWidth: 240, flex: 1 }}
-      options={people}
-      value={people.find((x) => x.employeeId === value) ?? null}
-      disabled={disabled}
-      getOptionLabel={(option) => `${option.name} · ${option.position}`}
-      isOptionEqualToValue={(option, selected) => option.employeeId === selected.employeeId}
-      onChange={(_event, selected) => onChange(selected?.employeeId ?? null)}
-      renderInput={(params) => <TextField {...params} label={label} helperText={helper} />}
-    />
-  );
-}
 
 /** «Керівні частки» (master and chief, for every open month) and «Вишивка» of the month. */
 export function PayrollSetupForm({

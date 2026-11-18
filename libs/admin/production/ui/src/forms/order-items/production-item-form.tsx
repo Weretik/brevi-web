@@ -1,16 +1,10 @@
-import {
-  PRODUCTION_ORDER_MAX_ADDITIONAL_COLORS,
-  formatMeters,
-  plannedFabricMeters,
-} from '@admin/production/model';
-import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
-import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import { Box, Button, IconButton, Stack, TextField, Tooltip, Typography } from '@mui/material';
+import { formatMeters, plannedFabricMeters } from '@admin/production/model';
+import { Box, Stack, TextField, Typography } from '@mui/material';
 
 import { ProductionItemApplications } from './production-item-applications';
-import { ProductionColorField } from '../colors/production-color-field';
+import { ProductionItemColors } from './production-item-colors';
 
-import type { EmbroideryPicker } from './production-item-applications';
+import type { EmbroideryPicker } from './production-item-embroidery-field';
 import type {
   FabricNormValues,
   ProductionItemErrors,
@@ -53,11 +47,6 @@ export function ProductionItemForm({
     key: K,
     value: ProductionItemFormValues[K],
   ) => onChange({ ...values, [key]: value });
-  const setColor = (index: number, color: string) =>
-    set(
-      'additionalColors',
-      values.additionalColors.map((item, i) => (i === index ? color : item)),
-    );
   const planned = plannedFabricMeters(norm ?? null, values);
 
   return (
@@ -87,57 +76,14 @@ export function ProductionItemForm({
           onChange={(event) => set('dueDate', event.target.value)}
         />
       </Box>
-      <ProductionColorField
-        id={`${idPrefix}-color`}
-        label="Основний колір"
-        required
-        disabled={disabled}
-        colors={colors}
-        value={values.mainColor}
+      <ProductionItemColors
+        idPrefix={idPrefix}
+        values={values}
         error={errors.mainColor}
-        helperText="З довідника «Кольори»."
-        onChange={(color) => set('mainColor', color)}
+        colors={colors}
+        disabled={disabled}
+        onChange={onChange}
       />
-      {values.additionalColors.map((color, index) => (
-        <Stack key={index} direction="row" sx={{ gap: 1, alignItems: 'center' }}>
-          <ProductionColorField
-            id={`${idPrefix}-color-${index + 1}`}
-            label={`Додатковий колір ${index + 1}`}
-            disabled={disabled}
-            colors={colors}
-            value={color}
-            onChange={(next) => setColor(index, next)}
-          />
-          <Tooltip title="Прибрати колір">
-            <span>
-              <IconButton
-                aria-label={`Прибрати додатковий колір ${index + 1}`}
-                disabled={disabled}
-                onClick={() =>
-                  set(
-                    'additionalColors',
-                    values.additionalColors.filter((_, i) => i !== index),
-                  )
-                }
-              >
-                <DeleteOutlineOutlinedIcon />
-              </IconButton>
-            </span>
-          </Tooltip>
-        </Stack>
-      ))}
-      {values.additionalColors.length < PRODUCTION_ORDER_MAX_ADDITIONAL_COLORS && (
-        <Box>
-          <Button
-            size="small"
-            startIcon={<AddOutlinedIcon />}
-            disabled={disabled}
-            onClick={() => set('additionalColors', [...values.additionalColors, ''])}
-          >
-            Додатковий колір
-          </Button>
-        </Box>
-      )}
       {norm !== undefined && (
         <Typography variant="body2" color="text.secondary">
           {planned === null

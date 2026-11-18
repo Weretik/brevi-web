@@ -1,22 +1,14 @@
-import { productionOrderOverview, todayIso } from '@admin/production/model';
-import {
-  ProductionItemsTable,
-  ProductionOrderDueAlert,
-  ProductionOrderFacts,
-  ProductionOrderPrint,
-  ProductionOrderStatusPill,
-} from '@admin/production/ui';
+import { ProductionOrderPrint } from '@admin/production/ui';
 import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
-import { Alert, Box, CircularProgress, Stack } from '@mui/material';
+import { Alert, Box, CircularProgress } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { ProductionItemPanel } from '../../components/order-items/production-item-panel';
+import { ProductionOrderContent } from './production-order-content';
 import { ProductionOrderActions } from '../../components/orders/page/production-order-actions';
 import { ProductionOrderDialogs } from '../../components/orders/page/production-order-dialogs';
 import { ProductionOrderEditDrawers } from '../../components/orders/page/production-order-edit-drawers';
 import { ProductionOrderHistoryDrawer } from '../../components/orders/page/production-order-history-drawer';
-import { ProductionOrderWork } from '../../components/tracking/production-order-work';
 import { useProductionOrderFiles } from '../../hooks/files/use-production-order-files';
 import { useProductionOrder } from '../../hooks/order-editor/use-production-order';
 import { useProductionOrderActions } from '../../hooks/order-editor/use-production-order-actions';
@@ -77,10 +69,6 @@ export function ProductionOrderPage() {
     );
 
   const { permissions } = order;
-  const editing = editor.editing;
-  const overview = productionOrderOverview(order, todayIso());
-  const quoteId = order.quoteId;
-  const openItem = panel.item;
 
   return (
     <Box sx={{ minWidth: 0 }}>
@@ -111,54 +99,16 @@ export function ProductionOrderPage() {
         actionMessage={message}
         onCloseActionMessage={() => setMessage(null)}
       />
-      {order.status !== 'New' && (
-        <Box sx={{ mb: 2 }}>
-          <ProductionOrderStatusPill status={order.status} />
-        </Box>
-      )}
-      <ProductionOrderDueAlert overview={overview} />
-      <ProductionOrderFacts
+      <ProductionOrderContent
         order={order}
-        overview={overview}
-        onOpenQuote={quoteId === null ? undefined : () => navigate(`/crm/quotes/${quoteId}`)}
+        editing={Boolean(editor.editing)}
+        panel={panel}
+        tracking={tracking}
+        files={files}
+        telegram={telegram}
+        onEditItem={editor.editItem}
+        onMessage={setMessage}
       />
-      <Stack sx={{ gap: 2 }}>
-        <ProductionItemsTable
-          items={order.items}
-          overview={overview}
-          selectedId={panel.item?.id ?? null}
-          busy={tracking.busy}
-          onOpen={(item) => panel.open(item)}
-          onNextStage={permissions.canTrack ? panel.askStage : undefined}
-        />
-        <ProductionOrderWork
-          order={order}
-          filesBusy={files.busy}
-          telegramBusy={telegram.busy}
-          onUpload={(kind, file) => void files.add(null, kind, file)}
-          onDeleteFile={files.requestDelete}
-          onSendTelegram={() => void telegram.send()}
-          onOpenSettings={permissions.canTrack ? () => navigate('/production/settings') : undefined}
-        />
-      </Stack>
-      {openItem && !editing && !tracking.shipping && (
-        <ProductionItemPanel
-          order={order}
-          item={openItem}
-          tab={panel.tab}
-          busy={tracking.busy || files.busy}
-          onTab={panel.setTab}
-          onMove={(item) => panel.open(item)}
-          onClose={panel.close}
-          onEdit={permissions.canEdit ? () => editor.editItem(openItem) : undefined}
-          onToggleStage={(stage) => void tracking.toggle(openItem, stage)}
-          onShip={() => tracking.openShipping(openItem)}
-          onCancelShipment={(shipmentId) => void tracking.cancel(shipmentId)}
-          onUpload={(kind, file) => void files.add(openItem.id, kind, file)}
-          onDeleteFile={files.requestDelete}
-          onMessage={setMessage}
-        />
-      )}
       <ProductionOrderDialogs
         order={order}
         panel={panel}

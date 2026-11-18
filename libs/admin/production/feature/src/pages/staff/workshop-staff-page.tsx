@@ -1,16 +1,16 @@
-import { countWorkshopPositions, parseStaffImportFile } from '@admin/production/model';
+import { parseStaffImportFile } from '@admin/production/model';
 import {
   ProductionConfirmDialog,
-  WorkshopStaffChips,
   WorkshopStaffGrid,
   WorkshopTabHeader,
 } from '@admin/production/ui';
-import { ReferenceFilterRow, ReferenceListAlerts, ReferenceSearchBar } from '@admin/references/ui';
+import { ReferenceListAlerts } from '@admin/references/ui';
 import { usePageRights } from '@admin/shared/ui';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import { Box, Button, Paper } from '@mui/material';
 
+import { WorkshopStaffFilters } from './workshop-staff-filters';
 import { ProductionImportDrawer } from '../../components/import/production-import-drawer';
 import { WorkshopEmployeeDrawer } from '../../components/staff/workshop-employee-drawer';
 import { useWorkshopStaffPage } from '../../hooks/staff/use-workshop-staff-page';
@@ -18,17 +18,12 @@ import { useWorkshopStaffPage } from '../../hooks/staff/use-workshop-staff-page'
 /** «Швейний цех › Персонал цеху › Працівники»: the list the head of the workshop records work and pay for. */
 export function WorkshopStaffPage() {
   const { canCreate } = usePageRights();
+  const page = useWorkshopStaffPage();
   const {
-    rows,
     loading,
     error,
     reload,
-    search,
-    setSearch,
     status,
-    setStatus,
-    position,
-    setPosition,
     active,
     setActive,
     importing,
@@ -39,8 +34,7 @@ export function WorkshopStaffPage() {
     importStaff,
     filtered,
     inStatus,
-    activeCount,
-  } = useWorkshopStaffPage();
+  } = page;
   return (
     <Box sx={{ minWidth: 0 }}>
       <WorkshopTabHeader
@@ -77,33 +71,7 @@ export function WorkshopStaffPage() {
         actionMessage={message}
         onCloseActionMessage={() => setMessage(null)}
       />
-      <ReferenceSearchBar
-        placeholder="Знайти за ПІБ або посадою"
-        label="Пошук працівників"
-        value={search}
-        onChange={setSearch}
-      />
-      <ReferenceFilterRow
-        filters={
-          <WorkshopStaffChips
-            status={status}
-            activeCount={activeCount}
-            archivedCount={rows.length - activeCount}
-            positions={countWorkshopPositions(rows, status)}
-            position={position}
-            onStatusChange={(next) => {
-              setStatus(next);
-              setPosition(null);
-            }}
-            onPositionChange={setPosition}
-          />
-        }
-        count={filtered.length}
-        total={inStatus}
-        countLabel="Кількість працівників"
-        selectedCount={0}
-        onClearSelection={() => undefined}
-      />
+      <WorkshopStaffFilters page={page} />
       <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
         <WorkshopStaffGrid
           rows={filtered}

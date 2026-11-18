@@ -5,23 +5,14 @@ import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
 import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
-import {
-  Button,
-  Divider,
-  IconButton,
-  ListItemIcon,
-  ListItemText,
-  Menu,
-  MenuItem,
-  Tooltip,
-} from '@mui/material';
-import { useState } from 'react';
+import { Button, IconButton, Tooltip } from '@mui/material';
 
+import { ProductionOrderMoreMenu } from './production-order-more-menu';
+
+import type { ProductionOrderAction } from './production-order-more-menu';
 import type { ProductionOrderPermissions } from '@admin/production/model';
-import type { ReactNode } from 'react';
 
 interface Props {
   permissions: ProductionOrderPermissions;
@@ -35,14 +26,6 @@ interface Props {
   onReopen: () => void;
   onDelete: () => void;
   onEdit: () => void;
-}
-
-interface Action {
-  label: string;
-  icon: ReactNode;
-  danger?: boolean;
-  disabled?: boolean;
-  run: () => void;
 }
 
 /**
@@ -63,8 +46,7 @@ export function ProductionOrderActions({
   onDelete,
   onEdit,
 }: Props) {
-  const [anchor, setAnchor] = useState<HTMLElement | null>(null);
-  const common: Action[] = [
+  const common: ProductionOrderAction[] = [
     { label: 'Історія змін', icon: <HistoryOutlinedIcon fontSize="small" />, run: onHistory },
   ];
   if (permissions.canCopy)
@@ -88,7 +70,7 @@ export function ProductionOrderActions({
       disabled: statusBusy,
       run: onReopen,
     });
-  const dangerous: Action[] = [];
+  const dangerous: ProductionOrderAction[] = [];
   if (permissions.canCancel)
     dangerous.push({
       label: 'Скасувати',
@@ -104,23 +86,6 @@ export function ProductionOrderActions({
       danger: true,
       run: onDelete,
     });
-
-  const item = (action: Action) => (
-    <MenuItem
-      key={action.label}
-      disabled={action.disabled}
-      sx={action.danger ? { color: 'error.main' } : undefined}
-      onClick={() => {
-        setAnchor(null);
-        action.run();
-      }}
-    >
-      <ListItemIcon sx={action.danger ? { color: 'error.main' } : undefined}>
-        {action.icon}
-      </ListItemIcon>
-      <ListItemText>{action.label}</ListItemText>
-    </MenuItem>
-  );
 
   const iconSx = {
     border: 1,
@@ -138,28 +103,7 @@ export function ProductionOrderActions({
       <Button variant="outlined" startIcon={<PrintOutlinedIcon />} onClick={() => window.print()}>
         Друк
       </Button>
-      <Tooltip title="Ще">
-        <IconButton
-          aria-label="Ще дії"
-          aria-haspopup="menu"
-          aria-expanded={anchor ? true : undefined}
-          onClick={(event) => setAnchor(event.currentTarget)}
-          sx={iconSx}
-        >
-          <MoreHorizIcon />
-        </IconButton>
-      </Tooltip>
-      <Menu
-        anchorEl={anchor}
-        open={Boolean(anchor)}
-        onClose={() => setAnchor(null)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        {common.map(item)}
-        {dangerous.length > 0 && <Divider />}
-        {dangerous.map(item)}
-      </Menu>
+      <ProductionOrderMoreMenu common={common} dangerous={dangerous} buttonSx={iconSx} />
       {permissions.canEdit && (
         <Button variant="contained" startIcon={<EditOutlinedIcon />} onClick={onEdit}>
           Редагувати

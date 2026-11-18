@@ -12,7 +12,7 @@ export { ProductionConfirmDialog } from './dialogs/production-confirm-dialog';
 export { ProductionItemDetails } from './details/order-items/production-item-details';
 export { ProductionItemsTable } from './tables/order-items/production-items-table';
 export { ProductionItemForm } from './forms/order-items/production-item-form';
-export type { EmbroideryPicker } from './forms/order-items/production-item-applications';
+export type { EmbroideryPicker } from './forms/order-items/production-item-embroidery-field';
 export { ProductionOrderChips } from './components/orders/production-order-chips';
 export { ProductionOrderFilterChips } from './tables/orders/toolbar/filters/production-order-filter-chips';
 export { ProductionOrderFilterPanel } from './tables/orders/toolbar/filters/production-order-filter-panel';

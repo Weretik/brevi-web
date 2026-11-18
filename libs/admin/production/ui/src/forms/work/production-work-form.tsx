@@ -1,20 +1,8 @@
-import {
-  PRODUCTION_WORK_COMMENT_MAX_LENGTH,
-  productionWorkKindLabels,
-  productionWorkKinds,
-  workTarget,
-} from '@admin/production/model';
+import { productionWorkKindLabels, productionWorkKinds, workTarget } from '@admin/production/model';
 import { ReferenceFormSection } from '@admin/references/ui';
-import {
-  Autocomplete,
-  Checkbox,
-  FormControlLabel,
-  MenuItem,
-  Stack,
-  TextField,
-  ToggleButton,
-  ToggleButtonGroup,
-} from '@mui/material';
+import { Autocomplete, Stack, TextField, ToggleButton, ToggleButtonGroup } from '@mui/material';
+
+import { ProductionWorkOverPlanSection } from './production-work-over-plan-section';
 
 import type {
   ProductionWorkErrors,
@@ -141,47 +129,13 @@ export function ProductionWorkForm({
           onChange={(event) => set({ workDate: event.target.value })}
         />
       </ReferenceFormSection>
-      <ReferenceFormSection title="Понад план">
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={values.overPlan}
-              disabled={disabled}
-              onChange={(event) => set({ overPlan: event.target.checked, reason: '' })}
-            />
-          }
-          label="Робота понад кількість у позиції"
-        />
-        {values.overPlan && (
-          <TextField
-            select
-            label="Причина"
-            required
-            value={values.reason}
-            error={Boolean(errors.reason)}
-            helperText={errors.reason ?? 'Така робота не зараховується в план позиції.'}
-            disabled={disabled}
-            onChange={(event) => set({ reason: event.target.value })}
-          >
-            {choices.overPlanReasons.map((reason) => (
-              <MenuItem key={reason} value={reason}>
-                {reason}
-              </MenuItem>
-            ))}
-          </TextField>
-        )}
-        <TextField
-          label="Коментар"
-          multiline
-          minRows={2}
-          value={values.comment}
-          error={Boolean(errors.comment)}
-          helperText={errors.comment}
-          disabled={disabled}
-          slotProps={{ htmlInput: { maxLength: PRODUCTION_WORK_COMMENT_MAX_LENGTH } }}
-          onChange={(event) => set({ comment: event.target.value })}
-        />
-      </ReferenceFormSection>
+      <ProductionWorkOverPlanSection
+        values={values}
+        errors={errors}
+        reasons={choices.overPlanReasons}
+        disabled={disabled}
+        onChange={set}
+      />
     </Stack>
   );
 }

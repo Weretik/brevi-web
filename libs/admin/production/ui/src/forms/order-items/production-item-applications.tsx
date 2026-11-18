@@ -1,14 +1,11 @@
 import {
   PRODUCTION_ORDER_MAX_APPLICATIONS,
-  embroideryChoiceText,
-  embroideryLinkLabel,
   emptyItemApplication,
   itemApplicationKindLabels,
 } from '@admin/production/model';
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import {
-  Autocomplete,
   Box,
   Button,
   IconButton,
@@ -19,19 +16,10 @@ import {
   Typography,
 } from '@mui/material';
 
-import type {
-  ItemApplicationFormValues,
-  ItemApplicationKind,
-  ItemEmbroideryLink,
-  ProductionEmbroideryChoice,
-} from '@admin/production/model';
+import { ProductionItemEmbroideryField } from './production-item-embroidery-field';
 
-/** «Розрахунок вишивки»: saved calculations found by the typed text. */
-export interface EmbroideryPicker {
-  options: readonly ProductionEmbroideryChoice[];
-  loading: boolean;
-  onSearch: (text: string) => void;
-}
+import type { EmbroideryPicker } from './production-item-embroidery-field';
+import type { ItemApplicationFormValues, ItemApplicationKind } from '@admin/production/model';
 
 interface Props {
   idPrefix: string;
@@ -42,15 +30,6 @@ interface Props {
   onChange: (applications: ItemApplicationFormValues[]) => void;
 }
 
-type EmbroideryOption = ItemEmbroideryLink & { details?: string };
-
-const toOption = (x: ProductionEmbroideryChoice): EmbroideryOption => ({
-  id: x.id,
-  number: x.number,
-  name: x.name,
-  details: [embroideryChoiceText(x), x.customerName].filter(Boolean).join(' · '),
-});
-
 /** «Нанесення» of an item: embroidery or print, where, what and in which colour. */
 export function ProductionItemApplications({
   idPrefix,
@@ -59,7 +38,6 @@ export function ProductionItemApplications({
   embroidery,
   onChange,
 }: Props) {
-  const options = (embroidery?.options ?? []).map(toOption);
   const setApplication = (index: number, application: ItemApplicationFormValues) =>
     onChange(applications.map((item, i) => (i === index ? application : item)));
 
@@ -108,48 +86,12 @@ export function ProductionItemApplications({
               ))}
             </TextField>
             {application.kind === 'Embroidery' && (
-              <Autocomplete<EmbroideryOption>
+              <ProductionItemEmbroideryField
                 id={`${idPrefix}-application-${index}-embroidery`}
-                sx={{ gridColumn: { sm: '1 / -1' } }}
-                options={options}
-                value={application.embroidery}
-                disabled={disabled || !embroidery}
-                loading={embroidery?.loading ?? false}
-                filterOptions={(x) => x}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                getOptionLabel={embroideryLinkLabel}
-                noOptionsText="Розрахунків не знайдено"
-                onInputChange={(_event, text, reason) => {
-                  if (reason === 'input') embroidery?.onSearch(text);
-                }}
-                onChange={(_event, value) =>
-                  setApplication(index, {
-                    ...application,
-                    embroidery: value
-                      ? { id: value.id, number: value.number, name: value.name }
-                      : null,
-                    description: application.description || value?.name || '',
-                  })
-                }
-                renderOption={({ key, ...props }, option) => (
-                  <li key={key} {...props}>
-                    <Box>
-                      <Typography variant="body2">{embroideryLinkLabel(option)}</Typography>
-                      {option.details && (
-                        <Typography variant="caption" color="text.secondary">
-                          {option.details}
-                        </Typography>
-                      )}
-                    </Box>
-                  </li>
-                )}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Розрахунок вишивки"
-                    helperText="З «Ціна вишивки»: цех побачить стібки, пʼяльця, матеріали й макет"
-                  />
-                )}
+                application={application}
+                disabled={disabled}
+                embroidery={embroidery}
+                onChange={(next) => setApplication(index, next)}
               />
             )}
             <TextField
