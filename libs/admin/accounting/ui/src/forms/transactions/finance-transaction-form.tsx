@@ -1,13 +1,10 @@
-import {
-  categoryDirections,
-  financeTransactionLimits,
-  transactionTypeLabels,
-} from '@admin/accounting/model';
+import { categoryDirections, transactionTypeLabels } from '@admin/accounting/model';
 import { ReferenceFormSection } from '@admin/references/ui';
 import { FormControlLabel, MenuItem, Stack, Switch, TextField } from '@mui/material';
 
 import { FinanceCategoryFields } from './finance-category-fields';
 import { FinanceCounterpartyFields } from './finance-counterparty-fields';
+import { FinanceTransactionDetailsFields } from './finance-transaction-details-fields';
 
 import type { FinanceNamedChoice } from './finance-category-fields';
 import type { FinanceCounterpartySearch } from './finance-counterparty-fields';
@@ -122,28 +119,7 @@ export function FinanceTransactionForm({
           onChange={onChange}
         />
       </ReferenceFormSection>
-      <ReferenceFormSection title="Подробиці">
-        <TextField
-          label="Опис"
-          value={values.description}
-          onChange={(event) => onChange('description', event.target.value)}
-          error={Boolean(errors.description)}
-          helperText={errors.description}
-          slotProps={{ htmlInput: { maxLength: financeTransactionLimits.description } }}
-          fullWidth
-        />
-        <TextField
-          label="Примітка"
-          value={values.comment}
-          onChange={(event) => onChange('comment', event.target.value)}
-          error={Boolean(errors.comment)}
-          helperText={errors.comment}
-          multiline
-          minRows={2}
-          slotProps={{ htmlInput: { maxLength: financeTransactionLimits.comment } }}
-          fullWidth
-        />
-      </ReferenceFormSection>
+      <FinanceTransactionDetailsFields values={values} errors={errors} onChange={onChange} />
       {addNext && (
         <FormControlLabel
           control={

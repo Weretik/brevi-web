@@ -2,23 +2,14 @@ import {
   categoryDirectionLabels,
   categoryDirections,
   financeReportHasType,
-  financeReportKindHints,
-  financeReportKindLabels,
-  financeReportKinds,
-  ledgerScopeLabels,
-  ledgerScopes,
 } from '@admin/accounting/model';
 import { Alert, Button, MenuItem, Paper, Stack, TextField } from '@mui/material';
 
+import { FinanceReportPeriodFields } from './finance-report-period-fields';
 import { FinanceCounterpartyPicker } from '../counterparties/finance-counterparty-picker';
 
 import type { FinanceCounterpartySearch } from '../transactions/finance-counterparty-fields';
-import type {
-  CategoryDirection,
-  FinanceReportFilter,
-  FinanceReportKind,
-  LedgerScope,
-} from '@admin/accounting/model';
+import type { CategoryDirection, FinanceReportFilter } from '@admin/accounting/model';
 
 interface Choice {
   id: string;
@@ -36,8 +27,6 @@ interface Props {
   onChange: (next: FinanceReportFilter) => void;
   onApply: () => void;
 }
-
-const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' };
 
 /** «Звіти»: the kind, the period and narrowing fields; the report changes only on «Сформувати звіт». */
 export function FinanceReportForm({
@@ -67,56 +56,7 @@ export function FinanceReportForm({
       sx={{ p: 2 }}
     >
       <Stack sx={{ gap: 2 }}>
-        <Stack direction={{ xs: 'column', md: 'row' }} sx={{ gap: 2 }}>
-          <TextField
-            select
-            label="Звіт"
-            value={value.kind}
-            helperText={financeReportKindHints[value.kind]}
-            onChange={(event) =>
-              onChange({ ...value, kind: event.target.value as FinanceReportKind, categoryId: '' })
-            }
-            sx={{ flex: 2, minWidth: 0 }}
-          >
-            {financeReportKinds.map((kind) => (
-              <MenuItem key={kind} value={kind}>
-                {financeReportKindLabels[kind]}
-              </MenuItem>
-            ))}
-          </TextField>
-          <TextField
-            label="Від"
-            type="date"
-            value={value.from}
-            onChange={(event) => set('from', event.target.value)}
-            slotProps={{ inputLabel: { shrink: true }, htmlInput: { style: mono } }}
-            sx={{ flex: 1, minWidth: 0 }}
-          />
-          <TextField
-            label="До"
-            type="date"
-            value={value.to}
-            onChange={(event) => set('to', event.target.value)}
-            slotProps={{ inputLabel: { shrink: true }, htmlInput: { style: mono } }}
-            sx={{ flex: 1, minWidth: 0 }}
-          />
-          <TextField
-            select
-            label="Облік"
-            value={value.scope}
-            onChange={(event) =>
-              onChange({ ...value, scope: event.target.value as LedgerScope | '', categoryId: '' })
-            }
-            sx={{ flex: 1, minWidth: 0 }}
-          >
-            {ledgerScopes.map((scope) => (
-              <MenuItem key={scope} value={scope}>
-                {ledgerScopeLabels[scope]}
-              </MenuItem>
-            ))}
-            <MenuItem value="">Увесь облік</MenuItem>
-          </TextField>
-        </Stack>
+        <FinanceReportPeriodFields value={value} onChange={onChange} />
         <Stack direction={{ xs: 'column', md: 'row' }} sx={{ gap: 2 }}>
           <TextField
             select

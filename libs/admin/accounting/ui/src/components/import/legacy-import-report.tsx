@@ -1,35 +1,26 @@
-import {
-  formatMinor,
-  ledgerScopeLabels,
-  legacyImportKindLabels,
-  legacyImportMovementLabels,
-} from '@admin/accounting/model';
+import { legacyImportKindLabels } from '@admin/accounting/model';
 import {
   Alert,
   AlertTitle,
   Box,
-  Paper,
   Stack,
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
   Typography,
 } from '@mui/material';
 
-import { FinanceProblemPill } from '../status/finance-problem-pill';
+import { LegacyImportBalancesTable } from './legacy-import-balances-table';
+import { LegacyImportSection as Section, count, mono } from './legacy-import-section';
+import { LegacyImportTotalsTable } from './legacy-import-totals-table';
 
 import type { LegacyFinanceImportReport } from '@admin/accounting/model';
-import type { ReactNode } from 'react';
 
 interface Props {
   report: LegacyFinanceImportReport;
 }
-
-const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' };
-const count = (value: number) => value.toLocaleString('uk-UA');
 
 /**
  * The report of «Перенесення архіву»: what stops the move, what to know, how many records of each kind, how clients and
@@ -112,107 +103,10 @@ export function LegacyImportReport({ report }: Props) {
           alignItems: 'start',
         }}
       >
-        <Section id="legacy-import-totals" title="Суми у файлі">
-          <Table size="small" aria-labelledby="legacy-import-totals">
-            <TableHead>
-              <TableRow>
-                <TableCell>Облік</TableCell>
-                <TableCell>Рух</TableCell>
-                <TableCell align="right">Кількість</TableCell>
-                <TableCell align="right">Сума</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {report.totals.map((row) => (
-                <TableRow key={`${row.scope}-${row.movement}-${row.status}-${row.currency}`}>
-                  <TableCell>{ledgerScopeLabels[row.scope]}</TableCell>
-                  <TableCell>
-                    {legacyImportMovementLabels[row.movement]}
-                    {row.status === 'Void' && (
-                      <Typography variant="caption" component="div" color="text.secondary">
-                        анульовані
-                      </Typography>
-                    )}
-                  </TableCell>
-                  <TableCell align="right" sx={mono}>
-                    {count(row.count)}
-                  </TableCell>
-                  <TableCell align="right" sx={mono}>
-                    {formatMinor(row.amountMinor, row.currency)}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Section>
+        <LegacyImportTotalsTable totals={report.totals} />
 
-        <Section id="legacy-import-balances" title="Залишки після перенесення">
-          <Table size="small" aria-labelledby="legacy-import-balances">
-            <TableHead>
-              <TableRow>
-                <TableCell>Рахунок</TableCell>
-                <TableCell align="right">На 30.09</TableCell>
-                <TableCell align="right">На 01.10</TableCell>
-                <TableCell align="right">Зараз</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {report.balances.map((row) => (
-                <TableRow key={row.accountId}>
-                  <TableCell>
-                    {row.name}
-                    {!row.active && (
-                      <Typography variant="caption" component="div" color="text.secondary">
-                        в архіві
-                      </Typography>
-                    )}
-                  </TableCell>
-                  <TableCell align="right" sx={mono}>
-                    {formatMinor(row.archiveMinor, row.currency)}
-                  </TableCell>
-                  <TableCell align="right" sx={mono}>
-                    {row.cutoverMinor === null ? (
-                      row.active ? (
-                        <FinanceProblemPill label="Не підтверджено" />
-                      ) : (
-                        '—'
-                      )
-                    ) : (
-                      formatMinor(row.cutoverMinor, row.currency)
-                    )}
-                    {row.differenceMinor !== null && (
-                      <Box sx={{ mt: 0.5 }}>
-                        <FinanceProblemPill
-                          label={`Різниця ${formatMinor(row.differenceMinor, row.currency)}`}
-                        />
-                      </Box>
-                    )}
-                  </TableCell>
-                  <TableCell align="right" sx={mono}>
-                    {row.currentMinor === null ? '—' : formatMinor(row.currentMinor, row.currency)}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Section>
+        <LegacyImportBalancesTable balances={report.balances} />
       </Box>
     </Stack>
-  );
-}
-
-function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
-  return (
-    <Paper component="section" variant="outlined" aria-labelledby={id} sx={{ overflow: 'hidden' }}>
-      <Typography
-        id={id}
-        variant="h6"
-        component="h2"
-        sx={{ px: 2, py: 1.5, borderBottom: 1, borderColor: 'divider' }}
-      >
-        {title}
-      </Typography>
-      <TableContainer>{children}</TableContainer>
-    </Paper>
   );
 }

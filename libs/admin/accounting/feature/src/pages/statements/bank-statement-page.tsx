@@ -1,13 +1,9 @@
 import {
-  bankLineStateLabels,
-  bankLineStates,
   bankStatementPeriod,
-  bankStatementRollbackText,
   financeOperationForms,
   formatFinanceCount,
-  formatMinor,
 } from '@admin/accounting/model';
-import { BankLinesGrid, FinanceDeleteDialog, FinanceSegmentedButtons } from '@admin/accounting/ui';
+import { BankLinesGrid } from '@admin/accounting/ui';
 import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
 import { usePageRights } from '@admin/shared/ui';
 import ArrowBackOutlinedIcon from '@mui/icons-material/ArrowBackOutlined';
@@ -17,13 +13,12 @@ import { Link as RouterLink, useLocation, useParams } from 'react-router-dom';
 
 import { bankStatementsPath, financeReviewPath } from '../../accounting.routes';
 import { BankLineDrawer } from '../../components/statements/bank-line-drawer';
+import { BankStatementDialogs } from '../../components/statements/bank-statement-dialogs';
+import { BankStatementStateFilter } from '../../components/statements/bank-statement-state-filter';
+import { BankStatementTotals } from '../../components/statements/bank-statement-totals';
 import { useBankStatement } from '../../hooks/statements/use-bank-statement';
 
-import type { BankLineState, BankStatementLine } from '@admin/accounting/model';
-
-type Filter = BankLineState | 'All';
-
-const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' };
+import type { BankStatementLine } from '@admin/accounting/model';
 
 /**
  * One statement (ACC-001 stages 6–7): lines by state, each changed in the side panel; «Провести виписку» books every
@@ -40,9 +35,6 @@ export function BankStatementPage() {
   const details = view.details;
   const statement = details?.statement;
   const booked = statement?.status === 'Booked';
-  const all = details?.states.reduce((sum, row) => sum + row.count, 0) ?? 0;
-  const countOf = (state: BankLineState) =>
-    details?.states.find((row) => row.state === state)?.count ?? 0;
   const totals = details?.totals;
   const nothingToBook = !totals || totals.operations + totals.transfers === 0;
 
@@ -106,52 +98,14 @@ export function BankStatementPage() {
           onCloseActionMessage={() => view.setNotice(null)}
         />
         {view.message && <Alert severity="error">{view.message}</Alert>}
-        {totals && !booked && (
-          <Paper variant="outlined" sx={{ p: 2 }}>
-            <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ columnGap: 4, rowGap: 1 }}>
-              <Typography variant="body2">
-                Буде проведено:{' '}
-                <b>{formatFinanceCount(totals.operations, financeOperationForms)}</b>
-                {totals.transfers > 0 && (
-                  <>
-                    {' '}
-                    і <b>{totals.transfers} переказів</b>
-                  </>
-                )}
-              </Typography>
-              <Typography variant="body2" sx={{ ...mono, color: 'success.main' }}>
-                +{formatMinor(totals.incomeMinor)}
-              </Typography>
-              <Typography variant="body2" sx={{ ...mono, color: 'error.main' }}>
-                −{formatMinor(totals.expenseMinor)}
-              </Typography>
-            </Stack>
-          </Paper>
-        )}
+        {totals && !booked && <BankStatementTotals totals={totals} />}
         {booked && (
           <Typography variant="body2" color="text.secondary">
             Операції без категорії й з новими контрагентами — у розділі{' '}
             <RouterLink to={financeReviewPath}>«Потребують перевірки»</RouterLink>.
           </Typography>
         )}
-        {details && (
-          <Box sx={{ overflowX: 'auto' }}>
-            <FinanceSegmentedButtons<Filter>
-              label="Стан рядків"
-              value={view.state ?? 'All'}
-              onChange={(next) => view.setState(next === 'All' ? null : next)}
-              segments={[
-                { value: 'All', label: `Усі ${all}` },
-                ...bankLineStates
-                  .filter((state) => countOf(state) > 0 || view.state === state)
-                  .map((state) => ({
-                    value: state,
-                    label: `${bankLineStateLabels[state]} ${countOf(state)}`,
-                  })),
-              ]}
-            />
-          </Box>
-        )}
+        {details && <BankStatementStateFilter view={view} />}
         <Paper variant="outlined" sx={{ minWidth: 0, overflow: 'hidden' }}>
           <BankLinesGrid
             rows={details?.lines ?? []}
@@ -180,34 +134,10 @@ export function BankStatementPage() {
           }}
         />
       )}
-      <FinanceDeleteDialog
-        open={confirming === 'book'}
-        title="Провести виписку?"
-        text={
-          totals
-            ? `Буде додано ${formatFinanceCount(totals.operations, financeOperationForms)} і ${totals.transfers} переказів. Нових контрагентів буде створено непідтвердженими. Помилкове проведення можна скасувати кнопкою «Відкотити виписку».`
-            : ''
-        }
-        deleting={view.booking}
-        confirmLabel="Провести"
-        confirmColor="primary"
+      <BankStatementDialogs
+        view={view}
+        confirming={confirming}
         onClose={() => setConfirming(null)}
-        onConfirm={() => {
-          setConfirming(null);
-          void view.book();
-        }}
-      />
-      <FinanceDeleteDialog
-        open={confirming === 'rollback'}
-        title="Відкотити виписку?"
-        text={details?.rollback ? bankStatementRollbackText(details.rollback) : ''}
-        deleting={view.rollingBack}
-        confirmLabel="Відкотити"
-        onClose={() => setConfirming(null)}
-        onConfirm={() => {
-          setConfirming(null);
-          view.rollback();
-        }}
       />
     </Box>
   );

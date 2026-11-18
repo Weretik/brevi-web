@@ -1,16 +1,9 @@
-import { categoryDirectionLabels, categoryDirections } from '@admin/accounting/model';
-import {
-  Alert,
-  Button,
-  FormControlLabel,
-  MenuItem,
-  Paper,
-  Stack,
-  Switch,
-  TextField,
-} from '@mui/material';
+import { Alert, Button, FormControlLabel, Paper, Stack, Switch, TextField } from '@mui/material';
 
-import type { CategoryDirection, FinanceJournalFilter } from '@admin/accounting/model';
+import { FinanceJournalCategoryFilters } from './finance-journal-category-filters';
+import { FinanceJournalPeriodFields } from './finance-journal-period-fields';
+
+import type { FinanceJournalFilter } from '@admin/accounting/model';
 
 interface Choice {
   id: string;
@@ -63,103 +56,15 @@ export function FinanceJournalFilters({
       sx={{ p: 2, mb: 2 }}
     >
       <Stack sx={{ gap: 2 }}>
-        <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ gap: 2 }}>
-          <TextField
-            label="Від"
-            type="date"
-            value={value.from}
-            onChange={(event) => set('from', event.target.value)}
-            slotProps={{ inputLabel: { shrink: true }, htmlInput: { style: mono } }}
-            fullWidth
-          />
-          <TextField
-            label="До"
-            type="date"
-            value={value.to}
-            onChange={(event) => set('to', event.target.value)}
-            slotProps={{ inputLabel: { shrink: true }, htmlInput: { style: mono } }}
-            fullWidth
-          />
-          <TextField
-            select
-            label="Рахунок"
-            value={value.accountId}
-            onChange={(event) => set('accountId', event.target.value)}
-            fullWidth
-          >
-            <MenuItem value="">Усі рахунки</MenuItem>
-            {accounts.map((account) => (
-              <MenuItem key={account.id} value={account.id}>
-                {account.name}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Stack>
+        <FinanceJournalPeriodFields value={value} accounts={accounts} onChange={onChange} />
         {kind === 'transactions' && (
-          <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ gap: 2 }}>
-            {!quick && (
-              <TextField
-                select
-                label="Тип"
-                value={value.type}
-                onChange={(event) =>
-                  onChange({
-                    ...value,
-                    type: event.target.value as CategoryDirection | '',
-                    categoryId: '',
-                    subcategoryId: '',
-                  })
-                }
-                fullWidth
-              >
-                <MenuItem value="">Доходи й витрати</MenuItem>
-                {categoryDirections.map((direction) => (
-                  <MenuItem key={direction} value={direction}>
-                    {categoryDirectionLabels[direction]}
-                  </MenuItem>
-                ))}
-              </TextField>
-            )}
-            <TextField
-              select
-              label="Категорія"
-              value={value.categoryId}
-              disabled={!value.type}
-              helperText={
-                value.type
-                  ? undefined
-                  : quick
-                    ? 'Спершу оберіть «Надходження» або «Витрати»'
-                    : 'Спершу оберіть тип'
-              }
-              onChange={(event) =>
-                onChange({ ...value, categoryId: event.target.value, subcategoryId: '' })
-              }
-              fullWidth
-            >
-              <MenuItem value="">Усі категорії</MenuItem>
-              {roots.map((root) => (
-                <MenuItem key={root.id} value={root.id}>
-                  {root.name}
-                </MenuItem>
-              ))}
-            </TextField>
-            <TextField
-              select
-              label="Підкатегорія"
-              value={value.subcategoryId}
-              disabled={!value.categoryId || !children.length}
-              onChange={(event) => set('subcategoryId', event.target.value)}
-              fullWidth
-            >
-              <MenuItem value="">Усі підкатегорії</MenuItem>
-              {children.map((child) => (
-                <MenuItem key={child.id} value={child.id}>
-                  {child.name}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Stack>
+          <FinanceJournalCategoryFilters
+            value={value}
+            roots={roots}
+            children={children}
+            quick={quick}
+            onChange={onChange}
+          />
         )}
         <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ gap: 2 }}>
           {!quick && (
