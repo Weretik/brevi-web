@@ -5,15 +5,17 @@ import {
   balanceAfterIssue,
   createFabricAdjustmentValues,
   createFabricIssueValues,
-  createFabricOpeningValues,
-  createFabricReceiptValues,
   fabricAdjustmentBody,
   fabricIssueBody,
+  validateFabricAdjustment,
+  validateFabricIssue,
+} from './fabric-issue-forms';
+import {
+  createFabricOpeningValues,
+  createFabricReceiptValues,
   fabricReceiptBody,
   nextFabricReceiptValues,
   presetFabricReceiptValues,
-  validateFabricAdjustment,
-  validateFabricIssue,
   validateFabricOpening,
   validateFabricReceipt,
 } from './stock-operation-forms';

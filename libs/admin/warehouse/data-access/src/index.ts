@@ -1,8 +1,6 @@
 export {
   useAdjustFabricStockMutation,
-  useEditFabricMovementMutation,
   useGetFabricConsumptionQuery,
-  useGetFabricMovementHistoryQuery,
   useGetFabricMovementsQuery,
   useGetFabricStockChoicesQuery,
   useGetFabricStockQuery,
@@ -10,10 +8,14 @@ export {
   useLazyGetFabricMovementsQuery,
   useOpenFabricStockMutation,
   useReceiveFabricMutation,
+} from './api/fabric-stock.api';
+export {
+  useEditFabricMovementMutation,
+  useGetFabricMovementHistoryQuery,
   useRestoreFabricMovementMutation,
   useReverseFabricMovementMutation,
   useVoidFabricMovementMutation,
-} from './api/fabric-stock.api';
+} from './api/fabric-movement-revisions.api';
 export {
   useGetFabricIssueItemsQuery,
   useGetItemFabricQuery,

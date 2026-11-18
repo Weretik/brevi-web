@@ -1,4 +1,7 @@
-import type { ValuationFabric, ValuationReport } from '../../entities/reports/stock-reports';
+import type {
+  ValuationFabric,
+  ValuationReport,
+} from '../../entities/reports/stock-valuation-reports';
 
 /** «Вартість» chips: every fabric, the ones without a price, the shortages. */
 export const valuationViews = ['all', 'unpriced', 'shortage'] as const;

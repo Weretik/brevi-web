@@ -1,4 +1,4 @@
-import type { HardwareNeed, HardwareReport } from '../../entities/reports/stock-reports';
+import type { HardwareNeed, HardwareReport } from '../../entities/reports/stock-valuation-reports';
 
 const squash = (value: string) => value.normalize('NFC').toLocaleLowerCase('uk-UA').trim();
 

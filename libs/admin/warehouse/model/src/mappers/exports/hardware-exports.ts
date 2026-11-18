@@ -1,8 +1,8 @@
 import { xlsxWorkbook } from './xlsx-workbook';
-import { hardwareUnitLabel } from '../../entities/reports/stock-reports';
+import { hardwareUnitLabel } from '../../entities/reports/stock-valuation-reports';
 import { formatKyivTime } from '../format/warehouse-format';
 
-import type { HardwareReport } from '../../entities/reports/stock-reports';
+import type { HardwareReport } from '../../entities/reports/stock-valuation-reports';
 
 /**
  * «Фурнітура до замовлення» in Excel (TZ §14.3): «Зведена потреба» with the same rows as the page,

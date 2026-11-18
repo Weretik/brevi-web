@@ -1,9 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
+import { mapFabricMovementHistory, mapFabricMovementPage } from './fabric-movement.mapper';
 import {
   mapFabricConsumption,
-  mapFabricMovementHistory,
-  mapFabricMovementPage,
   mapFabricStockChoices,
   mapFabricStockList,
   mapFabricStockOperation,

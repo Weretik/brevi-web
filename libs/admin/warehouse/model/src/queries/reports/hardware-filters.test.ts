@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { filterHardware, hardwareTasks, hardwareViewCounts } from './hardware-filters';
 
-import type { HardwareNeed } from '../../entities/reports/stock-reports';
+import type { HardwareNeed } from '../../entities/reports/stock-valuation-reports';
 
 const need = (
   code: string,
