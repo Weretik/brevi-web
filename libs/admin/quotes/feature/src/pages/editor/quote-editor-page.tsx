@@ -1,20 +1,15 @@
-import {
-  QuoteRecipientCard,
-  QuoteSendActions,
-  quoteItemAnchor,
-  quoteRecipientAnchor,
-} from '@admin/quotes/ui';
-import { Alert, Box, Button, CircularProgress, Stack } from '@mui/material';
+import { QuoteSendActions, quoteItemAnchor, quoteRecipientAnchor } from '@admin/quotes/ui';
+import { Alert, Box, Button, CircularProgress } from '@mui/material';
 import { Navigate } from 'react-router-dom';
 
-import { QuoteEditorAside } from './quote-editor-aside';
 import { QuoteEditorHeader } from './quote-editor-header';
 import { QuoteEditorNotices } from './quote-editor-notices';
-import { QuoteEditorPanels } from './quote-editor-panels';
+import { QuoteEditorWorkspace } from './quote-editor-workspace';
 import { QuoteDeleteDialog } from '../../components/editor/quote-delete-dialog';
-import { QuoteEditorItems, quoteAddItemsAnchor } from '../../components/editor/quote-editor-items';
+import { quoteAddItemsAnchor } from '../../components/editor/quote-editor-items';
 import { QuoteSaveFirstDialog } from '../../components/editor/quote-save-first-dialog';
 import { QuoteSaveProblemsDialog } from '../../components/editor/quote-save-problems-dialog';
+import { QuoteEditorPanels } from '../../components/editor-panels/quote-editor-panels';
 import { QuotePreview } from '../../components/preview/quote-preview';
 import { useQuoteEditorPage } from '../../hooks/editor/use-quote-editor-page';
 
@@ -42,15 +37,13 @@ export default function QuoteEditorPage({
   /** «Цех» in the right column (client corrections item 9); the app supplies it from «Виробничі завдання». */
   workshopCard?: QuoteWorkshopCard;
 }) {
+  const page = useQuoteEditorPage(supplierCard);
   const {
     navigate,
     editor,
-    clients,
     wide,
     panel,
     setPanel,
-    fabricFacts,
-    openSupplier,
     preview,
     saveFirst,
     removal,
@@ -60,7 +53,7 @@ export default function QuoteEditorPage({
     lifecycle,
     routeNotice,
     actions,
-  } = useQuoteEditorPage(supplierCard);
+  } = page;
   const { quote, draft } = editor;
 
   if (editor.loading)
@@ -105,50 +98,7 @@ export default function QuoteEditorPage({
         onSentNoticeClose={() => setSentNotice(null)}
       />
 
-      <Box
-        sx={{
-          display: 'grid',
-          gap: 2.5,
-          alignItems: 'start',
-          gridTemplateColumns: { xs: 'minmax(0, 1fr)', lg: 'minmax(0, 1fr) 340px' },
-        }}
-      >
-        <Stack sx={{ gap: 2, minWidth: 0 }}>
-          <QuoteRecipientCard
-            draft={draft}
-            clients={clients.clients}
-            headerError={editor.errors['header']}
-            onChange={editor.change}
-            onClientSearch={clients.search}
-          />
-          <QuoteEditorItems
-            editor={editor}
-            fabricFacts={fabricFacts}
-            onOpenSupplier={openSupplier}
-            onPanel={setPanel}
-          />
-        </Stack>
-        <Box sx={{ position: { lg: 'sticky' }, top: { lg: 88 } }}>
-          <Stack sx={{ gap: 2 }}>
-            <QuoteEditorAside
-              draft={draft}
-              withActions={wide}
-              onTierShown={editor.setTierShown}
-              onGo={scrollTo}
-              {...actions}
-            />
-            {WorkshopCard && (
-              <WorkshopCard
-                quoteId={quote?.id ?? null}
-                canCreate={actor.canPassToWorkshop === true && draft.items.length > 0}
-                onPass={() =>
-                  saveFirst.run((saved) => navigate(`/production/orders/new?quote=${saved.id}`))
-                }
-              />
-            )}
-          </Stack>
-        </Box>
-      </Box>
+      <QuoteEditorWorkspace page={page} actor={actor} workshopCard={WorkshopCard} onGo={scrollTo} />
       {!wide && <QuoteSendActions layout="bar" {...actions} />}
       <QuotePreview preview={preview} onSend={() => setPanel({ kind: 'send' })} />
 

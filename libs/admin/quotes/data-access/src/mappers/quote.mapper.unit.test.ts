@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { mapQuoteProductPhotos } from './quote.mapper';
+import { mapQuoteProductPhotos } from './quote-catalog.mapper';
 
 describe('mapQuoteProductPhotos', () => {
   it('keeps the product photos in order and leaves out files missing from the library', () => {

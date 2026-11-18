@@ -1,13 +1,9 @@
 import { apiCall, apiClient } from '@admin/shared/api-client';
 
 import { quoteErrors, toQuoteApiError } from '../../errors/quote-api-error';
+import { mapQuoteRepriceReport } from '../../mappers/quote-catalog.mapper';
 import { toSaveQuoteInput } from '../../mappers/quote-input.mapper';
-import {
-  mapQuote,
-  mapQuotePage,
-  mapQuotePeriod,
-  mapQuoteRepriceReport,
-} from '../../mappers/quote.mapper';
+import { mapQuote, mapQuotePage, mapQuotePeriod } from '../../mappers/quote.mapper';
 import { quotesBaseApi } from '../base/quotes-base-api';
 
 import type {

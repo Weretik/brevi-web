@@ -1,14 +1,6 @@
-import { quoteNameMaxLength } from '@admin/quotes/model';
-import {
-  Autocomplete,
-  Box,
-  FormControlLabel,
-  Radio,
-  RadioGroup,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Box, FormControlLabel, Radio, RadioGroup, Stack, Typography } from '@mui/material';
+
+import { QuoteStartClientField } from './quote-start-client-field';
 
 import type { QuoteClientSuggestion, QuoteStartKind } from '@admin/quotes/model';
 
@@ -53,55 +45,13 @@ export function QuoteStartForm({
         <Typography variant="overline" color="text.secondary" component="h3">
           1 · Для кого
         </Typography>
-        <Autocomplete
-          freeSolo
-          options={clients as QuoteClientSuggestion[]}
-          getOptionLabel={(option) => (typeof option === 'string' ? option : option.name)}
-          filterOptions={(options) => options}
-          inputValue={name}
-          value={client}
-          onInputChange={(_event, value, reason) => {
-            onNameChange(value);
-            if (reason === 'input') onClientChange(null);
-          }}
-          onChange={(_event, value) => onClientChange(typeof value === 'string' ? null : value)}
-          renderOption={({ key, ...props }, option) => (
-            <li key={key} {...props}>
-              <Box>
-                <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                  {option.name}
-                </Typography>
-                {(option.companyName || option.contactName) && (
-                  <Typography variant="caption" color="text.secondary">
-                    {[option.companyName, option.contactName].filter(Boolean).join(' · ')}
-                  </Typography>
-                )}
-              </Box>
-            </li>
-          )}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              autoFocus
-              label="Клієнт або запит"
-              placeholder="Почніть вводити назву клієнта з KeepinCRM"
-              error={Boolean(nameError)}
-              helperText={
-                nameError ??
-                'Немає в KeepinCRM? Просто напишіть назву. Компанія й отримувач підставляться самі, їх можна змінити в КП.'
-              }
-              slotProps={{
-                ...params.slotProps,
-                // The panel checks the name itself and shows the error under the field.
-                htmlInput: {
-                  ...params.slotProps.htmlInput,
-                  maxLength: quoteNameMaxLength,
-                  required: false,
-                },
-              }}
-              sx={{ mt: 1 }}
-            />
-          )}
+        <QuoteStartClientField
+          name={name}
+          client={client}
+          clients={clients}
+          error={nameError}
+          onNameChange={onNameChange}
+          onClientChange={onClientChange}
         />
       </Box>
       <Box>

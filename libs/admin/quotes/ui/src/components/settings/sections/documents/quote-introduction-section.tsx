@@ -1,27 +1,16 @@
-import { Box, Stack, Typography } from '@mui/material';
-
+import { QuoteIntroSeasonFields } from './quote-intro-season-fields';
 import { QuoteColorField } from '../../form/quote-color-field';
 import { QuoteSettingsField } from '../../form/quote-settings-field';
 import { QuoteSettingsGroup, QuoteSettingsGrid, errorsAt } from '../../form/quote-settings-layout';
 import { QuoteAdvantagesList } from '../company/quote-advantages-list';
 
+import type { QuoteModelFieldRender } from './quote-intro-season-fields';
 import type { QuoteImageFieldRender } from '../../form/quote-settings-layout';
 import type {
   QuoteAdvantageDraft,
-  QuoteIntroSeason,
   QuoteIntroductionDraft,
   QuoteSettingsErrors,
 } from '@admin/quotes/model';
-import type { ReactNode } from 'react';
-
-/** The main model of a season page: the page picks it from the Catalog by name. */
-export type QuoteModelFieldRender = (field: {
-  season: QuoteIntroSeason;
-  label: string;
-  value: string;
-  error: string | undefined;
-  onChange: (code: string) => void;
-}) => ReactNode;
 
 type TextKey = Exclude<keyof QuoteIntroductionDraft, 'advantages'>;
 
@@ -35,23 +24,6 @@ interface Props {
   onAdvantageChange: (index: number, patch: Partial<QuoteAdvantageDraft>) => void;
   onAdvantageMove: (from: number, to: number) => void;
 }
-
-const seasons = [
-  {
-    season: 'Summer',
-    title: 'Літо',
-    titleKey: 'summerTitle',
-    bannerKey: 'summerBannerUrl',
-    codeKey: 'summerMainCode',
-  },
-  {
-    season: 'Winter',
-    title: 'Зима',
-    titleKey: 'winterTitle',
-    bannerKey: 'winterBannerUrl',
-    codeKey: 'winterMainCode',
-  },
-] as const;
 
 const texts: {
   key: TextKey;
@@ -118,41 +90,14 @@ export function QuoteIntroductionSection({
         </QuoteSettingsGrid>
       </QuoteSettingsGroup>
 
-      <QuoteSettingsGroup title="Сезони">
-        <QuoteSettingsGrid>
-          {seasons.map((season) => (
-            <Box
-              key={season.season}
-              component="fieldset"
-              sx={{ m: 0, p: 1.5, border: 1, borderColor: 'divider', borderRadius: 1, minWidth: 0 }}
-            >
-              <Typography component="legend" sx={{ fontWeight: 700, px: 0.5 }}>
-                {season.title}
-              </Typography>
-              <Stack sx={{ gap: 1.5 }}>
-                {imageField({
-                  label: `Банер — ${season.title.toLowerCase()}`,
-                  hint: '1600×640 px, JPG. Без банера PDF бере вбудований.',
-                  upload: true,
-                  value: introduction[season.bannerKey],
-                  error: at(season.bannerKey),
-                  onChange: (value) => onChange({ [season.bannerKey]: value }),
-                })}
-                {text(season.titleKey, `Заголовок — ${season.title.toLowerCase()}`, {
-                  hint: 'Слово в *зірочках* буде помаранчевим.',
-                })}
-                {modelField({
-                  season: season.season,
-                  label: `Головна модель — ${season.title.toLowerCase()}`,
-                  value: introduction[season.codeKey],
-                  error: at(season.codeKey),
-                  onChange: (code) => onChange({ [season.codeKey]: code }),
-                })}
-              </Stack>
-            </Box>
-          ))}
-        </QuoteSettingsGrid>
-      </QuoteSettingsGroup>
+      <QuoteIntroSeasonFields
+        introduction={introduction}
+        saved={saved}
+        errors={errors}
+        imageField={imageField}
+        modelField={modelField}
+        onChange={onChange}
+      />
 
       <QuoteSettingsGroup title="Переваги">
         <QuoteAdvantagesList

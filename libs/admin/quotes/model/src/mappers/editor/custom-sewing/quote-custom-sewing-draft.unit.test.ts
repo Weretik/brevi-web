@@ -1,22 +1,23 @@
 import { describe, expect, it } from 'vitest';
 
+import { customSewingDraft, parseCustomQuantity } from './quote-custom-sewing-draft';
 import {
   addCustomFabric,
   addCustomLine,
   addCustomVariant,
-  customSewingDraft,
+  recommendCustomVariant,
+} from './quote-custom-sewing-edits';
+import {
   customSewingErrors,
   customSewingItemDraft,
   customSewingPriceRequest,
-  parseCustomQuantity,
-  recommendCustomVariant,
-} from './quote-custom-sewing-mapper';
-import { catalogItemDraft } from './quote-draft-mapper';
+} from './quote-custom-sewing-price';
+import { catalogItemDraft } from '../draft/quote-draft-mapper';
 
 import type {
   QuoteCustomSewingPrice,
   QuoteModelComposition,
-} from '../../entities/items/quote-custom-sewing';
+} from '../../../entities/items/quote-custom-sewing';
 
 const composed = () => {
   let draft = { ...customSewingDraft(), name: 'Фартух з логотипом' };

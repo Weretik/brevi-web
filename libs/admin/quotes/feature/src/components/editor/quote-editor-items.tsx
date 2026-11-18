@@ -3,7 +3,7 @@ import { QuoteAddItems, QuoteItemCard, QuoteNotesCard } from '@admin/quotes/ui';
 import { Box, Typography } from '@mui/material';
 
 import type { useQuoteEditor } from '../../hooks/editor/use-quote-editor';
-import type { QuoteEditorPanel } from '../../pages/editor/quote-editor-panels';
+import type { QuoteEditorPanel } from '../editor-panels/quote-editor-panels';
 import type { QuoteFabricFacts } from '@admin/quotes/model';
 
 /** The anchor of «Додати позицію», for jumping to it from a save problem. */

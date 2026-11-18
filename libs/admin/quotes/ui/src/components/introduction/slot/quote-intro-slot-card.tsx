@@ -1,15 +1,7 @@
 import { formatQuotePrice } from '@admin/quotes/model';
-import AddIcon from '@mui/icons-material/Add';
-import {
-  Box,
-  Button,
-  ButtonBase,
-  Card,
-  MenuItem,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Card, MenuItem, Stack, TextField, Typography } from '@mui/material';
+
+import { QuoteIntroEmptySlot } from './quote-intro-empty-slot';
 
 import type { QuoteCatalogProduct, QuoteIntroSlotDraft } from '@admin/quotes/model';
 
@@ -52,30 +44,13 @@ export function QuoteIntroSlotCard({
 
   if (slot.productId === null)
     return (
-      <Card
-        variant="outlined"
-        sx={{ p: 1.5, borderStyle: 'dashed', display: 'flex', flexDirection: 'column' }}
-      >
-        {head}
-        <ButtonBase
-          onClick={onPick}
-          disabled={isMain}
-          sx={{ flex: 1, minHeight: 160, flexDirection: 'column', gap: 0.5, borderRadius: 1 }}
-        >
-          <AddIcon />
-          <Typography variant="body2" sx={{ fontWeight: 600 }}>
-            {isMain ? 'Головну модель не знайдено' : 'Обрати модель'}
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            {seasonHint}
-          </Typography>
-        </ButtonBase>
-        {(error ?? slot.problem) && (
-          <Typography variant="caption" color="error.main">
-            {error ?? slot.problem}
-          </Typography>
-        )}
-      </Card>
+      <QuoteIntroEmptySlot
+        head={head}
+        isMain={isMain}
+        seasonHint={seasonHint}
+        problem={error ?? slot.problem}
+        onPick={onPick}
+      />
     );
 
   const variants = product?.variants ?? [];

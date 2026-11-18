@@ -5,8 +5,8 @@ import {
 } from '@admin/quotes/model';
 import { Alert, Box, Stack, Typography } from '@mui/material';
 
-import { QuoteIntroSlotCard } from './quote-intro-slot-card';
 import { QuoteIntroStep } from './quote-intro-step';
+import { QuoteIntroSlotCard } from '../slot/quote-intro-slot-card';
 
 import type {
   QuoteCatalogProduct,

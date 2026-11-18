@@ -5,27 +5,11 @@ import {
   quoteTierLabels,
   quoteTiers,
 } from '@admin/quotes/model';
-import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
-import StarOutlinedIcon from '@mui/icons-material/StarOutlined';
-import {
-  Alert,
-  Box,
-  IconButton,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  TextField,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import { Alert, Box, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material';
 import { useState } from 'react';
 
-import { QuoteFabricLine } from './quote-fabric-line';
-import { QuotePriceCell } from './quote-price-cell';
+import { QuoteManualPriceReason } from './quote-manual-price-reason';
+import { QuoteOptionRow } from './quote-option-row';
 import { QuoteRemoveLastFabricDialog } from '../../../../dialogs/editor/quote-remove-last-fabric-dialog';
 
 import type {
@@ -111,120 +95,31 @@ export function QuoteItemPrices({
           </TableHead>
           <TableBody>
             {item.options.map((option) => (
-              <TableRow key={option.key}>
-                <TableCell sx={{ verticalAlign: 'top' }}>
-                  <Stack direction="row" sx={{ gap: 0.5, alignItems: 'flex-start' }}>
-                    {sewing && (
-                      <IconButton
-                        size="small"
-                        aria-pressed={option.isRecommended}
-                        aria-label={
-                          option.isRecommended
-                            ? `Не рекомендувати: ${rowLabel(option)}`
-                            : `Рекомендувати клієнту: ${rowLabel(option)}`
-                        }
-                        title={option.isRecommended ? 'Не рекомендувати' : 'Рекомендувати клієнту'}
-                        onClick={() => onRecommend(option.key)}
-                        sx={{
-                          ml: -0.75,
-                          mt: -0.25,
-                          flexShrink: 0,
-                          color: option.isRecommended ? 'primary.dark' : 'text.disabled',
-                        }}
-                      >
-                        {option.isRecommended ? (
-                          <StarOutlinedIcon fontSize="small" />
-                        ) : (
-                          <StarBorderOutlinedIcon fontSize="small" />
-                        )}
-                      </IconButton>
-                    )}
-                    <Box sx={{ minWidth: 0, flex: 1 }}>
-                      <Typography variant="body2" component="span" sx={{ fontWeight: 600 }}>
-                        {sewing || embroidery ? option.title : 'За одиницю'}
-                      </Typography>
-                      {option.isRecommended && (
-                        <Typography
-                          variant="caption"
-                          component="span"
-                          sx={{ color: 'primary.dark', fontWeight: 600, ml: 0.75 }}
-                        >
-                          рекомендуємо
-                        </Typography>
-                      )}
-                      {sewing && (
-                        <QuoteFabricLine
-                          option={option}
-                          fabricFacts={fabricFacts}
-                          onOpenSupplier={onOpenSupplier}
-                        />
-                      )}
-                      {!sewing && option.details && (
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{ display: 'block' }}
-                        >
-                          {option.details}
-                        </Typography>
-                      )}
-                    </Box>
-                  </Stack>
-                </TableCell>
-                {quoteTiers.map((tier) => (
-                  <TableCell key={tier} align="right" sx={{ verticalAlign: 'top' }}>
-                    <QuotePriceCell
-                      tier={tier}
-                      price={option.prices[tier]}
-                      editable={!fixed}
-                      label={rowLabel(option)}
-                      onManualChange={(manual) => onTierChange(option.key, tier, { manual })}
-                      onShownChange={(shown) => onTierChange(option.key, tier, { shown })}
-                    />
-                  </TableCell>
-                ))}
-                <TableCell align="right" sx={{ verticalAlign: 'top' }}>
-                  {removable && (
-                    <Tooltip title="Прибрати тканину">
-                      <IconButton
-                        size="small"
-                        aria-label={`Прибрати тканину: ${rowLabel(option)}`}
-                        onClick={() => remove(option)}
-                      >
-                        <DeleteOutlineOutlinedIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                </TableCell>
-              </TableRow>
+              <QuoteOptionRow
+                key={option.key}
+                option={option}
+                sewing={sewing}
+                embroidery={embroidery}
+                editable={!fixed}
+                removable={removable}
+                label={rowLabel(option)}
+                fabricFacts={fabricFacts}
+                onOpenSupplier={onOpenSupplier}
+                onRecommend={() => onRecommend(option.key)}
+                onTierChange={(tier, patch) => onTierChange(option.key, tier, patch)}
+                onRemove={() => remove(option)}
+              />
             ))}
           </TableBody>
         </Table>
       </Box>
-      {manualRows.map((option) => {
-        const missing = !option.manualReason.trim();
-        return (
-          <Box
-            key={option.key}
-            sx={{ px: 2, py: 1.5, bgcolor: missing ? 'warning.light' : 'action.hover' }}
-          >
-            <TextField
-              size="small"
-              fullWidth
-              required
-              label="Причина ручної ціни"
-              placeholder="Напр.: знижка за обсяг від 500 пар"
-              value={option.manualReason}
-              onChange={(event) => onReasonChange(option.key, event.target.value)}
-              helperText={
-                option.manualBy ? `Ручну ціну встановив(-ла): ${option.manualBy}` : undefined
-              }
-              slotProps={{ htmlInput: { maxLength: 500 } }}
-              sx={{ bgcolor: 'background.paper' }}
-            />
-          </Box>
-        );
-      })}
+      {manualRows.map((option) => (
+        <QuoteManualPriceReason
+          key={option.key}
+          option={option}
+          onChange={(reason) => onReasonChange(option.key, reason)}
+        />
+      ))}
       <QuoteRemoveLastFabricDialog
         open={confirmLast}
         itemName={itemName}

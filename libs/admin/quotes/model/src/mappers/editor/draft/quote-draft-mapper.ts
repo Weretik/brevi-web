@@ -1,14 +1,17 @@
 import { priceInputText } from './quote-price-text';
-import { quoteItemSubtitles } from '../../forms/editor/quote-draft';
+import { quoteItemSubtitles } from '../../../forms/editor/quote-draft';
 
-import type { QuoteCatalogProduct, QuoteCatalogVariant } from '../../entities/items/quote-catalog';
-import type { Quote, QuoteItem, QuoteOption, QuoteTier } from '../../entities/quote/quote';
+import type {
+  QuoteCatalogProduct,
+  QuoteCatalogVariant,
+} from '../../../entities/items/quote-catalog';
+import type { Quote, QuoteItem, QuoteOption, QuoteTier } from '../../../entities/quote/quote';
 import type {
   QuoteDraft,
   QuoteItemDraft,
   QuoteOptionDraft,
   QuotePriceDraft,
-} from '../../forms/editor/quote-draft';
+} from '../../../forms/editor/quote-draft';
 
 let sequence = 0;
 const nextKey = (prefix: string) => `${prefix}-${++sequence}`;
