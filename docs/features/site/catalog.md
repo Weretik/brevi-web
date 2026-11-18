@@ -59,10 +59,10 @@ libs/site/
 │   └── queries/                   # catalog-search (index types, text normalizing, ranking),
 │                                  # catalog-listing (price ranges, filters, order, choice in the address)
 ├── catalog/data-access/src/lib/
-│   ├── catalog-cache.ts           # cache tag and lifetimes
-│   ├── loaders/                   # catalog-source (what pages call: tree, categories, products, related),
-│   │                              # catalog-loaders (cached reads of the API)
-│   └── mappers/                   # run-time check of answers, API to site types
+│   ├── source/                    # catalog-source (what pages call: tree, categories, products, related),
+│   │                              # catalog-loaders (cached reads of the API), catalog-cache (tag, lifetimes)
+│   └── mapping/                   # run-time check of answers, API to site types: values, text, product,
+│                                  # tree and cards
 ├── catalog/ui/src/lib/
 │   ├── i18n/catalog-dictionary.ts # uk and ru text, price format
 │   ├── category/                  # section groups and icons, category tabs and their scroller
@@ -75,8 +75,8 @@ libs/site/
 ├── catalog/seo/src/lib/
 │   ├── metadata/                  # catalog-metadata, catalog-product-metadata
 │   └── json-ld/                   # catalog-json-ld: Product and ItemList
-└── catalog/feature/src/lib/       # one folder per page: root/, category/, product/,
-                                   # search/ (page and search index)
+└── catalog/feature/src/lib/       # one folder per page: root/, category/, product/ (page, summary,
+                                   # heading, lower sections, JSON-LD, blocks), search/ (page and index)
 ```
 
 ## Tests
@@ -86,8 +86,9 @@ libs/site/
 - `libs/site/catalog/model/src/lib/mappers/catalog-product-facts.spec.ts`
 - `libs/site/catalog/model/src/lib/queries/catalog-search.spec.ts`
 - `libs/site/catalog/model/src/lib/queries/catalog-listing.spec.ts`
-- `libs/site/catalog/data-access/src/lib/catalog-source.spec.ts`
-- `libs/site/catalog/data-access/src/lib/public-catalog.mapper.spec.ts`
+- `libs/site/catalog/data-access/src/lib/source/catalog-source.spec.ts`
+- `libs/site/catalog/data-access/src/lib/mapping/public-catalog.mapper.spec.ts`
+- `libs/site/catalog/feature/src/lib/product/catalog-product-blocks.spec.ts`
 - `libs/site/catalog/ui/src/lib/catalog-ui.spec.tsx`
 - `libs/site/catalog/seo/src/lib/metadata/catalog-metadata.spec.ts`
 - `libs/site/catalog/seo/src/lib/catalog-product-seo.spec.ts`

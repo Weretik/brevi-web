@@ -1,7 +1,8 @@
 import { ppeSupplierOfferLimits } from '@admin/products/model';
 import { ReferenceFormSection } from '@admin/references/ui';
-import { Button, FormControlLabel, Link, MenuItem, Stack, Switch, TextField } from '@mui/material';
+import { Button, Link, Stack, TextField } from '@mui/material';
 
+import { PpeSupplierPricingSection } from './ppe-supplier-pricing-section';
 import { PpeLinkField } from '../../components/ppe-card/ppe-link-field';
 import { PpeSupplierSelect } from '../../components/ppe-card/ppe-supplier-select';
 
@@ -35,7 +36,6 @@ interface Props {
 /** Supplier fields of the sheet tab «ЗІЗ» (columns D, F–H, K, N, O). */
 export function PpeSupplierForm(props: Props) {
   const { values, errors, readOnly, onChange, showCost = true } = props;
-  const ruleMissing = values.ruleCode !== '' && !props.ruleNames.includes(values.ruleCode);
   return (
     <Stack
       component="form"
@@ -102,52 +102,14 @@ export function PpeSupplierForm(props: Props) {
           />
         </Stack>
       </ReferenceFormSection>
-      <ReferenceFormSection title={showCost ? 'Ціна постачальника' : 'Ціноутворення'}>
-        {showCost && (
-          <TextField
-            label="Ціна постачальника, грн"
-            value={values.supplierPrice}
-            onChange={(event) => onChange('supplierPrice', event.target.value)}
-            error={Boolean(errors.supplierPrice)}
-            helperText={errors.supplierPrice}
-            disabled={readOnly}
-            fullWidth
-            slotProps={{ htmlInput: { inputMode: 'decimal' } }}
-          />
-        )}
-        <FormControlLabel
-          control={
-            <Switch
-              checked={values.allowManualPrice}
-              onChange={(event) => onChange('allowManualPrice', event.target.checked)}
-              disabled={readOnly}
-            />
-          }
-          label="Дозволити ручну ціну (автооновлення не змінює ціну)"
-        />
-        <TextField
-          select
-          label="Правило ціноутворення"
-          value={values.ruleCode}
-          onChange={(event) => onChange('ruleCode', event.target.value)}
-          error={ruleMissing}
-          helperText={
-            ruleMissing
-              ? 'Такого правила немає в «Параметри ціноутворення».'
-              : 'Відсотки правил — «Параметри ціноутворення».'
-          }
-          disabled={readOnly}
-          fullWidth
-        >
-          <MenuItem value="">—</MenuItem>
-          {ruleMissing && <MenuItem value={values.ruleCode}>{values.ruleCode}</MenuItem>}
-          {props.ruleNames.map((name) => (
-            <MenuItem key={name} value={name}>
-              {name}
-            </MenuItem>
-          ))}
-        </TextField>
-      </ReferenceFormSection>
+      <PpeSupplierPricingSection
+        values={values}
+        errors={errors}
+        ruleNames={props.ruleNames}
+        readOnly={readOnly}
+        showCost={showCost}
+        onChange={onChange}
+      />
       {!readOnly && (
         <Stack direction="row" sx={{ gap: 1, justifyContent: 'flex-end' }}>
           <Button disabled={!props.dirty || props.saving} onClick={props.onReset}>

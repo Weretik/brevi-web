@@ -4,14 +4,14 @@ import { PhoneIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { CatalogMenu } from './catalog-menu';
 import { HeaderSearch } from './header-search';
 import { ShowWhenStuck } from './show-when-stuck';
-import { LocaleSwitch } from '../controls/locale-switch';
-import { NavLink } from '../controls/nav-link';
-import { MAIN_NAV_LINKS, SHELL_PATHS } from '../navigation/site-navigation';
+import { LocaleSwitch } from '../../controls/locale-switch';
+import { NavLink } from '../../controls/nav-link';
+import { MAIN_NAV_LINKS, SHELL_PATHS } from '../../navigation/site-navigation';
+import { CatalogMenu } from '../catalog-menu/catalog-menu';
 
-import type { ShellDictionary } from '../i18n/shell-dictionary';
+import type { ShellDictionary } from '../../i18n/shell-dictionary';
 import type { CatalogSection } from '@site/catalog/model';
 import type { Company } from '@site/core/config';
 import type { Locale } from '@site/core/i18n';

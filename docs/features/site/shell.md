@@ -60,9 +60,10 @@ libs/site/
 │   └── json-ld/              # JsonLd, Organization, WebSite, LocalBusiness, BreadcrumbList, FAQPage
 ├── core/shell/src/lib/
 │   ├── shell/site-shell.tsx  # page frame
-│   ├── header/               # site-header, catalog-menu, catalog-section-icon, header-search, show-when-stuck
-│   ├── mobile/mobile-bar.tsx # bottom bar with the catalog and menu sheets
-│   ├── footer/site-footer.tsx
+│   ├── header/bar/           # site-header, header-search, show-when-stuck, use-dismiss
+│   ├── header/catalog-menu/  # catalog-menu with its sections, panel and promo panes, catalog-section-icon
+│   ├── mobile/               # mobile-bar with the catalog and menu sheets
+│   ├── footer/               # site-footer, footer-call-band, footer-contacts
 │   ├── controls/             # locale-switch, nav-link
 │   ├── navigation/           # SHELL_PATHS (= SITE_PATHS of core/i18n), menu and footer links
 │   ├── i18n/shell-dictionary.ts

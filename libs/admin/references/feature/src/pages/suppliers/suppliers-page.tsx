@@ -1,20 +1,16 @@
 import { filterSuppliers, lastSupplierKeepinSync } from '@admin/references/model';
 import {
-  ReferenceBulkDeleteButton,
   ReferenceFilterBar,
   ReferenceListAlerts,
-  ReferencePageHeader,
   ReferenceSearchBar,
   SupplierDeleteDialog,
   SuppliersGrid,
 } from '@admin/references/ui';
-import { usePageRights } from '@admin/shared/ui';
-import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
-import SyncOutlinedIcon from '@mui/icons-material/SyncOutlined';
-import { Alert, Box, Button, Paper } from '@mui/material';
+import { Alert, Box, Paper } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import { SupplierDrawer } from '../../components/suppliers/supplier-drawer';
+import { SuppliersHeader } from '../../components/suppliers/suppliers-header';
 import { useReferenceListFilters } from '../../hooks/reference-lists/use-reference-list-filters';
 import { useSupplierDeletion } from '../../hooks/suppliers/use-supplier-deletion';
 import { useSupplierKeepinSync } from '../../hooks/suppliers/use-supplier-keepin-sync';
@@ -43,7 +39,6 @@ export function SuppliersPage({
   openSupplierId = null,
   onSupplierOpened,
 }: Props = {}) {
-  const { canCreate, canEdit } = usePageRights();
   const { rows, loading, error, reload } = useSuppliers();
   const [active, setActive] = useState<{
     mode: SupplierDialogMode;
@@ -69,51 +64,14 @@ export function SuppliersPage({
   return (
     <Box sx={{ minWidth: 0 }}>
       {tabs}
-      <ReferencePageHeader
-        title="Постачальники"
-        subtitle={
-          lastSync ? (
-            <>
-              Картки оновлюються з KeepinCRM щодня. Останнє оновлення:{' '}
-              <Box component="span" sx={{ fontFamily: 'var(--admin-font-mono)' }}>
-                {new Date(lastSync).toLocaleString('uk-UA', {
-                  dateStyle: 'short',
-                  timeStyle: 'short',
-                })}
-              </Box>
-            </>
-          ) : (
-            'Контакти та інформація про постачальників'
-          )
-        }
-        actions={
-          <>
-            <ReferenceBulkDeleteButton
-              selectedCount={deletion.selectedIds.length}
-              disabled={deletion.deleting || loading}
-              onDelete={() => deletion.requestDelete(deletion.selectedIds)}
-            />
-            {canEdit && (
-              <Button
-                variant="outlined"
-                startIcon={<SyncOutlinedIcon />}
-                disabled={syncing}
-                onClick={() => void sync()}
-              >
-                {syncing ? 'Оновлення…' : 'Оновити з KeepinCRM'}
-              </Button>
-            )}
-            {canCreate && (
-              <Button
-                variant="contained"
-                startIcon={<AddOutlinedIcon />}
-                onClick={() => setActive({ mode: 'create', supplier: null })}
-              >
-                Додати постачальника
-              </Button>
-            )}
-          </>
-        }
+      <SuppliersHeader
+        lastSync={lastSync}
+        selectedCount={deletion.selectedIds.length}
+        deleteDisabled={deletion.deleting || loading}
+        syncing={syncing}
+        onDelete={() => deletion.requestDelete(deletion.selectedIds)}
+        onSync={() => void sync()}
+        onCreate={() => setActive({ mode: 'create', supplier: null })}
       />
       {syncNotice && (
         <Alert
