@@ -1,22 +1,8 @@
-import {
-  countProductionOrderFilters,
-  productionOrderFilterLabels as fieldLabels,
-} from '@admin/production/model';
+import { countProductionOrderFilters } from '@admin/production/model';
 import CloseIcon from '@mui/icons-material/Close';
-import {
-  Box,
-  Button,
-  Divider,
-  Drawer,
-  IconButton,
-  MenuItem,
-  Stack,
-  TextField,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Divider, Drawer, IconButton, Stack, Typography } from '@mui/material';
 
-import { CodeFilterPicker } from './code-filter-picker';
-import { TextFilterPicker } from './text-filter-picker';
+import { ProductionOrderFilterFields } from './production-order-filter-fields';
 
 import type {
   ProductionOrderFilterField,
@@ -55,7 +41,6 @@ export function ProductionOrderFilterPanel({
   onReset,
   onClose,
 }: Props) {
-  const periodWrong = values.from && values.to && values.to < values.from;
   const active = countProductionOrderFilters(values, manager);
   return (
     <Drawer
@@ -89,82 +74,14 @@ export function ProductionOrderFilterPanel({
         </Stack>
         <Divider />
         <Stack sx={{ gap: 2, px: 3, py: 2.5, overflowY: 'auto', flex: 1 }}>
-          <TextFilterPicker
-            label={fieldLabels.client}
-            value={values.client}
-            options={options?.clients ?? []}
-            onChange={(value) => onChange('client', value)}
+          <ProductionOrderFilterFields
+            values={values}
+            options={options}
+            manager={manager}
+            managers={managers}
+            onChange={onChange}
+            onManagerChange={onManagerChange}
           />
-          <Stack direction="row" spacing={1}>
-            <TextField
-              size="small"
-              type="date"
-              label={fieldLabels.from}
-              value={values.from ?? ''}
-              onChange={(event) => onChange('from', event.target.value || null)}
-              slotProps={{ inputLabel: { shrink: true } }}
-              fullWidth
-            />
-            <TextField
-              size="small"
-              type="date"
-              label={fieldLabels.to}
-              value={values.to ?? ''}
-              error={Boolean(periodWrong)}
-              helperText={periodWrong ? 'Раніше за «від»' : undefined}
-              onChange={(event) => onChange('to', event.target.value || null)}
-              slotProps={{ inputLabel: { shrink: true } }}
-              fullWidth
-            />
-          </Stack>
-          <TextField
-            select
-            size="small"
-            label={fieldLabels.season}
-            value={values.season ?? ''}
-            onChange={(event) => onChange('season', event.target.value || null)}
-          >
-            <MenuItem value="">Усі</MenuItem>
-            {(options?.seasons ?? []).map((season) => (
-              <MenuItem key={season} value={season}>
-                {season}
-              </MenuItem>
-            ))}
-          </TextField>
-          <CodeFilterPicker
-            label={fieldLabels.model}
-            value={values.model}
-            options={options?.models ?? []}
-            onChange={(value) => onChange('model', value)}
-          />
-          <CodeFilterPicker
-            label={fieldLabels.fabric}
-            value={values.fabric}
-            options={options?.fabrics ?? []}
-            onChange={(value) => onChange('fabric', value)}
-          />
-          <TextFilterPicker
-            label={fieldLabels.color}
-            value={values.color}
-            options={options?.colors ?? []}
-            onChange={(value) => onChange('color', value)}
-          />
-          {(managers.length > 1 || manager) && (
-            <TextField
-              select
-              size="small"
-              label="Менеджер"
-              value={manager ?? ''}
-              onChange={(event) => onManagerChange(event.target.value || null)}
-            >
-              <MenuItem value="">Усі</MenuItem>
-              {managers.map((name) => (
-                <MenuItem key={name} value={name}>
-                  {name}
-                </MenuItem>
-              ))}
-            </TextField>
-          )}
         </Stack>
         <Divider />
         <Stack direction="row" sx={{ gap: 1, px: 3, py: 2, justifyContent: 'flex-end' }}>

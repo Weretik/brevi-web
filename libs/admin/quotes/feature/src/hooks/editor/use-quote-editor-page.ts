@@ -14,7 +14,7 @@ import { useQuotePreview } from '../preview/use-quote-preview';
 import { useGmailReturnNotice } from '../sending/use-gmail-return-notice';
 import { useQuoteStartPrefill } from '../start/use-quote-start-prefill';
 
-import type { QuoteEditorPanel } from '../../pages/editor/quote-editor-panels';
+import type { QuoteEditorPanel } from '../../components/editor-panels/quote-editor-panels';
 import type { QuoteSupplierCard } from '../../pages/editor/quote-supplier-card';
 import type { QuoteFabricFacts } from '@admin/quotes/model';
 

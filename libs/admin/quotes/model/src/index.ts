@@ -13,34 +13,38 @@ export {
 export type * from './entities/items/quote-custom-sewing';
 export type * from './forms/editor/quote-custom-sewing-draft';
 export { quoteCustomLineKindLabels } from './forms/editor/quote-custom-sewing-draft';
-export { quoteModelChanges } from './mappers/editor/quote-model-changes';
+export { quoteModelChanges } from './mappers/editor/draft/quote-model-changes';
 export type {
   QuoteModelChange,
   QuoteModelChangeGroup,
   QuoteModelChangeKind,
-} from './mappers/editor/quote-model-changes';
+} from './mappers/editor/draft/quote-model-changes';
 export {
   addCustomFabric,
   addCustomLine,
   addCustomVariant,
-  customSewingDraft,
-  customSewingErrors,
-  customSewingItemDraft,
-  customSewingPriceRequest,
-  parseCustomQuantity,
-  pricedOptionDraft,
   recommendCustomVariant,
   removeCustomFabric,
   removeCustomVariant,
   setCustomFabricMeters,
-} from './mappers/editor/quote-custom-sewing-mapper';
+} from './mappers/editor/custom-sewing/quote-custom-sewing-edits';
+export {
+  customSewingDraft,
+  parseCustomQuantity,
+} from './mappers/editor/custom-sewing/quote-custom-sewing-draft';
+export {
+  customSewingErrors,
+  customSewingItemDraft,
+  customSewingPriceRequest,
+  pricedOptionDraft,
+} from './mappers/editor/custom-sewing/quote-custom-sewing-price';
 export {
   catalogItemDraft,
   emptyQuoteDraft,
   oneOffItemDraft,
   quoteToDraft,
   variantOptionDraft,
-} from './mappers/editor/quote-draft-mapper';
+} from './mappers/editor/draft/quote-draft-mapper';
 export {
   addQuoteOptions,
   moveQuoteItem,
@@ -51,22 +55,22 @@ export {
   setQuoteTierShown,
   updateQuoteItem,
   updateQuoteOption,
-} from './mappers/editor/quote-draft-edits';
+} from './mappers/editor/draft/quote-draft-edits';
 export {
   formatQuotePrice,
   parseQuotePrice,
   priceInputText,
-} from './mappers/editor/quote-price-text';
+} from './mappers/editor/draft/quote-price-text';
 export {
   quoteDraftFabricIds,
   quoteFabricFactsParts,
   quoteOptionFabrics,
   quoteSupplierFabrics,
-} from './mappers/editor/quote-fabric-facts';
+} from './mappers/editor/draft/quote-fabric-facts';
 export type {
   QuoteOptionFabricRef,
   QuoteSupplierFabric,
-} from './mappers/editor/quote-fabric-facts';
+} from './mappers/editor/draft/quote-fabric-facts';
 export { quotePreviewWarnings } from './mappers/preview/quote-preview-warnings';
 export type { QuotePreviewWarning } from './mappers/preview/quote-preview-warnings';
 export {
@@ -138,13 +142,15 @@ export {
   applyIntroTemplate,
   chooseIntroFabric,
   chooseIntroModel,
-  emptyIntroDraft,
   introProductIds,
   introSlotPrice,
-  introToDraft,
-  mainProductsOf,
   setIntroLayout,
   updateIntroSlot,
+} from './mappers/introduction/quote-intro-slot-edits';
+export {
+  emptyIntroDraft,
+  introToDraft,
+  mainProductsOf,
 } from './mappers/introduction/quote-intro-draft-mapper';
 export {
   quoteIntroErrors,

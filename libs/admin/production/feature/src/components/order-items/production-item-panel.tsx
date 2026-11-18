@@ -1,17 +1,11 @@
 import { formatDay } from '@admin/production/model';
-import {
-  ProductionFiles,
-  ProductionItemDetails,
-  ProductionItemShipments,
-  ProductionItemStages,
-} from '@admin/production/ui';
+import { ProductionFiles, ProductionItemDetails } from '@admin/production/ui';
 import { ReferenceEditorDrawer } from '@admin/references/ui';
 import { ItemFabricSection } from '@admin/warehouse/feature';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { Box, IconButton, Stack, Tab, Tabs, Tooltip, Typography } from '@mui/material';
+import { Tab, Tabs, Typography } from '@mui/material';
 
-import { ProductionItemWorkSection } from '../work/production-item-work-section';
+import { ProductionItemNav } from './production-item-nav';
+import { ProductionItemWorkTab } from './production-item-work-tab';
 
 import type { ProductionItemTab } from '../../hooks/order-items/use-production-item-panel';
 import type {
@@ -21,7 +15,6 @@ import type {
   ProductionOrderFile,
   ProductionStage,
 } from '@admin/production/model';
-import type { ReactNode } from 'react';
 
 interface Props {
   order: ProductionOrder;
@@ -39,19 +32,6 @@ interface Props {
   onUpload: (kind: ProductionFileKind, file: File) => void;
   onDeleteFile: (file: ProductionOrderFile) => void;
   onMessage: (message: string) => void;
-}
-
-function Section({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <Box
-      sx={{ border: 1, borderColor: 'divider', borderRadius: 2, p: 2, bgcolor: 'background.paper' }}
-    >
-      <Typography variant="overline" color="text.secondary" component="h3">
-        {title}
-      </Typography>
-      {children}
-    </Box>
-  );
 }
 
 /**
@@ -75,9 +55,6 @@ export function ProductionItemPanel({
   onMessage,
 }: Props) {
   const { permissions } = order;
-  const index = order.items.findIndex((x) => x.id === item.id);
-  const previous = order.items[index - 1];
-  const next = order.items[index + 1];
   const files = order.files.filter((file) => file.itemId === item.id);
   const fabric = [item.fabricCode, [item.mainColor, ...item.additionalColors].join(' + ')]
     .filter(Boolean)
@@ -93,41 +70,7 @@ export function ProductionItemPanel({
       readOnly
       saving={false}
       editLabel={onEdit ? 'Редагувати позицію' : null}
-      readActions={
-        order.items.length > 1 && (
-          <Stack direction="row" sx={{ mr: 'auto', order: -1, alignItems: 'center', gap: 0.5 }}>
-            <Tooltip title="Попередня позиція">
-              <span>
-                <IconButton
-                  aria-label="Попередня позиція"
-                  disabled={!previous}
-                  onClick={() => previous && onMove(previous)}
-                >
-                  <ChevronLeftIcon />
-                </IconButton>
-              </span>
-            </Tooltip>
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ fontFamily: 'var(--admin-font-mono)' }}
-            >
-              {index + 1} з {order.items.length}
-            </Typography>
-            <Tooltip title="Наступна позиція">
-              <span>
-                <IconButton
-                  aria-label="Наступна позиція"
-                  disabled={!next}
-                  onClick={() => next && onMove(next)}
-                >
-                  <ChevronRightIcon />
-                </IconButton>
-              </span>
-            </Tooltip>
-          </Stack>
-        )
-      }
+      readActions={<ProductionItemNav order={order} item={item} onMove={onMove} />}
       onClose={onClose}
       onEdit={() => onEdit?.()}
       onSubmit={onClose}
@@ -145,28 +88,15 @@ export function ProductionItemPanel({
         <Tab value="files" label={files.length ? `Файли ${files.length}` : 'Файли'} />
       </Tabs>
       {tab === 'work' && (
-        <Stack sx={{ gap: 2 }}>
-          <Section title="Етапи">
-            <ProductionItemStages
-              item={item}
-              busy={busy}
-              onToggle={permissions.canTrack ? onToggleStage : undefined}
-            />
-          </Section>
-          <Section title="Відвантаження">
-            <ProductionItemShipments
-              item={item}
-              busy={busy}
-              onShip={permissions.canTrack ? onShip : undefined}
-              onCancel={permissions.canTrack ? onCancelShipment : undefined}
-            />
-          </Section>
-          {permissions.seesSewingRate && (
-            <Section title="Пошито й покроєно">
-              <ProductionItemWorkSection order={order} item={item} onMessage={onMessage} />
-            </Section>
-          )}
-        </Stack>
+        <ProductionItemWorkTab
+          order={order}
+          item={item}
+          busy={busy}
+          onToggleStage={onToggleStage}
+          onShip={onShip}
+          onCancelShipment={onCancelShipment}
+          onMessage={onMessage}
+        />
       )}
       {tab === 'details' && <ProductionItemDetails item={item} permissions={permissions} />}
       {tab === 'fabric' && (

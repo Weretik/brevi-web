@@ -1,4 +1,4 @@
-import { formatHours, formatWorkMonth, shiftDay, workMonth } from '@admin/production/model';
+import { formatHours, formatWorkMonth, workMonth } from '@admin/production/model';
 import {
   TimesheetDayTable,
   TimesheetHistory,
@@ -8,11 +8,10 @@ import {
 import { ReferenceListAlerts } from '@admin/references/ui';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
 import { usePageRights } from '@admin/shared/ui';
-import ChevronLeftOutlinedIcon from '@mui/icons-material/ChevronLeftOutlined';
-import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
-import { Alert, Box, Button, IconButton, Paper, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, Paper, Typography } from '@mui/material';
 import { useState } from 'react';
 
+import { TimesheetDayToolbar } from './timesheet-day-toolbar';
 import { useTimesheetDay } from '../../hooks/timesheet/use-timesheet-day';
 
 /** «Швейний цех › Персонал цеху › Робочий час»: hours of each worker per day and the month in totals. */
@@ -45,62 +44,7 @@ export function TimesheetPage() {
         actionMessage={message}
         onCloseActionMessage={() => setMessage(null)}
       />
-      <Stack
-        direction={{ xs: 'column', md: 'row' }}
-        sx={{ gap: 1.5, mb: 2, alignItems: { md: 'center' } }}
-      >
-        <Stack direction="row" sx={{ alignItems: 'center', gap: 0.5 }}>
-          <IconButton
-            aria-label="Попередній день"
-            onClick={() => sheet.choose(shiftDay(sheet.date, -1))}
-          >
-            <ChevronLeftOutlinedIcon />
-          </IconButton>
-          <TextField
-            size="small"
-            type="date"
-            label="Дата"
-            value={sheet.date}
-            onChange={(event) => sheet.choose(event.target.value)}
-            slotProps={{ inputLabel: { shrink: true }, htmlInput: { max: sheet.today } }}
-          />
-          <IconButton
-            aria-label="Наступний день"
-            disabled={sheet.date >= sheet.today}
-            onClick={() => sheet.choose(shiftDay(sheet.date, 1))}
-          >
-            <ChevronRightOutlinedIcon />
-          </IconButton>
-          {sheet.date !== sheet.today && (
-            <Button size="small" onClick={() => sheet.choose(sheet.today)}>
-              Сьогодні
-            </Button>
-          )}
-        </Stack>
-        {canEdit && (
-          <Stack direction="row" sx={{ gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
-            <Typography variant="body2" color="text.secondary">
-              Невідміченим:
-            </Typography>
-            <Button
-              size="small"
-              variant="outlined"
-              disabled={sheet.saving}
-              onClick={() => sheet.fill('8')}
-            >
-              8 год усім
-            </Button>
-            <Button
-              size="small"
-              variant="outlined"
-              disabled={sheet.saving}
-              onClick={() => sheet.fill('0')}
-            >
-              0 год усім
-            </Button>
-          </Stack>
-        )}
-      </Stack>
+      <TimesheetDayToolbar sheet={sheet} canEdit={canEdit} />
       {data?.isMonthClosed && (
         <Alert severity="info" sx={{ mb: 2 }}>
           Місяць зарплати закрито: години за цей день змінювати не можна.

@@ -1,20 +1,11 @@
-import { countFabricNorms, parseFabricNormImportFile } from '@admin/production/model';
-import {
-  FabricNormFilterChips,
-  FabricNormModelList,
-  ModelWorkCard,
-  ProductionConfirmDialog,
-} from '@admin/production/ui';
-import {
-  ReferenceFilterRow,
-  ReferenceListAlerts,
-  ReferencePageHeader,
-  ReferenceSearchBar,
-} from '@admin/references/ui';
+import { parseFabricNormImportFile } from '@admin/production/model';
+import { ModelWorkCard, ProductionConfirmDialog } from '@admin/production/ui';
+import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
 import { usePageRights } from '@admin/shared/ui';
 import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import { Box, Button, Typography } from '@mui/material';
 
+import { FabricNormModelColumn } from './fabric-norm-model-column';
 import { ProductionImportDrawer } from '../../components/import/production-import-drawer';
 import { FabricNormDrawer } from '../../components/norms/fabric-norm-drawer';
 import { useFabricNormsPage } from '../../hooks/norms/use-fabric-norms-page';
@@ -27,16 +18,12 @@ import { useFabricNormsPage } from '../../hooks/norms/use-fabric-norms-page';
 export function FabricNormsPage() {
   const rights = usePageRights();
   const { canCreate } = rights;
+  const page = useFabricNormsPage();
   const {
-    rows,
     loading,
     error,
     reload,
     compositions,
-    search,
-    setSearch,
-    filter,
-    setFilter,
     batchText,
     setBatchText,
     editing,
@@ -47,12 +34,10 @@ export function FabricNormsPage() {
     setMessage,
     deletion,
     importNorms,
-    filtered,
     selected,
     composition,
     batchSize,
-    select,
-  } = useFabricNormsPage();
+  } = page;
   return (
     <Box sx={{ minWidth: 0 }}>
       <ReferencePageHeader
@@ -87,38 +72,7 @@ export function FabricNormsPage() {
           alignItems: 'start',
         }}
       >
-        <Box sx={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-          <ReferenceSearchBar
-            placeholder="Модель або MOD"
-            label="Пошук моделей"
-            value={search}
-            onChange={setSearch}
-          />
-          <ReferenceFilterRow
-            filters={
-              <FabricNormFilterChips
-                total={rows.length}
-                counts={countFabricNorms(rows)}
-                value={filter}
-                onChange={setFilter}
-              />
-            }
-            count={filtered.length}
-            total={rows.length}
-            countLabel="Кількість моделей"
-            selectedCount={0}
-            onClearSelection={() => undefined}
-          />
-          <FabricNormModelList
-            rows={filtered}
-            selectedCode={selected?.modelCode ?? null}
-            loading={loading}
-            emptyLabel={
-              rows.length === 0 ? 'Швейних моделей у «Товари» поки немає.' : 'Моделей не знайдено.'
-            }
-            onSelect={select}
-          />
-        </Box>
+        <FabricNormModelColumn page={page} />
         {selected ? (
           <ModelWorkCard
             row={selected}

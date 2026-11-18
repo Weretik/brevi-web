@@ -5,7 +5,7 @@ import {
   productionOrderFilterChipText,
   productionOrderFilterLabels,
 } from './production-order-filters';
-import { emptyProductionOrderFilters } from '../../entities/orders/production-order';
+import { emptyProductionOrderFilters } from '../../entities/orders/production-order-list';
 
 const options = {
   clients: [],

@@ -5,12 +5,9 @@ import {
   timesheetErrors,
   toProductionApiError,
 } from '../../errors/production-api-error';
-import {
-  mapPayrollEmployee,
-  mapPayrollMonth,
-  mapPayrollYear,
-  mapTimesheetDay,
-} from '../../mappers/people/payroll.mapper';
+import { mapPayrollEmployee, mapPayrollYear } from '../../mappers/people/payroll-year.mapper';
+import { mapPayrollMonth } from '../../mappers/people/payroll.mapper';
+import { mapTimesheetDay } from '../../mappers/people/timesheet.mapper';
 import { productionBaseApi } from '../base/production-base-api';
 
 import type {

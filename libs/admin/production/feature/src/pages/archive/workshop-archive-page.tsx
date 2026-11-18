@@ -1,22 +1,17 @@
 import { useImportWorkshopArchiveMutation } from '@admin/production/data-access';
 import { parseWorkshopArchiveImportFile, workshopArchiveKindLabels } from '@admin/production/model';
-import {
-  ProductionOrdersGrid,
-  WorkshopArchiveDetails,
-  WorkshopArchiveGrid,
-} from '@admin/production/ui';
+import { WorkshopArchiveDetails } from '@admin/production/ui';
 import {
   ReferenceEditorDrawer,
   ReferenceListAlerts,
   ReferencePageHeader,
-  ReferenceSearchBar,
 } from '@admin/references/ui';
 import { usePageRights } from '@admin/shared/ui';
 import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
-import { Alert, Box, Button, Paper, Stack, Tab, Tabs, TextField } from '@mui/material';
+import { Box, Button, Tab, Tabs } from '@mui/material';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
+import { WorkshopArchiveResults } from './workshop-archive-results';
 import { ProductionImportDrawer } from '../../components/import/production-import-drawer';
 import { useWorkshopArchive } from '../../hooks/archive/use-workshop-archive';
 
@@ -33,38 +28,14 @@ const views: { value: WorkshopArchiveView; label: string }[] = [
   { value: 'Closed', label: 'Закриті завдання' },
 ];
 
-function DayField({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <TextField
-      label={label}
-      type="date"
-      size="small"
-      value={value}
-      onChange={(event) => onChange(event.target.value)}
-      slotProps={{ inputLabel: { shrink: true } }}
-      sx={{ width: 170 }}
-    />
-  );
-}
-
 /** «Швейний цех › Архів цеху»: the old books of the «Цех» and the closed orders, read only. */
 export function WorkshopArchivePage({ useOrderActor }: Props) {
   const { canEdit } = usePageRights();
   const actor = useOrderActor();
-  const navigate = useNavigate();
   const list = useWorkshopArchive();
   const [opened, setOpened] = useState<WorkshopArchiveRow | null>(null);
   const [importing, setImporting] = useState(false);
   const [importArchive] = useImportWorkshopArchiveMutation();
-  const closed = list.view === 'Closed';
 
   return (
     <Box sx={{ minWidth: 0 }}>
@@ -101,51 +72,7 @@ export function WorkshopArchivePage({ useOrderActor }: Props) {
         actionMessage={null}
         onCloseActionMessage={() => undefined}
       />
-      <ReferenceSearchBar
-        placeholder={
-          closed
-            ? 'Знайти за номером, клієнтом, КП або моделлю'
-            : 'Знайти за замовником, виробом, тканиною чи приміткою'
-        }
-        label="Пошук в архіві"
-        value={list.search}
-        onChange={list.setSearch}
-      />
-      {!closed && (
-        <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 1.5, mb: 2 }}>
-          <DayField label="Від" value={list.from} onChange={list.setFrom} />
-          <DayField label="До" value={list.to} onChange={list.setTo} />
-        </Stack>
-      )}
-      {list.wrongPeriod && !closed && (
-        <Alert severity="warning" sx={{ mb: 2 }}>
-          Дата «Від» пізніша за «До».
-        </Alert>
-      )}
-      <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
-        {closed ? (
-          <ProductionOrdersGrid
-            rows={list.closed?.items ?? []}
-            rowCount={list.closed?.total ?? 0}
-            loading={list.loading}
-            searching={list.search !== ''}
-            today={list.today}
-            paginationModel={list.pagination}
-            onPaginationModelChange={list.setPagination}
-            onOpen={(row) => navigate(`/production/orders/${row.id}`)}
-          />
-        ) : (
-          <WorkshopArchiveGrid
-            rows={list.archive?.items ?? []}
-            rowCount={list.archive?.total ?? 0}
-            loading={list.loading}
-            searching={list.search !== '' || list.from !== '' || list.to !== ''}
-            paginationModel={list.pagination}
-            onPaginationModelChange={list.setPagination}
-            onOpen={setOpened}
-          />
-        )}
-      </Paper>
+      <WorkshopArchiveResults list={list} onOpen={setOpened} />
       {opened && (
         <ReferenceEditorDrawer
           titleId="workshop-archive-title"

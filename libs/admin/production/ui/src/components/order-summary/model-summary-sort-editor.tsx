@@ -2,26 +2,22 @@ import {
   addModelSummarySortLevel,
   modelSummarySortFieldLabels,
   modelSummarySortFields,
-  moveModelSummarySortLevel,
 } from '@admin/production/model';
 import AddIcon from '@mui/icons-material/Add';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import CloseIcon from '@mui/icons-material/Close';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import {
   Box,
   Button,
-  IconButton,
   MenuItem,
   Stack,
   TextField,
   ToggleButton,
   ToggleButtonGroup,
-  Tooltip,
   Typography,
 } from '@mui/material';
+
+import { ModelSummarySortLevelButtons } from './model-summary-sort-level-buttons';
 
 import type {
   ModelSummarySortDirection,
@@ -98,41 +94,12 @@ export function ModelSummarySortEditor({ levels, onChange }: Props) {
                 Спадання
               </ToggleButton>
             </ToggleButtonGroup>
-            <Box>
-              <Tooltip title="Вище">
-                <span>
-                  <IconButton
-                    size="small"
-                    aria-label={`Підняти: ${label}`}
-                    disabled={index === 0}
-                    onClick={() => onChange(moveModelSummarySortLevel(levels, index, -1))}
-                  >
-                    <KeyboardArrowUpIcon fontSize="small" />
-                  </IconButton>
-                </span>
-              </Tooltip>
-              <Tooltip title="Нижче">
-                <span>
-                  <IconButton
-                    size="small"
-                    aria-label={`Опустити: ${label}`}
-                    disabled={index === levels.length - 1}
-                    onClick={() => onChange(moveModelSummarySortLevel(levels, index, 1))}
-                  >
-                    <KeyboardArrowDownIcon fontSize="small" />
-                  </IconButton>
-                </span>
-              </Tooltip>
-              <Tooltip title="Прибрати">
-                <IconButton
-                  size="small"
-                  aria-label={`Прибрати: ${label}`}
-                  onClick={() => onChange(levels.filter((_, i) => i !== index))}
-                >
-                  <CloseIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
-            </Box>
+            <ModelSummarySortLevelButtons
+              levels={levels}
+              index={index}
+              label={label}
+              onChange={onChange}
+            />
           </Stack>
         );
       })}

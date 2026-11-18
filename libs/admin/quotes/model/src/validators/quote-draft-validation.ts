@@ -1,5 +1,5 @@
 import { quoteTiers } from '../forms/editor/quote-draft';
-import { parseQuotePrice } from '../mappers/editor/quote-price-text';
+import { parseQuotePrice } from '../mappers/editor/draft/quote-price-text';
 
 import type {
   QuoteDraft,

@@ -1,11 +1,9 @@
-import { PRODUCTION_ORDER_MAX_ADDITIONAL_COLORS } from '../../entities/orders/production-order';
+import { PRODUCTION_ORDER_MAX_ADDITIONAL_COLORS } from '../../entities/orders/production-order-applications';
 
 import type { FabricNormValues } from '../../entities/norms/fabric-norm';
-import type {
-  ItemApplicationKind,
-  ProductionItem,
-  ProductionItemDetails,
-} from '../../entities/orders/production-order';
+import type { ProductionItem } from '../../entities/orders/production-order';
+import type { ItemApplicationKind } from '../../entities/orders/production-order-applications';
+import type { ProductionItemDetails } from '../../entities/orders/production-order-inputs';
 
 /** The saved calculation an embroidery points to, as the form shows it. */
 export interface ItemEmbroideryLink {

@@ -8,7 +8,7 @@ import {
   mapQuoteModelComposition,
   mapQuoteProductPhotos,
   mapQuoteStaff,
-} from '../../mappers/quote.mapper';
+} from '../../mappers/quote-catalog.mapper';
 import { quotesBaseApi } from '../base/quotes-base-api';
 
 import type {

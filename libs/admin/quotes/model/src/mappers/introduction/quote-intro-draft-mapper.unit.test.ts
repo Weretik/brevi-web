@@ -1,13 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
+import { emptyIntroDraft, introToDraft } from './quote-intro-draft-mapper';
 import {
   applyIntroTemplate,
   chooseIntroModel,
-  emptyIntroDraft,
   introSlotPrice,
-  introToDraft,
   setIntroLayout,
-} from './quote-intro-draft-mapper';
+} from './quote-intro-slot-edits';
 import { quoteIntroErrors } from '../../validators/quote-intro-validation';
 
 import type { QuoteCatalogProduct } from '../../entities/items/quote-catalog';

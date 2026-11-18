@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { mapPayrollMonth, mapPayrollYear, mapTimesheetDay } from './payroll.mapper';
+import { mapPayrollYear } from './payroll-year.mapper';
+import { mapPayrollMonth } from './payroll.mapper';
+import { mapTimesheetDay } from './timesheet.mapper';
 
 const line = {
   employeeId: 1,

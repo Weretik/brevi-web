@@ -3,27 +3,14 @@ import {
   quoteSettingsErrors,
   quoteSettingsSections,
 } from '@admin/quotes/model';
-import {
-  QuoteSettingsFormContext,
-  QuoteSettingsNav,
-  QuoteSettingsPreview,
-  QuoteSettingsSaveBar,
-} from '@admin/quotes/ui';
+import { QuoteSettingsFormContext, QuoteSettingsSaveBar } from '@admin/quotes/ui';
 import { ReferencePageHeader } from '@admin/references/ui';
-import {
-  Alert,
-  Box,
-  Button,
-  CircularProgress,
-  Drawer,
-  useMediaQuery,
-  useTheme,
-} from '@mui/material';
+import { Alert, Box, Button, CircularProgress, useMediaQuery, useTheme } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { QuoteSettingsLayout } from './quote-settings-layout';
 import { QuoteManagerDrawer } from '../../components/settings/quote-manager-drawer';
-import { QuoteSettingsContent } from '../../components/settings/quote-settings-content';
 import { QuoteSettingsNotices } from '../../components/settings/quote-settings-notices';
 import { useGmailReturnNotice } from '../../hooks/sending/use-gmail-return-notice';
 import { useMailboxConnect } from '../../hooks/sending/use-mailbox-connect';
@@ -48,7 +35,7 @@ export default function QuoteSettingsPage() {
   const gmail = useGmailReturnNotice();
   const sections = useSettingsSections(Boolean(editor.draft));
   const previewState = useQuoteSettingsPreview();
-  const { form, focused, view, openLetter, setView, openLetterRow } = previewState;
+  const { form } = previewState;
   const [managerId, setManagerId] = useState<number | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
   const { draft, saved, errors } = editor;
@@ -78,16 +65,6 @@ export default function QuoteSettingsPage() {
   };
   const manager = draft.staffContacts.find((contact) => contact.userId === managerId) ?? null;
 
-  const preview = (
-    <QuoteSettingsPreview
-      draft={draft}
-      view={view}
-      letter={openLetter}
-      focused={focused}
-      onViewChange={setView}
-    />
-  );
-
   return (
     <QuoteSettingsFormContext.Provider value={form}>
       <Box sx={{ pb: 4 }}>
@@ -108,36 +85,17 @@ export default function QuoteSettingsPage() {
           restored={editor.restored}
           onRestoredClose={editor.dismissRestored}
         />
-        <Box
-          sx={{
-            display: 'grid',
-            gap: 3,
-            alignItems: 'start',
-            gridTemplateColumns: widePreview
-              ? '200px minmax(0, 1fr) 380px'
-              : wideNav
-                ? '200px minmax(0, 1fr)'
-                : 'minmax(0, 1fr)',
-          }}
-        >
-          <Box sx={wideNav ? { position: 'sticky', top: 88 } : undefined}>
-            <QuoteSettingsNav
-              active={sections.active}
-              changed={editor.changed}
-              errorCounts={editor.errorCounts}
-              layout={wideNav ? 'column' : 'row'}
-              onSelect={sections.goTo}
-            />
-          </Box>
-          <QuoteSettingsContent
-            editor={{ ...editor, draft, saved }}
-            mailbox={mailbox}
-            openLetter={openLetter}
-            onOpenLetter={openLetterRow}
-            onEditManager={setManagerId}
-          />
-          {widePreview && <Box sx={{ position: 'sticky', top: 88 }}>{preview}</Box>}
-        </Box>
+        <QuoteSettingsLayout
+          editor={{ ...editor, draft, saved }}
+          sections={sections}
+          mailbox={mailbox}
+          previewState={previewState}
+          wideNav={wideNav}
+          widePreview={widePreview}
+          previewOpen={previewOpen}
+          onPreviewClose={() => setPreviewOpen(false)}
+          onEditManager={setManagerId}
+        />
 
         <QuoteSettingsSaveBar
           changed={editor.changed}
@@ -159,16 +117,6 @@ export default function QuoteSettingsPage() {
           onSave={() => void save()}
         />
 
-        {!widePreview && (
-          <Drawer
-            anchor="right"
-            open={previewOpen}
-            onClose={() => setPreviewOpen(false)}
-            slotProps={{ paper: { sx: { width: { xs: '100%', sm: 420 }, p: 2.5 } } }}
-          >
-            {preview}
-          </Drawer>
-        )}
         {manager && (
           <QuoteManagerDrawer
             key={manager.userId}

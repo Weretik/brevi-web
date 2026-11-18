@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
 import { quoteDraftProblems, quoteDraftSummary, quoteTierVisibility } from './quote-draft-problems';
-import { setQuoteTier, setQuoteTierShown } from '../mappers/editor/quote-draft-edits';
+import { setQuoteTier, setQuoteTierShown } from '../mappers/editor/draft/quote-draft-edits';
 import {
   catalogItemDraft,
   emptyQuoteDraft,
   oneOffItemDraft,
-} from '../mappers/editor/quote-draft-mapper';
+} from '../mappers/editor/draft/quote-draft-mapper';
 
 import type { QuoteCatalogProduct } from '../entities/items/quote-catalog';
 import type { QuoteDraft, QuoteItemDraft } from '../forms/editor/quote-draft';

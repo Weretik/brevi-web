@@ -1,4 +1,4 @@
-import { mapQuoteCatalogProduct } from './quote.mapper';
+import { mapQuoteCatalogProduct } from './quote-catalog.mapper';
 
 import type {
   QuoteIntroDraft,

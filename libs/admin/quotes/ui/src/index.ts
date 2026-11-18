@@ -35,7 +35,7 @@ export {
 export type { QuoteImageFieldRender } from './components/settings/form/quote-settings-layout';
 export { QuoteCompanySection } from './components/settings/sections/company/quote-company-section';
 export { QuoteIntroductionSection } from './components/settings/sections/documents/quote-introduction-section';
-export type { QuoteModelFieldRender } from './components/settings/sections/documents/quote-introduction-section';
+export type { QuoteModelFieldRender } from './components/settings/sections/documents/quote-intro-season-fields';
 export { QuoteLettersSection } from './components/settings/sections/letters/quote-letters-section';
 export type { QuoteLetterRef } from './components/settings/sections/letters/quote-letters-section';
 export { QuoteManagersSection } from './components/settings/sections/company/quote-managers-section';
@@ -44,7 +44,7 @@ export { QuoteSettingsPreview } from './components/settings/preview/letter/quote
 export type { QuotePreviewView } from './components/settings/preview/letter/quote-settings-preview';
 export { QuoteSettingsNav } from './components/settings/page/quote-settings-nav';
 export { QuoteSettingsSaveBar } from './components/settings/page/quote-settings-save-bar';
-export { QuoteIntroLayoutStep } from './components/introduction/quote-intro-layout-step';
-export { QuoteIntroRecipientStep } from './components/introduction/quote-intro-recipient-step';
-export { QuoteIntroLetterStep } from './components/introduction/quote-intro-letter-step';
-export { QuoteIntroPagesStep } from './components/introduction/quote-intro-pages-step';
+export { QuoteIntroLayoutStep } from './components/introduction/steps/quote-intro-layout-step';
+export { QuoteIntroRecipientStep } from './components/introduction/steps/quote-intro-recipient-step';
+export { QuoteIntroLetterStep } from './components/introduction/steps/quote-intro-letter-step';
+export { QuoteIntroPagesStep } from './components/introduction/steps/quote-intro-pages-step';

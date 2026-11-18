@@ -1,7 +1,5 @@
-import { countProductionOrderFilters, ordersWord } from '@admin/production/model';
+import { countProductionOrderFilters } from '@admin/production/model';
 import {
-  ProductionOrderChips,
-  ProductionOrderFilterChips,
   ProductionOrderFilterPanel,
   ProductionOrdersGrid,
   ProductionOrdersMoreMenu,
@@ -12,9 +10,10 @@ import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
 import { usePageRights } from '@admin/shared/ui';
 import AddIcon from '@mui/icons-material/Add';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
-import { Box, Button, Stack, Typography } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
+import { ProductionOrdersSelection } from './production-orders-selection';
 import { ProductionOrdersImportDrawers } from '../../components/import/production-orders-import-drawers';
 import { ProductionModelSummaryView } from '../../components/orders/list/production-model-summary-view';
 import { ProductionOrderQuickPanel } from '../../components/orders/list/production-order-quick-panel';
@@ -102,39 +101,7 @@ export function ProductionOrdersPage({ useOrderActor }: Props) {
         view={view}
         onViewChange={setView}
       />
-      <Stack
-        direction="row"
-        sx={{ gap: 1, flexWrap: 'wrap', alignItems: 'center', my: 1.5 }}
-        aria-label="Відбір завдань"
-        role="group"
-      >
-        <ProductionOrderChips
-          counts={page?.counts ?? { all: 0, new: 0, closed: 0, cancelled: 0 }}
-          status={list.urgency ? undefined : list.status}
-          overdue={list.urgency === 'overdue'}
-          overdueCount={attention.overdue}
-          dueSoon={list.urgency === 'dueSoon'}
-          dueSoonCount={attention.overdue + attention.dueSoon}
-          onStatusChange={list.setStatus}
-          onOverdueChange={(on) => list.setUrgency(on ? 'overdue' : null)}
-          onDueSoonChange={(on) => list.setUrgency(on ? 'dueSoon' : null)}
-        />
-        <ProductionOrderFilterChips
-          values={list.filters}
-          options={list.filterOptions}
-          manager={list.manager}
-          stage={list.stage}
-          onChange={list.setFilter}
-          onManagerChange={list.setManager}
-          onStageChange={list.setStage}
-        />
-        <Box sx={{ flexGrow: 1 }} />
-        {page && (
-          <Typography variant="body2" color="text.secondary" aria-live="polite">
-            Знайдено {page.total} {ordersWord(page.total)}
-          </Typography>
-        )}
-      </Stack>
+      <ProductionOrdersSelection list={list} page={page} attention={attention} />
       {view === 'list' ? (
         <ProductionOrdersGrid
           rows={page?.items ?? []}

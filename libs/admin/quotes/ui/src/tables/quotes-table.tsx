@@ -1,11 +1,10 @@
-import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import { Box, IconButton, Paper, Tooltip } from '@mui/material';
+import { Box, Paper } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 
-import { QuoteStatusPill } from '../components/editor/cards/quote-status-pill';
+import { columns, deleteColumn, statusColumn } from './quotes-table.columns';
 
 import type { QuoteSummary } from '@admin/quotes/model';
-import type { GridColDef, GridPaginationModel } from '@mui/x-data-grid';
+import type { GridPaginationModel } from '@mui/x-data-grid';
 import type {} from '@mui/x-data-grid/themeAugmentation';
 
 interface Props {
@@ -23,77 +22,6 @@ interface Props {
   /** «Видалити КП» in each row; only for who may delete (the Director for now). */
   onDelete?: (row: QuoteSummary) => void;
 }
-
-const dateFormat = new Intl.DateTimeFormat('uk-UA', { dateStyle: 'short', timeStyle: 'short' });
-
-const statusColumn: GridColDef<QuoteSummary> = {
-  field: 'status',
-  headerName: 'Стан',
-  width: 170,
-  renderCell: ({ row }) => <QuoteStatusPill status={row.status} lastSentAt={row.lastSentAt} />,
-};
-
-const deleteColumn = (onDelete: (row: QuoteSummary) => void): GridColDef<QuoteSummary> => ({
-  field: 'actions',
-  headerName: '',
-  width: 64,
-  sortable: false,
-  align: 'center',
-  renderCell: ({ row }) => (
-    <Tooltip title="Видалити КП">
-      <IconButton
-        size="small"
-        aria-label={`Видалити КП ${row.number}`}
-        onClick={(event) => {
-          event.stopPropagation();
-          onDelete(row);
-        }}
-      >
-        <DeleteOutlineOutlinedIcon fontSize="small" />
-      </IconButton>
-    </Tooltip>
-  ),
-});
-
-const columns: GridColDef<QuoteSummary>[] = [
-  { field: 'number', headerName: 'Номер', width: 120, cellClassName: 'quote-mono' },
-  { field: 'internalName', headerName: 'Клієнт / запит', flex: 1.4, minWidth: 200 },
-  {
-    field: 'kind',
-    headerName: 'Вид',
-    width: 130,
-    valueGetter: (_value, row) => (row.kind === 'Introduction' ? 'Для знайомства' : 'Під запит'),
-  },
-  {
-    field: 'companyName',
-    headerName: 'Підприємство',
-    flex: 1,
-    minWidth: 160,
-    valueGetter: (_value, row) => row.companyName ?? '',
-  },
-  {
-    field: 'responsible',
-    headerName: 'Відповідальний',
-    flex: 0.8,
-    minWidth: 150,
-    valueGetter: (_value, row) => row.responsible.name,
-  },
-  {
-    field: 'itemsCount',
-    headerName: 'Позицій',
-    width: 100,
-    align: 'right',
-    headerAlign: 'right',
-    cellClassName: 'quote-mono',
-  },
-  {
-    field: 'updatedAt',
-    headerName: 'Змінено',
-    width: 150,
-    cellClassName: 'quote-mono',
-    valueFormatter: (value: string) => dateFormat.format(new Date(value)),
-  },
-];
 
 /** «КП» list: one page from the server, newest change first; a row opens the editor. */
 export function QuotesTable({

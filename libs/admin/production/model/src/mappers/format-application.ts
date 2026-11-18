@@ -1,10 +1,10 @@
 import { formatMeters } from './format-production';
-import { itemApplicationKindLabels } from '../entities/orders/production-order';
+import { itemApplicationKindLabels } from '../entities/orders/production-order-applications';
 
 import type {
   ItemApplication,
   ProductionEmbroideryChoice,
-} from '../entities/orders/production-order';
+} from '../entities/orders/production-order-applications';
 
 const count = new Intl.NumberFormat('uk-UA');
 

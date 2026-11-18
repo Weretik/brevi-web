@@ -1,6 +1,8 @@
 import { forBatch, formatMeters } from '@admin/production/model';
 import { Box, Button, Paper, Typography } from '@mui/material';
 
+import { FabricNormPartRow, fluid, mono, tones } from './fabric-norm-part-row';
+
 import type { FabricNormVariant } from '@admin/production/model';
 
 interface Props {
@@ -10,25 +12,6 @@ interface Props {
   /** «Додати варіант» for an empty variant; null hides it. */
   onAdd: (() => void) | null;
 }
-
-const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' } as const;
-
-/**
- * Font sizes follow the card width (container query units), so on a narrow screen the labels and
- * metres shrink instead of running into each other; below the minimum the metres wrap under the label.
- */
-const fluid = {
-  title: 'clamp(14px, 8cqi, 20px)',
-  label: 'clamp(12px, 6.5cqi, 14px)',
-  meters: 'clamp(15px, 9cqi, 20px)',
-} as const;
-
-/** Swatch and row tint of each fabric: graphite main, orange additional, grey second additional. */
-const tones = [
-  { swatch: 'text.primary', row: 'action.hover' },
-  { swatch: 'primary.main', row: 'primary.light' },
-  { swatch: 'text.secondary', row: 'action.hover' },
-] as const;
 
 /**
  * A colour variant of a norm. Its fabrics are stacked rows (colour mark and full label on the left,
@@ -113,55 +96,7 @@ export function FabricNormVariantCard({ variant, batchSize, onAdd }: Props) {
         <>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
             {variant.parts.map((part, index) => (
-              <Box
-                key={part.label}
-                sx={{
-                  px: 1.5,
-                  py: 1,
-                  borderRadius: 1.5,
-                  bgcolor: tones[index].row,
-                  minWidth: 0,
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  columnGap: 1.5,
-                  rowGap: 0.25,
-                }}
-              >
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
-                  <Box
-                    aria-hidden
-                    sx={{
-                      width: 12,
-                      height: 12,
-                      borderRadius: 0.5,
-                      flexShrink: 0,
-                      bgcolor: tones[index].swatch,
-                    }}
-                  />
-                  <Typography sx={{ fontSize: fluid.label, fontWeight: 700, whiteSpace: 'nowrap' }}>
-                    {part.label}
-                  </Typography>
-                </Box>
-                <Box sx={{ textAlign: 'right', flexShrink: 0, ml: 'auto' }}>
-                  <Typography
-                    sx={{ ...mono, fontSize: fluid.meters, fontWeight: 600, whiteSpace: 'nowrap' }}
-                  >
-                    {formatMeters(part.meters)}
-                  </Typography>
-                  {batchSize !== null && (
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ ...mono, whiteSpace: 'nowrap' }}
-                      component="div"
-                    >
-                      × {batchSize} = {formatMeters(forBatch(part.meters, batchSize))}
-                    </Typography>
-                  )}
-                </Box>
-              </Box>
+              <FabricNormPartRow key={part.label} part={part} tone={index} batchSize={batchSize} />
             ))}
           </Box>
           {variant.parts.length > 1 && (

@@ -3,7 +3,7 @@ import type {
   ProductionOrderFilterField,
   ProductionOrderFilterOptions,
   ProductionOrderFilterValues,
-} from '../../entities/orders/production-order';
+} from '../../entities/orders/production-order-list';
 
 /** Labels of the «Фільтри» fields on «Виробничі завдання». */
 export const productionOrderFilterLabels: Record<ProductionOrderFilterField, string> = {

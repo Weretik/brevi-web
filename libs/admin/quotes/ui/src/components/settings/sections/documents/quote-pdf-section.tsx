@@ -1,11 +1,10 @@
-import { quotePdfIntroCases, quotePdfIntroMarks } from '@admin/quotes/model';
-import { Box, FormControlLabel, Stack, Switch, Typography } from '@mui/material';
+import { Box, FormControlLabel, Stack, Switch } from '@mui/material';
 
+import { QuotePdfIntroGroup, standardHint } from './quote-pdf-intro-group';
 import { QuoteSettingsField } from '../../form/quote-settings-field';
 import { QuoteSettingsGroup, errorsAt } from '../../form/quote-settings-layout';
 
 import type {
-  QuotePdfIntroTextsDraft,
   QuotePdfLabelsDraft,
   QuotePdfTextsDraft,
   QuoteMark,
@@ -28,8 +27,6 @@ interface FieldOptions {
   helperText?: string;
   minRows?: number;
 }
-
-const standardHint = 'Порожнє поле — стандартний текст.';
 
 const labelFields: readonly { key: keyof QuotePdfLabelsDraft; label: string; hint: string }[] = [
   { key: 'codeLabel', label: 'Перед кодом товару', hint: 'Наприклад «арт.».' },
@@ -55,29 +52,6 @@ export function QuotePdfSection({ pdf, saved, errors, onChange }: Props) {
       error={at(key)}
       onChange={(value) => onChange({ [key]: value })}
     />
-  );
-  // Each variant under its own heading and a line, so the cases stand apart from the mark buttons.
-  const intro = (key: keyof QuotePdfIntroTextsDraft, when: string, index: number) => (
-    <Box
-      key={key}
-      sx={{ pt: index === 0 ? 0 : 2, borderTop: index === 0 ? 0 : 1, borderColor: 'divider' }}
-    >
-      <Typography variant="subtitle2" component="h4" sx={{ mb: 1, fontWeight: 700 }}>
-        {when}
-      </Typography>
-      <QuoteSettingsField
-        path={`pdf.intros.${key}`}
-        label="Текст"
-        name={when}
-        multiline
-        minRows={2}
-        marks={quotePdfIntroMarks}
-        value={pdf.intros[key]}
-        saved={saved.intros[key]}
-        error={at(`intros.${key}`)}
-        onChange={(value) => onChange({ intros: { ...pdf.intros, [key]: value } })}
-      />
-    </Box>
   );
   const label = (key: keyof QuotePdfLabelsDraft, title: string, options: FieldOptions = {}) => (
     <QuoteSettingsField
@@ -125,15 +99,7 @@ export function QuotePdfSection({ pdf, saved, errors, onChange }: Props) {
             })}
         </Stack>
       </QuoteSettingsGroup>
-      <QuoteSettingsGroup title="Вступ під назвою клієнта">
-        <Stack sx={{ gap: 1.5 }}>
-          <Box sx={{ typography: 'body2', color: 'text.secondary' }}>
-            PDF сам вибирає текст за складом КП. «Для кого» стає «для ТОВ …» або «для вас»,
-            «Модель», «Тканина» і «ЗІЗ» беруться з позицій. {standardHint}
-          </Box>
-          {quotePdfIntroCases.map(({ key, when }, index) => intro(key, when, index))}
-        </Stack>
-      </QuoteSettingsGroup>
+      <QuotePdfIntroGroup pdf={pdf} saved={saved} errors={errors} onChange={onChange} />
       <QuoteSettingsGroup title="Підписи позицій">
         <Box
           sx={{

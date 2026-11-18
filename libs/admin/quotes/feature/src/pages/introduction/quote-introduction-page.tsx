@@ -1,18 +1,14 @@
-import { quoteIntroPageErrors } from '@admin/quotes/model';
-import {
-  QuoteIntroLayoutStep,
-  QuoteIntroLetterStep,
-  QuoteIntroPagesStep,
-  QuoteIntroRecipientStep,
-  QuoteMoreMenu,
-  QuoteSendActions,
-} from '@admin/quotes/ui';
-import { ReferencePageHeader } from '@admin/references/ui';
-import { Alert, Box, Button, CircularProgress, Stack } from '@mui/material';
+import { Alert, Box, Button, CircularProgress } from '@mui/material';
 import { useState } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 
-import { QuoteIntroductionActions } from './quote-introduction-actions';
+import { QuoteIntroductionHeader } from './quote-introduction-header';
+import { QuoteIntroductionSendBar } from './quote-introduction-send-bar';
+import {
+  QuoteIntroductionSteps,
+  quoteIntroPagesAnchor,
+  quoteIntroRecipientAnchor,
+} from './quote-introduction-steps';
 import { QuoteDeleteDialog } from '../../components/editor/quote-delete-dialog';
 import { QuoteSaveFirstDialog } from '../../components/editor/quote-save-first-dialog';
 import { QuoteSaveProblemsDialog } from '../../components/editor/quote-save-problems-dialog';
@@ -32,19 +28,15 @@ import type { QuoteIntroductionNotice } from '../../components/introduction/quot
 import type { QuoteIntroductionPanel } from '../../components/introduction/quote-introduction-panels';
 import type { QuoteActor } from '@admin/quotes/model';
 
-const recipientAnchor = 'quote-intro-recipient';
-const pagesAnchor = 'quote-intro-pages';
-
 /** Scrolls to the step of a save problem: the recipient fields or the pages with models. */
 const scrollToProblem = (target: string) =>
   document
     .getElementById(
-      target.startsWith('slot:') || target === 'pages' ? pagesAnchor : recipientAnchor,
+      target.startsWith('slot:') || target === 'pages'
+        ? quoteIntroPagesAnchor
+        : quoteIntroRecipientAnchor,
     )
     ?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
-
-const sentLabel = (at: string | null) =>
-  at ? ` · надіслано ${new Date(at).toLocaleDateString('uk-UA')}` : '';
 
 /** «КП для знайомства»: a promotional catalogue of season pages, 4 models each (`/crm/quote-introductions/…`). */
 export default function QuoteIntroductionPage({ actor }: { actor: QuoteActor }) {
@@ -80,49 +72,16 @@ export default function QuoteIntroductionPage({ actor }: { actor: QuoteActor }) 
       </Box>
     );
 
-  const mainProblems = {
-    Summer: setup.summer.problem ?? undefined,
-    Winter: setup.winter.problem ?? undefined,
-  };
-
   return (
     <Box sx={{ pb: 10 }}>
-      <ReferencePageHeader
-        overline="Менеджер сервісу"
-        title="КП для знайомства"
-        subtitle={
-          quote
-            ? `КП ${quote.number}${sentLabel(quote.lastSentAt)}`
-            : 'Самостійна добірка для холодного контакту: лише актуальні моделі, тканини та ціни з каталогу.'
-        }
-        actions={
-          <>
-            <QuoteIntroductionActions
-              onRestart={() => {
-                setNotice(null);
-                editor.restart();
-              }}
-              onTemplates={() => setPanel({ kind: 'templates' })}
-              onSaveTemplate={() => {
-                if (Object.keys(quoteIntroPageErrors(draft)).length > 0)
-                  setNotice({
-                    severity: 'warning',
-                    text: 'Щоб зберегти шаблон, оберіть усі моделі й тканини.',
-                  });
-                else setPanel({ kind: 'save-template' });
-              }}
-            />
-            {quote && (
-              <QuoteMoreMenu
-                dirty={editor.dirty}
-                busy={lifecycle.busy}
-                onHistory={() => setPanel({ kind: 'history' })}
-                onCopy={() => void lifecycle.copy()}
-                onDelete={actor.canDelete ? () => removal.ask(quote) : undefined}
-              />
-            )}
-          </>
-        }
+      <QuoteIntroductionHeader
+        editor={editor}
+        draft={draft}
+        lifecycle={lifecycle}
+        canDelete={actor.canDelete === true}
+        onDelete={removal.ask}
+        onPanel={setPanel}
+        onNotice={setNotice}
       />
       <QuoteIntroductionNotices
         lifecycle={lifecycle}
@@ -132,56 +91,17 @@ export default function QuoteIntroductionPage({ actor }: { actor: QuoteActor }) 
         notice={notice}
         onCloseNotice={() => setNotice(null)}
       />
-      <Stack sx={{ gap: 2 }}>
-        <QuoteIntroLayoutStep layout={draft.layout} onChange={editor.setLayout} />
-        <Box id={recipientAnchor} sx={{ scrollMarginTop: 96 }}>
-          <QuoteIntroRecipientStep draft={draft} errors={editor.errors} onChange={editor.change} />
-        </Box>
-        <QuoteIntroLetterStep
-          letters={setup.letters}
-          letterName={draft.letterName}
-          letterSubject={draft.letterSubject}
-          letterBody={draft.letterBody}
-          onChange={(letterName) => {
-            if (letterName !== draft.letterName)
-              editor.change({ letterName, letterSubject: null, letterBody: null });
-          }}
-          onEditLetter={editor.change}
-        />
-        <Box id={pagesAnchor} sx={{ scrollMarginTop: 96 }}>
-          <QuoteIntroPagesStep
-            pages={draft.pages}
-            products={editor.products}
-            errors={editor.errors}
-            mainProblems={mainProblems}
-            onPick={(season, slot) => setPanel({ kind: 'pick', season, slot })}
-            onFabric={editor.chooseFabric}
-            onClear={editor.clearSlot}
-          />
-        </Box>
-      </Stack>
-
-      <QuoteSendActions
-        layout="bar"
-        dirty={editor.dirty}
-        saving={editor.saving}
-        generating={preview.preparing}
-        onSave={() =>
-          void editor.save().then((saved) => {
-            if (saved) setNotice({ severity: 'success', text: 'КП збережено.' });
-          })
-        }
-        onSaveAndClose={() =>
-          void editor.save().then((saved) => {
-            if (saved) navigate('/crm/quotes', { state: { notice: 'КП збережено' } });
-          })
-        }
-        onCancel={() => navigate('/crm/quotes')}
-        onPdf={() => saveFirst.run((saved) => void preview.open(saved))}
-        onSend={() => {
-          setNotice(null);
-          saveFirst.run((saved) => void preview.open(saved));
-        }}
+      <QuoteIntroductionSteps
+        editor={editor}
+        draft={draft}
+        setup={setup}
+        onPick={(season, slot) => setPanel({ kind: 'pick', season, slot })}
+      />
+      <QuoteIntroductionSendBar
+        editor={editor}
+        preview={preview}
+        saveFirst={saveFirst}
+        onNotice={setNotice}
       />
       <QuotePreview preview={preview} onSend={() => setPanel({ kind: 'send' })} />
       {saveFirst.asking && (

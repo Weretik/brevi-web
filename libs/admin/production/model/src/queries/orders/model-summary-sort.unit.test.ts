@@ -7,9 +7,9 @@ import {
   moveModelSummarySortLevel,
   sortModelSummary,
 } from './model-summary-sort';
-import { emptyProductionOrderFilters } from '../../entities/orders/production-order';
+import { emptyProductionOrderFilters } from '../../entities/orders/production-order-list';
 
-import type { ProductionModelSummaryRow } from '../../entities/orders/production-order';
+import type { ProductionModelSummaryRow } from '../../entities/orders/production-order-list';
 
 const row = (
   modelCode: string,

@@ -3,7 +3,7 @@ import { productionOrderStatusLabels } from '../../entities/orders/production-or
 import { productionStageLabels } from '../../entities/orders/production-tracking';
 import { formatDay } from '../../mappers/format-production';
 
-import type { ProductionOrderSummary } from '../../entities/orders/production-order';
+import type { ProductionOrderSummary } from '../../entities/orders/production-order-list';
 
 const columns: [string, (row: ProductionOrderSummary) => string | number][] = [
   ['Номер', (row) => row.number],

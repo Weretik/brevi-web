@@ -1,6 +1,7 @@
 import { apiCall, apiClient } from '@admin/shared/api-client';
 
 import { quoteErrors, quoteLookupErrors, toQuoteApiError } from '../../errors/quote-api-error';
+import { mapQuoteCatalogProduct } from '../../mappers/quote-catalog.mapper';
 import {
   mapQuoteIntroductionSetup,
   mapQuoteIntroTemplate,
@@ -8,7 +9,7 @@ import {
   toCreateQuoteIntroTemplateInput,
   toSaveQuoteIntroductionInput,
 } from '../../mappers/quote-introduction.mapper';
-import { mapQuote, mapQuoteCatalogProduct } from '../../mappers/quote.mapper';
+import { mapQuote } from '../../mappers/quote.mapper';
 import { quotesBaseApi } from '../base/quotes-base-api';
 
 import type {
