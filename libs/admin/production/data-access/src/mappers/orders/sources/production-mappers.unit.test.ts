@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import { mapFabricNormImportResult } from './production-import.mapper';
-import { mapFabricNormRows } from '../norms/fabric-norm.mapper';
-import { mapModelCompositions } from '../norms/model-composition.mapper';
-import { mapWorkshopStaff } from '../people/workshop-employee.mapper';
+import { mapFabricNormRows } from '../../norms/fabric-norm.mapper';
+import { mapModelCompositions } from '../../norms/model-composition.mapper';
+import { mapWorkshopStaff } from '../../people/workshop-employee.mapper';
 
 describe('production response mappers', () => {
   it('maps a norm row and a model without a norm', () => {

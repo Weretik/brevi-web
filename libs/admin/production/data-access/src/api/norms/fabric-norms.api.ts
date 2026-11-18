@@ -3,7 +3,7 @@ import { apiCall, apiClient } from '@admin/shared/api-client';
 import { fabricNormErrors, toProductionApiError } from '../../errors/production-api-error';
 import { mapFabricNormRow, mapFabricNormRows } from '../../mappers/norms/fabric-norm.mapper';
 import { mapModelCompositions } from '../../mappers/norms/model-composition.mapper';
-import { mapFabricNormImportResult } from '../../mappers/orders/production-import.mapper';
+import { mapFabricNormImportResult } from '../../mappers/orders/sources/production-import.mapper';
 import { productionBaseApi } from '../base/production-base-api';
 
 import type {

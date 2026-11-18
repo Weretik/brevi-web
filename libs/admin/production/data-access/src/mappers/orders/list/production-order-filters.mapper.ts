@@ -5,7 +5,7 @@ import {
   nullableText,
   record,
   text,
-} from '../../validators/production-response';
+} from '../../../validators/production-response';
 
 import type {
   ProductionFilterOption,

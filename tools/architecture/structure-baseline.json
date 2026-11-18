@@ -1,7 +1,4 @@
 [
-  "long-file: libs/admin/production/data-access/src/api/orders/production-orders.api.ts",
-  "long-file: libs/admin/production/data-access/src/mappers/orders/production-order.mapper.ts",
-  "long-file: libs/admin/production/data-access/src/mappers/people/payroll.mapper.ts",
   "long-file: libs/admin/production/feature/src/components/order-items/production-item-panel.tsx",
   "long-file: libs/admin/production/feature/src/components/orders/page/production-order-actions.tsx",
   "long-file: libs/admin/production/feature/src/pages/archive/workshop-archive-page.tsx",
@@ -10,7 +7,6 @@
   "long-file: libs/admin/production/feature/src/pages/orders/production-orders-page.tsx",
   "long-file: libs/admin/production/feature/src/pages/staff/workshop-staff-page.tsx",
   "long-file: libs/admin/production/feature/src/pages/timesheet/timesheet-page.tsx",
-  "long-file: libs/admin/production/model/src/entities/orders/production-order.ts",
   "long-file: libs/admin/production/ui/src/components/order-summary/model-summary-sort-editor.tsx",
   "long-file: libs/admin/production/ui/src/details/norms/card/fabric-norm-variant-card.tsx",
   "long-file: libs/admin/production/ui/src/forms/order-items/production-item-applications.tsx",

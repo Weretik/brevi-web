@@ -3,7 +3,7 @@ import { productionStageLabels, productionStages } from '../../entities/orders/p
 import type {
   ProductionOrderSummary,
   ProductionOrderSummaryItem,
-} from '../../entities/orders/production-order';
+} from '../../entities/orders/production-order-list';
 import type { ProductionStage } from '../../entities/orders/production-tracking';
 
 /** Days after today that still count as «скоро термін», as on the server. */

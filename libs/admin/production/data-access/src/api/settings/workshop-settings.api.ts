@@ -1,7 +1,7 @@
 import { apiCall, apiClient } from '@admin/shared/api-client';
 
 import { toProductionApiError } from '../../errors/production-api-error';
-import { mapWorkshopSettings } from '../../mappers/orders/production-tracking.mapper';
+import { mapWorkshopSettings } from '../../mappers/orders/card/production-tracking.mapper';
 import { productionBaseApi } from '../base/production-base-api';
 
 import type { WorkshopSettings, WorkshopSettingsBody } from '@admin/production/model';

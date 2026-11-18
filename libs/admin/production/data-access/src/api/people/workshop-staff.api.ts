@@ -1,7 +1,7 @@
 import { apiCall, apiClient } from '@admin/shared/api-client';
 
 import { toProductionApiError, workshopStaffErrors } from '../../errors/production-api-error';
-import { mapStaffImportResult } from '../../mappers/orders/production-import.mapper';
+import { mapStaffImportResult } from '../../mappers/orders/sources/production-import.mapper';
 import {
   mapWorkshopEmployee,
   mapWorkshopStaff,

@@ -1,7 +1,7 @@
 import type {
   ProductionModelSummaryRow,
   ProductionOrderFilterValues,
-} from '../../entities/orders/production-order';
+} from '../../entities/orders/production-order-list';
 
 /** Fields of «Зведення за моделями» that «Сортування за пріоритетом» can compare. */
 export const modelSummarySortFields = [

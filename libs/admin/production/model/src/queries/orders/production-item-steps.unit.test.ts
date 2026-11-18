@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { itemStageSteps, nextItemStage } from './production-item-steps';
 
-import type { ItemApplication } from '../../entities/orders/production-order';
+import type { ItemApplication } from '../../entities/orders/production-order-applications';
 import type { ProductionStage } from '../../entities/orders/production-tracking';
 
 const item = (stages: ProductionStage[], withApplication = false) => ({

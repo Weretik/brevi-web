@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { mapProductionOrder, mapProductionOrderPage } from './production-order.mapper';
+import { mapProductionOrder } from './production-order.mapper';
+import { mapProductionOrderPage } from '../list/production-order-page.mapper';
 
 const order = {
   id: 5,

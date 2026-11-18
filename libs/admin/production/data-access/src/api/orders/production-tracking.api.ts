@@ -1,7 +1,7 @@
 import { apiCall, apiClient } from '@admin/shared/api-client';
 
 import { productionOrderErrors, toProductionApiError } from '../../errors/production-api-error';
-import { mapProductionOrder } from '../../mappers/orders/production-order.mapper';
+import { mapProductionOrder } from '../../mappers/orders/card/production-order.mapper';
 import { productionBaseApi } from '../base/production-base-api';
 
 import type {

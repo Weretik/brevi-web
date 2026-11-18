@@ -18,12 +18,9 @@ import { productionOrdersCsv } from '../../queries/orders/production-orders-csv'
 import { parseProductionOrderImportFile } from '../../validators/production-order-import-file';
 import { validateWorkshopSettings, workshopSettingsBody } from '../settings/workshop-settings-form';
 
-import type {
-  ProductionItem,
-  ProductionOrder,
-  ProductionOrderSummary,
-  ProductionQuoteDraft,
-} from '../../entities/orders/production-order';
+import type { ProductionItem, ProductionOrder } from '../../entities/orders/production-order';
+import type { ProductionQuoteDraft } from '../../entities/orders/production-order-inputs';
+import type { ProductionOrderSummary } from '../../entities/orders/production-order-list';
 
 const norm = {
   oneColor: 1.5,

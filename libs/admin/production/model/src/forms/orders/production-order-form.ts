@@ -6,13 +6,12 @@ import {
 } from './production-item-form';
 
 import type { ProductionItemErrors, ProductionItemFormValues } from './production-item-form';
+import type { ProductionOrder, ReportPriceTier } from '../../entities/orders/production-order';
 import type {
   CreateProductionOrderBody,
-  ProductionOrder,
   ProductionQuoteDraft,
-  ReportPriceTier,
   UpdateProductionOrderBody,
-} from '../../entities/orders/production-order';
+} from '../../entities/orders/production-order-inputs';
 
 export interface ProductionOrderHeaderValues {
   clientName: string;

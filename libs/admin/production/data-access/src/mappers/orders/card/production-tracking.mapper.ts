@@ -13,7 +13,7 @@ import {
   oneOf,
   record,
   text,
-} from '../../validators/production-response';
+} from '../../../validators/production-response';
 
 import type {
   ProductionImportResult,
