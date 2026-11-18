@@ -1,33 +1,21 @@
-import { useGetFinanceTransfersQuery } from '@admin/accounting/data-access';
 import {
-  financeTransferParams,
-  formatLedgerDate,
-  formatMinor,
-  previousDay,
-} from '@admin/accounting/model';
-import {
-  FinanceDeleteDialog,
   FinanceJournalFilters,
   FinanceTransferTotals,
   FinanceTransfersGrid,
 } from '@admin/accounting/ui';
 import { ReferenceListAlerts, ReferencePageHeader } from '@admin/references/ui';
-import { adminApiErrorMessage } from '@admin/shared/api-client';
 import { usePageRights } from '@admin/shared/ui';
 import SwapHorizOutlinedIcon from '@mui/icons-material/SwapHorizOutlined';
 import { Button, Paper } from '@mui/material';
-import { useState } from 'react';
 
 import { FinanceTransferDrawer } from './finance-transfer-drawer';
-import { useFinanceChoices } from '../../hooks/journal/use-finance-choices';
-import { useFinanceJournal } from '../../hooks/journal/use-finance-journal';
+import { FinanceTransferVoidDialog } from './finance-transfer-void-dialog';
 import { canEditTransfer } from '../../hooks/transfers/use-finance-transfer-editor';
-import { useFinanceTransferVoid } from '../../hooks/transfers/use-finance-transfer-void';
+import { useFinanceTransfersJournal } from '../../hooks/transfers/use-finance-transfers-journal';
 import { FinanceJournalQuickBar } from '../journal/finance-journal-quick-bar';
 import { LedgerScopeTabs } from '../journal/ledger-scope-tabs';
 
-import type { FinanceMovementEditorMode } from '../../hooks/transactions/use-finance-transaction-editor';
-import type { FinanceTransfer, LedgerScope } from '@admin/accounting/model';
+import type { LedgerScope } from '@admin/accounting/model';
 
 interface JournalProps {
   scope: LedgerScope;
@@ -44,30 +32,22 @@ export function FinanceTransfersJournal({
   onScopeChange,
 }: JournalProps) {
   const { canCreate } = usePageRights();
-  const journal = useFinanceJournal(scope, cutoverDate, today);
-  const choices = useFinanceChoices(scope);
-  const query = useGetFinanceTransfersQuery(
-    financeTransferParams(scope, journal.applied, journal.sort, journal.direction, journal.page),
-  );
-  const page = query.data;
-  const loading = query.isLoading || query.isFetching;
-  const error = query.error
-    ? adminApiErrorMessage(query.error, 'Не вдалося завантажити перекази.')
-    : null;
-  const [active, setActive] = useState<{
-    mode: FinanceMovementEditorMode;
-    transfer: FinanceTransfer | null;
-  } | null>(null);
-  const [actionMessage, setActionMessage] = useState<string | null>(null);
-  const voiding = useFinanceTransferVoid(setActionMessage);
-  const rows = page?.items ?? [];
-  const newDate =
-    scope === 'Current' ? (today < cutoverDate ? cutoverDate : today) : previousDay(cutoverDate);
-
-  const requestVoid = (transfer: FinanceTransfer) => {
-    setActive(null);
-    voiding.request(transfer);
-  };
+  const {
+    journal,
+    choices,
+    query,
+    page,
+    loading,
+    error,
+    active,
+    setActive,
+    actionMessage,
+    setActionMessage,
+    voiding,
+    rows,
+    newDate,
+    requestVoid,
+  } = useFinanceTransfersJournal(scope, cutoverDate, today);
 
   return (
     <>
@@ -154,19 +134,7 @@ export function FinanceTransfersJournal({
           onVoid={requestVoid}
         />
       )}
-      <FinanceDeleteDialog
-        open={Boolean(voiding.pending)}
-        title="Анулювати переказ?"
-        text={
-          voiding.pending
-            ? `${formatLedgerDate(voiding.pending.date)}, ${voiding.pending.fromAccountName} → ${voiding.pending.toAccountName}, ${formatMinor(voiding.pending.amountMinor, voiding.pending.currency)}. Переказ залишиться в журналі й історії, але більше не змінюватиме залишки. Повернути його не можна.`
-            : ''
-        }
-        confirmLabel="Анулювати"
-        deleting={voiding.deleting}
-        onClose={voiding.cancel}
-        onConfirm={() => void voiding.confirm()}
-      />
+      <FinanceTransferVoidDialog voiding={voiding} />
     </>
   );
 }

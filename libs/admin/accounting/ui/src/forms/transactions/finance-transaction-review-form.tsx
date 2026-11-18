@@ -1,7 +1,8 @@
 import { financeTransactionLimits } from '@admin/accounting/model';
-import { Box, Button, Checkbox, FormControlLabel, Stack, Switch, TextField } from '@mui/material';
+import { Box, Button, Stack, TextField } from '@mui/material';
 
 import { FinanceCategoryFields } from './finance-category-fields';
+import { FinanceReviewOptions } from './finance-review-options';
 import { FinanceCounterpartyPicker } from '../counterparties/finance-counterparty-picker';
 
 import type { FinanceNamedChoice } from './finance-category-fields';
@@ -120,32 +121,13 @@ export function FinanceTransactionReviewForm({
           </Button>
         )}
       </Box>
-      <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ columnGap: 3, rowGap: 0.5 }}>
-        <FormControlLabel
-          control={
-            <Switch
-              size="small"
-              checked={values.oneoff}
-              onChange={(event) => onChange('oneoff', event.target.checked)}
-            />
-          }
-          label="Разова назва"
-          slotProps={{ typography: { variant: 'body2' } }}
-        />
-        {rememberLabel && (
-          <FormControlLabel
-            control={
-              <Checkbox
-                size="small"
-                checked={remember}
-                onChange={(event) => onRememberChange(event.target.checked)}
-              />
-            }
-            label={rememberLabel}
-            slotProps={{ typography: { variant: 'body2' } }}
-          />
-        )}
-      </Stack>
+      <FinanceReviewOptions
+        oneoff={values.oneoff}
+        onOneoffChange={(oneoff) => onChange('oneoff', oneoff)}
+        rememberLabel={rememberLabel}
+        remember={remember}
+        onRememberChange={onRememberChange}
+      />
     </Stack>
   );
 }
