@@ -24,7 +24,7 @@ The axiom shared with the backend: "A folder holds at most 6 code files. When it
 
 ## File size while writing
 
-Never let a giant file appear: plan the split before creating a file. A component stays under 150 lines and a hook, model, or other module under 200; when a file nears the limit, or a component renders several independent blocks, split it at once into one component per block, a controller hook for state and actions, and pure functions in `model/`, each with its own spec. Do not wait for CI. Before handoff run `npm run architecture:structure` and fix every new violation in the files you touched; never add a baseline entry or an exception ([code organization](docs/standards/shared/code-organization.md#one-responsibility-per-file)).
+Never let a giant file appear: plan the split before creating a file. A component stays under 150 lines and a hook, model, or other module under 200; when a file nears the limit, or a component renders several independent blocks, split it at once into one component per block, a controller hook for state and actions, and pure functions in `model/`, each with its own spec. Do not wait for CI. Before handoff run `npm run architecture:structure` and fix every new violation in the files you touched; an exception is allowed only for content that cannot be split (for example a long list of required parameters or a static dictionary), never for anything that can become several files or components, and it needs a written reason in the known deviations; never add a baseline entry for splittable code ([code organization](docs/standards/shared/code-organization.md#one-responsibility-per-file)).
 
 ## Repeated submits
 
