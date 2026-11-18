@@ -13,8 +13,4 @@ The shared [frontend code organization rules](../shared/code-organization.md) ap
 
 ## Known deviations
 
-`npm run architecture:structure` lists every entry in [the baseline](../../../tools/architecture/structure-baseline.json).
-
-| Path under `libs/site/`                          | Deviation             | Decision                                                                                                                                                                               |
-| ------------------------------------------------ | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Six files over the line limit (see the baseline) | Over 150 or 200 lines | `split when next changed`: cohesive (the catalog mapper of one API shape, the product page, footer, catalog menu, mobile bar, request form); a change that touches one splits it first |
+None: no file under `libs/site/` is in [the structure baseline](../../../tools/architecture/structure-baseline.json), and `npm run architecture:structure` fails on any new one.

@@ -1,8 +1,8 @@
 import { COMPANY } from '@site/core/config';
 import { fireEvent, render, screen } from '@testing-library/react';
 
+import { RequestForm } from './form/request-form';
 import { getRequestDictionary } from './i18n/request-dictionary';
-import { RequestForm } from './sections/request-form';
 import { RequestIntro } from './sections/request-intro';
 
 import type { RequestFormState } from '@site/request/model';

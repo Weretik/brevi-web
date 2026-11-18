@@ -1,5 +1,5 @@
 import { SiteFooter } from '../footer/site-footer';
-import { SiteHeader } from '../header/site-header';
+import { SiteHeader } from '../header/bar/site-header';
 import { getShellDictionary } from '../i18n/shell-dictionary';
 import { MobileBar } from '../mobile/mobile-bar';
 

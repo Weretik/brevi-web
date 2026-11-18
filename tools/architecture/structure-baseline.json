@@ -76,10 +76,5 @@
   "long-file: libs/admin/warehouse/ui/src/tables/movements/fabric-movements-table.tsx",
   "long-file: libs/admin/warehouse/ui/src/tables/reports/booking/booking-table.tsx",
   "long-file: libs/admin/warehouse/ui/src/tables/reports/valuation/valuation-table.tsx",
-  "long-file: libs/site/catalog/feature/src/lib/product/catalog-product-page.tsx",
-  "long-file: libs/site/core/shell/src/lib/footer/site-footer.tsx",
-  "long-file: libs/site/core/shell/src/lib/header/catalog-menu.tsx",
-  "long-file: libs/site/core/shell/src/lib/mobile/mobile-bar.tsx",
-  "long-file: libs/site/request/ui/src/lib/sections/request-form.tsx",
   "missing-tests: libs/admin/shared/contracts"
 ]
