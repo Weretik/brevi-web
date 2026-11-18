@@ -1,10 +1,8 @@
-import {
-  leadCommentMaxLength,
-  leadOutcomeHint,
-  leadQuickDates,
-  leadResultTakesDate,
-} from '@admin/leads/model';
-import { Box, Button, Chip, Stack, TextField, Typography } from '@mui/material';
+import { leadCommentMaxLength, leadResultTakesDate } from '@admin/leads/model';
+import { Box, Button, TextField, Typography } from '@mui/material';
+
+import { LeadCallNextDate } from './lead-call-next-date';
+import { LeadCallResultButtons } from './lead-call-result-buttons';
 
 import type { LeadCallFormErrors, LeadCallFormValues, LeadCallResult } from '@admin/leads/model';
 
@@ -19,8 +17,6 @@ interface Props {
   onChange: (values: LeadCallFormValues) => void;
   onSubmit: () => void;
 }
-
-const tones = { Client: 'success.main', Closed: 'error.main' } as const;
 
 /** «Чим закінчився дзвінок?»: one button per result of «Довідники», a date when it needs one, a comment. */
 export function LeadCallForm({
@@ -49,72 +45,13 @@ export function LeadCallForm({
       }}
       sx={{ display: 'grid', gap: 2 }}
     >
-      <Box component="fieldset" sx={{ border: 0, p: 0, m: 0, minWidth: 0 }}>
-        <Typography variant="overline" component="legend" color="text.secondary" sx={{ mb: 1 }}>
-          Чим закінчився дзвінок?
-        </Typography>
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: {
-              xs: 'repeat(2, minmax(0, 1fr))',
-              md: 'repeat(4, minmax(0, 1fr))',
-            },
-            gap: 1,
-          }}
-        >
-          {results.map((result) => {
-            const active = result.id === values.resultId;
-            return (
-              <Button
-                key={result.id}
-                type="button"
-                variant="outlined"
-                color="inherit"
-                aria-pressed={active}
-                disabled={saving}
-                onClick={() => onChange({ ...values, resultId: result.id })}
-                sx={{
-                  minHeight: 56,
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  justifyContent: 'center',
-                  textAlign: 'left',
-                  textTransform: 'none',
-                  px: 1.75,
-                  borderColor: active ? 'primary.main' : 'divider',
-                  bgcolor: active ? 'primary.light' : 'background.paper',
-                  color:
-                    result.outcome in tones
-                      ? tones[result.outcome as keyof typeof tones]
-                      : 'text.primary',
-                }}
-              >
-                <Typography
-                  variant="body2"
-                  component="span"
-                  sx={{ fontWeight: 600, color: 'inherit' }}
-                >
-                  {result.name}
-                </Typography>
-                <Typography variant="caption" component="span" color="text.secondary">
-                  {leadOutcomeHint(result.outcome, result.retryDays)}
-                </Typography>
-              </Button>
-            );
-          })}
-        </Box>
-        {error('resultId') && (
-          <Typography
-            variant="caption"
-            color="error"
-            role="alert"
-            sx={{ mt: 0.5, display: 'block' }}
-          >
-            {error('resultId')}
-          </Typography>
-        )}
-      </Box>
+      <LeadCallResultButtons
+        results={results}
+        selectedId={values.resultId}
+        error={error('resultId')}
+        disabled={saving}
+        onSelect={(resultId) => onChange({ ...values, resultId })}
+      />
 
       <Box
         sx={{
@@ -128,35 +65,14 @@ export function LeadCallForm({
         }}
       >
         {takesDate && (
-          <Box>
-            <TextField
-              label={
-                selected?.outcome === 'Retry' ? 'Коли повторити (необов’язково)' : 'Коли зв’язатися'
-              }
-              type="datetime-local"
-              value={values.nextContactAt}
-              disabled={saving}
-              error={Boolean(error('nextContactAt'))}
-              helperText={error('nextContactAt')}
-              onChange={(event) => onChange({ ...values, nextContactAt: event.target.value })}
-              fullWidth
-              slotProps={{
-                inputLabel: { shrink: true },
-                htmlInput: { style: { fontFamily: 'var(--admin-font-mono)' } },
-              }}
-            />
-            <Stack direction="row" sx={{ gap: 0.5, mt: 0.75, flexWrap: 'wrap' }}>
-              {leadQuickDates(now).map((quick) => (
-                <Chip
-                  key={quick.label}
-                  size="small"
-                  label={quick.label}
-                  variant={values.nextContactAt === quick.value ? 'filled' : 'outlined'}
-                  onClick={() => onChange({ ...values, nextContactAt: quick.value })}
-                />
-              ))}
-            </Stack>
-          </Box>
+          <LeadCallNextDate
+            retry={selected?.outcome === 'Retry'}
+            value={values.nextContactAt}
+            error={error('nextContactAt')}
+            disabled={saving}
+            now={now}
+            onChange={(nextContactAt) => onChange({ ...values, nextContactAt })}
+          />
         )}
         <TextField
           label="Коментар"

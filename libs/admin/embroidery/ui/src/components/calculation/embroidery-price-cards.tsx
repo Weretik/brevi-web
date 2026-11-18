@@ -1,17 +1,9 @@
-import { formatEmbroideryMoney, formatEmbroideryNumber } from '@admin/embroidery/model';
+import { formatEmbroideryNumber } from '@admin/embroidery/model';
 import ContentCopyOutlinedIcon from '@mui/icons-material/ContentCopyOutlined';
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
-import {
-  Alert,
-  Box,
-  Button,
-  IconButton,
-  LinearProgress,
-  Paper,
-  Stack,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import { Alert, Box, Button, LinearProgress, Paper, Stack, Typography } from '@mui/material';
+
+import { EmbroideryPriceCard, priceMono as mono } from './embroidery-price-card';
 
 import type { EmbroideryPrice } from '@admin/embroidery/model';
 import type { ReactNode } from 'react';
@@ -32,8 +24,6 @@ interface Props {
   /** «Зберегти розрахунок»; absent where there is nothing to save. */
   onSave?: () => void;
 }
-
-const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' };
 
 /** The right column of «Розрахунок»: a price per unit of each category with the order and repeat. */
 export function EmbroideryPriceCards({
@@ -81,60 +71,12 @@ export function EmbroideryPriceCards({
               </Alert>
             )}
             {prices.map((price, index) => (
-              <Box
+              <EmbroideryPriceCard
                 key={price.name}
-                sx={{
-                  p: 1.5,
-                  borderRadius: 1.5,
-                  border: 1,
-                  borderColor: index === 0 ? 'primary.main' : 'divider',
-                  bgcolor: index === 0 ? 'primary.light' : 'background.paper',
-                }}
-              >
-                <Stack
-                  direction="row"
-                  sx={{ justifyContent: 'space-between', alignItems: 'center' }}
-                >
-                  <Typography variant="subtitle2">
-                    {price.name}
-                    {price.markupPercent !== null && (
-                      <Typography
-                        component="span"
-                        variant="caption"
-                        color="text.secondary"
-                        sx={mono}
-                      >
-                        {' '}
-                        +{formatEmbroideryNumber(price.markupPercent)}%
-                      </Typography>
-                    )}
-                  </Typography>
-                  <Stack direction="row" sx={{ alignItems: 'center', gap: 0.5 }}>
-                    <Typography sx={{ ...mono, fontSize: 22, fontWeight: 600 }}>
-                      {formatEmbroideryMoney(price.unit)}
-                    </Typography>
-                    <Tooltip title="Копіювати ціну за 1 шт">
-                      <IconButton
-                        size="small"
-                        aria-label={`Копіювати ціну за 1 шт: ${price.name}`}
-                        onClick={() => onCopy(price)}
-                      >
-                        <ContentCopyOutlinedIcon fontSize="inherit" />
-                      </IconButton>
-                    </Tooltip>
-                  </Stack>
-                </Stack>
-                <Typography variant="caption" color="text.secondary">
-                  Замовлення{' '}
-                  <Box component="span" sx={{ ...mono, color: 'text.primary' }}>
-                    {formatEmbroideryMoney(price.total)}
-                  </Box>{' '}
-                  · повтор{' '}
-                  <Box component="span" sx={{ ...mono, color: 'text.primary' }}>
-                    {formatEmbroideryMoney(price.repeatUnit)}
-                  </Box>
-                </Typography>
-              </Box>
+                price={price}
+                first={index === 0}
+                onCopy={() => onCopy(price)}
+              />
             ))}
             <Typography variant="caption" color="text.secondary">
               Ціни з податком, грн. Повтор — та сама вишивка з готовою програмою.

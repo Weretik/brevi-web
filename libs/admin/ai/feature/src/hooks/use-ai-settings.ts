@@ -1,8 +1,5 @@
 import {
   useGetAiSettingsQuery,
-  useRemoveAiKeyMutation,
-  useSetAiKeyMutation,
-  useTestAiConnectionMutation,
   useUpdateAiPromptMutation,
   useUpdateAiSettingsMutation,
 } from '@admin/ai/data-access';
@@ -11,13 +8,15 @@ import {
   aiRulesText,
   aiSettingsFormOf,
   aiSettingsInputOf,
-  validateAiKey,
   validateAiSettings,
 } from '@admin/ai/model';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
 import { useEffect, useState } from 'react';
 
-import type { AiModelTier, AiSettingsErrors, AiSettingsFormValues } from '@admin/ai/model';
+import { useAiKey } from './use-ai-key';
+import { useAiModels } from './use-ai-models';
+
+import type { AiSettings, AiSettingsErrors, AiSettingsFormValues } from '@admin/ai/model';
 
 export interface AiNotice {
   text: string;
@@ -29,7 +28,17 @@ export type AiArea = 'work' | 'key' | 'models' | 'prompt';
 
 export type AiModelValues = Omit<AiSettingsFormValues, 'enabled' | 'monthlyLimitUsd'>;
 
-const usd = (value: number) => `${value.toLocaleString('uk-UA', { maximumFractionDigits: 6 })} $`;
+/** What a card hook needs from the page: the settings, the notices and one save of the stored settings. */
+export interface AiSettingsContext {
+  settings: AiSettings | null;
+  notify: (area: AiArea, notice: AiNotice | null) => void;
+  fail: (area: AiArea, error: unknown, fallback: string) => void;
+  saveWith: (
+    changes: Partial<AiSettingsFormValues>,
+    area: AiArea,
+    done: string,
+  ) => Promise<{ errors: AiSettingsErrors; saved: boolean }>;
+}
 
 /**
  * «Налаштування ШІ»: every card saves itself. The switch saves at once, the limit has its own
@@ -38,19 +47,11 @@ const usd = (value: number) => `${value.toLocaleString('uk-UA', { maximumFractio
 export function useAiSettings() {
   const query = useGetAiSettingsQuery();
   const [update, updating] = useUpdateAiSettingsMutation();
-  const [setKey, settingKey] = useSetAiKeyMutation();
-  const [removeKey, removingKey] = useRemoveAiKeyMutation();
-  const [test, testing] = useTestAiConnectionMutation();
   const [updatePrompt, savingPrompt] = useUpdateAiPromptMutation();
   const settings = query.data ?? null;
   const [limit, setLimit] = useState('');
   const [limitError, setLimitError] = useState<string | undefined>();
-  const [models, setModels] = useState<AiModelValues | null>(null);
-  const [modelErrors, setModelErrors] = useState<AiSettingsErrors>({});
-  const [key, setKeyValue] = useState('');
-  const [keyError, setKeyError] = useState<string | undefined>();
   const [notices, setNotices] = useState<Partial<Record<AiArea, AiNotice>>>({});
-  const [testingTier, setTestingTier] = useState<AiModelTier | null>(null);
 
   useEffect(() => {
     if (!settings) return;
@@ -86,6 +87,10 @@ export function useAiSettings() {
     }
   }
 
+  const context: AiSettingsContext = { settings, notify, fail, saveWith };
+  const keyCard = useAiKey(context);
+  const modelCard = useAiModels(context);
+
   async function toggle(enabled: boolean) {
     const { errors } = await saveWith(
       { enabled },
@@ -98,70 +103,6 @@ export function useAiSettings() {
   async function saveLimit() {
     const { errors } = await saveWith({ monthlyLimitUsd: limit }, 'work', 'Ліміт збережено.');
     setLimitError(errors.monthlyLimitUsd);
-  }
-
-  function openModels() {
-    if (!settings) return;
-    const form = aiSettingsFormOf(settings);
-    setModels({
-      fastModel: form.fastModel,
-      fastInputPrice: form.fastInputPrice,
-      fastOutputPrice: form.fastOutputPrice,
-      strongModel: form.strongModel,
-      strongInputPrice: form.strongInputPrice,
-      strongOutputPrice: form.strongOutputPrice,
-    });
-    setModelErrors({});
-  }
-
-  async function saveModels() {
-    if (!models) return;
-    const { errors, saved } = await saveWith(models, 'models', 'Моделі й ціни збережено.');
-    setModelErrors(errors);
-    if (saved) setModels(null);
-  }
-
-  async function saveKey() {
-    const found = validateAiKey(key);
-    setKeyError(found);
-    if (found) return;
-    notify('key', null);
-    try {
-      const saved = await setKey(key.trim()).unwrap();
-      setKeyValue('');
-      notify('key', {
-        text: `Ключ збережено (…${saved.keyHint ?? ''}). Перевірте моделі нижче.`,
-        ok: true,
-      });
-    } catch (error) {
-      fail('key', error, 'Не вдалося зберегти ключ.');
-    }
-  }
-
-  async function deleteKey() {
-    notify('key', null);
-    try {
-      await removeKey().unwrap();
-      notify('key', { text: 'Ключ видалено, ШІ вимкнено.', ok: true });
-    } catch (error) {
-      fail('key', error, 'Не вдалося видалити ключ.');
-    }
-  }
-
-  async function check(tier: AiModelTier) {
-    setTestingTier(tier);
-    notify('models', null);
-    try {
-      const result = await test(tier).unwrap();
-      notify('models', {
-        text: `OpenAI відповів: ${result.model} працює. Перевірка коштувала ${usd(result.costUsd)}.`,
-        ok: true,
-      });
-    } catch (error) {
-      fail('models', error, 'Не вдалося перевірити модель.');
-    } finally {
-      setTestingTier(null);
-    }
   }
 
   /** Saves the whole list after one condition is added, changed or deleted. */
@@ -178,18 +119,15 @@ export function useAiSettings() {
   }
 
   return {
+    ...modelCard,
+    ...keyCard,
     settings,
     loading: query.isLoading,
     error: query.error
       ? adminApiErrorMessage(query.error, 'Не вдалося відкрити налаштування ШІ.')
       : null,
     reload: query.refetch,
-    busy:
-      updating.isLoading ||
-      settingKey.isLoading ||
-      removingKey.isLoading ||
-      testing.isLoading ||
-      savingPrompt.isLoading,
+    busy: updating.isLoading || keyCard.busy || modelCard.busy || savingPrompt.isLoading,
     saving: updating.isLoading,
     notices,
     limit,
@@ -199,26 +137,10 @@ export function useAiSettings() {
       setLimit(value);
       setLimitError(undefined);
     },
-    models,
-    modelErrors,
-    changeModels: setModels,
-    openModels,
-    closeModels: () => setModels(null),
-    key,
-    keyError,
-    changeKey: (value: string) => {
-      setKeyValue(value);
-      setKeyError(undefined);
-    },
     rulesOf: (promptKey: string) =>
       aiRulesOf(settings?.prompts.find((x) => x.key === promptKey)?.text ?? ''),
-    testingTier,
     toggle,
     saveLimit,
-    saveModels,
-    saveKey,
-    deleteKey,
-    check,
     saveRules,
   };
 }

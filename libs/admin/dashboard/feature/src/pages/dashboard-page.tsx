@@ -1,89 +1,15 @@
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  Box,
-  Stack,
-  Tab,
-  Tabs,
-  Typography,
-} from '@mui/material';
+import { Box, Stack, Tab, Tabs, Typography } from '@mui/material';
 
-import { AccountingDesk } from '../components/desks/accounting-desk';
-import { MainDesk } from '../components/desks/main-desk';
-import { SalesDesk } from '../components/desks/sales-desk';
-import { SeoDesk } from '../components/desks/seo-desk';
-import { WorkshopDesk } from '../components/desks/workshop-desk';
+import { FoldedDesks } from '../components/desk-list/folded-desks';
+import { Desk } from '../components/desks/desk';
 import { useChosenDesk } from '../hooks/use-chosen-desk';
-import { useOpenDesks } from '../hooks/use-open-desks';
 import { visibleDesks } from '../model/desks/desks';
 
 import type { DashboardViewer } from '../model/desk-views/dashboard-view';
-import type { DeskDefinition, DeskKey } from '../model/desks/desks';
-
-/** yyyy-mm-dd of the person's own day. */
-const today = () => {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-};
+import type { DeskKey } from '../model/desks/desks';
 
 interface DashboardPageProps {
   useViewer: () => DashboardViewer;
-}
-
-function Desk({ deskKey, viewer }: { deskKey: DeskKey; viewer: DashboardViewer }) {
-  switch (deskKey) {
-    case 'main':
-      return <MainDesk today={today()} viewer={viewer} />;
-    case 'workshop':
-      return <WorkshopDesk viewer={viewer} />;
-    case 'sales':
-      return <SalesDesk today={today()} viewer={viewer} />;
-    case 'seo':
-      return <SeoDesk viewer={viewer} />;
-    case 'accounting':
-      return <AccountingDesk today={today()} viewer={viewer} />;
-  }
-}
-
-/** The main desk with every other desk folded under it; an unfolded desk is remembered and loads only when open. */
-function MainWithFoldedDesks({
-  others,
-  viewer,
-}: {
-  others: DeskDefinition[];
-  viewer: DashboardViewer;
-}) {
-  const { isOpen, toggle } = useOpenDesks();
-  return (
-    <Stack spacing={2}>
-      <Desk deskKey="main" viewer={viewer} />
-      {others.map((desk) => (
-        <Accordion
-          disableGutters
-          expanded={isOpen(desk.key)}
-          key={desk.key}
-          onChange={() => toggle(desk.key)}
-          slotProps={{ transition: { unmountOnExit: true } }}
-          variant="outlined"
-        >
-          <AccordionSummary
-            aria-controls={`desk-panel-${desk.key}`}
-            expandIcon={<ExpandMoreIcon />}
-            id={`desk-fold-${desk.key}`}
-          >
-            <Typography component="h2" variant="h6">
-              {desk.title}
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails id={`desk-panel-${desk.key}`}>
-            <Desk deskKey={desk.key} viewer={viewer} />
-          </AccordionDetails>
-        </Accordion>
-      ))}
-    </Stack>
-  );
 }
 
 /**
@@ -103,10 +29,7 @@ export default function DashboardPage({ useViewer }: DashboardPageProps) {
         <Typography component="h1" variant="h4">
           Робочий стіл
         </Typography>
-        <MainWithFoldedDesks
-          others={visible.filter((desk) => desk.key !== 'main')}
-          viewer={viewer}
-        />
+        <FoldedDesks others={visible.filter((desk) => desk.key !== 'main')} viewer={viewer} />
       </Stack>
     );
 

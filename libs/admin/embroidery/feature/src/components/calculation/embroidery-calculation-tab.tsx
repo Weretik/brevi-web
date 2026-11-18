@@ -1,20 +1,19 @@
 import { formatEmbroideryMoney } from '@admin/embroidery/model';
 import {
   EmbroideryBreakdownTable,
-  EmbroideryCostCard,
   EmbroideryCutLayout,
   EmbroideryExpensesSection,
   EmbroideryMaterialSection,
-  EmbroideryPriceCards,
   EmbroideryProgramSection,
   EmbroiderySubjectSection,
 } from '@admin/embroidery/ui';
 import { usePageRights } from '@admin/shared/ui';
-import { Alert, Box, Button, Link, Snackbar, Stack, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Button, Snackbar, Stack, useMediaQuery, useTheme } from '@mui/material';
 import { useState } from 'react';
 
+import { EmbroideryCalculationPrices } from './embroidery-calculation-prices';
 import { useEmbroideryCopy } from '../../hooks/calculation/use-embroidery-copy';
-import { EmbroiderySaveDrawer } from '../saved/embroidery-save-drawer';
+import { EmbroiderySaveDrawer } from '../saved/list/embroidery-save-drawer';
 
 import type { useEmbroideryCalculation } from '../../hooks/calculation/use-embroidery-calculation';
 
@@ -42,43 +41,13 @@ export function EmbroideryCalculationTab({
   const program = rows.find((row) => row.kind === 'Program');
 
   const prices = (
-    <Stack sx={{ gap: 2 }}>
-      {calculator.requestError ? (
-        <Alert
-          severity="error"
-          action={
-            <Button color="inherit" onClick={calculator.retry}>
-              Повторити
-            </Button>
-          }
-        >
-          {calculator.requestError}
-        </Alert>
-      ) : (
-        <EmbroideryPriceCards
-          prices={calculation?.prices ?? []}
-          quantity={values.quantity}
-          error={calculation?.error ?? null}
-          missing={calculation?.missing ?? []}
-          missingAction={
-            seesCost ? (
-              <Link component="button" type="button" onClick={onOpenSettings}>
-                Заповнити в «Налаштуваннях»
-              </Link>
-            ) : (
-              'Попросіть директора заповнити «Налаштування».'
-            )
-          }
-          waiting={calculator.waiting}
-          fetching={calculator.fetching}
-          onCopy={(price) =>
-            void copier.copy(calculation?.prices ?? [], price, values.quantity ?? 0)
-          }
-          onSave={calculator.priced && canCreate ? () => setSaving(true) : undefined}
-        />
-      )}
-      {calculation?.cost && <EmbroideryCostCard cost={calculation.cost} />}
-    </Stack>
+    <EmbroideryCalculationPrices
+      calculator={calculator}
+      seesCost={seesCost}
+      onOpenSettings={onOpenSettings}
+      onCopy={(price) => void copier.copy(calculation?.prices ?? [], price, values.quantity ?? 0)}
+      onSave={calculator.priced && canCreate ? () => setSaving(true) : undefined}
+    />
   );
 
   return (

@@ -5,7 +5,7 @@ import { Alert, Box, Button, CircularProgress, Tab, Tabs } from '@mui/material';
 import { useSearchParams } from 'react-router-dom';
 
 import { EmbroideryCalculationTab } from '../components/calculation/embroidery-calculation-tab';
-import { EmbroiderySavedTab } from '../components/saved/embroidery-saved-tab';
+import { EmbroiderySavedTab } from '../components/saved/list/embroidery-saved-tab';
 import { EmbroideryLeaveDialog } from '../components/settings/embroidery-leave-dialog';
 import { EmbroiderySettingsTab } from '../components/settings/embroidery-settings-tab';
 import { useEmbroideryCalculation } from '../hooks/calculation/use-embroidery-calculation';
