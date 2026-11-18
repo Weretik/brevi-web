@@ -1,8 +1,7 @@
+import { mapCatalogAddresses, mapCatalogProduct } from './public-catalog-product.mapper';
 import {
-  mapCatalogAddresses,
   mapCatalogCardPage,
   mapCatalogCategoryText,
-  mapCatalogProduct,
   mapCatalogTree,
 } from './public-catalog.mapper';
 

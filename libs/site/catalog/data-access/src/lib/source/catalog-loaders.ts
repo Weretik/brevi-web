@@ -2,13 +2,12 @@ import { siteApiGet } from '@site/shared/api-client';
 import { cacheLife, cacheTag } from 'next/cache';
 
 import { CATALOG_CACHE_TAG, CATALOG_LIFE, FAILURE_LIFE } from './catalog-cache';
+import { mapCatalogAddresses, mapCatalogProduct } from '../mapping/public-catalog-product.mapper';
 import {
-  mapCatalogAddresses,
   mapCatalogCardPage,
   mapCatalogCategoryText,
-  mapCatalogProduct,
   mapCatalogTree,
-} from './public-catalog.mapper';
+} from '../mapping/public-catalog.mapper';
 
 import type {
   CatalogCategoryPage,
