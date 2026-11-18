@@ -2,12 +2,8 @@ import { apiCall, apiClient } from '@admin/shared/api-client';
 
 import { warehouseBaseApi } from './warehouse-base-api';
 import { warehouseApiError } from '../errors/warehouse-api-error';
-import {
-  mapBooking,
-  mapHardware,
-  mapPlanFact,
-  mapValuation,
-} from '../mappers/stock-reports.mapper';
+import { mapBooking, mapPlanFact } from '../mappers/stock-reports.mapper';
+import { mapHardware, mapValuation } from '../mappers/stock-valuation.mapper';
 
 import type {
   BookingReport,

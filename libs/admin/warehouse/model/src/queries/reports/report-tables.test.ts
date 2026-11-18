@@ -4,7 +4,7 @@ import { filterConsumption } from './consumption-filters';
 import { filterValuation, valuationShare, valuationViewCounts } from './valuation-filters';
 
 import type { FabricConsumptionRow } from '../../entities/consumption/fabric-consumption';
-import type { ValuationFabric } from '../../entities/reports/stock-reports';
+import type { ValuationFabric } from '../../entities/reports/stock-valuation-reports';
 
 const row = (fabricName: string, color: string, issuedToTasks: number): FabricConsumptionRow => ({
   stockId: issuedToTasks,

@@ -4,32 +4,18 @@ import {
   bookingViewLabels,
   bookingViews,
   formatKyivTime,
-  formatMeters,
 } from '@admin/warehouse/model';
-import {
-  BookingTable,
-  BookingUnknownTable,
-  ReportFilterBar,
-  ReportStats,
-} from '@admin/warehouse/ui';
+import { BookingTable, BookingUnknownTable, ReportFilterBar } from '@admin/warehouse/ui';
 import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
 import { Alert, Box, Button, Link } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
 import { FabricReceiptDrawer } from '../../components/operations/fabric-receipt-drawer';
 import { BookingPairDrawer } from '../../components/reports/booking-pair-drawer';
+import { BookingStats } from '../../components/reports/booking-stats';
 import { useFabricBookingReport } from '../../hooks/reports/use-fabric-booking-report';
 
 import type { WarehouseTabProps } from '../tabs/warehouse-tab';
-
-const plural = (count: number, one: string, few: string, many: string) => {
-  const tens = count % 100;
-  const units = count % 10;
-  if (tens >= 11 && tens <= 14) return many;
-  if (units === 1) return one;
-  if (units >= 2 && units <= 4) return few;
-  return many;
-};
 
 /**
  * «Склад тканин › Що замовити › Тканина» (WH-005, WH-009): what to order first, by the nearest date a task needs it,
@@ -86,31 +72,7 @@ export function FabricBookingPage({ title, tabs, access }: WarehouseTabProps) {
       />
       {data && summary && (
         <>
-          <ReportStats
-            stats={[
-              {
-                label: 'Замовити',
-                value: formatMeters(summary.meters),
-                tone: summary.meters > 0 ? 'error' : undefined,
-                hint:
-                  summary.pairs > 0
-                    ? `${summary.pairs} ${plural(summary.pairs, 'пара', 'пари', 'пар')} · ${summary.suppliers} ${plural(summary.suppliers, 'постачальник', 'постачальники', 'постачальників')}`
-                    : undefined,
-              },
-              { label: 'У броні', value: formatMeters(data.reserved) },
-              { label: 'Вільно на складі', value: formatMeters(data.free) },
-              ...(data.unknown.length > 0
-                ? [
-                    {
-                      label: 'Без плану',
-                      value: `${data.unknown.length} поз.`,
-                      tone: 'warning' as const,
-                      hint: 'Потреба невідома, не враховано',
-                    },
-                  ]
-                : []),
-            ]}
-          />
+          <BookingStats data={data} summary={summary} />
           <ReportFilterBar
             search={search}
             searchPlaceholder="Тканина, колір, постачальник, замовник або Ц-12"

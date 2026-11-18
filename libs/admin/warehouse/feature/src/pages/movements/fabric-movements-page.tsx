@@ -6,32 +6,17 @@ import {
   FabricMovementPager,
   FabricMovementsTable,
   MovementCancelDialog,
-  WarehouseMoreMenu,
 } from '@admin/warehouse/ui';
-import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
-import ContentCutOutlinedIcon from '@mui/icons-material/ContentCutOutlined';
-import DownloadOutlinedIcon from '@mui/icons-material/DownloadOutlined';
-import InventoryOutlinedIcon from '@mui/icons-material/InventoryOutlined';
-import RemoveOutlinedIcon from '@mui/icons-material/RemoveOutlined';
-import { Box, Button, Stack } from '@mui/material';
+import { Box } from '@mui/material';
 import { useState } from 'react';
 
-import { IssueToItemDrawer } from '../../components/item-issue/issue-to-item-drawer';
-import { FabricMovementDrawer } from '../../components/movements/fabric-movement-drawer';
-import { FabricMovementEditDrawer } from '../../components/movements/fabric-movement-edit-drawer';
-import { FabricMovementHistoryDrawer } from '../../components/movements/fabric-movement-history-drawer';
-import { FabricIssueDrawer } from '../../components/operations/fabric-issue-drawer';
-import { FabricOpeningDrawer } from '../../components/operations/fabric-opening-drawer';
-import { FabricReceiptDrawer } from '../../components/operations/fabric-receipt-drawer';
+import { FabricMovementPanels } from './fabric-movement-panels';
+import { FabricMovementsActions } from './fabric-movements-actions';
 import { useMovementCancel } from '../../hooks/movements/use-movement-cancel';
 import { useMovementFilters } from '../../hooks/movements/use-movement-filters';
 import { useMovementsExport } from '../../hooks/movements/use-movements-export';
 
-import type { FabricMovementRow } from '@admin/warehouse/model';
-
-type Panel =
-  | { kind: 'receipt' | 'issue' | 'item-issue' | 'opening' }
-  | { kind: 'movement' | 'edit' | 'history'; row: FabricMovementRow };
+import type { FabricMovementPanel as Panel } from './fabric-movement-panels';
 
 /**
  * «Склад тканин › Рух тканини»: a compact journal of receipts, issues and every other movement, 50 per page, with
@@ -64,52 +49,14 @@ export function FabricMovementsPage() {
         title="Рух тканини"
         subtitle="Прихід, видача на завдання, разова витрата і вся історія. Нові операції зверху."
         actions={
-          <Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap' }}>
-            <WarehouseMoreMenu
-              actions={[
-                ...(canMove
-                  ? [
-                      {
-                        label: 'Разова витрата',
-                        secondary: 'Зразок, брак, без завдання',
-                        icon: <RemoveOutlinedIcon fontSize="small" />,
-                        disabled: !stock.data,
-                        onClick: () => setPanel({ kind: 'issue' }),
-                      },
-                      {
-                        label: 'Внести початковий залишок',
-                        icon: <InventoryOutlinedIcon fontSize="small" />,
-                        onClick: () => setPanel({ kind: 'opening' }),
-                      },
-                    ]
-                  : []),
-                {
-                  label: exporter.busy ? 'Збираю сторінки…' : 'Вивантажити рух в Excel',
-                  icon: <DownloadOutlinedIcon fontSize="small" />,
-                  disabled: exporter.busy || !movements.data?.rows.length,
-                  onClick: () => void exporter.run(query),
-                },
-              ]}
-            />
-            {canMove && (
-              <>
-                <Button
-                  variant="outlined"
-                  startIcon={<ContentCutOutlinedIcon />}
-                  onClick={() => setPanel({ kind: 'item-issue' })}
-                >
-                  Видача на завдання
-                </Button>
-                <Button
-                  variant="contained"
-                  startIcon={<AddOutlinedIcon />}
-                  onClick={() => setPanel({ kind: 'receipt' })}
-                >
-                  Новий прихід
-                </Button>
-              </>
-            )}
-          </Stack>
+          <FabricMovementsActions
+            canMove={canMove}
+            stockReady={Boolean(stock.data)}
+            exporting={exporter.busy}
+            canExport={Boolean(movements.data?.rows.length)}
+            onPanel={setPanel}
+            onExport={() => void exporter.run(query)}
+          />
         }
       />
       <ReferenceListAlerts
@@ -145,48 +92,15 @@ export function FabricMovementsPage() {
           />
         </>
       )}
-      {panel?.kind === 'receipt' && (
-        <FabricReceiptDrawer onClose={() => setPanel(null)} onSaved={setMessage} />
-      )}
-      {panel?.kind === 'issue' && stock.data && (
-        <FabricIssueDrawer
-          fabrics={stock.data.fabrics}
-          onClose={() => setPanel(null)}
-          onSaved={saved}
-        />
-      )}
-      {panel?.kind === 'item-issue' && (
-        <IssueToItemDrawer onClose={() => setPanel(null)} onMessage={setMessage} />
-      )}
-      {panel?.kind === 'opening' && (
-        <FabricOpeningDrawer onClose={() => setPanel(null)} onSaved={setMessage} />
-      )}
-      {panel?.kind === 'movement' && (
-        <FabricMovementDrawer
-          row={panel.row}
-          canMove={canChange}
-          onClose={() => setPanel(null)}
-          onEdit={(row) => setPanel({ kind: 'edit', row })}
-          onCancel={cancelling.request}
-          onHistory={(row) => setPanel({ kind: 'history', row })}
-        />
-      )}
-      {panel?.kind === 'edit' && (
-        <FabricMovementEditDrawer
-          row={panel.row}
-          fabrics={stock.data?.fabrics ?? []}
-          onClose={() => setPanel(null)}
-          onSaved={saved}
-        />
-      )}
-      {panel?.kind === 'history' && (
-        <FabricMovementHistoryDrawer
-          row={panel.row}
-          canMove={canChange}
-          onClose={() => setPanel(null)}
-          onRestored={saved}
-        />
-      )}
+      <FabricMovementPanels
+        panel={panel}
+        fabrics={stock.data?.fabrics ?? null}
+        canChange={canChange}
+        onPanel={setPanel}
+        onSaved={saved}
+        onMessage={setMessage}
+        onCancel={cancelling.request}
+      />
       <MovementCancelDialog
         row={cancelling.pending}
         mode={cancelling.mode}

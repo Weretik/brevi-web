@@ -21,29 +21,21 @@ import type {
   BookingReport,
   BookingUnknown,
   FabricLayer,
-  HardwareIncomplete,
-  HardwareNeed,
-  HardwareNeedOrder,
-  HardwareReport,
   PlanFactItem,
   PlanFactMaterial,
   PlanFactModel,
   PlanFactReport,
   PlanFactSummary,
-  ValuationColor,
-  ValuationFabric,
-  ValuationReport,
-  ValuationShortage,
 } from '@admin/warehouse/model';
 
 const layer = (value: unknown): FabricLayer => oneOf(value, fabricLayers, 'шар');
 const nullableLayer = (value: unknown): FabricLayer | null =>
   value === null || value === undefined ? null : layer(value);
-const nullableDay = (value: unknown, what: string): string | null =>
+export const nullableDay = (value: unknown, what: string): string | null =>
   value === null || value === undefined ? null : day(value, what);
 
 /** The order an item belongs to, as every report row carries it. */
-const orderRef = (row: Record<string, unknown>) => ({
+export const orderRef = (row: Record<string, unknown>) => ({
   orderId: integer(row['orderId'], 'завдання', 1),
   orderNumber: integer(row['orderNumber'], 'номер завдання', 1),
   clientName: text(row['clientName'], 'замовник'),
@@ -173,105 +165,4 @@ export function mapBooking(value: unknown): BookingReport {
 
 // «Вартість складу»
 
-const valuationColor = (value: unknown): ValuationColor => {
-  const row = record(value, 'колір вартості');
-  return {
-    color: text(row['color'], 'колір'),
-    meters: decimal(row['meters'], 'метри'),
-    price: nullableNumber(row['price'], 'ціна'),
-    value: nullableNumber(row['value'], 'вартість'),
-  };
-};
-
-const valuationFabric = (value: unknown): ValuationFabric => {
-  const row = record(value, 'тканина вартості');
-  return {
-    fabricCode: nonEmptyText(row['fabricCode'], 'код тканини'),
-    fabricName: text(row['fabricName'], 'тканина'),
-    price: nullableNumber(row['price'], 'ціна'),
-    priceFabricCode: nullableText(row['priceFabricCode'], 'ціна з пропозиції'),
-    meters: decimal(row['meters'], 'метри'),
-    unpricedMeters: decimal(row['unpricedMeters'], 'без ціни'),
-    value: decimal(row['value'], 'вартість'),
-    colors: list(row['colors'], 'кольори').map(valuationColor),
-  };
-};
-
-const valuationShortage = (value: unknown): ValuationShortage => {
-  const row = record(value, 'нестача');
-  return {
-    fabricCode: nonEmptyText(row['fabricCode'], 'код тканини'),
-    fabricName: text(row['fabricName'], 'тканина'),
-    color: text(row['color'], 'колір'),
-    meters: decimal(row['meters'], 'нестача'),
-    price: nullableNumber(row['price'], 'ціна'),
-    value: nullableNumber(row['value'], 'вартість'),
-  };
-};
-
-export function mapValuation(value: unknown): ValuationReport {
-  const row = record(value, 'вартість складу');
-  return {
-    value: decimal(row['value'], 'вартість'),
-    positiveMeters: decimal(row['positiveMeters'], 'метри'),
-    unpricedPairs: integer(row['unpricedPairs'], 'пар без ціни'),
-    unpricedMeters: decimal(row['unpricedMeters'], 'метрів без ціни'),
-    isPartial: boolean(row['isPartial'], 'часткова'),
-    shortageMeters: decimal(row['shortageMeters'], 'нестача'),
-    shortageValue: decimal(row['shortageValue'], 'вартість нестачі'),
-    fabrics: list(row['fabrics'], 'тканини').map(valuationFabric),
-    shortages: list(row['shortages'], 'нестачі').map(valuationShortage),
-    calculatedAt: dateTime(row['calculatedAt'], 'час розрахунку'),
-    priceSource: text(row['priceSource'], 'джерело цін'),
-  };
-}
-
 // «Фурнітура до замовлення»
-
-const needOrder = (value: unknown): HardwareNeedOrder => {
-  const row = record(value, 'частка замовлення');
-  return {
-    ...orderRef(row),
-    modelName: text(row['modelName'], 'модель'),
-    norm: decimal(row['norm'], 'норма'),
-    products: integer(row['products'], 'виробів'),
-    quantity: decimal(row['quantity'], 'потреба'),
-    dueDate: nullableDay(row['dueDate'], 'термін'),
-  };
-};
-
-const need = (value: unknown): HardwareNeed => {
-  const row = record(value, 'фурнітура');
-  return {
-    code: nonEmptyText(row['code'], 'код'),
-    name: nonEmptyText(row['name'], 'назва'),
-    nameChecked: boolean(row['nameChecked'], 'назва перевірена'),
-    note: nullableText(row['note'], 'примітка'),
-    unit: nonEmptyText(row['unit'], 'одиниця'),
-    quantity: decimal(row['quantity'], 'потреба'),
-    orders: list(row['orders'], 'замовлення').map(needOrder),
-    dueDate: nullableDay(row['dueDate'], 'найближчий термін'),
-  };
-};
-
-const incomplete = (value: unknown): HardwareIncomplete => {
-  const row = record(value, 'неповна потреба');
-  return {
-    ...orderRef(row),
-    modelName: text(row['modelName'], 'модель'),
-    code: nullableText(row['code'], 'код'),
-    name: nullableText(row['name'], 'назва'),
-    reason: nonEmptyText(row['reason'], 'причина'),
-  };
-};
-
-export function mapHardware(value: unknown): HardwareReport {
-  const row = record(value, 'фурнітура до замовлення');
-  return {
-    orders: integer(row['orders'], 'замовлень'),
-    items: integer(row['items'], 'позицій'),
-    needs: list(row['needs'], 'потреба').map(need),
-    incomplete: list(row['incomplete'], 'неповна потреба').map(incomplete),
-    calculatedAt: dateTime(row['calculatedAt'], 'час розрахунку'),
-  };
-}

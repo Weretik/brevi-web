@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { mapBooking, mapHardware, mapPlanFact, mapValuation } from './stock-reports.mapper';
+import { mapBooking, mapPlanFact } from './stock-reports.mapper';
+import { mapHardware, mapValuation } from './stock-valuation.mapper';
 
 const summary = {
   orders: 1,

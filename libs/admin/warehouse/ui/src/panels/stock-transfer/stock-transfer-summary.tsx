@@ -12,7 +12,9 @@ import {
   Typography,
 } from '@mui/material';
 
-import type { StockTransferProblem, StockTransferResult } from '@admin/warehouse/model';
+import { StockTransferProblems } from './stock-transfer-problems';
+
+import type { StockTransferResult } from '@admin/warehouse/model';
 
 const number = (value: number | null | undefined) =>
   value === null || value === undefined ? '—' : value.toLocaleString('uk-UA');
@@ -131,47 +133,8 @@ export function StockTransferSummary({ result }: Props) {
           Попереднє перенесення: {formatKyivTime(result.lastTransferAt)}
         </Typography>
       )}
-      <ProblemTable title="Помилки" label="Помилки вигрузки" problems={result.errors} />
-      <ProblemTable title="Зауваження" label="Зауваження" problems={result.notes} />
-    </Stack>
-  );
-}
-
-function ProblemTable({
-  title,
-  label,
-  problems,
-}: {
-  title: string;
-  label: string;
-  problems: StockTransferProblem[];
-}) {
-  if (problems.length === 0) return null;
-  return (
-    <Stack sx={{ gap: 1 }}>
-      <Typography variant="subtitle2">
-        {title}: {problems.length}
-      </Typography>
-      <TableContainer component={Paper} variant="outlined" sx={{ maxHeight: 360 }}>
-        <Table stickyHeader size="small" aria-label={label}>
-          <TableHead>
-            <TableRow>
-              <TableCell>Таблиця</TableCell>
-              <TableCell>Що</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {problems.map((problem, index) => (
-              <TableRow key={`${problem.table}-${problem.rowId ?? ''}-${index}`}>
-                <TableCell sx={{ fontFamily: 'var(--admin-font-mono)', whiteSpace: 'nowrap' }}>
-                  {problem.table}
-                </TableCell>
-                <TableCell>{problem.message}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <StockTransferProblems title="Помилки" label="Помилки вигрузки" problems={result.errors} />
+      <StockTransferProblems title="Зауваження" label="Зауваження" problems={result.notes} />
     </Stack>
   );
 }

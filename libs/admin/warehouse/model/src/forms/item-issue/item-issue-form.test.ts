@@ -8,10 +8,9 @@ import {
   issueLinePair,
   issueLinePart,
   issueLinePurpose,
-  itemIssueBody,
-  itemIssuePreview,
   validateItemIssue,
 } from './item-issue-form';
+import { itemIssueBody, itemIssuePreview } from './item-issue-preview';
 
 import type { FabricPlanPart, ItemFabric } from '../../entities/issues/item-fabric';
 import type { FabricStockFabric } from '../../entities/stock/fabric-stock';

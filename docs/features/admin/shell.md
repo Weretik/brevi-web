@@ -79,7 +79,7 @@ libs/admin/shared/
 
 - `libs/admin/core/shell/src/**/*.component.test.tsx`
 - `libs/admin/core/auth/src/**/*.test.ts(x)` (session, transport, return path, guard, login page)
-- `libs/admin/shared/api-client/src/interceptors/auth-interceptors.integration.test.ts`
+- `libs/admin/shared/api-client/src/client/api-client.integration.test.ts` (CSRF header, session end on 401)
 - `apps/admin-react/src/app/**/*.test.ts(x)` (router, providers, navigation, theme)
 
 Focused run: `npx nx test admin-core-shell`; `npx nx test admin-core-auth`; `npx nx test admin-react -- src/app`.
