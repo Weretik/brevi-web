@@ -50,6 +50,7 @@
     ]
   },
   "enabledPlugins": {
+    "architecture@weretik-dev": true,
     "dotnet-backend@weretik-dev": false
   }
 }
