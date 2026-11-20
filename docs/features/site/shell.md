@@ -11,7 +11,7 @@ Every page under `/uk` and `/ru` is rendered inside `SiteShell`: a skip link, th
 
 Company facts come as a prop from the layout, which reads «Контакти та компанія» with `loadSiteCompany` ([SEO settings](seo-settings.md)); `COMPANY` is the fallback and always gives the name and the logo. The catalog sections come as a prop from the layout, which reads the [catalog](catalog.md) tree on the server; every entry opens its category page, and with an empty catalog only «Весь каталог» remains. There is no search field until the catalog page exists.
 
-`/` redirects to `/uk`. Unknown paths under a locale get a 404 inside the frame; paths without a locale get a bare two-language 404. Indexing is off unless `SITE_ENV=production` and `SITE_INDEXING=true`.
+`/` redirects to `/uk`. Unknown paths under a locale get a 404 inside the frame; paths without a locale get a bare Ukrainian 404. Indexing is off unless `SITE_ENV=production` and `SITE_INDEXING=true`.
 
 ## Structure diagram
 

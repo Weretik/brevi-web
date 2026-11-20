@@ -35,6 +35,25 @@ describe('siteApiGet', () => {
   });
 });
 
+describe('siteApiGet retries', () => {
+  it('repeats a brief API failure before it reports unavailable', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(json(503))
+      .mockResolvedValueOnce(json(200, { items: [] }));
+
+    const result = await siteApiGet(
+      '/api/public/catalog/categories',
+      {},
+      fetchMock,
+      'https://api.example.com',
+    );
+
+    expect(result).toEqual({ kind: 'ok', data: { items: [] } });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+});
+
 describe('siteApiPostForm', () => {
   it('posts the form to the public address and reads the answer', async () => {
     const fetchMock = vi.fn().mockResolvedValue(json(200, { id: 5 }));
