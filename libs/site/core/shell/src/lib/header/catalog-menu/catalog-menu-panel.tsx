@@ -10,7 +10,10 @@ import type { ShellDictionary } from '../../i18n/shell-dictionary';
 import type { CatalogSection } from '@site/catalog/model';
 import type { Locale } from '@site/core/i18n';
 
-/** Right pane of the catalog menu: the subsections of every section (only the active one shown) and the links under them. */
+/**
+ * Right pane of the catalog menu: the subsections of every section (only the active one shown). Only an empty
+ * catalog gets «Весь каталог» here, so the menu is never a dead end.
+ */
 export function CatalogMenuPanel({
   locale,
   dictionary,
@@ -26,7 +29,6 @@ export function CatalogMenuPanel({
   panelId: string;
   onNavigate: () => void;
 }) {
-  const catalogHref = localizedPath(locale, SHELL_PATHS.catalog);
   const categoryHref = (slug: string) => localizedPath(locale, catalogCategoryPath(slug));
   return (
     <div className="p-7">
@@ -65,22 +67,15 @@ export function CatalogMenuPanel({
           </ul>
         </div>
       ))}
-      <div className="mt-6 flex flex-wrap items-center gap-2.5 border-t border-dashed border-brand-soft pt-4 text-sm font-semibold">
+      {sections.length === 0 ? (
         <Link
-          href={catalogHref}
+          href={localizedPath(locale, SHELL_PATHS.catalog)}
           onClick={onNavigate}
-          className="rounded-full border border-border-strong px-3.5 py-2 hover:border-foreground"
+          className="font-bold text-brand-text hover:underline"
         >
-          {dictionary.allCatalog}
+          {dictionary.allCatalog} <span aria-hidden>→</span>
         </Link>
-        <Link
-          href={localizedPath(locale, SHELL_PATHS.deliveryAndPayment)}
-          onClick={onNavigate}
-          className="rounded-full border border-border-strong px-3.5 py-2 hover:border-foreground"
-        >
-          {dictionary.links.deliveryAndPayment}
-        </Link>
-      </div>
+      ) : null}
     </div>
   );
 }

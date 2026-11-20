@@ -1,6 +1,7 @@
 import { SITE_PATHS, localizedPath } from '@site/core/i18n';
 import { JsonLd, buildBreadcrumbJsonLd } from '@site/core/seo';
 import {
+  DeliveryAcrossUkraine,
   DeliveryContact,
   DeliveryOptions,
   DeliveryPayment,
@@ -13,7 +14,7 @@ import type { Locale } from '@site/core/i18n';
 
 /**
  * «Доставка та оплата» page in the order of the live `brevi.com.ua` page: delivery, payment with the bank
- * details, and whom to call. The text is in the delivery dictionary, the facts come from «Контакти та компанія».
+ * details, the map «Працюємо по всій Україні», and whom to call. The text is in the delivery dictionary, the facts come from «Контакти та компанія».
  */
 export async function DeliveryPage({ locale }: { locale: Locale }) {
   const company = await loadSiteCompany();
@@ -48,6 +49,8 @@ export async function DeliveryPage({ locale }: { locale: Locale }) {
       >
         <DeliveryPayment company={company} locale={locale} dictionary={dictionary.payment} />
       </PageSection>
+
+      <DeliveryAcrossUkraine id="across-ukraine" index="04" dictionary={dictionary.acrossUkraine} />
 
       <DeliveryContact
         company={company}

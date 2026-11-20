@@ -1,8 +1,6 @@
-import { localizedPath } from '@site/core/i18n';
+import { requestHref } from '@site/core/i18n';
 import { Button } from '@site/shared/ui';
 import Link from 'next/link';
-
-import { SHELL_PATHS } from '../navigation/site-navigation';
 
 import type { ShellDictionary } from '../i18n/shell-dictionary';
 import type { Company } from '@site/core/config';
@@ -37,7 +35,7 @@ export function FooterCallBand({
             size="lg"
             className="border-primary-foreground/40 bg-transparent text-primary-foreground hover:bg-primary-foreground/10"
           >
-            <Link href={localizedPath(locale, SHELL_PATHS.request)} rel="nofollow">
+            <Link href={requestHref(locale)} rel="nofollow">
               {dictionary.requestLong}
             </Link>
           </Button>

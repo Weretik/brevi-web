@@ -1,10 +1,12 @@
 import { COMPANY } from '@site/core/config';
+import { withRequestProduct } from '@site/core/i18n';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 
 import { CatalogCategoryTabs } from './category/catalog-category-tabs';
 import { CatalogSectionGroups } from './category/catalog-section-groups';
 import { formatCount, formatModelCount, getCatalogDictionary } from './i18n/catalog-dictionary';
 import { CatalogListing } from './listing/grid/catalog-listing';
+import { CatalogProductCarousel } from './listing/grid/catalog-product-carousel';
 import { CatalogProductGrid } from './listing/grid/catalog-product-grid';
 import { CatalogProductBuy } from './product/catalog-product-buy';
 import { CatalogProductGallery } from './product/catalog-product-gallery';
@@ -321,9 +323,14 @@ describe('catalog blocks', () => {
     // Own sewing is marked; protective equipment is not.
     expect(screen.getAllByText('Власне пошиття')).toHaveLength(2);
     expect(screen.queryByRole('link', { name: 'Дізнатися ціну: Костюм ВЕРДЕ' })).toBeNull();
+    // A priced product is bought through the request window, which opens with its name.
+    const buy = screen.getByRole('link', { name: 'Купити: Костюм ВЕРДЕ' });
+    expect(buy.getAttribute('href')).toBe(withRequestProduct('/uk/request', 'Костюм ВЕРДЕ'));
+    expect(buy.getAttribute('rel')).toBe('nofollow');
+    expect(screen.queryByRole('link', { name: 'Купити: Модель без фото' })).toBeNull();
     // A product without a price asks to learn it from a manager.
     const link = screen.getByRole('link', { name: 'Дізнатися ціну: Модель без фото' });
-    expect(link.getAttribute('href')).toBe('/uk/request');
+    expect(link.getAttribute('href')).toBe(withRequestProduct('/uk/request', 'Модель без фото'));
     expect(link.getAttribute('rel')).toBe('nofollow');
     expect(screen.getByRole('link', { name: 'Костюм ВЕРДЕ' }).getAttribute('href')).toBe(
       '/uk/product/kostyum-verde',
@@ -383,9 +390,7 @@ describe('catalog blocks', () => {
       prices.getByRole('row', { name: 'від 40 шт 1\u00a0250,5 Економія 250 грн/шт' }),
     ).toBeTruthy();
     expect(screen.getByText('бавовна 35 %, 210 г/м²')).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Залишити заявку' }).getAttribute('href')).toBe(
-      '/uk/request',
-    );
+    expect(screen.getByRole('link', { name: 'Купити' }).getAttribute('href')).toBe('/uk/request');
     expect(screen.getByRole('link', { name: '050 469 86 75' }).getAttribute('href')).toBe(
       'tel:+380504698675',
     );
@@ -442,5 +447,36 @@ describe('catalog blocks', () => {
     expect(screen.getByText('Бавовна').tagName).toBe('STRONG');
     expect(screen.getByText('вологу').tagName).toBe('EM');
     expect(screen.queryByText(/\*/)).toBeNull();
+  });
+
+  it('scrolls a row of product cards with the arrows and keeps every card in the HTML', () => {
+    const items = ['a', 'b', 'c', 'd', 'e'].map((slug) => ({
+      product: {
+        slug,
+        type: 'Sewing' as const,
+        code: null,
+        name: `Модель ${slug}`,
+        image: `https://media.example/${slug}.webp`,
+        priceFrom: 1000,
+        fabrics: [],
+      },
+      href: `/uk/product/${slug}`,
+    }));
+    render(
+      <CatalogProductCarousel
+        items={items}
+        dictionary={dictionary.products}
+        requestHref="/uk/request"
+        labels={dictionary.carousel}
+      />,
+    );
+
+    expect(screen.getAllByRole('link', { name: /^Купити: / })).toHaveLength(5);
+    const list = screen.getAllByRole('list')[0];
+    const scrollBy = vi.fn();
+    Object.assign(list, { scrollBy });
+    fireEvent.click(screen.getByRole('button', { name: 'Наступні моделі' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Попередні моделі' }));
+    expect(scrollBy).toHaveBeenCalledTimes(2);
   });
 });

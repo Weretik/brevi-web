@@ -35,7 +35,7 @@ describe('WorksPage', () => {
     expect(screen.getByRole('link', { name: 'Главная' }).getAttribute('href')).toBe('/ru');
     expect(
       screen.getByRole('link', { name: 'Обсудить пошив спецодежды' }).getAttribute('href'),
-    ).toBe('/ru#zayavka');
+    ).toBe('/ru/request');
     expect(screen.getByRole('link', { name: /О производстве/ }).getAttribute('href')).toBe(
       '/ru/about-company',
     );

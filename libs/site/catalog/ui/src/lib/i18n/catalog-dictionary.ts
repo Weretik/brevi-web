@@ -23,6 +23,8 @@ const uk = {
     label: 'Моделі',
     title: 'Моделі розділу',
     askPrice: 'Дізнатися ціну',
+    /** Opens the request window with the product; the site takes no online orders. */
+    buy: 'Купити',
     priceFrom: 'від',
     noPhoto: 'Фото готується',
     empty: 'Моделі цього розділу скоро з’являться. Зателефонуйте, і менеджер підкаже наявність.',
@@ -33,6 +35,7 @@ const uk = {
     fabric: 'Тканина',
     fabrics: { one: 'тканина', few: 'тканини', many: 'тканин' } as Plural,
   },
+  carousel: { previous: 'Попередні моделі', next: 'Наступні моделі' },
   listing: {
     all: 'Усі',
     tabs: 'Підрозділи',
@@ -85,7 +88,7 @@ const uk = {
     photo: 'Фото',
     priceNote: 'Ціну під вашу кількість порахує менеджер. Залиште номер, і ми передзвонимо.',
     askPrice: 'Дізнатися ціну',
-    request: 'Залишити заявку',
+    request: 'Купити',
     fabric: 'Тканина',
     prices: 'Ціна за одиницю, грн',
     tiers: { retail: '1–9 шт', wholesale: '10–39 шт', largeWholesale: 'від 40 шт' },
@@ -100,7 +103,7 @@ const uk = {
     specs: { title: 'Характеристики', summary: 'Коротко про модель' },
     related: { label: 'Схожі моделі', title: 'Інші моделі розділу', all: 'Усі моделі розділу' },
     nav: { label: 'Розділи сторінки', sizes: 'Таблиця розмірів' },
-    priceBar: { label: 'Ціна моделі', request: 'Заявка' },
+    priceBar: { label: 'Ціна моделі', request: 'Купити' },
   },
   order: {
     label: 'Замовлення',
@@ -130,6 +133,7 @@ const ru: CatalogDictionary = {
     label: 'Модели',
     title: 'Модели раздела',
     askPrice: 'Узнать цену',
+    buy: 'Купить',
     priceFrom: 'от',
     noPhoto: 'Фото готовится',
     empty: 'Модели этого раздела скоро появятся. Позвоните, и менеджер подскажет наличие.',
@@ -140,6 +144,7 @@ const ru: CatalogDictionary = {
     fabric: 'Ткань',
     fabrics: { one: 'ткань', few: 'ткани', many: 'тканей' },
   },
+  carousel: { previous: 'Предыдущие модели', next: 'Следующие модели' },
   listing: {
     all: 'Все',
     tabs: 'Подразделы',
@@ -193,7 +198,7 @@ const ru: CatalogDictionary = {
     photo: 'Фото',
     priceNote: 'Цену под ваше количество посчитает менеджер. Оставьте номер, и мы перезвоним.',
     askPrice: 'Узнать цену',
-    request: 'Оставить заявку',
+    request: 'Купить',
     fabric: 'Ткань',
     prices: 'Цена за единицу, грн',
     tiers: { retail: '1–9 шт', wholesale: '10–39 шт', largeWholesale: 'от 40 шт' },
@@ -213,7 +218,7 @@ const ru: CatalogDictionary = {
     specs: { title: 'Характеристики', summary: 'Коротко о модели' },
     related: { label: 'Похожие модели', title: 'Другие модели раздела', all: 'Все модели раздела' },
     nav: { label: 'Разделы страницы', sizes: 'Таблица размеров' },
-    priceBar: { label: 'Цена модели', request: 'Заявка' },
+    priceBar: { label: 'Цена модели', request: 'Купить' },
   },
   order: {
     label: 'Заказ',

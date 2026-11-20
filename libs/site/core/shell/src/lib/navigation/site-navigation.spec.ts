@@ -13,7 +13,7 @@ describe('site navigation', () => {
     expect(MAIN_NAV_LINKS.map((link) => links[link.key])).toEqual([
       'Пошиття з логотипом',
       'Ціни для опту',
-      'Галузі',
+      'Доставка та оплата',
       'Про виробництво',
       'Наші роботи',
       'Контакти',

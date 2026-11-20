@@ -32,4 +32,12 @@ describe('RequestPage', () => {
       screen.getByRole('link', { name: 'пользовательским соглашением' }).getAttribute('href'),
     ).toBe('/ru/agreement');
   });
+
+  it('fills the form with the product of a «Купити» link', async () => {
+    render(await RequestPage({ locale: 'uk', product: 'Жилет сигнальний' }));
+
+    expect((document.getElementById('request-workwear') as HTMLInputElement).value).toBe(
+      'Жилет сигнальний',
+    );
+  });
 });

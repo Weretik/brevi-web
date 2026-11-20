@@ -12,11 +12,11 @@ export const SHELL_PATHS = SITE_PATHS satisfies Record<NavLinkKey | 'request', s
 const links = (...keys: NavLinkKey[]): readonly NavLink[] =>
   keys.map((key) => ({ key, path: SHELL_PATHS[key] }));
 
-/** Header menu after the «Каталог» button. */
+/** Header menu after the «Каталог» button; «Галузі» is reached from the footer. */
 export const MAIN_NAV_LINKS = links(
   'logoPrinting',
   'wholesale',
-  'industries',
+  'deliveryAndPayment',
   'production',
   'ourWork',
   'contacts',

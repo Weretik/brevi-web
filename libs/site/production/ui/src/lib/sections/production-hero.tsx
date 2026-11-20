@@ -32,7 +32,7 @@ export function ProductionHero({
             </p>
           ))}
           <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
-            <Link href={discussHref} className={buttonVariants({ size: 'lg' })}>
+            <Link href={discussHref} rel="nofollow" className={buttonVariants({ size: 'lg' })}>
               {dictionary.discuss}
             </Link>
             <Link href={worksHref} className="font-bold text-brand-text hover:underline">

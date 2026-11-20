@@ -30,6 +30,12 @@ const CATALOG_SECTIONS: CatalogSection[] = [
   },
 ];
 
+/** «Каталог» of the menu row of wide screens; the phone header has its own, which opens a sheet. */
+const catalogToggle = () =>
+  within(screen.getByRole('banner'))
+    .getAllByRole('button', { name: 'Каталог' })
+    .find((button) => !button.hasAttribute('aria-haspopup')) as HTMLElement;
+
 describe('SiteShell', () => {
   it('frames the page with the header menu, phones, and footer contacts', () => {
     render(
@@ -44,11 +50,9 @@ describe('SiteShell', () => {
     expect(within(header).getByRole('link', { name: 'Цены для опта' }).getAttribute('href')).toBe(
       '/ru/order-in-bulk',
     );
-    expect(
-      within(header)
-        .getByRole('link', { name: /050 469 86 75/ })
-        .getAttribute('href'),
-    ).toBe('tel:+380504698675');
+    for (const link of within(header).getAllByRole('link', { name: /050 469 86 75/ })) {
+      expect(link.getAttribute('href')).toBe('tel:+380504698675');
+    }
     for (const link of within(footer).getAllByRole('link', { name: '050 469 86 75' })) {
       expect(link.getAttribute('href')).toBe('tel:+380504698675');
     }
@@ -112,7 +116,7 @@ describe('SiteShell', () => {
       </SiteShell>,
     );
 
-    const toggle = within(screen.getByRole('banner')).getByRole('button', { name: 'Каталог' });
+    const toggle = catalogToggle();
     const panel = document.getElementById(toggle.getAttribute('aria-controls') ?? '');
     expect(panel?.hidden).toBe(true);
     expect(panel?.querySelectorAll('a[href^="/uk/catalog/"]').length).toBe(5);
@@ -137,6 +141,10 @@ describe('SiteShell', () => {
         .getAttribute('href'),
     ).toBe('/uk/logo-printing');
 
+    // The owner asked for no extra buttons under the sections.
+    expect(within(menu).queryByRole('link', { name: /Весь каталог/ })).toBeNull();
+    expect(within(menu).queryByRole('link', { name: 'Доставка та оплата' })).toBeNull();
+
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(toggle.getAttribute('aria-expanded')).toBe('false');
   });
@@ -148,11 +156,13 @@ describe('SiteShell', () => {
       </SiteShell>,
     );
 
-    fireEvent.click(within(screen.getByRole('banner')).getByRole('button', { name: 'Каталог' }));
+    fireEvent.click(catalogToggle());
     const menu = screen.getByRole('region', { name: 'Розділи каталогу' });
-    expect(within(menu).getByRole('link', { name: 'Весь каталог' }).getAttribute('href')).toBe(
-      '/uk/catalog',
-    );
+    expect(
+      within(menu)
+        .getByRole('link', { name: /Весь каталог/ })
+        .getAttribute('href'),
+    ).toBe('/uk/catalog');
     expect(
       within(screen.getByRole('contentinfo'))
         .getByRole('link', { name: 'Весь каталог' })
@@ -167,12 +177,14 @@ describe('SiteShell', () => {
       </SiteShell>,
     );
     const header = screen.getByRole('banner');
-    expect(within(header).getAllByRole('link', { name: /050 469 86 75/ })).toHaveLength(1);
-    expect(within(header).getByText('Від 5 одиниць · Працюємо з ПДВ')).toBeTruthy();
+    // One phone in the contacts row of wide screens, one in the phone header.
+    expect(within(header).getAllByRole('link', { name: /050 469 86 75/ })).toHaveLength(2);
+    expect(within(header).queryByText(/Від 5 одиниць/)).toBeNull();
+    expect(within(header).getByText('власне виробництво, Полтава')).toBeTruthy();
 
     Object.defineProperty(window, 'scrollY', { value: 400, configurable: true });
     fireEvent.scroll(window);
-    expect(within(header).getAllByRole('link', { name: /050 469 86 75/ })).toHaveLength(2);
+    expect(within(header).getAllByRole('link', { name: /050 469 86 75/ })).toHaveLength(3);
     Object.defineProperty(window, 'scrollY', { value: 0, configurable: true });
   });
 
@@ -185,33 +197,31 @@ describe('SiteShell', () => {
     const header = screen.getByRole('banner');
     expect(within(header).queryByRole('search')).toBeNull();
 
-    // One button in the phone header, one in the menu row of wider screens.
+    // Phones search inside «Меню»; the header button is for wide screens.
     const buttons = within(header).getAllByRole('button', { name: 'Пошук' });
-    expect(buttons).toHaveLength(2);
-    fireEvent.click(buttons[1]);
+    expect(buttons).toHaveLength(1);
+    fireEvent.click(buttons[0]);
     const form = within(header).getByRole('search', { name: 'Пошук по каталогу' });
     expect(form.getAttribute('action')).toBe('/uk/search');
     expect(within(form).getByRole('combobox')).toBeTruthy();
   });
 
-  it('gives phones a bottom bar with the catalog, the request, the call, and the menu', () => {
+  it('gives phones a header with the phone, «Каталог» and «Меню», and no bottom bar', () => {
     render(
       <SiteShell company={COMPANY} locale="uk" catalogSections={CATALOG_SECTIONS}>
         content
       </SiteShell>,
     );
 
-    const bar = screen.getByRole('navigation', { name: 'Швидкі дії' });
-    expect(within(bar).getByRole('link', { name: 'Заявка' }).getAttribute('href')).toBe(
-      '/uk/request',
-    );
-    expect(
-      within(bar)
-        .getByRole('link', { name: /050 469 86 75/ })
-        .getAttribute('href'),
-    ).toBe('tel:+380504698675');
+    const header = screen.getByRole('banner');
+    expect(screen.queryByRole('navigation', { name: 'Швидкі дії' })).toBeNull();
+    const call = within(header).getAllByRole('link', { name: /050 469 86 75/ })[1];
+    expect(call.getAttribute('href')).toBe('tel:+380504698675');
 
-    fireEvent.click(within(bar).getByRole('button', { name: 'Каталог' }));
+    const catalogSheet = within(header)
+      .getAllByRole('button', { name: 'Каталог' })
+      .find((button) => button.hasAttribute('aria-haspopup')) as HTMLElement;
+    fireEvent.click(catalogSheet);
     const catalog = screen.getByRole('dialog');
     expect(within(catalog).getByText('Захист рук')).toBeTruthy();
     expect(within(catalog).getAllByRole('link', { name: 'Усі товари розділу' }).length).toBe(
@@ -219,11 +229,17 @@ describe('SiteShell', () => {
     );
     fireEvent.click(within(catalog).getByRole('button', { name: 'Закрити меню' }));
 
-    fireEvent.click(screen.getByRole('button', { name: 'Відкрити меню' }));
+    fireEvent.click(within(header).getByRole('button', { name: 'Меню' }));
     const menu = screen.getByRole('dialog');
     expect(
       within(menu).getByRole('link', { name: 'Пошиття з логотипом' }).getAttribute('href'),
     ).toBe('/uk/logo-printing');
+    // Search, the request and the language are inside «Меню» on phones.
+    expect(within(menu).getByRole('search', { name: 'Пошук по каталогу' })).toBeTruthy();
+    const request = within(menu).getByRole('link', { name: 'Залишити заявку' });
+    expect(request.getAttribute('href')).toBe('/uk/request');
+    expect(request.getAttribute('rel')).toBe('nofollow');
+    expect(within(menu).getByRole('navigation', { name: 'Мова сайту' })).toBeTruthy();
     expect(within(menu).getByText(/Працюємо з ПДВ/)).toBeTruthy();
   });
 
@@ -234,7 +250,7 @@ describe('SiteShell', () => {
       </SiteShell>,
     );
 
-    // The toggle is in the contacts row on phones and in the menu row on wide screens.
+    // The toggle is in the menu row on wide screens and inside «Меню» on phones.
     const [languages] = screen.getAllByRole('navigation', { name: 'Язык сайта' });
     const ua = within(languages).getByRole('link', { name: 'UA' });
     expect(ua.getAttribute('href')).toBe('/uk/contacts');

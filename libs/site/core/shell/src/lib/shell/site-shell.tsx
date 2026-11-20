@@ -1,7 +1,6 @@
 import { SiteFooter } from '../footer/site-footer';
 import { SiteHeader } from '../header/bar/site-header';
 import { getShellDictionary } from '../i18n/shell-dictionary';
-import { MobileBar } from '../mobile/mobile-bar';
 
 import type { CatalogSection } from '@site/catalog/model';
 import type { Company } from '@site/core/config';
@@ -9,8 +8,8 @@ import type { Locale } from '@site/core/i18n';
 import type { ReactNode } from 'react';
 
 /**
- * Page frame for every localized route: skip link, two-row header, main content, footer, and the bottom bar
- * on phones. The catalog sections come from the layout, which reads them on the server.
+ * Page frame for every localized route: skip link, header (two rows on wide screens, one on phones), main
+ * content, and footer. The catalog sections come from the layout, which reads them on the server.
  */
 export function SiteShell({
   company,
@@ -44,12 +43,6 @@ export function SiteShell({
         {children}
       </main>
       <SiteFooter
-        company={company}
-        locale={locale}
-        dictionary={dictionary}
-        catalogSections={catalogSections}
-      />
-      <MobileBar
         company={company}
         locale={locale}
         dictionary={dictionary}

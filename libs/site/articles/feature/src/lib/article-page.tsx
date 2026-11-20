@@ -1,7 +1,7 @@
 import { formatArticleDate } from '@site/articles/model';
 import { buildArticleJsonLd } from '@site/articles/seo';
 import { ArticleBody, ArticleCards, ArticlesOrder, getArticlesDictionary } from '@site/articles/ui';
-import { SITE_PATHS, localizedPath } from '@site/core/i18n';
+import { SITE_PATHS, localizedPath, requestHref } from '@site/core/i18n';
 import { JsonLd, buildBreadcrumbJsonLd } from '@site/core/seo';
 import { Breadcrumbs, PageSection, StitchLabel } from '@site/shared/ui';
 
@@ -9,9 +9,6 @@ import { articleHref, toArticleSeoInput } from './article-links';
 
 import type { Article, ArticleCard } from '@site/articles/model';
 import type { Locale } from '@site/core/i18n';
-
-/** Anchor of the home contacts block; «Обговорити пошиття» leads there until the request page exists. */
-const REQUEST_ANCHOR = '#zayavka';
 
 /**
  * One article from the Admin: breadcrumbs, date, `h1`, the text, the call to order, and other articles.
@@ -64,7 +61,7 @@ export function ArticlePage({
       <ArticlesOrder
         id="article-order"
         dictionary={dictionary.article.order}
-        discussHref={`${localizedPath(locale)}${REQUEST_ANCHOR}`}
+        discussHref={requestHref(locale)}
         productionHref={localizedPath(locale, SITE_PATHS.production)}
       />
 

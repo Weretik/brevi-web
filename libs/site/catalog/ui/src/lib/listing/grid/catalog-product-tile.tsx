@@ -1,4 +1,5 @@
-import { cn } from '@site/shared/ui';
+import { withRequestProduct } from '@site/core/i18n';
+import { buttonVariants, cn } from '@site/shared/ui';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -10,8 +11,9 @@ import type { CatalogProductCard } from '@site/catalog/model';
 /**
  * One product of a listing: the photo on white, «Власне пошиття» on own sewing, the name, the model number,
  * the fabrics («3 тканини», or the name of the only one), and «від 1 480 грн/шт» with the order size that
- * price is for. The whole card opens the product page (the name is the link). A product without a price
- * links «Дізнатися ціну» to the request page. It has no state, so both the server grid and the client
+ * price is for, then «Купити». The whole card opens the product page (the name is the link); «Купити» and,
+ * for a product without a price, «Дізнатися ціну» open the request window with the product's name. The site
+ * takes no online orders. It has no state, so both the server grid and the client
  * listing render it.
  */
 export function CatalogProductTile({
@@ -21,6 +23,7 @@ export function CatalogProductTile({
   requestHref,
   eager = false,
   hidden = false,
+  className,
 }: {
   product: CatalogProductCard;
   /** Localized address of the product page. */
@@ -31,11 +34,18 @@ export function CatalogProductTile({
   eager?: boolean;
   /** Kept in the page for search engines but not shown, for example after «Показати ще». */
   hidden?: boolean;
+  /** Width of the card where the row sets it, for example in a carousel. */
+  className?: string;
 }) {
+  const productRequestHref = withRequestProduct(requestHref, product.name);
+
   return (
     <li
       hidden={hidden}
-      className="relative flex flex-col overflow-hidden rounded-xl border border-border bg-background hover:border-border-strong"
+      className={cn(
+        'relative flex flex-col overflow-hidden rounded-xl border border-border bg-background hover:border-border-strong',
+        className,
+      )}
     >
       <div className="relative flex aspect-[4/5] items-center justify-center bg-white">
         {product.image ? (
@@ -83,7 +93,7 @@ export function CatalogProductTile({
         ) : null}
         {product.priceFrom === null ? (
           <Link
-            href={requestHref}
+            href={productRequestHref}
             rel="nofollow"
             aria-label={`${dictionary.askPrice}: ${product.name}`}
             className="relative z-10 mt-auto inline-flex min-h-11 items-center text-sm font-bold text-brand-text hover:underline"
@@ -91,7 +101,7 @@ export function CatalogProductTile({
             {dictionary.askPrice} <span aria-hidden>&nbsp;→</span>
           </Link>
         ) : (
-          <p className={cn('mt-auto grid pt-2 text-sm text-muted-foreground')}>
+          <div className="mt-auto grid pt-2 text-sm text-muted-foreground">
             <span className="flex flex-wrap items-baseline gap-x-1.5">
               {dictionary.priceFrom}
               <span className="text-lg font-extrabold text-foreground">
@@ -100,7 +110,18 @@ export function CatalogProductTile({
               {dictionary.perPiece}
             </span>
             <span className="text-xs">{dictionary.tierNote}</span>
-          </p>
+            <Link
+              href={productRequestHref}
+              rel="nofollow"
+              aria-label={`${dictionary.buy}: ${product.name}`}
+              className={cn(
+                buttonVariants({ variant: 'brand' }),
+                'relative z-10 mt-3 h-10 w-full text-sm',
+              )}
+            >
+              {dictionary.buy}
+            </Link>
+          </div>
         )}
       </div>
     </li>

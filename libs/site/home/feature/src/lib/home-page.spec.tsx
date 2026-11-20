@@ -1,9 +1,11 @@
+import { getCatalogDictionary } from '@site/catalog/ui';
+import { getDeliveryDictionary } from '@site/delivery/ui';
 import { getHomeDictionary } from '@site/home/ui';
 import { render, screen } from '@testing-library/react';
 
 import { HomePage } from './home-page';
 
-import type { CatalogSection } from '@site/catalog/model';
+import type { CatalogProductCard, CatalogSection } from '@site/catalog/model';
 import type { SitePageText } from '@site/settings/data-access';
 
 const page = vi.hoisted(() => ({ saved: undefined as SitePageText | undefined }));
@@ -33,6 +35,22 @@ const CATALOG_SECTIONS: CatalogSection[] = [
   },
 ];
 
+const NAMES: Record<string, string> = {
+  'kostyum-verde': 'Костюм ВЕРДЕ',
+  'kurtka-lito': 'Куртка ЛІТО',
+  'zhylet-signal': 'Жилет СИГНАЛ',
+};
+
+const FEATURED: CatalogProductCard[] = Object.keys(NAMES).map((slug) => ({
+  slug,
+  type: 'Sewing',
+  code: null,
+  name: NAMES[slug],
+  image: `https://media.example/${slug}.webp`,
+  priceFrom: 1250,
+  fabrics: [],
+}));
+
 const readJsonLd = (container: HTMLElement): Record<string, unknown>[] =>
   [...container.querySelectorAll('script[type="application/ld+json"]')].flatMap((script) =>
     JSON.parse(script.textContent ?? '[]'),
@@ -41,26 +59,26 @@ const readJsonLd = (container: HTMLElement): Record<string, unknown>[] =>
 describe('HomePage', () => {
   it('renders one h1 and the blocks in the mockup order', async () => {
     const dictionary = getHomeDictionary('uk');
-    render(await HomePage({ locale: 'uk', catalogSections: CATALOG_SECTIONS }));
+    render(await HomePage({ locale: 'uk', catalogSections: CATALOG_SECTIONS, featured: FEATURED }));
 
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     const headings = screen.getAllByRole('heading', { level: 2 }).map((node) => node.textContent);
     expect(headings).toEqual([
       dictionary.catalog.title,
+      dictionary.popular.title,
       dictionary.logo.title,
       dictionary.process.title,
       dictionary.production.title,
       dictionary.industries.title,
+      getDeliveryDictionary('uk').acrossUkraine.title,
       dictionary.contacts.title,
       dictionary.seo.title,
       dictionary.seo.faqTitle,
     ]);
   });
 
-  it('links to the localized pages and scrolls the request action to the contacts block', async () => {
-    const { container } = render(
-      await HomePage({ locale: 'ru', catalogSections: CATALOG_SECTIONS }),
-    );
+  it('links to the localized pages and opens the request window from the first screen', async () => {
+    render(await HomePage({ locale: 'ru', catalogSections: CATALOG_SECTIONS, featured: [] }));
 
     expect(screen.getByRole('link', { name: /Весь каталог/ }).getAttribute('href')).toBe(
       '/ru/catalog',
@@ -68,18 +86,41 @@ describe('HomePage', () => {
     expect(screen.getByRole('link', { name: /О производстве/ }).getAttribute('href')).toBe(
       '/ru/about-company',
     );
-    expect(screen.getByRole('link', { name: /Все отрасли/ }).getAttribute('href')).toBe(
-      '/ru/industries',
-    );
+    // Industries are plain text on the home page: no links to the industries page.
+    expect(screen.queryByRole('link', { name: /Все отрасли/ })).toBeNull();
+    expect(screen.queryByRole('link', { name: /Сельское хозяйство/ })).toBeNull();
+    expect(screen.getByText('Сельское хозяйство')).toBeTruthy();
     const request = screen.getByRole('link', { name: 'Оставить заявку' });
-    expect(request.getAttribute('href')).toBe('#zayavka');
-    expect(container.querySelector('#zayavka')).toBeTruthy();
+    expect(request.getAttribute('href')).toBe('/ru/request');
+    expect(request.getAttribute('rel')).toBe('nofollow');
+    expect(
+      screen.getByRole('link', { name: /Условия доставки и оплаты/ }).getAttribute('href'),
+    ).toBe('/ru/delivery-and-payment');
+  });
+
+  it('shows the popular models with «Купити», and leaves the block out without them', async () => {
+    const { unmount } = render(
+      await HomePage({ locale: 'uk', catalogSections: CATALOG_SECTIONS, featured: FEATURED }),
+    );
+
+    const popular = screen.getByRole('region', { name: getHomeDictionary('uk').popular.title });
+    expect(popular.querySelectorAll('li')).toHaveLength(3);
+    expect(
+      screen.getByRole('button', { name: getCatalogDictionary('uk').carousel.next }),
+    ).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Купити: Костюм ВЕРДЕ' })).toBeTruthy();
+    unmount();
+
+    render(await HomePage({ locale: 'uk', catalogSections: CATALOG_SECTIONS, featured: [] }));
+    expect(
+      screen.queryByRole('region', { name: getHomeDictionary('uk').popular.title }),
+    ).toBeNull();
   });
 
   it('describes the site, the business, and the visible FAQ in JSON-LD', async () => {
     const dictionary = getHomeDictionary('uk');
     const { container } = render(
-      await HomePage({ locale: 'uk', catalogSections: CATALOG_SECTIONS }),
+      await HomePage({ locale: 'uk', catalogSections: CATALOG_SECTIONS, featured: [] }),
     );
     const data = readJsonLd(container);
 
@@ -100,7 +141,7 @@ describe('HomePage', () => {
     };
     const dictionary = getHomeDictionary('uk');
     const { container } = render(
-      await HomePage({ locale: 'uk', catalogSections: CATALOG_SECTIONS }),
+      await HomePage({ locale: 'uk', catalogSections: CATALOG_SECTIONS, featured: [] }),
     );
 
     expect(screen.getByText('оптом').tagName).toBe('STRONG');

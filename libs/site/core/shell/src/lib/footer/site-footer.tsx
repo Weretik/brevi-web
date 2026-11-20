@@ -62,7 +62,7 @@ export function SiteFooter({
   ];
 
   return (
-    <footer className="mt-16 bg-primary text-[0.9375rem] text-primary-foreground/75 max-lg:pb-17">
+    <footer className="mt-16 bg-primary text-[0.9375rem] text-primary-foreground/75">
       <FooterCallBand phone={phone} locale={locale} dictionary={dictionary} />
 
       <div className="mx-auto grid max-w-[77.5rem] gap-x-9 gap-y-10 px-4 py-11 sm:grid-cols-2 sm:px-6 lg:grid-cols-[1.3fr_1fr_1fr_1fr_1.2fr]">

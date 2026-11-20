@@ -2,6 +2,7 @@ export { Button, buttonVariants } from './lib/primitives/button';
 export type { ButtonProps } from './lib/primitives/button';
 export { Breadcrumbs } from './lib/layout/breadcrumbs';
 export type { BreadcrumbItem } from './lib/layout/breadcrumbs';
+export { Dialog, DialogContent, DialogDescription, DialogTitle } from './lib/primitives/dialog';
 export { cn } from './lib/primitives/cn';
 export { FaqList } from './lib/layout/faq-list';
 export type { FaqListItem } from './lib/layout/faq-list';

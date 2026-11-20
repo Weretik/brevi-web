@@ -38,6 +38,7 @@ export type {
   CatalogPriceBand,
   CatalogSort,
 } from './lib/queries/catalog-listing';
+export { pickFeaturedProducts } from './lib/queries/catalog-featured';
 export {
   catalogQueryWords,
   normalizeCatalogText,

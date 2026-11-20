@@ -17,6 +17,7 @@ describe('DeliveryPage', () => {
     expect(screen.getAllByRole('heading', { level: 2 }).map((node) => node.textContent)).toEqual([
       dictionary.delivery.title,
       dictionary.payment.title,
+      dictionary.acrossUkraine.title,
       dictionary.contact.title,
     ]);
   });

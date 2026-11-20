@@ -1,4 +1,4 @@
-import { SITE_PATHS, localizedPath } from '@site/core/i18n';
+import { SITE_PATHS, localizedPath, requestHref } from '@site/core/i18n';
 import { JsonLd, buildBreadcrumbJsonLd } from '@site/core/seo';
 import { galleryText, loadSiteGalleries } from '@site/settings/data-access';
 import { PageHeader, PageSection } from '@site/shared/ui';
@@ -9,9 +9,6 @@ import type { WorkPicture } from '@site/works/ui';
 
 /** Size reserved for a library photo whose size is unknown; the photo keeps its own shape once loaded. */
 const FALLBACK_SIZE = { width: 480, height: 360 };
-
-/** Anchor of the home contacts block; «Обговорити пошиття» leads there until the request page exists. */
-const REQUEST_ANCHOR = '#zayavka';
 
 /**
  * «Наші роботи» page: the photo gallery from «Контент → Наші роботи» and a closing block with the next step.
@@ -57,7 +54,7 @@ export async function WorksPage({ locale }: { locale: Locale }) {
       <WorksOrder
         id="works-order"
         dictionary={dictionary.order}
-        discussHref={`${localizedPath(locale)}${REQUEST_ANCHOR}`}
+        discussHref={requestHref(locale)}
         productionHref={localizedPath(locale, SITE_PATHS.production)}
       />
 

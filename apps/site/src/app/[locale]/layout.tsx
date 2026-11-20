@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: LayoutProps<'/[locale]'>): Pr
 
 export const viewport: Viewport = { themeColor: '#ffffff' };
 
-export default async function LocaleLayout({ children, params }: LayoutProps<'/[locale]'>) {
+export default async function LocaleLayout({ children, modal, params }: LayoutProps<'/[locale]'>) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
   const [tree, settings, company] = await Promise.all([
@@ -55,6 +55,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
         <SiteShell company={company} locale={locale} catalogSections={catalogSections}>
           {children}
         </SiteShell>
+        {/* The request window that «Залишити заявку» and «Купити» open over the page. */}
+        {modal}
         <JsonLd data={buildOrganizationJsonLd(locale, company)} />
         <SiteAnalytics
           googleAnalyticsId={settings.googleAnalyticsId}

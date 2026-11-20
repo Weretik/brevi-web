@@ -8,9 +8,10 @@ import {
 } from '@site/request/model';
 import { Button } from '@site/shared/ui';
 import Link from 'next/link';
-import { useActionState, useEffect, useState } from 'react';
+import { useActionState, useState } from 'react';
 
 import { RequestFormFields } from './request-form-fields';
+import { useRequestId } from './use-request-id';
 import { RequestSent } from '../sections/request-sent';
 
 import type { RequestDictionary } from '../i18n/request-dictionary';
@@ -30,6 +31,8 @@ type RequestFormProps = {
   action: RequestFormAction;
   agreementHref: string;
   catalogHref: string;
+  /** Product of a «Купити» button; the form opens with it in «Що потрібно пошити?». */
+  product?: string;
 };
 
 /**
@@ -41,22 +44,13 @@ export function RequestForm(props: RequestFormProps) {
   return <RequestFormAttempt key={attempt} {...props} onAgain={() => setAttempt(attempt + 1)} />;
 }
 
-/**
- * One id for this filled form, made in the browser after hydration (the server render has none), so the same
- * form sent twice is one request. «Надіслати ще одну» starts a new attempt and so a new id.
- */
-function useRequestId() {
-  const [id, setId] = useState('');
-  useEffect(() => setId(crypto.randomUUID()), []);
-  return id;
-}
-
 function RequestFormAttempt({
   company,
   dictionary,
   action,
   agreementHref,
   catalogHref,
+  product,
   onAgain,
 }: RequestFormProps & { onAgain: () => void }) {
   const [state, formAction, pending] = useActionState(action, REQUEST_FORM_IDLE);
@@ -76,7 +70,12 @@ function RequestFormAttempt({
     );
   }
 
-  const values = state.status === 'idle' ? undefined : state.values;
+  const values =
+    state.status !== 'idle'
+      ? state.values
+      : product
+        ? { phone: '', workwear: product, quantity: '', comment: '' }
+        : undefined;
   const errors = state.status === 'invalid' ? state.errors : {};
 
   return (
