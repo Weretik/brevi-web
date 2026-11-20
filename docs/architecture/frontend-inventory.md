@@ -37,7 +37,7 @@ are in root `package.json` and `package-lock.json`.
 - React Admin has a separate `vitest.config.mts`, jsdom configuration, and an executable unit, component, and integration test suite.
 - `admin-dashboard-feature` (`libs/admin/dashboard/feature`) has lint, typecheck, typecheck-tests, and Vitest test targets.
 - `admin-core-shell` has separate lint, typecheck, typecheck-tests, and Vitest test targets, as well as component tests.
-- `apps/stack-e2e` holds the only browser tests; they run against the real API, never a mocked one. Install the Chromium binary locally or in CI with `npx playwright install chromium`.
+- `apps/stack-e2e` holds the only browser tests; they run against the real API, never a mocked one. Install the Chromium binary locally or in CI with `npx playwright install chromium`. They run only through `npm run test:stack:e2e`; `nx.json` does not register the `@nx/playwright` plugin, so no Nx `e2e` target exists and the Cloudflare build never loads Playwright.
 
 An installed dependency does not by itself make a test level available. A new
 React library must have an executable Nx test target/configuration and focused
