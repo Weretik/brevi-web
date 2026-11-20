@@ -13,7 +13,7 @@ The public site runs on Cloudflare Workers through the OpenNext adapter (`@openn
 | `npx nx run site:preview-cloudflare` | `opennextjs-cloudflare preview` | fills the cache and runs the bundle in the local Workers runtime        |
 | `npx nx run site:deploy-cloudflare`  | `opennextjs-cloudflare deploy`  | fills the cache with the prerendered pages and deploys the Worker       |
 
-- Cloudflare Workers Builds connects to `Weretik/brevi-web`: root directory empty (workspace root), build command `npx nx run site:build-cloudflare`, deploy command `npx nx run site:deploy-cloudflare`. Node comes from `.nvmrc`.
+- Cloudflare Workers Builds connects to `Weretik/brevi-web`: root directory empty (workspace root), build command `npx nx run site:build-cloudflare`, deploy command `npx nx run site:deploy-cloudflare`. Node comes from `.nvmrc`. The build must not load e2e tooling: `nx.json` has no `@nx/playwright` plugin, because its project-graph step failed there with `Failed to load native binding`. The e2e tests run in GitHub Actions (`e2e.yml`) through `npm run test:stack:e2e`.
 - `apps/site` has no `package.json`, so `open-next.config.mjs` sets `buildCommand` to run `next build` from `apps/site`.
 - `wrangler dev` straight after `build-cloudflare` serves pages without the cache (each request renders and logs a read-only cache error); use the preview target.
 
