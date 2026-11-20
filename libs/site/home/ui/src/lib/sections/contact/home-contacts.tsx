@@ -34,7 +34,7 @@ export function HomeContacts({
     >
       <address className="grid content-start gap-3 bg-muted p-6 not-italic sm:p-8">
         <p className="font-mono text-[0.8125rem] font-semibold text-brand-text uppercase">
-          06 · {dictionary.label}
+          07 · {dictionary.label}
         </p>
         <h2 id={titleId} className="text-2xl leading-tight font-extrabold tracking-[-0.015em]">
           {dictionary.title}

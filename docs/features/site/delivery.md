@@ -1,10 +1,12 @@
 # Site: «Доставка та оплата» page
 
-**Status:** code exists, checked 2026-11-10. Specification: [«Доставка та оплата» page](../../specs/site/delivery/001-delivery/README.md).
+**Status:** code exists, checked 2026-11-20 (block «Працюємо по всій Україні» with the map). Specification: [«Доставка та оплата» page](../../specs/site/delivery/001-delivery/README.md).
 
-`/uk/delivery-and-payment` and `/ru/delivery-and-payment` show how Brevi ships and how to pay: four delivery ways with their cost, the footnote about what the cost depends on, payment rules, bank details, and the phone. The text and numbers are from the live `brevi.com.ua` page; Russian is its translation. The page is static and reads no API.
+`/uk/delivery-and-payment` and `/ru/delivery-and-payment` show how Brevi ships and how to pay: four delivery ways with their cost, the footnote about what the cost depends on, payment rules, bank details, «Працюємо по всій Україні» with the map, and the phone. The text and numbers are from the live `brevi.com.ua` page; Russian is its translation. The page is static and reads no API.
 
 Bank details (`recipient`, `edrpou`, `iban`, `bank`) come from «Контакти та компанія» (`loadSiteCompany`). The sentence of the live page about paying by card on the site is left out: the new site has no online payment.
+
+`DeliveryAcrossUkraine` is the shared block «Працюємо по всій Україні»: delivery by Nova Poshta and SAT across Ukraine, three short facts, a link to this page, and a stylised map (`UkraineMap`) with stitched routes from Poltava to six cities. The map outline is static data in `map/ukraine-outline.ts`, projected from the Natural Earth 1:50m borders (public domain) with Crimea. It has no online-order or order-status wording. The home, «Регіони» and this page show it; the city pages will too.
 
 ## Structure diagram
 
@@ -27,7 +29,8 @@ libs/site/
 ├── delivery/feature/src/lib/delivery-page.tsx   # block order, links, JSON-LD
 ├── delivery/ui/src/lib/
 │   ├── i18n/delivery-dictionary.ts              # uk and ru text
-│   └── sections/                                # delivery-options, -payment, -contact
+│   ├── sections/                                # delivery-options, -payment, -contact
+│   └── map/                                     # delivery-across-ukraine, ukraine-map, ukraine-outline (data)
 ├── delivery/seo/src/lib/delivery-metadata.ts
 └── core/config/src/lib/company.ts               # bankDetails
 ```

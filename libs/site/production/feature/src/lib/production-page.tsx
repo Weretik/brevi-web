@@ -1,4 +1,4 @@
-import { SITE_PATHS, localizedPath } from '@site/core/i18n';
+import { SITE_PATHS, localizedPath, requestHref } from '@site/core/i18n';
 import { JsonLd, buildBreadcrumbJsonLd } from '@site/core/seo';
 import {
   ProductionDetails,
@@ -13,9 +13,6 @@ import { PageSection } from '@site/shared/ui';
 
 import type { Locale } from '@site/core/i18n';
 
-/** Anchor of the home contacts block; «Обговорити пошиття» leads there until the request page exists. */
-const REQUEST_ANCHOR = '#zayavka';
-
 /**
  * «Виробництво» page in the order of the live `brevi.com.ua` page: lead, production stages, fabric, threads
  * and hardware, branding, and how to start an order. Static: the text is in the production dictionary.
@@ -24,7 +21,7 @@ export async function ProductionPage({ locale }: { locale: Locale }) {
   const company = await loadSiteCompany();
   const dictionary = getProductionDictionary(locale);
   const path = (key: keyof typeof SITE_PATHS) => localizedPath(locale, SITE_PATHS[key]);
-  const discussHref = `${localizedPath(locale)}${REQUEST_ANCHOR}`;
+  const discussHref = requestHref(locale);
   const breadcrumbs = [
     { name: dictionary.home, href: localizedPath(locale) },
     { name: dictionary.breadcrumb, href: path('production') },

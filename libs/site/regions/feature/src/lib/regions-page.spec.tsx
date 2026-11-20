@@ -1,3 +1,4 @@
+import { getDeliveryDictionary } from '@site/delivery/ui';
 import { getRegionsDictionary } from '@site/regions/ui';
 import { render, screen } from '@testing-library/react';
 
@@ -17,6 +18,7 @@ describe('RegionsPage', () => {
     expect(screen.getAllByRole('heading', { level: 2 }).map((node) => node.textContent)).toEqual([
       dictionary.steps.title,
       dictionary.cities.title,
+      getDeliveryDictionary('uk').acrossUkraine.title,
       dictionary.local.title,
       dictionary.order.title,
     ]);
@@ -41,14 +43,16 @@ describe('RegionsPage', () => {
     }
   });
 
-  it('is one page for all cities: the cities are text, not links', async () => {
+  it('links the cities to their city pages', async () => {
     const { container } = render(await RegionsPage({ locale: 'uk' }));
     const [breadcrumbs] = [...container.querySelectorAll('script[type="application/ld+json"]')].map(
       (node) => JSON.parse(node.textContent ?? '{}'),
     );
 
     expect(breadcrumbs.itemListElement[1].item).toBe('https://brevi.com.ua/uk/regions');
-    expect(screen.getByText('Харків').closest('a')).toBeNull();
+    expect(screen.getByRole('link', { name: 'Пошиття у Харкові' }).getAttribute('href')).toBe(
+      '/uk/sewing/kharkiv',
+    );
     expect(container.querySelector('a[href*="/regions/"]')).toBeNull();
   });
 });

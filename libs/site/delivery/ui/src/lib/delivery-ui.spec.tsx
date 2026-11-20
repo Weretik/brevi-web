@@ -2,6 +2,7 @@ import { COMPANY } from '@site/core/config';
 import { render, screen } from '@testing-library/react';
 
 import { getDeliveryDictionary } from './i18n/delivery-dictionary';
+import { DeliveryAcrossUkraine } from './map/delivery-across-ukraine';
 import { DeliveryContact } from './sections/delivery-contact';
 import { DeliveryOptions } from './sections/delivery-options';
 import { DeliveryPayment } from './sections/delivery-payment';
@@ -68,5 +69,43 @@ describe('DeliveryContact', () => {
     expect(screen.getByRole('link', { name: /Контакти/ }).getAttribute('href')).toBe(
       '/uk/contacts',
     );
+  });
+});
+
+describe('DeliveryAcrossUkraine', () => {
+  it('says Brevi delivers across Ukraine from Poltava, with the map and a link to the terms', () => {
+    const dictionary = getDeliveryDictionary('uk').acrossUkraine;
+    render(
+      <DeliveryAcrossUkraine
+        id="across-ukraine"
+        index="06"
+        dictionary={dictionary}
+        moreHref="/uk/delivery-and-payment"
+      />,
+    );
+
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Працюємо по всій Україні' }),
+    ).toBeTruthy();
+    expect(screen.getByText(/Новою Поштою або САТ/)).toBeTruthy();
+    expect(screen.getByRole('img', { name: dictionary.mapLabel }).textContent).toContain('Полтава');
+    expect(
+      screen.getByRole('link', { name: /Умови доставки та оплати/ }).getAttribute('href'),
+    ).toBe('/uk/delivery-and-payment');
+    // No online order or order tracking: the site only takes calls and requests.
+    expect(document.body.textContent).not.toMatch(/статус замовлення|оформити онлайн/i);
+  });
+
+  it('leaves out the link on the delivery page itself', () => {
+    render(
+      <DeliveryAcrossUkraine
+        id="across-ukraine"
+        index="04"
+        dictionary={getDeliveryDictionary('ru').acrossUkraine}
+      />,
+    );
+
+    expect(screen.getByRole('heading', { name: 'Работаем по всей Украине' })).toBeTruthy();
+    expect(screen.queryByRole('link')).toBeNull();
   });
 });

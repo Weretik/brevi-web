@@ -12,6 +12,7 @@ import {
   catalogCategoryPath,
   catalogProductPath,
   localizedPath,
+  requestHref,
 } from '@site/core/i18n';
 import { loadSiteCompany } from '@site/settings/data-access';
 import { Breadcrumbs } from '@site/shared/ui';
@@ -31,7 +32,7 @@ const RELATED_LIMIT = 4;
  * Product page (concept «Ціна поруч»): photos, the tags and the name with one line on who the model is for,
  * then the order card with the price right under the name. Below are links to the blocks, the
  * characteristics with the short facts first, the folded description, other models of the same category,
- * and the call to order. Phones get a price strip above the bottom bar. No cart. `product` is already in
+ * and the call to order. Phones get a price strip at the bottom of the screen. No cart. `product` is already in
  * the language of the page.
  */
 export async function CatalogProductPage({
@@ -51,6 +52,8 @@ export async function CatalogProductPage({
   const categoryHref = (slug: string) => localizedPath(locale, catalogCategoryPath(slug));
   const productHref = (slug: string) => localizedPath(locale, catalogProductPath(slug));
   const name = product.name;
+  // «Купити» opens the request window with this product in the form.
+  const buyHref = requestHref(locale, name);
   const breadcrumbs = [
     { name: dictionary.home, href: localizedPath(locale) },
     { name: dictionary.catalog, href: path('catalog') },
@@ -81,7 +84,7 @@ export async function CatalogProductPage({
           company={company}
           locale={locale}
           noPhoto={dictionary.products.noPhoto}
-          requestHref={path('request')}
+          requestHref={buyHref}
           sizeChartHref={path('sizeChart')}
         />
         <CatalogProductNav label={text.nav.label} items={nav} />
@@ -112,7 +115,7 @@ export async function CatalogProductPage({
           price={`${text.priceFrom} ${formatPrice(product.priceFrom)} ${text.currencyShort}`}
           label={text.priceBar.label}
           request={text.priceBar.request}
-          requestHref={path('request')}
+          requestHref={buyHref}
         />
       ) : null}
 

@@ -1,13 +1,14 @@
 import { getArticleAddresses } from '@site/articles/data-access';
 import { articlePath } from '@site/articles/seo';
 import { getCatalogCategoryAddresses, getCatalogProductAddresses } from '@site/catalog/data-access';
+import { citySitemapPages } from '@site/cities/seo';
 import { SITE_PATHS, catalogCategoryPath, catalogProductPath } from '@site/core/i18n';
 import { buildSitemapEntries } from '@site/core/seo';
 
 import type { MetadataRoute } from 'next';
 
 /**
- * Pages in both languages with `hreflang` alternates. Each migrated page adds its own entry. Catalog pages
+ * Pages in both languages with `hreflang` alternates. Each migrated page adds its own entry; the 26 city pages come from the city list. Catalog pages
  * and articles come from the Admin; a page without Russian texts is listed only in Ukrainian.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -31,6 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: SITE_PATHS.wholesale },
     { path: SITE_PATHS.industries },
     { path: SITE_PATHS.regions },
+    ...citySitemapPages(),
     { path: SITE_PATHS.agreement },
     { path: SITE_PATHS.catalog },
     ...categories.map((category) => ({

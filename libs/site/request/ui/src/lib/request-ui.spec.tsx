@@ -109,4 +109,20 @@ describe('request blocks', () => {
     expect(ids[2]).toMatch(/^[0-9a-f-]{36}$/);
     expect(ids[2]).not.toBe(ids[0]);
   });
+
+  it('opens with the product a visitor wants to buy', () => {
+    render(
+      <RequestForm
+        company={COMPANY}
+        dictionary={dictionary}
+        action={async () => ({ status: 'idle' })}
+        agreementHref="/uk/agreement"
+        catalogHref="/uk/catalog"
+        product="Костюм «Імпульс»"
+      />,
+    );
+
+    const workwear = document.getElementById('request-workwear') as HTMLInputElement;
+    expect(workwear.value).toBe('Костюм «Імпульс»');
+  });
 });

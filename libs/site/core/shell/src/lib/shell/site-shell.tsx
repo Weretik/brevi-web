@@ -1,7 +1,6 @@
 import { SiteFooter } from '../footer/site-footer';
 import { SiteHeader } from '../header/bar/site-header';
 import { getShellDictionary } from '../i18n/shell-dictionary';
-import { MobileBar } from '../mobile/mobile-bar';
 
 import type { CatalogSection } from '@site/catalog/model';
 import type { Company } from '@site/core/config';
@@ -9,19 +8,22 @@ import type { Locale } from '@site/core/i18n';
 import type { ReactNode } from 'react';
 
 /**
- * Page frame for every localized route: skip link, two-row header, main content, footer, and the bottom bar
- * on phones. The catalog sections come from the layout, which reads them on the server.
+ * Page frame for every localized route: skip link, header (two rows on wide screens, one on phones), main
+ * content, and footer. The catalog sections come from the layout, which reads them on the server; the city
+ * sections («Пошиття», «Робочий одяг») join them in the catalog menus but not in the footer.
  */
 export function SiteShell({
   company,
   locale,
   catalogSections,
+  citySections = [],
   children,
 }: {
   /** Company facts from «Контакти та компанія»; the layout reads them on the server. */
   company: Company;
   locale: Locale;
   catalogSections: readonly CatalogSection[];
+  citySections?: readonly CatalogSection[];
   children: ReactNode;
 }) {
   const dictionary = getShellDictionary(locale);
@@ -38,18 +40,12 @@ export function SiteShell({
         company={company}
         locale={locale}
         dictionary={dictionary}
-        catalogSections={catalogSections}
+        catalogSections={[...catalogSections, ...citySections]}
       />
       <main id="content" className="mx-auto w-full max-w-[77.5rem] flex-1 px-4 sm:px-6">
         {children}
       </main>
       <SiteFooter
-        company={company}
-        locale={locale}
-        dictionary={dictionary}
-        catalogSections={catalogSections}
-      />
-      <MobileBar
         company={company}
         locale={locale}
         dictionary={dictionary}

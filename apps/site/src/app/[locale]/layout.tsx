@@ -1,5 +1,6 @@
 import { getCatalogTree } from '@site/catalog/data-access';
 import { toCatalogSections } from '@site/catalog/model';
+import { citySections } from '@site/cities/model';
 import { LOCALES, LOCALE_LANGUAGE_TAGS, isLocale } from '@site/core/i18n';
 import {
   JsonLd,
@@ -35,7 +36,7 @@ export async function generateMetadata({ params }: LayoutProps<'/[locale]'>): Pr
 
 export const viewport: Viewport = { themeColor: '#ffffff' };
 
-export default async function LocaleLayout({ children, params }: LayoutProps<'/[locale]'>) {
+export default async function LocaleLayout({ children, modal, params }: LayoutProps<'/[locale]'>) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
   const [tree, settings, company] = await Promise.all([
@@ -52,9 +53,16 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
     >
       {/* Browser extensions (Grammarly and similar) add attributes to <body> before React hydrates. */}
       <body className="flex min-h-dvh flex-col" suppressHydrationWarning>
-        <SiteShell company={company} locale={locale} catalogSections={catalogSections}>
+        <SiteShell
+          company={company}
+          locale={locale}
+          catalogSections={catalogSections}
+          citySections={citySections()}
+        >
           {children}
         </SiteShell>
+        {/* The request window that «Залишити заявку» and «Купити» open over the page. */}
+        {modal}
         <JsonLd data={buildOrganizationJsonLd(locale, company)} />
         <SiteAnalytics
           googleAnalyticsId={settings.googleAnalyticsId}

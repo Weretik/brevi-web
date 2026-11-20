@@ -5,6 +5,7 @@ export { CatalogProductBuy } from './lib/product/catalog-product-buy';
 export { CatalogProductPrices } from './lib/product/catalog-product-prices';
 export { CatalogProductGallery } from './lib/product/catalog-product-gallery';
 export { CatalogProductSpecs } from './lib/product/catalog-product-specs';
+export { CatalogProductCarousel } from './lib/listing/grid/catalog-product-carousel';
 export { CatalogProductGrid } from './lib/listing/grid/catalog-product-grid';
 export { CatalogCategoryIcon } from './lib/category/catalog-category-icon';
 export { CatalogCategoryTabs } from './lib/category/catalog-category-tabs';

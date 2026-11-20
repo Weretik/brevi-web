@@ -87,7 +87,7 @@ describe('ArticlePage', () => {
     ).toBe('/uk/articles');
     expect(
       screen.getByRole('link', { name: dictionary.article.order.discuss }).getAttribute('href'),
-    ).toBe('/uk#zayavka');
+    ).toBe('/uk/request');
   });
 
   it('leaves out «Читайте також» when there are no other articles', () => {

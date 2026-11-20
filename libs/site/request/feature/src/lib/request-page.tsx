@@ -10,9 +10,9 @@ import type { Locale } from '@site/core/i18n';
 
 /**
  * «Заявка» page: the visitor leaves a phone (and, if they wish, what to sew) and a manager calls back.
- * The text is on the left, the form on the right.
+ * The text is on the left, the form on the right. A «Купити» link passes the product, which fills the form.
  */
-export async function RequestPage({ locale }: { locale: Locale }) {
+export async function RequestPage({ locale, product }: { locale: Locale; product?: string }) {
   const company = await loadSiteCompany();
   const dictionary = getRequestDictionary(locale);
   const path = (key: keyof typeof SITE_PATHS) => localizedPath(locale, SITE_PATHS[key]);
@@ -32,6 +32,7 @@ export async function RequestPage({ locale }: { locale: Locale }) {
           action={submitRequest.bind(null, locale)}
           agreementHref={path('agreement')}
           catalogHref={path('catalog')}
+          product={product}
         />
       </div>
       <RequestFacts dictionary={dictionary} />

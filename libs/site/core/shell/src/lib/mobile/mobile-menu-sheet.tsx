@@ -1,6 +1,7 @@
 'use client';
 
-import { localizedPath } from '@site/core/i18n';
+import { CatalogSearchBox, getCatalogDictionary } from '@site/catalog/ui';
+import { SITE_PATHS, catalogSearchIndexPath, localizedPath, requestHref } from '@site/core/i18n';
 import {
   Sheet,
   SheetClose,
@@ -8,17 +9,23 @@ import {
   SheetDescription,
   SheetTitle,
   SheetTrigger,
+  buttonVariants,
+  cn,
 } from '@site/shared/ui';
-import { MenuIcon } from 'lucide-react';
 import Link from 'next/link';
+import { useState } from 'react';
 
-import { MAIN_NAV_LINKS, SHELL_PATHS } from '../navigation/site-navigation';
+import { LocaleSwitch } from '../controls/locale-switch';
+import { MAIN_NAV_LINKS } from '../navigation/site-navigation';
 
 import type { ShellDictionary } from '../i18n/shell-dictionary';
 import type { Company } from '@site/core/config';
 import type { Locale } from '@site/core/i18n';
 
-/** «Меню» of the bottom bar: a right sheet with the main links and the contacts. */
+/**
+ * «Меню» of the phone header: a right sheet with the catalog search, the main links, «Залишити заявку», the
+ * language and the contacts. Search and the language live here on phones so the header stays short.
+ */
 export function MobileMenuSheet({
   company,
   locale,
@@ -30,18 +37,35 @@ export function MobileMenuSheet({
   dictionary: ShellDictionary;
   triggerClassName: string;
 }) {
+  const [open, setOpen] = useState(false);
   const [phone] = company.phones;
+  const search = getCatalogDictionary(locale).search;
+
   return (
-    <Sheet>
-      <SheetTrigger className={triggerClassName} aria-label={dictionary.openMenu}>
-        <MenuIcon aria-hidden strokeWidth={1.75} />
-        {dictionary.menuTitle}
-      </SheetTrigger>
-      <SheetContent side="right" closeLabel={dictionary.closeMenu} className="gap-0 p-0">
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetTrigger className={triggerClassName}>{dictionary.menuTitle}</SheetTrigger>
+      <SheetContent
+        side="right"
+        closeLabel={dictionary.closeMenu}
+        className="gap-0 p-0"
+        // Focus the panel, not the search field, so the phone keyboard does not cover the menu.
+        onOpenAutoFocus={(event) => {
+          event.preventDefault();
+          (event.currentTarget as HTMLElement).focus();
+        }}
+      >
         <SheetTitle className="border-b border-border px-5 py-4 text-lg font-extrabold">
           {dictionary.menuTitle}
         </SheetTitle>
         <SheetDescription>{dictionary.mainNav}</SheetDescription>
+        <div className="border-b border-border px-5 py-4">
+          <CatalogSearchBox
+            indexUrl={catalogSearchIndexPath(locale)}
+            action={localizedPath(locale, SITE_PATHS.search)}
+            text={search}
+            onNavigate={() => setOpen(false)}
+          />
+        </div>
         <ul className="font-bold">
           {MAIN_NAV_LINKS.map((link) => (
             <li key={link.key} className="border-b border-border">
@@ -52,17 +76,19 @@ export function MobileMenuSheet({
               </SheetClose>
             </li>
           ))}
-          <li className="border-b border-border">
-            <SheetClose asChild>
-              <Link
-                href={localizedPath(locale, SHELL_PATHS.deliveryAndPayment)}
-                className="block px-5 py-3.5"
-              >
-                {dictionary.links.deliveryAndPayment}
-              </Link>
-            </SheetClose>
-          </li>
         </ul>
+        <div className="flex items-center justify-between gap-3 px-5 py-4">
+          <SheetClose asChild>
+            <Link
+              href={requestHref(locale)}
+              rel="nofollow"
+              className={cn(buttonVariants({ variant: 'brand' }), 'flex-1')}
+            >
+              {dictionary.requestLong}
+            </Link>
+          </SheetClose>
+          <LocaleSwitch locale={locale} label={dictionary.languageSwitch} />
+        </div>
         <address className="mt-auto grid gap-1.5 border-t border-dashed border-brand-soft bg-muted px-5 py-4 text-sm text-muted-foreground not-italic">
           <a href={`tel:${phone.e164}`} className="text-xl font-extrabold text-foreground">
             {phone.display}

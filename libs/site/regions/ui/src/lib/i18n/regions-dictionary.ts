@@ -3,8 +3,8 @@ import type { Locale } from '@site/core/i18n';
 type Named = { title: string; text: string };
 
 /**
- * Text of the «Регіони» page: one page about orders from any city of Ukraine instead of a page per city.
- * Delivery terms repeat the «Доставка та оплата» page; the cities are those the live `brevi.com.ua` lists.
+ * Text of the «Регіони» page: orders from any city of Ukraine. Delivery terms repeat the «Доставка та оплата»
+ * page; the cities are those the live `brevi.com.ua` lists, and those with city pages link to both of them.
  */
 const uk = {
   breadcrumbsLabel: 'Хлібні крихти',
@@ -68,6 +68,9 @@ const uk = {
       'Біла Церква',
     ],
     note: 'Немає вашого міста у списку? Доставимо й туди: вартість залежить від ваги та об’єму вантажу, відстані і тарифів перевізника.',
+    /** Links of a city to its two pages; the city name in the locative is added for screen readers. */
+    sewing: 'Пошиття',
+    workwear: 'Робочий одяг',
   },
   local: {
     label: 'Полтава',
@@ -156,6 +159,8 @@ const ru: RegionsDictionary = {
       'Белая Церковь',
     ],
     note: 'Нет вашего города в списке? Доставим и туда: стоимость зависит от веса и объёма груза, расстояния и тарифов перевозчика.',
+    sewing: 'Пошив',
+    workwear: 'Рабочая одежда',
   },
   local: {
     label: 'Полтава',

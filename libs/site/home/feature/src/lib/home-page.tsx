@@ -1,10 +1,18 @@
-import { SITE_PATHS, catalogCategoryPath, localizedPath } from '@site/core/i18n';
+import { CatalogProductCarousel, getCatalogDictionary } from '@site/catalog/ui';
+import {
+  SITE_PATHS,
+  catalogCategoryPath,
+  catalogProductPath,
+  localizedPath,
+  requestHref,
+} from '@site/core/i18n';
 import {
   JsonLd,
   buildFaqPageJsonLd,
   buildLocalBusinessJsonLd,
   buildWebSiteJsonLd,
 } from '@site/core/seo';
+import { DeliveryAcrossUkraine, getDeliveryDictionary } from '@site/delivery/ui';
 import {
   HomeCatalog,
   HomeContacts,
@@ -19,24 +27,28 @@ import {
 import { loadSiteCompany, loadSitePageText } from '@site/settings/data-access';
 import { PageSection } from '@site/shared/ui';
 
-import type { CatalogSection } from '@site/catalog/model';
+import type { CatalogProductCard, CatalogSection } from '@site/catalog/model';
 import type { Locale } from '@site/core/i18n';
 
-/** Anchor of the contacts block; «Залишити заявку» scrolls to it until the request page exists. */
+/** Anchor of the contacts block, kept for old links to `#zayavka`. */
 const CONTACTS_ID = 'zayavka';
 
 /**
- * Home page body in the order of the «Строчка» mockup: first screen, catalog sections, logo, process, own
- * production, industries, contacts, SEO text with FAQ. The text is in the home dictionary; the SEO text and FAQ saved in «Сторінки сайту» replace it; the catalog sections
- * come from the route, which reads them from the catalog API, and the block is left out while there are none. The price calculator, product cards with prices, and the request
- * form of the mockup come with the catalog and request steps (owner decision 2026-11-10).
+ * Home page body: first screen, catalog sections, popular models, logo, process, own production, industries
+ * (plain text), «Працюємо по всій Україні» with the map, contacts, SEO text with FAQ. The text is in the home
+ * dictionary; the SEO text and FAQ saved in «Сторінки сайту» replace it. The catalog sections and the
+ * popular models come from the route, which reads them from the catalog API; each block is left out while it
+ * has nothing to show. «Залишити заявку» and «Купити» open the request window.
  */
 export async function HomePage({
   locale,
   catalogSections,
+  featured,
 }: {
   locale: Locale;
   catalogSections: readonly CatalogSection[];
+  /** Models for «Популярні моделі», already picked by the route. */
+  featured: readonly CatalogProductCard[];
 }) {
   const [company, saved] = await Promise.all([loadSiteCompany(), loadSitePageText('home', locale)]);
   const dictionary = getHomeDictionary(locale);
@@ -44,10 +56,11 @@ export async function HomePage({
   const faq = saved?.faq.length ? saved.faq : dictionary.seo.faq;
   const path = (key: keyof typeof SITE_PATHS) => localizedPath(locale, SITE_PATHS[key]);
   const catalogHref = path('catalog');
+  const catalogText = getCatalogDictionary(locale);
 
   return (
     <div className="grid gap-14 pb-4 sm:gap-16">
-      <HomeHero company={company} dictionary={dictionary.hero} requestHref={`#${CONTACTS_ID}`} />
+      <HomeHero company={company} dictionary={dictionary.hero} requestHref={requestHref(locale)} />
 
       {catalogSections.length > 0 && (
         <PageSection
@@ -60,6 +73,24 @@ export async function HomePage({
             locale={locale}
             sections={catalogSections}
             categoryHref={(slug) => localizedPath(locale, catalogCategoryPath(slug))}
+          />
+        </PageSection>
+      )}
+
+      {featured.length > 0 && (
+        <PageSection
+          id="home-popular"
+          title={dictionary.popular.title}
+          action={{ href: catalogHref, label: dictionary.popular.all }}
+        >
+          <CatalogProductCarousel
+            items={featured.map((product) => ({
+              product,
+              href: localizedPath(locale, catalogProductPath(product.slug)),
+            }))}
+            dictionary={catalogText.products}
+            requestHref={requestHref(locale)}
+            labels={catalogText.carousel}
           />
         </PageSection>
       )}
@@ -83,13 +114,16 @@ export async function HomePage({
         <HomeProduction points={dictionary.production.points} />
       </PageSection>
 
-      <PageSection
-        id="home-industries"
-        title={dictionary.industries.title}
-        action={{ href: path('industries'), label: dictionary.industries.all }}
-      >
-        <HomeIndustries items={dictionary.industries.items} href={path('industries')} />
+      <PageSection id="home-industries" title={dictionary.industries.title}>
+        <HomeIndustries items={dictionary.industries.items} />
       </PageSection>
+
+      <DeliveryAcrossUkraine
+        id="home-delivery"
+        index="06"
+        dictionary={getDeliveryDictionary(locale).acrossUkraine}
+        moreHref={path('deliveryAndPayment')}
+      />
 
       <HomeContacts
         company={company}

@@ -1,6 +1,7 @@
 'use client';
 
-import { catalogCategoryPath, localizedPath } from '@site/core/i18n';
+import { catalogSectionPath } from '@site/catalog/model';
+import { localizedPath } from '@site/core/i18n';
 import {
   Sheet,
   SheetClose,
@@ -9,7 +10,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@site/shared/ui';
-import { ChevronDownIcon, LayoutGridIcon } from 'lucide-react';
+import { ChevronDownIcon } from 'lucide-react';
 import Link from 'next/link';
 
 import { CatalogSectionIcon } from '../header/catalog-menu/catalog-section-icon';
@@ -19,7 +20,10 @@ import type { ShellDictionary } from '../i18n/shell-dictionary';
 import type { CatalogSection } from '@site/catalog/model';
 import type { Locale } from '@site/core/i18n';
 
-/** «Каталог» of the bottom bar: a left sheet with the sections folded into their subsections. */
+/**
+ * Yellow «Каталог» of the phone header: a left sheet with the sections folded into their subsections, the city
+ * sections («Пошиття», «Робочий одяг») last.
+ */
 export function MobileCatalogSheet({
   locale,
   dictionary,
@@ -34,10 +38,7 @@ export function MobileCatalogSheet({
   const catalogHref = localizedPath(locale, SHELL_PATHS.catalog);
   return (
     <Sheet>
-      <SheetTrigger className={triggerClassName}>
-        <LayoutGridIcon aria-hidden strokeWidth={1.75} />
-        {dictionary.links.catalog}
-      </SheetTrigger>
+      <SheetTrigger className={triggerClassName}>{dictionary.links.catalog}</SheetTrigger>
       <SheetContent side="left" closeLabel={dictionary.closeMenu} className="gap-0 p-0">
         <SheetTitle className="border-b border-border px-5 py-4 text-lg font-extrabold">
           {dictionary.links.catalog}
@@ -63,10 +64,10 @@ export function MobileCatalogSheet({
                   <li>
                     <SheetClose asChild>
                       <Link
-                        href={localizedPath(locale, catalogCategoryPath(section.slug))}
+                        href={localizedPath(locale, catalogSectionPath(section))}
                         className="block py-2 font-bold text-brand-text"
                       >
-                        {dictionary.sectionAll}
+                        {section.allLabel?.[locale] ?? dictionary.sectionAll}
                       </Link>
                     </SheetClose>
                   </li>
@@ -74,7 +75,7 @@ export function MobileCatalogSheet({
                     <li key={item.key}>
                       <SheetClose asChild>
                         <Link
-                          href={localizedPath(locale, catalogCategoryPath(item.slug))}
+                          href={localizedPath(locale, catalogSectionPath(item))}
                           className="block py-2"
                         >
                           {item.label[locale]}

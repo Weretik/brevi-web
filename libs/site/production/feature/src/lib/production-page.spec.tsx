@@ -35,7 +35,7 @@ describe('ProductionPage', () => {
     );
     expect(
       screen.getByRole('link', { name: 'Обсудить пошив спецодежды' }).getAttribute('href'),
-    ).toBe('/ru#zayavka');
+    ).toBe('/ru/request');
   });
 
   it('describes the breadcrumb trail in JSON-LD', async () => {

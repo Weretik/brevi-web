@@ -6,6 +6,7 @@ import {
   getCatalogRelatedProducts,
   getCatalogTree,
 } from '@site/catalog/data-access';
+import { requestHref } from '@site/core/i18n';
 import { render, screen, within } from '@testing-library/react';
 
 import { CatalogCategoryPage } from './category/catalog-category-page';
@@ -246,16 +247,16 @@ describe('CatalogProductPage', () => {
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Костюм ВЕРДЕ');
     const prices = within(screen.getByRole('table', { name: 'Ціна за одиницю, грн' }));
     expect(prices.getAllByRole('row')).toHaveLength(3);
-    expect(screen.getAllByRole('link', { name: 'Залишити заявку' })[0].getAttribute('href')).toBe(
-      '/uk/request',
-    );
+    // «Купити» opens the request window with the product; there is no cart.
+    const buyHref = requestHref('uk', 'Костюм ВЕРДЕ');
+    expect(screen.getAllByRole('link', { name: 'Купити' })[0].getAttribute('href')).toBe(buyHref);
     expect(screen.getByRole('table', { name: 'Куртка' })).toBeTruthy();
     // The short facts open the characteristics; the price strip for phones links to the request.
     const facts = within(screen.getByRole('table', { name: 'Коротко про модель' }));
     expect(facts.getByRole('cell', { name: 'літо' })).toBeTruthy();
     const bar = within(screen.getByRole('complementary', { name: 'Ціна моделі' }));
     expect(bar.getByText('від 900 грн')).toBeTruthy();
-    expect(bar.getByRole('link', { name: 'Заявка' }).getAttribute('href')).toBe('/uk/request');
+    expect(bar.getByRole('link', { name: 'Купити' }).getAttribute('href')).toBe(buyHref);
     const nav = within(screen.getByRole('navigation', { name: 'Розділи сторінки' }));
     expect(nav.getByRole('link', { name: 'Характеристики' }).getAttribute('href')).toBe(
       '#product-specs',

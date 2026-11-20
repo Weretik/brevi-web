@@ -40,7 +40,7 @@ export function ProductionOrder({
       </h2>
       <ProductionProse paragraphs={dictionary.paragraphs} />
       <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
-        <Link href={discussHref} className={buttonVariants({ size: 'lg' })}>
+        <Link href={discussHref} rel="nofollow" className={buttonVariants({ size: 'lg' })}>
           {dictionary.discuss}
         </Link>
         <a

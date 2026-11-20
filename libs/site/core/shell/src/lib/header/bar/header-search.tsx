@@ -2,7 +2,6 @@
 
 import { CatalogSearchBox, getCatalogDictionary } from '@site/catalog/ui';
 import { SITE_PATHS, catalogSearchIndexPath, localizedPath } from '@site/core/i18n';
-import { cn } from '@site/shared/ui';
 import { SearchIcon, XIcon } from 'lucide-react';
 import { useCallback, useId, useRef, useState } from 'react';
 
@@ -11,17 +10,10 @@ import { useDismiss } from './use-dismiss';
 import type { Locale } from '@site/core/i18n';
 
 /**
- * «Пошук» in the header: a button that opens the catalog search under the header, with the field in focus.
+ * «Пошук» in the menu row of wide screens, an icon button so the menu fits (phones search inside «Меню»): a button that opens the catalog search under the header, with the field in focus.
  * The panel spans the header width; Escape, a press outside, or picking a suggestion closes it.
  */
-export function HeaderSearch({
-  locale,
-  variant,
-}: {
-  locale: Locale;
-  /** `menu`: a labelled button in the menu row; `icon`: an icon button in the phone header. */
-  variant: 'menu' | 'icon';
-}) {
+export function HeaderSearch({ locale }: { locale: Locale }) {
   const text = getCatalogDictionary(locale).search;
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
@@ -35,19 +27,16 @@ export function HeaderSearch({
         type="button"
         aria-expanded={open}
         aria-controls={panelId}
-        aria-label={variant === 'icon' ? text.open : undefined}
+        aria-label={text.open}
+        title={text.open}
         onClick={() => setOpen((value) => !value)}
-        className={cn(
-          'inline-flex items-center gap-2 rounded-md font-semibold whitespace-nowrap hover:text-brand-text focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
-          variant === 'icon' ? 'size-11 justify-center' : 'h-10 px-1 text-sm xl:text-[0.9375rem]',
-        )}
+        className="inline-flex size-10 items-center justify-center rounded-md hover:text-brand-text focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
       >
         {open ? (
           <XIcon aria-hidden className="size-5" strokeWidth={1.9} />
         ) : (
           <SearchIcon aria-hidden className="size-5" strokeWidth={1.9} />
         )}
-        {variant === 'menu' ? text.open : null}
       </button>
       {open ? (
         <div

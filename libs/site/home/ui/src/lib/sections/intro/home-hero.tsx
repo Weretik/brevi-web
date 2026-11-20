@@ -1,5 +1,6 @@
 import { StitchLabel, buttonVariants, cn } from '@site/shared/ui';
 import Image from 'next/image';
+import Link from 'next/link';
 
 import type { HomeDictionary } from '../../i18n/home-dictionary';
 import type { Company } from '@site/core/config';
@@ -45,9 +46,9 @@ export function HomeHero({
           ))}
         </dl>
         <div className="flex flex-wrap items-center gap-3">
-          <a href={requestHref} className={buttonVariants({ size: 'lg' })}>
+          <Link href={requestHref} rel="nofollow" className={buttonVariants({ size: 'lg' })}>
             {dictionary.request}
-          </a>
+          </Link>
           <a
             href={`tel:${salesPhone.e164}`}
             className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), 'font-mono')}

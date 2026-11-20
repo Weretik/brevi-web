@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 /**
- * Phone and tablet strip above the bottom bar of the site: the lowest price of the model and «Заявка».
+ * Phone and tablet strip at the bottom of the screen: the lowest price of the model and «Купити».
  * It hides while the order card (`targetId`) or the site footer is on the screen, so the price is not
  * shown twice and the footer stays readable; without
  * JavaScript it stays visible.
@@ -47,7 +47,7 @@ export function CatalogProductPriceBar({
     <aside
       aria-label={label}
       className={cn(
-        'fixed inset-x-0 bottom-[calc(4.25rem+env(safe-area-inset-bottom))] z-20 flex items-center justify-between gap-3 border-t border-border-strong bg-background px-4 py-2.5 transition-transform motion-reduce:transition-none lg:hidden',
+        'fixed inset-x-0 bottom-0 z-20 flex items-center justify-between gap-3 border-t border-border-strong bg-background px-4 pt-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] transition-transform motion-reduce:transition-none lg:hidden',
         hidden && 'pointer-events-none translate-y-full opacity-0',
       )}
     >

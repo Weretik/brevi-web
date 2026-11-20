@@ -1,5 +1,6 @@
 import { SITE_PATHS, localizedPath } from '@site/core/i18n';
 import { JsonLd, buildBreadcrumbJsonLd } from '@site/core/seo';
+import { DeliveryAcrossUkraine, getDeliveryDictionary } from '@site/delivery/ui';
 import {
   RegionsCities,
   RegionsHero,
@@ -14,8 +15,8 @@ import { PageSection } from '@site/shared/ui';
 import type { Locale } from '@site/core/i18n';
 
 /**
- * «Регіони» page: one page about orders from any city of Ukraine. Lead with the delivery terms, how to order
- * from another city, the cities, what a buyer in Poltava gets, and the call to order. Static.
+ * «Регіони» page: orders from any city of Ukraine. Lead with the delivery terms, how to order from another
+ * city, the cities (with links to their «Пошиття» and «Робочий одяг» pages), the map of delivery across Ukraine, what a buyer in Poltava gets, and the call to order. Static.
  */
 export async function RegionsPage({ locale }: { locale: Locale }) {
   const company = await loadSiteCompany();
@@ -48,13 +49,19 @@ export async function RegionsPage({ locale }: { locale: Locale }) {
         title={dictionary.cities.title}
         label={{ index: '03', text: dictionary.cities.label }}
       >
-        <RegionsCities dictionary={dictionary.cities} />
+        <RegionsCities dictionary={dictionary.cities} locale={locale} />
       </PageSection>
+
+      <DeliveryAcrossUkraine
+        id="regions-map"
+        index="04"
+        dictionary={getDeliveryDictionary(locale).acrossUkraine}
+      />
 
       <PageSection
         id="regions-local"
         title={dictionary.local.title}
-        label={{ index: '04', text: dictionary.local.label }}
+        label={{ index: '05', text: dictionary.local.label }}
       >
         <RegionsLocal
           company={company}
@@ -68,7 +75,7 @@ export async function RegionsPage({ locale }: { locale: Locale }) {
       <RegionsOrder
         company={company}
         id="regions-order"
-        index="05"
+        index="06"
         dictionary={dictionary.order}
         requestLabel={dictionary.request}
         requestHref={path('request')}

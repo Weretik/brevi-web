@@ -4,7 +4,7 @@
 
 `/uk/about-company` and `/ru/about-company` show the page about Brevi's own sewing production: breadcrumbs, `h1` with two lead paragraphs and a suit photo, three production stages, fabric choice, threads and hardware, branding, and how to start an order. The text is the live `brevi.com.ua` page «Власне виробництво спецодягу Brevi»; Russian is its translation. The page is static and reads no API.
 
-«Обговорити пошиття спецодягу» leads to the contacts block of the home page (`/uk#zayavka`) until the request page exists. The links to `/our-work`, `/logo-printing`, and `/contacts` answer 404 until their stages.
+«Обговорити пошиття спецодягу» opens the [request window](request.md). The links to `/our-work`, `/logo-printing`, and `/contacts` answer 404 until their stages.
 
 ## Structure diagram
 
