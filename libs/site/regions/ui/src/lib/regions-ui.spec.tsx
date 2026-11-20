@@ -44,14 +44,20 @@ describe('regions blocks', () => {
     expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(4);
   });
 
-  it('names the cities of the live site and says the list is not a limit', () => {
+  it('links every city of the city pages to both of its pages and says the list is not a limit', () => {
     const dictionary = getRegionsDictionary('uk').cities;
-    render(<RegionsCities dictionary={dictionary} />);
+    render(<RegionsCities dictionary={dictionary} locale="uk" />);
 
     expect(screen.getAllByRole('listitem')).toHaveLength(14);
-    for (const city of ['Київ', 'Харків', 'Дніпро', 'Одеса', 'Полтава']) {
-      expect(screen.getByText(city)).toBeTruthy();
-    }
+    expect(screen.getByRole('link', { name: 'Пошиття у Харкові' }).getAttribute('href')).toBe(
+      '/uk/sewing/kharkiv',
+    );
+    expect(screen.getByRole('link', { name: 'Робочий одяг у Харкові' }).getAttribute('href')).toBe(
+      '/uk/workwear/kharkiv',
+    );
+    expect(screen.getAllByRole('link')).toHaveLength(26);
+    // Lviv has no city pages yet: its name stays plain text.
+    expect(screen.getByText('Львів').closest('li')?.querySelector('a')).toBeNull();
     expect(screen.getByText(/Немає вашого міста/)).toBeTruthy();
   });
 

@@ -1,6 +1,7 @@
 'use client';
 
-import { catalogCategoryPath, localizedPath } from '@site/core/i18n';
+import { catalogSectionPath } from '@site/catalog/model';
+import { localizedPath } from '@site/core/i18n';
 import {
   Sheet,
   SheetClose,
@@ -19,7 +20,10 @@ import type { ShellDictionary } from '../i18n/shell-dictionary';
 import type { CatalogSection } from '@site/catalog/model';
 import type { Locale } from '@site/core/i18n';
 
-/** Yellow «Каталог» of the phone header: a left sheet with the sections folded into their subsections. */
+/**
+ * Yellow «Каталог» of the phone header: a left sheet with the sections folded into their subsections, the city
+ * sections («Пошиття», «Робочий одяг») last.
+ */
 export function MobileCatalogSheet({
   locale,
   dictionary,
@@ -60,10 +64,10 @@ export function MobileCatalogSheet({
                   <li>
                     <SheetClose asChild>
                       <Link
-                        href={localizedPath(locale, catalogCategoryPath(section.slug))}
+                        href={localizedPath(locale, catalogSectionPath(section))}
                         className="block py-2 font-bold text-brand-text"
                       >
-                        {dictionary.sectionAll}
+                        {section.allLabel?.[locale] ?? dictionary.sectionAll}
                       </Link>
                     </SheetClose>
                   </li>
@@ -71,7 +75,7 @@ export function MobileCatalogSheet({
                     <li key={item.key}>
                       <SheetClose asChild>
                         <Link
-                          href={localizedPath(locale, catalogCategoryPath(item.slug))}
+                          href={localizedPath(locale, catalogSectionPath(item))}
                           className="block py-2"
                         >
                           {item.label[locale]}

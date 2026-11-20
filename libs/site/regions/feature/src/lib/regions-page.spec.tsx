@@ -43,14 +43,16 @@ describe('RegionsPage', () => {
     }
   });
 
-  it('is one page for all cities: the cities are text, not links', async () => {
+  it('links the cities to their city pages', async () => {
     const { container } = render(await RegionsPage({ locale: 'uk' }));
     const [breadcrumbs] = [...container.querySelectorAll('script[type="application/ld+json"]')].map(
       (node) => JSON.parse(node.textContent ?? '{}'),
     );
 
     expect(breadcrumbs.itemListElement[1].item).toBe('https://brevi.com.ua/uk/regions');
-    for (const city of screen.getAllByText('Харків')) expect(city.closest('a')).toBeNull();
+    expect(screen.getByRole('link', { name: 'Пошиття у Харкові' }).getAttribute('href')).toBe(
+      '/uk/sewing/kharkiv',
+    );
     expect(container.querySelector('a[href*="/regions/"]')).toBeNull();
   });
 });

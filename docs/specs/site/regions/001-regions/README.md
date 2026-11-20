@@ -33,16 +33,16 @@ One page for all cities instead of a page per city. A city gets its own page lat
 
 ## Rules
 
-| ID     | Rule                                                                                                                   |
-| ------ | ---------------------------------------------------------------------------------------------------------------------- |
-| RG-001 | One `h1`; blocks: lead with the delivery terms, how to order from another city, cities, Poltava, order.                |
-| RG-002 | The first screen says that orders come from any city and nobody has to travel to Poltava.                              |
-| RG-003 | Delivery facts repeat the delivery page: Nova Poshta and SAT, shipped within 3 working days, courier in Poltava 250 ₴. |
-| RG-004 | Cities are plain text, not links; the page says the list is not a limit.                                               |
-| RG-005 | «Залишити заявку» opens the request page with `nofollow`; the only phone is the site phone.                            |
-| RG-006 | Internal links to delivery, contacts, production, wholesale prices, and industries; the footer links to the page.      |
-| RG-007 | Breadcrumbs are visible and repeated in `BreadcrumbList`; `Organization` names Ukraine as the area served.             |
-| RG-008 | Title and description per language, canonical, `hreflang`; both languages have the same blocks; no client components.  |
+| ID     | Rule                                                                                                                                                                                       |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| RG-001 | One `h1`; blocks: lead with the delivery terms, how to order from another city, cities, Poltava, order.                                                                                    |
+| RG-002 | The first screen says that orders come from any city and nobody has to travel to Poltava.                                                                                                  |
+| RG-003 | Delivery facts repeat the delivery page: Nova Poshta and SAT, shipped within 3 working days, courier in Poltava 250 ₴.                                                                     |
+| RG-004 | Cities are plain text, not links; the page says the list is not a limit. Replaced on 2026-11-20 by [002](../002-city-pages/README.md): the 13 cities with city pages link to both of them. |
+| RG-005 | «Залишити заявку» opens the request page with `nofollow`; the only phone is the site phone.                                                                                                |
+| RG-006 | Internal links to delivery, contacts, production, wholesale prices, and industries; the footer links to the page.                                                                          |
+| RG-007 | Breadcrumbs are visible and repeated in `BreadcrumbList`; `Organization` names Ukraine as the area served.                                                                                 |
+| RG-008 | Title and description per language, canonical, `hreflang`; both languages have the same blocks; no client components.                                                                      |
 
 ## Traceability
 

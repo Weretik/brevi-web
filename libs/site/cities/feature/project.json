@@ -1,0 +1,7 @@
+{
+  "name": "site-cities-feature",
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/site/cities/feature/src",
+  "projectType": "library",
+  "tags": ["scope:site", "domain:cities", "type:feature"]
+}

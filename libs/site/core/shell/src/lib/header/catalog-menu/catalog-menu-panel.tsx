@@ -1,6 +1,7 @@
 'use client';
 
-import { catalogCategoryPath, localizedPath } from '@site/core/i18n';
+import { catalogSectionPath } from '@site/catalog/model';
+import { localizedPath } from '@site/core/i18n';
 import { ChevronRightIcon } from 'lucide-react';
 import Link from 'next/link';
 
@@ -11,8 +12,9 @@ import type { CatalogSection } from '@site/catalog/model';
 import type { Locale } from '@site/core/i18n';
 
 /**
- * Right pane of the catalog menu: the subsections of every section (only the active one shown). Only an empty
- * catalog gets «Весь каталог» here, so the menu is never a dead end.
+ * Right pane of the catalog menu: the subsections of every section (only the active one shown). A city section
+ * («Пошиття», «Робочий одяг») leads to its city pages and «Усі міста». Only a catalog without its own sections
+ * gets «Весь каталог» here, so the menu is never a dead end.
  */
 export function CatalogMenuPanel({
   locale,
@@ -29,7 +31,8 @@ export function CatalogMenuPanel({
   panelId: string;
   onNavigate: () => void;
 }) {
-  const categoryHref = (slug: string) => localizedPath(locale, catalogCategoryPath(slug));
+  const href = (entry: { slug: string; path?: string }) =>
+    localizedPath(locale, catalogSectionPath(entry));
   return (
     <div className="p-7">
       {sections.map((section) => (
@@ -39,19 +42,19 @@ export function CatalogMenuPanel({
               {section.label[locale]}
             </p>
             <Link
-              href={categoryHref(section.slug)}
+              href={href(section)}
               onClick={onNavigate}
-              aria-label={`${dictionary.sectionAll}: ${section.label[locale]}`}
+              aria-label={`${section.allLabel?.[locale] ?? dictionary.sectionAll}: ${section.label[locale]}`}
               className="font-bold text-brand-text hover:underline"
             >
-              {dictionary.sectionAll} <span aria-hidden>→</span>
+              {section.allLabel?.[locale] ?? dictionary.sectionAll} <span aria-hidden>→</span>
             </Link>
           </div>
           <ul className="grid gap-x-8 sm:grid-cols-2">
             {section.items.map((item) => (
               <li key={item.key} className="border-b border-border">
                 <Link
-                  href={categoryHref(item.slug)}
+                  href={href(item)}
                   onClick={onNavigate}
                   className="flex items-center justify-between gap-3 py-3 font-semibold hover:text-brand-text"
                 >
@@ -67,7 +70,7 @@ export function CatalogMenuPanel({
           </ul>
         </div>
       ))}
-      {sections.length === 0 ? (
+      {sections.every((section) => section.path) ? (
         <Link
           href={localizedPath(locale, SHELL_PATHS.catalog)}
           onClick={onNavigate}

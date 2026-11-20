@@ -1,4 +1,4 @@
-import { toCatalogSections } from './catalog-sections';
+import { catalogSectionPath, toCatalogSections } from './catalog-sections';
 import { findCatalogPath, flattenCatalogTree } from '../entities/catalog-tree';
 
 import type { CatalogTreeNode } from '../entities/catalog-tree';
@@ -46,5 +46,12 @@ describe('catalog tree', () => {
         ],
       },
     ]);
+  });
+
+  it('leads a menu entry to its own page or to its catalog category', () => {
+    expect(catalogSectionPath({ slug: 'kurtky' })).toBe('/catalog/kurtky');
+    expect(catalogSectionPath({ slug: 'kharkiv', path: '/sewing/kharkiv' })).toBe(
+      '/sewing/kharkiv',
+    );
   });
 });

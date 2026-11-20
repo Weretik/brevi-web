@@ -40,3 +40,17 @@ export function catalogCategoryPath(slug: string): string {
 export function catalogSearchIndexPath(locale: string): string {
   return `/api/catalog-search/${locale}`;
 }
+
+/** The two kinds of city page: own sewing to order, and ready workwear to buy. */
+export type CityPageKind = 'sewing' | 'workwear';
+
+/** Locale-free root of each kind of city page; a city page is `<root>/<citySlug>`. */
+export const CITY_PAGE_ROOTS: Record<CityPageKind, string> = {
+  sewing: '/sewing',
+  workwear: '/workwear',
+};
+
+/** Locale-free path of a city page: `/sewing/kharkiv` or `/workwear/kharkiv`. */
+export function cityPagePath(kind: CityPageKind, citySlug: string): string {
+  return `${CITY_PAGE_ROOTS[kind]}/${citySlug}`;
+}

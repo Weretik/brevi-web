@@ -15,8 +15,8 @@ export type {
 } from './lib/entities/catalog-product';
 export { parseCatalogInline, plainCatalogText } from './lib/mappers/catalog-inline';
 export type { CatalogInlineRun } from './lib/mappers/catalog-inline';
-export { toCatalogSections } from './lib/mappers/catalog-sections';
-export type { CatalogSection } from './lib/mappers/catalog-sections';
+export { catalogSectionPath, toCatalogSections } from './lib/mappers/catalog-sections';
+export type { CatalogSection, CatalogSectionItem } from './lib/mappers/catalog-sections';
 export {
   catalogCategoryFamily,
   findCatalogPath,

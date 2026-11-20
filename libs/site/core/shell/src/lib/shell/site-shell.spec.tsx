@@ -1,3 +1,4 @@
+import { citySections } from '@site/cities/model';
 import { COMPANY } from '@site/core/config';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 
@@ -241,6 +242,51 @@ describe('SiteShell', () => {
     expect(request.getAttribute('rel')).toBe('nofollow');
     expect(within(menu).getByRole('navigation', { name: 'Мова сайту' })).toBeTruthy();
     expect(within(menu).getByText(/Працюємо з ПДВ/)).toBeTruthy();
+  });
+
+  it('adds «Пошиття» and «Робочий одяг» with their cities to the catalog menus, not to the footer', () => {
+    render(
+      <SiteShell
+        company={COMPANY}
+        locale="uk"
+        catalogSections={CATALOG_SECTIONS}
+        citySections={citySections()}
+      >
+        content
+      </SiteShell>,
+    );
+
+    fireEvent.click(catalogToggle());
+    const menu = screen.getByRole('region', { name: 'Розділи каталогу' });
+    fireEvent.click(within(menu).getByRole('button', { name: 'Пошиття' }));
+    expect(within(menu).getByRole('link', { name: 'Харків' }).getAttribute('href')).toBe(
+      '/uk/sewing/kharkiv',
+    );
+    expect(
+      within(menu).getByRole('link', { name: 'Усі міста: Пошиття' }).getAttribute('href'),
+    ).toBe('/uk/regions');
+    fireEvent.click(within(menu).getByRole('button', { name: 'Робочий одяг' }));
+    expect(within(menu).getByRole('link', { name: 'Біла Церква' }).getAttribute('href')).toBe(
+      '/uk/workwear/bila-tserkva',
+    );
+    // A catalog with its own sections needs no «Весь каталог» in the menu.
+    expect(within(menu).queryByRole('link', { name: /Весь каталог/ })).toBeNull();
+    expect(within(screen.getByRole('contentinfo')).queryByText('Пошиття')).toBeNull();
+    fireEvent.keyDown(document, { key: 'Escape' });
+
+    const catalogSheet = within(screen.getByRole('banner'))
+      .getAllByRole('button', { name: 'Каталог' })
+      .find((button) => button.hasAttribute('aria-haspopup')) as HTMLElement;
+    fireEvent.click(catalogSheet);
+    const sheet = screen.getByRole('dialog');
+    expect(within(sheet).getAllByRole('link', { name: 'Усі міста' })[0].getAttribute('href')).toBe(
+      '/uk/regions',
+    );
+    expect(
+      within(sheet)
+        .getAllByRole('link', { name: 'Суми' })
+        .map((link) => link.getAttribute('href')),
+    ).toEqual(['/uk/sewing/sumy', '/uk/workwear/sumy']);
   });
 
   it('switches the language on the same page', () => {

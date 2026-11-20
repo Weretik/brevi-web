@@ -1,4 +1,5 @@
 import {
+  BriefcaseIcon,
   DropletsIcon,
   FlameIcon,
   FootprintsIcon,
@@ -7,6 +8,7 @@ import {
   HardHatIcon,
   LayoutGridIcon,
   PackageCheckIcon,
+  ScissorsIcon,
   ShirtIcon,
   SnowflakeIcon,
   SunIcon,
@@ -35,6 +37,9 @@ const ICONS: Record<string, LucideIcon> = {
   'zahyst-organiv-dyhannya': WindIcon,
   'kasky-kepky': HardHatIcon,
   'gotovi-rishennya': PackageCheckIcon,
+  // The city sections of the menu: «Пошиття» and «Робочий одяг».
+  sewing: ScissorsIcon,
+  workwear: BriefcaseIcon,
 };
 
 /** Icon of a catalog category by its slug; decorative, the name is always written next to it. */

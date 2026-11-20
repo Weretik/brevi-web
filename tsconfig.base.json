@@ -173,7 +173,11 @@
       "@site/redirects/data-access": ["./libs/site/redirects/data-access/src/index.ts"],
       "@site/settings/data-access": ["./libs/site/settings/data-access/src/index.ts"],
       "@site/settings/feature": ["./libs/site/settings/feature/src/index.ts"],
-      "@admin/shared/routing": ["libs/admin/shared/routing/src/index.ts"]
+      "@admin/shared/routing": ["libs/admin/shared/routing/src/index.ts"],
+      "@site/cities/model": ["./libs/site/cities/model/src/index.ts"],
+      "@site/cities/ui": ["./libs/site/cities/ui/src/index.ts"],
+      "@site/cities/seo": ["./libs/site/cities/seo/src/index.ts"],
+      "@site/cities/feature": ["./libs/site/cities/feature/src/index.ts"]
     }
   }
 }
