@@ -58,7 +58,7 @@ export function CompanyContactFields({ values, errors, disabled, set }: CompanyF
         value={values.mapQuery}
         disabled={disabled}
         error={Boolean(errors['mapQuery'])}
-        helperText={errors['mapQuery'] ?? 'Що мапа шукає, щоб показати офіс.'}
+        helperText={errors['mapQuery'] ?? 'Адреса або точні координати офісу, наприклад 49.572597,34.53757.'}
         onChange={(event) => set('mapQuery', event.target.value)}
       />
       <Stack sx={{ gap: 0.5 }}>
