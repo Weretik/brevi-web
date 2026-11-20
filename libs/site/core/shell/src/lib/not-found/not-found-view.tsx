@@ -27,22 +27,15 @@ const TEXT: Record<
 };
 
 /** Not-found message with links to the home page and the catalog; used by both app 404 files. */
-export function NotFoundView({
-  locale,
-  headingLevel = 'h1',
-}: {
-  locale: Locale;
-  headingLevel?: 'h1' | 'h2';
-}) {
+export function NotFoundView({ locale }: { locale: Locale }) {
   const text = TEXT[locale];
-  const Heading = headingLevel;
 
   return (
     <section className="py-14" lang={LOCALE_LANGUAGE_TAGS[locale]}>
       <StitchLabel index="404">{text.label}</StitchLabel>
-      <Heading className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">
+      <h1 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">
         {text.heading}
-      </Heading>
+      </h1>
       <p className="mt-3 text-muted-foreground">{text.body}</p>
       <div className="mt-6 flex flex-wrap gap-3">
         <Button asChild>

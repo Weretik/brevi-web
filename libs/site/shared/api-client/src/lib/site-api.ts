@@ -1,5 +1,7 @@
 import { siteConfig } from '@site/core/config';
 
+import { getWithRetry } from './get-with-retry';
+
 import type { ApiResult } from './api-result';
 
 /** Anonymous read paths of BreviERP that the site may call. */
@@ -29,7 +31,8 @@ function buildUrl(path: PublicGetPath, query: SiteApiQuery, apiUrl: string): URL
 
 /**
  * GET against the public BreviERP API, for Server Components, metadata, and sitemaps only. The answer is raw
- * JSON: the domain `data-access` checks its shape. Caching is the caller's job (`'use cache'`).
+ * JSON: the domain `data-access` checks its shape. A brief failure (dropped connection, 429, 5xx) is repeated
+ * up to twice before it counts as `unavailable`. Caching is the caller's job (`'use cache'`).
  */
 export async function siteApiGet(
   path: PublicGetPath,
@@ -38,10 +41,12 @@ export async function siteApiGet(
   apiUrl: string = siteConfig.apiUrl,
 ): Promise<ApiResult> {
   try {
-    const response = await fetchImpl(buildUrl(path, query, apiUrl), {
-      headers: { Accept: 'application/json' },
-      signal: AbortSignal.timeout(DEFAULT_TIMEOUT_MS),
-    });
+    const response = await getWithRetry(
+      fetchImpl,
+      buildUrl(path, query, apiUrl),
+      { Accept: 'application/json' },
+      DEFAULT_TIMEOUT_MS,
+    );
     if (response.status === 404) return { kind: 'not-found' };
     if (!response.ok) return { kind: 'unavailable', status: response.status };
     return { kind: 'ok', data: (await response.json()) as unknown };

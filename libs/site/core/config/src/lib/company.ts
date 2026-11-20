@@ -96,8 +96,8 @@ export const COMPANY: Company = {
       email: 'brevi.pl05@gmail.com',
     },
   ],
-  /** Where the map link and the embedded map point. */
-  mapQuery: 'Полтава, вулиця Кагамлика, 3А',
+  /** Coordinates of the workshop from its Google Maps place: the street address puts the pin a little off. */
+  mapQuery: '49.572597,34.53757',
   /** Payment details from the live «Доставка та оплата» page. */
   bankDetails: {
     recipient: {
