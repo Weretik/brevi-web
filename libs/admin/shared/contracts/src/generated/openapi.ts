@@ -12662,8 +12662,8 @@ export interface components {
             kind: string;
             status: string;
             internalName: string;
-            /** Format: int64 */
-            customerId: null | number;
+            /** Format: uuid */
+            customerPublicId: null | string;
             recipientName: null | string;
             companyName: null | string;
             clientComment: null | string;
@@ -13100,8 +13100,8 @@ export interface components {
             /** Format: int32 */
             version: number;
             internalName: string;
-            /** Format: int64 */
-            customerId: null | number;
+            /** Format: uuid */
+            customerPublicId: null | string;
             recipientName: null | string;
             companyName: null | string;
             clientComment: null | string;
@@ -13114,8 +13114,8 @@ export interface components {
             /** Format: int32 */
             version: number;
             internalName: string;
-            /** Format: int64 */
-            customerId: null | number;
+            /** Format: uuid */
+            customerPublicId: null | string;
             recipientEmail: null | string;
             recipientName: null | string;
             companyName: null | string;
@@ -15478,6 +15478,7 @@ export interface operations {
                 search?: string;
                 from?: string;
                 to?: string;
+                supplierId?: number;
             };
             header?: never;
             path?: never;
@@ -18737,7 +18738,7 @@ export interface operations {
                 stage?: string;
                 page?: number;
                 pageSize?: number;
-                customerId?: number;
+                customerPublicId?: string;
                 quoteId?: number;
                 client?: string;
                 from?: string;
@@ -21287,6 +21288,9 @@ export interface operations {
                 search?: string;
                 page?: number;
                 pageSize?: number;
+                customerPublicId?: string;
+                from?: string;
+                to?: string;
             };
             header?: never;
             path?: never;
@@ -22227,7 +22231,9 @@ export interface operations {
                 responsibleUserId?: number;
                 page?: number;
                 pageSize?: number;
-                customerId?: number;
+                customerPublicId?: string;
+                from?: string;
+                to?: string;
             };
             header?: never;
             path?: never;
@@ -22680,6 +22686,9 @@ export interface operations {
                 assigneeUserId?: number;
                 page?: number;
                 pageSize?: number;
+                customerPublicId?: string;
+                from?: string;
+                to?: string;
             };
             header?: never;
             path?: never;
@@ -23428,6 +23437,7 @@ export interface operations {
                 categoryId?: number;
                 sortBy?: string;
                 sortDirection?: string;
+                supplierId?: number;
             };
             header?: never;
             path?: never;
