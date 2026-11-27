@@ -48,13 +48,13 @@ export function createAdminRouter() {
       children: [
         ...profileRoutes,
         { element: <RequireRole allow={canManageUsers} />, children: usersRoutes },
-        { element: <RequireRole allow={canManageUsers} />, children: tasksRoutes.admin },
         { element: <RequireRole allow={canManageUsers} />, children: aiRoutes },
         { element: <RequireRole allow={canManageUsers} />, children: accessRoutes },
         {
           element: <RequirePageAccess />,
           children: [
             ...adminRouteDefinitions,
+            ...tasksRoutes.admin,
             ...tasksRoutes.board,
             ...embroideryRoutes,
             ...productionRoutes,

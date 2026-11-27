@@ -1,13 +1,22 @@
 import {
   areAccessGrantsEqual,
+  changedAccessAreas,
   normalizeAccessGrants,
   setAccessAction,
-  setAccessView,
+  setAccessLevel,
+  setGroupAccessLevel,
 } from '@admin/users/model';
 import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import type { AccessAction, AccessArea, AccessGrants, AccessRole } from '@admin/users/model';
+import type {
+  AccessAction,
+  AccessArea,
+  AccessAreaGroup,
+  AccessGrants,
+  AccessLevel,
+  AccessRole,
+} from '@admin/users/model';
 
 interface RoleDraft {
   role: string;
@@ -24,8 +33,8 @@ interface Options {
 const tabParam = 'role';
 
 /**
- * «Права доступу»: the role tab kept in the URL, the unsaved switches of that role, and the
- * question before a changed role is left.
+ * «Права доступу»: the selected role kept in the URL, the unsaved switches of that role, the pages
+ * they change, and the question before a changed role is left.
  */
 export function useAccessRoleDraft({ roles, areas, onTabChange }: Options) {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -46,6 +55,11 @@ export function useAccessRoleDraft({ roles, areas, onTabChange }: Options) {
   const grants =
     draft && selectedRole && draft.role === selectedRole.name ? draft.grants : savedGrants;
   const dirty = Boolean(selectedRole) && !areAccessGrantsEqual(grants, savedGrants, areas);
+  const changedAreas = useMemo(
+    () => changedAccessAreas(grants, savedGrants, areas),
+    [grants, savedGrants, areas],
+  );
+  const changedKeys = useMemo(() => new Set(changedAreas.map((area) => area.key)), [changedAreas]);
 
   const selectTab = (roleName: string) => {
     setDraft(null);
@@ -76,6 +90,8 @@ export function useAccessRoleDraft({ roles, areas, onTabChange }: Options) {
     selectedRole,
     grants,
     dirty,
+    changedAreas,
+    changedKeys,
     pendingTab,
     selectTab,
     requestTab,
@@ -84,8 +100,15 @@ export function useAccessRoleDraft({ roles, areas, onTabChange }: Options) {
     },
     cancelPendingTab: () => setPendingTab(null),
     discardDraft: () => setDraft(null),
-    changeView: (pageKey: string, on: boolean) =>
-      changeGrants((current) => setAccessView(current, pageKey, on)),
+    changeLevel: (area: AccessArea, level: AccessLevel) =>
+      changeGrants((current) => setAccessLevel(current, area, level)),
+    changeGroupLevel: (group: AccessAreaGroup, level: 'none' | 'view' | 'all') =>
+      changeGrants((current) => setGroupAccessLevel(current, group, level)),
+    /** «Копіювати з ролі…»: the other role's saved rights become this role's draft. */
+    copyFrom: (roleName: string) => {
+      const source = roles.find((role) => role.name === roleName);
+      if (source) changeGrants(() => normalizeAccessGrants(source.grants, areas));
+    },
     changeAction: (pageKey: string, action: Exclude<AccessAction, 'view'>, on: boolean) =>
       changeGrants((current) => setAccessAction(current, pageKey, action, on)),
   };

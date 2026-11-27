@@ -1,106 +1,93 @@
-import { Alert, Box, Button, Card, Stack, Typography } from '@mui/material';
+import { filterAccessAreas } from '@admin/users/model';
+import { Alert, Button, Stack, Typography } from '@mui/material';
 
-import { AccessGroupCard } from '../../components/access-rights/access-group-card';
+import { AccessGroupSection } from '../../components/access-rights/rights/access-group-section';
+import { AccessRightsToolbar } from '../../components/access-rights/rights/access-rights-toolbar';
+import { AccessRoleHeader } from '../../components/access-rights/roles/access-role-header';
 
-import type { AccessAction, AccessAreaGroup, AccessGrants, AccessRole } from '@admin/users/model';
+import type {
+  AccessAction,
+  AccessArea,
+  AccessAreaGroup,
+  AccessGrants,
+  AccessLevel,
+  AccessPageFilter,
+  AccessRole,
+} from '@admin/users/model';
+
+/** Search, filter and folded groups of the rights list. */
+export interface AccessListView {
+  search: string;
+  filter: AccessPageFilter;
+  counts: Readonly<Record<AccessPageFilter, number>>;
+  collapsed: ReadonlySet<string>;
+  allCollapsed: boolean;
+  onSearchChange: (value: string) => void;
+  onFilterChange: (filter: AccessPageFilter) => void;
+  onToggleGroup: (title: string) => void;
+  onToggleAll: () => void;
+}
+
+/** Changes of the role's draft. */
+export interface AccessRoleEditing {
+  onLevelChange: (area: AccessArea, level: AccessLevel) => void;
+  onGroupLevelChange: (group: AccessAreaGroup, level: 'none' | 'view' | 'all') => void;
+  onActionChange: (pageKey: string, action: Exclude<AccessAction, 'view'>, on: boolean) => void;
+}
 
 interface AccessRolePanelProps {
   role: AccessRole;
   groups: readonly AccessAreaGroup[];
   grants: AccessGrants;
-  /** False while saving, for the director, or without the right to change. */
+  changed: ReadonlySet<string>;
+  /** False while saving, or for the director. */
   editable: boolean;
   /** The last save failed; `conflict` means someone else saved the role first. */
   saveError: { message: string; conflict: boolean } | null;
+  view: AccessListView;
+  editing: AccessRoleEditing;
+  onCopy: () => void;
+  onRename: () => void;
   onDelete: () => void;
   onReload: () => void;
   onClearSaveError: () => void;
-  onViewChange: (pageKey: string, on: boolean) => void;
-  onActionChange: (pageKey: string, action: Exclude<AccessAction, 'view'>, on: boolean) => void;
 }
 
-const savedAtFormat = new Intl.DateTimeFormat('uk-UA', { dateStyle: 'medium', timeStyle: 'short' });
-
-const formatSavedAt = (value: string): string => {
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? value : savedAtFormat.format(date);
-};
-
-const mono = { fontFamily: 'var(--admin-font-mono)', fontVariantNumeric: 'tabular-nums' } as const;
-
-/** «Права доступу»: one role tab — who holds it, deleting it, and its page switches. */
-export function AccessRolePanel({
-  role,
-  groups,
-  grants,
-  editable,
-  saveError,
-  onDelete,
-  onReload,
-  onClearSaveError,
-  onViewChange,
-  onActionChange,
-}: AccessRolePanelProps) {
-  const deleteBlocked = role.userCount > 0;
+/** The right column: the selected role, its search and filters, and its pages by menu group. */
+export function AccessRolePanel(props: AccessRolePanelProps) {
+  const { role, groups, grants, changed, editable, saveError, view, editing } = props;
+  const narrowed = view.search.trim() !== '' || view.filter !== 'all';
+  const visible = groups
+    .map((group) => ({
+      group,
+      areas: filterAccessAreas(group.areas, {
+        search: view.search,
+        filter: view.filter,
+        grants,
+        changed,
+      }),
+    }))
+    .filter((item) => item.areas.length > 0);
 
   return (
-    <Stack
-      aria-labelledby={`access-role-tab-${role.name}`}
-      role="tabpanel"
-      spacing={2}
-      sx={{ pt: 2 }}
-    >
-      <Stack
-        direction={{ xs: 'column', sm: 'row' }}
-        sx={{ alignItems: { sm: 'center' }, gap: 1, justifyContent: 'space-between' }}
-      >
-        <Typography sx={{ color: 'text.secondary' }} variant="body2">
-          Користувачів з цією роллю:{' '}
-          <Box component="span" sx={mono}>
-            {role.userCount}
-          </Box>
-          {role.updatedAt ? (
-            <>
-              {' · '}Останні зміни: {role.updatedByName ? `${role.updatedByName}, ` : ''}
-              <Box component="span" sx={mono}>
-                {formatSavedAt(role.updatedAt)}
-              </Box>
-            </>
-          ) : null}
-        </Typography>
-        {!role.builtIn && !role.locked ? (
-          <Stack sx={{ alignItems: { sm: 'flex-end' }, gap: 0.5 }}>
-            <Button
-              color="error"
-              disabled={deleteBlocked}
-              onClick={onDelete}
-              size="small"
-              variant="outlined"
-            >
-              Видалити роль
-            </Button>
-            {deleteBlocked ? (
-              <Typography sx={{ color: 'text.secondary' }} variant="caption">
-                Спершу змініть роль у{' '}
-                <Box component="span" sx={mono}>
-                  {role.userCount}
-                </Box>{' '}
-                {role.userCount === 1 ? 'користувача' : 'користувачів'}
-              </Typography>
-            ) : null}
-          </Stack>
-        ) : null}
-      </Stack>
+    <Stack aria-label={`Права ролі «${role.title}»`} component="section" spacing={2}>
+      <AccessRoleHeader
+        editable={editable}
+        onCopy={props.onCopy}
+        onDelete={props.onDelete}
+        onRename={props.onRename}
+        role={role}
+      />
       {saveError ? (
         <Alert
           action={
             saveError.conflict ? (
-              <Button color="inherit" onClick={onReload} size="small">
+              <Button color="inherit" onClick={props.onReload} size="small">
                 Перезавантажити
               </Button>
             ) : undefined
           }
-          onClose={saveError.conflict ? undefined : onClearSaveError}
+          onClose={saveError.conflict ? undefined : props.onClearSaveError}
           severity="error"
         >
           {saveError.message}
@@ -111,32 +98,39 @@ export function AccessRolePanel({
           {role.title} — усі права, не змінюється. Директор бачить кожну сторінку й може все,
           зокрема сторінки, додані пізніше.
         </Alert>
-      ) : groups.length === 0 ? (
-        <Card sx={{ p: 3 }} variant="outlined">
-          <Typography color="text.secondary" variant="body2">
-            Сторінок, до яких можна дати доступ, ще немає.
-          </Typography>
-        </Card>
       ) : (
-        <Box
-          sx={{
-            alignItems: 'start',
-            display: 'grid',
-            gap: 2,
-            gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'repeat(2, minmax(0, 1fr))' },
-          }}
-        >
-          {groups.map((group) => (
-            <AccessGroupCard
-              disabled={!editable}
-              grants={grants}
-              group={group}
-              key={group.title}
-              onActionChange={onActionChange}
-              onViewChange={onViewChange}
-            />
-          ))}
-        </Box>
+        <>
+          <AccessRightsToolbar
+            allCollapsed={view.allCollapsed}
+            counts={view.counts}
+            filter={view.filter}
+            onFilterChange={view.onFilterChange}
+            onSearchChange={view.onSearchChange}
+            onToggleAll={view.onToggleAll}
+            search={view.search}
+          />
+          {visible.length === 0 ? (
+            <Typography sx={{ color: 'text.secondary', py: 2 }} variant="body2">
+              {view.filter === 'changed' && !view.search ? 'Змін ще немає.' : 'Нічого не знайдено.'}
+            </Typography>
+          ) : (
+            visible.map(({ group, areas }) => (
+              <AccessGroupSection
+                changed={changed}
+                disabled={!editable}
+                expanded={narrowed || !view.collapsed.has(group.title)}
+                grants={grants}
+                group={group}
+                key={group.title}
+                onActionChange={editing.onActionChange}
+                onGroupLevelChange={editing.onGroupLevelChange}
+                onLevelChange={editing.onLevelChange}
+                onToggle={() => view.onToggleGroup(group.title)}
+                visibleAreas={areas}
+              />
+            ))
+          )}
+        </>
       )}
     </Stack>
   );

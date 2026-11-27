@@ -1,14 +1,18 @@
 import { useGetAccessRightsQuery } from '@admin/users/data-access';
 import { groupAccessAreas, normalizeAccessGrants } from '@admin/users/model';
-import { AccessRightsHeader, AccessRolePanel, AccessRoleTabs, NewRolePanel } from '@admin/users/ui';
-import { Alert, Box, Button, Card, Stack, Typography } from '@mui/material';
+import { AccessAdminOnlyCard, AccessRightsHeader } from '@admin/users/ui';
+import { Alert, Button, Stack } from '@mui/material';
 import { useMemo, useState } from 'react';
 
 import { AccessRightsDialogs } from '../components/access-rights-dialogs';
+import { AccessRightsPanels } from '../components/access-rights-panels';
 import { AccessRightsUnavailable } from '../components/access-rights-unavailable';
-import { useAccessRightsActions } from '../hooks/use-access-rights-actions';
-import { useAccessRoleDraft } from '../hooks/use-access-role-draft';
+import { AccessRightsWorkspace } from '../components/access-rights-workspace';
+import { useAccessListView } from '../hooks/access/use-access-list-view';
+import { useAccessRightsActions } from '../hooks/access/use-access-rights-actions';
+import { useAccessRoleDraft } from '../hooks/access/use-access-role-draft';
 
+import type { AccessPanel } from '../components/access-rights-panels';
 import type { AccessRole } from '@admin/users/model';
 
 interface AccessRightsPageProps {
@@ -16,6 +20,7 @@ interface AccessRightsPageProps {
   onAccessChanged: () => Promise<void>;
 }
 
+/** «Адміністрування › Права доступу»: roles on the left, the selected role's rights on the right (ACC-002). */
 export default function AccessRightsPage({ onAccessChanged }: AccessRightsPageProps) {
   const rightsQuery = useGetAccessRightsQuery();
   const rights = rightsQuery.currentData ?? rightsQuery.data;
@@ -23,22 +28,28 @@ export default function AccessRightsPage({ onAccessChanged }: AccessRightsPagePr
   const roles = useMemo(() => rights?.roles ?? [], [rights]);
   const groups = useMemo(() => groupAccessAreas(areas), [areas]);
 
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [panel, setPanel] = useState<AccessPanel>(null);
   const [deleteTarget, setDeleteTarget] = useState<AccessRole | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const actions = useAccessRightsActions({ onAccessChanged, onSuccess: setSuccessMessage });
-  const role = useAccessRoleDraft({ roles, areas, onTabChange: actions.clearSaveError });
-  const { selectedRole, grants, dirty } = role;
-  const editable = Boolean(selectedRole) && !selectedRole?.locked && !actions.saving;
+  const draft = useAccessRoleDraft({ roles, areas, onTabChange: actions.clearSaveError });
+  const list = useAccessListView({
+    areas,
+    groups,
+    grants: draft.grants,
+    changed: draft.changedKeys,
+  });
+  const { selectedRole } = draft;
 
   const handleSave = async () => {
-    if (!selectedRole || !dirty) return;
-    if (await actions.save(selectedRole, normalizeAccessGrants(grants, areas))) role.discardDraft();
+    if (!selectedRole || !draft.dirty) return;
+    const saved = await actions.save(selectedRole, normalizeAccessGrants(draft.grants, areas));
+    if (saved) draft.discardDraft();
   };
 
   const handleReload = () => {
-    role.discardDraft();
+    draft.discardDraft();
     actions.clearSaveError();
     void rightsQuery.refetch();
   };
@@ -46,31 +57,26 @@ export default function AccessRightsPage({ onAccessChanged }: AccessRightsPagePr
   const handleCreate = async (title: string): Promise<boolean> => {
     const name = await actions.create(title);
     if (!name) return false;
-    role.selectTab(name);
+    list.stopComparing();
+    draft.selectTab(name);
     return true;
   };
 
   const handleDelete = async () => {
-    if (!deleteTarget) return;
-    if (await actions.remove(deleteTarget)) {
-      setDeleteTarget(null);
-      const next = roles.find((item) => !item.locked && item.name !== deleteTarget.name);
-      if (next) role.selectTab(next.name);
-    }
+    if (!deleteTarget || !(await actions.remove(deleteTarget))) return;
+    setDeleteTarget(null);
+    const next = roles.find((item) => !item.locked && item.name !== deleteTarget.name);
+    if (next) draft.selectTab(next.name);
+  };
+
+  const openPanel = (next: Exclude<AccessPanel, null>) => {
+    actions.clearCreateError();
+    actions.clearRenameError();
+    setPanel(next);
   };
 
   const header = (
-    <AccessRightsHeader
-      canSave={Boolean(selectedRole && !selectedRole.locked)}
-      dirty={dirty}
-      loaded={Boolean(rights)}
-      onNewRole={() => {
-        actions.clearCreateError();
-        setIsCreateOpen(true);
-      }}
-      onSave={() => void handleSave()}
-      saving={actions.saving}
-    />
+    <AccessRightsHeader loaded={Boolean(rights)} onNewRole={() => openPanel('create')} />
   );
 
   if (!rights) {
@@ -78,8 +84,8 @@ export default function AccessRightsPage({ onAccessChanged }: AccessRightsPagePr
       <Stack component="section" spacing={3}>
         {header}
         <AccessRightsUnavailable
-          isError={rightsQuery.isError}
           error={rightsQuery.error}
+          isError={rightsQuery.isError}
           onRetry={() => void rightsQuery.refetch()}
         />
       </Stack>
@@ -97,53 +103,39 @@ export default function AccessRightsPage({ onAccessChanged }: AccessRightsPagePr
           Не вдалося оновити права доступу.
         </Alert>
       ) : null}
-      {roles.length === 0 ? (
-        <Card sx={{ p: 3 }} variant="outlined">
-          <Typography color="text.secondary" variant="body2">
-            Ролей ще немає.
-          </Typography>
-        </Card>
-      ) : (
-        <Box>
-          <AccessRoleTabs
-            onSelect={role.requestTab}
-            roles={roles}
-            selected={selectedRole?.name ?? ''}
-          />
-          {selectedRole ? (
-            <AccessRolePanel
-              editable={editable}
-              grants={grants}
-              groups={groups}
-              onActionChange={role.changeAction}
-              onClearSaveError={actions.clearSaveError}
-              onDelete={() => {
-                actions.clearDeleteError();
-                setDeleteTarget(selectedRole);
-              }}
-              onReload={handleReload}
-              onViewChange={role.changeView}
-              role={selectedRole}
-              saveError={actions.saveError}
-            />
-          ) : null}
-        </Box>
-      )}
-      <NewRolePanel
-        error={actions.createError}
-        onClose={() => setIsCreateOpen(false)}
-        onSubmit={handleCreate}
-        open={isCreateOpen}
-        submitting={actions.creating}
+      <AccessRightsWorkspace
+        actions={actions}
+        areas={areas}
+        draft={draft}
+        groups={groups}
+        list={list}
+        onCopy={() => openPanel('copy')}
+        onDelete={() => {
+          actions.clearDeleteError();
+          setDeleteTarget(selectedRole);
+        }}
+        onReload={handleReload}
+        onRename={() => openPanel('rename')}
+        onSave={() => void handleSave()}
+        roles={roles}
+      />
+      <AccessAdminOnlyCard items={rights.adminOnly} />
+      <AccessRightsPanels
+        actions={actions}
+        draft={draft}
+        onClose={() => setPanel(null)}
+        onCreate={handleCreate}
+        panel={panel}
+        roles={roles}
       />
       <AccessRightsDialogs
         actions={actions}
-        role={role}
         deleteTarget={deleteTarget}
         onCancelDelete={() => setDeleteTarget(null)}
-        onDelete={() => void handleDelete()}
-        successMessage={successMessage}
         onCloseSuccess={() => setSuccessMessage(null)}
+        onDelete={() => void handleDelete()}
+        role={draft}
+        successMessage={successMessage}
       />
     </Stack>
   );

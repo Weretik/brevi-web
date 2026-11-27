@@ -21,6 +21,7 @@ export {
   useCreateRoleMutation,
   useDeleteRoleMutation,
   useGetAccessRightsQuery,
+  useRenameRoleMutation,
   useSaveRoleAccessMutation,
 } from './api/access-rights.api';
-export type { SaveRoleAccessInput } from './api/access-rights.api';
+export type { RenameRoleInput, SaveRoleAccessInput } from './api/access-rights.api';

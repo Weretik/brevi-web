@@ -1,8 +1,8 @@
 import { ConfirmActionDialog } from '@admin/users/ui';
 import { Alert, Snackbar } from '@mui/material';
 
-import type { useAccessRightsActions } from '../hooks/use-access-rights-actions';
-import type { useAccessRoleDraft } from '../hooks/use-access-role-draft';
+import type { useAccessRightsActions } from '../hooks/access/use-access-rights-actions';
+import type { useAccessRoleDraft } from '../hooks/access/use-access-role-draft';
 import type { AccessRole } from '@admin/users/model';
 
 interface Props {

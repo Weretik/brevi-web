@@ -1,13 +1,14 @@
 import {
   useCreateRoleMutation,
   useDeleteRoleMutation,
+  useRenameRoleMutation,
   useSaveRoleAccessMutation,
 } from '@admin/users/data-access';
 import { useState } from 'react';
 
-import { getAccessErrorMessage } from '../errors/access-error-message';
+import { getAccessErrorMessage } from '../../errors/access-error-message';
 
-import type { AccessErrorMessage } from '../errors/access-error-message';
+import type { AccessErrorMessage } from '../../errors/access-error-message';
 import type { AccessGrants, AccessRole } from '@admin/users/model';
 
 interface AccessRightsActionsOptions {
@@ -21,10 +22,12 @@ export function useAccessRightsActions({ onAccessChanged, onSuccess }: AccessRig
   const [saveRoleAccess, saveState] = useSaveRoleAccessMutation();
   const [createRole, createState] = useCreateRoleMutation();
   const [deleteRole, deleteState] = useDeleteRoleMutation();
+  const [renameRole, renameState] = useRenameRoleMutation();
 
   const [saveError, setSaveError] = useState<AccessErrorMessage | null>(null);
   const [createError, setCreateError] = useState<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [renameError, setRenameError] = useState<string | null>(null);
 
   const refreshSession = () => {
     onAccessChanged().catch(() => {
@@ -59,6 +62,19 @@ export function useAccessRightsActions({ onAccessChanged, onSuccess }: AccessRig
     }
   };
 
+  const rename = async (role: AccessRole, title: string): Promise<boolean> => {
+    setRenameError(null);
+    try {
+      const renamed = await renameRole({ role: role.name, title }).unwrap();
+      onSuccess(`Роль перейменовано на «${renamed.title}».`);
+      refreshSession();
+      return true;
+    } catch (error) {
+      setRenameError(getAccessErrorMessage(error, 'rename').message);
+      return false;
+    }
+  };
+
   const remove = async (role: AccessRole): Promise<boolean> => {
     setDeleteError(null);
     try {
@@ -75,6 +91,7 @@ export function useAccessRightsActions({ onAccessChanged, onSuccess }: AccessRig
   return {
     clearCreateError: () => setCreateError(null),
     clearDeleteError: () => setDeleteError(null),
+    clearRenameError: () => setRenameError(null),
     clearSaveError: () => setSaveError(null),
     create,
     createError,
@@ -82,6 +99,9 @@ export function useAccessRightsActions({ onAccessChanged, onSuccess }: AccessRig
     deleteError,
     deleting: deleteState.isLoading,
     remove,
+    rename,
+    renameError,
+    renaming: renameState.isLoading,
     save,
     saveError,
     saving: saveState.isLoading,

@@ -33,7 +33,8 @@ export default function TaskBoardPage({
   const editor = useTaskEditor(viewer, notice.notify);
   useTaskLink(openTaskId, editor.open);
   const today = tasksForToday(board.tasks, new Date());
-  const { canCreate } = usePageRights();
+  // «Нове завдання» belongs to «Завдання менеджерам», not to «Мої завдання» (ACC-002).
+  const canCreate = usePageRights().can('create', 'manager-tasks');
 
   return (
     <Box>

@@ -11,6 +11,12 @@ import type { components } from '@admin/shared/contracts';
 import type { AccessGrants, AccessRights, AccessRole } from '@admin/users/model';
 
 type CreateRoleBody = components['schemas']['CreateRoleRequest'];
+type RenameRoleBody = components['schemas']['RenameRoleRequest'];
+
+export interface RenameRoleInput {
+  role: string;
+  title: string;
+}
 
 export interface SaveRoleAccessInput {
   role: string;
@@ -63,6 +69,18 @@ export const accessRightsApi = adminApi.injectEndpoints({
         ),
       invalidatesTags: ['AccessRights'],
     }),
+    renameRole: build.mutation<AccessRole, RenameRoleInput>({
+      queryFn: ({ role, title }, { signal }) =>
+        apiCall(
+          apiClient.PUT('/api/admin/access/roles/{role}/title', {
+            params: { path: { role } },
+            body: { title: title.trim() } satisfies RenameRoleBody,
+            signal,
+          }),
+          mapAccessRole,
+        ),
+      invalidatesTags: ['AccessRights'],
+    }),
     deleteRole: build.mutation<void, string>({
       queryFn: (role, { signal }) =>
         apiCall(
@@ -80,5 +98,6 @@ export const {
   useCreateRoleMutation,
   useDeleteRoleMutation,
   useGetAccessRightsQuery,
+  useRenameRoleMutation,
   useSaveRoleAccessMutation,
 } = accessRightsApi;

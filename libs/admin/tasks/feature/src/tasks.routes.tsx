@@ -15,8 +15,8 @@ export interface TasksRouteOptions {
 type TaskRoute = RouteObject & { path: string };
 
 /**
- * `admin`: «Адміністрування › Завдання менеджерам», the app puts it behind the Admin role.
- * `board`: «Менеджер сервісу › Мої завдання» for Manager, Director and Admin.
+ * `admin`: «Адміністрування › Завдання менеджерам» (page `manager-tasks`).
+ * `board`: «Менеджер сервісу › Мої завдання» (page `tasks`).
  */
 export function createTasksRoutes({ useTaskViewer }: TasksRouteOptions): {
   admin: TaskRoute[];

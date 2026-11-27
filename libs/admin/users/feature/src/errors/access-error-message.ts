@@ -1,6 +1,6 @@
 import type { ApiError } from '@admin/shared/api-client';
 
-export type AccessOperation = 'load' | 'save' | 'create' | 'delete';
+export type AccessOperation = 'load' | 'save' | 'create' | 'rename' | 'delete';
 
 export interface AccessErrorMessage {
   message: string;
@@ -31,7 +31,9 @@ export const getAccessErrorMessage = (
         true,
       );
     }
-    if (operation === 'create') return result('Роль з такою назвою вже існує.');
+    if (operation === 'create' || operation === 'rename') {
+      return result('Роль з такою назвою вже існує.');
+    }
     if (operation === 'delete') {
       return result('Роль ще мають користувачі. Спершу змініть їм роль на сторінці «Користувачі».');
     }
@@ -47,6 +49,10 @@ export const getAccessErrorMessage = (
 
   if (error.status === 400 && operation === 'delete') {
     return result('Вбудовану роль не можна видалити.');
+  }
+
+  if (error.status === 400 && operation === 'rename' && !error.fieldErrors?.['title']) {
+    return result('Вбудовану роль перейменувати не можна.');
   }
 
   if (error.code === 'Validation' || error.status === 400) {

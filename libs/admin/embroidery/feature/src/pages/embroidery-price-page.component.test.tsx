@@ -1,3 +1,4 @@
+import { PageRightsProvider } from '@admin/shared/ui';
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -148,13 +149,18 @@ afterEach(() => {
   addToQuote.mockReset();
 });
 
-function renderPage(isAdmin: boolean, url = '/crm/embroidery') {
+/** `canDelete` is «Видаляти» on «Ціна вишивки»; the settings tab is its own page (ACC-002). */
+function renderPage(isAdmin: boolean, url = '/crm/embroidery', canDelete = isAdmin) {
   formQuery.mockReturnValue({ data: { ...setup, seesCost: isAdmin }, isLoading: false });
   const router = createMemoryRouter(
     [
       {
         path: '/crm/embroidery',
-        element: <EmbroideryPricePage viewer={{ canEditSettings: isAdmin }} />,
+        element: (
+          <PageRightsProvider can={(action) => action !== 'delete' || canDelete}>
+            <EmbroideryPricePage viewer={{ canEditSettings: isAdmin }} />
+          </PageRightsProvider>
+        ),
       },
     ],
     { initialEntries: [url] },

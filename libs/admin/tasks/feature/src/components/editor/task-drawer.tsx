@@ -29,7 +29,10 @@ function description(editor: TaskEditor, viewer: TaskViewer): string {
 
 /** Side panel of both task pages (ReferenceEditorDrawer, like every Admin side panel). */
 export function TaskDrawer({ editor, viewer }: Props) {
-  const { canEdit, canDelete } = usePageRights();
+  const { can, canEdit } = usePageRights();
+  // Managing a task is «Завдання менеджерам», also from the «Мої завдання» board (ACC-002).
+  const canManage = viewer.isAdmin && can('edit', 'manager-tasks');
+  const canDelete = viewer.isAdmin && can('delete', 'manager-tasks');
   if (!editor.mode) return null;
   const reading = editor.mode.kind === 'view';
   const task = editor.task;
@@ -45,7 +48,7 @@ export function TaskDrawer({ editor, viewer }: Props) {
         readOnly={reading}
         saving={editor.saving}
         submitLabel={editor.mode.kind === 'create' ? 'Поставити завдання' : 'Зберегти'}
-        editLabel={viewer.isAdmin && task ? 'Редагувати' : null}
+        editLabel={canManage && task ? 'Редагувати' : null}
         readActions={
           canEdit &&
           task &&
@@ -83,11 +86,11 @@ export function TaskDrawer({ editor, viewer }: Props) {
                   busy={editor.busy}
                   onStatus={editor.setStatus}
                   onStep={editor.setStep}
-                  {...(viewer.isAdmin
+                  {...(canManage
                     ? { assignees: editor.assignees, onReassign: editor.reassign }
                     : {})}
                 />
-                {viewer.isAdmin && canDelete && (
+                {canDelete && (
                   <Button
                     color="error"
                     startIcon={<DeleteOutlinedIcon />}

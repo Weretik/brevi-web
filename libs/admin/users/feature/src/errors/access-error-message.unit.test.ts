@@ -20,6 +20,15 @@ describe('getAccessErrorMessage', () => {
     });
   });
 
+  it('explains a taken title and a built-in role on rename', () => {
+    expect(getAccessErrorMessage(apiError(409, 'Conflict'), 'rename').message).toBe(
+      'Роль з такою назвою вже існує.',
+    );
+    expect(getAccessErrorMessage(apiError(400, 'Validation'), 'rename').message).toBe(
+      'Вбудовану роль перейменувати не можна.',
+    );
+  });
+
   it('explains conflicts on create and delete', () => {
     expect(getAccessErrorMessage(apiError(409, 'Conflict'), 'create').message).toBe(
       'Роль з такою назвою вже існує.',

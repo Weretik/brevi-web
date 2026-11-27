@@ -40,6 +40,7 @@ export {
 } from './validators/staff-account-rules';
 export type { StaffAccountFieldErrors } from './validators/staff-account-rules';
 export {
+  accessActionLabelOf,
   accessActionLabels,
   accessActions,
   accessChangeActions,
@@ -52,7 +53,26 @@ export type {
   AccessGrants,
   AccessRights,
   AccessRole,
+  AdminOnlyItem,
 } from './entities/access-rights';
+export {
+  accessLevelLabels,
+  accessLevelOf,
+  accessLevelsOf,
+  groupAccessLevelOf,
+  setAccessLevel,
+  setGroupAccessLevel,
+} from './queries/access-levels';
+export type { AccessLevel, AccessLevelState, GroupAccessLevel } from './queries/access-levels';
+export {
+  accessCellOf,
+  changedAccessAreas,
+  countGrantedPages,
+  describePageCount,
+  describeRoleAccess,
+  filterAccessAreas,
+} from './queries/access-overview';
+export type { AccessPageFilter } from './queries/access-overview';
 export {
   areAccessGrantsEqual,
   describeGroupAccess,

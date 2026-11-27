@@ -11,7 +11,7 @@ import {
 import { Alert, Box, Button, CircularProgress, Snackbar, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 
-import { useProfileActions } from '../hooks/use-profile-actions';
+import { useProfileActions } from '../hooks/staff/use-profile-actions';
 
 interface ProfilePageProps {
   /** Re-reads the session so the header shows the change. */

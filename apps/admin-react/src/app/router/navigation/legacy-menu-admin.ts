@@ -14,7 +14,6 @@ export const adminGroups: readonly LegacyNavigationGroup[] = [
     section: 'Дані',
     label: 'Загальні звіти',
     items: [
-      { id: 'reports-overview', label: 'Загальні звіти' },
       {
         id: 'workshop-reports',
         label: 'Звіти цеху',
@@ -47,7 +46,7 @@ export const adminGroups: readonly LegacyNavigationGroup[] = [
         id: 'manager-tasks',
         label: 'Завдання менеджерам',
         path: '/admin/tasks',
-        requiredRoles: adminOnly,
+        access: 'manager-tasks',
       },
       { id: 'lead-stats', label: 'Статистика лідів', path: '/admin/leads', access: 'lead-stats' },
       { id: 'ai-settings', label: 'Налаштування ШІ', path: '/admin/ai', requiredRoles: adminOnly },

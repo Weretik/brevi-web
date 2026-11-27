@@ -29,6 +29,15 @@ export interface AccessArea {
   title: string;
   /** Actions the page actually has; always includes `view`. */
   actions: readonly AccessAction[];
+  /** What each action does on this page, in Ukrainian («Запускати зараз»); a missing one uses `accessActionLabels`. */
+  actionLabels: Readonly<Partial<Record<AccessAction, string>>>;
+}
+
+/** Something only the administrator may do; «Права доступу» lists it so nothing in the admin is hidden. */
+export interface AdminOnlyItem {
+  group: string;
+  title: string;
+  reason: string;
 }
 
 export interface AccessRole {
@@ -39,6 +48,8 @@ export interface AccessRole {
   /** Built-in roles are never deleted. */
   builtIn: boolean;
   userCount: number;
+  /** Names of the people who hold the role, for the role header. */
+  userNames: readonly string[];
   /** Optimistic concurrency version sent back on save. */
   version: number;
   updatedByName: string | null;
@@ -49,6 +60,7 @@ export interface AccessRole {
 export interface AccessRights {
   areas: readonly AccessArea[];
   roles: readonly AccessRole[];
+  adminOnly: readonly AdminOnlyItem[];
 }
 
 /** Pages of one menu group, in menu order. */
@@ -58,3 +70,7 @@ export interface AccessAreaGroup {
 }
 
 export const roleTitleMaxLength = 100;
+
+/** The name of an action on a page: its own label, or the general one. */
+export const accessActionLabelOf = (area: AccessArea, action: AccessAction): string =>
+  area.actionLabels[action] ?? accessActionLabels[action];

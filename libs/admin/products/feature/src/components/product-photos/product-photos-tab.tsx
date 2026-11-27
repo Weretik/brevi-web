@@ -13,7 +13,7 @@ interface Props {
 
 /**
  * Tab «Фото» of a product card (CAT-018): the main photo (used by КП and the «Товари» list) and the
- * others in order. Admin and the Director change them; a manager only views. Removing a photo keeps
+ * others in order. Whoever may edit «Товари» changes them; others only view. Removing a photo keeps
  * it in the library.
  */
 export function ProductPhotosTab({ productId, productName }: Props) {

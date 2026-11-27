@@ -17,9 +17,16 @@ const areas: AccessArea[] = [
     group: 'Довідники',
     title: 'Товари',
     actions: ['view', 'create', 'edit', 'delete'],
+    actionLabels: {},
   },
-  { key: 'reports', group: 'Звіти', title: 'Звіт', actions: ['view'] },
-  { key: 'fabrics', group: 'Довідники', title: 'Тканини', actions: ['view', 'edit'] },
+  { key: 'reports', group: 'Звіти', title: 'Звіт', actions: ['view'], actionLabels: {} },
+  {
+    key: 'fabrics',
+    group: 'Довідники',
+    title: 'Тканини',
+    actions: ['view', 'edit'],
+    actionLabels: {},
+  },
 ];
 
 describe('access grants', () => {
