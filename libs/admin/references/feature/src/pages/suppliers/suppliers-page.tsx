@@ -7,7 +7,7 @@ import {
   SuppliersGrid,
 } from '@admin/references/ui';
 import { Alert, Box, Paper } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { SupplierDrawer } from '../../components/suppliers/supplier-drawer';
 import { SuppliersHeader } from '../../components/suppliers/suppliers-header';
@@ -22,23 +22,12 @@ import type { ReactNode } from 'react';
 interface Props {
   /** The page tabs shown above the header. */
   tabs?: ReactNode;
-  canSeePurchaseInvoices?: boolean;
-  /** The «Бухгалтерія» right: the viewed card gets «Фінанси». */
-  canSeeFinance?: boolean;
-  /** A supplier to open once the list is loaded («Відкрити в контрагентах»). */
-  openSupplierId?: number | null;
-  /** Called once the requested supplier is handled, so the page can drop it from the URL. */
-  onSupplierOpened?: () => void;
+  /** A row click opens the supplier card (CARD-001); without it the row opens the side panel to view. */
+  onOpenCard?: (supplier: Supplier) => void;
 }
 
-/** «Контрагенти → Постачальники». */
-export function SuppliersPage({
-  tabs,
-  canSeePurchaseInvoices = false,
-  canSeeFinance = false,
-  openSupplierId = null,
-  onSupplierOpened,
-}: Props = {}) {
+/** «Контрагенти → Постачальники»: a row opens the supplier card (CARD-001), «Редагувати» the side panel. */
+export function SuppliersPage({ tabs, onOpenCard }: Props = {}) {
   const { rows, loading, error, reload } = useSuppliers();
   const [active, setActive] = useState<{
     mode: SupplierDialogMode;
@@ -47,14 +36,6 @@ export function SuppliersPage({
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const filters = useReferenceListFilters(rows, filterSuppliers);
   const deletion = useSupplierDeletion(setActionMessage);
-
-  // «Відкрити в контрагентах» from a supplier card elsewhere: open that supplier once the list is here.
-  useEffect(() => {
-    if (openSupplierId == null || loading) return;
-    const supplier = rows.find((row) => row.id === openSupplierId);
-    if (supplier) setActive({ mode: 'view', supplier });
-    onSupplierOpened?.();
-  }, [openSupplierId, loading, rows, onSupplierOpened]);
 
   const nextId = rows.reduce((largest, row) => Math.max(largest, row.id), 0) + 1;
   const [syncNotice, setSyncNotice] = useState<{ text: string; ok: boolean } | null>(null);
@@ -113,7 +94,9 @@ export function SuppliersPage({
           unavailable={Boolean(error)}
           selection={deletion.selection}
           onSelectionChange={deletion.setSelection}
-          onView={(supplier) => setActive({ mode: 'view', supplier })}
+          onView={(supplier) =>
+            onOpenCard ? onOpenCard(supplier) : setActive({ mode: 'view', supplier })
+          }
           onEdit={(supplier) => setActive({ mode: 'edit', supplier })}
           onDelete={(id) => deletion.requestDelete([id])}
         />
@@ -124,8 +107,6 @@ export function SuppliersPage({
           mode={active.mode}
           supplier={active.supplier}
           nextId={nextId}
-          canSeePurchaseInvoices={canSeePurchaseInvoices}
-          canSeeFinance={canSeeFinance}
           onClose={() => setActive(null)}
           onSaved={() => {
             setActive(null);

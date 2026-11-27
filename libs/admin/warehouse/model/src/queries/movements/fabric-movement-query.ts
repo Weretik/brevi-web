@@ -14,6 +14,8 @@ export interface FabricMovementQuery {
   /** Operation-date period, `YYYY-MM-DD`, inclusive. */
   from: string | null;
   to: string | null;
+  /** The supplier card: receipts of this supplier only. */
+  supplierId?: number | null;
 }
 
 export const defaultFabricMovementQuery: FabricMovementQuery = {

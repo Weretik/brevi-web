@@ -14,8 +14,8 @@ interface Props {
   supplier: Supplier;
   /** An extra section under the contacts, for example «Тканини цього постачальника в КП». */
   related?: { title: string; rows: readonly SupplierViewRelatedRow[] };
-  /** «Відкрити в контрагентах»; left out for those who may not open the supplier there. */
-  onOpenInCounterparties?: () => void;
+  /** «Відкрити картку»: the full supplier card; left out for those who may not open «Контрагенти». */
+  onOpenCard?: () => void;
   onClose: () => void;
 }
 
@@ -23,7 +23,7 @@ interface Props {
  * The supplier's read-only card, opened from a supplier name anywhere in the admin (CAT-019, КП R-32).
  * Contacts are links: a call, a letter, the supplier's site.
  */
-export function SupplierViewPanel({ supplier, related, onOpenInCounterparties, onClose }: Props) {
+export function SupplierViewPanel({ supplier, related, onOpenCard, onClose }: Props) {
   const titleId = useId();
   const categories = supplier.purchaseCategories?.trim();
   const notes = supplier.notes?.trim();
@@ -83,12 +83,12 @@ export function SupplierViewPanel({ supplier, related, onOpenInCounterparties, o
           </Stack>
         )}
       </Stack>
-      {onOpenInCounterparties && (
+      {onOpenCard && (
         <>
           <Divider />
           <Box sx={{ px: 3, py: 2 }}>
-            <Button fullWidth size="large" variant="contained" onClick={onOpenInCounterparties}>
-              Відкрити в контрагентах
+            <Button fullWidth size="large" variant="contained" onClick={onOpenCard}>
+              Відкрити картку
             </Button>
           </Box>
         </>

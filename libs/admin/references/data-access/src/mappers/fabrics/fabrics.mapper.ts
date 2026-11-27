@@ -8,6 +8,7 @@ export function mapFabrics(value: FabricsResponse): Fabric[] {
     name: row.name,
     nameRu: row.nameRu,
     providerName: row.providerName,
+    providerId: row.providerId ?? null,
     composition: row.composition,
     compositionRu: row.compositionRu,
     density: row.density,

@@ -36,7 +36,7 @@ export function toSaveQuoteInput(draft: QuoteDraft): Schemas['SaveQuoteInput'] {
   return {
     version: draft.version,
     internalName: draft.internalName.trim(),
-    customerId: draft.customerId,
+    customerPublicId: draft.customerPublicId,
     recipientName: text(draft.recipientName),
     companyName: text(draft.companyName),
     clientComment: text(draft.clientComment),

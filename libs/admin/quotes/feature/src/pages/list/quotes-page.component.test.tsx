@@ -52,6 +52,7 @@ vi.mock('@admin/clients/data-access', () => ({
       : {
           rows: [
             {
+              publicId: 'PUBID',
               displayName: 'Агроресурс',
               legalName: 'ТОВ «Агроресурс»',
               contactName: 'Марина',
@@ -174,7 +175,7 @@ describe('КП list', () => {
     await user.click(screen.getByRole('button', { name: 'Перейти до КП' }));
     expect(
       screen.getByText(
-        'request editor {"internalName":"Агроресурс","companyName":"ТОВ «Агроресурс»","recipientName":"Марина"}',
+        'request editor {"internalName":"Агроресурс","companyName":"ТОВ «Агроресурс»","recipientName":"Марина","customerPublicId":"PUBID"}',
       ),
     ).toBeInTheDocument();
     cleanup();
@@ -183,7 +184,9 @@ describe('КП list', () => {
     await user.click(screen.getByRole('button', { name: 'Нове КП' }));
     await user.click(screen.getByRole('button', { name: 'Перейти до КП' }));
     expect(
-      screen.getByText('request editor {"internalName":"","companyName":"","recipientName":""}'),
+      screen.getByText(
+        'request editor {"internalName":"","companyName":"","recipientName":"","customerPublicId":null}',
+      ),
     ).toBeInTheDocument();
   });
 
@@ -196,7 +199,7 @@ describe('КП list', () => {
     await user.click(screen.getByRole('button', { name: 'Перейти до КП' }));
     expect(
       screen.getByText(
-        'introduction editor {"internalName":"Новий клієнт","companyName":"","recipientName":""}',
+        'introduction editor {"internalName":"Новий клієнт","companyName":"","recipientName":"","customerPublicId":null}',
       ),
     ).toBeInTheDocument();
   });

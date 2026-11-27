@@ -29,7 +29,7 @@ export interface QuoteIntroPageDraft {
 export interface QuoteIntroDraft {
   readonly version: number;
   readonly internalName: string;
-  readonly customerId: number | null;
+  readonly customerPublicId: string | null;
   readonly recipientEmail: string;
   readonly recipientName: string;
   readonly companyName: string;

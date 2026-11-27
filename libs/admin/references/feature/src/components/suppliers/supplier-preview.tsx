@@ -4,6 +4,8 @@ import { Alert, Snackbar } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { supplierCardPath } from './supplier-card-path';
+
 import type { Supplier } from '@admin/references/model';
 import type { SupplierViewRelatedRow } from '@admin/references/ui';
 
@@ -16,13 +18,9 @@ export interface SupplierRef {
 }
 
 export interface SupplierPreviewOptions {
-  /** Whether the user may open «Контрагенти»; false hides «Відкрити в контрагентах». */
+  /** Whether the user may open «Контрагенти»; false hides «Відкрити картку». */
   canOpenCounterparties?: boolean;
 }
-
-/** «Відкрити в контрагентах»: the suppliers tab opens this supplier's card. */
-export const counterpartiesSupplierPath = (id: number) =>
-  `/references/counterparties?supplier=${id}`;
 
 const same = (a: string, b: string) =>
   a.trim().toLocaleLowerCase('uk') === b.trim().toLocaleLowerCase('uk');
@@ -52,11 +50,11 @@ function SupplierPreviewPanel({
     <SupplierViewPanel
       supplier={supplier}
       related={related}
-      onOpenInCounterparties={
+      onOpenCard={
         canOpenCounterparties
           ? () => {
               onClose();
-              void navigate(counterpartiesSupplierPath(supplier.id));
+              void navigate(supplierCardPath(supplier.id));
             }
           : undefined
       }
@@ -67,7 +65,7 @@ function SupplierPreviewPanel({
 
 /**
  * «Переглянути постачальника» from any table (CAT-019): the click on a supplier name opens the supplier's
- * read-only card with «Відкрити в контрагентах». `element` must be rendered once by the page.
+ * read-only card with «Відкрити картку» (the full supplier card, CARD-001). `element` must be rendered once by the page.
  */
 export function useSupplierPreview({ canOpenCounterparties = true }: SupplierPreviewOptions = {}) {
   const [ref, setRef] = useState<SupplierRef | null>(null);

@@ -1,5 +1,5 @@
 import { useGetProductionOrdersQuery } from '@admin/production/data-access';
-import { todayIso } from '@admin/production/model';
+import { emptyProductionOrderFilters, todayIso } from '@admin/production/model';
 import { ProductionOrdersGrid } from '@admin/production/ui';
 import { Alert, Button, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
@@ -8,17 +8,20 @@ import { useNavigate } from 'react-router-dom';
 import type { GridPaginationModel } from '@mui/x-data-grid';
 
 interface Props {
-  customerId: number;
+  customerPublicId: string;
+  /** The card's period: orders dated in it. */
+  from?: string;
+  to?: string;
 }
 
 /**
- * Client card tab «Завдання в цех»: orders made from this client's КП, newest number first.
- * Old orders moved from «Цех» carry no client link and are not listed. A row opens the order.
+ * Client card tab «Завдання в цех» (CARD-001): orders made from this client's КП, newest number first,
+ * 20 per page. Old orders moved from «Цех» carry no client link and are not listed. A row opens the order.
  */
-export function CustomerProductionOrders({ customerId }: Props) {
+export function CustomerProductionOrders({ customerPublicId, from, to }: Props) {
   const navigate = useNavigate();
   const [today] = useState(todayIso);
-  const [pagination, setPagination] = useState<GridPaginationModel>({ page: 0, pageSize: 25 });
+  const [pagination, setPagination] = useState<GridPaginationModel>({ page: 0, pageSize: 20 });
   const list = useGetProductionOrdersQuery({
     search: '',
     status: null,
@@ -27,7 +30,8 @@ export function CustomerProductionOrders({ customerId }: Props) {
     stage: null,
     page: pagination.page + 1,
     pageSize: pagination.pageSize,
-    customerId,
+    customerPublicId,
+    filters: { ...emptyProductionOrderFilters, from: from ?? null, to: to ?? null },
   });
 
   return (

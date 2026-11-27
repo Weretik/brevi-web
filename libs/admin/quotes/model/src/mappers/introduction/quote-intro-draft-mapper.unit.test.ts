@@ -131,7 +131,7 @@ describe('introduction draft', () => {
     const quote = {
       version: 2,
       internalName: 'Агро',
-      customerId: null,
+      customerPublicId: null,
       recipientName: null,
       companyName: null,
       managerNote: null,

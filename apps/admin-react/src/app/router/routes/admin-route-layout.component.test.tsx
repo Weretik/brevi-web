@@ -5,6 +5,7 @@ import { AdminRouteLayout } from './admin-route-layout';
 import { defaultAccess } from '../../../test/default-access';
 
 import type { SessionRole, SessionUser } from '@admin/core/auth';
+import type { ReactNode } from 'react';
 
 const user = (roles: SessionRole[]): SessionUser => ({
   id: '1',
@@ -30,6 +31,9 @@ vi.mock('@admin/core/shell', () => ({
   ),
 }));
 vi.mock('../../slots/tasks/use-home-hint', () => ({ useHomeHint: () => null }));
+vi.mock('../../slots/counterparties/supplier-card-slot', () => ({
+  SupplierCardSlot: ({ children }: { children: ReactNode }) => children,
+}));
 vi.mock('../../providers/color-mode-provider', () => ({
   useAdminColorMode: () => ({ colorMode: 'light', changeColorMode: vi.fn() }),
 }));

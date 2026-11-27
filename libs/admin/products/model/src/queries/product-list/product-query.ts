@@ -8,4 +8,6 @@ export interface ProductQuery {
   categoryId?: number;
   sortBy?: 'id' | 'name' | 'createdAt' | 'updatedAt';
   sortDirection?: 'asc' | 'desc';
+  /** The supplier card: products of this supplier only. */
+  supplierId?: number;
 }

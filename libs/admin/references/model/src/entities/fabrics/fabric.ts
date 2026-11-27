@@ -5,6 +5,8 @@ export interface Fabric {
   name: string;
   nameRu: string | null;
   providerName: string;
+  /** The supplier in «Контрагенти»; null for a fabric with only a typed name. */
+  providerId?: number | null;
   composition: string | null;
   compositionRu: string | null;
   /** Density, g/m². */

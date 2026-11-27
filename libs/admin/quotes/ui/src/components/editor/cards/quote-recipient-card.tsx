@@ -42,13 +42,19 @@ export function QuoteRecipientCard({
           getOptionLabel={(option) => (typeof option === 'string' ? option : option.name)}
           filterOptions={(options) => options}
           inputValue={draft.internalName}
-          onInputChange={(_event, value) => {
-            onChange({ internalName: value });
+          onInputChange={(_event, value, reason) => {
+            // Typing makes the name free text again; choosing an option keeps the link.
+            onChange(
+              reason === 'input'
+                ? { internalName: value, customerPublicId: null }
+                : { internalName: value },
+            );
             onClientSearch(value);
           }}
           onChange={(_event, value) => {
             if (!value || typeof value === 'string') return;
             onChange({
+              customerPublicId: value.publicId,
               internalName: value.name,
               companyName: draft.companyName || value.companyName || value.name,
               recipientName: draft.recipientName || value.contactName || '',
@@ -76,7 +82,10 @@ export function QuoteRecipientCard({
               label="Клієнт або запит"
               error={Boolean(headerError)}
               helperText={
-                headerError ?? 'Оберіть клієнта з KeepinCRM або напишіть. Бачите лише ви.'
+                headerError ??
+                (draft.customerPublicId
+                  ? 'Пов’язано з клієнтом: КП буде в його картці.'
+                  : 'Оберіть клієнта зі списку, щоб КП була в його картці, або напишіть. Бачите лише ви.')
               }
               slotProps={{
                 ...params.slotProps,

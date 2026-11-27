@@ -84,7 +84,8 @@ export interface Quote {
   readonly kind: QuoteKind;
   readonly status: QuoteStatus;
   readonly internalName: string;
-  readonly customerId: number | null;
+  /** The client chosen in «Кому» (its public id); null for a typed name only. */
+  readonly customerPublicId: string | null;
   readonly recipientName: string | null;
   readonly companyName: string | null;
   readonly clientComment: string | null;
@@ -138,7 +139,10 @@ export interface QuoteListQuery {
   readonly page: number;
   readonly pageSize: number;
   /** The client card tab «КП»: only this client's КП. */
-  readonly customerId?: number;
+  readonly customerPublicId?: string;
+  /** Created in this period, Kyiv days (`yyyy-mm-dd`). */
+  readonly from?: string;
+  readonly to?: string;
 }
 
 export type QuoteEventKind =

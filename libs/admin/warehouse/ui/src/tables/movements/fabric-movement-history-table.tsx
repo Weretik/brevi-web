@@ -1,3 +1,4 @@
+import { SupplierName } from '@admin/shared/ui';
 import {
   fabricMovementRevisionActionLabels,
   formatDay,
@@ -34,7 +35,9 @@ function StateCell({ state }: { state: FabricMovementState }) {
       </Typography>
       {(state.supplierName || state.document) && (
         <Typography variant="caption" color="text.secondary" component="div">
-          {[state.supplierName, state.document].filter(Boolean).join(' · ')}
+          <SupplierName name={state.supplierName} empty="" />
+          {state.supplierName && state.document ? ' · ' : ''}
+          {state.document}
         </Typography>
       )}
       {state.destination && (

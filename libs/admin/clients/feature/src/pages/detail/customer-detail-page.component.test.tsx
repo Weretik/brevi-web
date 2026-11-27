@@ -1,20 +1,26 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { RouterProvider, createMemoryRouter } from 'react-router-dom';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { RouterProvider, createMemoryRouter, useLocation } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import CustomerDetailPage from './customer-detail-page';
 
+import type { CustomerCardAccess } from '../../clients.routes';
+
 const fixture = vi.hoisted(() => ({
   customer: {
     publicId: '11111111-1111-4111-8111-111111111111',
-    kind: 'person',
+    kind: 'organization',
     displayName: 'Synthetic',
-    legalName: null,
-    taxIdentity: null,
+    legalName: 'ТОВ «Synthetic»',
+    taxIdentity: '12345678',
     ownerId: 22,
     active: true,
     revision: 1,
     updatedAt: '2026-10-26T12:00:00Z',
+    keepinCrmId: null,
+    contactName: 'Марина',
+    phones: [],
+    keepinSyncedAt: null,
     canEdit: true,
     canMerge: false,
     contacts: [],
@@ -23,6 +29,7 @@ const fixture = vi.hoisted(() => ({
   stale: false,
   revise: vi.fn(),
   refetch: vi.fn(),
+  quoteQueries: [] as unknown[],
 }));
 vi.mock('@admin/clients/data-access', () => ({
   useGetCustomerQuery: () => ({
@@ -38,7 +45,50 @@ vi.mock('@admin/clients/data-access', () => ({
   useMergeCustomersMutation: () => [vi.fn(), { isLoading: false }],
   useListCustomersQuery: () => ({ data: undefined, isLoading: false }),
 }));
-
+vi.mock('@admin/quotes/data-access', () => ({
+  useListQuotesQuery: (query: unknown) => {
+    fixture.quoteQueries.push(query);
+    return {
+      data: {
+        items: [
+          {
+            id: 12,
+            number: 'КП-1048',
+            kind: 'Request',
+            status: 'Sent',
+            internalName: 'Фартухи для кухні',
+            companyName: null,
+            responsible: { userId: 1, name: 'Оля' },
+            itemsCount: 2,
+            updatedAt: '2026-11-20T10:00:00Z',
+            lastSentAt: '2026-11-20T10:00:00Z',
+            version: 1,
+          },
+        ],
+        total: 7,
+      },
+      isFetching: false,
+      isError: false,
+    };
+  },
+}));
+vi.mock('@admin/production/data-access', () => ({
+  useGetProductionOrdersQuery: () => ({ data: { items: [], total: 3 } }),
+}));
+vi.mock('@admin/tasks/data-access', () => ({
+  useListTasksQuery: () => ({ data: { items: [], total: 2 } }),
+}));
+vi.mock('@admin/embroidery/data-access', () => ({
+  useGetEmbroideryCalculationsQuery: () => ({ data: { items: [], total: 1 } }),
+}));
+vi.mock('@admin/quotes/feature', () => ({
+  CustomerQuotes: (props: { customerPublicId: string; from?: string; to?: string }) => (
+    <p>КП клієнта {JSON.stringify(props)}</p>
+  ),
+}));
+vi.mock('@admin/production/feature', () => ({ CustomerProductionOrders: () => <p>Цех</p> }));
+vi.mock('@admin/tasks/feature', () => ({ CustomerTasks: () => <p>Завдання</p> }));
+vi.mock('@admin/embroidery/feature', () => ({ CustomerEmbroidery: () => <p>Вишивка</p> }));
 vi.mock('@admin/accounting/feature', () => ({
   CounterpartyFinance: ({ kind, id }: { kind: string; id: string }) => (
     <p>
@@ -47,96 +97,118 @@ vi.mock('@admin/accounting/feature', () => ({
   ),
 }));
 
-describe('customer detail «Фінанси»', () => {
-  afterEach(cleanup);
-  const openCard = (canSeeFinance: boolean) => {
-    const router = createMemoryRouter(
-      [
-        {
-          path: '/crm/clients/:customerId',
-          element: <CustomerDetailPage canSeeFinance={canSeeFinance} />,
-        },
-      ],
-      { initialEntries: [`/crm/clients/${fixture.customer.publicId}?tab=finance`] },
-    );
-    render(<RouterProvider router={router} />);
-  };
-  it('shows the tab and this client operations with the «Бухгалтерія» right', () => {
-    openCard(true);
-    expect(screen.getByRole('tab', { name: 'Фінанси' })).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByText(`Фінанси Client ${fixture.customer.publicId}`)).toBeInTheDocument();
-  });
-  it('hides the tab without the right, even from the link', () => {
-    openCard(false);
-    expect(screen.queryByRole('tab', { name: 'Фінанси' })).not.toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: 'Картка' })).toHaveAttribute('aria-selected', 'true');
-  });
+const all: CustomerCardAccess = {
+  quotes: true,
+  productionOrders: true,
+  tasks: true,
+  embroidery: true,
+  finance: true,
+};
+
+function Where() {
+  const location = useLocation();
+  return <p>{`${location.pathname} ${JSON.stringify(location.state)}`}</p>;
+}
+
+function openCard(access: CustomerCardAccess = all, query = '') {
+  const router = createMemoryRouter(
+    [
+      { path: '/crm/clients/:customerId', element: <CustomerDetailPage access={access} /> },
+      { path: '/references/counterparties', element: <p>Клієнтський список</p> },
+      { path: '/crm/quotes/:id', element: <Where /> },
+    ],
+    { initialEntries: [`/crm/clients/${fixture.customer.publicId}${query}`] },
+  );
+  render(<RouterProvider router={router} />);
+  return router;
+}
+
+afterEach(() => {
+  cleanup();
+  fixture.quoteQueries = [];
+});
+beforeEach(() => {
+  vi.clearAllMocks();
+  fixture.stale = false;
 });
 
-describe('customer detail conflicts', () => {
-  afterEach(cleanup);
-  beforeEach(() => {
-    vi.clearAllMocks();
-    fixture.stale = false;
+describe('client card (CARD-001)', () => {
+  it('shows the header, the counts of every linked list and the latest КП', () => {
+    openCard();
+    expect(screen.getByRole('heading', { level: 1, name: 'Synthetic' })).toBeInTheDocument();
+    expect(screen.getByText(/ТОВ «Synthetic» · Код 12345678/)).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Огляд' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('button', { name: 'КП: відкрити список' })).toHaveTextContent('7');
+    expect(
+      screen.getByRole('button', { name: 'Завдання в цех: відкрити список' }),
+    ).toHaveTextContent('3');
+    expect(screen.getByText('Фартухи для кухні')).toBeInTheDocument();
+    expect(screen.queryByText('До списку клієнтів')).not.toBeInTheDocument();
+  });
+
+  it('applies one period to every tab and keeps it in the address', () => {
+    openCard(all, '?period=custom&from=2026-11-01&to=2026-11-27');
+    expect(fixture.quoteQueries[0]).toEqual(
+      expect.objectContaining({ from: '2026-11-01', to: '2026-11-27', pageSize: 5 }),
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'КП: відкрити список' }));
+    expect(screen.getByRole('tab', { name: 'КП' })).toHaveAttribute('aria-selected', 'true');
+    expect(
+      screen.getByText(
+        `КП клієнта {"customerPublicId":"${fixture.customer.publicId}","from":"2026-11-01","to":"2026-11-27"}`,
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it('shows only the tabs the user may open, even from a link', () => {
+    openCard({ ...all, finance: false, tasks: false }, '?tab=finance');
+    expect(screen.queryByRole('tab', { name: 'Фінанси' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('tab', { name: 'Завдання менеджерам' })).not.toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Огляд' })).toHaveAttribute('aria-selected', 'true');
+  });
+
+  it('opens «Фінанси» with its own period', () => {
+    openCard(all, '?tab=finance');
+    expect(screen.getByText(`Фінанси Client ${fixture.customer.publicId}`)).toBeInTheDocument();
+    expect(screen.queryByRole('group', { name: 'Період' })).not.toBeInTheDocument();
+  });
+
+  it('starts a new КП linked to this client', () => {
+    openCard();
+    fireEvent.click(screen.getByRole('button', { name: 'Нова КП' }));
+    expect(
+      screen.getByText(/"customerPublicId":"11111111-1111-4111-8111-111111111111"/),
+    ).toBeInTheDocument();
+  });
+
+  it('leads back to the client list', async () => {
+    openCard();
+    fireEvent.click(screen.getByRole('button', { name: /Контрагенти · Клієнти/ }));
+    expect(await screen.findByText('Клієнтський список')).toBeInTheDocument();
+  });
+
+  it('edits in the side panel and keeps the input after a 409', async () => {
     fixture.revise.mockReturnValue({
       unwrap: () =>
         Promise.reject({ code: 'Conflict', status: 409, message: 'conflict', fieldErrors: {} }),
     });
-  });
-  it('retains input after 409 and requires confirmation before refreshing a dirty form', async () => {
-    const router = createMemoryRouter(
-      [{ path: '/crm/clients/:customerId', element: <CustomerDetailPage /> }],
-      { initialEntries: [`/crm/clients/${fixture.customer.publicId}`] },
-    );
-    render(<RouterProvider router={router} />);
-    fireEvent.change(screen.getByRole('textbox', { name: /Назва клієнта/ }), {
+    openCard();
+    fireEvent.click(screen.getByRole('button', { name: 'Редагувати' }));
+    const panel = screen.getByRole('dialog', { name: 'Редагувати клієнта' });
+    fireEvent.change(within(panel).getByRole('textbox', { name: /Назва клієнта/ }), {
       target: { value: 'Edited synthetic' },
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Зберегти клієнта' }));
+    fireEvent.click(within(panel).getByRole('button', { name: 'Зберегти' }));
     expect(await screen.findByText(/Дані змінилися або запит конфліктує/)).toBeInTheDocument();
-    expect(screen.getByRole('textbox', { name: /Назва клієнта/ })).toHaveValue('Edited synthetic');
-    fireEvent.click(screen.getByRole('button', { name: 'Оновити дані із сервера' }));
-    expect(fixture.refetch).not.toHaveBeenCalled();
-    expect(
-      screen.getByRole('dialog', { name: 'Відхилити зміни й оновити клієнта?' }),
-    ).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'Продовжити редагування' }));
-    expect(await screen.findByRole('textbox', { name: /Назва клієнта/ })).toHaveValue(
+    expect(within(panel).getByRole('textbox', { name: /Назва клієнта/ })).toHaveValue(
       'Edited synthetic',
     );
-    expect(
-      screen.queryByRole('button', { name: 'Об’єднати з перевіреним дублем' }),
-    ).not.toBeInTheDocument();
   });
+
   it('does not expose a cached previous customer while the new route is loading', () => {
     fixture.stale = true;
-    const router = createMemoryRouter(
-      [{ path: '/crm/clients/:customerId', element: <CustomerDetailPage /> }],
-      { initialEntries: ['/crm/clients/22222222-2222-4222-8222-222222222222'] },
-    );
-    render(<RouterProvider router={router} />);
+    openCard();
     expect(screen.getByRole('progressbar', { name: 'Завантаження клієнта' })).toBeInTheDocument();
-    expect(screen.queryByRole('textbox', { name: /Назва клієнта/ })).not.toBeInTheDocument();
     expect(screen.queryByText('Synthetic')).not.toBeInTheDocument();
-  });
-  it('blocks leaving a dirty client until the user explicitly discards the changes', async () => {
-    const router = createMemoryRouter(
-      [
-        { path: '/crm/clients/:customerId', element: <CustomerDetailPage /> },
-        { path: '/references/counterparties', element: <div>Клієнтський список</div> },
-      ],
-      { initialEntries: [`/crm/clients/${fixture.customer.publicId}`] },
-    );
-    render(<RouterProvider router={router} />);
-    fireEvent.change(screen.getByRole('textbox', { name: /Назва клієнта/ }), {
-      target: { value: 'Unsaved' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: 'До списку клієнтів' }));
-    expect(screen.getByRole('dialog', { name: 'Незбережені зміни' })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'Продовжити редагування' }));
-    expect(await screen.findByRole('textbox', { name: /Назва клієнта/ })).toHaveValue('Unsaved');
-    fireEvent.click(screen.getByRole('button', { name: 'До списку клієнтів' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Відхилити й вийти' }));
-    expect(await screen.findByText('Клієнтський список')).toBeInTheDocument();
   });
 });

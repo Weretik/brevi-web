@@ -1,16 +1,14 @@
 import { CustomersReferenceContent } from '@admin/clients/feature';
 import { purchaseInvoicesPath } from '@admin/purchasing/feature';
 import { Tab, Tabs } from '@mui/material';
-import { useCallback } from 'react';
-import { Navigate, useSearchParams } from 'react-router-dom';
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 
+import { supplierCardPath } from '../../components/suppliers/supplier-card-path';
 import { SuppliersPage } from '../suppliers/suppliers-page';
 
 interface Props {
   /** The app passes the role check: only the Director sees «Рахунки на закупку» of a supplier. */
   canSeePurchaseInvoices?: boolean;
-  /** The «Бухгалтерія» right: the supplier card gets «Фінанси». */
-  canSeeFinance?: boolean;
 }
 
 export type CounterpartiesTab = 'suppliers' | 'clients';
@@ -24,25 +22,14 @@ export function counterpartiesTabOf(value: string | null): CounterpartiesTab {
  * «Загальні довідники → Контрагенти»: suppliers and clients from KeepinCRM, switched by `?tab=`.
  * The old `?tab=purchases` link leads the Director to «Бухгалтерія → Рахунки на закупку».
  */
-export function CounterpartiesPage({
-  canSeePurchaseInvoices = false,
-  canSeeFinance = false,
-}: Props) {
+export function CounterpartiesPage({ canSeePurchaseInvoices = false }: Props) {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const purchases = canSeePurchaseInvoices;
   const tab = counterpartiesTabOf(searchParams.get('tab'));
+  // The old «Відкрити в контрагентах» link `?supplier=<id>` now opens the supplier card.
   const openSupplierId = Number(searchParams.get('supplier')) || null;
-  const dropOpenSupplier = useCallback(
-    () =>
-      setSearchParams(
-        (params) => {
-          params.delete('supplier');
-          return params;
-        },
-        { replace: true },
-      ),
-    [setSearchParams],
-  );
+  if (openSupplierId) return <Navigate to={supplierCardPath(openSupplierId)} replace />;
   const tabs = (
     <Tabs
       value={tab}
@@ -65,13 +52,7 @@ export function CounterpartiesPage({
     );
   }
   return tab === 'suppliers' ? (
-    <SuppliersPage
-      tabs={tabs}
-      canSeePurchaseInvoices={purchases}
-      canSeeFinance={canSeeFinance}
-      openSupplierId={openSupplierId}
-      onSupplierOpened={dropOpenSupplier}
-    />
+    <SuppliersPage tabs={tabs} onOpenCard={(supplier) => navigate(supplierCardPath(supplier.id))} />
   ) : (
     <CustomersReferenceContent tabs={tabs} />
   );

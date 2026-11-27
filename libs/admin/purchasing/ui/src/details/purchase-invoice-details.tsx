@@ -1,5 +1,6 @@
 import { formatPurchaseMessageAt, purchaseLinkStatus } from '@admin/purchasing/model';
 import { ReferenceDetailsList, ReferenceFormSection } from '@admin/references/ui';
+import { useOpenSupplierCard } from '@admin/shared/ui';
 import { Divider, Link, Stack, Typography } from '@mui/material';
 import { Fragment } from 'react';
 
@@ -25,6 +26,7 @@ const formatTime = (value: string) =>
  * the source payment mark, problems (only when there are any) and the manual supplier and note.
  */
 export function PurchaseInvoiceDetails({ invoice, renderLinkActions, payments }: Props) {
+  const openSupplier = useOpenSupplierCard();
   const supplier =
     invoice.supplierId !== null && invoice.supplierName === null
       ? 'Постачальника не знайдено або видалено з довідника'
@@ -45,7 +47,14 @@ export function PurchaseInvoiceDetails({ invoice, renderLinkActions, payments }:
       <ReferenceFormSection title="Постачальник і примітка">
         <ReferenceDetailsList
           items={[
-            { label: 'Постачальник', value: supplier },
+            {
+              label: 'Постачальник',
+              value: supplier,
+              onOpen:
+                openSupplier && invoice.supplierName
+                  ? () => openSupplier({ id: invoice.supplierId, name: invoice.supplierName })
+                  : undefined,
+            },
             { label: 'Примітка', value: invoice.reviewNote },
             {
               label: 'Змінено',

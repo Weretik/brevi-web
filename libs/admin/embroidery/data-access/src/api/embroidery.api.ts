@@ -43,6 +43,10 @@ export interface EmbroiderySavedListArgs {
   search: string;
   page: number;
   pageSize: number;
+  /** The client card: this client's calculations created in the period (Kyiv days). */
+  customerPublicId?: string;
+  from?: string;
+  to?: string;
 }
 
 export const embroideryApi = embroideryBaseApi.injectEndpoints({
@@ -95,11 +99,18 @@ export const embroideryApi = embroideryBaseApi.injectEndpoints({
       invalidatesTags: (_result, error) => (error ? [] : settingsTag),
     }),
     getEmbroideryCalculations: build.query<EmbroiderySavedPage, EmbroiderySavedListArgs>({
-      queryFn: ({ search, page, pageSize }, { signal }) =>
+      queryFn: ({ search, page, pageSize, customerPublicId, from, to }, { signal }) =>
         apiCall(
           apiClient.GET('/api/crm/embroidery/calculations', {
             params: {
-              query: { ...(search.trim() ? { search: search.trim() } : {}), page, pageSize },
+              query: {
+                ...(search.trim() ? { search: search.trim() } : {}),
+                page,
+                pageSize,
+                customerPublicId,
+                from,
+                to,
+              },
             },
             signal,
           }),

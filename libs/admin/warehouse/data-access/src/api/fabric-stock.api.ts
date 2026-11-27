@@ -51,6 +51,7 @@ const movementParams = (query: FabricMovementQuery) => ({
   ...(query.search.trim() ? { search: query.search.trim() } : {}),
   ...(query.from ? { from: query.from } : {}),
   ...(query.to ? { to: query.to } : {}),
+  ...(query.supplierId ? { supplierId: query.supplierId } : {}),
 });
 
 export const fabricStockApi = warehouseBaseApi.injectEndpoints({

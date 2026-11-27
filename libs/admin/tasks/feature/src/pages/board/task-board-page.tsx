@@ -11,6 +11,7 @@ import { TaskDrawer } from '../../components/editor/task-drawer';
 import { TaskNotice } from '../../components/notice/task-notice';
 import { useTaskBoard } from '../../hooks/board/use-task-board';
 import { useTaskEditor } from '../../hooks/editor/use-task-editor';
+import { useTaskLink } from '../../hooks/editor/use-task-link';
 import { useTaskNotice } from '../../hooks/notice/use-task-notice';
 
 import type { TaskViewer } from '@admin/tasks/model';
@@ -19,10 +20,18 @@ import type { TaskViewer } from '@admin/tasks/model';
  * «Менеджер сервісу › Мої завдання» (K2). A Manager sees own cards; Director and Admin see
  * everyone's, filter by manager and manage tasks right here in the same side panel.
  */
-export default function TaskBoardPage({ viewer }: { viewer: TaskViewer }) {
+export default function TaskBoardPage({
+  viewer,
+  openTaskId = null,
+}: {
+  viewer: TaskViewer;
+  /** `?task=<id>` of the address: a client card opens this task on the board. */
+  openTaskId?: number | null;
+}) {
   const notice = useTaskNotice();
   const board = useTaskBoard(viewer, notice.notify);
   const editor = useTaskEditor(viewer, notice.notify);
+  useTaskLink(openTaskId, editor.open);
   const today = tasksForToday(board.tasks, new Date());
   const { canCreate } = usePageRights();
 

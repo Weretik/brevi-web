@@ -23,7 +23,7 @@ const slot = (productId: number, itemId: number | null = null) => ({
 const draft: QuoteIntroDraft = {
   version: 3,
   internalName: '  ТОВ «Агро» ',
-  customerId: null,
+  customerPublicId: null,
   recipientEmail: ' ',
   recipientName: 'Іван',
   companyName: '',

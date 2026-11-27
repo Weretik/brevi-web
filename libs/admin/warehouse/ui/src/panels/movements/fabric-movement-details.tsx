@@ -1,4 +1,5 @@
 import { ReferenceDetailsList, ReferenceFormSection } from '@admin/references/ui';
+import { useOpenSupplierCard } from '@admin/shared/ui';
 import {
   formatDay,
   formatKyivTime,
@@ -13,6 +14,7 @@ import type { FabricMovementRow } from '@admin/warehouse/model';
 
 /** The side panel of a journal row: what moved, where from or to, and who wrote it. */
 export function FabricMovementDetails({ row }: { row: FabricMovementRow }) {
+  const openSupplier = useOpenSupplierCard();
   const cancelled = movementCancelMark(row);
   const issue = row.kind === 'Issue';
   return (
@@ -87,7 +89,14 @@ export function FabricMovementDetails({ row }: { row: FabricMovementRow }) {
                       ]),
                 ]
               : [
-                  { label: 'Постачальник', value: row.supplierName },
+                  {
+                    label: 'Постачальник',
+                    value: row.supplierName,
+                    onOpen:
+                      openSupplier && row.supplierName
+                        ? () => openSupplier({ name: row.supplierName })
+                        : undefined,
+                  },
                   { label: 'Документ', value: row.document },
                 ]
           }

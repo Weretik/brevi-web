@@ -87,7 +87,7 @@ export interface ProductionOrderListQuery {
   /** Newest number first when not set. */
   sort?: ProductionOrderSort;
   /** The client card tab «Завдання в цех»: only orders made from this client's КП. */
-  customerId?: number;
+  customerPublicId?: string;
   /** The КП editor: only orders made from this КП. */
   quoteId?: number;
   /** «Фільтри» of «Виробничі завдання». */

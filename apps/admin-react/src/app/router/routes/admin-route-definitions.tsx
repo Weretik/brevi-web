@@ -19,7 +19,6 @@ import { backgroundTasksRoutes } from '@admin/scheduling/feature';
 import { createTasksRoutes } from '@admin/tasks/feature';
 import { createWarehouseRoutes } from '@admin/warehouse/feature';
 
-import { useCanSeeFinance } from '../../slots/accounting/use-can-see-finance';
 import { useSiteCategoriesViewer } from '../../slots/content/site/use-site-categories-viewer';
 import { useSiteCompanyViewer } from '../../slots/content/site/use-site-company-viewer';
 import {
@@ -31,6 +30,10 @@ import { useArticlesViewer } from '../../slots/content/viewers/use-articles-view
 import { useContentProductsViewer } from '../../slots/content/viewers/use-content-products-viewer';
 import { useRedirectsViewer } from '../../slots/content/viewers/use-redirects-viewer';
 import { useSeoSettingsViewer } from '../../slots/content/viewers/use-seo-settings-viewer';
+import {
+  useCustomerCardAccess,
+  useSupplierCardAccess,
+} from '../../slots/counterparties/use-counterparty-card-access';
 import { useDashboardViewer } from '../../slots/dashboard/use-dashboard-viewer';
 import { useEmbroideryViewer } from '../../slots/embroidery/use-embroidery-viewer';
 import {
@@ -40,7 +43,6 @@ import {
 } from '../../slots/leads/use-lead-viewer';
 import { useProductionOrderActor } from '../../slots/production/use-production-order-actor';
 import { useWorkshopPeopleAccess } from '../../slots/production/use-workshop-people-access';
-import { useCanSeePurchaseInvoices } from '../../slots/purchasing/use-can-see-purchase-invoices';
 import { useQuoteActor } from '../../slots/quotes/use-quote-actor';
 import { useQuoteSupplierCard } from '../../slots/quotes/use-quote-supplier-card';
 import { useTaskViewer } from '../../slots/tasks/use-task-viewer';
@@ -48,8 +50,8 @@ import { useWarehouseAccess } from '../../slots/warehouse/use-warehouse-access';
 
 export const adminRouteDefinitions = [
   ...createDashboardRoutes({ useViewer: useDashboardViewer }),
-  ...createReferencesRoutes({ useCanSeePurchaseInvoices, useCanSeeFinance }),
-  ...createClientsRoutes({ useCanSeeFinance }),
+  ...createReferencesRoutes({ useCardAccess: useSupplierCardAccess }),
+  ...createClientsRoutes({ useCardAccess: useCustomerCardAccess }),
   ...createQuotesRoutes({
     useQuoteActor,
     useSupplierCard: useQuoteSupplierCard,
