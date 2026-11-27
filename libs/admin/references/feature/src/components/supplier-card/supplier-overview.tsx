@@ -23,29 +23,31 @@ interface Props {
 export function SupplierOverview(props: Props) {
   const { supplier, access, fabrics, accessories, from, to, onTab } = props;
   const overview = useSupplierOverview({ supplierId: supplier.id, from, to, access });
-  const metrics: CardMetric[] = [
-    access.materials && { label: 'Тканини', value: fabrics, onOpen: () => onTab('fabrics') },
-    access.materials && {
-      label: 'Фурнітура',
-      value: accessories,
-      onOpen: () => onTab('accessories'),
-    },
-    access.products && {
-      label: 'Товари',
-      value: overview.products,
-      onOpen: () => onTab('products'),
-    },
-    access.fabricStock && {
-      label: 'Приходи за період',
-      value: overview.receipts,
-      onOpen: () => onTab('receipts'),
-    },
-    access.purchaseInvoices && {
-      label: 'Рахунки за період',
-      value: overview.invoices,
-      onOpen: () => onTab('invoices'),
-    },
-  ].filter((metric): metric is CardMetric => !!metric);
+  const metrics = (
+    [
+      access.materials && { label: 'Тканини', value: fabrics, onOpen: () => onTab('fabrics') },
+      access.materials && {
+        label: 'Фурнітура',
+        value: accessories,
+        onOpen: () => onTab('accessories'),
+      },
+      access.products && {
+        label: 'Товари',
+        value: overview.products,
+        onOpen: () => onTab('products'),
+      },
+      access.fabricStock && {
+        label: 'Приходи за період',
+        value: overview.receipts,
+        onOpen: () => onTab('receipts'),
+      },
+      access.purchaseInvoices && {
+        label: 'Рахунки за період',
+        value: overview.invoices,
+        onOpen: () => onTab('invoices'),
+      },
+    ] as (CardMetric | false)[]
+  ).filter((metric): metric is CardMetric => !!metric);
   const notes = supplier.notes?.trim();
 
   return (

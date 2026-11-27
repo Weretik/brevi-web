@@ -27,24 +27,30 @@ export function CustomerOverview(props: Props) {
   const { customer, access, from, to, canEditContacts, onEditContact, onTab } = props;
   const navigate = useNavigate();
   const overview = useCustomerOverview({ customerPublicId: customer.publicId, from, to, access });
-  const metrics: CardMetric[] = [
-    access.quotes && { label: 'КП', value: overview.counts.quotes, onOpen: () => onTab('quotes') },
-    access.productionOrders && {
-      label: 'Завдання в цех',
-      value: overview.counts.orders,
-      onOpen: () => onTab('orders'),
-    },
-    access.tasks && {
-      label: 'Завдання менеджерам',
-      value: overview.counts.tasks,
-      onOpen: () => onTab('tasks'),
-    },
-    access.embroidery && {
-      label: 'Розрахунки вишивки',
-      value: overview.counts.embroidery,
-      onOpen: () => onTab('embroidery'),
-    },
-  ].filter((metric): metric is CardMetric => !!metric);
+  const metrics = (
+    [
+      access.quotes && {
+        label: 'КП',
+        value: overview.counts.quotes,
+        onOpen: () => onTab('quotes'),
+      },
+      access.productionOrders && {
+        label: 'Завдання в цех',
+        value: overview.counts.orders,
+        onOpen: () => onTab('orders'),
+      },
+      access.tasks && {
+        label: 'Завдання менеджерам',
+        value: overview.counts.tasks,
+        onOpen: () => onTab('tasks'),
+      },
+      access.embroidery && {
+        label: 'Розрахунки вишивки',
+        value: overview.counts.embroidery,
+        onOpen: () => onTab('embroidery'),
+      },
+    ] as (CardMetric | false)[]
+  ).filter((metric): metric is CardMetric => !!metric);
 
   return (
     <Stack spacing={2}>
