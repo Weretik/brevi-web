@@ -3,6 +3,7 @@ import {
   formatPurchaseMoney,
   purchaseLineDiscount,
 } from '@admin/purchasing/model';
+import { SupplierName } from '@admin/shared/ui';
 import {
   Stack,
   Table,
@@ -39,7 +40,7 @@ export function PurchaseDocumentView({ document }: Props) {
         <PurchaseVatChip vat={document.vat} />
       </Stack>
       <Typography variant="body2" color="text.secondary">
-        {document.supplierName}
+        <SupplierName name={document.supplierName} />
       </Typography>
       <TableContainer sx={{ border: 1, borderColor: 'divider', borderRadius: 1 }}>
         <Table size="small" aria-label="Позиції рахунку">
