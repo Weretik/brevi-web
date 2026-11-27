@@ -47,7 +47,7 @@ const api = vi.hoisted(() => {
         fabricCode: 'FAB-1',
         fabricName: 'Оксфорд',
         quantity: 10,
-        dueDate: '2026-11-20',
+        dueDate: '2099-11-20',
         mainColor: 'чорний',
         additionalColors: [],
         sizesText: null,
