@@ -52,3 +52,4 @@ export * from './dialogs/fabric-colors/fabric-color-delete-dialog';
 export * from './details/fabric-colors/fabric-color-details';
 export * from './forms/fabric-colors/fabric-color-form';
 export * from './tables/fabric-colors/fabric-colors-grid';
+export { SupplierContacts } from './panels/suppliers/supplier-contacts';

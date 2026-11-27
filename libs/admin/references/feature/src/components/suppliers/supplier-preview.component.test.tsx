@@ -67,7 +67,7 @@ function renderPage(props: { name?: string; id?: number; canOpen?: boolean }) {
     <MemoryRouter initialEntries={['/crm/quotes/1']}>
       <Routes>
         <Route path="/crm/quotes/1" element={<Page {...props} />} />
-        <Route path="/references/counterparties" element={<Where />} />
+        <Route path="/references/counterparties/suppliers/:supplierId" element={<Where />} />
       </Routes>
     </MemoryRouter>,
   );
@@ -112,18 +112,16 @@ describe('Supplier preview (CAT-019)', () => {
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
   });
 
-  it('opens the supplier in «Контрагенти»', async () => {
+  it('opens the full supplier card', async () => {
     renderPage({ id: 5 });
     await userEvent.click(screen.getByRole('button', { name: 'Відкрити' }));
-    await userEvent.click(screen.getByRole('button', { name: 'Відкрити в контрагентах' }));
-    expect(await screen.findByText('/references/counterparties?supplier=5')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Відкрити картку' }));
+    expect(await screen.findByText('/references/counterparties/suppliers/5')).toBeInTheDocument();
   });
 
-  it('hides «Відкрити в контрагентах» without access', async () => {
+  it('hides «Відкрити картку» without access', async () => {
     renderPage({ id: 5, canOpen: false });
     await userEvent.click(screen.getByRole('button', { name: 'Відкрити' }));
-    expect(
-      screen.queryByRole('button', { name: 'Відкрити в контрагентах' }),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Відкрити картку' })).not.toBeInTheDocument();
   });
 });

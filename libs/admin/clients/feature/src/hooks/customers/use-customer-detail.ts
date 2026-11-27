@@ -37,8 +37,9 @@ export function useCustomerDetail() {
       setError(customerError(error));
     }
   }
-  async function save(draft: CustomerDraft) {
-    if (!customer) return;
+  /** Saves the edited client; true when the server accepted it. */
+  async function save(draft: CustomerDraft): Promise<boolean> {
+    if (!customer) return false;
     const intent = { customerId, revision: customer.revision, draft };
     setError(null);
     setSaved(false);
@@ -46,8 +47,10 @@ export function useCustomerDetail() {
       await revise({ ...intent, requestId: requestId.forPayload(intent) }).unwrap();
       setDirty(false);
       setSaved(true);
+      return true;
     } catch (error) {
       setError(customerError(error));
+      return false;
     }
   }
   const pending = state.isLoading || query.isFetching;
