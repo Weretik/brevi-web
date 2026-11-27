@@ -47,3 +47,7 @@ may change without changing this rule.
 - Verify route boundary changes with lint for the shell and changed features,
   as well as `npx nx build admin-react`; build output must contain separate
   page chunks.
+- After a deploy, an open tab asks for hashed route chunks that no longer exist and
+  gets `index.html` back. `main.tsx` listens to `vite:preloadError` and reloads the page
+  once (at most once per 30 seconds, kept in `sessionStorage`, so a broken build cannot
+  loop); see `apps/admin-react/src/reload-on-stale-chunk.ts`.
