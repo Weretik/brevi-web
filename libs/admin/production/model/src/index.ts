@@ -187,9 +187,11 @@ export { productionOrdersCsv } from './queries/orders/production-orders-csv';
 export {
   PRODUCTION_DUE_SOON_DAYS,
   dueState,
+  itemColorsText,
   orderModelsText,
   orderStageSpread,
   ordersWord,
+  uniqueValues,
 } from './queries/orders/production-order-row';
 export type { DueState } from './queries/orders/production-order-row';
 export { itemsWord, productionOrderOverview } from './queries/orders/production-order-overview';

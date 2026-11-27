@@ -165,7 +165,7 @@ describe('FabricStockPage', () => {
     fireEvent.click(row);
     const drawer = screen.getByRole('dialog', { name: 'Грета · Синій' });
     expect(within(drawer).getByText('Нафтогаз · Куртка «Віол»')).toBeTruthy();
-    expect(within(drawer).getByText(/На завдання · Ц-14/)).toBeTruthy();
+    expect(within(drawer).getByText(/Розхід · Ц-14/)).toBeTruthy();
     expect(within(drawer).queryByRole('button', { name: 'Уточнити залишок' })).toBeNull();
   });
 

@@ -114,6 +114,7 @@ export function ProductionOrdersPage({ useOrderActor }: Props) {
           onOpen={(row) => quick.open(row.id)}
           sort={list.sort}
           onSortChange={list.setSort}
+          modelCode={list.filters.model}
         />
       ) : (
         <ProductionModelSummaryView

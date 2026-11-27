@@ -1,15 +1,19 @@
-import { formatDay, orderModelsText } from '@admin/production/model';
-import { Box, Typography } from '@mui/material';
+import { formatDay } from '@admin/production/model';
 
-import { DueCell, ShippedCell, StageCell } from './production-order-cells';
+import { DueCell } from './production-order-cells';
+import { ApplicationsCell, FabricColorCell, OrderCell } from './production-order-item-cells';
 
 import type { ProductionOrderSummary } from '@admin/production/model';
 import type { GridColDef } from '@mui/x-data-grid';
 
-/** The columns of «Виробничі завдання»; `sortable` turns on the server-sorted ones. */
+/**
+ * The columns of «Виробничі завдання»; `sortable` turns on the server-sorted ones. «Готово до» is the last one,
+ * and `firstModelCode` (the model filter) puts that model first in the models of a row.
+ */
 export const productionOrdersColumns = (
   today: string,
   sortable: boolean,
+  firstModelCode: string | null = null,
 ): GridColDef<ProductionOrderSummary>[] => [
   {
     field: 'number',
@@ -20,52 +24,26 @@ export const productionOrdersColumns = (
   },
   {
     field: 'clientName',
-    headerName: 'Клієнт і моделі',
-    flex: 1.6,
-    minWidth: 240,
+    headerName: 'Модель · клієнт · етап',
+    flex: 1.8,
+    minWidth: 280,
     sortable: false,
-    renderCell: ({ row }) => {
-      const models = orderModelsText(row.items);
-      return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', minWidth: 0, lineHeight: 1.35 }}>
-          <Box component="span" sx={{ fontWeight: 600 }} className="order-ellipsis">
-            {row.clientName}
-          </Box>
-          {models && (
-            <Typography
-              component="span"
-              variant="caption"
-              color="text.secondary"
-              className="order-ellipsis"
-              title={models}
-            >
-              {models}
-            </Typography>
-          )}
-        </Box>
-      );
-    },
+    renderCell: ({ row }) => <OrderCell row={row} firstModelCode={firstModelCode} />,
   },
   {
-    field: 'stage',
-    headerName: 'Етап',
-    width: 230,
+    field: 'applications',
+    headerName: 'Нанесення',
+    width: 120,
     sortable: false,
-    renderCell: ({ row }) => <StageCell row={row} />,
+    renderCell: ({ row }) => <ApplicationsCell row={row} />,
   },
   {
-    field: 'shippedQuantity',
-    headerName: 'Відвантажено, шт.',
-    width: 150,
+    field: 'fabric',
+    headerName: 'Тканина · колір',
+    flex: 1,
+    minWidth: 170,
     sortable: false,
-    renderCell: ({ row }) => <ShippedCell row={row} />,
-  },
-  {
-    field: 'nearestDueDate',
-    headerName: 'Готово до',
-    width: 150,
-    sortable,
-    renderCell: ({ row }) => <DueCell row={row} today={today} />,
+    renderCell: ({ row }) => <FabricColorCell row={row} />,
   },
   {
     field: 'quoteNumber',
@@ -83,5 +61,12 @@ export const productionOrdersColumns = (
     sortable,
     cellClassName: 'order-mono',
     valueFormatter: (value: string) => formatDay(value),
+  },
+  {
+    field: 'nearestDueDate',
+    headerName: 'Готово до',
+    width: 150,
+    sortable,
+    renderCell: ({ row }) => <DueCell row={row} today={today} />,
   },
 ];

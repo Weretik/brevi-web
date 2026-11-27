@@ -37,10 +37,14 @@ const row = (change: Partial<FabricMovementRow>): FabricMovementRow => ({
 });
 
 describe('movement labels', () => {
-  it('names an issue by whether it went to a task', () => {
-    expect(movementOperationLabel(row({ kind: 'Issue', orderId: 4 }))).toBe('На завдання');
-    expect(movementOperationLabel(row({ kind: 'Issue' }))).toBe('Разова витрата');
-    expect(movementOperationLabel(row({ kind: 'Reversal' }))).toBe('Сторно');
+  it('names every movement «Прихід» or «Розхід»', () => {
+    expect(movementOperationLabel(row({ kind: 'Issue', orderId: 4, delta: -3 }))).toBe('Розхід');
+    expect(movementOperationLabel(row({ kind: 'Issue', delta: -3 }))).toBe('Розхід');
+    expect(movementOperationLabel(row({ kind: 'Receipt' }))).toBe('Прихід');
+    expect(movementOperationLabel(row({ kind: 'Opening' }))).toBe('Прихід');
+    expect(movementOperationLabel(row({ kind: 'Adjustment', delta: -1 }))).toBe('Розхід');
+    expect(movementOperationLabel(row({ kind: 'Adjustment', delta: 2 }))).toBe('Прихід');
+    expect(movementOperationLabel(row({ kind: 'Reversal', delta: -5 }))).toBe('Розхід');
   });
 
   it('says where the fabric came from or went', () => {
