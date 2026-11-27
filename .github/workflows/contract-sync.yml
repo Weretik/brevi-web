@@ -54,7 +54,7 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git switch -C "$BRANCH"
           git add docs/contracts/openapi libs/admin/shared/contracts/src/generated
-          git commit -m 'Sync the BreviERP API contract'
+          git commit -m 'chore(contracts): sync the BreviERP API contract'
           git push --force origin "$BRANCH"
           if [ "$TYPECHECK" = 'success' ]; then
             result='Typecheck passed: the frontend compiles against the new contract.'
@@ -67,7 +67,7 @@ jobs:
             'CI does not start on a pull request opened by this workflow; close and reopen it, or push a commit, to run CI.')"
           number="$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number')"
           if [ -z "$number" ]; then
-            gh pr create --head "$BRANCH" --base master --title 'Sync the BreviERP API contract' --body "$body"
+            gh pr create --head "$BRANCH" --base master --title 'chore(contracts): sync the BreviERP API contract' --body "$body"
           else
             gh pr edit "$number" --body "$body"
           fi
