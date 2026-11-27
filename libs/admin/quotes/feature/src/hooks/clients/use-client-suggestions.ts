@@ -13,6 +13,7 @@ export function useClientSuggestions() {
   );
   const clients: QuoteClientSuggestion[] =
     query.data?.rows.map((row) => ({
+      publicId: row.publicId,
       name: row.displayName,
       companyName: row.legalName ?? (row.kind === 'organization' ? row.displayName : null),
       contactName: row.contactName ?? (row.kind === 'person' ? row.displayName : null),

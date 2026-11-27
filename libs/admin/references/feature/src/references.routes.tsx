@@ -11,6 +11,7 @@ const MaterialsPage = lazy(() => import('./pages/materials/materials-page'));
 const OperationsPage = lazy(() => import('./pages/operations/operations-page'));
 const ProductSectionsPage = lazy(() => import('./pages/product-sections/product-sections-page'));
 const CounterpartiesPage = lazy(() => import('./pages/counterparties/counterparties-page'));
+const SupplierCardPage = lazy(() => import('./pages/suppliers/supplier-card-page'));
 
 /** Old separate pages: `/references/garment-accessory` (with `?tab=fabrics` for fabrics). */
 function GarmentAccessoriesRedirect() {
@@ -27,27 +28,37 @@ function GarmentAccessoriesRedirect() {
   );
 }
 
+/** The pages of «Права доступу» a supplier card's tabs follow (CARD-001). */
+export interface SupplierCardAccess {
+  /** «Матеріали»: the tabs «Тканини» and «Фурнітура». */
+  readonly materials: boolean;
+  /** «Товари»: the tab «Товари». */
+  readonly products: boolean;
+  /** «Склад тканин»: the tab «Прихід на склад». */
+  readonly fabricStock: boolean;
+  /** «Рахунки на закупку»: the tab of the same name. */
+  readonly purchaseInvoices: boolean;
+  /** «Бухгалтерія»: the tab «Фінанси». */
+  readonly finance: boolean;
+}
+
 export interface ReferencesRouteOptions {
-  /** Whether the signed-in user may see a supplier's «Рахунки на закупку» (the Director). */
-  useCanSeePurchaseInvoices: () => boolean;
-  /** Whether the signed-in user has the «Бухгалтерія» right: the supplier card gets «Фінанси». */
-  useCanSeeFinance: () => boolean;
+  /** What the signed-in user may open in a supplier card. */
+  useCardAccess: () => SupplierCardAccess;
 }
 
 export function createReferencesRoutes({
-  useCanSeePurchaseInvoices,
-  useCanSeeFinance,
+  useCardAccess,
 }: ReferencesRouteOptions): (RouteObject & { path: string })[] {
   function Counterparties() {
-    return (
-      <CounterpartiesPage
-        canSeePurchaseInvoices={useCanSeePurchaseInvoices()}
-        canSeeFinance={useCanSeeFinance()}
-      />
-    );
+    return <CounterpartiesPage canSeePurchaseInvoices={useCardAccess().purchaseInvoices} />;
+  }
+  function SupplierCard() {
+    return <SupplierCardPage access={useCardAccess()} />;
   }
   return [
     { path: '/references/counterparties', element: <Counterparties /> },
+    { path: '/references/counterparties/suppliers/:supplierId', element: <SupplierCard /> },
     { path: '/references/supplier', element: <Navigate to="/references/counterparties" replace /> },
     { path: '/references/materials', element: <MaterialsPage /> },
     { path: '/references/fabric', element: <Navigate to="/references/materials" replace /> },

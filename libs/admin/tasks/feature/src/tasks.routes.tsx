@@ -1,4 +1,5 @@
 import { lazy } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import type { TaskViewer } from '@admin/tasks/model';
 import type { RouteObject } from 'react-router-dom';
@@ -25,7 +26,10 @@ export function createTasksRoutes({ useTaskViewer }: TasksRouteOptions): {
     return <ManagerTasksPage viewer={useTaskViewer()} />;
   }
   function Board() {
-    return <TaskBoardPage viewer={useTaskViewer()} />;
+    const [params] = useSearchParams();
+    return (
+      <TaskBoardPage viewer={useTaskViewer()} openTaskId={Number(params.get('task')) || null} />
+    );
   }
   return {
     admin: [{ path: '/admin/tasks', element: <Admin /> }],

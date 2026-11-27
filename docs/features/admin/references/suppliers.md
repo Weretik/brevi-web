@@ -63,6 +63,12 @@ flowchart LR
   Validator --> Mapper["mappers: response → Supplier"]
 ```
 
+## Supplier card
+
+A row (or «Переглянути») opens the supplier card `/references/counterparties/suppliers/:id` ([020](../../../specs/admin/references/020-counterparty-cards/README.md)), the same page as a client card: header with «Редагувати» (the usual `SupplierDrawer` in edit mode), one period for every tab, «Огляд» (counts of fabrics, accessories, products, receipts and invoices of the period; «Що закуповуємо», notes, contacts) and the tabs «Тканини», «Фурнітура» (by supplier link or name, 20 per page), «Товари» (`GET /api/v1/products?supplierId=`), «Прихід на склад» (`GET /api/warehouse/fabric-stock/movements?supplierId=&kind=Receipt`), «Рахунки на закупку» (document dates in the period) and «Фінанси». Each tab follows its «Права доступу» page (`SupplierCardAccess`). The old link `/references/counterparties?supplier=<id>` redirects to the card.
+
+A supplier name elsewhere (КП, fabrics, accessories, price import, PPE card, «Рух тканини», «Рахунки на закупку» and their side panels) opens the same read-only `SupplierViewPanel` with «Відкрити картку». The app provides one opener for every page (`SupplierCardSlot` in `apps/admin-react/src/app/slots/counterparties/`, `SupplierCardProvider` and `SupplierName` in `@admin/shared/ui`).
+
 ## Code structure
 
 ```text
@@ -78,7 +84,11 @@ libs/admin/references/
 │       └── suppliers.mapper.ts # validated response to domain model
 ├── feature/src/
 │   ├── components/suppliers/
-│   │   └── supplier-dialog.tsx # editor orchestration only
+│   │   ├── supplier-card-path.ts # the card route
+│   │   └── supplier-drawer.tsx # editor orchestration only
+│   ├── components/supplier-card/ # header, tabs, «Огляд», materials, products, receipts
+│   ├── hooks/supplier-card/ # supplier by id, tab by access, materials, overview counts
+│   ├── pages/suppliers/supplier-card-page.tsx # the supplier card
 │   ├── hooks/suppliers/
 │   │   ├── use-suppliers.ts # loading
 │   │   ├── use-supplier-editor.ts # draft and create/update mutations
@@ -121,7 +131,8 @@ libs/admin/references/
 ## Tests
 
 - `libs/admin/references/data-access/src/mappers/suppliers/suppliers.mapper.unit.test.ts`, shared `libs/admin/references/data-access/src/api/integration/references.api.integration.test.ts`
-- `libs/admin/references/feature/src/pages/suppliers/suppliers-page.component.test.tsx`
+- `libs/admin/references/feature/src/pages/suppliers/suppliers-page.component.test.tsx`, `supplier-card-page.component.test.tsx`
+- `libs/admin/shared/ui/src/counterparties/supplier-name.component.test.tsx`, `libs/admin/references/feature/src/components/suppliers/supplier-preview.component.test.tsx`
 - `libs/admin/references/ui/src/components/suppliers/supplier-link-cell.component.test.tsx`, `supplier-editor-drawer.component.test.tsx`
 - `libs/admin/references/model/src/mappers/suppliers/supplier-link.unit.test.ts`
 - `libs/admin/references/ui/src/dialogs/suppliers/supplier-editor-dialog.component.test.tsx`

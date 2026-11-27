@@ -4,6 +4,7 @@ import {
   formatPurchaseMoney,
   purchaseInvoiceStatus,
 } from '@admin/purchasing/model';
+import { SupplierName } from '@admin/shared/ui';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { IconButton, TableCell, TableRow, Typography } from '@mui/material';
@@ -69,7 +70,7 @@ export function PurchaseInvoiceRow({
           title={supplier ?? undefined}
           color={supplier ? 'text.primary' : 'text.secondary'}
         >
-          {supplier ?? '—'}
+          <SupplierName name={supplier} id={first ? null : invoice.supplierId} />
         </Typography>
         <Typography
           variant="caption"

@@ -10,7 +10,7 @@ interface Props {
   onChange: (filter: TaskListFilter) => void;
 }
 
-const counts: Record<TaskListFilter, keyof TaskOverview> = {
+const counts: Record<Exclude<TaskListFilter, 'All'>, keyof TaskOverview> = {
   Open: 'open',
   Overdue: 'overdue',
   Urgent: 'urgent',
@@ -22,7 +22,7 @@ const counts: Record<TaskListFilter, keyof TaskOverview> = {
 /** Filter chips with counts of the selected manager (or of everyone). */
 export function TaskListFilters({ filter, overview, count, onChange }: Props) {
   const countOf = (value: TaskListFilter) =>
-    overview ? (overview[counts[value]] as number) : undefined;
+    overview && value !== 'All' ? (overview[counts[value]] as number) : undefined;
   return (
     <ReferenceFilterRow
       filters={taskFilters.map((item) => (

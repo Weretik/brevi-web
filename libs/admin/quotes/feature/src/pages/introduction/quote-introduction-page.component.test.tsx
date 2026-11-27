@@ -147,7 +147,7 @@ describe('КП для знайомства', () => {
       kind: 'Introduction',
       status: 'Draft',
       internalName: 'ТОВ «Агро»',
-      customerId: null,
+      customerPublicId: null,
       recipientName: null,
       companyName: null,
       clientComment: null,

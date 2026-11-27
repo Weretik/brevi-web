@@ -78,7 +78,7 @@ export const mapQuote = (value: Schemas['QuoteResponse']): Quote => ({
   kind: value.kind as QuoteKind,
   status: value.status as QuoteStatus,
   internalName: value.internalName,
-  customerId: value.customerId ?? null,
+  customerPublicId: value.customerPublicId ?? null,
   recipientName: value.recipientName ?? null,
   companyName: value.companyName ?? null,
   clientComment: value.clientComment ?? null,

@@ -14,6 +14,7 @@ import {
   tasksRoutes,
 } from './admin-route-definitions';
 import { useAdminColorMode } from '../../providers/color-mode-provider';
+import { SupplierCardSlot } from '../../slots/counterparties/supplier-card-slot';
 import { useHomeHint } from '../../slots/tasks/use-home-hint';
 import { createNavigation } from '../navigation/navigation-config';
 
@@ -42,18 +43,20 @@ export function AdminRouteLayout({ user }: { user: SessionUser }) {
   const homeHint = useHomeHint(user);
 
   return (
-    <AdminLayout
-      colorMode={colorMode}
-      homeHint={homeHint}
-      navigation={navigation}
-      onColorModeChange={changeColorMode}
-      profileHref={profilePath}
-      user={{
-        avatarUrl: user.avatarUrl,
-        email: user.email,
-        fullName: user.fullName,
-        roleLabel: sessionRoleLabel(user),
-      }}
-    />
+    <SupplierCardSlot>
+      <AdminLayout
+        colorMode={colorMode}
+        homeHint={homeHint}
+        navigation={navigation}
+        onColorModeChange={changeColorMode}
+        profileHref={profilePath}
+        user={{
+          avatarUrl: user.avatarUrl,
+          email: user.email,
+          fullName: user.fullName,
+          roleLabel: sessionRoleLabel(user),
+        }}
+      />
+    </SupplierCardSlot>
   );
 }

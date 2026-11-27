@@ -15,7 +15,7 @@ const quote: Quote = {
   kind: 'Request',
   status: 'Draft',
   internalName: 'Агро база',
-  customerId: null,
+  customerPublicId: null,
   recipientName: null,
   companyName: null,
   clientComment: null,

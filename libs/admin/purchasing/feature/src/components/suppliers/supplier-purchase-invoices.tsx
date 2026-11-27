@@ -8,14 +8,17 @@ import { purchaseInvoicesPath } from '../../purchasing-paths';
 
 interface Props {
   supplierId: number;
+  /** The supplier card's period: invoices dated in it. */
+  from?: string;
+  to?: string;
 }
 
-const pageSize = 25;
+const pageSize = 20;
 /**
  * Supplier card tab «Рахунки на закупку»: invoices the accountant linked to this supplier, newest first.
  * A row opens the register on that invoice; it is read-only here.
  */
-export function SupplierPurchaseInvoices({ supplierId }: Props) {
+export function SupplierPurchaseInvoices({ supplierId, from, to }: Props) {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const list = useGetPurchaseInvoicesQuery({
@@ -24,6 +27,8 @@ export function SupplierPurchaseInvoices({ supplierId }: Props) {
     search: '',
     filter: 'All',
     supplierId,
+    documentFrom: from,
+    documentTo: to,
   });
 
   if (list.isLoading)
@@ -44,8 +49,8 @@ export function SupplierPurchaseInvoices({ supplierId }: Props) {
   if (list.data.total === 0)
     return (
       <Typography variant="body2" color="text.secondary">
-        Рахунків цього постачальника ще немає. Їх прив’язують у «Рахунки на закупку» кнопкою
-        «Постачальник і примітка».
+        {from || to ? 'За цей період рахунків немає. ' : 'Рахунків цього постачальника ще немає. '}
+        Їх прив’язують у «Рахунки на закупку» кнопкою «Постачальник і примітка».
       </Typography>
     );
 

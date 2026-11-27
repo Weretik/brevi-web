@@ -6,10 +6,14 @@ export interface QuoteStartPrefill {
   readonly internalName: string;
   readonly companyName: string;
   readonly recipientName: string;
+  /** The chosen client (its public id); null for a typed name. */
+  readonly customerPublicId: string | null;
 }
 
 /** A KeepinCRM client offered in the client field. */
 export interface QuoteClientSuggestion {
+  /** Public id of the client in «Контрагенти → Клієнти». */
+  readonly publicId: string;
   readonly name: string;
   readonly companyName: string | null;
   readonly contactName: string | null;
@@ -30,6 +34,7 @@ export function readQuoteStartPrefill(state: unknown): QuoteStartPrefill | null 
     internalName: text(prefill['internalName']),
     companyName: text(prefill['companyName']),
     recipientName: text(prefill['recipientName']),
+    customerPublicId: text(prefill['customerPublicId']) || null,
   };
 }
 
@@ -42,5 +47,6 @@ export function quoteStartPrefillOf(
     internalName: name.trim(),
     companyName: client?.companyName ?? (client ? client.name : ''),
     recipientName: client?.contactName ?? '',
+    customerPublicId: client?.publicId ?? null,
   };
 }

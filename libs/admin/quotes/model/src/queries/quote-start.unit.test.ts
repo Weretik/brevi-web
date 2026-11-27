@@ -3,9 +3,10 @@ import { describe, expect, it } from 'vitest';
 import { quoteStartPrefillOf, readQuoteStartPrefill } from './quote-start';
 
 describe('«Нове КП» prefill', () => {
-  it('fills the company and recipient from a KeepinCRM client', () => {
+  it('fills the company, recipient and client link from a chosen client', () => {
     expect(
       quoteStartPrefillOf(' Агроресурс ', {
+        publicId: 'c1',
         name: 'Агроресурс',
         companyName: 'ТОВ «Агроресурс»',
         contactName: 'Марина',
@@ -14,6 +15,7 @@ describe('«Нове КП» prefill', () => {
       internalName: 'Агроресурс',
       companyName: 'ТОВ «Агроресурс»',
       recipientName: 'Марина',
+      customerPublicId: 'c1',
     });
   });
 
@@ -22,6 +24,7 @@ describe('«Нове КП» prefill', () => {
       internalName: 'Запит на фартухи',
       companyName: '',
       recipientName: '',
+      customerPublicId: null,
     });
   });
 
@@ -32,6 +35,7 @@ describe('«Нове КП» prefill', () => {
       internalName: 'Агро',
       companyName: '',
       recipientName: '',
+      customerPublicId: null,
     });
   });
 });

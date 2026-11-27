@@ -91,7 +91,7 @@ export function emptyIntroDraft(setup: QuoteIntroductionSetup): QuoteIntroDraft 
   return {
     version: 0,
     internalName: '',
-    customerId: null,
+    customerPublicId: null,
     recipientEmail: '',
     recipientName: '',
     companyName: '',
@@ -110,7 +110,7 @@ export function introToDraft(quote: Quote): QuoteIntroDraft {
   return {
     version: quote.version,
     internalName: quote.internalName,
-    customerId: quote.customerId,
+    customerPublicId: quote.customerPublicId,
     recipientEmail: quote.introduction?.recipientEmail ?? '',
     recipientName: quote.recipientName ?? '',
     companyName: quote.companyName ?? '',

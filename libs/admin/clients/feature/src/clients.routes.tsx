@@ -5,16 +5,30 @@ import type { RouteObject } from 'react-router-dom';
 
 const CustomerDetailPage = lazy(() => import('./pages/detail/customer-detail-page'));
 
+/** The pages of «Права доступу» a client card's tabs follow (CARD-001). */
+export interface CustomerCardAccess {
+  /** «КП»: the tab «КП» and «Нова КП». */
+  readonly quotes: boolean;
+  /** «Виробничі завдання»: the tab «Завдання в цех». */
+  readonly productionOrders: boolean;
+  /** «Мої завдання»: the tab «Завдання менеджерам». */
+  readonly tasks: boolean;
+  /** «Ціна вишивки»: the tab «Розрахунки вишивки». */
+  readonly embroidery: boolean;
+  /** «Бухгалтерія»: the tab «Фінанси». */
+  readonly finance: boolean;
+}
+
 export interface ClientsRouteOptions {
-  /** Whether the signed-in user has the «Бухгалтерія» right: the client card gets «Фінанси». */
-  useCanSeeFinance: () => boolean;
+  /** What the signed-in user may open in a client card. */
+  useCardAccess: () => CustomerCardAccess;
 }
 
 export function createClientsRoutes({
-  useCanSeeFinance,
+  useCardAccess,
 }: ClientsRouteOptions): (RouteObject & { path: string })[] {
   function CustomerDetail() {
-    return <CustomerDetailPage canSeeFinance={useCanSeeFinance()} />;
+    return <CustomerDetailPage access={useCardAccess()} />;
   }
   return [
     {

@@ -55,7 +55,7 @@ export interface QuoteItemDraft {
 export interface QuoteDraft {
   readonly version: number;
   readonly internalName: string;
-  readonly customerId: number | null;
+  readonly customerPublicId: string | null;
   readonly recipientName: string;
   readonly companyName: string;
   readonly clientComment: string;

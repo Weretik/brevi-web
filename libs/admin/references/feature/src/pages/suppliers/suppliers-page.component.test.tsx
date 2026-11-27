@@ -578,32 +578,17 @@ describe('suppliers from KeepinCRM', () => {
     expect(screen.getByRole('alert')).toHaveTextContent(/KeepinCRM/);
   });
 
-  it('opens the supplier asked by «Відкрити в контрагентах»', async () => {
+  it('opens the supplier card from a row when the page passes one', async () => {
+    const user = userEvent.setup();
     vi.stubGlobal(
       'fetch',
-      vi.fn().mockResolvedValue({
-        ok: true,
-        json: async () => [
-          {
-            email: null,
-            purchaseCategories: null,
-            tags: null,
-            isActive: true,
-            keepinCrmId: null,
-            keepinSyncedAt: null,
-            id: 7,
-            name: 'Атлас',
-            link: null,
-            contactPerson: null,
-            phoneNumber: null,
-            notes: null,
-          },
-        ],
-      }),
+      vi.fn().mockResolvedValue({ ok: true, json: async () => searchableSuppliers }),
     );
-    const opened = vi.fn();
-    render(<SuppliersPage openSupplierId={7} onSupplierOpened={opened} />);
-    expect(await screen.findByRole('dialog', { name: 'Перегляд постачальника' })).toBeVisible();
-    expect(opened).toHaveBeenCalled();
+    const openCard = vi.fn();
+    render(<SuppliersPage onOpenCard={openCard} />);
+    await user.click(await screen.findByRole('button', { name: 'Дії: Атлас' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Переглянути' }));
+    expect(openCard).toHaveBeenCalledWith(expect.objectContaining({ name: 'Атлас' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 });
