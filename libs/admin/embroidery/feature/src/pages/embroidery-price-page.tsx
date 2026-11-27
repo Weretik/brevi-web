@@ -55,14 +55,12 @@ function EmbroideryPriceContent({
 }) {
   const [search, setSearch] = useSearchParams();
   const rights = usePageRights();
-  const tab = embroideryTabOf(search, {
-    ...viewer,
-    canEditSettings: viewer.canEditSettings && rights.canEdit,
-  });
+  const tab = embroideryTabOf(search, viewer);
   const calculator = useEmbroideryCalculation(setup);
-  // «Налаштування» need «Редагування» on «Ціна вишивки»; deleting a saved calculation needs «Видалення».
-  const canEdit = viewer.canEditSettings && setup.seesCost && rights.canEdit;
-  const canDelete = viewer.canEditSettings && setup.seesCost && rights.canDelete;
+  // «Налаштування» are their own page «Ціна вишивки: собівартість і налаштування»; deleting a saved
+  // calculation needs «Видаляти» on «Ціна вишивки» (ACC-002).
+  const canEdit = viewer.canEditSettings && setup.seesCost;
+  const canDelete = rights.canDelete;
   const setTab = (next: EmbroideryTab) =>
     setSearch(next === 'calculation' ? {} : { tab: next }, { replace: true });
   const since = dateOf(setup.settingsUpdatedAt);

@@ -16,7 +16,7 @@ interface NewRolePanelProps {
   onSubmit: (title: string) => Promise<boolean>;
 }
 
-/** «Нова роль»: the role starts without rights; they are given on its tab. */
+/** «Нова роль»: the role starts without rights; they are given or copied after it opens. */
 export function NewRolePanel({ error, onClose, onSubmit, open, submitting }: NewRolePanelProps) {
   const [title, setTitle] = useState('');
   const [fieldError, setFieldError] = useState<string | null>(null);
@@ -38,7 +38,7 @@ export function NewRolePanel({ error, onClose, onSubmit, open, submitting }: New
 
   return (
     <StaffSidePanel
-      description="Нова роль спочатку нічого не бачить. Права позначте на її вкладці."
+      description="Нова роль спочатку нічого не бачить. Потім позначте права або скопіюйте їх з іншої ролі."
       onClose={handleClose}
       onSubmit={(event) => void handleSubmit(event)}
       open={open}

@@ -4,16 +4,16 @@
 
 ## Behavior and routes
 
-| Route          | Purpose                                                                                     |
-| -------------- | ------------------------------------------------------------------------------------------- |
-| `/admin/tasks` | «Адміністрування › Завдання менеджерам» (Admin role): tabs «Завдання» and «Навантаження»    |
-| `/crm/tasks`   | «Менеджер сервісу › Мої завдання» (Manager or Admin role): «На сьогодні», metrics, K2 board |
+| Route          | Purpose                                                                                            |
+| -------------- | -------------------------------------------------------------------------------------------------- |
+| `/admin/tasks` | «Адміністрування › Завдання менеджерам» (page `manager-tasks`): tabs «Завдання» and «Навантаження» |
+| `/crm/tasks`   | «Менеджер сервісу › Мої завдання» (page `tasks`): «На сьогодні», metrics, K2 board                 |
 
 - Tab «Завдання»: metrics, search, filter chips and the table on the full width; a «Менеджер: …» chip shows and clears the manager filter. Tab «Навантаження» (L3): a row per manager with open, overdue, urgent, in progress, done in 7 days, % on time in 30 days and a bar; a row click opens «Завдання» for that manager.
-- Director and Admin create, edit and delete tasks, and filter both pages by manager. On the board they see everyone's cards with avatars and can mark cards urgent by dragging.
+- Whoever has «Завдання менеджерам» (`manager-tasks`, Director and Admin by default; ACC-002) creates, edits and deletes tasks (each by its action) and filter both pages by manager. On the board they see everyone's cards with avatars and can mark cards urgent by dragging.
 - A Manager sees own tasks only (the server enforces it), drags cards to «У роботі» or «Виконано», and checks steps in the side panel.
 - «Мої завдання» shows every open task and the tasks done in the chosen «Виконані за» period («Цей тиждень» from Monday by default, «Минулий тиждень», «Останній місяць», «Квартал», «Рік», «Усі»); every column is newest added first. The side panel of an open task has a green «Виконано» next to «Закрити»: it marks the task done and closes the panel (client corrections round 2, 2026-11-08).
-- Both pages open the same side panel (`ReferenceEditorDrawer`): view with status, steps and history; the form for Director and Admin. In the view Director and Admin pick another manager in «Виконавець» to pass the task on at once (saved as an edit; history shows the transfer).
+- Both pages open the same side panel (`ReferenceEditorDrawer`): view with status, steps and history; the form with «Завдання менеджерам». In the view they pick another manager in «Виконавець» to pass the task on at once (saved as an edit; history shows the transfer).
 - A «Подзвонити» task made from a lead call (LEAD-001 R-08) shows «Лід» in the side panel with a link to the lead in «Мій день»; see [leads](leads.md).
 - The sidebar «Робочий стіл» tile shows «Завдання: прострочено N · терміново M» from the overview, or a neutral line when nothing burns.
 
@@ -34,7 +34,7 @@ flowchart LR
 
 ```text
 apps/admin-react/src/app/router/
-  use-task-viewer.ts               signed-in user → TaskViewer (Admin role manages all)
+  use-task-viewer.ts               signed-in user → TaskViewer (`manager-tasks` sees all)
   use-home-hint.ts                 task overview → second line of «Робочий стіл»
   admin-route-definitions.tsx      tasksRoutes = createTasksRoutes({ useTaskViewer })
   create-admin-router.tsx          /admin/tasks behind Admin, /crm/tasks behind Manager or Admin

@@ -8,8 +8,14 @@ import type { AccessArea, AccessRole } from '@admin/users/model';
 import type { ReactNode } from 'react';
 
 const areas: AccessArea[] = [
-  { key: 'quotes', group: 'Продажі', title: 'КП', actions: ['view', 'create', 'edit', 'delete'] },
-  { key: 'leads', group: 'Продажі', title: 'Ліди', actions: ['view', 'edit'] },
+  {
+    key: 'quotes',
+    group: 'Продажі',
+    title: 'КП',
+    actions: ['view', 'create', 'edit', 'delete'],
+    actionLabels: {},
+  },
+  { key: 'leads', group: 'Продажі', title: 'Ліди', actions: ['view', 'edit'], actionLabels: {} },
 ];
 
 const role = (name: string, patch: Partial<AccessRole> = {}): AccessRole => ({
@@ -18,6 +24,7 @@ const role = (name: string, patch: Partial<AccessRole> = {}): AccessRole => ({
   locked: false,
   builtIn: true,
   userCount: 0,
+  userNames: [],
   version: 1,
   updatedByName: null,
   updatedAt: null,
@@ -25,7 +32,11 @@ const role = (name: string, patch: Partial<AccessRole> = {}): AccessRole => ({
   ...patch,
 });
 
-const roles = [role('Director', { locked: true }), role('Manager'), role('Accountant')];
+const roles = [
+  role('Director', { locked: true }),
+  role('Manager'),
+  role('Accountant', { grants: { leads: ['view', 'edit'] } }),
+];
 
 function render(initialUrl = '/access', onTabChange = vi.fn()) {
   const wrapper = ({ children }: { children: ReactNode }) => (
@@ -52,12 +63,29 @@ describe('useAccessRoleDraft', () => {
   it('marks the role changed after a switch and back to clean when undone', () => {
     const { result } = render();
 
-    act(() => result.current.changeView('leads', true));
+    act(() => result.current.changeLevel(areas[1], 'view'));
     expect(result.current.grants).toEqual({ quotes: ['view'], leads: ['view'] });
     expect(result.current.dirty).toBe(true);
+    expect(result.current.changedAreas.map((area) => area.title)).toEqual(['Ліди']);
 
-    act(() => result.current.changeView('leads', false));
+    act(() => result.current.changeLevel(areas[1], 'none'));
     expect(result.current.dirty).toBe(false);
+    expect(result.current.changedKeys.size).toBe(0);
+  });
+
+  it('gives a whole group one level and copies another role into the draft', () => {
+    const { result } = render();
+
+    act(() => result.current.changeGroupLevel({ title: 'Продажі', areas }, 'all'));
+    expect(result.current.grants).toEqual({
+      quotes: ['view', 'create', 'edit', 'delete'],
+      leads: ['view', 'edit'],
+    });
+
+    act(() => result.current.copyFrom('Accountant'));
+    expect(result.current.grants).toEqual({ leads: ['view', 'edit'] });
+    expect(result.current.selectedRole?.name).toBe('Manager');
+    expect(result.current.changedAreas.map((area) => area.key)).toEqual(['quotes', 'leads']);
   });
 
   it('asks before leaving a changed role and drops the changes when confirmed', () => {

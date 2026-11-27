@@ -8,8 +8,8 @@ import {
 } from '@admin/users/data-access';
 import { useState } from 'react';
 
-import { getProfileErrorMessage } from '../errors/profile-error-message';
-import { checkAvatarFile } from '../model/check-avatar-file';
+import { getProfileErrorMessage } from '../../errors/profile-error-message';
+import { checkAvatarFile } from '../../model/check-avatar-file';
 
 import type { OwnEmailChange, OwnPasswordChange, ProfileField } from '@admin/users/ui';
 

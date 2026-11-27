@@ -107,7 +107,7 @@ export interface TaskAssignee {
   readonly email: string | null;
 }
 
-/** The signed-in staff member: Director and Admin manage every task (R-01, R-02). */
+/** The signed-in staff member; `isAdmin`: «Завдання менеджерам» sees every task (R-01, R-02, ACC-002). */
 export interface TaskViewer {
   readonly userId: number | null;
   readonly isAdmin: boolean;

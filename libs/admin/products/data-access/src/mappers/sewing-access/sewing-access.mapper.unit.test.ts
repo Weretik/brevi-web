@@ -7,17 +7,14 @@ describe('Sewing access response mapping', () => {
     expect(mapSewingAccess({ roles: ['User'] })).toEqual({
       canRead: true,
       canManage: false,
-      canManagePhotos: false,
       canSeeCost: false,
     });
     expect(mapSewingAccess({ roles: ['Manager'] })).toEqual({
       canRead: true,
       canManage: true,
-      canManagePhotos: false,
       canSeeCost: false,
     });
     expect(mapSewingAccess({ roles: ['Admin', 'Director'] })).toMatchObject({
-      canManagePhotos: true,
       canSeeCost: true,
     });
     expect(() => mapSewingAccess({ roles: 'Admin' })).toThrow();

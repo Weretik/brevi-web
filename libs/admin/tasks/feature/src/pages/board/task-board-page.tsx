@@ -24,7 +24,8 @@ export default function TaskBoardPage({ viewer }: { viewer: TaskViewer }) {
   const board = useTaskBoard(viewer, notice.notify);
   const editor = useTaskEditor(viewer, notice.notify);
   const today = tasksForToday(board.tasks, new Date());
-  const { canCreate } = usePageRights();
+  // «Нове завдання» belongs to «Завдання менеджерам», not to «Мої завдання» (ACC-002).
+  const canCreate = usePageRights().can('create', 'manager-tasks');
 
   return (
     <Box>

@@ -4,17 +4,17 @@
 
 ## Behavior and routes
 
-| Route                          | Purpose                                                                 |
-| ------------------------------ | ----------------------------------------------------------------------- |
-| `/crm/embroidery`              | «Менеджер сервісу › Ціна вишивки» (Manager or Admin role): «Розрахунок» |
-| `/crm/embroidery?tab=saved`    | «Збережені»: saved calculations, search, side panel, «Повторити»        |
-| `…?tab=saved&calculation=42`   | Opens «ВШ-0042» in «Збережені» (link from a production order)           |
-| `/crm/embroidery?tab=settings` | «Налаштування» (Admin role; the tab is hidden for a Manager)            |
+| Route                          | Purpose                                                             |
+| ------------------------------ | ------------------------------------------------------------------- |
+| `/crm/embroidery`              | «Менеджер сервісу › Ціна вишивки» (page `embroidery`): «Розрахунок» |
+| `/crm/embroidery?tab=saved`    | «Збережені»: saved calculations, search, side panel, «Повторити»    |
+| `…?tab=saved&calculation=42`   | Opens «ВШ-0042» in «Збережені» (link from a production order)       |
+| `/crm/embroidery?tab=settings` | «Налаштування» (page `embroidery-settings`, «Редагувати»)           |
 
 - The form on the left, live prices on the right; the server computes prices 300 ms after the last change, so a Manager never receives rates or cost.
-- Director and Admin also see the cost card, «Розшифровка собівартості», material sums and the roll layout.
+- With «Ціна вишивки: собівартість і налаштування» (`embroidery-settings`, Director and Admin by default; ACC-002) the server also sends the cost card, «Розшифровка собівартості», material sums and the roll layout.
 - Prices come in two categories, «Категорія 1» and «Категорія 2» («Опт» removed; the old «Стандарт» and «Терміново» renamed, 2026-11-08). The copy icon next to a price copies only its unit price («96,83»); «Копіювати ціни» copies the full text of both.
-- «Зберегти розрахунок» asks for one price category (default «Категорія 1») and stores the priced form with frozen rates, that one price and an optional client; an older calculation shows «Стандарт» as «Категорія 1». «Збережені» lists them, a row opens a read-only side panel with «Повторити розрахунок» (Admin also deletes). «Додати в КП» from that panel appends a row to a chosen КП with the saved price in all three columns (no choice of level); the КП editor's «Вишивка» tile does the same from inside the КП.
+- «Зберегти розрахунок» asks for one price category (default «Категорія 1») and stores the priced form with frozen rates, that one price and an optional client; an older calculation shows «Стандарт» as «Категорія 1». «Збережені» lists them, a row opens a read-only side panel with «Повторити розрахунок» («Видалити розрахунок» with «Видаляти» on «Ціна вишивки»). «Додати в КП» from that panel appends a row to a chosen КП with the saved price in all three columns (no choice of level); the КП editor's «Вишивка» tile does the same from inside the КП.
 - «Макет» in the saved side panel picks one photo of the design from «Медіа» (`MediaPickerDrawer`) or clears it; the workshop sees it in the production order, and «Медіа» does not delete a photo in use.
 - «Налаштування» is saved whole with a version (409 → «Оновити»); hoops and extra costs open in `ReferenceEditorDrawer`; the stitch rate comes from «Параметри ціноутворення».
 

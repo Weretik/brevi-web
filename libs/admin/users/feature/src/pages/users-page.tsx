@@ -11,7 +11,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { Alert, Button, Card, Snackbar, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 
-import { useStaffAccountActions } from '../hooks/use-staff-account-actions';
+import { useStaffAccountActions } from '../hooks/staff/use-staff-account-actions';
 
 import type { StaffActor } from '@admin/users/model';
 

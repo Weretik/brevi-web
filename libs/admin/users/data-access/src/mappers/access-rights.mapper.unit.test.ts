@@ -3,7 +3,15 @@ import { describe, expect, it } from 'vitest';
 import { mapAccessRights, toSaveRoleAccessBody } from './access-rights.mapper';
 
 const response = {
-  areas: [{ key: 'products', group: 'Довідники', title: 'Товари', actions: ['view', 'edit'] }],
+  areas: [
+    {
+      key: 'products',
+      group: 'Довідники',
+      title: 'Товари',
+      actions: ['view', 'edit'],
+      actionLabels: { view: 'Бачить', edit: 'Редагувати товари і фото', print: 'Друк' },
+    },
+  ],
   roles: [
     {
       name: 'Manager',
@@ -11,23 +19,30 @@ const response = {
       locked: false,
       builtIn: true,
       userCount: 2,
+      userNames: ['Ірина К.', 'Олег П.'],
       version: 3,
       updatedByName: null,
       updatedAt: null,
       grants: { products: ['view'] },
     },
   ],
+  adminOnly: [{ group: 'Адміністрування', title: 'Користувачі', reason: 'Системна сторінка.' }],
 };
 
 describe('mapAccessRights', () => {
   it('maps pages and roles', () => {
     const rights = mapAccessRights(response);
-    expect(rights.areas[0]).toEqual(response.areas[0]);
+    expect(rights.areas[0]).toEqual({
+      ...response.areas[0],
+      actionLabels: { view: 'Бачить', edit: 'Редагувати товари і фото' },
+    });
     expect(rights.roles[0]).toMatchObject({
       name: 'Manager',
       version: 3,
+      userNames: ['Ірина К.', 'Олег П.'],
       grants: { products: ['view'] },
     });
+    expect(rights.adminOnly).toEqual(response.adminOnly);
   });
 
   it('rejects an unknown action', () => {

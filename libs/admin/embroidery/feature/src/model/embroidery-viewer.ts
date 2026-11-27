@@ -1,6 +1,6 @@
 /** The signed-in staff member as «Ціна вишивки» sees them. */
 export interface EmbroideryViewer {
-  /** Director and Admin: the cost, «Налаштування» and deleting saved calculations. */
+  /** «Ціна вишивки: собівартість і налаштування» with «Редагувати»: the «Налаштування» tab. */
   canEditSettings: boolean;
 }
 

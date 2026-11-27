@@ -1,28 +1,27 @@
 import {
-  useGetProductAccessQuery,
   useGetProductPhotosQuery,
   useSetProductPhotosMutation,
   useUploadProductMediaMutation,
 } from '@admin/products/data-access';
 import { movePhoto } from '@admin/products/model';
 import { adminApiErrorMessage } from '@admin/shared/api-client';
+import { usePageRights } from '@admin/shared/ui';
 import { useState } from 'react';
 
 import type { ProductCardPhoto } from '@admin/products/model';
 
 /**
- * The card tab «Фото» (CAT-018). Every change saves at once: Admin (the Director also holds Admin)
+ * The card tab «Фото» (CAT-018). Every change saves at once: whoever may edit «Товари» (ACC-002)
  * adds from the library or uploads, removes, moves and picks the main photo; others only view.
  */
 export function useProductPhotos(productId: number) {
-  const access = useGetProductAccessQuery();
   const photos = useGetProductPhotosQuery(productId);
   const [save, saveState] = useSetProductPhotosMutation();
   const [upload] = useUploadProductMediaMutation();
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const list = photos.data ?? [];
-  const canEdit = access.currentData?.canManagePhotos === true && !access.isError;
+  const { canEdit } = usePageRights();
   const busy = saveState.isLoading || uploading;
 
   async function store(next: readonly ProductCardPhoto[], mainMediaFileId: number | null) {

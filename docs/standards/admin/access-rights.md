@@ -1,6 +1,6 @@
 # Admin: «Права доступу» in every feature
 
-Every staff page of the Admin is controlled by «Права доступу» (`/admin/access`). The director grants each role «Бачить», «Створювати», «Редагувати» and «Видаляти» per page, and the server checks the same rights on every request. A new feature, or a change that adds a page, a tab or a button, must take part in this, or the director can't control it. The page itself is described in the [feature card](../../features/admin/access-rights.md).
+Every staff page of the Admin is controlled by «Права доступу» (`/admin/access`). The director grants each role «Бачить», «Створювати», «Редагувати» and «Видаляти» per page (shown with the page's own action names from the server's `actionLabels`), and the server checks the same rights on every request. A new feature, or a change that adds a page, a tab or a button, must take part in this, or the director can't control it. The page itself is described in the [feature card](../../features/admin/access-rights.md).
 
 ## Where the rights come from
 

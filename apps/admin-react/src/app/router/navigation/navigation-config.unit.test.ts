@@ -52,8 +52,8 @@ describe('legacy Admin navigation', () => {
       'Загальні звіти',
       'Адміністрування',
     ]);
-    expect(groups.map((group) => group.items.length)).toEqual([5, 6, 3, 4, 7, 1, 11, 3, 9]);
-    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(49);
+    expect(groups.map((group) => group.items.length)).toEqual([5, 6, 3, 4, 7, 1, 11, 2, 9]);
+    expect(new Set(groups.flatMap((group) => group.items.map((item) => item.id))).size).toBe(48);
     expect(groups[0].items.map((item) => item.id)).not.toContain('clients');
   });
   it('shows «Налаштування КП» only for the server Admin role', () => {
@@ -131,7 +131,7 @@ describe('legacy Admin navigation', () => {
     expect(available[0].items[2].to).toBeUndefined();
   });
 
-  it('shows «Користувачі», «Завдання менеджерам», «Налаштування ШІ» and «Права доступу» only to Admin', () => {
+  it('shows «Користувачі», «Налаштування ШІ» and «Права доступу» only to Admin and «Завдання менеджерам» by its right', () => {
     const paths = new Set([
       '/admin/users',
       '/admin/tasks',

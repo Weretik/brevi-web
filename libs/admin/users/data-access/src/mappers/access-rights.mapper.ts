@@ -7,6 +7,7 @@ import type {
   AccessGrants,
   AccessRights,
   AccessRole,
+  AdminOnlyItem,
 } from '@admin/users/model';
 
 type AccessRoleResponse = components['schemas']['AccessRoleResponse'];
@@ -35,6 +36,32 @@ const mapGrants = (value: unknown): AccessGrants => {
   return grants;
 };
 
+const isStrings = (value: unknown): value is string[] =>
+  Array.isArray(value) && value.every((item) => typeof item === 'string');
+
+/** Keeps the labels of known actions; an older server without labels gives none. */
+const mapActionLabels = (value: unknown): AccessArea['actionLabels'] => {
+  if (!isObject(value)) return {};
+  return Object.fromEntries(
+    Object.entries(value).filter(
+      (entry): entry is [AccessAction, string] =>
+        isAction(entry[0]) && typeof entry[1] === 'string',
+    ),
+  );
+};
+
+const mapAdminOnlyItem = (value: unknown): AdminOnlyItem => {
+  if (
+    !isObject(value) ||
+    typeof value['group'] !== 'string' ||
+    typeof value['title'] !== 'string' ||
+    typeof value['reason'] !== 'string'
+  ) {
+    throw new Error('Некоректний пункт «Тільки адміністратор».');
+  }
+  return { group: value['group'], title: value['title'], reason: value['reason'] };
+};
+
 const mapArea = (value: unknown): AccessArea => {
   const area = value as Partial<AccessAreaResponse> | null;
   if (
@@ -46,7 +73,13 @@ const mapArea = (value: unknown): AccessArea => {
   ) {
     throw new Error('Некоректна сторінка в правах доступу.');
   }
-  return { key: area.key, group: area.group, title: area.title, actions: [...area.actions] };
+  return {
+    key: area.key,
+    group: area.group,
+    title: area.title,
+    actions: [...area.actions],
+    actionLabels: mapActionLabels(area.actionLabels),
+  };
 };
 
 /** Checks one role of GET /api/admin/access or the role returned after a save. */
@@ -60,6 +93,7 @@ export const mapAccessRole = (value: unknown): AccessRole => {
     typeof role.builtIn !== 'boolean' ||
     typeof role.userCount !== 'number' ||
     typeof role.version !== 'number' ||
+    !isStrings(role.userNames ?? []) ||
     !isNullableString(role.updatedByName ?? null) ||
     !isNullableString(role.updatedAt ?? null)
   ) {
@@ -71,6 +105,7 @@ export const mapAccessRole = (value: unknown): AccessRole => {
     locked: role.locked,
     builtIn: role.builtIn,
     userCount: role.userCount,
+    userNames: [...(role.userNames ?? [])],
     version: role.version,
     updatedByName: role.updatedByName ?? null,
     updatedAt: role.updatedAt ?? null,
@@ -83,7 +118,12 @@ export const mapAccessRights = (value: unknown): AccessRights => {
   if (!isObject(value) || !Array.isArray(value['areas']) || !Array.isArray(value['roles'])) {
     throw new Error('Некоректна відповідь про права доступу.');
   }
-  return { areas: value['areas'].map(mapArea), roles: value['roles'].map(mapAccessRole) };
+  const adminOnly = Array.isArray(value['adminOnly']) ? value['adminOnly'] : [];
+  return {
+    areas: value['areas'].map(mapArea),
+    roles: value['roles'].map(mapAccessRole),
+    adminOnly: adminOnly.map(mapAdminOnlyItem),
+  };
 };
 
 /** The new role after POST; only its name and title are needed to open its tab. */

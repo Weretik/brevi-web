@@ -9,7 +9,7 @@ import {
 import { useState } from 'react';
 
 import { describeConfirmation } from './staff-action-confirmation';
-import { getStaffErrorMessage } from '../errors/staff-error-message';
+import { getStaffErrorMessage } from '../../errors/staff-error-message';
 
 import type { PendingConfirmation } from './staff-action-confirmation';
 import type { CreateStaffAccountInput, StaffAccount, StaffDetailsInput } from '@admin/users/model';

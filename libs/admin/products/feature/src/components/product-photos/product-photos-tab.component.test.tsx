@@ -1,3 +1,4 @@
+import { PageRightsProvider } from '@admin/shared/ui';
 import { cleanup, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
@@ -8,7 +9,7 @@ import { render } from '../../test-utils';
 
 import type { ProductCardPhoto } from '@admin/products/model';
 
-const mocks = vi.hoisted(() => ({ access: vi.fn(), save: vi.fn() }));
+const mocks = vi.hoisted(() => ({ save: vi.fn() }));
 
 const photos: ProductCardPhoto[] = [
   {
@@ -31,7 +32,6 @@ const photos: ProductCardPhoto[] = [
 
 vi.mock('@admin/products/data-access', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@admin/products/data-access')>()),
-  useGetProductAccessQuery: mocks.access,
   useGetProductPhotosQuery: () => ({
     data: photos,
     isLoading: false,
@@ -42,14 +42,13 @@ vi.mock('@admin/products/data-access', async (importOriginal) => ({
   useUploadProductMediaMutation: () => [vi.fn(), { isLoading: false }],
 }));
 
-function show(canManagePhotos: boolean) {
-  mocks.access.mockReturnValue({
-    currentData: { canRead: true, canManage: true, canManagePhotos },
-    isError: false,
-  });
+/** `canEdit`: «Редагувати» on «Товари» (ACC-002). */
+function show(canEdit: boolean) {
   return render(
     <MemoryRouter>
-      <ProductPhotosTab productId={7} productName="Куртка" />
+      <PageRightsProvider can={(action) => action !== 'edit' || canEdit}>
+        <ProductPhotosTab productId={7} productName="Куртка" />
+      </PageRightsProvider>
     </MemoryRouter>,
   );
 }
@@ -72,7 +71,7 @@ describe('ProductPhotosTab (CAT-018)', () => {
     expect(screen.queryByRole('button', { name: /Прибрати фото/ })).toBeNull();
   });
 
-  it('lets Admin make another photo main and move it', async () => {
+  it('lets a role that edits «Товари» make another photo main and move it', async () => {
     show(true);
 
     await userEvent.click(screen.getByRole('button', { name: 'Зробити головним фото 2' }));

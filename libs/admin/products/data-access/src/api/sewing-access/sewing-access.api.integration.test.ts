@@ -25,7 +25,7 @@ describe('Sewing access from the current session', () => {
     stubApiFetch(fetcher);
     expect(
       await store.dispatch(sewingAccessApi.endpoints.getSewingAccess.initiate()).unwrap(),
-    ).toEqual({ canRead: true, canManage: false, canManagePhotos: false, canSeeCost: false });
+    ).toEqual({ canRead: true, canManage: false, canSeeCost: false });
     expect(fetcher).toHaveBeenCalledOnce();
   });
 });

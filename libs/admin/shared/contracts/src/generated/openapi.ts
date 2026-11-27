@@ -1458,6 +1458,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/admin/access/roles/{role}/title": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Rename a role
+         * @description Only a role made on «Права доступу»; built-in roles keep their titles (400). A title another role has: 409. The same title again changes nothing.
+         */
+        put: operations["renameRole"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/admin/users": {
         parameters: {
             query?: never;
@@ -5094,8 +5114,8 @@ export interface paths {
         get: operations["getCrmTasks"];
         put?: never;
         /**
-         * Director or Admin gives a new task to an active Manager
-         * @description Director or Admin gives a new task to an active Manager. `version` must be 0.
+         * «Завдання менеджерам» gives a new task to an active Manager
+         * @description «Завдання менеджерам» gives a new task to an active Manager. `version` must be 0.
          */
         post: operations["createCrmTask"];
         delete?: never;
@@ -5113,7 +5133,7 @@ export interface paths {
         };
         /**
          * «Мої завдання» kanban: every open task and those done in `period` (at most 500 cards)
-         * @description «Мої завдання» kanban: every open task and those done in `period` (at most 500 cards). Open cards come first, then done ones; each group is newest added first; the Admin groups them by `lane`.
+         * @description «Мої завдання» kanban: every open task and those done in `period` (at most 500 cards). Open cards come first, then done ones; each group is newest added first; «Завдання менеджерам» groups them by `lane`.
          */
         get: operations["getCrmTaskBoard"];
         put?: never;
@@ -5133,10 +5153,69 @@ export interface paths {
         };
         /**
          * Get CRM task overview
-         * @description Counts for the metric strip and filter chips (narrowed by `assigneeUserId` for Admin) and the workload of each active Manager (always all of them for Admin, only the actor for a Manager).
+         * @description Counts for the metric strip and filter chips (narrowed by `assigneeUserId` for «Завдання менеджерам») and the workload of each active Manager (always all of them for «Завдання менеджерам», only the actor for a Manager).
          */
         get: operations["getCrmTaskOverview"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/crm/tasks/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get CRM task */
+        get: operations["getCrmTask"];
+        /**
+         * «Завдання менеджерам» saves the side panel
+         * @description «Завдання менеджерам» saves the side panel. Steps are replaced (new ids). `version` is the loaded one.
+         */
+        put: operations["editCrmTask"];
+        post?: never;
+        /** «Завдання менеджерам» deletes the task with its steps and history */
+        delete: operations["deleteCrmTask"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/crm/tasks/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * The assignee or «Завдання менеджерам» moves the task
+         * @description The assignee or «Завдання менеджерам» moves the task. `Done` sets `completedAt`; leaving `Done` clears it. The same status changes nothing.
+         */
+        put: operations["changeCrmTaskStatus"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/crm/tasks/{id}/steps/{stepId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** The assignee or «Завдання менеджерам» ticks or unticks one step */
+        put: operations["markCrmTaskStep"];
         post?: never;
         delete?: never;
         options?: never;
@@ -5161,48 +5240,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/crm/tasks/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get CRM task */
-        get: operations["getCrmTask"];
-        /**
-         * Director or Admin saves the side panel
-         * @description Director or Admin saves the side panel. Steps are replaced (new ids). `version` is the loaded one.
-         */
-        put: operations["editCrmTask"];
-        post?: never;
-        /** Director or Admin deletes the task with its steps and history */
-        delete: operations["deleteCrmTask"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/crm/tasks/{id}/status": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * The assignee or Admin moves the task
-         * @description The assignee or Admin moves the task. `Done` sets `completedAt`; leaving `Done` clears it. The same status changes nothing.
-         */
-        put: operations["changeCrmTaskStatus"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/crm/tasks/{id}/urgent": {
         parameters: {
             query?: never;
@@ -5211,25 +5248,8 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** Director or Admin drags a card into or out of «Терміново» */
+        /** «Завдання менеджерам» drags a card into or out of «Терміново» */
         put: operations["setCrmTaskUrgent"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/crm/tasks/{id}/steps/{stepId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** The assignee or Admin ticks or unticks one step */
-        put: operations["markCrmTaskStep"];
         post?: never;
         delete?: never;
         options?: never;
@@ -5359,7 +5379,7 @@ export interface paths {
         get: operations["getProductPhotos"];
         /**
          * Saves the photos of a product
-         * @description Admin only (the Director also holds Admin). The product gets exactly these library photos in this order; photos that stay keep their alt text and visibility. mainMediaFileId null keeps the current main photo or makes the first one main.
+         * @description Needs «Товари: Редагування» on «Права доступу» (ACC-002 R-03). The product gets exactly these library photos in this order; photos that stay keep their alt text and visibility. mainMediaFileId null keeps the current main photo or makes the first one main.
          */
         put: operations["setProductPhotos"];
         post?: never;
@@ -5522,8 +5542,8 @@ export interface paths {
         };
         get?: never;
         /**
-         * RequireAdminRole (administrators and the director)
-         * @description RequireAdminRole (administrators and the director). Saves the discount and, optionally, the «Постачальники» row.
+         * Change a PPE price source
+         * @description Needs «Імпорт цін: Редагування». Saves the discount and, optionally, the «Постачальники» row.
          */
         put: operations["updatePpePriceSource"];
         post?: never;
@@ -6678,6 +6698,9 @@ export interface components {
             group: string;
             title: string;
             actions: string[];
+            actionLabels: {
+                [key: string]: string;
+            };
         };
         AccessoryAdminDetail: {
             /** Format: int32 */
@@ -6701,6 +6724,7 @@ export interface components {
         AccessRightsResponse: {
             areas: components["schemas"]["AccessAreaResponse"][];
             roles: components["schemas"]["AccessRoleResponse"][];
+            adminOnly: components["schemas"]["AdminOnlyItemResponse"][];
         };
         AccessRoleResponse: {
             name: string;
@@ -6709,6 +6733,7 @@ export interface components {
             builtIn: boolean;
             /** Format: int32 */
             userCount: number;
+            userNames: string[];
             /** Format: int32 */
             version: number;
             updatedByName: null | string;
@@ -6793,6 +6818,11 @@ export interface components {
             targetMeters: number;
             /** Format: date */
             operationDate: string;
+            reason: string;
+        };
+        AdminOnlyItemResponse: {
+            group: string;
+            title: string;
             reason: string;
         };
         AdminProductCategoryRowDTO: {
@@ -11175,6 +11205,8 @@ export interface components {
             managers: string[];
             stages: components["schemas"]["ProductionStageCount"][];
             attention: components["schemas"]["ProductionOrderAttention"];
+            /** Format: int32 */
+            totalQuantity: number;
         };
         ProductionOrderPermissions: {
             canEdit: boolean;
@@ -11221,10 +11253,15 @@ export interface components {
             telegram: components["schemas"]["ProductionTelegramResponse"];
         };
         ProductionOrderSummaryItem: {
+            modelCode: null | string;
             modelName: string;
             /** Format: int32 */
             quantity: number;
             stage: string;
+            fabricName: null | string;
+            mainColor: string;
+            additionalColors: string[];
+            applications: string[];
         };
         ProductionOrderSummaryResponse: {
             /** Format: int32 */
@@ -12864,6 +12901,9 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             updatedAt: null | string;
+        };
+        RenameRoleRequest: {
+            title: string;
         };
         ReorderSiteCategoriesRequest: {
             /** Format: int32 */
@@ -16991,6 +17031,32 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["CreateRoleRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccessRoleResponse"];
+                };
+            };
+        };
+    };
+    renameRole: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                role: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RenameRoleRequest"];
             };
         };
         responses: {
@@ -22701,26 +22767,6 @@ export interface operations {
             };
         };
     };
-    getCrmTaskAssignees: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TaskAssigneeResponse"][];
-                };
-            };
-        };
-    };
     getCrmTask: {
         parameters: {
             query?: never;
@@ -22817,18 +22863,19 @@ export interface operations {
             };
         };
     };
-    setCrmTaskUrgent: {
+    markCrmTaskStep: {
         parameters: {
             query?: never;
             header?: never;
             path: {
                 id: number;
+                stepId: number;
             };
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["SetTaskUrgentRequest"];
+                "application/json": components["schemas"]["MarkTaskStepRequest"];
             };
         };
         responses: {
@@ -22843,19 +22890,38 @@ export interface operations {
             };
         };
     };
-    markCrmTaskStep: {
+    getCrmTaskAssignees: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TaskAssigneeResponse"][];
+                };
+            };
+        };
+    };
+    setCrmTaskUrgent: {
         parameters: {
             query?: never;
             header?: never;
             path: {
                 id: number;
-                stepId: number;
             };
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["MarkTaskStepRequest"];
+                "application/json": components["schemas"]["SetTaskUrgentRequest"];
             };
         };
         responses: {
