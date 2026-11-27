@@ -7,7 +7,6 @@ import { Box, IconButton, Tooltip } from '@mui/material';
 import { amount, labourKinds, metres, money, moneyColumn } from './sewing-variant-money';
 import { SewingCardStatusPill } from '../../components/sewing-card/sewing-card-status-pill';
 
-
 import type { SewingVariantRow } from '@admin/products/model';
 import type { GridColDef } from '@mui/x-data-grid';
 

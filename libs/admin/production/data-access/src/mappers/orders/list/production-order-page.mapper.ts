@@ -48,9 +48,23 @@ export function mapProductionOrderSummary(value: unknown): ProductionOrderSummar
 function mapSummaryItem(value: unknown): ProductionOrderSummaryItem {
   const row = record(value, 'позиція завдання');
   return {
+    modelCode: nullableText(row['modelCode'], 'код моделі'),
     modelName: nonEmptyText(row['modelName'], 'модель'),
     quantity: integer(row['quantity'], 'кількість'),
     stage: stage(row['stage'], 'етап позиції'),
+    // An API older than this change sends none of them; the row then shows nothing there.
+    fabricName: nullableText(row['fabricName'], 'тканина'),
+    mainColor: row['mainColor'] === undefined ? '' : nonEmptyText(row['mainColor'], 'колір'),
+    additionalColors:
+      row['additionalColors'] === undefined
+        ? []
+        : texts(row['additionalColors'], 'додаткові кольори'),
+    applications:
+      row['applications'] === undefined
+        ? []
+        : list(row['applications'], 'нанесення').map((kind) =>
+            oneOf(kind, ['Embroidery', 'Print'] as const, 'вид нанесення'),
+          ),
   };
 }
 
@@ -80,6 +94,8 @@ export function mapProductionOrderPage(value: unknown): ProductionOrderPage {
     page: integer(page['page'], 'сторінка', 1),
     pageSize: integer(page['pageSize'], 'розмір сторінки', 1),
     total: integer(page['total'], 'усього'),
+    totalQuantity:
+      page['totalQuantity'] === undefined ? 0 : integer(page['totalQuantity'], 'кількість виробів'),
     counts: {
       all: integer(counts['all'], 'усього'),
       new: integer(counts['new'], 'нові'),

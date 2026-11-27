@@ -21,11 +21,14 @@ interface Props {
   /** Server sort; without it the columns do not sort and the server order is kept. */
   sort?: ProductionOrderSort;
   onSortChange?: (sort: ProductionOrderSort) => void;
+  /** The model filter: that model stands first in the models of a row. */
+  modelCode?: string | null;
 }
 
 /**
- * «Виробничі завдання»: one page from the server; a row shows the client with its models, how far the items went,
- * the shipped pieces and the nearest due date, marked only when overdue or due within three days.
+ * «Виробничі завдання»: one page from the server; a row shows the models with the client and the stage under them, the
+ * applications, fabric and colours, and the nearest due date (the last column), marked only when overdue or due
+ * within three days. The shipped pieces are in the tooltip of the models and in the order card.
  */
 export function ProductionOrdersGrid({
   rows,
@@ -38,6 +41,7 @@ export function ProductionOrdersGrid({
   onOpen,
   sort,
   onSortChange,
+  modelCode = null,
 }: Props) {
   const sortable = Boolean(onSortChange);
   return (
@@ -46,10 +50,10 @@ export function ProductionOrdersGrid({
         <DataGrid
           aria-label="Виробничі завдання"
           rows={rows as ProductionOrderSummary[]}
-          columns={productionOrdersColumns(today, sortable)}
+          columns={productionOrdersColumns(today, sortable, modelCode)}
           loading={loading}
           rowCount={rowCount}
-          rowHeight={64}
+          rowHeight={92}
           paginationMode="server"
           sortingMode="server"
           disableColumnSorting={!sortable}

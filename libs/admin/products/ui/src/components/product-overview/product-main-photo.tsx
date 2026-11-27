@@ -6,12 +6,12 @@ interface Props {
   name: string;
 }
 
-/** The main photo in the quick view (CAT-019): the whole photo, full height, never cut to a square. */
+/** The main photo in the quick view (CAT-019): the whole photo in full height (a tall frame), never cut to a square or to a face. */
 export function ProductMainPhoto({ url, name }: Props) {
   return (
     <Box
       sx={{
-        height: 280,
+        height: 'min(68vh, 560px)',
         borderRadius: 1,
         border: 1,
         borderColor: 'divider',
