@@ -77,3 +77,7 @@ The user's direct request and this repository's rules define the scope of work. 
 During implementation, run only automated tests for the changed feature and related parts under the [testing rules](docs/standards/shared/testing-rules.md). Run general tests, the full suite, coverage, production build, E2E, or a full audit only at the user's explicit request. Determine available targets from `project.json` or `npx nx show project <name> --json`; the inventory is a snapshot, while current configuration takes precedence.
 
 Make commits, push, create a branch or PR, or take other actions that change remote state only at the user's direct request.
+
+## Branch names
+
+Every feature or fix is a new branch from `master` named `<type>/<short-kebab-description>`: types `feat`, `fix`, `hotfix`, `refactor`, `perf`, `docs`, `test`, `chore`; English, 3–6 words; for example `feat/site-order-1c-link`; the same name in every repository of one feature; no `claude`, hashes or dates. The `Branch name` workflow checks it on every pull request; details in [delivery rules](docs/standards/shared/delivery-rules.md#branch-names).

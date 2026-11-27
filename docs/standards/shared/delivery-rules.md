@@ -67,3 +67,14 @@ When changing an existing feature, open its card and the code and tests it lists
 ## Completion criteria
 
 All in-scope `SC-*` scenarios are implemented or explicitly deferred; tasks and checkpoints are complete; contracts, documentation, and implementation agree; and evidence of focused tests and regression for the affected feature is recorded. Checks needed for its risks pass or their absence is documented. General tests and a full suite run only at the user's explicit request. The delivery report lists scope, changed files, evidence, unrun checks, and real residual risks. Architecture findings in the current scope must be `verified`; an `open`, `blocked`, or `planned` finding blocks delivery, while `deferred-approved` requires a separate SDD/task, an owner, and explicit approval that the finding is not a prerequisite of the current result.
+
+## Branch names
+
+Every feature or fix is a new branch from the default branch (`master`), named in the Conventional Branch format `<type>/<short-description-in-kebab-case>`.
+
+- **Types:** `feat` (new feature), `fix` (bug), `hotfix` (urgent production fix), `refactor`, `perf`, `docs`, `test`, `chore` (infrastructure, dependencies, CI).
+- **Description:** English, lowercase letters, digits and hyphens, 3–6 words. Examples: `feat/site-order-1c-link`, `fix/model-category-save-button`, `chore/ci-contract-drift`.
+- **Forbidden:** the word `claude`, random suffixes, hashes and dates.
+- **Several repositories:** a feature that touches more than one repository uses the same branch name in all of them.
+- **Bots:** `dependabot/*` and `renovate/*` are allowed as they are. The automatic `chore/sync-backend-contract` branch is valid (three words).
+- **Check:** the `Branch name` workflow (`.github/workflows/branch-name.yml`) runs on every pull request, with no path filter, and fails with an explanation when the name breaks these rules. To make it block merging, mark the `branch name` check as required for `master` in GitHub Settings → Branches (or Rulesets).
