@@ -12,7 +12,7 @@ interface Props {
   attention: OrdersPage['attention'];
 }
 
-/** The status and urgency chips, the chips of the chosen filters and «Знайдено N завдань». */
+/** The status and urgency chips, the chips of the chosen filters and «Знайдено N завдань · M шт. виробів». */
 export function ProductionOrdersSelection({ list, page, attention }: Props) {
   return (
     <Stack
@@ -44,7 +44,8 @@ export function ProductionOrdersSelection({ list, page, attention }: Props) {
       <Box sx={{ flexGrow: 1 }} />
       {page && (
         <Typography variant="body2" color="text.secondary" aria-live="polite">
-          Знайдено {page.total} {ordersWord(page.total)}
+          Знайдено {page.total} {ordersWord(page.total)} ·{' '}
+          {page.totalQuantity.toLocaleString('uk-UA')} шт. виробів
         </Typography>
       )}
     </Stack>

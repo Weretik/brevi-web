@@ -8,7 +8,7 @@ export type BookingView = (typeof bookingViews)[number];
 
 export const bookingViewLabels: Record<BookingView, string> = {
   toOrder: 'Замовити',
-  all: 'Усі пари',
+  all: 'Усі',
   unknown: 'Без плану',
 };
 

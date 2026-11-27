@@ -30,7 +30,8 @@ export function ProductPhotoCard({
   onMove,
   onRemove,
 }: CardProps) {
-  const src = photo.thumbnailUrl ?? photo.url;
+  // The full photo first: a thumbnail may be cut to a square, and the product must be seen in full height.
+  const src = photo.url ?? photo.thumbnailUrl;
   return (
     <Paper
       variant="outlined"
@@ -40,7 +41,7 @@ export function ProductPhotoCard({
         borderWidth: photo.isMain ? 2 : 1,
       }}
     >
-      <Box sx={{ position: 'relative', aspectRatio: '1 / 1', bgcolor: 'action.hover' }}>
+      <Box sx={{ position: 'relative', aspectRatio: '3 / 4', bgcolor: 'action.hover' }}>
         {src ? (
           <Box
             component="img"

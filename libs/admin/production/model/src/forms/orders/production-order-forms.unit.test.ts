@@ -216,8 +216,26 @@ describe('production order forms', () => {
       stage: 'Cutting',
       shippedQuantity: 10,
       items: [
-        { modelName: 'Куртка', quantity: 20, stage: 'Cutting' },
-        { modelName: 'Штани', quantity: 10, stage: 'Sewing' },
+        {
+          modelCode: null,
+          fabricName: null,
+          mainColor: 'Синій',
+          additionalColors: [],
+          applications: [],
+          modelName: 'Куртка',
+          quantity: 20,
+          stage: 'Cutting',
+        },
+        {
+          modelCode: null,
+          fabricName: null,
+          mainColor: 'Синій',
+          additionalColors: [],
+          applications: [],
+          modelName: 'Штани',
+          quantity: 10,
+          stage: 'Sewing',
+        },
       ],
     };
     const csv = productionOrdersCsv([row]);

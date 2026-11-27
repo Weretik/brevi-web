@@ -15,6 +15,7 @@ const page = {
   page: 1,
   pageSize: 50,
   total: 0,
+  totalQuantity: 0,
   counts: { all: 4, new: 4, closed: 0, cancelled: 0 },
   managers: ['Олена', 'Анастасія'],
   stages: [

@@ -10,7 +10,18 @@ export function useProductionModelSummary(query: ProductionOrderListQuery, activ
   const [sort, setSort] = useState<ModelSummarySortLevel[]>(defaultModelSummarySort);
   const result = useGetProductionModelSummaryQuery({ ...query, page: 1 }, { skip: !active });
   const data = result.data;
-  const rows = useMemo(() => (data ? sortModelSummary(data.rows, sort) : []), [data, sort]);
+  const chosen = query.filters?.model ?? null;
+  const rows = useMemo(() => {
+    if (!data) return [];
+    const sorted = sortModelSummary(data.rows, sort);
+    // The model picked in the filter stands first, so it is not lost among the others.
+    return chosen === null
+      ? sorted
+      : [
+          ...sorted.filter((x) => x.modelCode === chosen),
+          ...sorted.filter((x) => x.modelCode !== chosen),
+        ];
+  }, [data, sort, chosen]);
 
   return {
     sort,

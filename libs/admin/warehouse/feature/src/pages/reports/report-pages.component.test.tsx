@@ -320,7 +320,7 @@ describe('stock report pages', () => {
     expect(within(panel).getByText(/не вистачає 5,2 м/)).toBeTruthy();
     fireEvent.click(within(panel).getByRole('button', { name: 'Закрити' }));
 
-    fireEvent.click(screen.getByRole('button', { name: /Усі пари/ }));
+    fireEvent.click(screen.getByRole('button', { name: /^Усі(\s|$)/ }));
     expect(screen.getByText('Грета · Синій')).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: /Без плану/ }));
     expect(screen.getByText('Для моделі немає норми витрати: план не порахувати.')).toBeTruthy();
