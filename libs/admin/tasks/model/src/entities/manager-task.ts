@@ -8,7 +8,8 @@ export type TaskLane = 'Overdue' | 'Urgent' | 'Active' | 'Done';
 export type TaskBoardPeriod = 'Week' | 'LastWeek' | 'Month' | 'Quarter' | 'Year' | 'All';
 
 /** Filter chips of «Завдання менеджерам». */
-export type TaskListFilter = 'Open' | 'Overdue' | 'Urgent' | 'New' | 'InProgress' | 'Done';
+/** `All` is the client card: open and done tasks together. */
+export type TaskListFilter = 'All' | 'Open' | 'Overdue' | 'Urgent' | 'New' | 'InProgress' | 'Done';
 
 export type TaskEventKind =
   | 'Created'
@@ -119,6 +120,10 @@ export interface TaskListQuery {
   readonly assigneeUserId: number | null;
   readonly page: number;
   readonly pageSize: number;
+  /** The client card: this client's tasks created in the period (Kyiv days). */
+  readonly customerPublicId?: string;
+  readonly from?: string;
+  readonly to?: string;
 }
 
 /** A Crm client the task points to. */

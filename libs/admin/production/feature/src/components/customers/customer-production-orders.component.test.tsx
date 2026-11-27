@@ -55,12 +55,24 @@ afterEach(() => {
 describe('CustomerProductionOrders', () => {
   it("lists the client's workshop orders and opens one", async () => {
     const router = createMemoryRouter(
-      [{ path: '/crm/clients/:id', element: <CustomerProductionOrders customerId={40} /> }],
+      [
+        {
+          path: '/crm/clients/:id',
+          element: <CustomerProductionOrders customerPublicId="c-40" from="2026-11-01" />,
+        },
+      ],
       { initialEntries: ['/crm/clients/40'] },
     );
     render(<RouterProvider router={router} />);
 
-    expect(fixture.queries[0]).toEqual(expect.objectContaining({ customerId: 40, page: 1 }));
+    expect(fixture.queries[0]).toEqual(
+      expect.objectContaining({
+        customerPublicId: 'c-40',
+        page: 1,
+        pageSize: 20,
+        filters: expect.objectContaining({ from: '2026-11-01', to: null }),
+      }),
+    );
     expect(await screen.findByText('12-11-2026')).toBeVisible();
 
     await userEvent.click(screen.getByText('12-11-2026'));

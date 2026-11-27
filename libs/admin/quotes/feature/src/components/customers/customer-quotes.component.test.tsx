@@ -44,14 +44,27 @@ afterEach(() => {
 });
 
 describe('CustomerQuotes', () => {
-  it("lists the client's КП and opens the editor", async () => {
+  it("lists the client's КП of the period, 20 per page, and opens the editor", async () => {
     const router = createMemoryRouter(
-      [{ path: '/crm/clients/:id', element: <CustomerQuotes customerId={40} /> }],
-      { initialEntries: ['/crm/clients/40'] },
+      [
+        {
+          path: '/crm/clients/:id',
+          element: <CustomerQuotes customerPublicId="c-40" from="2026-11-01" to="2026-11-27" />,
+        },
+      ],
+      { initialEntries: ['/crm/clients/c-40'] },
     );
     render(<RouterProvider router={router} />);
 
-    expect(fixture.queries[0]).toEqual(expect.objectContaining({ customerId: 40, page: 1 }));
+    expect(fixture.queries[0]).toEqual(
+      expect.objectContaining({
+        customerPublicId: 'c-40',
+        from: '2026-11-01',
+        to: '2026-11-27',
+        page: 1,
+        pageSize: 20,
+      }),
+    );
     expect(await screen.findByText('Школа №5')).toBeVisible();
 
     await userEvent.click(screen.getByText('Школа №5'));

@@ -21,7 +21,11 @@ const row = {
 
 describe('fabric response mapping', () => {
   it('maps the sheet fields of a valid row', () => {
-    expect(mapFabrics(parseFabricsResponse([row]))).toEqual([row]);
+    expect(mapFabrics(parseFabricsResponse([row]))).toEqual([{ ...row, providerId: null }]);
+  });
+
+  it('keeps the supplier link of a fabric for the supplier card', () => {
+    expect(mapFabrics(parseFabricsResponse([{ ...row, providerId: 7 }]))[0]?.providerId).toBe(7);
   });
 
   it('rejects a damaged row before it reaches the grid', () => {

@@ -26,7 +26,7 @@ export function emptyQuoteDraft(): QuoteDraft {
   return {
     version: 0,
     internalName: '',
-    customerId: null,
+    customerPublicId: null,
     recipientName: '',
     companyName: '',
     clientComment: '',
@@ -83,7 +83,7 @@ export function quoteToDraft(quote: Quote): QuoteDraft {
   return {
     version: quote.version,
     internalName: quote.internalName,
-    customerId: quote.customerId,
+    customerPublicId: quote.customerPublicId,
     recipientName: quote.recipientName ?? '',
     companyName: quote.companyName ?? '',
     clientComment: quote.clientComment ?? '',

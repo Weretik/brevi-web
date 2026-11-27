@@ -62,7 +62,7 @@ export function toSaveQuoteIntroductionInput(
   return {
     version: draft.version,
     internalName: draft.internalName.trim(),
-    customerId: draft.customerId,
+    customerPublicId: draft.customerPublicId,
     recipientEmail: text(draft.recipientEmail),
     recipientName: text(draft.recipientName),
     companyName: text(draft.companyName),
