@@ -1,6 +1,27 @@
 import { describe, expect, it } from 'vitest';
 
-import { dueState, orderModelsText, orderStageSpread, ordersWord } from './production-order-row';
+import {
+  dueState,
+  itemColorsText,
+  orderModelsText,
+  orderStageSpread,
+  ordersWord,
+  uniqueValues,
+} from './production-order-row';
+
+import type { ProductionOrderSummaryItem } from '../../entities/orders/production-order-list';
+
+const item = (change: Partial<ProductionOrderSummaryItem>): ProductionOrderSummaryItem => ({
+  modelCode: null,
+  modelName: 'Куртка',
+  quantity: 1,
+  stage: 'New',
+  fabricName: null,
+  mainColor: 'Синій',
+  additionalColors: [],
+  applications: [],
+  ...change,
+});
 
 describe('production order row', () => {
   it('marks only an overdue order or one due within three days', () => {
@@ -25,18 +46,35 @@ describe('production order row', () => {
   it('sums the same model and lists the models in card order', () => {
     expect(
       orderModelsText([
-        { modelName: 'Куртка', quantity: 10, stage: 'Cutting' },
-        { modelName: 'Штани', quantity: 5, stage: 'Sewing' },
-        { modelName: 'Куртка', quantity: 5, stage: 'Cutting' },
+        item({ modelName: 'Куртка', quantity: 10, stage: 'Cutting' }),
+        item({ modelName: 'Штани', quantity: 5, stage: 'Sewing' }),
+        item({ modelName: 'Куртка', quantity: 5, stage: 'Cutting' }),
       ]),
     ).toBe('Куртка ×15 · Штани ×5');
+  });
+
+  it('puts the model of the chosen filter first', () => {
+    const items = [
+      item({ modelCode: 'MOD-1', modelName: 'Куртка', quantity: 10 }),
+      item({ modelCode: 'MOD-2', modelName: 'Штани', quantity: 5 }),
+    ];
+    expect(orderModelsText(items, 'MOD-2')).toBe('Штани ×5 · Куртка ×10');
+    expect(orderModelsText(items, 'MOD-9')).toBe('Куртка ×10 · Штани ×5');
+    expect(orderModelsText(items)).toBe('Куртка ×10 · Штани ×5');
+  });
+
+  it('lists every fabric once and the colours of an item with its additional ones', () => {
+    expect(uniqueValues(['Габардин', null, 'Габардин', 'Твіл'])).toEqual(['Габардин', 'Твіл']);
+    expect(itemColorsText({ mainColor: 'Синій', additionalColors: ['Білий', 'Сірий'] })).toBe(
+      'Синій + Білий + Сірий',
+    );
   });
 
   it('counts items that went further than the slowest one', () => {
     expect(
       orderStageSpread('Cutting', [
-        { modelName: 'Куртка', quantity: 10, stage: 'Cutting' },
-        { modelName: 'Штани', quantity: 5, stage: 'Sewing' },
+        item({ modelName: 'Куртка', quantity: 10, stage: 'Cutting' }),
+        item({ modelName: 'Штани', quantity: 5, stage: 'Sewing' }),
       ]),
     ).toEqual({ index: 3, total: 9, label: 'Крій', ahead: 1, itemsCount: 2 });
   });

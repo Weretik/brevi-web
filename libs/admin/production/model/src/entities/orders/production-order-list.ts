@@ -1,4 +1,5 @@
 import type { ProductionOrderStatus } from './production-order';
+import type { ItemApplicationKind } from './production-order-applications';
 import type { ProductionStage } from './production-tracking';
 
 export interface ProductionOrderSummary {
@@ -25,9 +26,16 @@ export interface ProductionOrderSummary {
 }
 
 export interface ProductionOrderSummaryItem {
+  /** Null for a «Виріб з нуля» of the КП. */
+  modelCode: string | null;
   modelName: string;
   quantity: number;
   stage: ProductionStage;
+  fabricName: string | null;
+  mainColor: string;
+  additionalColors: string[];
+  /** Kinds of the item's «нанесення», each once. */
+  applications: ItemApplicationKind[];
 }
 
 /** A stage of the «конвеєр»: «Нове» orders whose slowest item is at it, and how many of them are overdue. */
@@ -58,6 +66,8 @@ export interface ProductionOrderPage {
   page: number;
   pageSize: number;
   total: number;
+  /** Pieces of every order found, over all pages. */
+  totalQuantity: number;
   counts: ProductionOrderCounts;
   managers: string[];
   /** Every stage in workshop order over «Нове» orders; ignores the status and stage filters. */

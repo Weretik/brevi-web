@@ -25,12 +25,37 @@ export function dueState(
   return null;
 }
 
-/** «Куртка утеплена ×15 · Штани ×10»: the same model in several items is summed. */
-export function orderModelsText(items: readonly ProductionOrderSummaryItem[]): string {
-  const pieces = new Map<string, number>();
-  for (const item of items)
-    pieces.set(item.modelName, (pieces.get(item.modelName) ?? 0) + item.quantity);
-  return [...pieces].map(([name, quantity]) => `${name} ×${quantity}`).join(' · ');
+/**
+ * «Куртка утеплена ×15 · Штани ×10»: the same model in several items is summed. The model of the chosen filter
+ * (by its code) stands first, so it is not lost among the others.
+ */
+export function orderModelsText(
+  items: readonly ProductionOrderSummaryItem[],
+  firstModelCode: string | null = null,
+): string {
+  const pieces = new Map<string, { quantity: number; chosen: boolean }>();
+  for (const item of items) {
+    const entry = pieces.get(item.modelName) ?? { quantity: 0, chosen: false };
+    entry.quantity += item.quantity;
+    entry.chosen ||= firstModelCode !== null && item.modelCode === firstModelCode;
+    pieces.set(item.modelName, entry);
+  }
+  return [...pieces]
+    .sort(([, a], [, b]) => Number(b.chosen) - Number(a.chosen))
+    .map(([name, { quantity }]) => `${name} ×${quantity}`)
+    .join(' · ');
+}
+
+/** Every value once, in the order of the items: the fabrics or the application kinds of an order. */
+export function uniqueValues(values: readonly (string | null)[]): string[] {
+  return [...new Set(values.filter((value): value is string => Boolean(value)))];
+}
+
+/** «Синій + Білий»: the main colour of an item and its additional ones. */
+export function itemColorsText(
+  item: Pick<ProductionOrderSummaryItem, 'mainColor' | 'additionalColors'>,
+): string {
+  return [item.mainColor, ...item.additionalColors].filter(Boolean).join(' + ');
 }
 
 /**

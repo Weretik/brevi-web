@@ -44,26 +44,6 @@ export function StageCell({ row }: { row: ProductionOrderSummary }) {
   );
 }
 
-export function ShippedCell({ row }: { row: ProductionOrderSummary }) {
-  const share = row.totalQuantity > 0 ? Math.min(1, row.shippedQuantity / row.totalQuantity) : 0;
-  return (
-    <Box
-      sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-      aria-label={`Відвантажено ${row.shippedQuantity} з ${row.totalQuantity} шт.`}
-    >
-      <Box
-        aria-hidden
-        sx={{ width: 48, height: 5, borderRadius: 3, bgcolor: 'divider', overflow: 'hidden' }}
-      >
-        <Box sx={{ width: `${share * 100}%`, height: '100%', bgcolor: 'text.primary' }} />
-      </Box>
-      <Box component="span" className="order-mono">
-        {row.shippedQuantity} / {row.totalQuantity}
-      </Box>
-    </Box>
-  );
-}
-
 export function DueCell({ row, today }: { row: ProductionOrderSummary; today: string }) {
   const due = dueState(row, today);
   return (

@@ -41,13 +41,13 @@ describe('FabricMovementsTable', () => {
   it('shows a compact row with the task, the signed quantity and the pair balance, and opens it', () => {
     const onOpen = vi.fn();
     render(<FabricMovementsTable rows={[row({})]} filtered={false} onOpen={onOpen} />);
-    expect(screen.getByText('На завдання')).toBeTruthy();
+    expect(screen.getByText('Розхід')).toBeTruthy();
     expect(screen.getByText('Ц-12 · Куртка')).toBeTruthy();
     expect(screen.getByText('Сторновано')).toBeTruthy();
     expect(screen.getByText('10.11.2026')).toBeTruthy();
     expect(screen.getByText(/−2,5/)).toBeTruthy();
     expect(screen.getByText(/-1,5|−1,5/)).toBeTruthy();
-    fireEvent.click(screen.getByRole('row', { name: /На завдання: Грета, Синій/ }));
+    fireEvent.click(screen.getByRole('row', { name: /Розхід: Грета, Синій/ }));
     expect(onOpen).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
   });
 

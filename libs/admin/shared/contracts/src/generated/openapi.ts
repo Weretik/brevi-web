@@ -11175,6 +11175,8 @@ export interface components {
             managers: string[];
             stages: components["schemas"]["ProductionStageCount"][];
             attention: components["schemas"]["ProductionOrderAttention"];
+            /** Format: int32 */
+            totalQuantity: number;
         };
         ProductionOrderPermissions: {
             canEdit: boolean;
@@ -11221,10 +11223,15 @@ export interface components {
             telegram: components["schemas"]["ProductionTelegramResponse"];
         };
         ProductionOrderSummaryItem: {
+            modelCode: null | string;
             modelName: string;
             /** Format: int32 */
             quantity: number;
             stage: string;
+            fabricName: null | string;
+            mainColor: string;
+            additionalColors: string[];
+            applications: string[];
         };
         ProductionOrderSummaryResponse: {
             /** Format: int32 */

@@ -77,7 +77,7 @@ describe('filterBooking', () => {
     ]);
   });
 
-  it('«Усі пари» and a supplier', () => {
+  it('«Усі» and a supplier', () => {
     expect(filterBooking(pairs, 'all', null, '')).toHaveLength(4);
     expect(filterBooking(pairs, 'all', 'Черкаси', '').map((x) => x.color)).toEqual(['Білий']);
   });

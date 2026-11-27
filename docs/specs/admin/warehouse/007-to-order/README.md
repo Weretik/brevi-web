@@ -11,7 +11,7 @@
 ## Scope
 
 - **Тканина, figures.** «Замовити X м» with «N пар · M постачальників», «У броні», «Вільно на складі»; «Без плану» only when some items have no plan.
-- **Тканина, filters.** Search over fabric, code, colour, supplier, client and task number; chips «Замовити» (default), «Усі пари», «Без плану» (hidden when empty) with counts; supplier chip; «Знайдено: N».
+- **Тканина, filters.** Search over fabric, code, colour, supplier, client and task number; chips «Замовити» (default), «Усі», «Без плану» (hidden when empty) with counts; supplier chip; «Знайдено: N».
 - **Тканина, table.** One row per pair: «Тканина · колір» (a negative stock is marked), «Постачальник», «Потрібно до» (date and the task, red within three days or past), «Покриття» (bar and «є X з Y»), «Замовити, м». Sorted by «Потрібно до», undated last, then by metres. «+ Прихід» on a row for the stock keepers who also have the page «Залишки»: the receipt panel opens with the fabric offer, colour and supplier filled in.
 - **Тканина, side panel.** A row opens the pair: «На складі», «Потреба», «У броні», «Замовити», the shortage already there, and the queue of tasks in order of the orders with date, plan, issued, what is missing; «Прихід» from the panel.
 - **«Без плану».** The items with an unknown need and a link to «Норми витрати тканини».

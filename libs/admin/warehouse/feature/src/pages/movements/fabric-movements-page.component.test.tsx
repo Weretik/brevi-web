@@ -191,7 +191,7 @@ describe('FabricMovementsPage', () => {
     render(<FabricMovementsPage />, { wrapper: MemoryRouter });
     const table = screen.getByRole('table', { name: 'Рух тканини' });
     expect(within(table).getByText('Зразки')).toBeTruthy();
-    expect(within(table).getByText('Разова витрата')).toBeTruthy();
+    expect(within(table).getByText('Розхід')).toBeTruthy();
     expect(within(table).getByText('Тексика · Н-15')).toBeTruthy();
     expect(within(table).getAllByText(/FAB-067 → FAB-023/)).toHaveLength(2);
     expect(screen.getByRole('button', { name: 'На завдання 15' })).toBeTruthy();
@@ -305,7 +305,7 @@ describe('FabricMovementsPage', () => {
   it('takes a movement out of the account with a reason by default', async () => {
     api.voidMovement.mockResolvedValue(saved);
     render(<FabricMovementsPage />, { wrapper: MemoryRouter });
-    fireEvent.click(screen.getByRole('row', { name: /^Разова витрата: Грета/ }));
+    fireEvent.click(screen.getByRole('row', { name: /^Розхід: Грета/ }));
     fireEvent.click(screen.getByRole('button', { name: 'Відмінити операцію…' }));
     const dialog = screen.getByRole('dialog', { name: 'Відмінити операцію?' });
     expect(within(dialog).getByText(/залишок зміниться на \+3,5 м/)).toBeTruthy();

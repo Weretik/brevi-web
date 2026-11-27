@@ -2,8 +2,8 @@
 
 - Repository: `Weretik/BreviERP`
 - Source: `docs/sdd/contracts/openapi.json` (generated from the backend code on every build)
-- Ref: `master`
-- Commit: `ea541ad093ee591110832d47ca2cceb0675de891`
+- Ref: `local`
+- Commit: `local file openapi.json`
 
 This directory is machine-managed; do not edit it by hand. Refresh it from the backend default branch with:
 

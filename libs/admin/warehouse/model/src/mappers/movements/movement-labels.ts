@@ -1,18 +1,16 @@
 import type { FabricMovementRow } from '../../entities/movements/fabric-movement';
 
-/** «Операція» of a journal row: an issue says whether it went to a production task. */
+/** «Операція» of a journal row: only «Прихід» or «Розхід»; an adjustment or storno goes by the sign of its change. */
 export function movementOperationLabel(row: FabricMovementRow): string {
   switch (row.kind) {
-    case 'Issue':
-      return row.orderId !== null ? 'На завдання' : 'Разова витрата';
-    case 'Opening':
-      return 'Початковий';
     case 'Receipt':
+    case 'Opening':
       return 'Прихід';
+    case 'Issue':
+      return 'Розхід';
     case 'Adjustment':
-      return 'Уточнення';
     case 'Reversal':
-      return 'Сторно';
+      return row.delta < 0 ? 'Розхід' : 'Прихід';
   }
 }
 

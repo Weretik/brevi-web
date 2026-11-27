@@ -202,20 +202,42 @@ describe('production order mappers', () => {
           updatedAt: '2026-11-04T10:00:00Z',
           stage: 'Cutting',
           shippedQuantity: 5,
-          items: [{ modelName: 'Куртка утеплена', quantity: 15, stage: 'Cutting' }],
+          items: [
+            {
+              modelCode: 'MOD-1',
+              modelName: 'Куртка утеплена',
+              quantity: 15,
+              stage: 'Cutting',
+              fabricName: 'Габардин',
+              mainColor: 'Синій',
+              additionalColors: ['Білий'],
+              applications: ['Embroidery', 'Print'],
+            },
+          ],
         },
       ],
       page: 1,
       pageSize: 50,
       total: 1,
+      totalQuantity: 15,
       counts: { all: 1, new: 1, closed: 0, cancelled: 0 },
       managers: [],
       stages: [{ stage: 'Cutting', count: 1, overdue: 0 }],
       attention: { overdue: 0, dueSoon: 1 },
     });
     expect(page.items[0]?.shippedQuantity).toBe(5);
+    expect(page.totalQuantity).toBe(15);
     expect(page.items[0]?.items).toEqual([
-      { modelName: 'Куртка утеплена', quantity: 15, stage: 'Cutting' },
+      {
+        modelCode: 'MOD-1',
+        modelName: 'Куртка утеплена',
+        quantity: 15,
+        stage: 'Cutting',
+        fabricName: 'Габардин',
+        mainColor: 'Синій',
+        additionalColors: ['Білий'],
+        applications: ['Embroidery', 'Print'],
+      },
     ]);
     expect(page.stages).toEqual([{ stage: 'Cutting', count: 1, overdue: 0 }]);
     expect(page.attention).toEqual({ overdue: 0, dueSoon: 1 });
